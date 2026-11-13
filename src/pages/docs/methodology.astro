@@ -146,6 +146,11 @@ import { meta } from "../../lib/data.ts";
       re-sends were served from the cache: <code>3/3</code> is all of them, <code>0/3</code> none. Entry pages show this as a table, one column per age.
     </p>
     <p>
+      Every evaluation made since 14 November 2026 starts the same way: the prompt is sent again at once, then checked at 2.5, 5 and 7.5 minutes, and on from there (10, 15, 20, 25, 30, 40
+      and 50 minutes, 1 hour, 1 h 15, 1 h 30, 2 hours, and longer where the cache lasts). "At once" is the control: it shows that the prompt was cached at all and that the route reports
+      cache hits, so that a later miss means the cache is gone and not that nothing was cached. Older evaluations keep the ages they were made with, and some start at 5 minutes.
+    </p>
+    <p>
       "Always cached up to 30 min" means every re-send up to that age was served from the cache. It is what was observed, not a guaranteed lifetime, and the next age checked may be much
       later. A provider that spreads requests over several servers can miss at one age and hit again at a later one.
     </p>
