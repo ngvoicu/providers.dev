@@ -77,3 +77,15 @@ describe("prices", () => {
     expect(summarize("p", model({ text: { input: { price: 0 }, output: { price: 0 } } }), 0).price_in).toBe(0);
   });
 });
+
+describe("measured input", () => {
+  it("puts the bounds of an evaluated input limit in the summary", async () => {
+    const { summarize } = await import("../src/core/entries.ts");
+    const model = (measured: unknown[]) => ({ id: "m", name: "M", providers_dev: { origin: "added", access: "subscription", limits: { measured } } }) as never;
+    const two = summarize("p", model([{ input_accepted: 915011, input_refused: 922500 }, { input_accepted: 920870, input_refused: 921875 }]), 0);
+    // The widest accepted and the narrowest refused: the real limit is between them.
+    expect([two.measured_input_accepted, two.measured_input_refused, two.context]).toEqual([920870, 921875, undefined]);
+    const none = summarize("p", model([{ context: 1000000, output: 128000 }]), 0);
+    expect([none.measured_input_accepted, none.measured_input_refused]).toEqual([undefined, undefined]);
+  });
+});

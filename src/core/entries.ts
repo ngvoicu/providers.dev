@@ -42,6 +42,10 @@ export interface Summary {
   price_from?: string;
   measured_warm_min_s?: number;
   measured_warm_max_s?: number;
+  /** The largest input an evaluation saw accepted on this entry, in tokens. The real limit is at least this. */
+  measured_input_accepted?: number;
+  /** The smallest input an evaluation saw refused. The real limit is below this. */
+  measured_input_refused?: number;
   /** Our limit measurements on this entry. */
   measured_limits: number;
   overridden_fields: string[];
@@ -121,6 +125,9 @@ export function summarize(providerId: string, model: JsonObject, shard: number):
   const runs = extension.cache?.observed ?? [];
   const warm = runs.map((run) => run.all_warm_through_s).filter((value): value is number => typeof value === "number");
   const overridden = (extension.provenance ?? []).map((change) => change.path);
+  const measuredLimits = extension.limits?.measured ?? [];
+  const accepted = measuredLimits.map((item) => item.input_accepted).filter((value): value is number => typeof value === "number");
+  const refused = measuredLimits.map((item) => item.input_refused).filter((value): value is number => typeof value === "number");
   const touched = overridden.length > 0 || runs.length > 0 || (extension.limits?.measured?.length ?? 0) > 0;
   const summary: Summary = {
     ref: `${providerId}/${String(model.id)}`,
@@ -149,6 +156,8 @@ export function summarize(providerId: string, model: JsonObject, shard: number):
     price_from: extension.inherited?.fields.includes("cost") ? extension.inherited.from : undefined,
     measured_warm_min_s: warm.length > 0 ? Math.min(...warm) : undefined,
     measured_warm_max_s: warm.length > 0 ? Math.max(...warm) : undefined,
+    measured_input_accepted: accepted.length > 0 ? Math.max(...accepted) : undefined,
+    measured_input_refused: refused.length > 0 ? Math.min(...refused) : undefined,
     verified: extension.verified,
   };
   for (const [key, value] of Object.entries(optional)) {

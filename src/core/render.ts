@@ -63,6 +63,17 @@ function cacheCell(entry: Pick<Summary, "cache" | "cache_modes" | "cache_ttl_s">
   return `<span class="cache">${modes}${ttl}</span>`;
 }
 
+/** The documented window. Where there is none, the largest input an evaluation saw accepted, said as what it is. */
+function contextCell(entry: Summary, href: string): string {
+  const accepted = entry.measured_input_accepted;
+  if (entry.context !== undefined || accepted === undefined) return tokens(entry.context);
+  // Rounded down: "at least" must stay true.
+  const floor = compactTokens(Math.floor(accepted / 1000) * 1000);
+  const refused = entry.measured_input_refused;
+  const title = `Measured, not documented: no window is documented for this entry. An evaluation saw an input of ${exact(accepted)} tokens accepted${refused === undefined ? "" : ` and one of ${exact(refused)} refused`}. Input only: the output comes on top.`;
+  return `<a class="plain limit-measured" href="${e(href)}#limits" title="${e(title)}"><span class="limit-value">≥ ${floor}</span><span class="limit-note">input</span></a>`;
+}
+
 function measuredCell(entry: Summary, href: string): string {
   if (entry.evaluations === 0) return entry.measured_limits > 0 ? `<a class="measured" href="${e(href)}#limits">Limits measured</a>` : DASH;
   const range = warmRange(entry);
@@ -110,7 +121,7 @@ export function rowHtml(entry: Summary, options: RowOptions): string {
   return `<tr>
 <th scope="row"><a href="${e(href)}">${e(entry.name)}</a>${status}<div class="id"><code>${e(entry.model)}</code>${copyButton(entry.ref, "entry id")}</div></th>
 ${options.hideProvider ? "" : `<td><a class="plain" href="/providers/${e(entry.provider)}/">${e(provider)}</a>${access}</td>`}
-<td class="num">${tokens(entry.context)}</td>
+<td class="num">${contextCell(entry, href)}</td>
 <td class="num">${tokens(entry.max_output)}</td>
 <td class="num mid-only">${priceCell(entry)}</td>
 <td class="wide-only">${entry.release_date ? `<span class="muted date">${e(entry.release_date)}</span>` : UNKNOWN}</td>

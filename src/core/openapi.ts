@@ -181,6 +181,8 @@ export function openapi(): Record<string, unknown> {
             measured_warm_min_s: { type: "number" },
             measured_warm_max_s: { type: "number" },
             measured_limits: { type: "integer" },
+            measured_input_accepted: { type: "integer", description: "Tokens. The largest input an evaluation saw accepted on this entry: the real input limit is at least this. Useful where no limit is documented." },
+            measured_input_refused: { type: "integer", description: "Tokens. The smallest input an evaluation saw refused: the real input limit is below this." },
             overridden_fields: { type: "array", items: { type: "string" } },
             verified: { type: "string", format: "date", description: "Newest date of providers.dev evidence. Imported entries have none." },
             shard: { type: "integer" },
