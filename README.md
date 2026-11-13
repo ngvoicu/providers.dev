@@ -1,5 +1,7 @@
 # providers.dev
 
+<img src="public/favicon.svg" width="56" height="56" alt="The providers.dev mark: a p and a d sharing one bowl" />
+
 A developer reference and public JSON API for AI models **as each provider and access method really exposes
 them**: context window, maximum output and prompt-cache behaviour, for API keys and subscription logins alike.
 

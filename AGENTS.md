@@ -64,3 +64,13 @@ npm run check       # eslint + tsc + astro check + vitest
 
 Run `npm run build` before `npm run check` on a fresh clone: type-checking the Worker needs `worker/generated/`.
 Before finishing a change: `npm run build && npm run check`, and look at the affected page in a browser.
+
+## Logo and icons
+
+- The mark is a "p" and a "d" sharing one bowl: the ring is a provider, the dot is the model inside it, the two stems
+  are the two ways in (API key and subscription). Its only source is `src/core/brand.ts`; the header and footer draw
+  it through `src/components/Mark.astro` in the text colour with the dot in `--brand`.
+- `public/favicon.svg`, `favicon.ico` and `apple-touch-icon.png` are written by `npm run icons`. Run it after
+  changing the mark and commit the files.
+- `public/og.png` (the link preview) is a 1200 x 630 screenshot of the card that `npm run og-card` writes into
+  `dist/`; the steps are at the top of `scripts/og-card.ts`. Redo it when the mark or the tagline changes.
