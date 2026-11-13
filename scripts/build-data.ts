@@ -12,6 +12,6 @@ if (!report.ok || !report.meta) {
 }
 const { counts, dataset_version } = report.meta;
 console.log(
-  `published ${dataset_version}: ${counts.providers} providers, ${counts.models} entries ` +
-    `(${counts.added_providers} providers and ${counts.added_models} entries added, ${counts.overridden_models} overridden, ${counts.measured_models} measured)`,
+  `published ${dataset_version}: ${counts.providers} providers, ${counts.entries} entries ` +
+    `(${counts.added_providers} providers and ${counts.added_entries} entries added, ${counts.corrected_entries} corrected, ${counts.evaluated_entries} evaluated)`,
 );

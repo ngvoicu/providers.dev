@@ -64,51 +64,12 @@ export function plural(count: number, word: string): string {
   return `${exact(count)} ${word}${count === 1 ? "" : "s"}`;
 }
 
-/**
- * "At least 30 min": the age up to which every re-send was served from the cache. Across several evaluations it is
- * a range, "At least 10 min to 30 min".
- */
-export function warmRange(entry: Pick<Summary, "measured_warm_min_s" | "measured_warm_max_s">): string {
-  if (entry.measured_warm_min_s === undefined || entry.measured_warm_max_s === undefined) return "";
-  return entry.measured_warm_min_s === entry.measured_warm_max_s
-    ? `At least ${duration(entry.measured_warm_min_s)}`
-    : `At least ${duration(entry.measured_warm_min_s)} to ${duration(entry.measured_warm_max_s)}`;
-}
-
 /** A column heading for an age: "2.5 min", "1 h", "1 h 15". */
 export function shortAge(seconds: number): string {
   if (seconds < 3600) return duration(seconds);
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.round((seconds % 3600) / 60);
   return minutes === 0 ? `${hours} h` : `${hours} h ${minutes}`;
-}
-
-export interface RunAges {
-  all_warm_through_s: number | null;
-  last_warm_s: number | null;
-  first_all_cold_s: number | null;
-  control?: { warm: number; total: number };
-  checks?: { age_s: number }[];
-}
-
-/** One evaluation in words: what held for every re-send, and what was seen beyond that. */
-export function runVerdict(run: RunAges): { head: string; detail: string } {
-  const { all_warm_through_s: always, last_warm_s: last, first_all_cold_s: cold } = run;
-  const ages = (run.checks ?? []).map((check) => check.age_s);
-  const oldest = ages.length > 0 ? Math.max(...ages) : null;
-  if (last === null) {
-    return {
-      head: ages.length > 0 || cold !== null ? "Not cached at any age checked" : "No result by age",
-      detail: run.control && run.control.warm > 0 ? "Cached when sent again at once" : "",
-    };
-  }
-  const head = always === null ? "Cached only part of the time" : `Always cached up to ${duration(always)}`;
-  if (cold === null) {
-    if (always === last) return { head, detail: last === oldest ? "That was the oldest age checked" : "" };
-    return { head, detail: `Still cached at ${duration(last)}${last === oldest ? ", the oldest age checked" : ""}` };
-  }
-  if (cold < last) return { head, detail: `Nothing cached at ${duration(cold)}, but cached again as late as ${duration(last)}` };
-  return { head, detail: always === last ? `Nothing cached at ${duration(cold)}` : `Last cached at ${duration(last)}; nothing cached at ${duration(cold)}` };
 }
 
 export const ORIGIN_LABEL: Record<Summary["origin"], string> = {
@@ -123,8 +84,9 @@ export const ORIGIN_TITLE: Record<Summary["origin"], string> = {
   added: "Listed by providers.dev. models.dev has no entry for this access method.",
 };
 
+/** The page of an entry: /entries/{provider}/{model}, each part of the path encoded. The API has the same path under /api/v1. */
 export function entryHref(ref: string): string {
-  return `/entry/?ref=${encodeURIComponent(ref)}`;
+  return `/entries/${ref.split("/").map(encodeURIComponent).join("/")}`;
 }
 
 export function modelHref(canonicalId: string): string {

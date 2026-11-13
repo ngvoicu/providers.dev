@@ -19,7 +19,7 @@ const apiLink = document.getElementById("api-link") as HTMLAnchorElement;
 const apiCopy = document.getElementById("api-copy") as HTMLButtonElement;
 const now = new Date(table.dataset.now ?? Date.now());
 
-const FIELDS = ["q", "provider", "access", "type", "cache", "cache_mode", "origin", "min_context", "min_output", "max_age_months", "measured"] as const;
+const FIELDS = ["q", "provider", "access", "type", "cache", "cache_mode", "origin", "min_context", "min_output", "max_age_months", "evaluated"] as const;
 
 let index: Index | undefined;
 let providerNames: Record<string, string> = {};
@@ -103,7 +103,7 @@ function render(): void {
   const search = serializeQuery(query);
   const address = siteSearch();
   history.replaceState(null, "", address ? `?${address}` : location.pathname);
-  const api = `/api/v1/models${search ? `?${search}` : ""}`;
+  const api = `/api/v1/entries${search ? `?${search}` : ""}`;
   apiLink.href = api;
   apiLink.innerHTML = `<code>${api.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</code>`;
   apiCopy.dataset.copy = api;

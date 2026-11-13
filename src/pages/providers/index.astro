@@ -7,7 +7,7 @@ const providers = [...index.providers].sort((a, b) => a.name.localeCompare(b.nam
 const accessLabel = { api: "API key", subscription: "Subscription", unknown: "Unclassified" } as const;
 ---
 
-<Base title="Providers" description="Every provider in the catalog, how it is reached, and how many models it serves.">
+<Base title="Providers" description="Every provider in the catalog, how it is reached, and how many entries it has.">
   <h1>Providers</h1>
   <p class="lead mt-3">
     {exact(providers.length)} providers. Access says how a provider is reached: an API key billed by use, or a subscription login or plan. It is a classification only; plans and prices are
@@ -17,7 +17,7 @@ const accessLabel = { api: "API key", subscription: "Subscription", unknown: "Un
   <div class="scroll mt-3">
     <table class="entries">
       <thead>
-        <tr><th scope="col">Provider</th><th scope="col">Access</th><th scope="col" class="num">Models</th><th scope="col" class="num">With providers.dev evidence</th><th scope="col">Source</th></tr>
+        <tr><th scope="col">Provider</th><th scope="col">Access</th><th scope="col" class="num">Entries</th><th scope="col" class="num">With providers.dev evidence</th><th scope="col">Source</th></tr>
       </thead>
       <tbody id="list">
         {
@@ -31,8 +31,8 @@ const accessLabel = { api: "API key", subscription: "Subscription", unknown: "Un
                 {accessLabel[provider.access]}
                 {!provider.access_reviewed && <span class="hint"> · {provider.access === "api" ? "default" : "by name"}</span>}
               </td>
-              <td class="num">{exact(provider.models)}</td>
-              <td class="num">{provider.with_evidence > 0 ? <a href={`/?provider=${provider.id}&origin=modified,added`}>{exact(provider.with_evidence)}</a> : <span class="muted">–</span>}</td>
+              <td class="num">{exact(provider.entry_count)}</td>
+              <td class="num">{provider.evidence_entry_count > 0 ? <a href={`/?provider=${provider.id}&origin=modified,added`}>{exact(provider.evidence_entry_count)}</a> : <span class="muted">–</span>}</td>
               <td><span class:list={["origin", provider.origin]}>{provider.origin === "added" ? "providers.dev" : "models.dev"}</span></td>
             </tr>
           ))

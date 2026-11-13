@@ -1,12 +1,51 @@
-// The OpenAPI document, generated from the same parameter list the API validates with.
-import { DEFAULT_LIMIT, MAX_AGE_MONTHS, MAX_LIMIT, PARAMS } from "./query.ts";
+// The OpenAPI document. Nothing in it is written by hand twice: the response schemas come from the contract
+// (contract.ts), the query parameters from the lists the API validates with (query.ts).
+import { z } from "zod";
+import { BriefMetaSchema, COMPONENTS } from "./contract.ts";
+import { DEFAULT_LIMIT, EVALUATION_PARAMS, MAX_AGE_MONTHS, MAX_LIMIT, MODEL_PARAMS, PARAMS, PROVIDER_PARAMS, PROVIDER_VIEW_PARAMS, type ParamDoc } from "./query.ts";
 
-const errorResponse = (description: string) => ({
-  description,
-  content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
+type Schema = Record<string, unknown>;
+
+/** A contract definition as JSON Schema (2020-12, which is what OpenAPI 3.1 uses). */
+export function jsonSchema(schema: z.ZodType): Schema {
+  const out = z.toJSONSchema(schema, { target: "draft-2020-12", unrepresentable: "any", io: "output" }) as Schema;
+  delete out.$schema;
+  delete out.$defs;
+  // "Any JSON value" is written as a reference to a local definition, which has no place inside a component: say it as {}.
+  const tidy = (node: unknown): unknown => {
+    if (Array.isArray(node)) return node.map(tidy);
+    if (node === null || typeof node !== "object") return node;
+    const object = node as Schema;
+    if (typeof object.$ref === "string" && object.$ref.startsWith("#/$defs/")) return object.description ? { description: object.description } : {};
+    const result: Schema = {};
+    for (const [key, value] of Object.entries(object)) {
+      if (key === "maximum" && value === Number.MAX_SAFE_INTEGER) continue;
+      if (key === "minimum" && value === Number.MIN_SAFE_INTEGER) continue;
+      result[key] = tidy(value);
+    }
+    return result;
+  };
+  return tidy(out) as Schema;
+}
+
+const ref = (name: keyof typeof COMPONENTS | "BriefMeta"): Schema => ({ $ref: `#/components/schemas/${name}` });
+const pageOf = (item: Schema): Schema => ({
+  type: "object",
+  required: ["meta", "total", "limit", "offset", "next_offset", "data"],
+  additionalProperties: false,
+  properties: {
+    meta: ref("BriefMeta"),
+    total: { type: "integer", description: "How many items match." },
+    limit: { type: "integer" },
+    offset: { type: "integer" },
+    next_offset: { type: ["integer", "null"], description: "The offset of the next page. Null on the last page." },
+    data: { type: "array", items: item },
+  },
 });
+const oneOf = (data: Schema): Schema => ({ type: "object", required: ["meta", "data"], additionalProperties: false, properties: { meta: ref("BriefMeta"), data } });
 
-const ok = (description: string, schema: Record<string, unknown>) => ({
+const errorResponse = (description: string) => ({ description, content: { "application/json": { schema: ref("Error") } } });
+const ok = (description: string, schema: Schema) => ({
   description,
   headers: {
     ETag: { schema: { type: "string" }, description: "The dataset version in quotes. Send it back as If-None-Match to get 304." },
@@ -16,10 +55,12 @@ const ok = (description: string, schema: Record<string, unknown>) => ({
   },
   content: { "application/json": { schema } },
 });
+const notModified = { description: "Not modified" };
+const badParams = errorResponse("A parameter is unknown or not valid");
 
-function queryParameters(): Record<string, unknown>[] {
-  return PARAMS.map((param) => {
-    const schema: Record<string, unknown> =
+function queryParameters(docs: readonly ParamDoc[]): Schema[] {
+  return docs.map((param) => {
+    const schema: Schema =
       param.kind === "integer"
         ? param.name === "max_age_months"
           ? { type: "integer", minimum: 1, maximum: MAX_AGE_MONTHS }
@@ -34,194 +75,128 @@ function queryParameters(): Record<string, unknown>[] {
   });
 }
 
+const pathParam = (name: string, description: string, example: string): Schema => ({ name, in: "path", required: true, description, schema: { type: "string" }, example });
+
+/** Every endpoint, once. The documentation page lists them from here too. */
+export const ENDPOINTS: { path: string; summary: string; description?: string; params: readonly ParamDoc[]; returns: string }[] = [
+  { path: "/api/v1/entries", summary: "Search and filter entries", description: "An entry is a model at a provider and access method. Returns entry summaries. The order is fixed: the sort key, then provider id, then model id.", params: PARAMS, returns: "A page of EntrySummary" },
+  { path: "/api/v1/entries/{provider}/{model}", summary: "One entry in full", description: "The provider is the first path segment; the model id is the rest of the path and may contain slashes. URL-encode each segment.", params: [], returns: "provider, summary and entry" },
+  { path: "/api/v1/providers", summary: "List providers", params: PROVIDER_PARAMS, returns: "A page of ProviderSummary" },
+  { path: "/api/v1/providers/{provider}", summary: "One provider with its entries", params: PROVIDER_VIEW_PARAMS, returns: "provider and entries; with view=full also models" },
+  { path: "/api/v1/models", summary: "List canonical models", description: "A canonical model is a model as its lab names it. Several entries can serve the same one.", params: MODEL_PARAMS, returns: "A page of CanonicalModel" },
+  { path: "/api/v1/models/{lab}/{model}", summary: "One canonical model with every entry that serves it", params: [], returns: "CanonicalModelDetail" },
+  { path: "/api/v1/evaluations", summary: "List evaluations", description: "Every cache and limit evaluation, each with the entry it was made on: cache evaluations newest first, then limit evaluations.", params: EVALUATION_PARAMS, returns: "A page of Evaluation" },
+  { path: "/api/v1/meta", summary: "The dataset: version, counts, freshness, open issues", params: [], returns: "Meta" },
+  { path: "/api/v1/catalog", summary: "Everything in one file", description: "`{ meta, providers }`, where `providers` is keyed by provider id and each provider holds `models` keyed by model id. About 14 MB before compression.", params: [], returns: "meta and providers" },
+  { path: "/api/v1/openapi.json", summary: "This document", params: [], returns: "OpenAPI 3.1" },
+];
+
 export function openapi(): Record<string, unknown> {
-  const object = { type: "object", additionalProperties: true };
+  const endpoint = (path: string) => ENDPOINTS.find((item) => item.path === path) as (typeof ENDPOINTS)[number];
+  const get = (path: string, responses: Schema, parameters: Schema[] = []) => {
+    const { summary, description, params } = endpoint(path);
+    return { get: { summary, ...(description ? { description } : {}), parameters: [...parameters, ...queryParameters(params)], responses } };
+  };
   return {
     openapi: "3.1.0",
     info: {
       title: "providers.dev API",
       version: "1.0.0",
       description:
-        "Read-only metadata about AI models as each provider and access method exposes them. The baseline is imported from models.dev (MIT); providers.dev additions, corrections and evaluations are under the `providers_dev` key of each provider and model. `v1` is the version of this API; the model fields follow the models.dev v2 schema, which is experimental upstream.",
+        "Read-only metadata about AI models as each provider and access method exposes them. The baseline is imported from models.dev (MIT); providers.dev additions, corrections and evaluations are under the `providers_dev` key. " +
+        "Four resources: providers, entries (a model at a provider), models (canonical) and evaluations. Every collection answers `{ meta, total, limit, offset, next_offset, data }` and pages with `limit` and `offset`; every single object answers `{ meta, data }`. " +
+        "Unknown is never zero: an absent optional field, or null, means no source gives the value.",
       license: { name: "MIT", url: "https://providers.dev/docs/licensing/" },
     },
     servers: [{ url: "https://providers.dev" }],
     paths: {
-      "/api/v1/meta": {
-        get: {
-          summary: "Dataset version, freshness, upstream version and sync status",
-          responses: { 200: ok("Metadata", { $ref: "#/components/schemas/Meta" }), 304: { description: "Not modified" } },
+      "/api/v1/entries": get("/api/v1/entries", { 200: ok("A page of entries", pageOf(ref("EntrySummary"))), 304: notModified, 400: badParams }),
+      "/api/v1/entries/{provider}/{model}": get(
+        "/api/v1/entries/{provider}/{model}",
+        {
+          200: ok("The entry", oneOf({ type: "object", required: ["provider", "summary", "entry"], additionalProperties: false, properties: { provider: ref("ProviderSummary"), summary: ref("EntrySummary"), entry: ref("Entry") } })),
+          304: notModified,
+          400: badParams,
+          404: errorResponse("No such entry"),
         },
-      },
-      "/api/v1/catalog": {
-        get: {
-          summary: "The complete merged catalog",
-          description: "`{ meta, providers }`, where `providers` is keyed by provider id and each provider holds `models` keyed by model id. About 12 MB before compression.",
-          responses: { 200: ok("Catalog", object), 304: { description: "Not modified" } },
-        },
-      },
-      "/api/v1/providers": {
-        get: { summary: "Provider directory", responses: { 200: ok("Providers", object), 304: { description: "Not modified" } } },
-      },
-      "/api/v1/providers/{providerId}": {
-        get: {
-          summary: "One provider and all its models",
-          parameters: [{ name: "providerId", in: "path", required: true, schema: { type: "string" } }],
-          responses: { 200: ok("Provider", object), 304: { description: "Not modified" }, 404: errorResponse("No such provider") },
-        },
-      },
-      "/api/v1/models": {
-        get: {
-          summary: "Search and filter provider-model entries",
-          description: "Returns entry summaries. Order is deterministic: the sort key, then provider id, then model id.",
-          parameters: queryParameters(),
-          responses: {
-            200: ok("A page of entries", {
+        [pathParam("provider", "The provider id.", "openrouter"), pathParam("model", "The model id at that provider. It may contain slashes.", "anthropic/claude-opus-5.5")],
+      ),
+      "/api/v1/providers": get("/api/v1/providers", { 200: ok("A page of providers", pageOf(ref("ProviderSummary"))), 304: notModified, 400: badParams }),
+      "/api/v1/providers/{provider}": get(
+        "/api/v1/providers/{provider}",
+        {
+          200: ok(
+            "The provider",
+            oneOf({
               type: "object",
-              required: ["meta", "total", "limit", "offset", "next_offset", "data"],
+              required: ["provider", "entries"],
+              additionalProperties: false,
               properties: {
-                meta: object,
-                total: { type: "integer" },
-                limit: { type: "integer" },
-                offset: { type: "integer" },
-                next_offset: { type: ["integer", "null"], description: "The offset of the next page, or null on the last page." },
-                data: { type: "array", items: { $ref: "#/components/schemas/EntrySummary" } },
+                provider: ref("ProviderSummary"),
+                entries: { type: "array", items: ref("EntrySummary"), description: "The provider's entries, by name." },
+                models: { type: "object", additionalProperties: ref("Entry"), description: "With view=full: the entries in full, by model id." },
               },
             }),
-            304: { description: "Not modified" },
-            400: errorResponse("A parameter is unknown or not valid"),
-          },
+          ),
+          304: notModified,
+          400: badParams,
+          404: errorResponse("No such provider"),
         },
-      },
-      "/api/v1/entry": {
-        get: {
-          summary: "One provider-model entry in full",
-          description:
-            "Model ids often contain slashes, so the entry is named in the query string, not the path. Give `ref=provider/model` (the provider is everything before the first slash), or `provider` and `model` separately. URL-encode the values.",
-          parameters: [
-            { name: "ref", in: "query", required: false, schema: { type: "string" }, example: "openrouter/anthropic/claude-opus-5.5" },
-            { name: "provider", in: "query", required: false, schema: { type: "string" } },
-            { name: "model", in: "query", required: false, schema: { type: "string" } },
-          ],
-          responses: {
-            200: ok("Entry", object),
-            304: { description: "Not modified" },
-            400: errorResponse("Parameters missing or not valid"),
-            404: errorResponse("No such entry"),
-          },
-        },
-      },
-      "/api/v1/openapi.json": { get: { summary: "This document", responses: { 200: ok("OpenAPI 3.1", object) } } },
+        [pathParam("provider", "The provider id.", "anthropic")],
+      ),
+      "/api/v1/models": get("/api/v1/models", { 200: ok("A page of canonical models", pageOf(ref("CanonicalModel"))), 304: notModified, 400: badParams }),
+      "/api/v1/models/{lab}/{model}": get(
+        "/api/v1/models/{lab}/{model}",
+        { 200: ok("The model", oneOf(ref("CanonicalModelDetail"))), 304: notModified, 400: badParams, 404: errorResponse("No such model") },
+        [pathParam("lab", "The first part of the canonical id.", "anthropic"), pathParam("model", "The rest of the canonical id.", "claude-opus-5-5")],
+      ),
+      "/api/v1/evaluations": get("/api/v1/evaluations", { 200: ok("A page of evaluations", pageOf(ref("Evaluation"))), 304: notModified, 400: badParams }),
+      "/api/v1/meta": get("/api/v1/meta", { 200: ok("The dataset", ref("Meta")), 304: notModified }),
+      "/api/v1/catalog": get("/api/v1/catalog", {
+        200: ok("The catalog", { type: "object", required: ["meta", "providers"], properties: { meta: ref("BriefMeta"), providers: { type: "object", additionalProperties: ref("Provider") } } }),
+        304: notModified,
+      }),
+      "/api/v1/openapi.json": get("/api/v1/openapi.json", { 200: ok("OpenAPI 3.1", { type: "object" }) }),
       "/api.json": {
         get: {
           summary: "Compatibility export",
           description:
             "The merged catalog keyed by provider id, in the models.dev v2 structure, with no envelope. Added entries may lack fields that models.dev requires; every entry carries `providers_dev`. The dataset version is in the X-Dataset-Version header.",
-          responses: { 200: ok("Provider-keyed catalog", object) },
+          responses: { 200: ok("Provider-keyed catalog", { type: "object", additionalProperties: ref("Provider") }) },
         },
       },
     },
     components: {
-      schemas: {
-        Error: {
-          type: "object",
-          required: ["error"],
-          properties: {
-            error: {
-              type: "object",
-              required: ["code", "message"],
-              properties: {
-                code: { type: "string", examples: ["invalid_parameters", "provider_not_found", "entry_not_found", "method_not_allowed", "not_found"] },
-                message: { type: "string" },
-                details: {},
-              },
-            },
-          },
-        },
-        Meta: {
-          type: "object",
-          required: ["api_version", "dataset_version", "generated_at", "upstream", "counts"],
-          additionalProperties: true,
-          properties: {
-            api_version: { const: "v1" },
-            schema_version: { type: "integer" },
-            upstream_schema: { type: "string" },
-            dataset_version: { type: "string", description: "A hash of the published data. Changes only when the data does." },
-            generated_at: { type: "string", format: "date-time" },
-            upstream: { type: "object", additionalProperties: true },
-            counts: { type: "object", additionalProperties: { type: "integer" } },
-            sync: { type: "object", additionalProperties: true },
-            issues: { type: "array", items: object },
-            exclusions: { type: "array", items: object },
-          },
-        },
-        EntrySummary: {
-          type: "object",
-          required: ["ref", "provider", "model", "name", "access", "origin", "cache", "cache_modes", "cache_ttl_s", "evaluations"],
-          properties: {
-            ref: { type: "string", description: "provider/model" },
-            provider: { type: "string" },
-            model: { type: "string" },
-            name: { type: "string" },
-            type: { type: "string" },
-            family: { type: "string" },
-            canonical_id: { type: "string" },
-            status: { type: "string" },
-            release_date: { type: "string" },
-            access: { enum: ["api", "subscription", "unknown"] },
-            origin: { enum: ["upstream", "modified", "added"] },
-            context: { type: "integer", description: "Tokens. Absent = unknown." },
-            input: { type: "integer", description: "Tokens. Absent = not stated separately." },
-            max_output: { type: "integer", description: "Tokens. Absent = unknown." },
-            price_in: { type: "number", description: "List price of input in US dollars per million tokens (cost.text.input.price), before changes by context size or service tier. Absent = unknown. 0 on a plan or subscription entry means no price per token, not free." },
-            price_out: { type: "number", description: "The same for output (cost.text.output.price)." },
-            price_from: { type: "string", description: "Present where the price is inherited: the ref of the API entry whose list price this is. The entry itself is a subscription and is not paid per token." },
-            cache: { enum: ["yes", "no", "unknown"] },
-            cache_modes: { type: "array", items: { enum: ["implicit", "explicit"] } },
-            cache_ttl_s: { type: "array", items: { type: "number" }, description: "Documented lifetimes in seconds, of every mode together." },
-            cache_ttl_by_mode_s: {
-              type: "object",
-              description: "The documented lifetimes of each mode, in seconds. A mode with no documented lifetime has no key.",
-              properties: { implicit: { type: "array", items: { type: "number" } }, explicit: { type: "array", items: { type: "number" } } },
-            },
-            evaluations: { type: "integer" },
-            measured_warm_min_s: { type: "number" },
-            measured_warm_max_s: { type: "number" },
-            measured_cache: {
-              type: "array",
-              description: "The cache evaluations of this entry taken together, by age, across the clients they were sent through. One item per cache lifetime the requests asked for; the item without `asked` is the provider's default.",
-              items: {
-                type: "object",
-                required: ["evaluations", "bands"],
-                properties: {
-                  asked: { type: "string", description: "The lifetime the requests asked for, for example 1h. Absent = none asked: the default lifetime." },
-                  parameter: { type: "string", description: "The request parameter that carried `asked`: ttl or prompt_cache_retention. Present with `asked`." },
-                  evaluations: { type: "integer" },
-                  bands: {
-                    type: "array",
-                    description: "One item per age band with at least one check. A band holds the checks up to up_to_s and above the band before it.",
-                    items: {
-                      type: "object",
-                      required: ["up_to_s", "warm", "total"],
-                      properties: {
-                        up_to_s: { type: "integer", description: "The upper age of the band, in seconds: 150, 300, 900, 1800, 3600, 7200, 14400, 28800, 43200 or 86400." },
-                        warm: { type: "integer", description: "Re-sends served from the cache." },
-                        total: { type: "integer", description: "Re-sends made." },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-            measured_limits: { type: "integer" },
-            measured_input_accepted: { type: "integer", description: "Tokens. The largest input an evaluation saw accepted on this entry: the real input limit is at least this. Useful where no limit is documented." },
-            measured_input_refused: { type: "integer", description: "Tokens. The smallest input an evaluation saw refused: the real input limit is below this." },
-            overridden_fields: { type: "array", items: { type: "string" } },
-            verified: { type: "string", format: "date", description: "Newest date of providers.dev evidence. Imported entries have none." },
-            shard: { type: "integer" },
-          },
-        },
-      },
+      schemas: { BriefMeta: jsonSchema(BriefMetaSchema), ...Object.fromEntries(Object.entries(COMPONENTS).map(([name, schema]) => [name, jsonSchema(schema)])) },
     },
   };
+}
+
+export interface FieldRow {
+  name: string;
+  type: string;
+  required: boolean;
+  description: string;
+}
+
+function typeText(schema: Schema | undefined): string {
+  if (!schema) return "any";
+  if (Array.isArray(schema.enum)) return schema.enum.map((value) => JSON.stringify(value)).join(" | ");
+  if (schema.const !== undefined) return JSON.stringify(schema.const);
+  if (Array.isArray(schema.anyOf)) return (schema.anyOf as Schema[]).map(typeText).join(" | ");
+  if (Array.isArray(schema.type)) return (schema.type as string[]).join(" | ");
+  if (schema.type === "array") return `${typeText(schema.items as Schema | undefined)}[]`;
+  return typeof schema.type === "string" ? schema.type : "any";
+}
+
+/** The fields of one part of the contract, for a table in the documentation. */
+export function fieldRows(name: keyof typeof COMPONENTS): FieldRow[] {
+  const schema = jsonSchema(COMPONENTS[name]);
+  const required = new Set((schema.required as string[] | undefined) ?? []);
+  return Object.entries((schema.properties as Record<string, Schema> | undefined) ?? {}).map(([field, value]) => ({
+    name: field,
+    type: typeText(value),
+    required: required.has(field),
+    description: typeof value.description === "string" ? value.description : "",
+  }));
 }

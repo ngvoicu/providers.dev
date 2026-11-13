@@ -15,28 +15,22 @@ const subscriptions = index.providers.filter((provider) => provider.access === "
 ---
 
 <Base title="providers.dev">
-  <div class="grid items-end gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,32rem)]">
-    <section class="hero">
-      <p class="eyebrow">Updated {meta.generated_at.slice(0, 10)} · {exact(meta.counts.models)} entries</p>
-      <h1 class="mt-4">AI models as each provider actually exposes them</h1>
-      <p class="lead mt-4">
-        Context window, maximum output and prompt-cache behaviour for every provider and access method, API keys and subscriptions alike. Built on{" "}
-        <a href="https://models.dev">models.dev</a>, extended with documented corrections and independent evaluations.
-      </p>
-      <p class="mt-5 flex flex-wrap gap-2">
-        <a class="button primary" href="/docs/api/">API documentation</a>
-        <a class="button" href="/docs/methodology/">How values are sourced</a>
-      </p>
-    </section>
-    <dl class="stats two">
-      <div><dt>Provider-model entries</dt><dd>{exact(meta.counts.models)} <small>across {exact(meta.counts.providers)} providers</small></dd></div>
-      <div><dt>Subscription providers</dt><dd>{exact(subscriptions)} <small><a href="/?access=subscription">View their entries</a></small></dd></div>
-      <div><dt>Entries with providers.dev evidence</dt><dd>{exact(withEvidence)} <small><a href="/?origin=modified,added">View them</a></small></dd></div>
-      <div><dt>Cache evaluations</dt><dd>{exact(meta.measurements?.runs ?? 0)} <small><a href="/evidence/#cache">See the results</a></small></dd></div>
-    </dl>
-  </div>
+  <header class="home-head">
+    <h1>AI models as each provider exposes them</h1>
+    <p class="lead">
+      Context window, maximum output, price and prompt caching for {exact(meta.counts.entries)} entries: every model at every provider and access method, API keys and subscriptions alike.
+      Built on <a href="https://models.dev">models.dev</a>, with <a href="/?origin=modified,added">{exact(withEvidence)} entries</a> corrected or evaluated by providers.dev.
+    </p>
+    <p class="facts-line muted">
+      <span>{exact(meta.counts.providers)} providers, <a href="/?access=subscription">{exact(subscriptions)} by subscription</a></span>
+      <span><a href="/models/">{exact(meta.counts.models)} models</a></span>
+      <span><a href="/evidence/#cache">{exact(meta.counts.cache_evaluations)} cache evaluations</a></span>
+      <span>Updated {meta.generated_at.slice(0, 10)}</span>
+      <span><a href="/docs/api/">API</a> · <a href="/docs/methodology/">How values are sourced</a></span>
+    </p>
+  </header>
 
-  <form id="filters" class="mt-8" role="search" aria-label="Filter entries">
+  <form id="filters" class="mt-5" role="search" aria-label="Filter entries">
     <label class="search block">
       <span class="sr-only">Search</span>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
@@ -63,7 +57,7 @@ const subscriptions = index.providers.filter((provider) => provider.access === "
           <select name="origin"><option value="">Any</option><option value="modified,added">With providers.dev evidence</option><option value="added">providers.dev only</option><option value="upstream">models.dev only</option></select>
         </label>
         <label class="field">Cache evaluated
-          <select name="measured"><option value="">Any</option><option value="true">Yes</option><option value="false">No</option></select>
+          <select name="evaluated"><option value="">Any</option><option value="true">Yes</option><option value="false">No</option></select>
         </label>
         <div class="field justify-end"><button type="reset" class="button">Clear filters</button></div>
         <label class="field col-span-2">Minimum context window (tokens)
@@ -91,7 +85,7 @@ const subscriptions = index.providers.filter((provider) => provider.access === "
       // Filters are always open on wide screens, and on small ones when the address already carries a filter.
       (function () {
         var more = document.getElementById("more-filters");
-        var filtered = /[?&](provider|access|type|cache|cache_mode|origin|measured|min_context|min_output|max_age_months)=/.test(location.search);
+        var filtered = /[?&](provider|access|type|cache|cache_mode|origin|evaluated|min_context|min_output|max_age_months)=/.test(location.search);
         if (matchMedia("(min-width: 640px)").matches || filtered) more.open = true;
       })();
     </script>
@@ -102,8 +96,8 @@ const subscriptions = index.providers.filter((provider) => provider.access === "
     <p id="count" class="font-medium" aria-live="polite">{exact(first.total)} entries</p>
     <p class="muted flex min-w-0 items-center gap-2">
       <span class="hidden sm:inline">This view as JSON</span>
-      <a id="api-link" class="truncate" href={`/api/v1/models?${SITE_DEFAULT}`}><code>/api/v1/models?{SITE_DEFAULT}</code></a>
-      <button type="button" id="api-copy" class="copy" data-copy={`/api/v1/models?${SITE_DEFAULT}`} aria-label="Copy API URL">Copy</button>
+      <a id="api-link" class="truncate" href={`/api/v1/entries?${SITE_DEFAULT}`}><code>/api/v1/entries?{SITE_DEFAULT}</code></a>
+      <button type="button" id="api-copy" class="copy" data-copy={`/api/v1/entries?${SITE_DEFAULT}`} aria-label="Copy API URL">Copy</button>
     </p>
   </div>
 

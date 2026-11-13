@@ -1,44 +1,39 @@
 ---
+// One canonical model. Everything shown is the answer of GET /api/v1/models/{id}: the model, how its entries
+// compare, and the entries themselves. This page formats those values and works out nothing of its own.
 import Base from "../../layouts/Base.astro";
 import { compactTokens, exact } from "../../core/format.ts";
 import { rowHtml, tableHead } from "../../core/render.ts";
-import { entriesByCanonical, imported, now, providerNames } from "../../lib/data.ts";
+import { imported, models, now, providerNames } from "../../lib/data.ts";
 
 export function getStaticPaths() {
-  return [...entriesByCanonical.entries()].map(([id, entries]) => ({ params: { id }, props: { id, entries } }));
+  return models.map((model) => ({ params: { id: model.id }, props: { model } }));
 }
-const { id, entries } = Astro.props;
-const lab = id.split("/")[0]!;
-// The lab's own API first, then subscriptions, then the rest by provider.
-const rank = (provider: string, access: string): number => (provider === lab ? 0 : access === "subscription" ? 1 : 2);
-const sorted = [...entries].sort((a, b) => rank(a.provider, a.access) - rank(b.provider, b.access) || a.provider.localeCompare(b.provider) || a.model.localeCompare(b.model));
-const own = sorted.find((entry) => entry.provider === lab);
-const name = (own ?? sorted[0]!).name;
-const contexts = [...new Set(sorted.map((entry) => entry.context).filter((value): value is number => value !== undefined))].sort((a, b) => a - b);
-const outputs = [...new Set(sorted.map((entry) => entry.max_output).filter((value): value is number => value !== undefined))].sort((a, b) => a - b);
-const range = (values: number[]): string => (values.length === 0 ? "Unknown" : values.length === 1 ? compactTokens(values[0]!) : `${compactTokens(values[0]!)} to ${compactTokens(values.at(-1)!)}`);
+const { model } = Astro.props;
+const range = (low: number | null, high: number | null): string => (low === null || high === null ? "Unknown" : low === high ? compactTokens(low) : `${compactTokens(low)} to ${compactTokens(high)}`);
+const api = `/api/v1/models/${model.id.split("/").map(encodeURIComponent).join("/")}`;
 ---
 
-<Base title={name} description={`${name}: ${entries.length} ways to reach it, with the context, output and cache limits of each.`}>
-  <p class="crumbs"><a href="/models/">Models</a> / {name}</p>
-  <h1>{name}</h1>
-  <p class="id mt-1"><code>{id}</code><button type="button" class="copy" data-copy={id} aria-label="Copy canonical id">Copy</button></p>
+<Base title={model.name} description={`${model.name}: ${model.entry_count} entries, with the context window, maximum output, price and prompt caching of each.`}>
+  <p class="crumbs"><a href="/models/">Models</a> / {model.name}</p>
+  <h1>{model.name}</h1>
+  <p class="id mt-1"><code>{model.id}</code><button type="button" class="copy" data-copy={model.id} aria-label="Copy canonical id">Copy</button></p>
   <div class="tiles mt-6">
-    <div class="tile"><div class="label">Access methods</div><div class="value">{exact(entries.length)}</div><div class="foot">{exact(sorted.filter((entry) => entry.access === "subscription").length)} by subscription</div></div>
-    <div class="tile"><div class="label">Context window</div><div class="value small">{range(contexts)} <span class="unit">tokens</span></div><div class="foot">Across access methods</div></div>
-    <div class="tile"><div class="label">Maximum output</div><div class="value small">{range(outputs)} <span class="unit">tokens</span></div><div class="foot">Across access methods</div></div>
-    <div class="tile"><div class="label">With providers.dev evidence</div><div class="value">{exact(sorted.filter((entry) => entry.origin !== "upstream").length)}</div><div class="foot">Corrections or evaluations</div></div>
+    <div class="tile"><div class="label">Entries</div><div class="value">{exact(model.entry_count)}</div><div class="foot">{exact(model.subscription_entry_count)} by subscription</div></div>
+    <div class="tile"><div class="label">Context window</div><div class="value small">{range(model.context_min, model.context_max)} <span class="unit">tokens</span></div><div class="foot">Smallest to largest among its entries</div></div>
+    <div class="tile"><div class="label">Maximum output</div><div class="value small">{range(model.max_output_min, model.max_output_max)} <span class="unit">tokens</span></div><div class="foot">Smallest to largest among its entries</div></div>
+    <div class="tile"><div class="label">With providers.dev evidence</div><div class="value">{exact(model.evidence_entry_count)}</div><div class="foot">Corrections or evaluations</div></div>
   </div>
   <p class="note mt-5">
-    {own ? <>The first row is {providerNames[lab] ?? lab}'s own API, the closest reference for the model's own limits.</> : <>The lab's own API is not in the catalog, so there is no reference row for the model's own limits.</>}{" "}
+    {model.reference_ref ? <>The first row is {providerNames[model.lab] ?? model.lab}'s own API, the closest reference for the model's own limits.</> : <>The lab's own API is not in the catalog, so there is no reference row for the model's own limits.</>}{" "}
     A lower number on another row is that provider's limit for the model. Values are per entry; nothing is copied from one access method to another.
   </p>
   <div class="scroll mt-5">
     <table class="entries">
-      <caption class="sr-only">Access methods for {name}</caption>
+      <caption class="sr-only">Entries for {model.name}</caption>
       <thead set:html={tableHead({})} />
-      <tbody set:html={sorted.map((entry) => rowHtml(entry, { now, imported, providerNames })).join("")} />
+      <tbody set:html={model.entries.map((entry) => rowHtml(entry, { now, imported, providerNames })).join("")} />
     </table>
   </div>
-  <p class="hint mt-3"><a href={`/api/v1/models?canonical_id=${encodeURIComponent(id)}&limit=200`}><code>GET /api/v1/models?canonical_id={id}</code></a></p>
+  <p class="hint mt-3"><a href={api}><code>GET {api}</code></a></p>
 </Base>

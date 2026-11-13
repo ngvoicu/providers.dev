@@ -1,15 +1,10 @@
 ---
+// The page around an entry. The Worker fills the marks for each request to /entries/{provider}/{model}
+// (src/core/pages.ts), so every entry has its own address, title and description. Nobody is served this file as it is.
 import Base from "../../layouts/Base.astro";
-import { now } from "../../lib/data.ts";
+import { MARK } from "../../core/pages.ts";
 ---
 
-<Base title="Entry" description="Limits, prompt caching and sources for one provider-model entry.">
-  <div id="entry" data-now={now.toISOString()} aria-live="polite">
-    <p class="muted">Loading…</p>
-  </div>
-  <noscript><p class="note">This view needs JavaScript. The same data is at <code>/api/v1/entry?ref=provider/model</code>.</p></noscript>
+<Base title={MARK.title} description={MARK.description} canonical={MARK.canonical}>
+  <div id="entry" set:html={MARK.html} />
 </Base>
-
-<script>
-  import "../../client/entry.ts";
-</script>

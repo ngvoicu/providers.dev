@@ -2,6 +2,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Index, Summary } from "../core/entries.ts";
+import { canonicalModels, listEvaluations } from "../core/resources.ts";
 import type { Catalog, Meta } from "../core/schema.ts";
 
 const dir = join(process.cwd(), "data", "published", "site");
@@ -22,13 +23,14 @@ export const imported = meta.upstream.fetched_at.slice(0, 10);
 export const providerNames: Record<string, string> = Object.fromEntries(index.providers.map((provider) => [provider.id, provider.name]));
 
 export const entriesByProvider = new Map<string, Summary[]>();
-export const entriesByCanonical = new Map<string, Summary[]>();
 for (const entry of index.entries) {
   (entriesByProvider.get(entry.provider) ?? entriesByProvider.set(entry.provider, []).get(entry.provider)!).push(entry);
-  if (entry.canonical_id) {
-    (entriesByCanonical.get(entry.canonical_id) ?? entriesByCanonical.set(entry.canonical_id, []).get(entry.canonical_id)!).push(entry);
-  }
 }
+
+/** The canonical models, as GET /api/v1/models and /api/v1/models/{id} return them. */
+export const models = canonicalModels(index.entries);
+/** Every evaluation, as GET /api/v1/evaluations returns them. */
+export const evaluations = listEvaluations(catalog, index);
 
 export function shortDate(iso: string): string {
   return `${iso.slice(0, 10)} ${iso.slice(11, 16)} UTC`;

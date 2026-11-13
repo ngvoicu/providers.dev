@@ -42,9 +42,9 @@ import { meta } from "../../lib/data.ts";
       <li>For caching, models.dev distinguishes <code>cache = false</code> (the entry does not cache) from no <code>cache</code> field (nothing is stated). Both are kept: "None" and "Unknown".</li>
       <li>A field can be published as explicitly unknown where the upstream value does not hold for an access method. The field is then omitted and the reason is recorded.</li>
       <li>
-        Every entry page has the same sections, the same tables and the same rows, so that two entries can be read side by side. A row the source gives no value for is not left out:
-        it says <em>Unknown</em>, <em>Not stated</em> (a value that sources give only where it differs, such as a separate input limit or a reasoning price) or <em>In plan</em> (no price
-        per token, because the entry is paid for through a plan). A table with nothing measured says so in its place.
+        Every entry page has the same sections, the same tables and the same rows, so that two entries can be read side by side. A row with no value is not left out. It says one of four
+        things: <em>Unknown</em> (no source gives the value), <em>Unsupported</em> (a source says the entry cannot do it), <em>Not evaluated</em> (providers.dev has not measured it) or
+        <em>Not applicable</em> (the field has no meaning for this entry). A price on a subscription entry says <em>In plan</em>: there is no price per token.
       </li>
     </ul>
 
@@ -147,37 +147,42 @@ import { meta } from "../../lib/data.ts";
 
     <h2 id="evaluations">Cache evaluations</h2>
     <p>
-      An evaluation sends a fresh prompt once so that it is cached, then sends it again at each of several set ages, a few times per age. For each age the result records how many of those
-      re-sends were served from the cache: <code>3/3</code> is all of them, <code>0/3</code> none.
+      An evaluation sends a fresh prompt once so that it is cached, then sends it again at once and at each of several set ages, a few times per age. For each age the result records how
+      many of those re-sends were made, how many were served from the cache, and that share in percent.
     </p>
     <p>
-      Every evaluation made since 14 November 2026 starts the same way: the prompt is sent again at once, then checked at 2.5, 5 and 7.5 minutes, and on from there (10, 15, 20, 25, 30, 40
-      and 50 minutes, 1 hour, 1 h 15, 1 h 30, 2 hours, and longer where the cache lasts). "At once" is the control: it shows that the prompt was cached at all and that the route reports
-      cache hits, so that a later miss means the cache is gone and not that nothing was cached. Older evaluations keep the ages they were made with, and some start at 5 minutes.
+      Every evaluation made since 14 November 2026 follows the same ages: the prompt is sent again at once, then checked at 2.5, 5 and 7.5 minutes, and on from there (10, 15, 20, 25, 30, 40
+      and 50 minutes, 1 hour, 1 h 15, 1 h 30, 2 hours, and 4, 8, 12 and 24 hours where the cache lasts). "At once" is the control: it shows that the prompt was cached at all and that the
+      route reports cache hits, so that a later miss means the cache is gone and not that nothing was cached. Older evaluations keep the ages they were made with, and some start at 5 minutes.
     </p>
     <p>
-      "Always cached up to 30 min" means every re-send up to that age was served from the cache. It is what was observed, not a guaranteed lifetime, and the next age checked may be much
-      later. A provider that spreads requests over several servers can miss at one age and hit again at a later one.
+      Results are shown the same way on every page: the catalog, a provider's page, a model's page and an entry's page all draw one summary table, with the same lines and the same
+      columns. The columns are the control and the ages above. A cell is the share of re-sends at exactly that age that were served from the cache, in percent, with the counts on hover
+      or under it. Nothing is rounded into a neighbouring age: 7.5 minutes and 10 minutes are two cells. A cell with no check stays empty; it is not a miss. A check made at an age that
+      has no column (an older evaluation at 3 hours, say) is in the data at its exact age and is listed in words on the entry's page.
     </p>
-    <p>
-      Results are shown the same way for every entry: ten cells, for 2.5 min, 5 min, 15 min, 30 min, 1 h, 2 h, 4 h, 8 h, 12 h and 24 h. A cell holds every check up to its age and above the
-      cell before it, so the 15 min cell holds the checks at 7.5, 10 and 15 minutes. A cell with no check stays empty; it is not a miss.
-    </p>
-    <p>There are two lines of cells, because a request can ask for the cache in two ways, and the two answer different questions:</p>
+    <p>There are two kinds of line, because a request can ask for the cache in two ways, and the two answer different questions:</p>
     <ul>
-      <li><strong>Default:</strong> the request sends no lifetime parameter. This is the cache you get without asking for one.</li>
+      <li><strong>Short:</strong> the request asks for no lifetime, or for the shortest one the provider documents. This is the cache you get without asking.</li>
       <li>
-        <strong>Long:</strong> the request asks for a longer lifetime with a parameter, <code>ttl</code> (for example <code>1h</code>) or <code>prompt_cache_retention</code> (for example{" "}
-        <code>24h</code>). The value asked for is shown next to the word, and the entry page names the parameter.
+        <strong>Long:</strong> the request asks for a longer lifetime, for example <code>cache_control.ttl=1h</code> or <code>prompt_cache_retention=24h</code>. The value is shown next to
+        the word, and the entry's page names the request field.
       </li>
     </ul>
     <p>
-      Both lines are there on every evaluated entry. A line that was not evaluated is empty: that says nothing about whether the provider accepts the parameter.
+      Both lines are there on every evaluated entry. A line with no measurement says <em>Not evaluated</em>; that is not 0 %, and it says nothing about whether the provider accepts a
+      lifetime. What a request can ask for is a separate record, <em>Retention</em>, on every entry's page: whether a lifetime is accepted, the request field, the accepted values and which
+      value gives which line, each from documentation or from an evaluation that sent it. "Supported" there means the value is accepted; the lifetime the provider then gives is what the
+      lines show.
     </p>
     <p>
-      In the catalog a line adds up every evaluation of the entry, from every client, and a cell shows the share that was served from the cache, in percent; the counts appear on hover. One
-      evaluation has only a few re-sends per age, so a single miss moves it a lot, and the sum is steadier. The entry page has one row per evaluation with the counts, and where a part has
-      several evaluations a last row that adds them up. Measured limits are on the entry page only.
+      A line adds up every evaluation of the entry with that retention setting, from every client. One evaluation has only a few re-sends per age, so a single miss moves it a lot, and the
+      sum is steadier. The entry's page lists every evaluation under the summary, with its client, request settings, counts and raw result. The pages state no verdict about a cache
+      lifetime: they show the counts, and the reader draws the line.
+    </p>
+    <p>
+      Every number on these pages is in the API as published, counts and percentages alike; a page formats it and works out nothing of its own.
+      See <a href="/docs/api/#cache">cache evaluations in the API</a>.
     </p>
     <p>
       Each evaluation names the access method it was taken on and the client that sent the requests: straight to the provider, through{" "}

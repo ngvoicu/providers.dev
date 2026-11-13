@@ -6,8 +6,10 @@ import { meta, shortDate } from "../lib/data.ts";
 interface Props {
   title: string;
   description?: string;
+  /** The canonical address, where it is not the address the page is built at. */
+  canonical?: string;
 }
-const { title, description = "A reference for AI models as each provider and access method actually exposes them: context, output and prompt-cache behaviour, with sources." } = Astro.props;
+const { title, description = "A reference for AI models as each provider and access method actually exposes them: context, output and prompt-cache behaviour, with sources.", canonical } = Astro.props;
 const path = Astro.url.pathname;
 const nav = [
   { href: "/", label: "Catalog", match: (p: string) => p === "/" || p.startsWith("/entry") },
@@ -30,7 +32,7 @@ const full = title === "providers.dev" ? "providers.dev · AI models as each pro
     <meta property="og:title" content={full} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
-    <link rel="canonical" href={new URL(path, Astro.site)} />
+    <link rel="canonical" href={canonical ?? new URL(path, Astro.site)} />
     <meta property="og:image" content={new URL("/og.png", Astro.site)} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />

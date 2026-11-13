@@ -1,6 +1,7 @@
 // HTML for the entry table and the entry detail view. The same functions build the static pages and
 // re-render in the browser, so a row looks and reads the same wherever it appears.
-import { askedLifetime, cacheBand, CACHE_BANDS_S, type PooledCache, type ProviderSummary, type Summary } from "./entries.ts";
+import { CACHE_AGES_S, settingsText, type CacheResult, type CacheRetention, type CacheSummaryRow, type EntryCache } from "./cache.ts";
+import type { ProviderSummary, Summary } from "./entries.ts";
 import {
   compactTokens,
   duration,
@@ -12,18 +13,16 @@ import {
   ORIGIN_LABEL,
   ORIGIN_TITLE,
   plural,
-  runVerdict,
   shortAge,
   usd,
-  warmRange,
 } from "./format.ts";
 import { isObject, type Json, type JsonObject } from "./merge.ts";
-import { NS, type Evidence, type MeasuredLimit, type Measurement, type ModelExtension, type Provenance } from "./schema.ts";
+import { NS, type Evidence, type MeasuredLimit, type ModelExtension, type Provenance } from "./schema.ts";
 
 const UNKNOWN = '<span class="unknown" title="The source does not say. Unknown is not zero and not unlimited.">Unknown</span>';
 const DASH = '<span class="muted">–</span>';
 /** Every entry page has the same rows. These fill a row whose value the source does not give. */
-const NOT_STATED = '<span class="muted" title="The source states no such value for this entry.">Not stated</span>';
+const NOT_APPLICABLE = '<span class="muted" title="This field does not apply to this entry.">Not applicable</span>';
 const IN_PLAN = '<span class="muted" title="No price per token: the entry is paid for through a plan or subscription, which providers.dev does not list.">In plan</span>';
 const ACCESS_LABEL = { api: "API key", subscription: "Subscription", unknown: "Unclassified" } as const;
 
@@ -92,47 +91,65 @@ function contextCell(entry: Summary, href: string): string {
   return `<a class="plain limit-measured" href="${e(href)}#limits" title="${e(title)}"><span class="limit-value">≥ ${floor}</span><span class="limit-note">input</span></a>`;
 }
 
-const bandLabel = (seconds: number): string => (seconds < 3600 ? `${seconds / 60}m` : `${seconds / 3600}h`); // 150 -> "2.5m"
+// ---- cache evaluations: one summary table, the same on every page
+// Everything shown comes from `cache_results` as the API publishes it: the lines, the ages, the counts and the
+// percentages. This file lays them out; it adds nothing up.
 
-/** What a band covers, in words: "Up to 2.5 min", "5 min to 15 min". */
-const bandSpan = (limit: number): string => {
-  const at = CACHE_BANDS_S.indexOf(limit as (typeof CACHE_BANDS_S)[number]);
-  return `${at <= 0 ? "Up to" : `${shortAge(CACHE_BANDS_S[at - 1] as number)} to`} ${shortAge(limit)}`;
-};
+const columnLabel = (seconds: number): string => (seconds < 3600 ? `${seconds / 60}m` : seconds % 3600 === 0 ? `${seconds / 3600}h` : `${seconds / 60}m`); // 150 -> "2.5m", 4500 -> "75m"
+const CONTROL_TITLE = "At once: the prompt sent again immediately. It shows that the prompt was cached at all.";
+/** An age as a column heading or in a sentence: "2.5 min", "1 h 15", "24 h" (never "1 d": the columns count in hours). */
+const ageText = (seconds: number): string => (seconds === 0 ? "at once" : seconds % 86400 === 0 ? shortAge(seconds) : duration(seconds));
+const level = (result: CacheResult): string => (result.hit_rate_pct === 100 ? "all" : result.hit_rate_pct === 0 ? "none" : result.hit_rate_pct >= 50 ? "most" : "few");
+const said = (result: CacheResult): string => `${result.kind === "control" ? "At once" : `After ${ageText(result.age_s)}`}: ${result.hits} of ${result.checks} re-sends served from the cache (${result.hit_rate_pct}%)`;
 
-/** The ages of the heat strip, written once in the column head so that every row lines up under them. */
-const STRIP_HEAD = `<span class="heat-strip strip-head" aria-hidden="true"><span></span><span class="strip">${CACHE_BANDS_S.map((limit) => `<span>${bandLabel(limit)}</span>`).join("")}</span></span>`;
+/** The columns of every summary table: the control, then the ladder of ages. */
+const COLUMNS: { kind: CacheResult["kind"]; age_s: number }[] = [{ kind: "control", age_s: 0 }, ...CACHE_AGES_S.map((age) => ({ kind: "timed" as const, age_s: age }))];
+const inColumn = (results: readonly CacheResult[], column: (typeof COLUMNS)[number]): CacheResult | undefined =>
+  results.find((result) => result.kind === column.kind && result.age_s === column.age_s);
+/** The ages of the strip, written once in the column head so that every row lines up under them. */
+export const STRIP_HEAD = `<span class="heat-strip strip-head" aria-hidden="true"><span></span><span class="strip">${COLUMNS.map((column) => `<span${column.kind === "control" ? ' class="control"' : ""}>${column.kind === "control" ? "once" : columnLabel(column.age_s)}</span>`).join("")}</span></span>`;
 
-/**
- * One line of the measured cell: what the requests sent, then one cell per age band with the share of re-sends at that
- * age that were served from the cache, in percent. A line without evaluations keeps its place, with empty cells.
- */
-function strip(group: PooledCache | undefined, long: boolean): string {
-  const byBand = new Map((group?.bands ?? []).map((band) => [band.up_to_s, band]));
-  const cells = CACHE_BANDS_S.map((limit) => {
-    const band = byBand.get(limit);
-    if (!band) return `<span class="skip" title="${bandSpan(limit)}: not checked"></span>`;
-    const share = band.warm / band.total;
-    const level = share === 1 ? "all" : share === 0 ? "none" : share >= 0.5 ? "most" : "few";
-    return `<span class="${level}" title="${bandSpan(limit)}: ${band.warm} of ${band.total} re-sends served from the cache">${Math.round(share * 100)}</span>`;
+/** "Short" or "Long 1h": the retention profile, and the value the requests asked for. */
+function retentionWord(row: Pick<CacheSummaryRow, "retention_profile" | "value">): string {
+  return `${row.retention_profile === "short" ? "Short" : "Long"}${row.value ? ` <b>${e(row.value)}</b>` : ""}`;
+}
+
+/** What a line's requests sent, in one sentence. */
+function retentionSaid(row: Pick<CacheSummaryRow, "retention_profile" | "parameter" | "value">): string {
+  if (row.parameter && row.value) return `${row.retention_profile === "short" ? "Short" : "Long"} retention: the requests sent ${row.parameter}=${row.value}.`;
+  return row.retention_profile === "short" ? "Short retention: the requests asked for no lifetime, so this is the provider's default cache." : "Long retention: a request that asks for a longer lifetime.";
+}
+
+/** Why a line has no results: nobody evaluated it, or the entry cannot do it. */
+function notEvaluated(row: CacheSummaryRow, support: Summary["cache_retention"]): string {
+  if (row.retention_profile === "long" && support === "unsupported") return '<span class="muted" title="The source says this entry does not cache prompts, so there is no lifetime to ask for.">Unsupported</span>';
+  return `<span class="muted" title="${row.retention_profile === "long" ? "No evaluation on this entry asked for a longer lifetime. Not evaluated is not the same as unsupported." : "No evaluation on this entry left the lifetime to the provider."}">Not evaluated</span>`;
+}
+
+/** One line of the catalog's summary: the retention setting, then one cell per column with the hit rate in percent. */
+function strip(row: CacheSummaryRow, support: Summary["cache_retention"]): string {
+  const count = row.evaluations > 0 ? ` ${plural(row.evaluations, "evaluation")}, the newest on ${row.last_date}.` : "";
+  const label = `<span class="strip-label${row.results ? "" : " none"}" title="${e(retentionSaid(row) + count)}">${retentionWord(row)}</span>`;
+  if (!row.results) return `${label}<span class="strip-none">${notEvaluated(row, support)}</span>`;
+  const results = row.results;
+  const cells = COLUMNS.map((column) => {
+    const result = inColumn(results, column);
+    const control = column.kind === "control" ? " control" : "";
+    if (!result) return `<span class="skip${control}" title="${column.kind === "control" ? "At once" : `After ${ageText(column.age_s)}`}: not checked"></span>`;
+    return `<span class="${level(result)}${control}" title="${e(said(result))}">${Math.round(result.hit_rate_pct)}</span>`;
   }).join("");
-  const count = group ? plural(group.evaluations, "evaluation") : "Not evaluated";
-  const label = long
-    ? `<span class="strip-label${group ? "" : " none"}" title="${e(group?.asked ? `The requests asked for a longer lifetime with ${group.parameter ?? "a parameter"}=${group.asked}. ${count}.` : "A longer cache lifetime, asked for with a request parameter. Not evaluated on this entry.")}">Long${group?.asked ? ` <b>${e(group.asked)}</b>` : ""}</span>`
-    : `<span class="strip-label${group ? "" : " none"}" title="The requests sent no lifetime parameter: the provider's default cache. ${count}.">Default</span>`;
   return `${label}<span class="strip">${cells}</span>`;
 }
 
-/**
- * Every evaluated entry shows the same lines: Default (no lifetime parameter sent) and Long (a lifetime parameter sent),
- * each over the same ages. Measured limits are not shown here: they are on the entry's page.
- */
+/** One evaluation as a line of the same cells (the evidence page). */
+export function evaluationStrip(evaluation: Pick<CacheSummaryRow, "retention_profile" | "parameter" | "value"> & { results: CacheResult[]; date: string }): string {
+  return `<span class="heat-strip">${strip({ ...evaluation, evaluations: 1, evaluation_ids: [], last_date: evaluation.date, results: evaluation.results }, "unknown")}</span>`;
+}
+
+/** The summary of an entry's cache evaluations for a table cell. The same lines and columns for every entry. */
 function measuredCell(entry: Summary, href: string): string {
-  if (entry.evaluations === 0) return DASH;
-  const groups = entry.measured_cache ?? [];
-  const asked = groups.filter((group) => group.asked);
-  const lines = [strip(groups.find((group) => !group.asked), false), ...(asked.length > 0 ? asked.map((group) => strip(group, true)) : [strip(undefined, true)])];
-  return `<a class="plain heat-strip" href="${e(href)}#cache" aria-label="Cache evaluations by age. Open the entry for each one.">${lines.join("")}</a>`;
+  if (!entry.cache_results) return '<span class="muted" title="No cache evaluation on this entry.">Not evaluated</span>';
+  return `<a class="plain heat-strip" href="${e(href)}#cache" aria-label="Cache evaluations by age. Open the entry for each one.">${entry.cache_results.map((row) => strip(row, entry.cache_retention)).join("")}</a>`;
 }
 
 export interface RowOptions {
@@ -161,7 +178,7 @@ ${column("max_output", "Max output", "Largest single response in tokens (limit.o
 ${column("price_in", "Price in / out", "List price in US dollars per million tokens, input then output, as models.dev records it. Before the changes some providers make by context size or service tier: open the entry for those. On a subscription entry, the line API price marks the price of the same model at the API.", "num mid-only")}
 ${column("release_date", "Released", "When the model was released, as models.dev records it. It is the model's date: the same at every provider.", "wide-only")}
 ${column(null, "Cache, documented", "Prompt caching as the source documents it: mode and lifetimes.")}
-<th scope="col" class="strip-col"><span title="providers.dev evaluations, all clients together. Each cell is an age since the prompt was cached; the number is the share of re-sends at that age that were served from the cache, in percent. Default: the requests sent no lifetime parameter. Long: they asked for a longer lifetime with a parameter (ttl or prompt_cache_retention), and the value is shown. Hover a cell for the counts.">Cache, measured <span class="muted">% by age</span></span>${STRIP_HEAD}</th>
+<th scope="col" class="strip-col"><span title="providers.dev evaluations, all clients together. Each cell is an age since the prompt was cached, starting with the prompt sent again at once; the number is the share of re-sends at that age that were served from the cache, in percent. Short: the requests asked for no lifetime. Long: they asked for a longer one, and the value is shown. Hover a cell for the counts.">Cache, measured <span class="muted">% by age</span></span>${STRIP_HEAD}</th>
 ${column("verified", "Source", "Where the entry comes from, with a date per source: the import from models.dev, and the newest providers.dev evidence.")}
 </tr>`;
 }
@@ -238,7 +255,7 @@ function priceSection(model: JsonObject, summary: Summary, source: string): stri
   const rows = [
     fact("Input", "<code>cost.text.input.price</code>", amount(input?.price), source),
     fact("Output", "<code>cost.text.output.price</code>", amount(output?.price), source),
-    fact("Reasoning output", "<code>cost.text.output.reasoning</code>: stated where reasoning is priced apart from the rest of the output.", typeof output?.reasoning === "number" ? usd(output.reasoning) : priced ? NOT_STATED : absent, source),
+    fact("Reasoning output", "<code>cost.text.output.reasoning</code>: stated where reasoning is priced apart from the rest of the output.", typeof output?.reasoning === "number" ? usd(output.reasoning) : absent, source),
     fact("Cached input, read", "<code>cost.text.input.cache.read</code>: input served from the prompt cache.", amount(cache?.read), source),
     fact("Cached input, write", "<code>cost.text.input.cache.write</code>: input stored in the prompt cache, by lifetime where it differs.", cacheWrite(cache?.write) ?? absent, source),
   ].join("");
@@ -327,112 +344,94 @@ function sourceOf(path: string, provenance: Provenance[], origin: ModelExtension
 
 function fact(label: string, hint: string, value: string, source: string): string {
   // An unknown value has no source to name, unless it was published as unknown on purpose.
-  if ((value === UNKNOWN || value === NOT_STATED || value === IN_PLAN) && !source.includes("Corrected")) source = DASH;
+  if ((value === UNKNOWN || value === IN_PLAN) && !source.includes("Corrected")) source = DASH;
   return `<tr><th scope="row">${label}<div class="hint">${hint}</div></th><td class="num">${value}</td><td>${source}</td></tr>`;
 }
 
-function optionsText(options: JsonObject | undefined): string {
-  if (!options) return "";
-  return Object.entries(options)
-    .map(([key, value]) => `${key}=${typeof value === "string" ? value : JSON.stringify(value)}`)
-    .join(", ");
+/** One cell of a full-size table: the hit rate in percent with the counts under it, or the counts alone for one evaluation. */
+function heatCell(result: CacheResult | undefined, column: (typeof COLUMNS)[number], counts: boolean): string {
+  if (!result) return `<td class="heat"><span class="skip" title="${column.kind === "control" ? "At once" : `After ${ageText(column.age_s)}`}: not checked">·</span></td>`;
+  const inner = counts ? `${result.hits}/${result.checks}` : `${Math.round(result.hit_rate_pct)}<small>${result.hits}/${result.checks}</small>`;
+  return `<td class="heat"><span class="${level(result)}" title="${e(said(result))}">${inner}</span></td>`;
 }
 
-type Check = { warm: number; total: number };
-type AgedCheck = Check & { age_s: number };
+const HEAT_HEAD = `<th scope="col" class="age" title="${CONTROL_TITLE}">At once</th>${CACHE_AGES_S.map((age) => `<th scope="col" class="age">${shortAge(age)}</th>`).join("")}`;
 
-/** One cell of the entry's table: the checks of one age band added up. The title names the exact ages they were made at. */
-function heatCell(checks: readonly AgedCheck[], when: string): string {
-  const made = checks.filter((check) => check.total > 0);
-  if (made.length === 0) return `<td class="heat"><span class="skip" title="${e(when)}: not checked">·</span></td>`;
-  const warm = made.reduce((sum, check) => sum + check.warm, 0);
-  const total = made.reduce((sum, check) => sum + check.total, 0);
-  const share = warm / total;
-  const level = share === 1 ? "all" : share === 0 ? "none" : share >= 0.5 ? "most" : "few";
-  // Several ages in one cell (7.5, 10 and 15 minutes in the 15 min column) are listed, each with its own count.
-  const byAge = new Map<number, Check>();
-  for (const check of made) {
-    const sum = byAge.get(check.age_s) ?? { warm: 0, total: 0 };
-    byAge.set(check.age_s, { warm: sum.warm + check.warm, total: sum.total + check.total });
-  }
-  const ages = [...byAge].sort(([a], [b]) => a - b);
-  const at = ages.every(([age]) => age < 0)
-    ? when
-    : ages.length === 1
-      ? `Checked at ${exactAge((ages[0] as [number, Check])[0])}`
-      : `Checked at ${ages.map(([age, check]) => `${exactAge(age)} (${check.warm}/${check.total})`).join(", ")}`;
-  return `<td class="heat"><span class="${level}" title="${e(at)}: ${warm} of ${total} re-sends served from the cache">${warm}/${total}</span></td>`;
+/** Results at ages without a column, in words. Nothing an evaluation checked is left out of the page. */
+function otherAges(results: readonly CacheResult[], counts: boolean): string {
+  const others = results.filter((result) => !COLUMNS.some((column) => column.kind === result.kind && column.age_s === result.age_s));
+  if (others.length === 0) return "";
+  return `Also checked: ${others.map((result) => `${ageText(result.age_s)} ${counts ? "" : `${Math.round(result.hit_rate_pct)}% `}(${result.hits}/${result.checks})`).join(", ")}`;
 }
-
-/** An age as it was checked: "7.5 min", "1 h 5 min", "24 h" (not "1 d": the columns count in hours). */
-const exactAge = (seconds: number): string => (seconds % 86400 === 0 ? shortAge(seconds) : duration(seconds));
-
-/** The control of a run as a check: it has no age of its own, so it is given a negative one. */
-const controlOf = (run: Measurement): AgedCheck[] => (run.control ? [{ age_s: -1, ...run.control }] : []);
 
 /**
- * The cache evaluations of one entry. Every entry has the same table: the same columns (at once, then the ages from
- * 2.5 minutes to 24 hours) and the same two parts, the default lifetime and the long one, also where one of them
- * was not evaluated. A column holds the checks up to its age and above the column before it.
+ * The cache evaluations of one entry: the summary table (the same lines and columns as in the catalog, with the counts
+ * under each percentage), then every evaluation under it. Every entry has both, also where nothing was evaluated.
  */
-function heatmap(runs: Measurement[], now: Date): string {
-  const sorted = [...runs].sort((a, b) => b.date.localeCompare(a.date));
-  const columns = CACHE_BANDS_S.length + 1;
-  const width = columns + 3;
-  const head = `<tr><th scope="col" rowspan="2">Evaluation</th><th scope="col" rowspan="2">Result</th><th scope="colgroup" colspan="${columns}" class="span">Time since the prompt was cached · re-sends served from the cache</th><th scope="col" rowspan="2">Evidence</th></tr>
-<tr><th scope="col" class="age" title="Sent again immediately, to confirm the prompt was cached at all.">At once</th>${CACHE_BANDS_S.map((limit) => `<th scope="col" class="age" title="${e(bandSpan(limit))}">${shortAge(limit)}</th>`).join("")}</tr>`;
-
-  const cells = (members: readonly Measurement[]): string =>
-    `${heatCell(members.flatMap(controlOf), "Sent again at once")}${CACHE_BANDS_S.map((limit) =>
-      heatCell(
-        members.flatMap((run) => (run.checks ?? []).filter((check) => cacheBand(check.age_s) === limit)),
-        bandSpan(limit),
-      ),
-    ).join("")}`;
-
-  const part = (title: string, hint: string, members: Measurement[], missing: string): string => {
-    const rows = members
-      .map((run) => {
-        const verdict = runVerdict(run);
-        const options = optionsText(run.options);
-        return `<tr>
-<th scope="row">${e(run.route_label)} ${dateTag(run.date, now)}<div class="hint">${e(run.client_label)}${options ? ` · ${e(options)}` : ""}</div></th>
-<td class="result"><strong>${e(verdict.head)}</strong>${verdict.detail ? `<div class="hint">${e(verdict.detail)}</div>` : ""}${run.note ? `<div class="hint">${e(run.note)}</div>` : ""}</td>
-${cells([run])}
+function cacheMeasured(cache: EntryCache, now: Date): string {
+  const columns = COLUMNS.length;
+  const rows: CacheSummaryRow[] = cache.results ?? [
+    { retention_profile: "short", parameter: null, value: null, evaluations: 0, evaluation_ids: [], last_date: null, results: null },
+    { retention_profile: "long", parameter: null, value: null, evaluations: 0, evaluation_ids: [], last_date: null, results: null },
+  ];
+  const summary = rows
+    .map((row) => {
+      const sent = row.parameter && row.value ? `<code>${e(row.parameter)}=${e(row.value)}</code>` : row.retention_profile === "short" ? "No lifetime asked for" : "A longer lifetime asked for";
+      const head = `<th scope="row">${row.retention_profile === "short" ? "Short" : "Long"}<div class="hint">${sent}${row.evaluations > 0 ? ` · ${plural(row.evaluations, "evaluation")}` : ""}</div>${row.results && otherAges(row.results, false) ? `<div class="hint">${e(otherAges(row.results, false))}</div>` : ""}</th>`;
+      if (!row.results) return `<tr>${head}<td class="heat-none" colspan="${columns}">${notEvaluated(row, cache.retention.support)}</td></tr>`;
+      const results = row.results;
+      return `<tr>${head}${COLUMNS.map((column) => heatCell(inColumn(results, column), column, false)).join("")}</tr>`;
+    })
+    .join("");
+  const evaluations = cache.evaluations
+    .map((run) => {
+      const settings = settingsText(run.request_settings);
+      const other = otherAges(run.results, true);
+      return `<tr>
+<th scope="row">${e(run.route_label)} ${dateTag(run.date, now)}<div class="hint">${e(run.client_label)}${settings ? ` · ${e(settings)}` : ""}</div><div class="hint">${run.retention_profile === "short" ? "Short" : "Long"} retention${run.parameter && run.value ? `: <code>${e(run.parameter)}=${e(run.value)}</code>` : ""}${other ? ` · ${e(other)}` : ""}</div>${run.note ? `<div class="hint">${e(run.note)}</div>` : ""}</th>
+${COLUMNS.map((column) => heatCell(inColumn(run.results, column), column, true)).join("")}
 <td class="nowrap"><a href="${e(run.source)}" rel="noopener">Raw result</a></td>
 </tr>`;
-      })
-      .join("");
-    // Rows of three re-sends jump about. Where a part has several evaluations, a last row adds them up.
-    const together =
-      members.length > 1
-        ? `<tr class="together">
-<th scope="row">All ${members.length} together<div class="hint">Every client, added up by age</div></th>
-<td class="result"><span class="hint">Single rows have three re-sends per age, so one miss moves them a lot. The sum is steadier.</span></td>
-${cells(members)}
-<td></td>
-</tr>`
-        : "";
-    return `<tr class="part"><th scope="colgroup" colspan="${width}"><strong>${title}</strong><span class="hint">${hint}</span></th></tr>
-${members.length > 0 ? rows + together : `<tr class="part-empty"><td colspan="${width}" class="muted">${missing}</td></tr>`}`;
-  };
-
-  const plain = sorted.filter((run) => !askedLifetime(run));
-  const asked = new Map<string, Measurement[]>();
-  for (const run of sorted) {
-    const lifetime = askedLifetime(run);
-    if (lifetime) asked.set(`${lifetime.parameter}=${lifetime.value}`, [...(asked.get(`${lifetime.parameter}=${lifetime.value}`) ?? []), run]);
-  }
-  const parts = [
-    part("Default lifetime", "The request sends no lifetime parameter. This is the cache you get without asking for one.", plain, sorted.length === 0 ? "Not evaluated on this entry." : "Not evaluated: every evaluation on this entry sent a lifetime parameter."),
-    ...(asked.size > 0
-      ? [...asked].map(([sent, members]) => part("Long lifetime", `The request sends <code>${e(sent)}</code>.`, members, ""))
-      : [part("Long lifetime", "The request asks for a longer lifetime with a parameter.", [], sorted.length === 0 ? "Not evaluated on this entry." : "Not evaluated: no evaluation on this entry sent a lifetime parameter.")]),
-  ];
-  return `<p class="hint max-w-3xl">Each evaluation caches a fresh prompt, then sends it again at set ages. A cell shows how many of the re-sends at that age were served from the cache: <code>3/3</code> is all of them. Every entry has the same columns; a column holds the checks up to its age and above the column before it, so <em>15 min</em> is 5 to 15 minutes. Hover a cell for the exact ages.</p>
-<div class="scroll mt-3"><table class="facts heat"><thead>${head}</thead><tbody>${parts.join("")}</tbody></table></div>
-<p class="legend"><span><span class="heat-key all">3/3</span> All served from the cache</span><span><span class="heat-key most">2/3</span> Most</span><span><span class="heat-key few">1/3</span> Few</span><span><span class="heat-key none">0/3</span> None</span><span><span class="heat-key skip">·</span> Not checked at that age</span></p>
+    })
+    .join("");
+  return `<p class="hint max-w-3xl">An evaluation caches a fresh prompt, sends it again at once, and then again at set ages. A cell is the share of those re-sends that were served from the cache, in percent, with the counts under it. Short is the cache a request gets without asking for a lifetime; Long is what it gets when it asks for a longer one.</p>
+<div class="scroll mt-3"><table class="facts heat summary"><thead><tr><th scope="col" rowspan="2">Retention</th><th scope="colgroup" colspan="${columns}" class="span">Time since the prompt was cached · served from the cache, in percent</th></tr><tr>${HEAT_HEAD}</tr></thead><tbody>${summary}</tbody></table></div>
+<p class="legend"><span><span class="heat-key all">100</span> All served from the cache</span><span><span class="heat-key most">67</span> Half or more</span><span><span class="heat-key few">33</span> Fewer</span><span><span class="heat-key none">0</span> None</span><span><span class="heat-key skip">·</span> Not checked at that age</span></p>
+<details class="evaluations"${cache.evaluations.length > 0 ? " open" : ""}><summary>Individual evaluations (${cache.evaluations.length})</summary>
+${
+  cache.evaluations.length > 0
+    ? `<div class="scroll mt-3"><table class="facts heat"><thead><tr><th scope="col" rowspan="2">Evaluation</th><th scope="colgroup" colspan="${columns}" class="span">Time since the prompt was cached · re-sends served from the cache, of those made</th><th scope="col" rowspan="2">Evidence</th></tr><tr>${HEAT_HEAD}</tr></thead><tbody>${evaluations}</tbody></table></div>`
+    : '<p class="muted mt-3">No evaluations on this entry.</p>'
+}
+</details>
 <p class="hint">A result holds for the access method and client named, on that date. It is what was observed, not a guaranteed lifetime. <a href="/docs/methodology/#evaluations">How evaluations work</a></p>`;
+}
+
+/** What a request can do about the cache lifetime. The same rows on every entry. */
+function retentionTable(retention: CacheRetention): string {
+  const support = { supported: "Supported", unsupported: '<span class="muted">Unsupported</span>', unknown: UNKNOWN }[retention.support];
+  const none = retention.support === "unsupported" ? NOT_APPLICABLE : UNKNOWN;
+  const profile = (name: "short" | "long"): string => {
+    const items = retention.profiles.filter((item) => item.profile === name);
+    if (items.length === 0) return none;
+    return items.map((item) => (item.value === null ? "Leave the parameter out" : `<code>${e(item.value)}</code>`)).join(", ");
+  };
+  const row = (label: string, hint: string, value: string): string => `<tr><th scope="row">${label}<div class="hint">${hint}</div></th><td>${value}</td></tr>`;
+  const evidence =
+    retention.evidence.length > 0
+      ? `<ul class="evidence">${retention.evidence.map((item) => `<li><span class="badge ${item.kind}">${item.kind}</span> <a href="${e(item.url)}" rel="noopener">${e(shortUrl(item.url))}</a>${item.date ? ` <span class="muted date">${e(item.date)}</span>` : ""}<div class="hint">${e(item.note)}</div></li>`).join("")}</ul>`
+      : none;
+  return `<div class="scroll"><table class="facts"><thead><tr><th scope="col">Retention</th><th scope="col">Value</th></tr></thead><tbody>
+${row("Support", "<code>support</code>: whether a request can ask for a cache lifetime on this entry.", support)}
+${row("Parameter", "<code>parameter</code>: the request field, and where it goes.", retention.parameter ? `<code>${e(retention.parameter.name)}</code><div class="hint">${e(retention.parameter.location)}</div>` : none)}
+${row("Accepted values", "<code>accepted_values</code>: documented, or accepted in an evaluation.", retention.accepted_values ? retention.accepted_values.map((value) => `<code>${e(value)}</code>`).join(", ") : none)}
+${row("Default", "<code>default</code>: the lifetime when the parameter is left out.", retention.default ? `<code>${e(retention.default)}</code>` : none)}
+${row("Short", "<code>profiles</code>: what gives the short retention.", profile("short"))}
+${row("Long", "<code>profiles</code>: what gives the long retention.", profile("long"))}
+${row("Conditions", "<code>conditions</code>: a client, protocol or header this depends on.", retention.conditions.length > 0 ? retention.conditions.map(e).join("<br>") : retention.support === "unknown" ? UNKNOWN : "None recorded")}
+${row("Evidence", "<code>evidence</code>: the source of the rows above, and its date.", evidence)}
+</tbody></table></div>
+<p class="hint">Supported means the access method accepts the value. The lifetime it then gives is in the measured results below, not here.</p>`;
 }
 
 function measuredLimitRows(limits: MeasuredLimit[]): string {
@@ -464,16 +463,18 @@ function cacheDocumented(model: JsonObject, provenance: Provenance[], origin: Mo
     const state = !known
       ? UNKNOWN
       : supported
-        ? "Yes"
-        : `<span class="muted" title="${cache === false ? "The source says this entry does not cache prompts." : "The source lists the other way of caching only. A way it does not list is not supported."}">No</span>`;
+        ? "Supported"
+        : `<span class="muted" title="${cache === false ? "The source says this entry does not cache prompts." : "The source lists the other way of caching only. A way it does not list is not supported."}">Unsupported</span>`;
     const ttl = Array.isArray(detail.ttl) && detail.ttl.length > 0 ? detail.ttl.map((item) => `<span class="chip">${e(String(item))}</span>`).join(" ") : UNKNOWN;
+    // A way of caching the entry does not have has no details; where the source says nothing, the details are unknown too.
+    const blank = known ? NOT_APPLICABLE : UNKNOWN;
     return `<tr>
 <th scope="row">${CACHE_MODE_WORD[mode]} <span class="chip">${mode}</span><div class="hint">${mode === "implicit" ? "The provider caches on its own." : "The request marks what to cache."}</div></th>
 <td>${state}</td>
-<td>${supported ? ttl : DASH}</td>
-<td class="num">${supported ? (typeof detail.min_tokens === "number" ? exact(detail.min_tokens) : UNKNOWN) : DASH}</td>
-<td class="num">${supported && mode === "explicit" ? (typeof detail.max_breakpoints === "number" ? exact(detail.max_breakpoints) : UNKNOWN) : DASH}</td>
-<td>${supported && mode === "explicit" ? (Array.isArray(detail.targets) ? e(detail.targets.join(", ")) : UNKNOWN) : DASH}</td>
+<td>${supported ? ttl : blank}</td>
+<td class="num">${supported ? (typeof detail.min_tokens === "number" ? exact(detail.min_tokens) : UNKNOWN) : blank}</td>
+<td class="num">${supported && mode === "explicit" ? (typeof detail.max_breakpoints === "number" ? exact(detail.max_breakpoints) : UNKNOWN) : mode === "implicit" && known ? NOT_APPLICABLE : blank}</td>
+<td>${supported && mode === "explicit" ? (Array.isArray(detail.targets) ? e(detail.targets.join(", ")) : UNKNOWN) : mode === "implicit" && known ? NOT_APPLICABLE : blank}</td>
 </tr>`;
   });
   const foot = !known
@@ -505,17 +506,16 @@ export function entryHtml(view: EntryView): string {
   const extension = model[NS] as unknown as ModelExtension;
   const provenance = extension.provenance ?? [];
   const limit = isObject(model.limit) ? model.limit : {};
-  const runs = extension.cache?.observed ?? [];
+  const cache = extension.cache;
+  const runs = cache.evaluations;
   const measuredLimits = extension.limits?.measured ?? [];
   const fromMeasurement = extension.limits?.from_measurement ?? [];
   const number = (value: Json | undefined): string => (typeof value === "number" ? `${exact(value)} <span class="muted">tokens</span>` : UNKNOWN);
   const big = (value: Json | undefined): string => (typeof value === "number" ? `${exact(value)} <span class="unit">tokens</span>` : '<span class="muted">Unknown</span>');
-  const api = `/api/v1/entry?ref=${encodeURIComponent(summary.ref)}`;
-  const warm = warmRange(summary);
-  const seen = runs.map((run) => run.last_warm_s).filter((age): age is number => age !== null);
-  const measuredValue = runs.length === 0 ? '<span class="muted">Not measured</span>' : warm ? e(warm) : seen.length > 0 ? "Part of the time" : "Not cached";
-  const measuredFoot =
-    runs.length === 0 ? "No evaluations on this entry" : `${plural(runs.length, "evaluation")}${seen.length > 0 ? ` · seen cached as late as ${duration(Math.max(...seen))}` : ""}`;
+  const api = `/api/v1${entryHref(summary.ref)}`;
+  const newest = (cache.results ?? []).map((row) => row.last_date).filter((date): date is string => date !== null).sort().at(-1);
+  const measuredValue = summary.evaluation_count === 0 ? '<span class="muted">Not evaluated</span>' : plural(summary.evaluation_count, "evaluation");
+  const measuredFoot = summary.evaluation_count === 0 ? "No evaluations on this entry" : `The newest on ${newest}`;
   const cacheTile =
     summary.cache === "unknown"
       ? '<span class="muted">Unknown</span>'
@@ -556,7 +556,7 @@ export function entryHtml(view: EntryView): string {
     <thead><tr><th scope="col">Limit</th><th scope="col" class="num">Value</th><th scope="col">Source</th></tr></thead>
     <tbody>
       ${fact("Context window", "<code>limit.context</code>: what this provider accepts for the model, input and output together.", number(limit.context), sourceOf("limit.context", provenance, extension.origin, fromMeasurement))}
-      ${fact("Largest input", "<code>limit.input</code>: stated where the input limit is lower than the context window.", limit.input !== undefined || provenance.some((item) => item.path === "limit.input") ? number(limit.input) : NOT_STATED, sourceOf("limit.input", provenance, extension.origin))}
+      ${fact("Largest input", "<code>limit.input</code>: stated where the input limit is lower than the context window.", number(limit.input), sourceOf("limit.input", provenance, extension.origin))}
       ${fact("Maximum output", "<code>limit.output</code>: the most one response can hold. A maximum, not what you get by default.", number(limit.output), sourceOf("limit.output", provenance, extension.origin, fromMeasurement))}
     </tbody>
   </table></div>
@@ -576,8 +576,10 @@ export function entryHtml(view: EntryView): string {
   <h2 id="cache">Prompt caching</h2>
   <h3>Documented</h3>
   ${cacheDocumented(model, provenance, extension.origin)}
+  <h3>Retention</h3>
+  ${retentionTable(cache.retention)}
   <h3>Measured</h3>
-  ${heatmap(runs, now)}
+  ${cacheMeasured(cache, now)}
 </section>
 
 <section aria-labelledby="provenance">

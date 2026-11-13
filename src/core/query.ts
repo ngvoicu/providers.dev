@@ -1,4 +1,4 @@
-// One query language for the entry list. The website's URL, /api/v1/models and the tests all go through
+// One query language for the entry list. The website's URL, /api/v1/entries and the tests all go through
 // parseQuery() and runQuery(), so a filter means the same thing everywhere.
 import type { Summary } from "./entries.ts";
 
@@ -25,22 +25,22 @@ export interface Query {
   min_context?: number;
   min_output?: number;
   max_age_months?: number;
-  measured?: boolean;
+  evaluated?: boolean;
   sort: SortKey;
   order: "asc" | "desc";
   limit: number;
   offset: number;
 }
 
-interface ParamDoc {
-  name: keyof Query;
+export interface ParamDoc<Name extends string = string> {
+  name: Name;
   kind: "text" | "list" | "integer" | "boolean" | "enum";
   values?: readonly string[];
   description: string;
 }
 
-/** The single description of every query parameter: validation, the OpenAPI document and the docs page read it. */
-export const PARAMS: ParamDoc[] = [
+/** The single description of every query parameter of the entry list: validation, the OpenAPI document and the docs page read it. */
+export const PARAMS: ParamDoc<keyof Query & string>[] = [
   { name: "q", kind: "text", description: "Words to find in the provider id or name, the model id or name, the family or the canonical id. Every word must match." },
   { name: "provider", kind: "list", description: "Provider ids, comma-separated. An entry matches any of them." },
   { name: "family", kind: "text", description: "Exact model family, for example claude-opus." },
@@ -53,11 +53,38 @@ export const PARAMS: ParamDoc[] = [
   { name: "min_context", kind: "integer", description: "Smallest context window, in tokens, that this provider exposes for the model (limit.context). Entries with an unknown window do not match." },
   { name: "min_output", kind: "integer", description: "Smallest maximum response size, in tokens (limit.output). A maximum, not a default. Entries with an unknown maximum do not match." },
   { name: "max_age_months", kind: "integer", description: `Only models released in the last N months, counted back from today (UTC), 1 to ${MAX_AGE_MONTHS}. A release date given only to the month counts when that month is in range. Entries with an unknown release date do not match.` },
-  { name: "measured", kind: "boolean", description: "true = only entries with providers.dev cache evaluations; false = only entries without." },
+  { name: "evaluated", kind: "boolean", description: "true = only entries with providers.dev cache evaluations; false = only entries without." },
   { name: "sort", kind: "enum", values: SORT_KEYS, description: "Sort key. Ties are broken by provider id, then model id. Entries with no value for the key come last in either order." },
   { name: "order", kind: "enum", values: ["asc", "desc"], description: "Sort direction." },
   { name: "limit", kind: "integer", description: `Entries per page, 1 to ${MAX_LIMIT}. Default ${DEFAULT_LIMIT}.` },
   { name: "offset", kind: "integer", description: "Entries to skip. Default 0." },
+];
+
+const PAGING: ParamDoc[] = [
+  { name: "limit", kind: "integer", description: `Items per page, 1 to ${MAX_LIMIT}. Default ${DEFAULT_LIMIT}.` },
+  { name: "offset", kind: "integer", description: "Items to skip. Default 0." },
+];
+/** The parameters of the other lists. Every list pages the same way. */
+export const PROVIDER_PARAMS: ParamDoc[] = [
+  { name: "access", kind: "list", values: ["api", "subscription", "unknown"], description: "How the provider is reached." },
+  { name: "origin", kind: "list", values: ["upstream", "added"], description: "upstream = imported from models.dev; added = a provider models.dev does not list." },
+  ...PAGING,
+];
+export const MODEL_PARAMS: ParamDoc[] = [
+  { name: "q", kind: "text", description: "Words to find in the model's id or name. Every word must match." },
+  { name: "lab", kind: "text", description: "Exact lab, the first part of the id, for example anthropic." },
+  ...PAGING,
+];
+export const EVALUATION_PARAMS: ParamDoc[] = [
+  { name: "kind", kind: "enum", values: ["cache", "limit"], description: "cache = cache evaluations; limit = limit evaluations. Without it, both." },
+  { name: "provider", kind: "list", description: "Provider ids, comma-separated." },
+  { name: "entry", kind: "text", description: "Exact entry, provider/model." },
+  { name: "retention_profile", kind: "enum", values: ["short", "long"], description: "Only cache evaluations with this retention profile." },
+  { name: "client", kind: "list", description: "Client ids, comma-separated, for example direct or cliproxyapi." },
+  ...PAGING,
+];
+export const PROVIDER_VIEW_PARAMS: ParamDoc[] = [
+  { name: "view", kind: "enum", values: ["summary", "full"], description: "summary (default) = the provider and the summaries of its entries. full = also every entry in full, under models." },
 ];
 
 export interface QueryError {
@@ -72,15 +99,24 @@ export type ParseResult = { ok: true; query: Query } | { ok: false; errors: Quer
  * the website passes false so that unrelated URL parameters are ignored.
  */
 export function parseQuery(params: URLSearchParams, strict = true): ParseResult {
+  const parsed = parseParams(params, PARAMS, strict);
+  if (!parsed.ok) return parsed;
+  return { ok: true, query: { sort: "provider", order: "asc", limit: DEFAULT_LIMIT, offset: 0, ...parsed.values } as unknown as Query };
+}
+
+export type ParamsResult = { ok: true; values: Record<string, unknown> } | { ok: false; errors: QueryError[] };
+
+/** Validate query parameters against their description. The same rules for every list of the API. */
+export function parseParams(params: URLSearchParams, docs: readonly ParamDoc[], strict = true): ParamsResult {
   const errors: QueryError[] = [];
-  const query: Record<string, unknown> = { sort: "provider", order: "asc", limit: DEFAULT_LIMIT, offset: 0 };
-  const known = new Map(PARAMS.map((param) => [param.name as string, param]));
+  const query: Record<string, unknown> = {};
+  const known = new Map(docs.map((param) => [param.name as string, param]));
   const seen = new Set<string>();
 
   for (const [name, raw] of params) {
     const doc = known.get(name);
     if (!doc) {
-      if (strict) errors.push({ param: name, message: `Unknown parameter. Allowed: ${[...known.keys()].join(", ")}.` });
+      if (strict) errors.push({ param: name, message: known.size > 0 ? `Unknown parameter. Allowed: ${[...known.keys()].join(", ")}.` : "Unknown parameter. This endpoint takes none." });
       continue;
     }
     if (seen.has(name)) {
@@ -114,7 +150,7 @@ export function parseQuery(params: URLSearchParams, strict = true): ParseResult 
       else query[name] = number;
     }
   }
-  return errors.length > 0 ? { ok: false, errors } : { ok: true, query: query as unknown as Query };
+  return errors.length > 0 ? { ok: false, errors } : { ok: true, values: query };
 }
 
 /** The canonical query string of a query: defaults left out, fixed order. Used for URLs and ETags. */
@@ -158,7 +194,7 @@ function matches(entry: Summary, query: Query, words: string[], releasedSince: s
   if (query.cache_mode && !query.cache_mode.some((mode) => (entry.cache_modes as string[]).includes(mode))) return false;
   if (query.min_context !== undefined && !(entry.context !== undefined && entry.context >= query.min_context)) return false;
   if (query.min_output !== undefined && !(entry.max_output !== undefined && entry.max_output >= query.min_output)) return false;
-  if (query.measured !== undefined && query.measured !== entry.evaluations > 0) return false;
+  if (query.evaluated !== undefined && query.evaluated !== entry.evaluation_count > 0) return false;
   if (words.length > 0) {
     const haystack = `${entry.provider} ${entry.model} ${entry.name} ${entry.family ?? ""} ${entry.canonical_id ?? ""}`.toLowerCase();
     if (!words.every((word) => haystack.includes(word))) return false;

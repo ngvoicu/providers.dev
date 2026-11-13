@@ -1,5 +1,6 @@
 // resolve(): upstream snapshot + our additions + our overrides + our measurements -> the published catalog.
 // Pure: no files, no network, no clock. The same inputs always give the same output.
+import { cacheResult, lifetimeAsked, profileOf, retentionOf, summarizeCache, type CacheEvaluation } from "./cache.ts";
 import { clone, isObject, mergePatch, type Change, type Json, type JsonObject } from "./merge.ts";
 import {
   NS,
@@ -11,7 +12,6 @@ import {
   type Issue,
   type MeasuredLimit,
   type MeasurementLabels,
-  type Measurement,
   type ModelExtension,
   type ObservedFile,
   type OverrideFile,
@@ -31,6 +31,8 @@ export interface ResolveInput {
   routes: RouteMap;
   labels?: MeasurementLabels;
   observed?: ObservedFile;
+  /** The date of the models.dev import (YYYY-MM-DD): the date of what is taken from its documentation. */
+  upstreamDate?: string;
 }
 
 export interface ResolveResult {
@@ -277,6 +279,7 @@ export function resolve(input: ResolveInput): ResolveResult {
   }
 
   // 5. Measurements land on the entry they were taken on. They never replace a documented value.
+  const evaluations = new Map<PublishedModel, CacheEvaluation[]>();
   if (observed) {
     const routeLabel = (route: string): string => observed.routes[route] ?? route;
     const unknownClients = new Set<string>();
@@ -329,25 +332,28 @@ export function resolve(input: ResolveInput): ResolveResult {
         continue;
       }
       const note = publicNote(run.note);
-      const measurement: Measurement = {
-        run: run.id.slice(run.id.lastIndexOf("/") + 1),
+      const settings = (run.options ?? {}) as JsonObject;
+      const asked = lifetimeAsked(settings);
+      const evaluation: CacheEvaluation = {
+        id: run.id,
         route: run.route,
         route_label: routeLabel(run.route),
         ...clientOf(run.client),
-        ...(run.options && Object.keys(run.options).length > 0 ? { options: run.options as JsonObject } : {}),
         date: run.date,
-        ...(run.control ? { control: { warm: run.control.warm, total: run.control.total } } : {}),
-        ...(run.checks ? { checks: run.checks.map((c) => ({ age_s: c.age_s, warm: c.warm, total: c.total })) } : {}),
+        request_settings: settings,
+        retention_profile: profileOf(asked?.value ?? null, model),
+        parameter: asked?.parameter ?? null,
+        value: asked?.value ?? null,
+        // One result per exact age, the control first. An age with no check made has no result.
+        results: [
+          ...(run.control && run.control.total > 0 ? [cacheResult("control", 0, run.control.warm, run.control.total)] : []),
+          ...(run.checks ?? []).filter((c) => c.total > 0).sort((a, b) => a.age_s - b.age_s).map((c) => cacheResult("timed", c.age_s, c.warm, c.total)),
+        ],
         ...(run.late_excluded ? { late_excluded: run.late_excluded } : {}),
-        all_warm_through_s: run.all_warm_through_s ?? null,
-        last_warm_s: run.last_warm_s ?? null,
-        first_all_cold_s: run.first_all_cold_s ?? null,
         ...(note ? { note } : {}),
         source: sourceUrl(run.source),
       };
-      const extension = modelExt(model);
-      extension.cache ??= {};
-      (extension.cache.observed ??= []).push(measurement);
+      (evaluations.get(model) ?? evaluations.set(model, []).get(model)!).push(evaluation);
     }
 
     for (const limit of observed.limits) {
@@ -412,11 +418,14 @@ export function resolve(input: ResolveInput): ResolveResult {
     const provider = catalog[id] as PublishedProvider;
     for (const model of Object.values(provider.models)) {
       const extension = modelExt(model);
-      extension.cache?.observed?.sort((a, b) => b.date.localeCompare(a.date) || a.run.localeCompare(b.run));
+      // Every entry gets the same cache record: what a request can ask for, the summary table, and the evaluations
+      // under it. The sums and percentages are made here, once; pages and API answers only pass them on.
+      const own = (evaluations.get(model) ?? []).sort((a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id));
+      extension.cache = { retention: retentionOf(model, own, input.upstreamDate ?? null), results: summarizeCache(own), evaluations: own };
       const verified = newestDate([
         ...(extension.evidence ?? []).map((e) => e.date),
         ...(extension.provenance ?? []).flatMap((p) => p.evidence.map((e) => e.date)),
-        ...(extension.cache?.observed ?? []).map((m) => m.date),
+        ...own.map((m) => m.date),
         ...(extension.limits?.measured ?? []).map((m) => m.date),
       ]);
       if (verified) extension.verified = verified;
@@ -471,7 +480,7 @@ export function isOurs(model: JsonObject): boolean {
   return (
     extension.origin === "added" ||
     Boolean(extension.provenance?.length) ||
-    Boolean(extension.cache?.observed?.length) ||
+    Boolean(extension.cache?.evaluations.length) ||
     Boolean(extension.limits?.measured?.length)
   );
 }

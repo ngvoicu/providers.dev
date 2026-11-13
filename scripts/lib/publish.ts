@@ -4,13 +4,14 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync
 import { join } from "node:path";
 import { parse as parseYaml } from "yaml";
 import type { ZodType } from "zod";
+import { CACHE_AGES_S } from "../../src/core/cache.ts";
 import { buildIndex, SHARD_SIZE, type Index } from "../../src/core/entries.ts";
+import { listEvaluations } from "../../src/core/resources.ts";
 import { resolve } from "../../src/core/resolve.ts";
 import {
   AccessRules,
   AuthoredProvider,
   MeasurementLabels,
-  NS,
   ObservedFile,
   OverrideFile,
   RouteMap,
@@ -19,7 +20,6 @@ import {
   type Catalog,
   type Issue,
   type Meta,
-  type ProviderExtension,
   type SourceMeta,
 } from "../../src/core/schema.ts";
 import { readJsonIfExists, sha256, swapDir } from "./files.ts";
@@ -99,7 +99,16 @@ export function publish(input: PublishOptions): PublishReport {
   }
   if (errors.length > 0 || !access || !routes) return { ok: false, errors, issues: [] };
 
-  const { catalog, issues, exclusions } = resolve({ upstream: upstream.catalog, additions, overrides, access, routes, ...(labels ? { labels } : {}), ...(observed ? { observed } : {}) });
+  const { catalog, issues, exclusions } = resolve({
+    upstream: upstream.catalog,
+    additions,
+    overrides,
+    access,
+    routes,
+    upstreamDate: upstream.meta.fetched_at.slice(0, 10),
+    ...(labels ? { labels } : {}),
+    ...(observed ? { observed } : {}),
+  });
   for (const issue of issues) if (issue.level === "error") errors.push(`${issue.target}: ${issue.message}`);
   if (errors.length > 0) return { ok: false, errors, issues };
 
@@ -120,15 +129,19 @@ export function publish(input: PublishOptions): PublishReport {
     generated_at: generatedAt,
     counts: {
       providers: index.providers.length,
-      models: index.entries.length,
+      entries: index.entries.length,
+      models: new Set(index.entries.map((entry) => entry.canonical_id).filter(Boolean)).size,
       added_providers: index.providers.filter((provider) => provider.origin === "added").length,
-      added_models: index.entries.filter((entry) => entry.origin === "added").length,
-      overridden_models: index.entries.filter((entry) => entry.overridden_fields.length > 0).length,
-      measured_models: index.entries.filter((entry) => entry.evaluations > 0).length,
+      added_entries: index.entries.filter((entry) => entry.origin === "added").length,
+      corrected_entries: index.entries.filter((entry) => entry.overridden_fields.length > 0).length,
+      evaluated_entries: index.entries.filter((entry) => entry.evaluation_count > 0).length,
+      cache_evaluations: index.entries.reduce((sum, entry) => sum + entry.evaluation_count, 0),
+      limit_evaluations: index.entries.reduce((sum, entry) => sum + entry.measured_limit_count, 0),
     },
+    cache_ages_s: [...CACHE_AGES_S],
     upstream: upstream.meta,
     ...(observed && observedMeta
-      ? { measurements: { ...observedMeta, repository: observed.repository, runs: index.entries.reduce((sum, entry) => sum + entry.evaluations, 0), limits: observed.limits.length } }
+      ? { measurements: { ...observedMeta, repository: observed.repository } }
       : {}),
     sync: status
       ? { last_attempt_at: status.last_attempt_at, last_attempt_ok: status.last_attempt_ok, ...(status.last_error ? { last_error: status.last_error } : {}) }
@@ -167,13 +180,8 @@ function writeSnapshot(dir: string, catalog: Catalog, index: Index, meta: Meta, 
   writeFileSync(join(site, "data", "catalog.json"), compact({ meta: short, providers: catalog }));
   writeFileSync(join(site, "data", "meta.json"), compact(meta));
   writeFileSync(join(site, "data", "index.json"), compact(index));
-  writeFileSync(
-    join(site, "data", "providers.json"),
-    compact({
-      meta: short,
-      data: index.providers.map((provider) => ({ ...provider, [NS]: (catalog[provider.id] as Catalog[string])[NS] as unknown as ProviderExtension })),
-    }),
-  );
+  // Every evaluation with the entry it was made on: what /api/v1/evaluations answers from.
+  writeFileSync(join(site, "data", "evaluations.json"), compact({ meta: short, data: listEvaluations(catalog, index) }));
   for (const [id, provider] of Object.entries(catalog)) {
     writeFileSync(join(site, "data", "providers", `${id}.json`), compact({ meta: short, data: provider }));
     const models = Object.entries(provider.models);
@@ -213,7 +221,7 @@ function writeSnapshot(dir: string, catalog: Catalog, index: Index, meta: Meta, 
   ].join("\n");
   writeFileSync(join(site, "_headers"), `/api.json\n${freshness}\n\n/data/*\n${freshness}\n`);
 
-  // What the Worker bundles: the index for /api/v1/models and the metadata.
+  // What the Worker bundles: the index, which answers every list of the API, and the metadata.
   mkdirSync(join(dir, "worker"), { recursive: true });
   writeFileSync(join(dir, "worker", "index.json"), compact(index));
   writeFileSync(join(dir, "worker", "meta.json"), compact(meta));

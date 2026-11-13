@@ -263,9 +263,25 @@ describe("resolve: measurements", () => {
     const { catalog } = resolve(input([], { observed, routes, labels: directLabel, additions: [login] }));
     const model = catalog.lab!.models["model-a"]!;
     expect(model.limit).toEqual({ context: 200000, output: 64000 });
-    expect(ext(model).cache?.observed).toEqual([
-      expect.objectContaining({ run: "run-1", client: "direct", route_label: "Lab API key", all_warm_through_s: 300, source: "https://github.com/example/probe/blob/main/results/run-1.json" }),
+    expect(ext(model).cache.evaluations).toEqual([
+      expect.objectContaining({
+        id: "run-1",
+        client: "direct",
+        route_label: "Lab API key",
+        retention_profile: "short",
+        parameter: null,
+        value: null,
+        results: [{ kind: "timed", age_s: 300, hits: 3, checks: 3, hit_rate_pct: 100 }],
+        source: "https://github.com/example/probe/blob/main/results/run-1.json",
+      }),
     ]);
+    // The summary table is made here, once: a short line with the result, and a long line that was not evaluated.
+    expect(ext(model).cache.results).toEqual([
+      expect.objectContaining({ retention_profile: "short", evaluations: 1, evaluation_ids: ["run-1"], results: [{ kind: "timed", age_s: 300, hits: 3, checks: 3, hit_rate_pct: 100 }] }),
+      expect.objectContaining({ retention_profile: "long", evaluations: 0, results: null }),
+    ]);
+    // Every entry has the same cache record, also one nobody evaluated.
+    expect(ext(catalog.lab!.models["model-b"] ?? Object.values(catalog.lab!.models).find((item) => item.id !== "model-a")!).cache).toMatchObject({ results: null, evaluations: [] });
     expect(ext(model).verified).toBe("2026-11-05");
     expect(ext(model).provenance).toBeUndefined();
   });
@@ -276,7 +292,7 @@ describe("resolve: measurements", () => {
     expect(added).toMatchObject({ name: "Model A", canonical_id: "lab/model-a" });
     expect(added.limit).toBeUndefined();
     expect(ext(added)).toMatchObject({ origin: "added", access: "subscription" });
-    expect(ext(added).cache?.observed).toHaveLength(1);
+    expect(ext(added).cache.evaluations).toHaveLength(1);
     expect(issues).toEqual([expect.objectContaining({ code: "unmapped-route", target: "nowhere" })]);
   });
 
@@ -303,18 +319,24 @@ describe("resolve: measurements", () => {
     const labelled: ObservedFile = {
       ...observed,
       cache: [
-        { ...observed.cache[0]!, id: "tool-x-1.0/R7", client: "tool-x", note: "ToolX 1.0 with patch 12; 5 samples per age" },
-        { ...observed.cache[0]!, id: "tool-x-1.0/R8", lacks: "patch 12" },
+        { ...observed.cache[0]!, id: "runs-1.0/R7", client: "tool-x", note: "ToolX 1.0 with patch 12; 5 samples per age", control: { warm: 1, total: 1 }, options: { ttl: "1h" } },
+        { ...observed.cache[0]!, id: "runs-1.0/R8", lacks: "patch 12" },
         { ...observed.cache[0]!, id: "other/R9", client: "mystery" },
       ],
     };
     const labels = { clients: { "tool-x": { id: "gateway", label: "Through a gateway" } }, omit_note_parts_mentioning: ["toolx"] };
     const { catalog, issues } = resolve(input([], { observed: labelled, routes, labels, additions: [login] }));
-    const runs = ext(catalog.lab!.models["model-a"]!).cache!.observed!;
-    expect(runs.map((run) => [run.run, run.client, run.client_label, run.note])).toEqual([
-      ["R7", "gateway", "Through a gateway", "5 samples per age"],
-      ["R9", "other", "Another client", undefined],
+    const cache = ext(catalog.lab!.models["model-a"]!).cache;
+    const runs = cache.evaluations;
+    expect(runs.map((run) => [run.id, run.client, run.client_label, run.note])).toEqual([
+      ["other/R9", "other", "Another client", undefined],
+      ["runs-1.0/R7", "gateway", "Through a gateway", "5 samples per age"],
     ]);
+    // The run that sent a lifetime is the long line, with the request field it stands for; the control comes first.
+    expect(runs[1]).toMatchObject({ retention_profile: "long", parameter: "cache_control.ttl", value: "1h", request_settings: { ttl: "1h" } });
+    expect(runs[1]!.results.map((item) => [item.kind, item.age_s])).toEqual([["control", 0], ["timed", 300]]);
+    expect(cache.results!.map((row) => [row.retention_profile, row.value, row.evaluations])).toEqual([["short", null, 1], ["long", "1h", 1]]);
+    expect(cache.retention).toMatchObject({ support: "supported", parameter: { name: "cache_control.ttl" }, accepted_values: ["1h"] });
     expect(JSON.stringify(runs)).not.toMatch(/tool-x|ToolX/);
     expect(issues).toContainEqual(expect.objectContaining({ code: "unmapped-client", target: "mystery" }));
   });

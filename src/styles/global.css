@@ -163,7 +163,8 @@
 @layer components {
   .page {
     width: 100%;
-    max-width: 92rem;
+    /* wide enough for the catalog with every column: the cache summary alone has nineteen cells */
+    max-width: 100rem;
     margin-inline: auto;
     padding-inline: 1rem;
   }
@@ -332,6 +333,24 @@
     font-size: clamp(1.9rem, 3.6vw, 2.6rem);
     letter-spacing: -0.035em;
     max-width: 22ch;
+  }
+  /* The catalog's heading: one line of title, one of text, one of facts, then the table */
+  .home-head h1 {
+    font-size: clamp(1.45rem, 2.4vw, 1.8rem);
+    letter-spacing: -0.03em;
+  }
+  .home-head .lead {
+    margin-top: 0.5rem;
+    max-width: 62rem;
+    font-size: 0.95rem;
+    line-height: 1.55;
+  }
+  .facts-line {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem 1.4rem;
+    margin-top: 0.6rem;
+    font-size: 0.84rem;
   }
   .lead {
     max-width: 44rem;
@@ -552,7 +571,7 @@
   }
   @media (min-width: 640px) {
     table.entries tbody th {
-      min-width: 15rem;
+      min-width: 12.5rem;
     }
   }
   table.entries tbody th > a {
@@ -640,13 +659,13 @@
   .mid-only {
     display: none;
   }
-  @media (min-width: 1360px) {
+  @media (min-width: 1440px) {
     th.mid-only,
     td.mid-only {
       display: table-cell;
     }
   }
-  @media (min-width: 1440px) {
+  @media (min-width: 1560px) {
     th.wide-only,
     td.wide-only {
       display: table-cell;
@@ -680,6 +699,17 @@
     align-items: center;
     gap: 0.3rem 0.5rem;
     vertical-align: top;
+  }
+  /* Where the table is tight, the dates of the sources give way: they are in the entry's page and in each label's tooltip */
+  @media (max-width: 1359px) {
+    table.entries .sources {
+      grid-template-columns: max-content;
+    }
+    table.entries .sources > .date,
+    table.entries .sources > .stale,
+    table.entries .sources > span:empty {
+      display: none;
+    }
   }
   .sources.side {
     display: inline-flex;
@@ -754,14 +784,14 @@
   }
   table.heat td.heat {
     min-width: 0;
-    width: 3.25rem;
-    padding: 0.35rem 0.15rem;
+    width: 2.75rem;
+    padding: 0.35rem 0.1rem;
     text-align: center;
   }
   table.heat td.heat span,
   .heat-key {
     display: block;
-    min-width: 2.9rem;
+    min-width: 2.5rem;
     padding: 0.45rem 0;
     border-radius: 6px;
     font-family: var(--font-mono);
@@ -800,6 +830,29 @@
   }
   td.heat .skip {
     border-color: transparent;
+  }
+  /* The summary table: the percentage, and the counts it comes from under it */
+  table.heat.summary td.heat span {
+    padding: 0.3rem 0;
+    font-size: 0.86rem;
+  }
+  table.heat td.heat small {
+    display: block;
+    margin-top: 0.1rem;
+    font-size: 0.66rem;
+    opacity: 0.8;
+  }
+  table.heat td.heat-none {
+    font-size: 0.88rem;
+    vertical-align: middle;
+  }
+  details.evaluations {
+    margin-top: 1.1rem;
+  }
+  details.evaluations > summary {
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
   }
   .legend {
     display: flex;
@@ -897,8 +950,20 @@
   /* Cache evaluations in the catalog: one row of cells per entry, one cell per age, the same ages in every row */
   .strip {
     display: grid;
-    grid-template-columns: repeat(10, 1.35rem);
+    /* the control ("at once"), a little apart, then the eighteen ages */
+    grid-template-columns: 1.2rem 0.15rem repeat(18, 1.2rem);
     gap: 2px;
+  }
+  .strip > .control {
+    grid-column: 1;
+  }
+  .strip > .control + span {
+    grid-column: 3;
+  }
+  /* A line that was not evaluated says so where its cells would be */
+  .strip-none {
+    font-size: 0.74rem;
+    line-height: 1.25rem;
   }
   .strip > span {
     height: 1.25rem;
@@ -930,16 +995,18 @@
   }
 
   .strip-head .strip > span {
+    font-family: var(--font-sans);
+    letter-spacing: -0.02em;
     height: auto;
     color: var(--muted);
-    font-size: 0.64rem;
+    font-size: 0.56rem;
     font-weight: 400;
     line-height: 1.2;
   }
   /* Every line of the measured cell: what the requests sent, then the cells. The column head has the same grid. */
   .heat-strip {
     display: inline-grid;
-    grid-template-columns: 3.4rem auto;
+    grid-template-columns: 3.3rem auto;
     gap: 3px 0.4rem;
     align-items: center;
     text-decoration: none;

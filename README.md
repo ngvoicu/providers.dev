@@ -201,32 +201,49 @@ goes away, the sync fails loudly; it does not fall back to the v1 file, which ha
 Read-only, no key, CORS open. Full reference with every filter: `/docs/api/` on the site, and
 `/api/v1/openapi.json`.
 
+Four resources, with the same names on the website: **providers**, **entries** (a model at a provider and access
+method), **models** (canonical: a model as its lab names it) and **evaluations**. Every collection answers
+`{ meta, total, limit, offset, next_offset, data }`; every single object `{ meta, data }`.
+
 | Request | Returns |
 |---|---|
-| `GET /api/v1/models?…` | entry summaries: search, filters, sorting, pages of up to 200 |
-| `GET /api/v1/entry?ref=provider/model` | one entry in full (model ids contain slashes, so the name is a query parameter) |
-| `GET /api/v1/providers` | the provider directory |
-| `GET /api/v1/providers/{id}` | one provider with all its models |
+| `GET /api/v1/entries?…` | entry summaries: search, filters, sorting, pages of up to 200 |
+| `GET /api/v1/entries/{provider}/{model}` | one entry in full (the model id is the rest of the path, slashes and all) |
+| `GET /api/v1/providers` | providers |
+| `GET /api/v1/providers/{id}` | one provider with the summaries of its entries; `?view=full` adds the entries in full |
+| `GET /api/v1/models` | canonical models |
+| `GET /api/v1/models/{lab}/{model}` | one canonical model with every entry that serves it |
+| `GET /api/v1/evaluations` | every cache and limit evaluation, with the entry it was made on |
 | `GET /api/v1/catalog` | the complete merged catalog, `{ meta, providers }` |
-| `GET /api/v1/meta` | dataset version, freshness, upstream commit, sync status, open issues |
+| `GET /api/v1/meta` | dataset version, counts, freshness, upstream commit, sync status, open issues |
 | `GET /api/v1/openapi.json` | the OpenAPI 3.1 document |
 | `GET /api.json` | the merged catalog keyed by provider id, in the models.dev v2 structure, no envelope |
 
 ```
-curl 'https://providers.dev/api/v1/models?access=subscription&min_context=400000&sort=context&order=desc'
-curl 'https://providers.dev/api/v1/entry?ref=openrouter%2Fanthropic%2Fclaude-opus-5.5'
+curl 'https://providers.dev/api/v1/entries?access=subscription&min_context=400000&sort=context&order=desc'
+curl https://providers.dev/api/v1/entries/openrouter/anthropic/claude-opus-5.5
 curl -H 'If-None-Match: "<dataset version>"' -i https://providers.dev/api/v1/catalog     # 304 until the data changes
 ```
 
 ```ts
 const base = "https://providers.dev/api/v1";
-const page = await (await fetch(`${base}/models?q=opus&cache=yes&limit=200`)).json();
-for (const entry of page.data) console.log(entry.ref, entry.context, entry.max_output, entry.cache_ttl_s);
+const page = await (await fetch(`${base}/entries?q=opus&cache=yes&limit=200`)).json();
+for (const entry of page.data) console.log(entry.ref, entry.context, entry.max_output, entry.cache_ttl_s, entry.cache_results);
 
-const ref = "openrouter/anthropic/claude-opus-5.5";
-const { data } = await (await fetch(`${base}/entry?ref=${encodeURIComponent(ref)}`)).json();
-console.log(data.model.limit, data.model.providers_dev.cache?.observed);
+const { data } = await (await fetch(`${base}/entries/openrouter/anthropic/claude-opus-5.5`)).json();
+console.log(data.entry.limit, data.entry.providers_dev.cache.retention, data.entry.providers_dev.cache.evaluations);
 ```
+
+### One contract
+
+`src/core/contract.ts` defines the shape of everything the API returns. The OpenAPI document and the field tables of
+`/docs/api/` are generated from it, and the tests check every published object against it (all entries, all
+providers, every list). The pages are built from the same objects the API returns: a page formats a value and works
+out nothing of its own.
+
+Cache evaluations are published as counts and percentages at exact ages (`cache_results` of a summary,
+`providers_dev.cache` of an entry): one line per retention setting, short before long, the control ("at once") first.
+`null` means not evaluated, never 0 %. The sums are made once, in `src/core/cache.ts`, when the data is built.
 
 Every answer has an `ETag` (the dataset version), `X-Dataset-Version`, `X-Dataset-Generated-At` and
 `X-Upstream-Fetched-At`. Errors are always `{ "error": { "code", "message", "details"? } }`.
@@ -239,7 +256,8 @@ and model has an extra `providers_dev` key, and entries we add can lack fields t
 
 ## Deploying to Cloudflare
 
-The site is static files plus one small Worker for `/api/v1/*` (`wrangler.jsonc`).
+The site is static files plus one small Worker (`wrangler.jsonc`) for the API (`/api/v1/*`) and the entry pages
+(`/entries/{provider}/{model}`), which it renders on request from the same objects the API returns.
 
 1. `npx wrangler login`
 2. `npm run build`
@@ -255,7 +273,8 @@ For the scheduled workflow, add the repository secrets `CLOUDFLARE_API_TOKEN` (a
 `CLOUDFLARE_ACCOUNT_ID`. Without them the workflow builds and tests but does not deploy.
 
 A deployment replaces the whole site at once, and a failed build deploys nothing, so visitors always see one
-complete snapshot. Pages, `/api.json` and `/data/*` are static assets; only `/api/v1/*` uses Worker requests.
+complete snapshot. The other pages, `/api.json` and `/data/*` are static assets; `/api/v1/*` and `/entries/*` use
+Worker requests, and their answers may be cached for five minutes.
 
 ## Licensing
 

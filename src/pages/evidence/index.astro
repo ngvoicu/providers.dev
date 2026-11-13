@@ -1,26 +1,26 @@
 ---
+// Everything providers.dev adds. The evaluations are the answer of GET /api/v1/evaluations; each cache evaluation is
+// drawn with the same cells as the summary tables, from the results the API gives.
 import Base from "../../layouts/Base.astro";
-import { entryHref, exact, isStale, runVerdict, STALE_AFTER_DAYS } from "../../core/format.ts";
-import { ext, providerExt, type Evidence, type MeasuredLimit, type Measurement, type Provenance } from "../../core/schema.ts";
-import { catalog, index, meta, now } from "../../lib/data.ts";
+import { settingsText } from "../../core/cache.ts";
+import { entryHref, exact, isStale, STALE_AFTER_DAYS } from "../../core/format.ts";
+import { evaluationStrip, STRIP_HEAD } from "../../core/render.ts";
+import { ext, type Evidence, type Provenance } from "../../core/schema.ts";
+import { catalog, evaluations, index, meta, now } from "../../lib/data.ts";
 
-const runs: { ref: string; name: string; run: Measurement }[] = [];
-const limits: { ref: string; name: string; limit: MeasuredLimit }[] = [];
+const runs = evaluations.filter((item) => item.kind === "cache");
+const limits = evaluations.filter((item) => item.kind === "limit");
 const groups = new Map<string, { change: Provenance; refs: string[] }>();
 for (const entry of index.entries) {
-  if (entry.origin === "upstream") continue;
-  const extension = ext(catalog[entry.provider]!.models[entry.model]!);
-  for (const run of extension.cache?.observed ?? []) runs.push({ ref: entry.ref, name: entry.name, run });
-  for (const limit of extension.limits?.measured ?? []) limits.push({ ref: entry.ref, name: entry.name, limit });
-  for (const change of extension.provenance ?? []) {
+  if (entry.overridden_fields.length === 0) continue;
+  for (const change of ext(catalog[entry.provider]!.models[entry.model]!).provenance ?? []) {
     const key = JSON.stringify([entry.provider, change.path, change.op, change.value, change.reason]);
     const group = groups.get(key) ?? groups.set(key, { change, refs: [] }).get(key)!;
     group.refs.push(entry.ref);
   }
 }
-runs.sort((a, b) => b.run.date.localeCompare(a.run.date) || a.ref.localeCompare(b.ref));
 const added = index.providers.filter((provider) => provider.origin === "added");
-const staleRuns = runs.filter((item) => isStale(item.run.date, now)).length;
+const staleRuns = runs.filter((item) => isStale(item.date, now)).length;
 const host = (item: Evidence): string => new URL(item.url).hostname;
 ---
 
@@ -30,10 +30,10 @@ const host = (item: Evidence): string => new URL(item.url).hostname;
     Everything providers.dev publishes beyond the models.dev baseline, with the source and date of each item. Evidence older than {STALE_AFTER_DAYS} days is marked stale{staleRuns > 0 ? <> ({exact(staleRuns)} evaluations today)</> : <> (none today)</>}.
   </p>
   <dl class="stats mt-8">
-    <div><dt>Corrected entries</dt><dd>{exact(meta.counts.overridden_models)} <small><a href="#corrections">Corrections</a></small></dd></div>
-    <div><dt>Added providers</dt><dd>{exact(meta.counts.added_providers)} <small><a href="#added">{exact(meta.counts.added_models)} entries</a></small></dd></div>
-    <div><dt>Cache evaluations</dt><dd>{exact(runs.length)} <small><a href="#cache">On {exact(meta.counts.measured_models)} entries</a></small></dd></div>
-    <div><dt>Measured limits</dt><dd>{exact(limits.length)} <small><a href="#limits">Results</a></small></dd></div>
+    <div><dt>Corrected entries</dt><dd>{exact(meta.counts.corrected_entries)} <small><a href="#corrections">Corrections</a></small></dd></div>
+    <div><dt>Added providers</dt><dd>{exact(meta.counts.added_providers)} <small><a href="#added">{exact(meta.counts.added_entries)} entries</a></small></dd></div>
+    <div><dt>Cache evaluations</dt><dd>{exact(meta.counts.cache_evaluations)} <small><a href="#cache">On {exact(meta.counts.evaluated_entries)} entries</a></small></dd></div>
+    <div><dt>Measured limits</dt><dd>{exact(meta.counts.limit_evaluations)} <small><a href="#limits">Results</a></small></dd></div>
   </dl>
 
   <h2 id="corrections">Corrections to models.dev</h2>
@@ -74,8 +74,8 @@ const host = (item: Evidence): string => new URL(item.url).hostname;
           added.map((provider) => (
             <tr>
               <th scope="row"><a href={`/providers/${provider.id}/`}>{provider.name}</a><div class="id"><code>{provider.id}</code></div></th>
-              <td>{providerExt(catalog[provider.id]!).access_basis}<div class="hint">{providerExt(catalog[provider.id]!).note}</div></td>
-              <td class="num">{exact(provider.models)}</td>
+              <td>{provider.providers_dev.access_basis}<div class="hint">{provider.providers_dev.note}</div></td>
+              <td class="num">{exact(provider.entry_count)}</td>
             </tr>
           ))
         }
@@ -85,21 +85,22 @@ const host = (item: Evidence): string => new URL(item.url).hostname;
 
   <h2 id="cache">Cache evaluations</h2>
   <p class="hint mb-3 max-w-3xl">
-    Each evaluation caches a fresh prompt, then sends it again at set ages. Open an entry for its results age by age. A result holds for the access method and client named, on that
-    date; it is what was observed, not a guaranteed lifetime. <a href="/docs/methodology/#evaluations">How evaluations work</a>
+    An evaluation caches a fresh prompt, sends it again at once, and then again at set ages. A cell is the share of those re-sends that were served from the cache, in percent; hover it for
+    the counts. A result holds for the access method and client named, on that date; it is what was observed, not a guaranteed lifetime.
+    <a href="/docs/methodology/#evaluations">How evaluations work</a>
   </p>
   <div class="scroll">
     <table class="entries">
-      <thead><tr><th scope="col">Entry</th><th scope="col">Measured through</th><th scope="col">Result</th><th scope="col">Date</th><th scope="col">Evidence</th></tr></thead>
+      <thead><tr><th scope="col">Entry</th><th scope="col">Measured through</th><th scope="col" class="strip-col"><span>Served from the cache <span class="muted">% by age</span></span><Fragment set:html={STRIP_HEAD} /></th><th scope="col">Date</th><th scope="col">Evidence</th></tr></thead>
       <tbody>
         {
-          runs.map(({ ref, name, run }) => (
+          runs.map((run) => (
             <tr>
-              <th scope="row"><a href={`${entryHref(ref)}#cache`}>{name}</a><div class="id"><code>{ref}</code></div></th>
-              <td>{run.route_label}<div class="hint">{run.client_label}{run.options && ` · ${Object.entries(run.options).map(([k, v]) => `${k}=${v}`).join(", ")}`}</div></td>
-              <td>{runVerdict(run).head}{runVerdict(run).detail && <div class="hint">{runVerdict(run).detail}</div>}</td>
+              <th scope="row"><a href={`${entryHref(run.entry_ref)}#cache`}>{run.entry_name}</a><div class="id"><code>{run.entry_ref}</code></div></th>
+              <td>{run.route_label}<div class="hint">{run.client_label}{settingsText(run.request_settings) && ` · ${settingsText(run.request_settings)}`}</div></td>
+              <td set:html={evaluationStrip(run)} />
               <td>{isStale(run.date, now) ? <span class="stale">{run.date} · stale</span> : <span class="muted date">{run.date}</span>}</td>
-              <td><a href={run.source} rel="noopener">Raw result</a></td>
+              <td class="nowrap"><a href={run.source} rel="noopener">Raw result</a></td>
             </tr>
           ))
         }
@@ -113,9 +114,9 @@ const host = (item: Evidence): string => new URL(item.url).hostname;
       <thead><tr><th scope="col">Entry</th><th scope="col">Measured through</th><th scope="col">Result</th><th scope="col">Date</th><th scope="col">Evidence</th></tr></thead>
       <tbody>
         {
-          limits.map(({ ref, name, limit }) => (
+          limits.map((limit) => (
             <tr>
-              <th scope="row"><a href={`${entryHref(ref)}#limits`}>{name}</a><div class="id"><code>{ref}</code></div></th>
+              <th scope="row"><a href={`${entryHref(limit.entry_ref)}#limits`}>{limit.entry_name}</a><div class="id"><code>{limit.entry_ref}</code></div></th>
               <td>{limit.route_label}<div class="hint">{limit.client_label}</div></td>
               <td>
                 {[
@@ -128,7 +129,7 @@ const host = (item: Evidence): string => new URL(item.url).hostname;
                 {limit.note && <div class="hint">{limit.note}</div>}
               </td>
               <td>{limit.date ? <span class="muted date">{limit.date}</span> : <span class="muted">Undated</span>}</td>
-              <td><a href={limit.source} rel="noopener">Raw result</a></td>
+              <td class="nowrap"><a href={limit.source} rel="noopener">Raw result</a></td>
             </tr>
           ))
         }

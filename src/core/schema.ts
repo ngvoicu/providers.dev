@@ -1,6 +1,7 @@
 // Shapes of everything that enters or leaves the build: the upstream snapshot, our authored files,
 // the measurements file, and the published catalog.
 import { z } from "zod";
+import type { EntryCache } from "./cache.ts";
 import type { Change, Json, JsonObject } from "./merge.ts";
 
 export const SCHEMA_VERSION = 1;
@@ -227,27 +228,6 @@ export interface Provenance extends Change {
   evidence: Evidence[];
 }
 
-export interface Measurement {
-  run: string;
-  route: string;
-  route_label: string;
-  client: string;
-  client_label: string;
-  options?: JsonObject;
-  date: string;
-  control?: { warm: number; total: number };
-  checks?: { age_s: number; warm: number; total: number }[];
-  late_excluded?: number;
-  /** The longest age at which every check was still served from the cache. */
-  all_warm_through_s: number | null;
-  /** The longest age at which any check was served from the cache. */
-  last_warm_s: number | null;
-  /** The shortest age at which every check missed. */
-  first_all_cold_s: number | null;
-  note?: string;
-  source: string;
-}
-
 export interface MeasuredLimit {
   route: string;
   route_label: string;
@@ -270,7 +250,8 @@ export interface ModelExtension {
   provenance?: Provenance[];
   /** Fields copied from another entry, for entries we add: identity, and `cost` where a subscription entry carries the API list price. */
   inherited?: { from: string; fields: string[] };
-  cache?: { observed?: Measurement[] };
+  /** Prompt caching beyond what the source documents: what a request can ask for, and what evaluations measured. On every entry. */
+  cache: EntryCache;
   limits?: {
     measured?: MeasuredLimit[];
     /** On an entry we add: which of limit.context and limit.output are our measured values. */
@@ -326,9 +307,23 @@ export interface Meta {
   upstream_schema: string;
   dataset_version: string;
   generated_at: string;
-  counts: { providers: number; models: number; added_providers: number; added_models: number; overridden_models: number; measured_models: number };
+  counts: {
+    providers: number;
+    /** Provider-model entries. */
+    entries: number;
+    /** Canonical models: the distinct `canonical_id` values of the entries. */
+    models: number;
+    added_providers: number;
+    added_entries: number;
+    corrected_entries: number;
+    evaluated_entries: number;
+    cache_evaluations: number;
+    limit_evaluations: number;
+  };
+  /** The ages, in seconds, that every cache summary table has a column for, after the control at age 0. */
+  cache_ages_s: number[];
   upstream: UpstreamMeta;
-  measurements?: SourceMeta & { repository: string; runs: number; limits: number };
+  measurements?: SourceMeta & { repository: string };
   sync: { last_attempt_at?: string; last_attempt_ok?: boolean; last_error?: string };
   exclusions: Exclusion[];
   issues: Issue[];
