@@ -1,6 +1,6 @@
 ---
 import Base from "../../layouts/Base.astro";
-import { duration, entryHref, exact, isStale, STALE_AFTER_DAYS } from "../../core/format.ts";
+import { entryHref, exact, isStale, runVerdict, STALE_AFTER_DAYS } from "../../core/format.ts";
 import { ext, providerExt, type Evidence, type MeasuredLimit, type Measurement, type Provenance } from "../../core/schema.ts";
 import { catalog, index, meta, now } from "../../lib/data.ts";
 
@@ -21,8 +21,6 @@ for (const entry of index.entries) {
 runs.sort((a, b) => b.run.date.localeCompare(a.run.date) || a.ref.localeCompare(b.ref));
 const added = index.providers.filter((provider) => provider.origin === "added");
 const staleRuns = runs.filter((item) => isStale(item.run.date, now)).length;
-const through = (run: Measurement): string =>
-  run.all_warm_through_s === null ? "No age at which every check was warm" : `Every check warm through ${duration(run.all_warm_through_s)}`;
 const host = (item: Evidence): string => new URL(item.url).hostname;
 ---
 
@@ -87,8 +85,8 @@ const host = (item: Evidence): string => new URL(item.url).hostname;
 
   <h2 id="cache">Cache evaluations</h2>
   <p class="hint mb-3 max-w-3xl">
-    Each evaluation primes a fresh prompt and re-sends it once at fixed ages. A result holds for the access method and client named, on that date; it is an observed floor, not a guaranteed
-    lifetime. <a href="/docs/methodology/#evaluations">How evaluations work</a>
+    Each evaluation caches a fresh prompt, then sends it again at set ages. Open an entry for its results age by age. A result holds for the access method and client named, on that
+    date; it is what was observed, not a guaranteed lifetime. <a href="/docs/methodology/#evaluations">How evaluations work</a>
   </p>
   <div class="scroll">
     <table class="entries">
@@ -99,7 +97,7 @@ const host = (item: Evidence): string => new URL(item.url).hostname;
             <tr>
               <th scope="row"><a href={`${entryHref(ref)}#cache`}>{name}</a><div class="id"><code>{ref}</code></div></th>
               <td>{run.route_label}<div class="hint">{run.client_label}{run.options && ` · ${Object.entries(run.options).map(([k, v]) => `${k}=${v}`).join(", ")}`}</div></td>
-              <td>{through(run)}{run.first_all_cold_s !== null && <span class="muted">; all cold at {duration(run.first_all_cold_s)}</span>}</td>
+              <td>{runVerdict(run).head}{runVerdict(run).detail && <div class="hint">{runVerdict(run).detail}</div>}</td>
               <td>{isStale(run.date, now) ? <span class="stale">{run.date} · stale</span> : <span class="muted date">{run.date}</span>}</td>
               <td><a href={run.source} rel="noopener">Raw result</a></td>
             </tr>

@@ -46,6 +46,11 @@ The baseline is imported from models.dev; our additions, corrections and measure
 - Text on the site: plain, short, professional, no marketing. Say what a number means and where it comes from.
 - Wording: the two sources are named `models.dev` and `providers.dev` (never "ours"). A cache run is an
   "evaluation". Pages use the full width of the home page (`.page`).
+- Cache evaluations are described in plain words: a prompt is "cached", a re-send is "served from the cache", and
+  the catalog summary is "At least 30 min". "Warm" and "cold" stay in field names only. An entry page shows the
+  evaluations as a table with one column per age and a `3/3`-style value per cell.
+- Each source carries its own date: the import date next to `models.dev`, the newest evidence next to
+  `providers.dev`.
 - Do not name the tools a measurement was taken with, other than a vendor's own CLI. Client ids from the
   measurement file are published under the neutral names in `data/authored/measurement-labels.yaml`, note parts
   that mention a tool on its omit list are dropped, and runs marked `lacks` are not published. A new client id must

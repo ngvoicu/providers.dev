@@ -3,7 +3,7 @@ import Base from "../layouts/Base.astro";
 import { DEFAULT_LIMIT, parseQuery, runQuery, SITE_DEFAULT } from "../core/query.ts";
 import { rowHtml, tableHead } from "../core/render.ts";
 import { exact } from "../core/format.ts";
-import { index, meta, now, providerNames } from "../lib/data.ts";
+import { imported, index, meta, now, providerNames } from "../lib/data.ts";
 
 // The first page is built ahead of time, so the table is there before any script runs.
 // On the site, entries with providers.dev evidence come first, newest first; the API's default order is by provider.
@@ -100,7 +100,7 @@ const subscriptions = index.providers.filter((provider) => provider.access === "
     <table class="entries" id="entries" data-now={now.toISOString()}>
       <caption class="sr-only">Provider-model entries</caption>
       <thead id="head" set:html={tableHead({ sortable: true, sort: "verified", order: "desc" })} />
-      <tbody id="rows" set:html={first.data.map((entry) => rowHtml(entry, { now, providerNames })).join("")} />
+      <tbody id="rows" set:html={first.data.map((entry) => rowHtml(entry, { now, imported, providerNames })).join("")} />
     </table>
     <div id="empty" class="empty" hidden>
       <p class="font-medium text-fg">No entries match these filters</p>

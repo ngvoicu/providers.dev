@@ -107,9 +107,12 @@ import { meta } from "../../lib/data.ts";
 
     <h2 id="evaluations">Cache evaluations</h2>
     <p>
-      An evaluation sends a fresh prompt once to prime the cache, then re-sends it once at each of several fixed ages, with several samples per age. For each age the result records how many
-      re-sends were served from the cache. The summary "every check warm through 30 min" is the longest age at which all of them were. It is an observed floor, not a guaranteed lifetime, and
-      the next age tested may be much later.
+      An evaluation sends a fresh prompt once so that it is cached, then sends it again at each of several set ages, a few times per age. For each age the result records how many of those
+      re-sends were served from the cache: <code>3/3</code> is all of them, <code>0/3</code> none. Entry pages show this as a table, one column per age.
+    </p>
+    <p>
+      "Always cached up to 30 min" means every re-send up to that age was served from the cache; in the catalog it is shortened to "At least 30 min". It is what was observed, not a
+      guaranteed lifetime, and the next age checked may be much later. A provider that spreads requests over several servers can miss at one age and hit again at a later one.
     </p>
     <p>
       Each evaluation names the access method it was taken on and the kind of client that sent the requests: straight to the provider, through an API gateway, or through the vendor's own

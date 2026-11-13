@@ -19,7 +19,7 @@ export interface Summary {
   status?: string;
   release_date?: string;
   access: Access;
-  /** upstream = as imported; modified = an upstream entry with our overrides or measurements; added = with_evidence. */
+  /** upstream = as imported; modified = an upstream entry with our overrides or measurements; added = an entry models.dev does not have. */
   origin: Origin;
   /** limit.context: the context window this provider exposes for the model, in tokens. */
   context?: number;
@@ -59,6 +59,8 @@ export interface ProviderSummary {
 export interface Index {
   dataset_version: string;
   generated_at: string;
+  /** When the models.dev part of this dataset was imported. */
+  upstream_fetched_at: string;
   providers: ProviderSummary[];
   entries: Summary[];
 }
@@ -138,7 +140,7 @@ export function summarize(providerId: string, model: JsonObject, shard: number):
   return summary;
 }
 
-export function buildIndex(catalog: Catalog, datasetVersion: string, generatedAt: string): Index {
+export function buildIndex(catalog: Catalog, datasetVersion: string, generatedAt: string, upstreamFetchedAt: string): Index {
   const providers: ProviderSummary[] = [];
   const entries: Summary[] = [];
   for (const [id, provider] of Object.entries(catalog)) {
@@ -161,5 +163,5 @@ export function buildIndex(catalog: Catalog, datasetVersion: string, generatedAt
       with_evidence,
     });
   }
-  return { dataset_version: datasetVersion, generated_at: generatedAt, providers, entries };
+  return { dataset_version: datasetVersion, generated_at: generatedAt, upstream_fetched_at: upstreamFetchedAt, providers, entries };
 }

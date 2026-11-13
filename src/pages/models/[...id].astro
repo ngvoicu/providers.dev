@@ -2,7 +2,7 @@
 import Base from "../../layouts/Base.astro";
 import { compactTokens, exact } from "../../core/format.ts";
 import { rowHtml, tableHead } from "../../core/render.ts";
-import { entriesByCanonical, now, providerNames } from "../../lib/data.ts";
+import { entriesByCanonical, imported, now, providerNames } from "../../lib/data.ts";
 
 export function getStaticPaths() {
   return [...entriesByCanonical.entries()].map(([id, entries]) => ({ params: { id }, props: { id, entries } }));
@@ -37,7 +37,7 @@ const range = (values: number[]): string => (values.length === 0 ? "Unknown" : v
     <table class="entries">
       <caption class="sr-only">Access methods for {name}</caption>
       <thead set:html={tableHead({})} />
-      <tbody set:html={sorted.map((entry) => rowHtml(entry, { now, providerNames })).join("")} />
+      <tbody set:html={sorted.map((entry) => rowHtml(entry, { now, imported, providerNames })).join("")} />
     </table>
   </div>
   <p class="hint mt-3"><a href={`/api/v1/models?canonical_id=${encodeURIComponent(id)}&limit=200`}><code>GET /api/v1/models?canonical_id={id}</code></a></p>

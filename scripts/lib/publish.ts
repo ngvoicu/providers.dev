@@ -105,7 +105,7 @@ export function publish(input: PublishOptions): PublishReport {
 
   const generatedAt = options.now().toISOString();
   const datasetVersion = sha256(compact({ catalog, exclusions })).slice(0, 16);
-  const index = buildIndex(catalog, datasetVersion, generatedAt);
+  const index = buildIndex(catalog, datasetVersion, generatedAt, upstream.meta.fetched_at);
   const observedMeta = readJsonIfExists<SourceMeta>(join(dataDir, "sources", "observed.meta.json"));
   const status = readJsonIfExists<SyncStatus>(join(dataDir, "sync-status.json"));
 

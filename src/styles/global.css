@@ -607,6 +607,122 @@
   td.nowrap {
     white-space: nowrap;
   }
+
+  /* A source and its date, one pair per line (in tables) or side by side (in a heading).
+     The modifier is not called "inline": Tailwind has a utility of that name. */
+  .sources {
+    display: inline-grid;
+    grid-template-columns: max-content max-content;
+    align-items: center;
+    gap: 0.3rem 0.5rem;
+    vertical-align: top;
+  }
+  .sources.side {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 0.3rem 0.45rem;
+  }
+  .sources.side .date + .origin,
+  .sources.side .stale + .origin {
+    margin-left: 0.45rem;
+  }
+
+  /* Cache evaluations as a heat map: one row per evaluation, one column per age. */
+  table.heat th,
+  table.heat td {
+    vertical-align: middle;
+  }
+  table.heat thead th.span {
+    font-weight: 450;
+    border-bottom: 0;
+    padding: 0.5rem 0.25rem 0;
+  }
+  table.heat thead th.age {
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    padding: 0.3rem 0.15rem 0.5rem;
+  }
+  table.heat tbody th {
+    min-width: 10rem;
+  }
+  table.heat td.result {
+    min-width: 12rem;
+  }
+  @media (min-width: 768px) {
+    table.heat tbody th {
+      min-width: 12rem;
+      position: sticky;
+      left: 0;
+      z-index: 1;
+      background: var(--bg);
+    }
+    table.heat td.result {
+      min-width: 14rem;
+    }
+  }
+  table.heat td.heat {
+    min-width: 0;
+    width: 3.25rem;
+    padding: 0.35rem 0.15rem;
+    text-align: center;
+  }
+  table.heat td.heat span,
+  .heat-key {
+    display: block;
+    min-width: 2.9rem;
+    padding: 0.45rem 0;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.2;
+    text-align: center;
+    cursor: default;
+  }
+  .heat .all,
+  .heat-key.all {
+    background: light-dark(#6ee7b7, #047857);
+    color: light-dark(#064e3b, #ecfdf5);
+  }
+  .heat .most,
+  .heat-key.most {
+    background: light-dark(#d1fae5, #064e3b);
+    color: light-dark(#065f46, #a7f3d0);
+  }
+  .heat .few,
+  .heat-key.few {
+    background: light-dark(#fde68a, #713f12);
+    color: light-dark(#78350f, #fde68a);
+  }
+  .heat .none,
+  .heat-key.none {
+    background: light-dark(#fecaca, #7f1d1d);
+    color: light-dark(#7f1d1d, #fecaca);
+  }
+  .heat .skip,
+  .heat-key.skip {
+    color: var(--muted);
+    border: 1px dashed var(--line);
+    padding-top: calc(0.45rem - 1px);
+    padding-bottom: calc(0.45rem - 1px);
+  }
+  td.heat .skip {
+    border-color: transparent;
+  }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.1rem;
+    margin: 0.7rem 0 0.6rem;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+  .legend > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    white-space: nowrap;
+  }
   .id {
     display: flex;
     flex-wrap: wrap;

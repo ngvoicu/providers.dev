@@ -1,7 +1,7 @@
 // One entry in full. The entry is named in the query string (?ref=provider/model) because model ids contain slashes.
 // It reads the same index and the same entry files that /api/v1/entry answers from.
 import type { Index } from "../core/entries.ts";
-import { escapeHtml } from "../core/format.ts";
+import { escapeHtml, importDate } from "../core/format.ts";
 import type { JsonObject } from "../core/merge.ts";
 import { entryHtml } from "../core/render.ts";
 
@@ -37,7 +37,8 @@ async function load(): Promise<void> {
     const model = shard[summary.model];
     if (!model || !provider) throw new Error("the entry file does not hold this entry");
     document.title = `${summary.name} at ${provider.name} · providers.dev`;
-    root.innerHTML = entryHtml({ summary, provider, model, now });
+    const imported = importDate(index);
+    root.innerHTML = entryHtml({ summary, provider, model, now, ...(imported ? { imported } : {}) });
     if (location.hash) document.getElementById(location.hash.slice(1))?.scrollIntoView();
   } catch (error) {
     message(

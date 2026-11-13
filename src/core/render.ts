@@ -12,6 +12,8 @@ import {
   ORIGIN_LABEL,
   ORIGIN_TITLE,
   plural,
+  runVerdict,
+  shortAge,
   warmRange,
 } from "./format.ts";
 import { isObject, type Json, type JsonObject } from "./merge.ts";
@@ -36,8 +38,18 @@ function dateTag(date: string | undefined, now: Date): string {
     : `<span class="muted date" title="Date of the newest providers.dev evidence.">${e(date)}</span>`;
 }
 
-function originBadge(origin: Summary["origin"], extra = ""): string {
-  return `<span class="origin ${origin}" title="${e(ORIGIN_TITLE[origin] + extra)}">${ORIGIN_LABEL[origin]}</span>`;
+/** One line per source with its own date: the models.dev import, and the newest providers.dev evidence. */
+function sourcesHtml(entry: Pick<Summary, "origin" | "verified" | "overridden_fields">, options: { now: Date; imported?: string }, inline = false): string {
+  const parts: string[] = [];
+  if (entry.origin !== "added") {
+    const date = options.imported ? `<span class="muted date" title="Imported from models.dev on this date.">${e(options.imported)}</span>` : "<span></span>";
+    parts.push(`<span class="origin upstream" title="${e(ORIGIN_TITLE.upstream)}">${ORIGIN_LABEL.upstream}</span>${date}`);
+  }
+  if (entry.origin !== "upstream") {
+    const corrected = entry.overridden_fields.length > 0 ? ` Corrected fields: ${entry.overridden_fields.join(", ")}.` : "";
+    parts.push(`<span class="origin added" title="${e(ORIGIN_TITLE[entry.origin] + corrected)}">${ORIGIN_LABEL.added}</span>${dateTag(entry.verified, options.now) || "<span></span>"}`);
+  }
+  return `<span class="sources${inline ? " side" : ""}">${parts.join("")}</span>`;
 }
 
 function cacheCell(entry: Pick<Summary, "cache" | "cache_modes" | "cache_ttl_s">): string {
@@ -52,11 +64,14 @@ function measuredCell(entry: Summary, href: string): string {
   if (entry.evaluations === 0) return entry.measured_limits > 0 ? `<a class="measured" href="${e(href)}#limits">Limits measured</a>` : DASH;
   const range = warmRange(entry);
   const count = plural(entry.evaluations, "evaluation");
-  return `<a class="measured" href="${e(href)}#cache">${range ? `${e(range)} <small>${count}</small>` : count}</a>`;
+  const title = range ? "Every re-send up to this age was served from the cache. Open the entry for the results by age." : "Open the entry for the results by age.";
+  return `<a class="measured" href="${e(href)}#cache" title="${title}">${range ? `${e(range)} <small>${count}</small>` : count}</a>`;
 }
 
 export interface RowOptions {
   now: Date;
+  /** The date of the models.dev import, shown next to the models.dev source. */
+  imported?: string;
   /** Leave the provider column out (on a provider's own page). */
   hideProvider?: boolean;
   providerNames?: Record<string, string>;
@@ -77,8 +92,8 @@ ${options.hideProvider ? "" : column("provider", "Provider", "Who serves it, and
 ${column("context", "Context", "Exposed context window in tokens (limit.context): what this provider accepts for the model.", "num")}
 ${column("max_output", "Max output", "Largest single response in tokens (limit.output). A maximum, not a default.", "num")}
 ${column(null, "Cache, documented", "Prompt caching as the source documents it: mode and lifetimes.")}
-${column(null, "Cache, measured", "providers.dev evaluations: the ages at which every check was still served from the cache.")}
-${column("verified", "Source", "Where the entry comes from, and the date of the newest providers.dev evidence.")}
+${column(null, "Cache, measured", "providers.dev evaluations: the age up to which every re-send was still served from the cache.")}
+${column("verified", "Source", "Where the entry comes from, with a date per source: the import from models.dev, and the newest providers.dev evidence.")}
 </tr>`;
 }
 
@@ -87,7 +102,6 @@ export function rowHtml(entry: Summary, options: RowOptions): string {
   const provider = options.providerNames?.[entry.provider] ?? entry.provider;
   const access = entry.access === "api" ? "" : ` <span class="badge ${entry.access}" title="Access: ${ACCESS_LABEL[entry.access]}">${ACCESS_LABEL[entry.access]}</span>`;
   const status = entry.status ? ` <span class="badge">${e(entry.status)}</span>` : "";
-  const overridden = entry.overridden_fields.length > 0 ? ` Corrected fields: ${entry.overridden_fields.join(", ")}.` : "";
   return `<tr>
 <th scope="row"><a href="${e(href)}">${e(entry.name)}</a>${status}<div class="id"><code>${e(entry.model)}</code>${copyButton(entry.ref, "entry id")}</div></th>
 ${options.hideProvider ? "" : `<td><a class="plain" href="/providers/${e(entry.provider)}/">${e(provider)}</a>${access}</td>`}
@@ -95,7 +109,7 @@ ${options.hideProvider ? "" : `<td><a class="plain" href="/providers/${e(entry.p
 <td class="num">${tokens(entry.max_output)}</td>
 <td>${cacheCell(entry)}</td>
 <td>${measuredCell(entry, href)}</td>
-<td class="nowrap">${originBadge(entry.origin, overridden)} ${dateTag(entry.verified, options.now)}</td>
+<td class="nowrap">${sourcesHtml(entry, options)}</td>
 </tr>`;
 }
 
@@ -141,11 +155,6 @@ function fact(label: string, hint: string, value: string, source: string): strin
   return `<tr><th scope="row">${label}<div class="hint">${hint}</div></th><td class="num">${value}</td><td>${source}</td></tr>`;
 }
 
-function checksText(run: Measurement): string {
-  if (!run.checks?.length) return "";
-  return run.checks.map((check) => `${duration(check.age_s)}: ${check.warm}/${check.total}`).join(" · ");
-}
-
 function optionsText(options: JsonObject | undefined): string {
   if (!options) return "";
   return Object.entries(options)
@@ -153,21 +162,46 @@ function optionsText(options: JsonObject | undefined): string {
     .join(", ");
 }
 
-function measurementRows(runs: Measurement[], now: Date): string {
-  return runs
+type Check = { warm: number; total: number };
+
+function heatCell(check: Check | undefined, when: string): string {
+  if (!check || check.total === 0) return `<td class="heat"><span class="skip" title="${e(when)}: not checked">·</span></td>`;
+  const share = check.warm / check.total;
+  const level = share === 1 ? "all" : share === 0 ? "none" : share >= 0.5 ? "most" : "few";
+  return `<td class="heat"><span class="${level}" title="${e(when)}: ${check.warm} of ${check.total} re-sends served from the cache">${check.warm}/${check.total}</span></td>`;
+}
+
+/** One row per evaluation, one column per age: how many of the re-sends at that age were served from the cache. */
+function heatmap(runs: Measurement[], now: Date): string {
+  const sorted = [...runs].sort((a, b) => b.date.localeCompare(a.date));
+  const ages = [...new Set(sorted.flatMap((run) => (run.checks ?? []).map((check) => check.age_s)))].sort((a, b) => a - b);
+  const control = sorted.some((run) => run.control);
+  const columns = ages.length + (control ? 1 : 0);
+  const span = columns > 0 ? ' rowspan="2"' : "";
+  const head = `<tr><th scope="col"${span}>Evaluation</th><th scope="col"${span}>Result</th>${
+    columns > 0 ? `<th scope="colgroup" colspan="${columns}" class="span">Time since the prompt was cached · re-sends served from the cache</th>` : ""
+  }<th scope="col"${span}>Evidence</th></tr>${
+    columns > 0
+      ? `<tr>${control ? '<th scope="col" class="age" title="Sent again immediately, to confirm the prompt was cached at all.">At once</th>' : ""}${ages.map((age) => `<th scope="col" class="age">${shortAge(age)}</th>`).join("")}</tr>`
+      : ""
+  }`;
+  const rows = sorted
     .map((run) => {
-      const through =
-        run.all_warm_through_s === null ? '<span class="muted">No age at which every check was warm</span>' : `Every check warm through <strong>${duration(run.all_warm_through_s)}</strong>`;
-      const cold = run.first_all_cold_s === null ? "" : `; every check cold at ${duration(run.first_all_cold_s)}`;
+      const verdict = runVerdict(run);
+      const byAge = new Map((run.checks ?? []).map((check) => [check.age_s, check]));
       const options = optionsText(run.options);
       return `<tr>
-<td>${dateTag(run.date, now)}</td>
-<td>${e(run.route_label)}<div class="hint">${e(run.client_label)}${options ? ` · ${e(options)}` : ""}</div></td>
-<td class="wide">${through}${cold}<div class="hint">Warm checks by age: ${e(checksText(run)) || "not recorded"}</div>${run.note ? `<div class="hint">${e(run.note)}</div>` : ""}</td>
-<td><a href="${e(run.source)}" rel="noopener">Raw result</a></td>
+<th scope="row">${e(run.route_label)} ${dateTag(run.date, now)}<div class="hint">${e(run.client_label)}${options ? ` · ${e(options)}` : ""}</div></th>
+<td class="result"><strong>${e(verdict.head)}</strong>${verdict.detail ? `<div class="hint">${e(verdict.detail)}</div>` : ""}${run.note ? `<div class="hint">${e(run.note)}</div>` : ""}</td>
+${control ? heatCell(run.control, "Sent again at once") : ""}${ages.map((age) => heatCell(byAge.get(age), `After ${duration(age)}`)).join("")}
+<td class="nowrap"><a href="${e(run.source)}" rel="noopener">Raw result</a></td>
 </tr>`;
     })
     .join("");
+  return `<p class="hint max-w-3xl">Each evaluation caches a fresh prompt, then sends it again at set ages. A cell shows how many of the re-sends at that age were served from the cache: <code>3/3</code> is all of them.</p>
+<div class="scroll mt-3"><table class="facts heat"><thead>${head}</thead><tbody>${rows}</tbody></table></div>
+<p class="legend"><span><span class="heat-key all">3/3</span> All served from the cache</span><span><span class="heat-key most">2/3</span> Most</span><span><span class="heat-key few">1/3</span> Few</span><span><span class="heat-key none">0/3</span> None</span><span><span class="heat-key skip">·</span> Not checked at that age</span></p>
+<p class="hint">A result holds for the access method and client named, on that date. It is what was observed, not a guaranteed lifetime. <a href="/docs/methodology/#evaluations">How evaluations work</a></p>`;
 }
 
 function measuredLimitRows(limits: MeasuredLimit[]): string {
@@ -221,6 +255,8 @@ export interface EntryView {
   provider: ProviderSummary;
   model: JsonObject;
   now: Date;
+  /** The date of the models.dev import. */
+  imported?: string;
 }
 
 export function entryHtml(view: EntryView): string {
@@ -235,6 +271,10 @@ export function entryHtml(view: EntryView): string {
   const big = (value: Json | undefined): string => (typeof value === "number" ? `${exact(value)} <span class="unit">tokens</span>` : '<span class="muted">Unknown</span>');
   const api = `/api/v1/entry?ref=${encodeURIComponent(summary.ref)}`;
   const warm = warmRange(summary);
+  const seen = runs.map((run) => run.last_warm_s).filter((age): age is number => age !== null);
+  const measuredValue = runs.length === 0 ? '<span class="muted">Not measured</span>' : warm ? e(warm) : seen.length > 0 ? "Part of the time" : "Not cached";
+  const measuredFoot =
+    runs.length === 0 ? "No evaluations on this entry" : `${plural(runs.length, "evaluation")}${seen.length > 0 ? ` · seen cached as late as ${duration(Math.max(...seen))}` : ""}`;
   const cacheTile =
     summary.cache === "unknown"
       ? '<span class="muted">Unknown</span>'
@@ -251,7 +291,7 @@ export function entryHtml(view: EntryView): string {
   <p class="crumbs"><a href="/providers/">Providers</a> / <a href="/providers/${e(provider.id)}/">${e(provider.name)}</a>${summary.canonical_id ? ` · <a href="${e(modelHref(summary.canonical_id))}">All access methods for ${e(summary.canonical_id)}</a>` : ""}</p>
   <h1>${e(summary.name)}</h1>
   <p class="id"><code>${e(summary.ref)}</code>${copyButton(summary.ref, "entry id")} <span class="badge ${summary.access}">${ACCESS_LABEL[summary.access]}</span>
-  ${originBadge(summary.origin)} ${dateTag(summary.verified, now)}${summary.status ? ` <span class="badge">${e(summary.status)}</span>` : ""}</p>
+  ${sourcesHtml(summary, view, true)}${summary.status ? ` <span class="badge">${e(summary.status)}</span>` : ""}</p>
   ${typeof model.description === "string" ? `<p class="lead">${e(model.description)}</p>` : ""}
   ${inherited}
 </header>
@@ -260,7 +300,7 @@ export function entryHtml(view: EntryView): string {
   ${tile("Context window", big(limit.context), "Exposed by this provider")}
   ${tile("Maximum output", big(limit.output), "Per response; not a default")}
   ${tile("Prompt cache, documented", cacheTile, summary.cache === "unknown" ? "The source does not say" : "As documented", true)}
-  ${tile("Prompt cache, measured", warm ? e(warm) : '<span class="muted">Not measured</span>', runs.length > 0 ? plural(runs.length, "evaluation") : "No evaluations on this entry", true)}
+  ${tile("Prompt cache, measured", measuredValue, measuredFoot, true)}
 </div>
 
 <section aria-labelledby="limits">
@@ -286,12 +326,7 @@ export function entryHtml(view: EntryView): string {
   <h3>Documented</h3>
   ${cacheDocumented(model, provenance, extension.origin)}
   <h3>Measured</h3>
-  ${
-    runs.length > 0
-      ? `<div class="scroll"><table class="facts"><thead><tr><th scope="col">Date</th><th scope="col">Measured through</th><th scope="col">Result</th><th scope="col">Evidence</th></tr></thead><tbody>${measurementRows(runs, now)}</tbody></table></div>
-  <p class="hint">Each evaluation primes a fresh prompt and re-sends it once at fixed ages. "Warm through 30 min" means every check up to 30 minutes was served from the cache. It is an observed floor, not a guaranteed lifetime, and the next age checked may be much later. A result holds for the access method and client named, on that date. <a href="/docs/methodology/#evaluations">How evaluations work</a></p>`
-      : '<p class="muted">No evaluations on this entry.</p>'
-  }
+  ${runs.length > 0 ? heatmap(runs, now) : '<p class="muted">No evaluations on this entry.</p>'}
 </section>
 
 <section aria-labelledby="provenance">

@@ -16,6 +16,8 @@ export const catalog = read<Catalog>("api.json");
 export const index = read<Index>("data/index.json");
 export const meta = read<Meta>("data/meta.json");
 export const now = new Date();
+/** The date of the models.dev import this dataset is built on. */
+export const imported = meta.upstream.fetched_at.slice(0, 10);
 
 export const providerNames: Record<string, string> = Object.fromEntries(index.providers.map((provider) => [provider.id, provider.name]));
 

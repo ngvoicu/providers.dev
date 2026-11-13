@@ -1,7 +1,7 @@
 // The catalog table. It downloads the same index the API answers from and runs the same query code,
 // and it keeps the filters in the URL so a view can be shared.
 import type { Index } from "../core/entries.ts";
-import { exact } from "../core/format.ts";
+import { exact, importDate } from "../core/format.ts";
 import { parseQuery, runQuery, serializeQuery, SITE_DEFAULT, type Query, type SortKey } from "../core/query.ts";
 import { rowHtml, tableHead } from "../core/render.ts";
 
@@ -106,7 +106,8 @@ function render(): void {
   if (!index) return;
 
   const result = runQuery(index.entries, query);
-  rows.innerHTML = result.data.map((entry) => rowHtml(entry, { now, providerNames })).join("");
+  const imported = importDate(index);
+  rows.innerHTML = result.data.map((entry) => rowHtml(entry, { now, providerNames, ...(imported ? { imported } : {}) })).join("");
   const all = index.entries.length;
   count.textContent = result.total === all ? `${exact(all)} entries` : `${exact(result.total)} of ${exact(all)} entries`;
   const pages = Math.max(1, Math.ceil(result.total / query.limit));

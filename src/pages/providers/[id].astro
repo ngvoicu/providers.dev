@@ -3,7 +3,7 @@ import Base from "../../layouts/Base.astro";
 import { exact } from "../../core/format.ts";
 import { rowHtml, tableHead } from "../../core/render.ts";
 import { providerExt } from "../../core/schema.ts";
-import { catalog, entriesByProvider, index, now } from "../../lib/data.ts";
+import { catalog, entriesByProvider, imported, index, now } from "../../lib/data.ts";
 
 export function getStaticPaths() {
   return index.providers.map((provider) => ({ params: { id: provider.id }, props: { provider } }));
@@ -66,7 +66,7 @@ const accessLabel = { api: "API key, billed by use", subscription: "Subscription
         <table class="entries">
           <caption class="sr-only">Models at {provider.name}</caption>
           <thead set:html={tableHead({ hideProvider: true })} />
-          <tbody set:html={entries.map((entry) => rowHtml(entry, { now, hideProvider: true })).join("")} />
+          <tbody set:html={entries.map((entry) => rowHtml(entry, { now, imported, hideProvider: true })).join("")} />
         </table>
       </div>
     ) : (
