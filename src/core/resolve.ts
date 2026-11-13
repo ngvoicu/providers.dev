@@ -39,7 +39,10 @@ export interface ResolveResult {
   exclusions: Exclusion[];
 }
 
-/** What an entry we add may take from the upstream entry it names: who the model is, never how this access behaves. */
+/**
+ * What an entry we add may take from the upstream entry it names: who the model is, never how this access behaves.
+ * One more field is copied, and only by a subscription entry from an API entry: `cost`, the API list price (step 5b).
+ */
 export const IDENTITY_FIELDS = [
   "name",
   "description",
@@ -383,6 +386,23 @@ export function resolve(input: ResolveInput): ResolveResult {
         }
         if (Object.keys(limits).length === 0) delete model.limit;
       }
+    }
+  }
+
+  // 5b. A subscription entry we add is not paid per token, so it has no price of its own. It takes the API list price
+  // of the entry it names, marked as inherited, so that a client can work out what the usage is worth. Done after the
+  // overrides, so that it carries our corrections. An entry with a price of its own keeps it.
+  for (const provider of Object.values(catalog)) {
+    for (const model of Object.values(provider.models)) {
+      const extension = modelExt(model);
+      const inherited = extension.inherited;
+      if (!inherited || extension.origin !== "added" || extension.access !== "subscription" || model.cost !== undefined) continue;
+      const parts = splitRef(inherited.from);
+      const source = lookup(inherited.from);
+      const sourceProvider = parts ? catalog[parts.provider] : undefined;
+      if (!source || !sourceProvider || source.cost === undefined || provExt(sourceProvider).access !== "api") continue;
+      (model as JsonObject).cost = clone(source.cost as Json);
+      inherited.fields.push("cost");
     }
   }
 

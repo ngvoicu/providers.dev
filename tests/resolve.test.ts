@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { clone } from "../src/core/merge.ts";
+import { summarize } from "../src/core/entries.ts";
 import { resolve, type ResolveInput } from "../src/core/resolve.ts";
-import { ext, providerExt, type AccessRules, type Evidence, type ObservedFile, type OverrideFile, type UpstreamCatalog } from "../src/core/schema.ts";
+import { ext, providerExt, type AccessRules, type AuthoredProvider, type Evidence, type ObservedFile, type OverrideFile, type UpstreamCatalog } from "../src/core/schema.ts";
 
 const evidence: Evidence[] = [{ kind: "documented", url: "https://example.com/docs", date: "2026-11-01" }];
 
@@ -165,6 +166,57 @@ describe("resolve: access and additions", () => {
     expect(model.limit).toBeUndefined();
     expect(model.capabilities).toBeUndefined();
     expect(ext(model)).toMatchObject({ origin: "added", access: "subscription", inherited: { from: "lab/model-a" }, verified: "2026-11-01" });
+  });
+
+  it("gives an added subscription entry the API list price, marked as inherited", () => {
+    const cost = { text: { input: { price: 4, cache: { read: 0.4 } }, output: { price: 20 } } };
+    const priced = upstream();
+    priced.lab!.models["model-a"]!.cost = cost;
+    priced["lab-coding-plan"]!.models["model-a"]!.cost = { text: { input: { price: 0 }, output: { price: 0 } } };
+    const login = (accessMethod: "subscription" | "api", models: AuthoredProvider["models"]): AuthoredProvider => ({
+      id: `lab-${accessMethod}`,
+      name: "Lab other",
+      access: accessMethod,
+      access_basis: "stated",
+      evidence,
+      models,
+    });
+    const { catalog } = resolve(
+      input(
+        // A correction to the API price is carried too: the price is taken after the overrides.
+        [{ provider: "lab", rules: [{ models: ["model-a"], set: { cost: { text: { output: { price: 25 } } } }, reason: "price list", evidence }] }],
+        {
+          upstream: priced,
+          additions: [
+            login("subscription", [
+              { id: "a", inherits: "lab/model-a", evidence },
+              { id: "own", inherits: "lab/model-a", fields: { cost: { text: { input: { price: 1 }, output: { price: 2 } } } }, evidence },
+              { id: "from-plan", inherits: "lab-coding-plan/model-a", evidence },
+              { id: "unpriced", inherits: "lab/model-b", evidence },
+              { id: "alone", evidence },
+            ]),
+            login("api", [{ id: "a", inherits: "lab/model-a", evidence }]),
+          ],
+        },
+      ),
+    );
+    const models = catalog["lab-subscription"]!.models;
+    expect(models.a!.cost).toEqual({ text: { input: { price: 4, cache: { read: 0.4 } }, output: { price: 25 } } });
+    expect(ext(models.a!).inherited?.fields).toContain("cost");
+    expect(summarize("lab-subscription", models.a!, 0)).toMatchObject({ price_in: 4, price_out: 25, price_from: "lab/model-a", access: "subscription" });
+    // A price of its own is kept and is not marked.
+    expect(models.own!.cost).toEqual({ text: { input: { price: 1 }, output: { price: 2 } } });
+    expect(summarize("lab-subscription", models.own!, 0).price_from).toBeUndefined();
+    // Nothing is taken from another plan, from an entry without a price, or without a named entry.
+    for (const id of ["from-plan", "unpriced", "alone"]) {
+      expect(models[id]!.cost).toBeUndefined();
+      expect(ext(models[id]!).inherited?.fields ?? []).not.toContain("cost");
+    }
+    // An API entry we add has a price of its own to find: it does not take the lab's.
+    expect(catalog["lab-api"]!.models.a!.cost).toBeUndefined();
+    // The entries it was taken from are untouched.
+    expect(ext(catalog.lab!.models["model-a"]!).inherited).toBeUndefined();
+    expect(catalog["lab-coding-plan"]!.models["model-a"]!.cost).toEqual({ text: { input: { price: 0 }, output: { price: 0 } } });
   });
 
   it("flags an addition that upstream now has too", () => {

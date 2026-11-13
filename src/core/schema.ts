@@ -268,7 +268,7 @@ export interface ModelExtension {
   access: Access;
   /** Fields of with_evidence that replaced, hid or removed an upstream value. */
   provenance?: Provenance[];
-  /** Identity fields copied from another entry, for entries we add. */
+  /** Fields copied from another entry, for entries we add: identity, and `cost` where a subscription entry carries the API list price. */
   inherited?: { from: string; fields: string[] };
   cache?: { observed?: Measurement[] };
   limits?: {

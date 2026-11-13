@@ -173,6 +173,7 @@ export function openapi(): Record<string, unknown> {
             max_output: { type: "integer", description: "Tokens. Absent = unknown." },
             price_in: { type: "number", description: "List price of input in US dollars per million tokens (cost.text.input.price), before changes by context size or service tier. Absent = unknown. 0 on a plan or subscription entry means no price per token, not free." },
             price_out: { type: "number", description: "The same for output (cost.text.output.price)." },
+            price_from: { type: "string", description: "Present where the price is inherited: the ref of the API entry whose list price this is. The entry itself is a subscription and is not paid per token." },
             cache: { enum: ["yes", "no", "unknown"] },
             cache_modes: { type: "array", items: { enum: ["implicit", "explicit"] } },
             cache_ttl_s: { type: "array", items: { type: "number" }, description: "Documented lifetimes in seconds." },

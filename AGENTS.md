@@ -38,7 +38,9 @@ The baseline is imported from models.dev; our additions, corrections and measure
 - Everything we add to a provider or model object lives under the `providers_dev` key. Do not add other top-level
   fields to upstream objects.
 - An entry we add inherits identity fields only (`IDENTITY_FIELDS` in `src/core/resolve.ts`), never limits, cache
-  behaviour, prices or capabilities.
+  behaviour or capabilities. One exception: an added subscription entry takes `cost` from the API entry it names,
+  marked in `providers_dev.inherited.fields` and as `price_from` in the summary. It is the API list price, never
+  shown as what the subscription costs.
 - No subscription plans, plan prices, allowances or quota data. Access is a classification only.
 - The website and the API must read the same published snapshot and use the same query code (`src/core/query.ts`).
   Do not add a second filter implementation.

@@ -94,7 +94,7 @@ ${column("name", "Model", "The model's name and its id at this provider.")}
 ${options.hideProvider ? "" : column("provider", "Provider", "Who serves it, and how it is reached.")}
 ${column("context", "Context", "Exposed context window in tokens (limit.context): what this provider accepts for the model.", "num")}
 ${column("max_output", "Max output", "Largest single response in tokens (limit.output). A maximum, not a default.", "num")}
-${column("price_in", "Price in / out", "List price in US dollars per million tokens, input then output, as models.dev records it. Before the changes some providers make by context size or service tier: open the entry for those.", "num mid-only")}
+${column("price_in", "Price in / out", "List price in US dollars per million tokens, input then output, as models.dev records it. Before the changes some providers make by context size or service tier: open the entry for those. On a subscription entry, the line API price marks the price of the same model at the API.", "num mid-only")}
 ${column("release_date", "Released", "When the model was released, as models.dev records it. It is the model's date: the same at every provider.", "wide-only")}
 ${column(null, "Cache, documented", "Prompt caching as the source documents it: mode and lifetimes.")}
 ${column(null, "Cache, measured", "providers.dev evaluations: the age up to which every re-send was still served from the cache.")}
@@ -124,7 +124,7 @@ ${options.hideProvider ? "" : `<td><a class="plain" href="/providers/${e(entry.p
 
 const record = (value: Json | undefined): JsonObject | undefined => (isObject(value) ? value : undefined);
 
-function priceCell(entry: Pick<Summary, "price_in" | "price_out" | "access">): string {
+function priceCell(entry: Pick<Summary, "price_in" | "price_out" | "price_from" | "access">): string {
   const { price_in: input, price_out: output } = entry;
   const plan = '<span class="muted" title="No price per token: the entry is paid for through a plan or subscription, which providers.dev does not list.">In plan</span>';
   if (input === undefined && output === undefined) return entry.access === "subscription" ? plan : UNKNOWN;
@@ -132,7 +132,10 @@ function priceCell(entry: Pick<Summary, "price_in" | "price_out" | "access">): s
   if ((input ?? 0) === 0 && (output ?? 0) === 0) {
     return entry.access === "subscription" ? plan : `<span class="price" title="The source lists a price of 0. That can mean free of charge, or paid for another way (a plan or a seat).">$0 <span class="muted">/</span> $0</span>`;
   }
-  return `<span class="price">${input === undefined ? DASH : usd(input)} <span class="muted">/</span> ${output === undefined ? DASH : usd(output)}</span>`;
+  const price = `<span class="price">${input === undefined ? DASH : usd(input)} <span class="muted">/</span> ${output === undefined ? DASH : usd(output)}</span>`;
+  if (!entry.price_from) return price;
+  // Two short lines: the price, then whose price it is.
+  return `<span class="price-inherited" title="Not what this entry costs: a subscription is not paid per token. This is the API list price of ${e(entry.price_from)}, inherited from it.">${price}<span class="price-from">API price</span></span>`;
 }
 
 /** A condition of a price change, in words. Undefined for the shapes not handled here: they stay in the raw data. */
@@ -155,6 +158,8 @@ function cacheWrite(value: Json | undefined): string | undefined {
 }
 
 function priceSection(model: JsonObject, summary: Summary, source: string): string {
+  const from = summary.price_from;
+  if (from) source = `<span class="origin upstream" title="Inherited from ${e(from)}, where it is imported from models.dev.">inherited</span>`;
   const cost = record(model.cost);
   const words = record(cost?.text);
   const input = record(words?.input);
@@ -206,7 +211,10 @@ function priceSection(model: JsonObject, summary: Summary, source: string): stri
           other > 0 ? `<li class="muted">${plural(other, "more condition")} (by region, time or a mix): see <code>cost</code> in the full record below.</li>` : ""
         }</ul>`
       : "";
-  return `<div class="scroll"><table class="facts">
+  const note = from
+    ? `<p class="note">This entry is a subscription: it is <strong>not</strong> paid per token. These are the API list prices of <a href="${e(entryHref(from))}"><code>${e(from)}</code></a>, inherited so that a client can work out what the usage is worth.</p>`
+    : "";
+  return `${note}<div class="scroll"><table class="facts">
     <thead><tr><th scope="col">Price</th><th scope="col" class="num">US dollars per million ${unit}</th><th scope="col">Source</th></tr></thead>
     <tbody>${rows}</tbody>
   </table></div>
@@ -384,7 +392,7 @@ export function entryHtml(view: EntryView): string {
         : `${summary.cache_modes.join(" + ")}${summary.cache_ttl_s.length > 0 ? ` <span class="unit">${summary.cache_ttl_s.map(duration).join(", ")}</span>` : ""}`;
 
   const inherited = extension.inherited
-    ? `<p class="note">Name, family and dates are taken from <a href="${e(entryHref(extension.inherited.from))}"><code>${e(extension.inherited.from)}</code></a>. Limits, caching and prices are <strong>not</strong> copied from it, because this access method can differ.</p>`
+    ? `<p class="note">Name, family and dates are taken from <a href="${e(entryHref(extension.inherited.from))}"><code>${e(extension.inherited.from)}</code></a>. Limits and caching are <strong>not</strong> copied from it, because this access method can differ.${extension.inherited.fields.includes("cost") ? " The prices are that entry's API list prices, marked as inherited." : ""}</p>`
     : "";
 
   return `

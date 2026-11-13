@@ -14,7 +14,8 @@ The baseline is imported daily from [models.dev](https://models.dev) (MIT). On t
   shown next to the documented values, never instead of them.
 
 It publishes metadata only. There is no chat and no inference proxy. List prices per token are shown as models.dev
-records them; subscription plans, their prices and their quotas are not listed.
+records them; a subscription entry carries the API list price of the same model, marked as inherited. Subscription
+plans, their prices and their quotas are not listed.
 It is not affiliated with models.dev.
 
 ## Run it
@@ -147,9 +148,10 @@ models:
       - { kind: listed, url: https://example.com/the-providers-own-model-list, date: "2026-11-13" }
 ```
 
-`inherits` copies identity only (name, description, family, type, dates, canonical model). Limits, cache behaviour,
-prices and capabilities are never copied from another access method: leave them out unless you have evidence for
-this one. If a service does not say which model it serves, leave `inherits` out; do not guess.
+`inherits` copies identity (name, description, family, type, dates, canonical model). Limits, cache behaviour and
+capabilities are never copied from another access method: leave them out unless you have evidence for this one.
+One exception: a subscription entry is not paid per token, so it takes the API list price (`cost`) of the entry it
+names. It is marked: `providers_dev.inherited.fields` includes `cost`, and the summary has `price_from`. If a service does not say which model it serves, leave `inherits` out; do not guess.
 
 Models that exist only because they were evaluated do not need to be listed by hand: an evaluation on a route that
 `data/authored/routes.yaml` maps to one of our providers creates the entry.

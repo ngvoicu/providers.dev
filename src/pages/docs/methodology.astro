@@ -52,8 +52,10 @@ import { meta } from "../../lib/data.ts";
     <p>
       The same model reached with an API key and with a subscription can have different limits and cache behaviour. Each access method is a separate entry under its own provider, linked to the
       same model by <code>canonical_id</code>. An added entry takes only identity from the upstream entry it names
-      ({IDENTITY_FIELDS.map((field, i) => <><code>{field}</code>{i < IDENTITY_FIELDS.length - 1 ? ", " : ""}</>)}). Limits, caching, prices and capabilities are never copied across access
-      methods: on an added entry a value appears only when there is evidence for that access method.
+      ({IDENTITY_FIELDS.map((field, i) => <><code>{field}</code>{i < IDENTITY_FIELDS.length - 1 ? ", " : ""}</>)}). Limits, caching and capabilities are never copied across access
+      methods: on an added entry a value appears only when there is evidence for that access method. The one exception is the price: a subscription is not paid per token, so an added
+      subscription entry carries the API list price of the entry it names, marked as inherited (<code>providers_dev.inherited.fields</code> includes <code>cost</code>), so that a client
+      can work out what the usage is worth.
     </p>
     <p>
       Access is a classification: API key, subscription, or unclassified. Plans, plan prices, allowances and quotas are not tracked. API prices are kept as imported. Where a service does not

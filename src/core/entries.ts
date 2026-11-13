@@ -38,6 +38,8 @@ export interface Summary {
   price_in?: number;
   /** cost.text.output.price: the same for output. */
   price_out?: number;
+  /** Set where the price is inherited: the ref of the API entry whose list price this is. The entry itself is not paid per token. */
+  price_from?: string;
   measured_warm_min_s?: number;
   measured_warm_max_s?: number;
   /** Our limit measurements on this entry. */
@@ -144,6 +146,7 @@ export function summarize(providerId: string, model: JsonObject, shard: number):
     max_output: count(limit.output),
     price_in: basePrice(model, "input"),
     price_out: basePrice(model, "output"),
+    price_from: extension.inherited?.fields.includes("cost") ? extension.inherited.from : undefined,
     measured_warm_min_s: warm.length > 0 ? Math.min(...warm) : undefined,
     measured_warm_max_s: warm.length > 0 ? Math.max(...warm) : undefined,
     verified: extension.verified,
