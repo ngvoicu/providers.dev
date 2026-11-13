@@ -89,3 +89,24 @@ describe("measured input", () => {
     expect([none.measured_input_accepted, none.measured_input_refused]).toEqual([undefined, undefined]);
   });
 });
+
+describe("cache evaluations taken together", () => {
+  it("pools the checks by age band and keeps asked lifetimes apart", async () => {
+    const { poolCache } = await import("../src/core/entries.ts");
+    const run = (checks: [number, number, number][], options?: Record<string, string>) =>
+      ({ checks: checks.map(([age_s, warm, total]) => ({ age_s, warm, total })), ...(options ? { options } : {}) }) as never;
+    const pooled = poolCache([
+      run([[150, 3, 3], [300, 2, 3], [900, 3, 3], [43200, 0, 3]], { reasoning: "low" }),
+      run([[300, 3, 3], [600, 1, 3], [172800, 0, 3], [900, 0, 0]]),
+      run([[3600, 3, 3]], { ttl: "1h" }),
+      run([[3600, 2, 3]], { prompt_cache_retention: "24h" }),
+    ]);
+    expect(pooled).toEqual([
+      // 2.5 and 5 minutes share the first band; 10 and 15 minutes the second; two days falls in the last one. A check that was not made counts nowhere.
+      { evaluations: 2, bands: [{ up_to_s: 300, warm: 8, total: 9 }, { up_to_s: 900, warm: 4, total: 6 }, { up_to_s: 43200, warm: 0, total: 3 }, { up_to_s: 86400, warm: 0, total: 3 }] },
+      { asked: "1h", evaluations: 1, bands: [{ up_to_s: 3600, warm: 3, total: 3 }] },
+      { asked: "24h", evaluations: 1, bands: [{ up_to_s: 3600, warm: 2, total: 3 }] },
+    ]);
+    expect(poolCache([])).toEqual([]);
+  });
+});

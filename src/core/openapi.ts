@@ -182,6 +182,31 @@ export function openapi(): Record<string, unknown> {
             evaluations: { type: "integer" },
             measured_warm_min_s: { type: "number" },
             measured_warm_max_s: { type: "number" },
+            measured_cache: {
+              type: "array",
+              description: "The cache evaluations of this entry taken together, by age, across the clients they were sent through. One item per cache lifetime the requests asked for; the item without `asked` is the provider's default.",
+              items: {
+                type: "object",
+                required: ["evaluations", "bands"],
+                properties: {
+                  asked: { type: "string", description: "The lifetime the requests asked for (ttl or prompt_cache_retention), for example 1h. Absent = none asked." },
+                  evaluations: { type: "integer" },
+                  bands: {
+                    type: "array",
+                    description: "One item per age band with at least one check. A band holds the checks up to up_to_s and above the band before it.",
+                    items: {
+                      type: "object",
+                      required: ["up_to_s", "warm", "total"],
+                      properties: {
+                        up_to_s: { type: "integer", description: "The upper age of the band, in seconds: 300, 900, 1800, 3600, 7200, 14400, 28800, 43200 or 86400." },
+                        warm: { type: "integer", description: "Re-sends served from the cache." },
+                        total: { type: "integer", description: "Re-sends made." },
+                      },
+                    },
+                  },
+                },
+              },
+            },
             measured_limits: { type: "integer" },
             measured_input_accepted: { type: "integer", description: "Tokens. The largest input an evaluation saw accepted on this entry: the real input limit is at least this. Useful where no limit is documented." },
             measured_input_refused: { type: "integer", description: "Tokens. The smallest input an evaluation saw refused: the real input limit is below this." },

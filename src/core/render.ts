@@ -1,6 +1,6 @@
 // HTML for the entry table and the entry detail view. The same functions build the static pages and
 // re-render in the browser, so a row looks and reads the same wherever it appears.
-import type { ProviderSummary, Summary } from "./entries.ts";
+import { CACHE_BANDS_S, type PooledCache, type ProviderSummary, type Summary } from "./entries.ts";
 import {
   compactTokens,
   duration,
@@ -53,14 +53,22 @@ function sourcesHtml(entry: Pick<Summary, "origin" | "verified" | "overridden_fi
   return `<span class="sources${inline ? " side" : ""}">${parts.join("")}</span>`;
 }
 
+/** How a provider's prompt cache is switched on, in plain words. The data and the API keep models.dev's names: implicit, explicit. */
+export const CACHE_MODE_WORD = { implicit: "Automatic", explicit: "Manual" } as const;
+const CACHE_MODE_TITLE = {
+  implicit: "Automatic (implicit): the provider caches the start of a prompt by itself. The request does nothing for it.",
+  explicit: "Manual (explicit): nothing is cached unless the request marks what to cache. The mark also picks the lifetime.",
+} as const;
+
 function cacheCell(entry: Pick<Summary, "cache" | "cache_modes" | "cache_ttl_s">): string {
   if (entry.cache === "unknown") return UNKNOWN;
   if (entry.cache === "no") return '<span title="The source says this entry does not cache prompts.">None</span>';
-  // Two short lines, like the name and id beside them: how it caches, then for how long.
-  const words = entry.cache_modes.join(", ");
-  const modes = words ? `<span class="cache-modes">${e(words.charAt(0).toUpperCase() + words.slice(1))}</span>` : "";
+  // Two short lines, like the name and id beside them: how it is switched on, then for how long.
+  const words = entry.cache_modes.map((mode, at) => (at === 0 ? CACHE_MODE_WORD[mode] : CACHE_MODE_WORD[mode].toLowerCase())).join(" + ");
+  const title = entry.cache_modes.map((mode) => CACHE_MODE_TITLE[mode]).join(" ");
+  const modes = words ? `<span class="cache-modes">${words}</span>` : "";
   const ttl = entry.cache_ttl_s.length > 0 ? `<span class="cache-ttl">${entry.cache_ttl_s.map(duration).join(", ")}</span>` : "";
-  return `<span class="cache">${modes}${ttl}</span>`;
+  return `<span class="cache" title="${e(title)}">${modes}${ttl}</span>`;
 }
 
 /** The documented window. Where there is none, the largest input an evaluation saw accepted, said as what it is. */
@@ -74,12 +82,32 @@ function contextCell(entry: Summary, href: string): string {
   return `<a class="plain limit-measured" href="${e(href)}#limits" title="${e(title)}"><span class="limit-value">≥ ${floor}</span><span class="limit-note">input</span></a>`;
 }
 
+const bandLabel = (seconds: number): string => (seconds < 3600 ? `${seconds / 60}m` : `${seconds / 3600}h`);
+
+/** The ages of the heat strip, written once in the column head so that every row lines up under them. */
+const STRIP_HEAD = `<span class="strip strip-head" aria-hidden="true">${CACHE_BANDS_S.map((limit) => `<span>${bandLabel(limit)}</span>`).join("")}</span>`;
+
+/** One row of cells, one per age band: the share of re-sends at that age that were served from the cache, in percent. */
+function strip(group: PooledCache): string {
+  const byBand = new Map(group.bands.map((band) => [band.up_to_s, band]));
+  const cells = CACHE_BANDS_S.map((limit, at) => {
+    const from = at === 0 ? "Up to" : `${duration(CACHE_BANDS_S[at - 1] as number)} to`;
+    const band = byBand.get(limit);
+    if (!band) return `<span class="skip" title="${from} ${duration(limit)}: not checked"></span>`;
+    const share = band.warm / band.total;
+    const level = share === 1 ? "all" : share === 0 ? "none" : share >= 0.5 ? "most" : "few";
+    return `<span class="${level}" title="${from} ${duration(limit)}: ${band.warm} of ${band.total} re-sends served from the cache">${Math.round(share * 100)}</span>`;
+  }).join("");
+  const note = `${group.asked ? `asked for ${e(group.asked)} · ` : ""}${plural(group.evaluations, "evaluation")}`;
+  return `<span class="strip">${cells}</span><span class="strip-note">${note}</span>`;
+}
+
 function measuredCell(entry: Summary, href: string): string {
   if (entry.evaluations === 0) return entry.measured_limits > 0 ? `<a class="measured" href="${e(href)}#limits">Limits measured</a>` : DASH;
-  const range = warmRange(entry);
-  const count = plural(entry.evaluations, "evaluation");
-  const title = range ? "Every re-send up to this age was served from the cache. Open the entry for the results by age." : "Open the entry for the results by age.";
-  return `<a class="measured" href="${e(href)}#cache" title="${title}">${range ? `${e(range)} <small>${count}</small>` : count}</a>`;
+  const groups = (entry.measured_cache ?? []).filter((group) => group.bands.length > 0);
+  // Evaluations that made no check have nothing to draw.
+  if (groups.length === 0) return `<a class="measured" href="${e(href)}#cache" title="Open the entry for the results.">${plural(entry.evaluations, "evaluation")}</a>`;
+  return `<a class="plain heat-strip" href="${e(href)}#cache" aria-label="Cache evaluations by age. Open the entry for each one.">${groups.map(strip).join("")}</a>`;
 }
 
 export interface RowOptions {
@@ -108,7 +136,7 @@ ${column("max_output", "Max output", "Largest single response in tokens (limit.o
 ${column("price_in", "Price in / out", "List price in US dollars per million tokens, input then output, as models.dev records it. Before the changes some providers make by context size or service tier: open the entry for those. On a subscription entry, the line API price marks the price of the same model at the API.", "num mid-only")}
 ${column("release_date", "Released", "When the model was released, as models.dev records it. It is the model's date: the same at every provider.", "wide-only")}
 ${column(null, "Cache, documented", "Prompt caching as the source documents it: mode and lifetimes.")}
-${column(null, "Cache, measured", "providers.dev evaluations: the age up to which every re-send was still served from the cache.")}
+<th scope="col" class="strip-col"><span title="providers.dev evaluations, all clients together. Each cell is an age since the prompt was cached; the number is the share of re-sends at that age that were served from the cache, in percent. Hover a cell for the counts.">Cache, measured <span class="muted">% by age</span></span>${STRIP_HEAD}</th>
 ${column("verified", "Source", "Where the entry comes from, with a date per source: the import from models.dev, and the newest providers.dev evidence.")}
 </tr>`;
 }
@@ -318,8 +346,29 @@ ${control ? heatCell(run.control, "Sent again at once") : ""}${ages.map((age) =>
 </tr>`;
     })
     .join("");
+  // Rows of three re-sends jump about. Where an entry has several evaluations that asked for the same lifetime, a last row adds them up.
+  const groups = new Map<string, Measurement[]>();
+  for (const run of sorted) {
+    const asked = typeof run.options?.ttl === "string" ? run.options.ttl : typeof run.options?.prompt_cache_retention === "string" ? run.options.prompt_cache_retention : "";
+    groups.set(asked, [...(groups.get(asked) ?? []), run]);
+  }
+  const together = [...groups]
+    .filter(([, members]) => members.length > 1)
+    .map(([asked, members]) => {
+      const sum = (checks: (Check | undefined)[]): Check => ({
+        warm: checks.reduce((total, check) => total + (check?.warm ?? 0), 0),
+        total: checks.reduce((total, check) => total + (check?.total ?? 0), 0),
+      });
+      return `<tr class="together">
+<th scope="row">All ${members.length} together<div class="hint">${asked ? `The evaluations that asked for ${e(asked)}` : groups.size > 1 ? "The evaluations that asked for no lifetime" : "Every client, added up by age"}</div></th>
+<td class="result"><span class="hint">Single rows have three re-sends per age, so one miss moves them a lot. The sum is steadier.</span></td>
+${control ? heatCell(sum(members.map((run) => run.control)), "Sent again at once") : ""}${ages.map((age) => heatCell(sum(members.map((run) => (run.checks ?? []).find((check) => check.age_s === age))), `After ${duration(age)}`)).join("")}
+<td></td>
+</tr>`;
+    })
+    .join("");
   return `<p class="hint max-w-3xl">Each evaluation caches a fresh prompt, then sends it again at set ages. A cell shows how many of the re-sends at that age were served from the cache: <code>3/3</code> is all of them.</p>
-<div class="scroll mt-3"><table class="facts heat"><thead>${head}</thead><tbody>${rows}</tbody></table></div>
+<div class="scroll mt-3"><table class="facts heat"><thead>${head}</thead><tbody>${rows}${together}</tbody></table></div>
 <p class="legend"><span><span class="heat-key all">3/3</span> All served from the cache</span><span><span class="heat-key most">2/3</span> Most</span><span><span class="heat-key few">1/3</span> Few</span><span><span class="heat-key none">0/3</span> None</span><span><span class="heat-key skip">·</span> Not checked at that age</span></p>
 <p class="hint">A result holds for the access method and client named, on that date. It is what was observed, not a guaranteed lifetime. <a href="/docs/methodology/#evaluations">How evaluations work</a></p>`;
 }
@@ -355,7 +404,7 @@ function cacheDocumented(model: JsonObject, provenance: Provenance[], origin: Mo
     const detail = isObject(value) ? value : {};
     const ttl = Array.isArray(detail.ttl) && detail.ttl.length > 0 ? detail.ttl.map((item) => `<span class="chip">${e(String(item))}</span>`).join(" ") : UNKNOWN;
     rows.push(`<tr>
-<th scope="row"><span class="chip">${mode}</span><div class="hint">${mode === "implicit" ? "The provider caches on its own." : "The request marks what to cache."}</div></th>
+<th scope="row">${CACHE_MODE_WORD[mode]} <span class="chip">${mode}</span><div class="hint">${mode === "implicit" ? "The provider caches on its own." : "The request marks what to cache."}</div></th>
 <td>${ttl}</td>
 <td class="num">${typeof detail.min_tokens === "number" ? exact(detail.min_tokens) : UNKNOWN}</td>
 <td class="num">${mode === "explicit" ? (typeof detail.max_breakpoints === "number" ? exact(detail.max_breakpoints) : UNKNOWN) : DASH}</td>
@@ -400,7 +449,7 @@ export function entryHtml(view: EntryView): string {
       ? '<span class="muted">Unknown</span>'
       : summary.cache === "no"
         ? "None"
-        : `${summary.cache_modes.join(" + ")}${summary.cache_ttl_s.length > 0 ? ` <span class="unit">${summary.cache_ttl_s.map(duration).join(", ")}</span>` : ""}`;
+        : `${summary.cache_modes.map((mode, at) => (at === 0 ? CACHE_MODE_WORD[mode] : CACHE_MODE_WORD[mode].toLowerCase())).join(" + ")}${summary.cache_ttl_s.length > 0 ? ` <span class="unit">${summary.cache_ttl_s.map(duration).join(", ")}</span>` : ""}`;
 
   const inherited = extension.inherited
     ? `<p class="note">Name, family and dates are taken from <a href="${e(entryHref(extension.inherited.from))}"><code>${e(extension.inherited.from)}</code></a>. Limits and caching are <strong>not</strong> copied from it, because this access method can differ.${extension.inherited.fields.includes("cost") ? " The prices are that entry's API list prices, marked as inherited." : ""}</p>`

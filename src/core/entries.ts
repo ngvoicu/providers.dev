@@ -1,11 +1,23 @@
 // The flat view of the catalog: one summary per provider-model entry.
 // The website table, /api/v1/models and the compact index all use these summaries, built once by buildIndex().
 import { isObject, type JsonObject } from "./merge.ts";
-import { NS, type Access, type Catalog, type ModelExtension, type ProviderExtension } from "./schema.ts";
+import { NS, type Access, type Catalog, type Measurement, type ModelExtension, type ProviderExtension } from "./schema.ts";
 
 export type CacheSupport = "yes" | "no" | "unknown";
 export type CacheMode = "implicit" | "explicit";
 export type Origin = "upstream" | "modified" | "added";
+
+/** The ages a pooled cache result is given at. A band holds the checks up to its age and above the band before it. */
+export const CACHE_BANDS_S = [300, 900, 1800, 3600, 7200, 14400, 28800, 43200, 86400] as const;
+
+/** Every evaluation of an entry that asked for the same cache lifetime, taken together. */
+export interface PooledCache {
+  /** The lifetime the requests asked for (`ttl` or `prompt_cache_retention`). Absent = they asked for none: the provider's default. */
+  asked?: string;
+  evaluations: number;
+  /** Per band with at least one check: re-sends served from the cache, and re-sends made. */
+  bands: { up_to_s: number; warm: number; total: number }[];
+}
 
 export interface Summary {
   /** `provider/model`. Provider ids never contain a slash, so the first slash ends the provider. */
@@ -42,6 +54,8 @@ export interface Summary {
   price_from?: string;
   measured_warm_min_s?: number;
   measured_warm_max_s?: number;
+  /** The cache evaluations of this entry taken together, by age. One item per lifetime the requests asked for; the default first. */
+  measured_cache?: PooledCache[];
   /** The largest input an evaluation saw accepted on this entry, in tokens. The real limit is at least this. */
   measured_input_accepted?: number;
   /** The smallest input an evaluation saw refused. The real limit is below this. */
@@ -119,6 +133,38 @@ function basePrice(model: JsonObject, side: "input" | "output"): number | undefi
   return isObject(part) && part.unit === undefined ? count(part.price) : undefined;
 }
 
+/**
+ * Evaluations of one entry merged by age, across the clients they were sent through. Evaluations that asked for
+ * different cache lifetimes are kept apart: they answer different questions.
+ */
+export function poolCache(runs: readonly Measurement[]): PooledCache[] {
+  const groups = new Map<string, { asked?: string; evaluations: number; counts: Map<number, [number, number]> }>();
+  const last = CACHE_BANDS_S[CACHE_BANDS_S.length - 1] as number;
+  for (const run of runs) {
+    const asked = text(run.options?.ttl) ?? text(run.options?.prompt_cache_retention);
+    const key = asked ?? "";
+    const group = groups.get(key) ?? { ...(asked ? { asked } : {}), evaluations: 0, counts: new Map() };
+    groups.set(key, group);
+    group.evaluations += 1;
+    for (const check of run.checks ?? []) {
+      if (check.total === 0) continue;
+      const band = CACHE_BANDS_S.find((limit) => check.age_s <= limit) ?? last;
+      const sum = group.counts.get(band) ?? [0, 0];
+      group.counts.set(band, [sum[0] + check.warm, sum[1] + check.total]);
+    }
+  }
+  return [...groups.entries()]
+    .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
+    .map(([, group]) => ({
+      ...(group.asked ? { asked: group.asked } : {}),
+      evaluations: group.evaluations,
+      bands: CACHE_BANDS_S.flatMap((limit) => {
+        const sum = group.counts.get(limit);
+        return sum ? [{ up_to_s: limit, warm: sum[0], total: sum[1] }] : [];
+      }),
+    }));
+}
+
 export function summarize(providerId: string, model: JsonObject, shard: number): Summary {
   const extension = model[NS] as unknown as ModelExtension;
   const limit = isObject(model.limit) ? model.limit : {};
@@ -156,6 +202,7 @@ export function summarize(providerId: string, model: JsonObject, shard: number):
     price_from: extension.inherited?.fields.includes("cost") ? extension.inherited.from : undefined,
     measured_warm_min_s: warm.length > 0 ? Math.min(...warm) : undefined,
     measured_warm_max_s: warm.length > 0 ? Math.max(...warm) : undefined,
+    measured_cache: runs.length > 0 ? poolCache(runs) : undefined,
     measured_input_accepted: accepted.length > 0 ? Math.max(...accepted) : undefined,
     measured_input_refused: refused.length > 0 ? Math.min(...refused) : undefined,
     verified: extension.verified,
