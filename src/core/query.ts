@@ -5,7 +5,7 @@ import type { Summary } from "./entries.ts";
 export const SORT_KEYS = ["provider", "model", "name", "context", "max_output", "release_date", "verified"] as const;
 export type SortKey = (typeof SORT_KEYS)[number];
 
-/** The order the website opens with: entries with our own evidence first, newest first. The API's default is by provider. */
+/** The order the website opens with: entries with providers.dev evidence first, newest first. The API's default is by provider. */
 export const SITE_DEFAULT = "sort=verified&order=desc";
 
 export const MAX_LIMIT = 200;
@@ -45,12 +45,12 @@ export const PARAMS: ParamDoc[] = [
   { name: "canonical_id", kind: "text", description: "Exact canonical model, for example anthropic/claude-opus-5-5: every access method to that model." },
   { name: "type", kind: "list", description: "Model types, comma-separated, for example chat or embedding." },
   { name: "access", kind: "list", values: ["api", "subscription", "unknown"], description: "How the provider is reached: an API key billed by use, a subscription login or plan, or not classified." },
-  { name: "origin", kind: "list", values: ["upstream", "modified", "added"], description: "upstream = as imported from models.dev; modified = imported, with our overrides or measurements; added = an entry models.dev does not have." },
+  { name: "origin", kind: "list", values: ["upstream", "modified", "added"], description: "upstream = as imported from models.dev; modified = imported, with providers.dev corrections or evaluations; added = an entry models.dev does not have." },
   { name: "cache", kind: "list", values: ["yes", "no", "unknown"], description: "Prompt caching as documented. unknown means the source says nothing, which is not the same as no." },
   { name: "cache_mode", kind: "list", values: ["implicit", "explicit"], description: "implicit = the provider caches on its own; explicit = the request marks what to cache." },
   { name: "min_context", kind: "integer", description: "Smallest context window, in tokens, that this provider exposes for the model (limit.context). Entries with an unknown window do not match." },
   { name: "min_output", kind: "integer", description: "Smallest maximum response size, in tokens (limit.output). A maximum, not a default. Entries with an unknown maximum do not match." },
-  { name: "measured", kind: "boolean", description: "true = only entries with our own cache measurements; false = only entries without." },
+  { name: "measured", kind: "boolean", description: "true = only entries with providers.dev cache evaluations; false = only entries without." },
   { name: "sort", kind: "enum", values: SORT_KEYS, description: "Sort key. Ties are broken by provider id, then model id. Entries with no value for the key come last in either order." },
   { name: "order", kind: "enum", values: ["asc", "desc"], description: "Sort direction." },
   { name: "limit", kind: "integer", description: `Entries per page, 1 to ${MAX_LIMIT}. Default ${DEFAULT_LIMIT}.` },
@@ -139,7 +139,7 @@ function matches(entry: Summary, query: Query, words: string[]): boolean {
   if (query.cache_mode && !query.cache_mode.some((mode) => (entry.cache_modes as string[]).includes(mode))) return false;
   if (query.min_context !== undefined && !(entry.context !== undefined && entry.context >= query.min_context)) return false;
   if (query.min_output !== undefined && !(entry.max_output !== undefined && entry.max_output >= query.min_output)) return false;
-  if (query.measured !== undefined && query.measured !== entry.measured_runs > 0) return false;
+  if (query.measured !== undefined && query.measured !== entry.evaluations > 0) return false;
   if (words.length > 0) {
     const haystack = `${entry.provider} ${entry.model} ${entry.name} ${entry.family ?? ""} ${entry.canonical_id ?? ""}`.toLowerCase();
     if (!words.every((word) => haystack.includes(word))) return false;

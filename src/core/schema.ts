@@ -144,6 +144,13 @@ export type AccessRules = z.infer<typeof AccessRules>;
 export const RouteMap = z.record(z.string(), z.strictObject({ provider: z.string().regex(PROVIDER_ID) }));
 export type RouteMap = z.infer<typeof RouteMap>;
 
+// ---- authored: public names for the measurement file's clients (data/authored/measurement-labels.yaml)
+export const MeasurementLabels = z.strictObject({
+  clients: z.record(z.string(), z.strictObject({ id: z.string().min(1), label: z.string().min(1) })),
+  omit_note_parts_mentioning: z.array(z.string().min(1)).default([]),
+});
+export type MeasurementLabels = z.infer<typeof MeasurementLabels>;
+
 // ---- measurements (observed.json from cache-ttl-probe)
 const check = z.looseObject({ age: z.string().optional(), age_s: z.number(), warm: z.number(), total: z.number() });
 export const ObservedRun = z.looseObject({
@@ -163,6 +170,8 @@ export const ObservedRun = z.looseObject({
   last_warm_s: z.number().nullable().optional(),
   first_all_cold_s: z.number().nullable().optional(),
   latest: z.boolean().optional(),
+  /** Set on runs taken with a client that lacked something the route needs; such runs are not published. */
+  lacks: z.string().optional(),
   note: z.string().optional(),
 });
 export type ObservedRun = z.infer<typeof ObservedRun>;
@@ -257,7 +266,7 @@ export interface MeasuredLimit {
 export interface ModelExtension {
   origin: "upstream" | "added";
   access: Access;
-  /** Fields of ours that replaced, hid or removed an upstream value. */
+  /** Fields of with_evidence that replaced, hid or removed an upstream value. */
   provenance?: Provenance[];
   /** Identity fields copied from another entry, for entries we add. */
   inherited?: { from: string; fields: string[] };
@@ -281,7 +290,6 @@ export interface ProviderExtension {
   note?: string;
   evidence?: Evidence[];
   provenance?: Provenance[];
-  cache_known?: { client: string; client_label: string; ttl_s: number; basis: string; source: string; when?: JsonObject }[];
 }
 
 export type PublishedModel = JsonObject & { id: string; name: string };
@@ -298,6 +306,7 @@ export interface Issue {
     | "addition-collides"
     | "inherit-target-missing"
     | "unmapped-route"
+    | "unmapped-client"
     | "invalid-authored"
     | "reserved-field";
   target: string;

@@ -8,7 +8,7 @@ The baseline is imported daily from [models.dev](https://models.dev) (MIT). On t
 - **providers models.dev does not list**, mainly subscription access (a Claude login, a ChatGPT plan through Codex,
   Devin, Google Antigravity);
 - **corrections** to single fields, each with a reason and a source;
-- **measurements** of cache lifetimes and limits from [cache-ttl-probe](https://github.com/ngvoicu/cache-ttl-probe),
+- **evaluations** of cache lifetimes and limits from [cache-ttl-probe](https://github.com/ngvoicu/cache-ttl-probe),
   shown next to the documented values, never instead of them.
 
 It publishes metadata only. There is no chat, no inference proxy, and no subscription plans, prices or quotas.
@@ -96,7 +96,8 @@ What the build reports (in the console, on the *Our data* page and in `/api/v1/m
   recreated from it.
 - **redundant-override**: upstream now says what the override says. Delete the override.
 - **addition-collides**: upstream added a provider with the id of one of ours.
-- **orphan-observation**, **unmapped-route**: measurements that have no entry or provider to land on.
+- **orphan-observation**, **unmapped-route**: evaluations that have no entry or provider to land on.
+- **unmapped-client**: an evaluation names a client that `data/authored/measurement-labels.yaml` does not describe.
 
 ## Authoring
 
@@ -147,8 +148,12 @@ models:
 prices and capabilities are never copied from another access method: leave them out unless you have evidence for
 this one. If a service does not say which model it serves, leave `inherits` out; do not guess.
 
-Models that exist only because they were measured do not need to be listed by hand: a measurement on a route that
+Models that exist only because they were evaluated do not need to be listed by hand: an evaluation on a route that
 `data/authored/routes.yaml` maps to one of our providers creates the entry.
+
+`data/authored/measurement-labels.yaml` gives each client of the measurement file its public name (for example
+"Requests sent through an API gateway") and lists words whose note parts are not published. Runs marked `lacks` in
+the measurement file are skipped.
 
 ### Evidence requirements
 

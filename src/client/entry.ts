@@ -4,13 +4,12 @@ import type { Index } from "../core/entries.ts";
 import { escapeHtml } from "../core/format.ts";
 import type { JsonObject } from "../core/merge.ts";
 import { entryHtml } from "../core/render.ts";
-import { NS, type ProviderExtension } from "../core/schema.ts";
 
 const root = document.getElementById("entry") as HTMLElement;
 const now = new Date(root.dataset.now ?? Date.now());
 
 function message(title: string, body: string): void {
-  root.innerHTML = `<h1>${escapeHtml(title)}</h1><p class="lead mt-2">${body}</p><p class="mt-4"><a class="button" href="/">Back to the catalog</a></p>`;
+  root.innerHTML = `<h1>${escapeHtml(title)}</h1><p class="lead mt-2">${body}</p><p class="mt-5"><a class="button" href="/">Back to the catalog</a></p>`;
 }
 
 async function json<T>(path: string): Promise<T> {
@@ -34,15 +33,11 @@ async function load(): Promise<void> {
       return;
     }
     const provider = index.providers.find((item) => item.id === summary.provider);
-    const [shard, directory] = await Promise.all([
-      json<Record<string, JsonObject>>(`/data/entries/${encodeURIComponent(summary.provider)}/${summary.shard}.json`),
-      json<{ data: ({ id: string } & Record<string, unknown>)[] }>("/data/providers.json"),
-    ]);
+    const shard = await json<Record<string, JsonObject>>(`/data/entries/${encodeURIComponent(summary.provider)}/${summary.shard}.json`);
     const model = shard[summary.model];
     if (!model || !provider) throw new Error("the entry file does not hold this entry");
-    const providerExtension = directory.data.find((item) => item.id === summary.provider)?.[NS] as ProviderExtension | undefined;
     document.title = `${summary.name} at ${provider.name} · providers.dev`;
-    root.innerHTML = entryHtml({ summary, provider, model, now, ...(providerExtension ? { providerExtension } : {}) });
+    root.innerHTML = entryHtml({ summary, provider, model, now });
     if (location.hash) document.getElementById(location.hash.slice(1))?.scrollIntoView();
   } catch (error) {
     message(

@@ -9,22 +9,22 @@ const models = [...entriesByCanonical.entries()]
     name: (entries.find((entry) => `${entry.provider}/${entry.model}` === id) ?? entries[0]!).name,
     count: entries.length,
     subscription: entries.filter((entry) => entry.access === "subscription").length,
-    ours: entries.filter((entry) => entry.origin !== "upstream").length,
+    with_evidence: entries.filter((entry) => entry.origin !== "upstream").length,
   }))
   .sort((a, b) => b.count - a.count || a.id.localeCompare(b.id));
 ---
 
 <Base title="Models" description="Canonical models and every provider and access method that serves each of them.">
   <h1>Models</h1>
-  <p class="lead mt-1">
+  <p class="lead mt-3">
     {exact(models.length)} canonical models. Each page lists every provider and access method for that model side by side, because the same model is often
     exposed with a different context window, output limit or cache behaviour depending on where you reach it.
   </p>
-  <label class="field mt-4 max-w-sm">Filter <input id="filter" type="search" placeholder="name or id" autocomplete="off" spellcheck="false" /></label>
+  <label class="field mt-6 max-w-sm">Filter models <input id="filter" type="search" placeholder="Name or id" autocomplete="off" spellcheck="false" /></label>
   <div class="scroll mt-3">
     <table class="entries">
       <thead>
-        <tr><th scope="col">Model</th><th scope="col" class="num">Entries</th><th scope="col" class="num">By subscription</th><th scope="col" class="num">With our data</th></tr>
+        <tr><th scope="col">Model</th><th scope="col" class="num">Access methods</th><th scope="col" class="num">By subscription</th><th scope="col" class="num">With providers.dev evidence</th></tr>
       </thead>
       <tbody id="list">
         {
@@ -36,7 +36,7 @@ const models = [...entriesByCanonical.entries()]
               </th>
               <td class="num">{exact(model.count)}</td>
               <td class="num">{model.subscription > 0 ? exact(model.subscription) : <span class="muted">–</span>}</td>
-              <td class="num">{model.ours > 0 ? exact(model.ours) : <span class="muted">–</span>}</td>
+              <td class="num">{model.with_evidence > 0 ? exact(model.with_evidence) : <span class="muted">–</span>}</td>
             </tr>
           ))
         }

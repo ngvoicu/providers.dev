@@ -1,6 +1,6 @@
 ---
 import Base from "../../layouts/Base.astro";
-import { exact, duration } from "../../core/format.ts";
+import { exact } from "../../core/format.ts";
 import { rowHtml, tableHead } from "../../core/render.ts";
 import { providerExt } from "../../core/schema.ts";
 import { catalog, entriesByProvider, index, now } from "../../lib/data.ts";
@@ -13,20 +13,20 @@ const full = catalog[provider.id]!;
 const extension = providerExt(full);
 const entries = [...(entriesByProvider.get(provider.id) ?? [])].sort((a, b) => a.name.localeCompare(b.name) || a.model.localeCompare(b.model));
 const env = Array.isArray(full.env) ? (full.env as string[]) : [];
-const accessLabel = { api: "API key, billed by use", subscription: "Subscription login or plan", unknown: "Not classified" } as const;
+const accessLabel = { api: "API key, billed by use", subscription: "Subscription login or plan", unknown: "Unclassified" } as const;
 ---
 
-<Base title={provider.name} description={`${provider.name}: ${provider.models} models with context, output and prompt-cache limits.`} wide>
-  <p class="hint"><a class="quiet" href="/providers/">Providers</a></p>
+<Base title={provider.name} description={`${provider.name}: ${provider.models} models with context, output and prompt-cache limits.`}>
+  <p class="crumbs"><a href="/providers/">Providers</a> / {provider.name}</p>
   <h1>{provider.name}</h1>
   <p class="id mt-1">
     <code>{provider.id}</code>
-    <button type="button" class="copy" data-copy={provider.id} aria-label="Copy provider id">copy</button>
-    <span class:list={["origin", provider.origin]}>{provider.origin === "added" ? "ours" : "models.dev"}</span>
-    {provider.doc && <a href={provider.doc} rel="noopener">documentation</a>}
+    <button type="button" class="copy" data-copy={provider.id} aria-label="Copy provider id">Copy</button>
+    <span class:list={["origin", provider.origin]}>{provider.origin === "added" ? "providers.dev" : "models.dev"}</span>
+    {provider.doc && <a href={provider.doc} rel="noopener">Documentation ↗</a>}
   </p>
 
-  <dl class="mt-4 grid max-w-3xl grid-cols-[9rem_1fr] gap-x-4 gap-y-2 text-[0.9rem]">
+  <dl class="mt-6 grid max-w-4xl grid-cols-[9rem_1fr] gap-x-4 gap-y-3 text-[0.9rem]">
     <dt class="muted">Access</dt>
     <dd>
       <strong>{accessLabel[extension.access]}</strong>
@@ -36,7 +36,7 @@ const accessLabel = { api: "API key, billed by use", subscription: "Subscription
       </div>
     </dd>
     <dt class="muted">Models</dt>
-    <dd>{exact(provider.models)}{provider.ours > 0 && <>, {exact(provider.ours)} with our own data</>}</dd>
+    <dd>{exact(provider.models)}{provider.with_evidence > 0 && <>, {exact(provider.with_evidence)} with providers.dev evidence</>}</dd>
     {env.length > 0 && <><dt class="muted">Key variables</dt><dd>{env.map((name) => <code class="mr-2">{name}</code>)}</dd></>}
     {extension.note && <><dt class="muted">Note</dt><dd>{extension.note}</dd></>}
     {
@@ -54,29 +54,15 @@ const accessLabel = { api: "API key, billed by use", subscription: "Subscription
         </>
       )
     }
-    {
-      extension.cache_known && (
-        <>
-          <dt class="muted">Cache, set by the client</dt>
-          <dd>
-            {extension.cache_known.map((item) => (
-              <div class="mb-1">
-                {item.basis} <span class="muted">({item.client}{item.when && `, when ${Object.entries(item.when).map(([k, v]) => `${k}=${v}`).join(", ")}`}: {duration(item.ttl_s)})</span>{" "}
-                <a href={item.source} rel="noopener">source</a>
-              </div>
-            ))}
-          </dd>
-        </>
-      )
-    }
   </dl>
 
-  <p class="hint mt-5">
-    <a href={`/api/v1/providers/${provider.id}`}><code>GET /api/v1/providers/{provider.id}</code></a> · <a href={`/?provider=${provider.id}`}>open in the catalog to filter and sort</a>
-  </p>
+  <div class="mt-8 flex flex-wrap items-end justify-between gap-3">
+    <h2 class="!m-0">Models</h2>
+    <p class="hint"><a href={`/?provider=${provider.id}`}>Filter and sort in the catalog</a> · <a href={`/api/v1/providers/${provider.id}`}><code>GET /api/v1/providers/{provider.id}</code></a></p>
+  </div>
   {
     entries.length > 0 ? (
-      <div class="scroll mt-2">
+      <div class="scroll mt-3">
         <table class="entries">
           <caption class="sr-only">Models at {provider.name}</caption>
           <thead set:html={tableHead({ hideProvider: true })} />

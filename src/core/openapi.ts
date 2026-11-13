@@ -40,7 +40,7 @@ export function openapi(): Record<string, unknown> {
       title: "providers.dev API",
       version: "1.0.0",
       description:
-        "Read-only metadata about AI models as each provider and access method exposes them. The baseline is imported from models.dev (MIT); our additions and corrections are under the `providers_dev` key of each provider and model. `v1` is the version of this API; the model fields follow the models.dev v2 schema, which is experimental upstream.",
+        "Read-only metadata about AI models as each provider and access method exposes them. The baseline is imported from models.dev (MIT); providers.dev additions, corrections and evaluations are under the `providers_dev` key of each provider and model. `v1` is the version of this API; the model fields follow the models.dev v2 schema, which is experimental upstream.",
       license: { name: "MIT", url: "https://providers.dev/docs/licensing/" },
     },
     servers: [{ url: "https://providers.dev" }],
@@ -114,7 +114,7 @@ export function openapi(): Record<string, unknown> {
         get: {
           summary: "Compatibility export",
           description:
-            "The merged catalog keyed by provider id, in the models.dev v2 structure, with no envelope. Entries we add may lack fields that models.dev requires; every entry carries `providers_dev`. The dataset version is in the X-Dataset-Version header.",
+            "The merged catalog keyed by provider id, in the models.dev v2 structure, with no envelope. Added entries may lack fields that models.dev requires; every entry carries `providers_dev`. The dataset version is in the X-Dataset-Version header.",
           responses: { 200: ok("Provider-keyed catalog", object) },
         },
       },
@@ -155,7 +155,7 @@ export function openapi(): Record<string, unknown> {
         },
         EntrySummary: {
           type: "object",
-          required: ["ref", "provider", "model", "name", "access", "origin", "cache", "cache_modes", "cache_ttl_s", "measured_runs"],
+          required: ["ref", "provider", "model", "name", "access", "origin", "cache", "cache_modes", "cache_ttl_s", "evaluations"],
           properties: {
             ref: { type: "string", description: "provider/model" },
             provider: { type: "string" },
@@ -174,11 +174,12 @@ export function openapi(): Record<string, unknown> {
             cache: { enum: ["yes", "no", "unknown"] },
             cache_modes: { type: "array", items: { enum: ["implicit", "explicit"] } },
             cache_ttl_s: { type: "array", items: { type: "number" }, description: "Documented lifetimes in seconds." },
-            measured_runs: { type: "integer" },
+            evaluations: { type: "integer" },
             measured_warm_min_s: { type: "number" },
             measured_warm_max_s: { type: "number" },
+            measured_limits: { type: "integer" },
             overridden_fields: { type: "array", items: { type: "string" } },
-            verified: { type: "string", format: "date", description: "Newest date of our own evidence. Imported entries have none." },
+            verified: { type: "string", format: "date", description: "Newest date of providers.dev evidence. Imported entries have none." },
             shard: { type: "integer" },
           },
         },

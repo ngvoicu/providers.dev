@@ -19,7 +19,7 @@ The baseline is imported from models.dev; our additions, corrections and measure
 |---|---|---|
 | `data/upstream/` | the last good import of models.dev, one file per provider | `npm run sync` only |
 | `data/sources/` | the measurements file from cache-ttl-probe | `npm run sync` only |
-| `data/authored/` | our providers, overrides, access rules, route map | people |
+| `data/authored/` | our providers, overrides, access rules, route map, measurement labels | people |
 | `data/published/` | the resolved snapshot (not in git) | `npm run data` only |
 | `src/core/` | pure logic shared by scripts, Worker, pages and browser: merge, resolve, entries, query, api, render | |
 | `scripts/` | sync, data build, staging | |
@@ -43,7 +43,13 @@ The baseline is imported from models.dev; our additions, corrections and measure
 - The website and the API must read the same published snapshot and use the same query code (`src/core/query.ts`).
   Do not add a second filter implementation.
 - Public requests never fetch upstream. Only `npm run sync` does.
-- Text on the site: plain, short, no marketing. Say what a number means and where it comes from.
+- Text on the site: plain, short, professional, no marketing. Say what a number means and where it comes from.
+- Wording: the two sources are named `models.dev` and `providers.dev` (never "ours"). A cache run is an
+  "evaluation". Pages use the full width of the home page (`.page`).
+- Do not name the tools a measurement was taken with, other than a vendor's own CLI. Client ids from the
+  measurement file are published under the neutral names in `data/authored/measurement-labels.yaml`, note parts
+  that mention a tool on its omit list are dropped, and runs marked `lacks` are not published. A new client id must
+  be added to that file (the build warns and publishes it as "other").
 
 ## Commands
 

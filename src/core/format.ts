@@ -39,33 +39,34 @@ export function isStale(date: string | undefined, now: Date): boolean {
 }
 
 export function cacheLabel(entry: Pick<Summary, "cache" | "cache_modes" | "cache_ttl_s">): string {
-  if (entry.cache === "no") return "none";
-  if (entry.cache === "unknown") return "unknown";
+  if (entry.cache === "no") return "None";
+  if (entry.cache === "unknown") return "Unknown";
   const ttl = entry.cache_ttl_s.length > 0 ? ` · ${entry.cache_ttl_s.map(duration).join(", ")}` : "";
   return `${entry.cache_modes.join(" + ")}${ttl}`;
 }
 
-export function measuredLabel(entry: Pick<Summary, "measured_runs" | "measured_warm_min_s" | "measured_warm_max_s">): string {
-  if (entry.measured_runs === 0) return "";
-  const runs = `${entry.measured_runs} ${entry.measured_runs === 1 ? "run" : "runs"}`;
-  if (entry.measured_warm_min_s === undefined || entry.measured_warm_max_s === undefined) return runs;
-  const range =
-    entry.measured_warm_min_s === entry.measured_warm_max_s
-      ? duration(entry.measured_warm_min_s)
-      : `${duration(entry.measured_warm_min_s)} to ${duration(entry.measured_warm_max_s)}`;
-  return `warm at ${range} · ${runs}`;
+export function plural(count: number, word: string): string {
+  return `${exact(count)} ${word}${count === 1 ? "" : "s"}`;
+}
+
+/** "Warm 10 min to 30 min" for the ages at which every check was still served from the cache. */
+export function warmRange(entry: Pick<Summary, "measured_warm_min_s" | "measured_warm_max_s">): string {
+  if (entry.measured_warm_min_s === undefined || entry.measured_warm_max_s === undefined) return "";
+  return entry.measured_warm_min_s === entry.measured_warm_max_s
+    ? `Warm ${duration(entry.measured_warm_min_s)}`
+    : `Warm ${duration(entry.measured_warm_min_s)} to ${duration(entry.measured_warm_max_s)}`;
 }
 
 export const ORIGIN_LABEL: Record<Summary["origin"], string> = {
   upstream: "models.dev",
-  modified: "models.dev + ours",
-  added: "ours",
+  modified: "models.dev + providers.dev",
+  added: "providers.dev",
 };
 
 export const ORIGIN_TITLE: Record<Summary["origin"], string> = {
-  upstream: "Imported from models.dev as is. Not checked by us.",
-  modified: "Imported from models.dev, with our own overrides or measurements on top.",
-  added: "An entry models.dev does not have. Every value on it is ours.",
+  upstream: "Imported from models.dev as is. Not independently checked.",
+  modified: "Imported from models.dev, with providers.dev corrections or evaluations on top.",
+  added: "Listed by providers.dev. models.dev has no entry for this access method.",
 };
 
 export function entryHref(ref: string): string {

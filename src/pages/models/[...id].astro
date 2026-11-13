@@ -1,6 +1,6 @@
 ---
 import Base from "../../layouts/Base.astro";
-import { exact } from "../../core/format.ts";
+import { compactTokens, exact } from "../../core/format.ts";
 import { rowHtml, tableHead } from "../../core/render.ts";
 import { entriesByCanonical, now, providerNames } from "../../lib/data.ts";
 
@@ -16,20 +16,24 @@ const own = sorted.find((entry) => entry.provider === lab);
 const name = (own ?? sorted[0]!).name;
 const contexts = [...new Set(sorted.map((entry) => entry.context).filter((value): value is number => value !== undefined))].sort((a, b) => a - b);
 const outputs = [...new Set(sorted.map((entry) => entry.max_output).filter((value): value is number => value !== undefined))].sort((a, b) => a - b);
-const range = (values: number[]): string => (values.length === 0 ? "unknown" : values.length === 1 ? exact(values[0]!) : `${exact(values[0]!)} to ${exact(values.at(-1)!)}`);
+const range = (values: number[]): string => (values.length === 0 ? "Unknown" : values.length === 1 ? compactTokens(values[0]!) : `${compactTokens(values[0]!)} to ${compactTokens(values.at(-1)!)}`);
 ---
 
-<Base title={name} description={`${name}: ${entries.length} ways to reach it, with the context, output and cache limits of each.`} wide>
-  <p class="hint"><a class="quiet" href="/models/">Models</a></p>
+<Base title={name} description={`${name}: ${entries.length} ways to reach it, with the context, output and cache limits of each.`}>
+  <p class="crumbs"><a href="/models/">Models</a> / {name}</p>
   <h1>{name}</h1>
-  <p class="id mt-1"><code>{id}</code><button type="button" class="copy" data-copy={id} aria-label="Copy canonical id">copy</button></p>
-  <p class="lead mt-3">
-    {exact(entries.length)} {entries.length === 1 ? "entry" : "entries"} for this model. Exposed context window: <strong>{range(contexts)}</strong> tokens. Maximum output:{" "}
-    <strong>{range(outputs)}</strong> tokens.{" "}
-    {own ? <>The first row is {providerNames[lab] ?? lab}'s own API, the closest thing to the model's own limits.</> : <>The lab's own API is not in the catalog, so there is no reference row for the model's own limits.</>}
+  <p class="id mt-1"><code>{id}</code><button type="button" class="copy" data-copy={id} aria-label="Copy canonical id">Copy</button></p>
+  <div class="tiles mt-6">
+    <div class="tile"><div class="label">Access methods</div><div class="value">{exact(entries.length)}</div><div class="foot">{exact(sorted.filter((entry) => entry.access === "subscription").length)} by subscription</div></div>
+    <div class="tile"><div class="label">Context window</div><div class="value small">{range(contexts)} <span class="unit">tokens</span></div><div class="foot">Across access methods</div></div>
+    <div class="tile"><div class="label">Maximum output</div><div class="value small">{range(outputs)} <span class="unit">tokens</span></div><div class="foot">Across access methods</div></div>
+    <div class="tile"><div class="label">With providers.dev evidence</div><div class="value">{exact(sorted.filter((entry) => entry.origin !== "upstream").length)}</div><div class="foot">Corrections or evaluations</div></div>
+  </div>
+  <p class="note mt-5">
+    {own ? <>The first row is {providerNames[lab] ?? lab}'s own API, the closest reference for the model's own limits.</> : <>The lab's own API is not in the catalog, so there is no reference row for the model's own limits.</>}{" "}
+    A lower number on another row is that provider's limit for the model. Values are per entry; nothing is copied from one access method to another.
   </p>
-  <p class="hint mt-1">A lower number on another row is that provider's limit for the model, not an error. Values are per entry; nothing is copied from one access method to another.</p>
-  <div class="scroll mt-4">
+  <div class="scroll mt-5">
     <table class="entries">
       <caption class="sr-only">Access methods for {name}</caption>
       <thead set:html={tableHead({})} />

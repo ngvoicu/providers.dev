@@ -10,6 +10,7 @@ import {
   type Exclusion,
   type Issue,
   type MeasuredLimit,
+  type MeasurementLabels,
   type Measurement,
   type ModelExtension,
   type ObservedFile,
@@ -28,6 +29,7 @@ export interface ResolveInput {
   overrides: OverrideFile[];
   access: AccessRules;
   routes: RouteMap;
+  labels?: MeasurementLabels;
   observed?: ObservedFile;
 }
 
@@ -202,7 +204,7 @@ export function resolve(input: ResolveInput): ResolveResult {
 
   if (observed) {
     for (const run of observed.cache) {
-      if (!run.latest || run.models_dev) continue;
+      if (!run.latest || run.lacks || run.models_dev) continue;
       ensureMeasuredModel(run.route, run.model, run.base_model, { kind: "measured", url: sourceUrl(run.source), date: run.date });
     }
     for (const limit of observed.limits) {
@@ -274,7 +276,30 @@ export function resolve(input: ResolveInput): ResolveResult {
   // 5. Measurements land on the entry they were taken on. They never replace a documented value.
   if (observed) {
     const routeLabel = (route: string): string => observed.routes[route] ?? route;
-    const clientLabel = (client: string): string => observed.clients[client] ?? client;
+    const unknownClients = new Set<string>();
+    const clientOf = (client: string): { client: string; client_label: string } => {
+      const named = input.labels?.clients[client];
+      if (named) return { client: named.id, client_label: named.label };
+      if (!unknownClients.has(client)) {
+        unknownClients.add(client);
+        issues.push({
+          level: "warning",
+          code: "unmapped-client",
+          target: client,
+          message: `Measurements name a client "${client}" that data/authored/measurement-labels.yaml does not describe. It is published as "other".`,
+        });
+      }
+      return { client: "other", client_label: "Another client" };
+    };
+    const omit = (input.labels?.omit_note_parts_mentioning ?? []).map((word) => word.toLowerCase());
+    const publicNote = (note: string | undefined): string | undefined => {
+      if (!note) return undefined;
+      const kept = note
+        .split(";")
+        .map((part) => part.trim())
+        .filter((part) => part && !omit.some((word) => part.toLowerCase().includes(word)));
+      return kept.length > 0 ? kept.join("; ") : undefined;
+    };
     const targetOf = (record: { route: string; model: string; models_dev?: string | null }): { ref: string; model?: PublishedModel } => {
       const mapped = input.routes[record.route];
       const ref = record.models_dev ?? (mapped ? `${mapped.provider}/${record.model}` : `${record.route}/${record.model}`);
@@ -293,18 +318,19 @@ export function resolve(input: ResolveInput): ResolveResult {
     };
 
     for (const run of observed.cache) {
-      if (!run.latest) continue;
+      // A run taken with a client that lacked what the route needs says nothing about the provider.
+      if (!run.latest || run.lacks) continue;
       const { ref, model } = targetOf(run);
       if (!model) {
         orphan(ref, run.route);
         continue;
       }
+      const note = publicNote(run.note);
       const measurement: Measurement = {
-        run: run.id,
+        run: run.id.slice(run.id.lastIndexOf("/") + 1),
         route: run.route,
         route_label: routeLabel(run.route),
-        client: run.client,
-        client_label: clientLabel(run.client),
+        ...clientOf(run.client),
         ...(run.options && Object.keys(run.options).length > 0 ? { options: run.options as JsonObject } : {}),
         date: run.date,
         ...(run.control ? { control: { warm: run.control.warm, total: run.control.total } } : {}),
@@ -313,7 +339,7 @@ export function resolve(input: ResolveInput): ResolveResult {
         all_warm_through_s: run.all_warm_through_s ?? null,
         last_warm_s: run.last_warm_s ?? null,
         first_all_cold_s: run.first_all_cold_s ?? null,
-        ...(run.note ? { note: run.note } : {}),
+        ...(note ? { note } : {}),
         source: sourceUrl(run.source),
       };
       const extension = modelExt(model);
@@ -328,17 +354,17 @@ export function resolve(input: ResolveInput): ResolveResult {
         continue;
       }
       const date = /(\d{4}-\d{2}-\d{2})/.exec(limit.source)?.[1];
+      const limitNote = publicNote(limit.note);
       const measured: MeasuredLimit = {
         route: limit.route,
         route_label: routeLabel(limit.route),
-        client: limit.client,
-        client_label: clientLabel(limit.client),
+        ...clientOf(limit.client),
         ...(typeof limit.context === "number" ? { context: limit.context } : {}),
         ...(typeof limit.output === "number" ? { output: limit.output } : {}),
         ...(limit.input_accepted !== undefined ? { input_accepted: limit.input_accepted } : {}),
         ...(limit.input_refused !== undefined ? { input_refused: limit.input_refused } : {}),
         ...(limit.output_accepted !== undefined ? { output_accepted: limit.output_accepted } : {}),
-        ...(limit.note ? { note: limit.note } : {}),
+        ...(limitNote ? { note: limitNote } : {}),
         ...(date ? { date } : {}),
         source: sourceUrl(limit.source),
       };
@@ -357,20 +383,6 @@ export function resolve(input: ResolveInput): ResolveResult {
         }
         if (Object.keys(limits).length === 0) delete model.limit;
       }
-    }
-
-    for (const known of observed.known) {
-      const mapped = input.routes[known.route];
-      const provider = mapped ? catalog[mapped.provider] : undefined;
-      if (!provider) continue;
-      (provExt(provider).cache_known ??= []).push({
-        client: known.client,
-        client_label: clientLabel(known.client),
-        ttl_s: known.ttl_s,
-        basis: known.basis,
-        source: known.source,
-        ...(known.when ? { when: known.when as JsonObject } : {}),
-      });
     }
   }
 

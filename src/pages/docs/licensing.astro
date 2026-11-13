@@ -1,41 +1,45 @@
 ---
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import Base from "../../layouts/Base.astro";
+import Doc from "../../layouts/Doc.astro";
 
 const upstreamLicense = readFileSync(join(process.cwd(), "LICENSES", "models.dev-MIT.txt"), "utf8");
 const ownLicense = readFileSync(join(process.cwd(), "LICENSE"), "utf8");
 ---
 
-<Base title="Licensing" description="Licences and attribution for the providers.dev dataset and the models.dev data it builds on.">
+<Doc
+  title="Licensing and attribution"
+  description="Licences and attribution for the providers.dev dataset and the models.dev data it builds on."
+  lead="The baseline of this catalog is imported from models.dev, which is published under the MIT License. providers.dev is an independent project and is not affiliated with, sponsored by or endorsed by models.dev or any listed provider."
+  toc={[
+    { id: "attribution", label: "Attribution" },
+    { id: "use", label: "Using the data" },
+    { id: "upstream", label: "models.dev licence" },
+    { id: "own", label: "providers.dev licence" },
+  ]}
+>
   <div class="prose">
-    <h1>Licensing and attribution</h1>
-    <p class="lead">
-      The baseline of this catalog is imported from <a href="https://models.dev">models.dev</a> (<a href="https://github.com/anomalyco/models.dev">source</a>), which is published under the MIT
-      License. providers.dev is an independent project. It is not affiliated with, sponsored by or endorsed by models.dev or by any provider listed here.
-    </p>
-
-    <h2>What is whose</h2>
+    <h2 id="attribution">Attribution</h2>
     <ul>
-      <li>Every provider and entry whose <code>providers_dev.origin</code> is <code>upstream</code> comes from models.dev, except the fields listed in its <code>providers_dev.provenance</code>.</li>
-      <li>Everything under a <code>providers_dev</code> key, every entry whose origin is <code>added</code>, and every field listed in a <code>provenance</code> array is ours.</li>
-      <li>Measurements come from <a href="https://github.com/ngvoicu/cache-ttl-probe">cache-ttl-probe</a> (MIT).</li>
+      <li>Every provider and entry whose <code>providers_dev.origin</code> is <code>upstream</code> comes from <a href="https://models.dev">models.dev</a> (<a href="https://github.com/anomalyco/models.dev">source</a>), except the fields listed in its <code>providers_dev.provenance</code>.</li>
+      <li>Everything under a <code>providers_dev</code> key, every entry whose origin is <code>added</code>, and every field listed in a <code>provenance</code> array is by providers.dev.</li>
     </ul>
-    <p>That marking is kept through every export, so a consumer of <code>/api.json</code> can always tell the two apart.</p>
+    <p>This marking is kept through every export, so a consumer of <code>/api.json</code> can always tell the two apart.</p>
 
-    <h2>Using this data</h2>
+    <h2 id="use">Using the data</h2>
     <p>
-      Our additions, corrections and code are under the MIT License below. If you redistribute the dataset, keep both notices. The dataset ships with them:
+      providers.dev additions, corrections and code are under the MIT License below. When redistributing the dataset, keep both notices. They ship with the dataset as
       <a href="/data/LICENSE-models.dev.txt"><code>/data/LICENSE-models.dev.txt</code></a> and <a href="/data/NOTICE.txt"><code>/data/NOTICE.txt</code></a>.
     </p>
     <p>
-      Model and provider names are trademarks of their owners and are used only to identify them. The data is provided as is; check a provider's own documentation before relying on a limit.
+      Model and provider names are trademarks of their owners and are used only to identify them. The data is provided as is; confirm a limit against the provider's own documentation before
+      relying on it.
     </p>
 
-    <h2>models.dev licence</h2>
+    <h2 id="upstream">models.dev licence</h2>
     <pre style="white-space: pre-wrap">{upstreamLicense}</pre>
 
-    <h2>providers.dev licence</h2>
+    <h2 id="own">providers.dev licence</h2>
     <pre style="white-space: pre-wrap">{ownLicense}</pre>
   </div>
-</Base>
+</Doc>

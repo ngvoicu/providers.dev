@@ -180,7 +180,7 @@ describe("resolve: measurements", () => {
     schema: 1,
     repository: "https://github.com/example/probe",
     routes: { "lab-api": "Lab API key", "lab-login": "Lab login" },
-    clients: { direct: "plain requests" },
+    clients: { direct: "plain requests", "tool-x": "internal tool" },
     cache: [
       {
         id: "run-1",
@@ -205,20 +205,21 @@ describe("resolve: measurements", () => {
   };
   const login = { id: "lab-login", name: "Lab login", access: "subscription" as const, access_basis: "a login", evidence, models: [] };
   const routes = { "lab-api": { provider: "lab" }, "lab-login": { provider: "lab-login" } };
+  const directLabel = { clients: { direct: { id: "direct", label: "Straight to the provider" } }, omit_note_parts_mentioning: [] };
 
   it("puts a measurement next to the documented value without replacing it", () => {
-    const { catalog } = resolve(input([], { observed, routes, additions: [login] }));
+    const { catalog } = resolve(input([], { observed, routes, labels: directLabel, additions: [login] }));
     const model = catalog.lab!.models["model-a"]!;
     expect(model.limit).toEqual({ context: 200000, output: 64000 });
     expect(ext(model).cache?.observed).toEqual([
-      expect.objectContaining({ run: "run-1", route_label: "Lab API key", all_warm_through_s: 300, source: "https://github.com/example/probe/blob/main/results/run-1.json" }),
+      expect.objectContaining({ run: "run-1", client: "direct", route_label: "Lab API key", all_warm_through_s: 300, source: "https://github.com/example/probe/blob/main/results/run-1.json" }),
     ]);
     expect(ext(model).verified).toBe("2026-11-05");
     expect(ext(model).provenance).toBeUndefined();
   });
 
   it("creates an entry for a route upstream does not list, and reports routes it cannot place", () => {
-    const { catalog, issues } = resolve(input([], { observed, routes, additions: [login] }));
+    const { catalog, issues } = resolve(input([], { observed, routes, labels: directLabel, additions: [login] }));
     const added = catalog["lab-login"]!.models.a!;
     expect(added).toMatchObject({ name: "Model A", canonical_id: "lab/model-a" });
     expect(added.limit).toBeUndefined();
@@ -235,7 +236,7 @@ describe("resolve: measurements", () => {
         { route: "lab-api", client: "direct", model: "model-a", models_dev: "lab/model-a", context: 150000, source: "results/limits-2026-11-08/l.jsonl" },
       ],
     };
-    const { catalog } = resolve(input([], { observed: withLimits, routes, additions: [login] }));
+    const { catalog } = resolve(input([], { observed: withLimits, routes, labels: directLabel, additions: [login] }));
     const added = catalog["lab-login"]!.models.a!;
     expect(added.limit).toEqual({ context: 900000, output: 32000 });
     expect(ext(added).limits).toMatchObject({ from_measurement: ["context", "output"], measured: [expect.objectContaining({ context: 900000, date: "2026-11-08" })] });
@@ -246,10 +247,30 @@ describe("resolve: measurements", () => {
     expect(ext(imported).limits?.measured?.[0]?.context).toBe(150000);
   });
 
+  it("names clients by their public label, drops note parts on the omit list and skips runs marked as lacking", () => {
+    const labelled: ObservedFile = {
+      ...observed,
+      cache: [
+        { ...observed.cache[0]!, id: "tool-x-1.0/R7", client: "tool-x", note: "ToolX 1.0 with patch 12; 5 samples per age" },
+        { ...observed.cache[0]!, id: "tool-x-1.0/R8", lacks: "patch 12" },
+        { ...observed.cache[0]!, id: "other/R9", client: "mystery" },
+      ],
+    };
+    const labels = { clients: { "tool-x": { id: "gateway", label: "Through a gateway" } }, omit_note_parts_mentioning: ["toolx"] };
+    const { catalog, issues } = resolve(input([], { observed: labelled, routes, labels, additions: [login] }));
+    const runs = ext(catalog.lab!.models["model-a"]!).cache!.observed!;
+    expect(runs.map((run) => [run.run, run.client, run.client_label, run.note])).toEqual([
+      ["R7", "gateway", "Through a gateway", "5 samples per age"],
+      ["R9", "other", "Another client", undefined],
+    ]);
+    expect(JSON.stringify(runs)).not.toMatch(/tool-x|ToolX/);
+    expect(issues).toContainEqual(expect.objectContaining({ code: "unmapped-client", target: "mystery" }));
+  });
+
   it("flags measurements whose entry disappeared upstream", () => {
     const gone = upstream();
     delete gone.lab!.models["model-a"];
-    const { issues } = resolve({ ...input([], { observed, routes, additions: [login] }), upstream: gone });
+    const { issues } = resolve({ ...input([], { observed, routes, labels: directLabel, additions: [login] }), upstream: gone });
     expect(issues).toContainEqual(expect.objectContaining({ code: "orphan-observation", target: "lab/model-a" }));
   });
 });

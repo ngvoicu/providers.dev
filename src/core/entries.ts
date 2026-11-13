@@ -19,7 +19,7 @@ export interface Summary {
   status?: string;
   release_date?: string;
   access: Access;
-  /** upstream = as imported; modified = an upstream entry with our overrides or measurements; added = ours. */
+  /** upstream = as imported; modified = an upstream entry with our overrides or measurements; added = with_evidence. */
   origin: Origin;
   /** limit.context: the context window this provider exposes for the model, in tokens. */
   context?: number;
@@ -32,10 +32,12 @@ export interface Summary {
   /** Cache lifetimes the provider documents, in seconds, shortest first. */
   cache_ttl_s: number[];
   /** Our cache measurements on this entry. */
-  measured_runs: number;
+  evaluations: number;
   /** Across those runs: the shortest and longest age at which every check was still warm, in seconds. */
   measured_warm_min_s?: number;
   measured_warm_max_s?: number;
+  /** Our limit measurements on this entry. */
+  measured_limits: number;
   overridden_fields: string[];
   /** Newest date of our own evidence for this entry. Imported data has none. */
   verified?: string;
@@ -51,7 +53,7 @@ export interface ProviderSummary {
   access_reviewed: boolean;
   origin: "upstream" | "added";
   models: number;
-  ours: number;
+  with_evidence: number;
 }
 
 export interface Index {
@@ -112,7 +114,8 @@ export function summarize(providerId: string, model: JsonObject, shard: number):
     access: extension.access,
     origin: extension.origin === "added" ? "added" : touched ? "modified" : "upstream",
     ...cacheFacts(model),
-    measured_runs: runs.length,
+    evaluations: runs.length,
+    measured_limits: extension.limits?.measured?.length ?? 0,
     overridden_fields: overridden,
     shard,
   };
@@ -141,10 +144,10 @@ export function buildIndex(catalog: Catalog, datasetVersion: string, generatedAt
   for (const [id, provider] of Object.entries(catalog)) {
     const extension = provider[NS] as unknown as ProviderExtension;
     const models = Object.values(provider.models);
-    let ours = 0;
+    let with_evidence = 0;
     models.forEach((model, position) => {
       const summary = summarize(id, model, Math.floor(position / SHARD_SIZE));
-      if (summary.origin !== "upstream") ours += 1;
+      if (summary.origin !== "upstream") with_evidence += 1;
       entries.push(summary);
     });
     providers.push({
@@ -155,7 +158,7 @@ export function buildIndex(catalog: Catalog, datasetVersion: string, generatedAt
       access_reviewed: extension.access_reviewed,
       origin: extension.origin,
       models: models.length,
-      ours,
+      with_evidence,
     });
   }
   return { dataset_version: datasetVersion, generated_at: generatedAt, providers, entries };

@@ -2,7 +2,7 @@
 import Base from "../../layouts/Base.astro";
 import { duration, entryHref, exact, isStale, STALE_AFTER_DAYS } from "../../core/format.ts";
 import { ext, providerExt, type Evidence, type MeasuredLimit, type Measurement, type Provenance } from "../../core/schema.ts";
-import { catalog, index, meta, now, providerNames } from "../../lib/data.ts";
+import { catalog, index, meta, now } from "../../lib/data.ts";
 
 const runs: { ref: string; name: string; run: Measurement }[] = [];
 const limits: { ref: string; name: string; limit: MeasuredLimit }[] = [];
@@ -22,19 +22,24 @@ runs.sort((a, b) => b.run.date.localeCompare(a.run.date) || a.ref.localeCompare(
 const added = index.providers.filter((provider) => provider.origin === "added");
 const staleRuns = runs.filter((item) => isStale(item.run.date, now)).length;
 const through = (run: Measurement): string =>
-  run.all_warm_through_s === null ? "no age with every check warm" : `every check warm through ${duration(run.all_warm_through_s)}`;
+  run.all_warm_through_s === null ? "No age at which every check was warm" : `Every check warm through ${duration(run.all_warm_through_s)}`;
 const host = (item: Evidence): string => new URL(item.url).hostname;
 ---
 
-<Base title="Our data" description="Everything on providers.dev that does not come from models.dev: added providers, corrections and cache measurements, each with its source and date." wide>
-  <h1>Our data</h1>
-  <p class="lead mt-1">
-    Everything here that does not come from models.dev, in one place: {exact(meta.counts.added_providers)} providers and {exact(meta.counts.added_models)} entries we add,{" "}
-    {exact(meta.counts.overridden_models)} entries we correct, and {exact(runs.length)} cache measurements on {exact(meta.counts.measured_models)} entries. Each item names its source and
-    date. Evidence older than {STALE_AFTER_DAYS} days is marked stale{staleRuns > 0 ? <> ({exact(staleRuns)} measurements today)</> : <> (none today)</>}.
+<Base title="Evidence" description="Everything providers.dev adds to models.dev: added providers, corrections and cache evaluations, each with its source and date.">
+  <h1>Evidence</h1>
+  <p class="lead mt-3">
+    Everything providers.dev publishes beyond the models.dev baseline, with the source and date of each item. Evidence older than {STALE_AFTER_DAYS} days is marked stale{staleRuns > 0 ? <> ({exact(staleRuns)} evaluations today)</> : <> (none today)</>}.
   </p>
+  <dl class="stats mt-8">
+    <div><dt>Corrected entries</dt><dd>{exact(meta.counts.overridden_models)} <small><a href="#corrections">Corrections</a></small></dd></div>
+    <div><dt>Added providers</dt><dd>{exact(meta.counts.added_providers)} <small><a href="#added">{exact(meta.counts.added_models)} entries</a></small></dd></div>
+    <div><dt>Cache evaluations</dt><dd>{exact(runs.length)} <small><a href="#cache">On {exact(meta.counts.measured_models)} entries</a></small></dd></div>
+    <div><dt>Measured limits</dt><dd>{exact(limits.length)} <small><a href="#limits">Results</a></small></dd></div>
+  </dl>
 
   <h2 id="corrections">Corrections to models.dev</h2>
+  <p class="hint mb-3 max-w-3xl">Fields where providers.dev publishes a different value from models.dev. A correction is dropped as soon as models.dev agrees.</p>
   {groups.size === 0 && <p class="muted">None at the moment.</p>}
   {
     [...groups.values()].map(({ change, refs }) => (
@@ -44,11 +49,11 @@ const host = (item: Evidence): string => new URL(item.url).hostname;
           {change.op === "set" ? <>is <strong><code>{JSON.stringify(change.value)}</code></strong></> : change.op === "unknown" ? <>is published as <strong>unknown</strong></> : <>is <strong>removed</strong></>}
           {" "}on {exact(refs.length)} {refs.length === 1 ? "entry" : "entries"}. models.dev says: {change.had_upstream ? <code>{JSON.stringify(change.upstream)}</code> : <span class="muted">nothing</span>}.
         </p>
-        <p class="mt-1">{change.reason}</p>
+        <p class="muted mt-1">{change.reason}</p>
         <ul class="evidence">
           {change.evidence.map((item) => (
             <li>
-              <span class:list={["badge", item.kind]}>{item.kind}</span> <a href={item.url} rel="noopener">{host(item)}</a> <span class="muted">{item.date}</span>
+              <span class:list={["badge", item.kind]}>{item.kind}</span> <a href={item.url} rel="noopener">{host(item)}</a> <span class="muted date">{item.date}</span>
               {item.note && <div class="hint">{item.note}</div>}
             </li>
           ))}
@@ -61,10 +66,11 @@ const host = (item: Evidence): string => new URL(item.url).hostname;
     ))
   }
 
-  <h2 id="added">Providers we add</h2>
+  <h2 id="added">Added providers</h2>
+  <p class="hint mb-3 max-w-3xl">Access methods that models.dev does not list. Only models with evidence on that access method are included.</p>
   <div class="scroll">
     <table class="entries">
-      <thead><tr><th scope="col">Provider</th><th scope="col">Why it is separate</th><th scope="col" class="num">Entries</th></tr></thead>
+      <thead><tr><th scope="col">Provider</th><th scope="col">Access</th><th scope="col" class="num">Entries</th></tr></thead>
       <tbody>
         {
           added.map((provider) => (
@@ -79,10 +85,10 @@ const host = (item: Evidence): string => new URL(item.url).hostname;
     </table>
   </div>
 
-  <h2 id="cache">Cache measurements</h2>
-  <p class="hint mb-2 max-w-3xl">
-    Each run primes a fresh prompt and re-sends it once at fixed ages. The result holds for the route and client named, on that date; it is not a promised lifetime. Method and raw results:
-    <a href={meta.measurements?.repository}>{meta.measurements?.repository.replace("https://", "")}</a>.
+  <h2 id="cache">Cache evaluations</h2>
+  <p class="hint mb-3 max-w-3xl">
+    Each evaluation primes a fresh prompt and re-sends it once at fixed ages. A result holds for the access method and client named, on that date; it is an observed floor, not a guaranteed
+    lifetime. <a href="/docs/methodology/#evaluations">How evaluations work</a>
   </p>
   <div class="scroll">
     <table class="entries">
@@ -92,10 +98,10 @@ const host = (item: Evidence): string => new URL(item.url).hostname;
           runs.map(({ ref, name, run }) => (
             <tr>
               <th scope="row"><a href={`${entryHref(ref)}#cache`}>{name}</a><div class="id"><code>{ref}</code></div></th>
-              <td>{run.route_label}<div class="hint">client: {run.client}{run.options && ` · ${Object.entries(run.options).map(([k, v]) => `${k}=${v}`).join(", ")}`}</div></td>
+              <td>{run.route_label}<div class="hint">{run.client_label}{run.options && ` · ${Object.entries(run.options).map(([k, v]) => `${k}=${v}`).join(", ")}`}</div></td>
               <td>{through(run)}{run.first_all_cold_s !== null && <span class="muted">; all cold at {duration(run.first_all_cold_s)}</span>}</td>
-              <td>{isStale(run.date, now) ? <span class="stale">{run.date} · stale</span> : run.date}</td>
-              <td><a href={run.source} rel="noopener">raw result</a></td>
+              <td>{isStale(run.date, now) ? <span class="stale">{run.date} · stale</span> : <span class="muted date">{run.date}</span>}</td>
+              <td><a href={run.source} rel="noopener">Raw result</a></td>
             </tr>
           ))
         }
@@ -112,7 +118,7 @@ const host = (item: Evidence): string => new URL(item.url).hostname;
           limits.map(({ ref, name, limit }) => (
             <tr>
               <th scope="row"><a href={`${entryHref(ref)}#limits`}>{name}</a><div class="id"><code>{ref}</code></div></th>
-              <td>{limit.route_label}<div class="hint">client: {limit.client}</div></td>
+              <td>{limit.route_label}<div class="hint">{limit.client_label}</div></td>
               <td>
                 {[
                   limit.context !== undefined && `context ${exact(limit.context)}`,
@@ -123,8 +129,8 @@ const host = (item: Evidence): string => new URL(item.url).hostname;
                 ].filter(Boolean).join("; ")}
                 {limit.note && <div class="hint">{limit.note}</div>}
               </td>
-              <td>{limit.date ?? <span class="muted">undated</span>}</td>
-              <td><a href={limit.source} rel="noopener">raw result</a></td>
+              <td>{limit.date ? <span class="muted date">{limit.date}</span> : <span class="muted">Undated</span>}</td>
+              <td><a href={limit.source} rel="noopener">Raw result</a></td>
             </tr>
           ))
         }
@@ -132,10 +138,10 @@ const host = (item: Evidence): string => new URL(item.url).hostname;
     </table>
   </div>
 
-  <h2 id="issues">Open issues in this build</h2>
+  <h2 id="issues">Open issues in this dataset</h2>
   {
     meta.issues.length === 0 && meta.exclusions.length === 0 ? (
-      <p class="muted">None. Every override and measurement found its entry, and nothing is excluded.</p>
+      <p class="muted">None. Every correction and evaluation matched an entry, and nothing is excluded.</p>
     ) : (
       <ul class="prose">
         {meta.issues.map((issue) => <li><span class="badge plain">{issue.level}</span> <code>{issue.target}</code> {issue.message}</li>)}
@@ -143,8 +149,8 @@ const host = (item: Evidence): string => new URL(item.url).hostname;
       </ul>
     )
   }
-  <p class="hint mt-2">
-    An override whose entry disappears upstream is listed here instead of being dropped or turned into a stale entry. The same list is in <a href="/api/v1/meta"><code>/api/v1/meta</code></a>.
-    Provider names: {Object.keys(providerNames).length} in this dataset.
+  <p class="hint mt-3 max-w-3xl">
+    A correction whose entry disappears from models.dev is listed here instead of being dropped silently or turned into a stale entry. The same list is in
+    <a href="/api/v1/meta"><code>/api/v1/meta</code></a>.
   </p>
 </Base>

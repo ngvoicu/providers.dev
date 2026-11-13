@@ -9,6 +9,7 @@ import { resolve } from "../../src/core/resolve.ts";
 import {
   AccessRules,
   AuthoredProvider,
+  MeasurementLabels,
   NS,
   ObservedFile,
   OverrideFile,
@@ -86,6 +87,8 @@ export function publish(input: PublishOptions): PublishReport {
   const overrides = loadYamlDir(join(authored, "overrides"), OverrideFile, errors, (value) => value.provider);
   const access = loadYaml(join(authored, "access.yaml"), AccessRules, errors);
   const routes = loadYaml(join(authored, "routes.yaml"), RouteMap, errors);
+  const labelsPath = join(authored, "measurement-labels.yaml");
+  const labels = existsSync(labelsPath) ? loadYaml(labelsPath, MeasurementLabels, errors) : undefined;
 
   const observedPath = join(dataDir, "sources", "observed.json");
   let observed: ObservedFile | undefined;
@@ -96,7 +99,7 @@ export function publish(input: PublishOptions): PublishReport {
   }
   if (errors.length > 0 || !access || !routes) return { ok: false, errors, issues: [] };
 
-  const { catalog, issues, exclusions } = resolve({ upstream: upstream.catalog, additions, overrides, access, routes, ...(observed ? { observed } : {}) });
+  const { catalog, issues, exclusions } = resolve({ upstream: upstream.catalog, additions, overrides, access, routes, ...(labels ? { labels } : {}), ...(observed ? { observed } : {}) });
   for (const issue of issues) if (issue.level === "error") errors.push(`${issue.target}: ${issue.message}`);
   if (errors.length > 0) return { ok: false, errors, issues };
 
@@ -118,11 +121,11 @@ export function publish(input: PublishOptions): PublishReport {
       added_providers: index.providers.filter((provider) => provider.origin === "added").length,
       added_models: index.entries.filter((entry) => entry.origin === "added").length,
       overridden_models: index.entries.filter((entry) => entry.overridden_fields.length > 0).length,
-      measured_models: index.entries.filter((entry) => entry.measured_runs > 0).length,
+      measured_models: index.entries.filter((entry) => entry.evaluations > 0).length,
     },
     upstream: upstream.meta,
     ...(observed && observedMeta
-      ? { measurements: { ...observedMeta, repository: observed.repository, runs: observed.cache.filter((run) => run.latest).length, limits: observed.limits.length } }
+      ? { measurements: { ...observedMeta, repository: observed.repository, runs: index.entries.reduce((sum, entry) => sum + entry.evaluations, 0), limits: observed.limits.length } }
       : {}),
     sync: status
       ? { last_attempt_at: status.last_attempt_at, last_attempt_ok: status.last_attempt_ok, ...(status.last_error ? { last_error: status.last_error } : {}) }
