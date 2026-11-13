@@ -2,7 +2,7 @@
 // parseQuery() and runQuery(), so a filter means the same thing everywhere.
 import type { Summary } from "./entries.ts";
 
-export const SORT_KEYS = ["provider", "model", "name", "context", "max_output", "release_date", "verified"] as const;
+export const SORT_KEYS = ["provider", "model", "name", "context", "max_output", "price_in", "price_out", "release_date", "verified"] as const;
 export type SortKey = (typeof SORT_KEYS)[number];
 
 /** The order the website opens with: entries with providers.dev evidence first, newest first. The API's default is by provider. */
@@ -159,6 +159,10 @@ function sortValue(entry: Summary, key: SortKey): string | number | undefined {
       return entry.context;
     case "max_output":
       return entry.max_output;
+    case "price_in":
+      return entry.price_in;
+    case "price_out":
+      return entry.price_out;
     case "release_date":
       return entry.release_date;
     case "verified":

@@ -14,6 +14,13 @@ export function exact(value: number): string {
 }
 
 /** 1048576 -> "1.05M", 128000 -> "128K". Always pair it with the exact number. */
+/** A price in US dollars: `$10`, `$12.50`, `$0.075`. */
+export function usd(value: number): string {
+  const digits = value !== 0 && Math.abs(value) < 1 ? 4 : 2;
+  const text = value.toLocaleString("en-US", { minimumFractionDigits: Number.isInteger(value) ? 0 : 2, maximumFractionDigits: digits });
+  return `$${text}`;
+}
+
 export function compactTokens(value: number): string {
   if (value >= 1_000_000) return `${trim(value / 1_000_000)}M`;
   if (value >= 1_000) return `${trim(value / 1_000)}K`;

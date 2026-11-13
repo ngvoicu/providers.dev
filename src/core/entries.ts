@@ -34,6 +34,10 @@ export interface Summary {
   /** Our cache measurements on this entry. */
   evaluations: number;
   /** Across those runs: the shortest and longest age at which every check was still warm, in seconds. */
+  /** cost.text.input.price: the list price of input, in US dollars per million tokens, before any change by context size or tier. */
+  price_in?: number;
+  /** cost.text.output.price: the same for output. */
+  price_out?: number;
   measured_warm_min_s?: number;
   measured_warm_max_s?: number;
   /** Our limit measurements on this entry. */
@@ -101,6 +105,14 @@ export function cacheFacts(model: JsonObject): Pick<Summary, "cache" | "cache_mo
 const text = (value: unknown): string | undefined => (typeof value === "string" && value ? value : undefined);
 const count = (value: unknown): number | undefined => (typeof value === "number" && Number.isFinite(value) ? value : undefined);
 
+/** The base price of one side of `cost.text`. A price in another unit (per character) is not a price per token. */
+function basePrice(model: JsonObject, side: "input" | "output"): number | undefined {
+  const cost = model.cost;
+  const words = isObject(cost) ? cost.text : undefined;
+  const part = isObject(words) ? words[side] : undefined;
+  return isObject(part) && part.unit === undefined ? count(part.price) : undefined;
+}
+
 export function summarize(providerId: string, model: JsonObject, shard: number): Summary {
   const extension = model[NS] as unknown as ModelExtension;
   const limit = isObject(model.limit) ? model.limit : {};
@@ -130,6 +142,8 @@ export function summarize(providerId: string, model: JsonObject, shard: number):
     context: count(limit.context),
     input: count(limit.input),
     max_output: count(limit.output),
+    price_in: basePrice(model, "input"),
+    price_out: basePrice(model, "output"),
     measured_warm_min_s: warm.length > 0 ? Math.min(...warm) : undefined,
     measured_warm_max_s: warm.length > 0 ? Math.max(...warm) : undefined,
     verified: extension.verified,

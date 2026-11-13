@@ -58,3 +58,22 @@ describe("the date of the models.dev import", () => {
     expect(importDate({})).toBeUndefined();
   });
 });
+
+describe("prices", () => {
+  it("writes a price in dollars without noise", async () => {
+    const { usd } = await import("../src/core/format.ts");
+    expect([usd(10), usd(12.5), usd(0.075), usd(0), usd(1250), usd(0.132)]).toEqual(["$10", "$12.50", "$0.075", "$0", "$1,250", "$0.132"]);
+  });
+
+  it("takes the base price per token and nothing in another unit", async () => {
+    const { summarize } = await import("../src/core/entries.ts");
+    const model = (cost: unknown) => ({ id: "m", name: "M", cost, providers_dev: { origin: "upstream", access: "api" } }) as never;
+    const priced = summarize("p", model({ text: { input: { price: 10, overrides: [{ when: { context: { gt: 1 } }, price: 20 }] }, output: { price: 50 } } }), 0);
+    expect([priced.price_in, priced.price_out]).toEqual([10, 50]);
+    const perCharacter = summarize("p", model({ text: { input: { price: 15, unit: "character" } } }), 0);
+    expect([perCharacter.price_in, perCharacter.price_out]).toEqual([undefined, undefined]);
+    expect(summarize("p", model(undefined), 0).price_in).toBeUndefined();
+    // A listed 0 is kept as 0: the page says "Free" or "In plan" by the access method, never "Unknown".
+    expect(summarize("p", model({ text: { input: { price: 0 }, output: { price: 0 } } }), 0).price_in).toBe(0);
+  });
+});

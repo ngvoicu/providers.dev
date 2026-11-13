@@ -14,6 +14,7 @@ import {
   plural,
   runVerdict,
   shortAge,
+  usd,
   warmRange,
 } from "./format.ts";
 import { isObject, type Json, type JsonObject } from "./merge.ts";
@@ -93,6 +94,7 @@ ${column("name", "Model", "The model's name and its id at this provider.")}
 ${options.hideProvider ? "" : column("provider", "Provider", "Who serves it, and how it is reached.")}
 ${column("context", "Context", "Exposed context window in tokens (limit.context): what this provider accepts for the model.", "num")}
 ${column("max_output", "Max output", "Largest single response in tokens (limit.output). A maximum, not a default.", "num")}
+${column("price_in", "Price in / out", "List price in US dollars per million tokens, input then output, as models.dev records it. Before the changes some providers make by context size or service tier: open the entry for those.", "num mid-only")}
 ${column("release_date", "Released", "When the model was released, as models.dev records it. It is the model's date: the same at every provider.", "wide-only")}
 ${column(null, "Cache, documented", "Prompt caching as the source documents it: mode and lifetimes.")}
 ${column(null, "Cache, measured", "providers.dev evaluations: the age up to which every re-send was still served from the cache.")}
@@ -110,11 +112,106 @@ export function rowHtml(entry: Summary, options: RowOptions): string {
 ${options.hideProvider ? "" : `<td><a class="plain" href="/providers/${e(entry.provider)}/">${e(provider)}</a>${access}</td>`}
 <td class="num">${tokens(entry.context)}</td>
 <td class="num">${tokens(entry.max_output)}</td>
+<td class="num mid-only">${priceCell(entry)}</td>
 <td class="wide-only">${entry.release_date ? `<span class="muted date">${e(entry.release_date)}</span>` : UNKNOWN}</td>
 <td>${cacheCell(entry)}</td>
 <td>${measuredCell(entry, href)}</td>
 <td class="nowrap">${sourcesHtml(entry, options)}</td>
 </tr>`;
+}
+
+// ---- prices (cost.text, as models.dev records it)
+
+const record = (value: Json | undefined): JsonObject | undefined => (isObject(value) ? value : undefined);
+
+function priceCell(entry: Pick<Summary, "price_in" | "price_out" | "access">): string {
+  const { price_in: input, price_out: output } = entry;
+  const plan = '<span class="muted" title="No price per token: the entry is paid for through a plan or subscription, which providers.dev does not list.">In plan</span>';
+  if (input === undefined && output === undefined) return entry.access === "subscription" ? plan : UNKNOWN;
+  // A listed 0 is shown as the source has it. It can mean free, or paid for another way: the page does not decide.
+  if ((input ?? 0) === 0 && (output ?? 0) === 0) {
+    return entry.access === "subscription" ? plan : `<span class="price" title="The source lists a price of 0. That can mean free of charge, or paid for another way (a plan or a seat).">$0 <span class="muted">/</span> $0</span>`;
+  }
+  return `<span class="price">${input === undefined ? DASH : usd(input)} <span class="muted">/</span> ${output === undefined ? DASH : usd(output)}</span>`;
+}
+
+/** A condition of a price change, in words. Undefined for the shapes not handled here: they stay in the raw data. */
+function condition(value: Json | undefined): string | undefined {
+  const when = record(value);
+  if (!when || Object.keys(when).length !== 1) return undefined;
+  const context = record(when.context);
+  if (context && typeof context.gt === "number" && Object.keys(context).length === 1) return `Above ${exact(context.gt)} tokens of context`;
+  const tier = record(when.service_tier);
+  if (tier && typeof tier.equals === "string" && Object.keys(tier).length === 1) return `Service tier <code>${e(tier.equals)}</code>`;
+  return undefined;
+}
+
+function cacheWrite(value: Json | undefined): string | undefined {
+  if (typeof value === "number") return usd(value);
+  const byLifetime = record(value);
+  if (!byLifetime) return undefined;
+  const parts = Object.entries(byLifetime).flatMap(([lifetime, amount]) => (typeof amount === "number" ? [`${usd(amount)} <span class="muted">for ${e(lifetime)}</span>`] : []));
+  return parts.length > 0 ? parts.join(", ") : undefined;
+}
+
+function priceSection(model: JsonObject, summary: Summary, source: string): string {
+  const cost = record(model.cost);
+  const words = record(cost?.text);
+  const input = record(words?.input);
+  const output = record(words?.output);
+  if (!input && !output) {
+    return `<p class="hint">${summary.access === "api" ? "The source gives no price per token for this entry." : "No price per token: this entry is paid for through a plan or subscription. providers.dev does not list plans or their prices."}</p>`;
+  }
+  if ((summary.price_in ?? 0) === 0 && (summary.price_out ?? 0) === 0 && summary.price_in !== undefined) {
+    return `<p class="hint">The source lists a price of 0 per token. ${summary.access === "subscription" ? "This entry is paid for through a plan or subscription, not per token." : "That can mean free of charge, or paid for another way (a plan or a seat): check the provider."} providers.dev does not list plans or their prices.</p>`;
+  }
+  const unit = typeof input?.unit === "string" ? `${e(input.unit)}s` : "tokens";
+  const amount = (value: Json | undefined): string => (typeof value === "number" ? usd(value) : UNKNOWN);
+  const cache = record(input?.cache);
+  const rows = [
+    fact("Input", "<code>cost.text.input.price</code>", amount(input?.price), source),
+    fact("Output", "<code>cost.text.output.price</code>", amount(output?.price), source),
+    typeof output?.reasoning === "number" ? fact("Reasoning output", "<code>cost.text.output.reasoning</code>", usd(output.reasoning), source) : "",
+    typeof cache?.read === "number" ? fact("Cached input, read", "<code>cost.text.input.cache.read</code>: input served from the prompt cache.", usd(cache.read), source) : "",
+    cacheWrite(cache?.write) ? fact("Cached input, write", "<code>cost.text.input.cache.write</code>: input stored in the prompt cache, by lifetime where it differs.", cacheWrite(cache?.write) as string, source) : "",
+  ].join("");
+
+  // Changes to those prices. Only the two common conditions are put in words; the rest stay in the raw data.
+  const changes = new Map<string, string[]>();
+  let other = 0;
+  const add = (when: Json | undefined, part: string): void => {
+    const key = condition(when);
+    if (!key) other += 1;
+    else changes.set(key, [...(changes.get(key) ?? []), part]);
+  };
+  for (const [side, value] of [["input", input], ["output", output]] as const) {
+    for (const item of Array.isArray(value?.overrides) ? value.overrides : []) {
+      const change = record(item);
+      if (!change) continue;
+      const parts = [typeof change.price === "number" ? `${side} ${usd(change.price)}` : ""];
+      const changedCache = record(change.cache);
+      if (typeof changedCache?.read === "number") parts.push(`cached read ${usd(changedCache.read)}`);
+      add(change.when, parts.filter(Boolean).join(", "));
+    }
+  }
+  for (const item of Array.isArray(cost?.multipliers) ? cost.multipliers : []) {
+    const multiplier = record(item);
+    const factor = record(multiplier?.factor);
+    if (multiplier && typeof factor?.text === "number") add(multiplier.when, `every price × ${factor.text}`);
+    else other += 1;
+  }
+  const list =
+    changes.size > 0 || other > 0
+      ? `<h3>Price changes</h3><ul class="changes">${[...changes].map(([when, parts]) => `<li><strong>${when}:</strong> ${parts.join(", ")}</li>`).join("")}${
+          other > 0 ? `<li class="muted">${plural(other, "more condition")} (by region, time or a mix): see <code>cost</code> in the full record below.</li>` : ""
+        }</ul>`
+      : "";
+  return `<div class="scroll"><table class="facts">
+    <thead><tr><th scope="col">Price</th><th scope="col" class="num">US dollars per million ${unit}</th><th scope="col">Source</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>
+  <p class="hint">List prices as the source records them. Other kinds of use (web search, audio, images, video) are priced in <code>cost</code> in the full record below. A subscription's price is not a price per token and is not listed.</p>
+  ${list}`;
 }
 
 // ---- the entry detail view
@@ -328,6 +425,11 @@ export function entryHtml(view: EntryView): string {
       ? `<h3>Measured limits</h3><div class="scroll"><table class="facts"><thead><tr><th scope="col">Date</th><th scope="col">Measured through</th><th scope="col">Result</th><th scope="col">Evidence</th></tr></thead><tbody>${measuredLimitRows(measuredLimits)}</tbody></table></div>`
       : ""
   }
+</section>
+
+<section aria-labelledby="price">
+  <h2 id="price">Price</h2>
+  ${priceSection(model, summary, sourceOf("cost", provenance, extension.origin))}
 </section>
 
 <section aria-labelledby="cache">

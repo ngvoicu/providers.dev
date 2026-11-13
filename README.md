@@ -13,7 +13,8 @@ The baseline is imported daily from [models.dev](https://models.dev) (MIT). On t
 - **evaluations** of cache lifetimes and limits from [groundtruth](https://github.com/ngvoicu/groundtruth),
   shown next to the documented values, never instead of them.
 
-It publishes metadata only. There is no chat, no inference proxy, and no subscription plans, prices or quotas.
+It publishes metadata only. There is no chat and no inference proxy. List prices per token are shown as models.dev
+records them; subscription plans, their prices and their quotas are not listed.
 It is not affiliated with models.dev.
 
 ## Run it

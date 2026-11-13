@@ -607,14 +607,39 @@
   td.nowrap {
     white-space: nowrap;
   }
-  /* A column that is shown only where the table has room for it */
-  .wide-only {
+  .price {
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  ul.changes {
+    margin: 0.5rem 0 0;
+    padding-left: 1.1rem;
+    font-size: 0.9rem;
+    line-height: 1.7;
+  }
+  /* Columns that are shown only where the table has room for them: the price first, then the release date */
+  .wide-only,
+  .mid-only {
     display: none;
   }
-  @media (min-width: 1200px) {
+  @media (min-width: 1320px) {
+    th.mid-only,
+    td.mid-only {
+      display: table-cell;
+    }
+  }
+  @media (min-width: 1440px) {
     th.wide-only,
     td.wide-only {
       display: table-cell;
+    }
+  }
+  /* With every column shown the catalog is nine wide: a little less air between them keeps it inside the page */
+  @media (min-width: 1440px) {
+    table.entries th,
+    table.entries td {
+      padding-left: 0.7rem;
+      padding-right: 0.7rem;
     }
   }
   .entry-head .released {
