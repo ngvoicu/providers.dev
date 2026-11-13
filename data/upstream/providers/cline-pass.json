@@ -6,239 +6,24 @@
   "CLINE_API_KEY"
  ],
  "models": {
-  "cline-pass/mimo-v2.6-pro": {
-   "id": "cline-pass/mimo-v2.6-pro",
-   "name": "MiMo-V2.6-Pro",
+  "cline-pass/kimi-k2.7-code": {
+   "id": "cline-pass/kimi-k2.7-code",
+   "name": "Kimi K2.7 Code",
    "type": "chat",
-   "canonical_id": "xiaomi/mimo-v2.6-pro",
-   "family": "mimo",
-   "release_date": "2026-09-22",
+   "canonical_id": "moonshotai/kimi-k2.7-code",
+   "family": "kimi-k2",
+   "status": "deprecated",
+   "release_date": "2026-06-12",
    "limit": {
-    "context": 1048576,
-    "output": 131072
+    "context": 262144,
+    "output": 262144
    },
    "capabilities": {
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "xhigh"
-     ]
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Stronger MiMo Pro tier for multimodal reasoning and coding-agent execution",
-   "open_weights": true,
-   "last_updated": "2026-09-22",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "audio/mpeg",
-     "audio/wav",
-     "audio/flac",
-     "audio/mp4",
-     "audio/ogg",
-     "video/mp4",
-     "video/quicktime",
-     "video/x-msvideo",
-     "video/x-ms-wmv"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.435,
-      "cache": {
-       "read": 0.0036
-      }
-     },
-     "output": {
-      "price": 0.87
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cline.bot/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "cline-pass/deepseek-v4.1-flash": {
-   "id": "cline-pass/deepseek-v4.1-flash",
-   "name": "DeepSeek V4.1 Flash",
-   "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4.1-flash",
-   "family": "deepseek-flash",
-   "release_date": "2026-09-10",
-   "limit": {
-    "context": 1000000,
-    "output": 384000
-   },
-   "capabilities": {
-    "tools": {
      "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "DeepSeek V4.1 Flash model for reasoning and agentic coding",
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-09-10",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.15,
-      "cache": {
-       "read": 0.003
-      }
-     },
-     "output": {
-      "price": 0.6
-     }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "utc_days": {
-        "in": [
-         "mon",
-         "tue",
-         "wed",
-         "thu",
-         "fri"
-        ]
-       },
-       "any": [
-        {
-         "all": [
-          {
-           "utc_hours": {
-            "gte": "01:00"
-           }
-          },
-          {
-           "utc_hours": {
-            "lt": "04:00"
-           }
-          }
-         ]
-        },
-        {
-         "all": [
-          {
-           "utc_hours": {
-            "gte": "06:00"
-           }
-          },
-          {
-           "utc_hours": {
-            "lt": "10:00"
-           }
-          }
-         ]
-        }
-       ],
-       "not": {
-        "holiday": {
-         "equals": "CN"
-        }
-       }
-      },
-      "factor": 2
-     }
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cline.bot/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "cline-pass/kimi-k3": {
-   "id": "cline-pass/kimi-k3",
-   "name": "Kimi K3",
-   "type": "chat",
-   "canonical_id": "moonshotai/kimi-k3",
-   "family": "kimi-k3",
-   "release_date": "2026-07-16",
-   "limit": {
-    "context": 1048576,
-    "output": 131072
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "high",
-      "max"
-     ]
     },
     "structured_output": true,
     "temperature": false,
@@ -247,9 +32,10 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
+   "description": "Coding-focused Kimi model, stronger on long-horizon repo work with less overthinking",
    "open_weights": true,
-   "last_updated": "2026-07-16",
+   "knowledge": "2025-01",
+   "last_updated": "2026-06-12",
    "modalities": {
     "input": [
      "text",
@@ -277,13 +63,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 3,
+      "price": 0.95,
       "cache": {
-       "read": 0.3
+       "read": 0.19
       }
      },
      "output": {
-      "price": 15
+      "price": 4
      }
     }
    },
@@ -293,78 +79,6 @@
      "sdk": {
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "cline-pass/glm-5.3": {
-   "id": "cline-pass/glm-5.3",
-   "name": "GLM-5.3",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-5.3",
-   "family": "glm",
-   "release_date": "2026-08-14",
-   "limit": {
-    "context": 1000000,
-    "output": 131072
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
-   "open_weights": true,
-   "last_updated": "2026-08-14",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.4,
-      "cache": {
-       "read": 0.26
-      }
-     },
-     "output": {
-      "price": 4.4
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cline.bot/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
      },
      "capabilities": {
       "tools": {
@@ -531,155 +245,6 @@
     }
    }
   },
-  "cline-pass/mimo-v2.6-flash": {
-   "id": "cline-pass/mimo-v2.6-flash",
-   "name": "MiMo-V2.6-Flash",
-   "type": "chat",
-   "canonical_id": "xiaomi/mimo-v2.6-flash",
-   "family": "mimo",
-   "release_date": "2026-09-22",
-   "limit": {
-    "context": 1048576,
-    "output": 131072
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "xhigh"
-     ]
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "MiMo Flash model for multimodal coding agents and long-context automation",
-   "open_weights": true,
-   "last_updated": "2026-09-22",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "audio/mpeg",
-     "audio/wav",
-     "audio/flac",
-     "audio/mp4",
-     "audio/ogg",
-     "video/mp4",
-     "video/quicktime",
-     "video/x-msvideo",
-     "video/x-ms-wmv"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.14,
-      "cache": {
-       "read": 0.0028
-      }
-     },
-     "output": {
-      "price": 0.28
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cline.bot/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "cline-pass/qwen3.7-max": {
-   "id": "cline-pass/qwen3.7-max",
-   "name": "Qwen3.7 Max",
-   "type": "chat",
-   "canonical_id": "alibaba/qwen3.7-max",
-   "family": "qwen",
-   "release_date": "2026-05-21",
-   "limit": {
-    "context": 1000000,
-    "output": 131072
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Qwen frontier model tuned for agent frameworks, coding assistants, and long tasks",
-   "open_weights": false,
-   "last_updated": "2026-05-21",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2.5,
-      "cache": {
-       "read": 0.5,
-       "write": 3.125
-      }
-     },
-     "output": {
-      "price": 7.5
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cline.bot/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
   "cline-pass/kimi-k2.6": {
    "id": "cline-pass/kimi-k2.6",
    "name": "Kimi K2.6",
@@ -763,170 +328,16 @@
     }
    }
   },
-  "cline-pass/deepseek-v4-flash": {
-   "id": "cline-pass/deepseek-v4-flash",
-   "name": "DeepSeek V4 Flash",
+  "cline-pass/mimo-v2.5-pro": {
+   "id": "cline-pass/mimo-v2.5-pro",
+   "name": "MiMo-V2.5-Pro",
    "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4-flash",
-   "family": "deepseek-flash",
-   "status": "deprecated",
-   "release_date": "2026-04-24",
+   "canonical_id": "xiaomi/mimo-v2.5-pro",
+   "family": "mimo",
+   "release_date": "2026-04-22",
    "limit": {
-    "context": 1000000,
-    "output": 384000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Fast DeepSeek V4 lane for economical reasoning, coding, and long-context work",
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-04-24",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.14,
-      "cache": {
-       "read": 0.0028
-      }
-     },
-     "output": {
-      "price": 0.28
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cline.bot/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "cline-pass/kimi-k2.7-code": {
-   "id": "cline-pass/kimi-k2.7-code",
-   "name": "Kimi K2.7 Code",
-   "type": "chat",
-   "canonical_id": "moonshotai/kimi-k2.7-code",
-   "family": "kimi-k2",
-   "status": "deprecated",
-   "release_date": "2026-06-12",
-   "limit": {
-    "context": 262144,
-    "output": 262144
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Coding-focused Kimi model, stronger on long-horizon repo work with less overthinking",
-   "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-06-12",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/heic",
-     "image/heif",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.95,
-      "cache": {
-       "read": 0.19
-      }
-     },
-     "output": {
-      "price": 4
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cline.bot/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "cline-pass/qwen3.7-plus": {
-   "id": "cline-pass/qwen3.7-plus",
-   "name": "Qwen3.7 Plus",
-   "type": "chat",
-   "canonical_id": "alibaba/qwen3.7-plus",
-   "family": "qwen",
-   "release_date": "2026-06-02",
-   "limit": {
-    "context": 1000000,
-    "output": 64000
+    "context": 1048576,
+    "output": 131072
    },
    "capabilities": {
     "tools": {
@@ -942,25 +353,13 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Multimodal Qwen workhorse for long-context agents, visual inputs, and coding",
-   "open_weights": false,
-   "knowledge": "2025-04",
-   "last_updated": "2026-06-02",
+   "description": "Stronger MiMo Pro tier for multimodal reasoning and coding-agent execution",
+   "open_weights": true,
+   "knowledge": "2024-12",
+   "last_updated": "2026-04-22",
    "modalities": {
     "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/x-matroska",
-     "video/quicktime",
-     "video/x-flv",
-     "video/x-ms-wmv"
+     "text"
     ],
     "output": [
      "text"
@@ -969,122 +368,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.4,
+      "price": 1.74,
       "cache": {
-       "read": 0.04,
-       "write": 0.5
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 256000
-         }
-        },
-        "price": 1.2,
-        "cache": {
-         "read": 0.12,
-         "write": 1.5
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 1.6,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 256000
-         }
-        },
-        "price": 4.8
-       }
-      ]
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cline.bot/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "cline-pass/qwen3.8-max": {
-   "id": "cline-pass/qwen3.8-max",
-   "name": "Qwen3.8 Max",
-   "type": "chat",
-   "canonical_id": "alibaba/qwen3.8-max",
-   "family": "qwen",
-   "release_date": "2026-08-03",
-   "limit": {
-    "context": 1000000,
-    "output": 131072
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "xhigh"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "2.4-trillion-parameter MoE flagship for coding, professional work, multimodal understanding, and long-horizon agentic workflows",
-   "open_weights": false,
-   "last_updated": "2026-08-03",
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/x-matroska",
-     "video/quicktime",
-     "video/x-flv",
-     "video/x-ms-wmv",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2,
-      "cache": {
-       "read": 0.25,
-       "write": 2.5
+       "read": 0.0145
       }
      },
      "output": {
-      "price": 6
+      "price": 3.48
      }
     }
    },
@@ -1224,16 +514,16 @@
     }
    }
   },
-  "cline-pass/mimo-v2.5-pro": {
-   "id": "cline-pass/mimo-v2.5-pro",
-   "name": "MiMo-V2.5-Pro",
+  "cline-pass/qwen3.7-plus": {
+   "id": "cline-pass/qwen3.7-plus",
+   "name": "Qwen3.7 Plus",
    "type": "chat",
-   "canonical_id": "xiaomi/mimo-v2.5-pro",
-   "family": "mimo",
-   "release_date": "2026-04-22",
+   "canonical_id": "alibaba/qwen3.7-plus",
+   "family": "qwen",
+   "release_date": "2026-06-02",
    "limit": {
-    "context": 1048576,
-    "output": 131072
+    "context": 1000000,
+    "output": 64000
    },
    "capabilities": {
     "tools": {
@@ -1249,13 +539,25 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Stronger MiMo Pro tier for multimodal reasoning and coding-agent execution",
-   "open_weights": true,
-   "knowledge": "2024-12",
-   "last_updated": "2026-04-22",
+   "description": "Multimodal Qwen workhorse for long-context agents, visual inputs, and coding",
+   "open_weights": false,
+   "knowledge": "2025-04",
+   "last_updated": "2026-06-02",
    "modalities": {
     "input": [
-     "text"
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/x-matroska",
+     "video/quicktime",
+     "video/x-flv",
+     "video/x-ms-wmv"
     ],
     "output": [
      "text"
@@ -1264,13 +566,38 @@
    "cost": {
     "text": {
      "input": {
-      "price": 1.74,
+      "price": 0.4,
       "cache": {
-       "read": 0.0145
-      }
+       "read": 0.04,
+       "write": 0.5
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 256000
+         }
+        },
+        "price": 1.2,
+        "cache": {
+         "read": 0.12,
+         "write": 1.5
+        }
+       }
+      ]
      },
      "output": {
-      "price": 3.48
+      "price": 1.6,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 256000
+         }
+        },
+        "price": 4.8
+       }
+      ]
      }
     }
    },
@@ -1341,6 +668,516 @@
      },
      "output": {
       "price": 4.4
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cline.bot/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "cline-pass/qwen3.7-max": {
+   "id": "cline-pass/qwen3.7-max",
+   "name": "Qwen3.7 Max",
+   "type": "chat",
+   "canonical_id": "alibaba/qwen3.7-max",
+   "family": "qwen",
+   "release_date": "2026-05-21",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    },
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Qwen frontier model tuned for agent frameworks, coding assistants, and long tasks",
+   "open_weights": false,
+   "last_updated": "2026-05-21",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2.5,
+      "cache": {
+       "read": 0.5,
+       "write": 3.125
+      }
+     },
+     "output": {
+      "price": 7.5
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cline.bot/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "cline-pass/mimo-v2.6-flash": {
+   "id": "cline-pass/mimo-v2.6-flash",
+   "name": "MiMo-V2.6-Flash",
+   "type": "chat",
+   "canonical_id": "xiaomi/mimo-v2.6-flash",
+   "family": "mimo",
+   "release_date": "2026-09-22",
+   "limit": {
+    "context": 1048576,
+    "output": 131072
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    },
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "MiMo Flash model for multimodal coding agents and long-context automation",
+   "open_weights": true,
+   "last_updated": "2026-09-22",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "audio/mpeg",
+     "audio/wav",
+     "audio/flac",
+     "audio/mp4",
+     "audio/ogg",
+     "video/mp4",
+     "video/quicktime",
+     "video/x-msvideo",
+     "video/x-ms-wmv"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.14,
+      "cache": {
+       "read": 0.0028
+      }
+     },
+     "output": {
+      "price": 0.28
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cline.bot/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "cline-pass/qwen3.8-max": {
+   "id": "cline-pass/qwen3.8-max",
+   "name": "Qwen3.8 Max",
+   "type": "chat",
+   "canonical_id": "alibaba/qwen3.8-max",
+   "family": "qwen",
+   "release_date": "2026-08-03",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "xhigh"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "2.4-trillion-parameter MoE flagship for coding, professional work, multimodal understanding, and long-horizon agentic workflows",
+   "open_weights": false,
+   "last_updated": "2026-08-03",
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/x-matroska",
+     "video/quicktime",
+     "video/x-flv",
+     "video/x-ms-wmv",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.25,
+       "write": 2.5
+      }
+     },
+     "output": {
+      "price": 6
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cline.bot/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "cline-pass/deepseek-v4.1-flash": {
+   "id": "cline-pass/deepseek-v4.1-flash",
+   "name": "DeepSeek V4.1 Flash",
+   "type": "chat",
+   "canonical_id": "deepseek/deepseek-v4.1-flash",
+   "family": "deepseek-flash",
+   "release_date": "2026-09-10",
+   "limit": {
+    "context": 1000000,
+    "output": 384000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "high",
+      "max"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "DeepSeek V4.1 Flash model for reasoning and agentic coding",
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-09-10",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.15,
+      "cache": {
+       "read": 0.003
+      }
+     },
+     "output": {
+      "price": 0.6
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "utc_days": {
+        "in": [
+         "mon",
+         "tue",
+         "wed",
+         "thu",
+         "fri"
+        ]
+       },
+       "any": [
+        {
+         "all": [
+          {
+           "utc_hours": {
+            "gte": "01:00"
+           }
+          },
+          {
+           "utc_hours": {
+            "lt": "04:00"
+           }
+          }
+         ]
+        },
+        {
+         "all": [
+          {
+           "utc_hours": {
+            "gte": "06:00"
+           }
+          },
+          {
+           "utc_hours": {
+            "lt": "10:00"
+           }
+          }
+         ]
+        }
+       ],
+       "not": {
+        "holiday": {
+         "equals": "CN"
+        }
+       }
+      },
+      "factor": 2
+     }
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cline.bot/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "cline-pass/glm-5.3": {
+   "id": "cline-pass/glm-5.3",
+   "name": "GLM-5.3",
+   "type": "chat",
+   "canonical_id": "zhipuai/glm-5.3",
+   "family": "glm",
+   "release_date": "2026-08-14",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
+   "open_weights": true,
+   "last_updated": "2026-08-14",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.4,
+      "cache": {
+       "read": 0.26
+      }
+     },
+     "output": {
+      "price": 4.4
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cline.bot/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "cline-pass/mimo-v2.5": {
+   "id": "cline-pass/mimo-v2.5",
+   "name": "MiMo-V2.5",
+   "type": "chat",
+   "canonical_id": "xiaomi/mimo-v2.5",
+   "family": "mimo",
+   "release_date": "2026-04-22",
+   "limit": {
+    "context": 1048576,
+    "output": 131072
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    },
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Open MiMo model for multimodal coding agents and long-context automation",
+   "open_weights": true,
+   "knowledge": "2024-12",
+   "last_updated": "2026-04-22",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "audio/mpeg",
+     "audio/wav",
+     "audio/flac",
+     "audio/mp4",
+     "audio/ogg",
+     "video/mp4",
+     "video/quicktime",
+     "video/x-msvideo",
+     "video/x-ms-wmv"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.14,
+      "cache": {
+       "read": 0.0028
+      }
+     },
+     "output": {
+      "price": 0.28
      }
     }
    },
@@ -1431,13 +1268,13 @@
     }
    }
   },
-  "cline-pass/mimo-v2.5": {
-   "id": "cline-pass/mimo-v2.5",
-   "name": "MiMo-V2.5",
+  "cline-pass/mimo-v2.6-pro": {
+   "id": "cline-pass/mimo-v2.6-pro",
+   "name": "MiMo-V2.6-Pro",
    "type": "chat",
-   "canonical_id": "xiaomi/mimo-v2.5",
+   "canonical_id": "xiaomi/mimo-v2.6-pro",
    "family": "mimo",
-   "release_date": "2026-04-22",
+   "release_date": "2026-09-22",
    "limit": {
     "context": 1048576,
     "output": 131072
@@ -1448,7 +1285,13 @@
     },
     "reasoning": {
      "supported": true,
-     "toggle": true
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
     },
     "temperature": true,
     "top_p": true,
@@ -1456,10 +1299,9 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Open MiMo model for multimodal coding agents and long-context automation",
+   "description": "Stronger MiMo Pro tier for multimodal reasoning and coding-agent execution",
    "open_weights": true,
-   "knowledge": "2024-12",
-   "last_updated": "2026-04-22",
+   "last_updated": "2026-09-22",
    "modalities": {
     "input": [
      "text",
@@ -1477,6 +1319,164 @@
      "video/quicktime",
      "video/x-msvideo",
      "video/x-ms-wmv"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.435,
+      "cache": {
+       "read": 0.0036
+      }
+     },
+     "output": {
+      "price": 0.87
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cline.bot/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "cline-pass/kimi-k3": {
+   "id": "cline-pass/kimi-k3",
+   "name": "Kimi K3",
+   "type": "chat",
+   "canonical_id": "moonshotai/kimi-k3",
+   "family": "kimi-k3",
+   "release_date": "2026-07-16",
+   "limit": {
+    "context": 1048576,
+    "output": 131072
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "high",
+      "max"
+     ]
+    },
+    "structured_output": true,
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
+   "open_weights": true,
+   "last_updated": "2026-07-16",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 3,
+      "cache": {
+       "read": 0.3
+      }
+     },
+     "output": {
+      "price": 15
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cline.bot/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "cline-pass/deepseek-v4-flash": {
+   "id": "cline-pass/deepseek-v4-flash",
+   "name": "DeepSeek V4 Flash",
+   "type": "chat",
+   "canonical_id": "deepseek/deepseek-v4-flash",
+   "family": "deepseek-flash",
+   "status": "deprecated",
+   "release_date": "2026-04-24",
+   "limit": {
+    "context": 1000000,
+    "output": 384000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "high",
+      "max"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Fast DeepSeek V4 lane for economical reasoning, coding, and long-context work",
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-04-24",
+   "modalities": {
+    "input": [
+     "text"
     ],
     "output": [
      "text"

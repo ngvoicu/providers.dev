@@ -6,16 +6,16 @@
   "RUNINFRA_GATEWAY_KEY"
  ],
  "models": {
-  "deepseek-ai/DeepSeek-V4-Flash-0731": {
-   "id": "deepseek-ai/DeepSeek-V4-Flash-0731",
-   "name": "DeepSeek V4 Flash 0731",
+  "Inferact/Qwen3.8-2.4T-A95B-NVFP4": {
+   "id": "Inferact/Qwen3.8-2.4T-A95B-NVFP4",
+   "name": "Qwen3.8 2.4T A95B (NVFP4)",
    "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4-flash-0731",
-   "family": "deepseek-flash",
+   "canonical_id": "alibaba/qwen3.8-2.4t-a95b",
+   "family": "qwen",
    "status": "deprecated",
-   "release_date": "2026-07-31",
+   "release_date": "2026-08-12",
    "limit": {
-    "context": 1048576,
+    "context": 262144,
     "output": 32768
    },
    "capabilities": {
@@ -25,9 +25,9 @@
     "reasoning": {
      "supported": true,
      "effort": [
-      "none",
       "low",
-      "max"
+      "medium",
+      "xhigh"
      ]
     },
     "structured_output": true,
@@ -37,10 +37,9 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Official DeepSeek V4 Flash release with enhanced agentic capabilities and integrated DSpark speculative decoding",
+   "description": "Open-weight sparse MoE (2.4T total, 95B active), the open-weight twin of Qwen3.8 Max for coding, research, complex reasoning, and agentic workflows",
    "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-07-31",
+   "last_updated": "2026-08-12",
    "modalities": {
     "input": [
      "text"
@@ -52,13 +51,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.13,
+      "price": 2,
       "cache": {
-       "read": 0.01
+       "read": 0.2
       }
      },
      "output": {
-      "price": 0.27
+      "price": 6
      }
     }
    },
@@ -77,16 +76,15 @@
     }
    }
   },
-  "deepseek-ai/DeepSeek-V4-Pro-0813": {
-   "id": "deepseek-ai/DeepSeek-V4-Pro-0813",
-   "name": "DeepSeek V4 Pro 0813",
+  "ornith-ai/Ornith-1.5-35B-A3B": {
+   "id": "ornith-ai/Ornith-1.5-35B-A3B",
+   "name": "Ornith 1.5 35B A3B",
    "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4-pro-0813",
-   "family": "deepseek-thinking",
-   "status": "deprecated",
-   "release_date": "2026-08-13",
+   "canonical_id": "deepreinforce/ornith-1.5-35b-a3b",
+   "family": "ornith",
+   "release_date": "2026-08-18",
    "limit": {
-    "context": 1048576,
+    "context": 262144,
     "output": 32768
    },
    "capabilities": {
@@ -104,12 +102,13 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "DeepSeek V4 Pro snapshot with million-token context and support for thinking and non-thinking modes",
+   "description": "Mixture-of-experts coding-reasoning model for agentic software tasks, tool use, and image understanding",
    "open_weights": true,
-   "last_updated": "2026-08-22",
+   "last_updated": "2026-08-23",
    "modalities": {
     "input": [
-     "text"
+     "text",
+     "image"
     ],
     "output": [
      "text"
@@ -118,13 +117,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.6,
+      "price": 0.1,
       "cache": {
-       "read": 0.03
+       "read": 0.01
       }
      },
      "output": {
-      "price": 1.9
+      "price": 0.4
      }
     }
    },
@@ -134,6 +133,9 @@
      "sdk": {
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
      },
      "capabilities": {
       "tools": {
@@ -286,13 +288,150 @@
     }
    }
   },
-  "ornith-ai/Ornith-1.5-35B-A3B": {
-   "id": "ornith-ai/Ornith-1.5-35B-A3B",
-   "name": "Ornith 1.5 35B A3B",
+  "deepseek-ai/DeepSeek-V4-Flash-0731": {
+   "id": "deepseek-ai/DeepSeek-V4-Flash-0731",
+   "name": "DeepSeek V4 Flash 0731",
    "type": "chat",
-   "canonical_id": "deepreinforce/ornith-1.5-35b-a3b",
-   "family": "ornith",
-   "release_date": "2026-08-18",
+   "canonical_id": "deepseek/deepseek-v4-flash-0731",
+   "family": "deepseek-flash",
+   "status": "deprecated",
+   "release_date": "2026-07-31",
+   "limit": {
+    "context": 1048576,
+    "output": 32768
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "max"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Official DeepSeek V4 Flash release with enhanced agentic capabilities and integrated DSpark speculative decoding",
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-07-31",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.13,
+      "cache": {
+       "read": 0.01
+      }
+     },
+     "output": {
+      "price": 0.27
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.runinfra.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "deepseek-ai/DeepSeek-V4-Pro-0813": {
+   "id": "deepseek-ai/DeepSeek-V4-Pro-0813",
+   "name": "DeepSeek V4 Pro 0813",
+   "type": "chat",
+   "canonical_id": "deepseek/deepseek-v4-pro-0813",
+   "family": "deepseek-thinking",
+   "status": "deprecated",
+   "release_date": "2026-08-13",
+   "limit": {
+    "context": 1048576,
+    "output": 32768
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "DeepSeek V4 Pro snapshot with million-token context and support for thinking and non-thinking modes",
+   "open_weights": true,
+   "last_updated": "2026-08-22",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.6,
+      "cache": {
+       "read": 0.03
+      }
+     },
+     "output": {
+      "price": 1.9
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.runinfra.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "nvidia/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-BF16": {
+   "id": "nvidia/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-BF16",
+   "name": "Nemotron 3.5 Lightning 30B A3B",
+   "type": "chat",
+   "canonical_id": "nvidia/nemotron-3.5-lightning",
+   "family": "nemotron",
+   "release_date": "2026-08-11",
    "limit": {
     "context": 262144,
     "output": 32768
@@ -312,13 +451,13 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Mixture-of-experts coding-reasoning model for agentic software tasks, tool use, and image understanding",
+   "description": "Fast NVIDIA Nemotron MoE for reliable agentic tasks across enterprise workloads",
    "open_weights": true,
-   "last_updated": "2026-08-23",
+   "knowledge": "2025-09",
+   "last_updated": "2026-08-11",
    "modalities": {
     "input": [
-     "text",
-     "image"
+     "text"
     ],
     "output": [
      "text"
@@ -327,13 +466,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.1,
+      "price": 0.05,
       "cache": {
        "read": 0.01
       }
      },
      "output": {
-      "price": 0.4
+      "price": 0.15
      }
     }
    },
@@ -343,9 +482,6 @@
      "sdk": {
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
      },
      "capabilities": {
       "tools": {
@@ -413,142 +549,6 @@
      },
      "output": {
       "price": 0.4
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.runinfra.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "Inferact/Qwen3.8-2.4T-A95B-NVFP4": {
-   "id": "Inferact/Qwen3.8-2.4T-A95B-NVFP4",
-   "name": "Qwen3.8 2.4T A95B (NVFP4)",
-   "type": "chat",
-   "canonical_id": "alibaba/qwen3.8-2.4t-a95b",
-   "family": "qwen",
-   "status": "deprecated",
-   "release_date": "2026-08-12",
-   "limit": {
-    "context": 262144,
-    "output": 32768
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "xhigh"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open-weight sparse MoE (2.4T total, 95B active), the open-weight twin of Qwen3.8 Max for coding, research, complex reasoning, and agentic workflows",
-   "open_weights": true,
-   "last_updated": "2026-08-12",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2,
-      "cache": {
-       "read": 0.2
-      }
-     },
-     "output": {
-      "price": 6
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.runinfra.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "nvidia/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-BF16": {
-   "id": "nvidia/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-BF16",
-   "name": "Nemotron 3.5 Lightning 30B A3B",
-   "type": "chat",
-   "canonical_id": "nvidia/nemotron-3.5-lightning",
-   "family": "nemotron",
-   "release_date": "2026-08-11",
-   "limit": {
-    "context": 262144,
-    "output": 32768
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Fast NVIDIA Nemotron MoE for reliable agentic tasks across enterprise workloads",
-   "open_weights": true,
-   "knowledge": "2025-09",
-   "last_updated": "2026-08-11",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.05,
-      "cache": {
-       "read": 0.01
-      }
-     },
-     "output": {
-      "price": 0.15
      }
     }
    },

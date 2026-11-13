@@ -6,70 +6,9 @@
   "TENCENT_CODING_PLAN_API_KEY"
  ],
  "models": {
-  "tc-code-latest": {
-   "id": "tc-code-latest",
-   "name": "Auto",
-   "type": "chat",
-   "family": "auto",
-   "release_date": "2026-03-08",
-   "limit": {
-    "context": 131072,
-    "output": 16384
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Automatic model router for matching prompts to suitable backends and budgets",
-   "open_weights": false,
-   "last_updated": "2026-03-08",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.lkeap.cloud.tencent.com/coding/v3",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "hunyuan-2.0-instruct": {
-   "id": "hunyuan-2.0-instruct",
-   "name": "Tencent HY 2.0 Instruct",
+  "hunyuan-turbos": {
+   "id": "hunyuan-turbos",
+   "name": "Hunyuan-TurboS",
    "type": "chat",
    "family": "hunyuan",
    "status": "deprecated",
@@ -120,74 +59,6 @@
      "sdk": {
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "minimax-m2.5": {
-   "id": "minimax-m2.5",
-   "name": "MiniMax-M2.5",
-   "type": "chat",
-   "canonical_id": "minimax/MiniMax-M2.5",
-   "family": "minimax",
-   "status": "deprecated",
-   "release_date": "2026-02-12",
-   "limit": {
-    "context": 204800,
-    "output": 32768
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "MiniMax model for chat, coding, office work, and agentic tasks",
-   "open_weights": true,
-   "last_updated": "2026-02-12",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.lkeap.cloud.tencent.com/coding/v3",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
      },
      "capabilities": {
       "tools": {
@@ -274,6 +145,137 @@
      },
      "compatibility": {
       "reasoning_field": "reasoning_content"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "glm-5": {
+   "id": "glm-5",
+   "name": "GLM-5",
+   "type": "chat",
+   "canonical_id": "zhipuai/glm-5",
+   "family": "glm",
+   "status": "deprecated",
+   "release_date": "2026-02-12",
+   "limit": {
+    "context": 202752,
+    "output": 16384
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    },
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Flagship GLM model for hybrid reasoning, coding, and agentic engineering",
+   "open_weights": true,
+   "last_updated": "2026-02-12",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.lkeap.cloud.tencent.com/coding/v3",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "hunyuan-2.0-instruct": {
+   "id": "hunyuan-2.0-instruct",
+   "name": "Tencent HY 2.0 Instruct",
+   "type": "chat",
+   "family": "hunyuan",
+   "status": "deprecated",
+   "release_date": "2026-03-08",
+   "limit": {
+    "context": 131072,
+    "output": 16384
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    },
+    "temperature": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Tencent Hy reasoning model for coding, instruction following, and agent tasks",
+   "open_weights": false,
+   "last_updated": "2026-03-08",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.lkeap.cloud.tencent.com/coding/v3",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
      "capabilities": {
       "tools": {
@@ -413,33 +415,32 @@
     }
    }
   },
-  "glm-5": {
-   "id": "glm-5",
-   "name": "GLM-5",
+  "minimax-m2.5": {
+   "id": "minimax-m2.5",
+   "name": "MiniMax-M2.5",
    "type": "chat",
-   "canonical_id": "zhipuai/glm-5",
-   "family": "glm",
+   "canonical_id": "minimax/MiniMax-M2.5",
+   "family": "minimax",
    "status": "deprecated",
    "release_date": "2026-02-12",
    "limit": {
-    "context": 202752,
-    "output": 16384
+    "context": 204800,
+    "output": 32768
    },
    "capabilities": {
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": true,
-     "toggle": true
+     "supported": true
     },
     "temperature": true,
     "top_p": true,
-    "top_k": true,
+    "top_k": false,
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Flagship GLM model for hybrid reasoning, coding, and agentic engineering",
+   "description": "MiniMax model for chat, coding, office work, and agentic tasks",
    "open_weights": true,
    "last_updated": "2026-02-12",
    "modalities": {
@@ -482,12 +483,11 @@
     }
    }
   },
-  "hunyuan-turbos": {
-   "id": "hunyuan-turbos",
-   "name": "Hunyuan-TurboS",
+  "tc-code-latest": {
+   "id": "tc-code-latest",
+   "name": "Auto",
    "type": "chat",
-   "family": "hunyuan",
-   "status": "deprecated",
+   "family": "auto",
    "release_date": "2026-03-08",
    "limit": {
     "context": 131072,
@@ -504,7 +504,7 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Tencent Hy reasoning model for coding, instruction following, and agent tasks",
+   "description": "Automatic model router for matching prompts to suitable backends and budgets",
    "open_weights": false,
    "last_updated": "2026-03-08",
    "modalities": {

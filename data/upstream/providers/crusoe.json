@@ -6,34 +6,40 @@
   "CRUSOE_API_KEY"
  ],
  "models": {
-  "deepseek-ai/DeepSeek-V3-0324": {
-   "id": "deepseek-ai/DeepSeek-V3-0324",
-   "name": "DeepSeek V3 0324",
+  "openai/gpt-oss-120b": {
+   "id": "openai/gpt-oss-120b",
+   "name": "GPT OSS 120B",
    "type": "chat",
-   "canonical_id": "deepseek/deepseek-v3-0324",
-   "family": "deepseek",
-   "status": "deprecated",
-   "release_date": "2025-03-24",
+   "canonical_id": "openai/gpt-oss-120b",
+   "family": "gpt-oss",
+   "release_date": "2025-08-05",
    "limit": {
-    "context": 163840,
-    "output": 163840
+    "context": 131072,
+    "output": 32768
    },
    "capabilities": {
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": false
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
     },
+    "structured_output": true,
     "temperature": true,
     "top_p": true,
     "top_k": true,
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "March 2025 checkpoint of DeepSeek-V3 with improved reasoning and coding",
+   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
    "open_weights": true,
-   "last_updated": "2025-03-24",
+   "knowledge": "2024-06",
+   "last_updated": "2025-08-05",
    "modalities": {
     "input": [
      "text"
@@ -45,13 +51,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.5,
+      "price": 0.05,
       "cache": {
-       "read": 0.25
+       "read": 0.05
       }
      },
      "output": {
-      "price": 1.5
+      "price": 0.25
      }
     }
    },
@@ -153,70 +159,6 @@
     }
    }
   },
-  "Qwen/Qwen3-235B-A22B-Instruct-2507": {
-   "id": "Qwen/Qwen3-235B-A22B-Instruct-2507",
-   "name": "Qwen3 235B-A22B Instruct 2507",
-   "type": "chat",
-   "canonical_id": "alibaba/qwen3-235b-a22b-instruct-2507",
-   "family": "qwen",
-   "status": "deprecated",
-   "release_date": "2025-07-21",
-   "limit": {
-    "context": 262144,
-    "output": 16384
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Updated large open Qwen3 MoE instruct model for multilingual chat, coding, and tool use",
-   "open_weights": true,
-   "last_updated": "2025-07-21",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.22,
-      "cache": {
-       "read": 0.11
-      }
-     },
-     "output": {
-      "price": 0.8
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.inference.crusoecloud.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
   "google/gemma-4-31b-it": {
    "id": "google/gemma-4-31b-it",
    "name": "Gemma 4 31B IT",
@@ -270,6 +212,135 @@
      },
      "output": {
       "price": 0.4
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.inference.crusoecloud.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "deepseek-ai/DeepSeek-V3-0324": {
+   "id": "deepseek-ai/DeepSeek-V3-0324",
+   "name": "DeepSeek V3 0324",
+   "type": "chat",
+   "canonical_id": "deepseek/deepseek-v3-0324",
+   "family": "deepseek",
+   "status": "deprecated",
+   "release_date": "2025-03-24",
+   "limit": {
+    "context": 163840,
+    "output": 163840
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    },
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "March 2025 checkpoint of DeepSeek-V3 with improved reasoning and coding",
+   "open_weights": true,
+   "last_updated": "2025-03-24",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.5,
+      "cache": {
+       "read": 0.25
+      }
+     },
+     "output": {
+      "price": 1.5
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.inference.crusoecloud.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "nvidia/NVIDIA-Nemotron-3-Super-120B-A12B": {
+   "id": "nvidia/NVIDIA-Nemotron-3-Super-120B-A12B",
+   "name": "Nemotron 3 Super 120B A12B",
+   "type": "chat",
+   "canonical_id": "nvidia/nemotron-3-super-120b-a12b",
+   "family": "nemotron",
+   "release_date": "2026-03-11",
+   "limit": {
+    "context": 262144,
+    "output": 262144
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    },
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Nemotron middle tier for collaborative agents and high-volume reasoning workloads",
+   "open_weights": true,
+   "knowledge": "2025-06",
+   "last_updated": "2026-03-11",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.3,
+      "cache": {
+       "read": 0.15
+      }
+     },
+     "output": {
+      "price": 2.4
      }
     }
    },
@@ -427,100 +498,35 @@
     }
    }
   },
-  "nvidia/NVIDIA-Nemotron-3-Super-120B-A12B": {
-   "id": "nvidia/NVIDIA-Nemotron-3-Super-120B-A12B",
-   "name": "Nemotron 3 Super 120B A12B",
+  "meta-llama/Llama-3.3-70B-Instruct": {
+   "id": "meta-llama/Llama-3.3-70B-Instruct",
+   "name": "Llama-3.3-70B-Instruct",
    "type": "chat",
-   "canonical_id": "nvidia/nemotron-3-super-120b-a12b",
-   "family": "nemotron",
-   "release_date": "2026-03-11",
-   "limit": {
-    "context": 262144,
-    "output": 262144
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Nemotron middle tier for collaborative agents and high-volume reasoning workloads",
-   "open_weights": true,
-   "knowledge": "2025-06",
-   "last_updated": "2026-03-11",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.3,
-      "cache": {
-       "read": 0.15
-      }
-     },
-     "output": {
-      "price": 2.4
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.inference.crusoecloud.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "zai/GLM-5.1": {
-   "id": "zai/GLM-5.1",
-   "name": "GLM-5.1",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-5.1",
-   "family": "glm",
+   "canonical_id": "meta/llama-3.3-70b-instruct",
+   "family": "llama",
    "status": "deprecated",
-   "release_date": "2026-04-07",
+   "release_date": "2024-12-06",
    "limit": {
-    "context": 200000,
-    "output": 131072
+    "context": 128000,
+    "output": 4096
    },
    "capabilities": {
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": true
+     "supported": false
     },
-    "structured_output": true,
     "temperature": true,
     "top_p": true,
     "top_k": true,
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Strong GLM coding model for agentic engineering, terminals, and repository generation",
+   "description": "Popular open Llama workhorse for multilingual chat, coding, and self-hosting",
    "open_weights": true,
-   "last_updated": "2026-04-07",
+   "knowledge": "2023-12",
+   "last_updated": "2024-12-06",
    "modalities": {
     "input": [
      "text"
@@ -532,13 +538,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 1.2,
+      "price": 0.25,
       "cache": {
-       "read": 0.25
+       "read": 0.13
       }
      },
      "output": {
-      "price": 4.4
+      "price": 0.75
      }
     }
    },
@@ -623,28 +629,24 @@
     }
    }
   },
-  "openai/gpt-oss-120b": {
-   "id": "openai/gpt-oss-120b",
-   "name": "GPT OSS 120B",
+  "zai/GLM-5.1": {
+   "id": "zai/GLM-5.1",
+   "name": "GLM-5.1",
    "type": "chat",
-   "canonical_id": "openai/gpt-oss-120b",
-   "family": "gpt-oss",
-   "release_date": "2025-08-05",
+   "canonical_id": "zhipuai/glm-5.1",
+   "family": "glm",
+   "status": "deprecated",
+   "release_date": "2026-04-07",
    "limit": {
-    "context": 131072,
-    "output": 32768
+    "context": 200000,
+    "output": 131072
    },
    "capabilities": {
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
+     "supported": true
     },
     "structured_output": true,
     "temperature": true,
@@ -653,10 +655,9 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
+   "description": "Strong GLM coding model for agentic engineering, terminals, and repository generation",
    "open_weights": true,
-   "knowledge": "2024-06",
-   "last_updated": "2025-08-05",
+   "last_updated": "2026-04-07",
    "modalities": {
     "input": [
      "text"
@@ -668,13 +669,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.05,
+      "price": 1.2,
       "cache": {
-       "read": 0.05
+       "read": 0.25
       }
      },
      "output": {
-      "price": 0.25
+      "price": 4.4
      }
     }
    },
@@ -693,17 +694,17 @@
     }
    }
   },
-  "meta-llama/Llama-3.3-70B-Instruct": {
-   "id": "meta-llama/Llama-3.3-70B-Instruct",
-   "name": "Llama-3.3-70B-Instruct",
+  "Qwen/Qwen3-235B-A22B-Instruct-2507": {
+   "id": "Qwen/Qwen3-235B-A22B-Instruct-2507",
+   "name": "Qwen3 235B-A22B Instruct 2507",
    "type": "chat",
-   "canonical_id": "meta/llama-3.3-70b-instruct",
-   "family": "llama",
+   "canonical_id": "alibaba/qwen3-235b-a22b-instruct-2507",
+   "family": "qwen",
    "status": "deprecated",
-   "release_date": "2024-12-06",
+   "release_date": "2025-07-21",
    "limit": {
-    "context": 128000,
-    "output": 4096
+    "context": 262144,
+    "output": 16384
    },
    "capabilities": {
     "tools": {
@@ -718,10 +719,9 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Popular open Llama workhorse for multilingual chat, coding, and self-hosting",
+   "description": "Updated large open Qwen3 MoE instruct model for multilingual chat, coding, and tool use",
    "open_weights": true,
-   "knowledge": "2023-12",
-   "last_updated": "2024-12-06",
+   "last_updated": "2025-07-21",
    "modalities": {
     "input": [
      "text"
@@ -733,13 +733,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.25,
+      "price": 0.22,
       "cache": {
-       "read": 0.13
+       "read": 0.11
       }
      },
      "output": {
-      "price": 0.75
+      "price": 0.8
      }
     }
    },

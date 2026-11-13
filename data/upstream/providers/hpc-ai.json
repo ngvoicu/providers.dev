@@ -6,16 +6,17 @@
   "HPC_AI_API_KEY"
  ],
  "models": {
-  "zai-org/glm-5.1": {
-   "id": "zai-org/glm-5.1",
-   "name": "GLM 5.1",
+  "openai/gpt-5.5": {
+   "id": "openai/gpt-5.5",
+   "name": "GPT-5.5",
    "type": "chat",
-   "canonical_id": "zhipuai/glm-5.1",
-   "family": "glm",
-   "release_date": "2026-04-07",
+   "canonical_id": "openai/gpt-5.5",
+   "family": "gpt",
+   "release_date": "2026-04-23",
    "limit": {
-    "context": 202000,
-    "output": 202000
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
    },
    "capabilities": {
     "tools": {
@@ -23,21 +24,31 @@
     },
     "reasoning": {
      "supported": true,
-     "toggle": true
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high"
+     ]
     },
     "structured_output": true,
     "temperature": true,
     "top_p": true,
-    "top_k": true,
+    "top_k": false,
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Flagship GLM model for hybrid reasoning, coding, and agentic engineering",
-   "open_weights": true,
-   "last_updated": "2026-04-07",
+   "description": "Default frontier GPT for coding, computer use, research, and knowledge work",
+   "open_weights": false,
+   "knowledge": "2025-12-01",
+   "last_updated": "2026-04-23",
    "modalities": {
     "input": [
-     "text"
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
     ],
     "output": [
      "text"
@@ -46,13 +57,36 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.615,
+      "price": 5,
       "cache": {
-       "read": 0.133
-      }
+       "read": 0.5
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 10,
+        "cache": {
+         "read": 1
+        }
+       }
+      ]
      },
      "output": {
-      "price": 2.46
+      "price": 30,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 45
+       }
+      ]
      }
     }
    },
@@ -62,9 +96,6 @@
      "sdk": {
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
      },
      "capabilities": {
       "tools": {
@@ -74,41 +105,45 @@
     }
    }
   },
-  "zai-org/glm-5.2": {
-   "id": "zai-org/glm-5.2",
-   "name": "GLM-5.2",
+  "moonshotai/kimi-k2.7-code": {
+   "id": "moonshotai/kimi-k2.7-code",
+   "name": "Kimi K2.7 Code",
    "type": "chat",
-   "canonical_id": "zhipuai/glm-5.2",
-   "family": "glm",
-   "release_date": "2026-06-13",
+   "canonical_id": "moonshotai/kimi-k2.7-code",
+   "family": "kimi-k2",
+   "release_date": "2026-06-12",
    "limit": {
-    "context": 1048576,
-    "output": 131072
+    "context": 256000,
+    "output": 256000
    },
    "capabilities": {
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": true,
-     "effort": [
-      "high",
-      "max"
-     ]
+     "supported": true
     },
     "structured_output": true,
     "temperature": true,
-    "top_p": true,
-    "top_k": true,
+    "top_p": false,
+    "top_k": false,
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
+   "description": "Coding-focused Kimi model, stronger on long-horizon repo work with less overthinking",
    "open_weights": true,
-   "last_updated": "2026-06-13",
+   "knowledge": "2025-01",
+   "last_updated": "2026-06-12",
    "modalities": {
     "input": [
-     "text"
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/heic",
+     "image/heif"
     ],
     "output": [
      "text"
@@ -117,13 +152,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 1.4,
+      "price": 0.95,
       "cache": {
-       "read": 0.26
+       "read": 0.19
       }
      },
      "output": {
-      "price": 4.4
+      "price": 4
      }
     }
    },
@@ -133,9 +168,6 @@
      "sdk": {
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
      },
      "capabilities": {
       "tools": {
@@ -221,78 +253,6 @@
     }
    }
   },
-  "moonshotai/kimi-k2.7-code": {
-   "id": "moonshotai/kimi-k2.7-code",
-   "name": "Kimi K2.7 Code",
-   "type": "chat",
-   "canonical_id": "moonshotai/kimi-k2.7-code",
-   "family": "kimi-k2",
-   "release_date": "2026-06-12",
-   "limit": {
-    "context": 256000,
-    "output": 256000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Coding-focused Kimi model, stronger on long-horizon repo work with less overthinking",
-   "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-06-12",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/heic",
-     "image/heif"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.95,
-      "cache": {
-       "read": 0.19
-      }
-     },
-     "output": {
-      "price": 4
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.hpc-ai.com/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
   "anthropic/claude-opus-4.7": {
    "id": "anthropic/claude-opus-4.7",
    "name": "Claude Opus 4.7",
@@ -366,16 +326,16 @@
     }
    }
   },
-  "deepseek/deepseek-v4-flash": {
-   "id": "deepseek/deepseek-v4-flash",
-   "name": "DeepSeek V4 Flash",
+  "zai-org/glm-5.2": {
+   "id": "zai-org/glm-5.2",
+   "name": "GLM-5.2",
    "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4-flash",
-   "family": "deepseek-flash",
-   "release_date": "2026-04-24",
+   "canonical_id": "zhipuai/glm-5.2",
+   "family": "glm",
+   "release_date": "2026-06-13",
    "limit": {
     "context": 1048576,
-    "output": 128000
+    "output": 131072
    },
    "capabilities": {
     "tools": {
@@ -395,10 +355,9 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Fast DeepSeek V4 lane for economical reasoning, coding, and long-context work",
+   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
    "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-04-24",
+   "last_updated": "2026-06-13",
    "modalities": {
     "input": [
      "text"
@@ -410,13 +369,81 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.14,
+      "price": 1.4,
       "cache": {
-       "read": 0.028
+       "read": 0.26
       }
      },
      "output": {
-      "price": 0.28
+      "price": 4.4
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.hpc-ai.com/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "zai-org/glm-5.1": {
+   "id": "zai-org/glm-5.1",
+   "name": "GLM 5.1",
+   "type": "chat",
+   "canonical_id": "zhipuai/glm-5.1",
+   "family": "glm",
+   "release_date": "2026-04-07",
+   "limit": {
+    "context": 202000,
+    "output": 202000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Flagship GLM model for hybrid reasoning, coding, and agentic engineering",
+   "open_weights": true,
+   "last_updated": "2026-04-07",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.615,
+      "cache": {
+       "read": 0.133
+      }
+     },
+     "output": {
+      "price": 2.46
      }
     }
    },
@@ -510,16 +537,15 @@
     }
    }
   },
-  "openai/gpt-5.5": {
-   "id": "openai/gpt-5.5",
-   "name": "GPT-5.5",
+  "deepseek/deepseek-v4-flash": {
+   "id": "deepseek/deepseek-v4-flash",
+   "name": "DeepSeek V4 Flash",
    "type": "chat",
-   "canonical_id": "openai/gpt-5.5",
-   "family": "gpt",
-   "release_date": "2026-04-23",
+   "canonical_id": "deepseek/deepseek-v4-flash",
+   "family": "deepseek-flash",
+   "release_date": "2026-04-24",
    "limit": {
-    "context": 1050000,
-    "input": 922000,
+    "context": 1048576,
     "output": 128000
    },
    "capabilities": {
@@ -529,30 +555,24 @@
     "reasoning": {
      "supported": true,
      "effort": [
-      "none",
-      "low",
-      "medium",
-      "high"
+      "high",
+      "max"
      ]
     },
     "structured_output": true,
     "temperature": true,
     "top_p": true,
-    "top_k": false,
+    "top_k": true,
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Default frontier GPT for coding, computer use, research, and knowledge work",
-   "open_weights": false,
-   "knowledge": "2025-12-01",
-   "last_updated": "2026-04-23",
+   "description": "Fast DeepSeek V4 lane for economical reasoning, coding, and long-context work",
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-04-24",
    "modalities": {
     "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
+     "text"
     ],
     "output": [
      "text"
@@ -561,36 +581,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 5,
+      "price": 0.14,
       "cache": {
-       "read": 0.5
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 10,
-        "cache": {
-         "read": 1
-        }
-       }
-      ]
+       "read": 0.028
+      }
      },
      "output": {
-      "price": 30,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 45
-       }
-      ]
+      "price": 0.28
      }
     }
    },
@@ -600,6 +597,9 @@
      "sdk": {
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
      },
      "capabilities": {
       "tools": {

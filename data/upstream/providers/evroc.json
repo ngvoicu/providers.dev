@@ -6,39 +6,29 @@
   "EVROC_API_KEY"
  ],
  "models": {
-  "zai-org/GLM-5.2": {
-   "id": "zai-org/GLM-5.2",
-   "name": "GLM-5.2",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-5.2",
-   "family": "glm",
-   "release_date": "2026-06-13",
+  "intfloat/multilingual-e5-large-instruct": {
+   "id": "intfloat/multilingual-e5-large-instruct",
+   "name": "E5 Multi-Lingual Large Embeddings 0.6B",
+   "type": "embedding",
+   "family": "text-embedding",
+   "release_date": "2024-06-01",
    "limit": {
-    "context": 524288,
-    "output": 131072
+    "context": 512,
+    "output": 512
    },
    "capabilities": {
     "tools": {
-     "supported": true
+     "supported": false
     },
     "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "high",
-      "max"
-     ]
+     "supported": false
     },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
+   "description": "Embedding model for semantic search, retrieval, clustering, and ranking pipelines",
    "open_weights": true,
-   "last_updated": "2026-06-13",
+   "last_updated": "2024-06-01",
    "modalities": {
     "input": [
      "text"
@@ -50,10 +40,71 @@
    "cost": {
     "text": {
      "input": {
-      "price": 1.4375
+      "price": 0.114
      },
      "output": {
-      "price": 5.75
+      "price": 0.114
+     }
+    }
+   },
+   "api": {
+    "embeddings": {
+     "base_url": "https://models.think.evroc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
+     }
+    }
+   }
+  },
+  "openai/gpt-oss-120b": {
+   "id": "openai/gpt-oss-120b",
+   "name": "GPT OSS 120B",
+   "type": "chat",
+   "canonical_id": "openai/gpt-oss-120b",
+   "family": "gpt-oss",
+   "release_date": "2025-08-05",
+   "limit": {
+    "context": 65536,
+    "output": 65536
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    },
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Open-weight GPT model for self-hosted reasoning and instruction-following workloads",
+   "open_weights": true,
+   "knowledge": "2024-06",
+   "last_updated": "2025-08-05",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.23
+     },
+     "output": {
+      "price": 0.92
      }
     }
    },
@@ -68,6 +119,300 @@
       "tools": {
        "updates": false
       }
+     }
+    }
+   }
+  },
+  "openai/whisper-large-v3": {
+   "id": "openai/whisper-large-v3",
+   "name": "Whisper 3 Large",
+   "type": "transcription",
+   "canonical_id": "openai/whisper-large-v3",
+   "family": "whisper",
+   "release_date": "2023-11-06",
+   "limit": {
+    "context": 448,
+    "output": 4096
+   },
+   "capabilities": {
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    },
+    "temperature": true,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Open Whisper checkpoint for robust multilingual transcription and captioning",
+   "open_weights": true,
+   "last_updated": "2023-11-06",
+   "modalities": {
+    "input": [
+     "audio/flac",
+     "audio/mpeg",
+     "audio/mp4",
+     "audio/ogg",
+     "audio/wav",
+     "audio/webm"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.0023
+     },
+     "output": {
+      "price": 0.0023
+     }
+    },
+    "audio": {
+     "output": {
+      "price": 2.3
+     }
+    }
+   },
+   "api": {
+    "transcriptions": {
+     "base_url": "https://models.think.evroc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/protocols/openai-transcription"
+     }
+    }
+   }
+  },
+  "openai/whisper-large-v3-turbo": {
+   "id": "openai/whisper-large-v3-turbo",
+   "name": "Whisper Large v3 Turbo",
+   "type": "transcription",
+   "canonical_id": "openai/whisper-large-v3-turbo",
+   "family": "whisper",
+   "release_date": "2024-10-01",
+   "limit": {
+    "context": 448,
+    "output": 448
+   },
+   "capabilities": {
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    },
+    "temperature": true,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Speech transcription model for accurate audio-to-text and captioning workflows",
+   "open_weights": true,
+   "last_updated": "2024-10-01",
+   "modalities": {
+    "input": [
+     "audio/flac",
+     "audio/mpeg",
+     "audio/mp4",
+     "audio/ogg",
+     "audio/wav",
+     "audio/webm"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.0023
+     },
+     "output": {
+      "price": 0.0023
+     }
+    },
+    "audio": {
+     "output": {
+      "price": 2.3
+     }
+    }
+   },
+   "api": {
+    "transcriptions": {
+     "base_url": "https://models.think.evroc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/protocols/openai-transcription"
+     }
+    }
+   }
+  },
+  "KBLab/kb-whisper-large": {
+   "id": "KBLab/kb-whisper-large",
+   "name": "KB Whisper",
+   "type": "transcription",
+   "family": "whisper",
+   "release_date": "2024-10-01",
+   "limit": {
+    "context": 448,
+    "output": 448
+   },
+   "capabilities": {
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    },
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Speech transcription model for accurate audio-to-text and captioning workflows",
+   "open_weights": true,
+   "last_updated": "2024-10-01",
+   "modalities": {
+    "input": [
+     "audio"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "audio": {
+     "input": {
+      "unit": "minute",
+      "price": 0.0023
+     }
+    }
+   },
+   "api": {
+    "transcriptions": {
+     "base_url": "https://models.think.evroc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/protocols/openai-transcription"
+     }
+    }
+   }
+  },
+  "evroc/roc": {
+   "id": "evroc/roc",
+   "name": "roc",
+   "type": "chat",
+   "release_date": "2026-06-06",
+   "limit": {
+    "context": 262144,
+    "output": 262144
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "budget": {}
+    },
+    "structured_output": true,
+    "temperature": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
+   "open_weights": false,
+   "knowledge": "2026-01",
+   "last_updated": "2026-06-06",
+   "modalities": {
+    "input": [
+     "text",
+     "image",
+     "video"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2.875
+     },
+     "output": {
+      "price": 11.516
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://models.think.evroc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "mistralai/Voxtral-Small-24B-2507": {
+   "id": "mistralai/Voxtral-Small-24B-2507",
+   "name": "Voxtral Small 24B",
+   "type": "transcription",
+   "family": "voxtral",
+   "release_date": "2025-03-01",
+   "limit": {
+    "context": 32000,
+    "output": 32000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    },
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Efficient Mistral model for fast chat, extraction, and production assistants",
+   "open_weights": true,
+   "last_updated": "2025-03-01",
+   "modalities": {
+    "input": [
+     "audio/wav",
+     "audio/mpeg",
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "audio": {
+     "input": {
+      "unit": "minute",
+      "price": 0.0023
+     }
+    }
+   },
+   "api": {
+    "transcriptions": {
+     "base_url": "https://models.think.evroc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/protocols/openai-transcription"
      }
     }
    }
@@ -137,57 +482,6 @@
       "tools": {
        "updates": false
       }
-     }
-    }
-   }
-  },
-  "mistralai/Voxtral-Small-24B-2507": {
-   "id": "mistralai/Voxtral-Small-24B-2507",
-   "name": "Voxtral Small 24B",
-   "type": "transcription",
-   "family": "voxtral",
-   "release_date": "2025-03-01",
-   "limit": {
-    "context": 32000,
-    "output": 32000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Efficient Mistral model for fast chat, extraction, and production assistants",
-   "open_weights": true,
-   "last_updated": "2025-03-01",
-   "modalities": {
-    "input": [
-     "audio/wav",
-     "audio/mpeg",
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "audio": {
-     "input": {
-      "unit": "minute",
-      "price": 0.0023
-     }
-    }
-   },
-   "api": {
-    "transcriptions": {
-     "base_url": "https://models.think.evroc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/protocols/openai-transcription"
      }
     }
    }
@@ -271,80 +565,16 @@
     }
    }
   },
-  "evroc/roc": {
-   "id": "evroc/roc",
-   "name": "roc",
+  "zai-org/GLM-5.2": {
+   "id": "zai-org/GLM-5.2",
+   "name": "GLM-5.2",
    "type": "chat",
-   "release_date": "2026-06-06",
+   "canonical_id": "zhipuai/glm-5.2",
+   "family": "glm",
+   "release_date": "2026-06-13",
    "limit": {
-    "context": 262144,
-    "output": 262144
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "budget": {}
-    },
-    "structured_output": true,
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
-   "open_weights": false,
-   "knowledge": "2026-01",
-   "last_updated": "2026-06-06",
-   "modalities": {
-    "input": [
-     "text",
-     "image",
-     "video"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2.875
-     },
-     "output": {
-      "price": 11.516
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://models.think.evroc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "Qwen/Qwen3.8-27B": {
-   "id": "Qwen/Qwen3.8-27B",
-   "name": "Qwen3.8-27B",
-   "type": "chat",
-   "canonical_id": "alibaba/qwen3.8-27b",
-   "family": "qwen",
-   "release_date": "2026-08-14",
-   "limit": {
-    "context": 262144,
-    "output": 262144
+    "context": 524288,
+    "output": 131072
    },
    "capabilities": {
     "tools": {
@@ -354,9 +584,8 @@
      "supported": true,
      "toggle": true,
      "effort": [
-      "low",
-      "medium",
-      "xhigh"
+      "high",
+      "max"
      ]
     },
     "structured_output": true,
@@ -366,24 +595,12 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Dense 27B vision-language model for coding, agent tasks, and image and video understanding",
+   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
    "open_weights": true,
-   "last_updated": "2026-08-14",
+   "last_updated": "2026-06-13",
    "modalities": {
     "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/x-matroska",
-     "video/quicktime",
-     "video/x-flv",
-     "video/x-ms-wmv"
+     "text"
     ],
     "output": [
      "text"
@@ -392,10 +609,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.87
+      "price": 1.4375
      },
      "output": {
-      "price": 3.5
+      "price": 5.75
      }
     }
    },
@@ -410,183 +627,6 @@
       "tools": {
        "updates": false
       }
-     }
-    }
-   }
-  },
-  "Qwen/Qwen3-Reranker-4B": {
-   "id": "Qwen/Qwen3-Reranker-4B",
-   "name": "Qwen3 Reranker 4B",
-   "type": "reranking",
-   "family": "qwen",
-   "release_date": "2025-07-30",
-   "limit": {
-    "context": 32000,
-    "output": 4096
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Reranking model for improving retrieval quality in search and recommendation systems",
-   "open_weights": true,
-   "last_updated": "2025-07-30",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.0575
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "rerank": {
-     "base_url": "https://models.think.evroc.com/v1",
-     "sdk": {}
-    }
-   }
-  },
-  "Qwen/Qwen3.6-35B-A3B": {
-   "id": "Qwen/Qwen3.6-35B-A3B",
-   "name": "Qwen3.6 35B-A3B",
-   "type": "chat",
-   "canonical_id": "alibaba/qwen3.6-35b-a3b",
-   "family": "qwen",
-   "release_date": "2026-04-17",
-   "limit": {
-    "context": 262144,
-    "output": 65536
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open multimodal Qwen MoE for local agents that need vision, audio, and code",
-   "open_weights": true,
-   "last_updated": "2026-04-17",
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/x-matroska",
-     "video/quicktime",
-     "video/x-flv",
-     "video/x-ms-wmv"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.345
-     },
-     "output": {
-      "price": 1.38
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://models.think.evroc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "Qwen/Qwen3-Embedding-8B": {
-   "id": "Qwen/Qwen3-Embedding-8B",
-   "name": "Qwen3 Embedding 8B",
-   "type": "embedding",
-   "canonical_id": "alibaba/qwen3-embedding-8b",
-   "family": "qwen",
-   "release_date": "2025-06-05",
-   "limit": {
-    "context": 40960,
-    "output": 4096
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Embedding model for semantic search, retrieval, clustering, and ranking pipelines",
-   "open_weights": true,
-   "last_updated": "2025-06-05",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "embedding"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.115
-     },
-     "output": {
-      "price": 0.115
-     }
-    }
-   },
-   "api": {
-    "embeddings": {
-     "base_url": "https://models.think.evroc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
      }
     }
    }
@@ -719,64 +759,15 @@
     }
    }
   },
-  "KBLab/kb-whisper-large": {
-   "id": "KBLab/kb-whisper-large",
-   "name": "KB Whisper",
-   "type": "transcription",
-   "family": "whisper",
-   "release_date": "2024-10-01",
-   "limit": {
-    "context": 448,
-    "output": 448
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Speech transcription model for accurate audio-to-text and captioning workflows",
-   "open_weights": true,
-   "last_updated": "2024-10-01",
-   "modalities": {
-    "input": [
-     "audio"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "audio": {
-     "input": {
-      "unit": "minute",
-      "price": 0.0023
-     }
-    }
-   },
-   "api": {
-    "transcriptions": {
-     "base_url": "https://models.think.evroc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/protocols/openai-transcription"
-     }
-    }
-   }
-  },
-  "openai/gpt-oss-120b": {
-   "id": "openai/gpt-oss-120b",
-   "name": "GPT OSS 120B",
+  "Qwen/Qwen3.6-35B-A3B": {
+   "id": "Qwen/Qwen3.6-35B-A3B",
+   "name": "Qwen3.6 35B-A3B",
    "type": "chat",
-   "canonical_id": "openai/gpt-oss-120b",
-   "family": "gpt-oss",
-   "release_date": "2025-08-05",
+   "canonical_id": "alibaba/qwen3.6-35b-a3b",
+   "family": "qwen",
+   "release_date": "2026-04-17",
    "limit": {
-    "context": 65536,
+    "context": 262144,
     "output": 65536
    },
    "capabilities": {
@@ -785,25 +776,33 @@
     },
     "reasoning": {
      "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
+     "toggle": true
     },
+    "structured_output": true,
     "temperature": true,
     "top_p": true,
     "top_k": true,
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Open-weight GPT model for self-hosted reasoning and instruction-following workloads",
+   "description": "Open multimodal Qwen MoE for local agents that need vision, audio, and code",
    "open_weights": true,
-   "knowledge": "2024-06",
-   "last_updated": "2025-08-05",
+   "last_updated": "2026-04-17",
    "modalities": {
     "input": [
-     "text"
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/x-matroska",
+     "video/quicktime",
+     "video/x-flv",
+     "video/x-ms-wmv"
     ],
     "output": [
      "text"
@@ -812,10 +811,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.23
+      "price": 0.345
      },
      "output": {
-      "price": 0.92
+      "price": 1.38
      }
     }
    },
@@ -834,41 +833,55 @@
     }
    }
   },
-  "openai/whisper-large-v3-turbo": {
-   "id": "openai/whisper-large-v3-turbo",
-   "name": "Whisper Large v3 Turbo",
-   "type": "transcription",
-   "canonical_id": "openai/whisper-large-v3-turbo",
-   "family": "whisper",
-   "release_date": "2024-10-01",
+  "Qwen/Qwen3.8-27B": {
+   "id": "Qwen/Qwen3.8-27B",
+   "name": "Qwen3.8-27B",
+   "type": "chat",
+   "canonical_id": "alibaba/qwen3.8-27b",
+   "family": "qwen",
+   "release_date": "2026-08-14",
    "limit": {
-    "context": 448,
-    "output": 448
+    "context": 262144,
+    "output": 262144
    },
    "capabilities": {
     "tools": {
-     "supported": false
+     "supported": true
     },
     "reasoning": {
-     "supported": false
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "medium",
+      "xhigh"
+     ]
     },
+    "structured_output": true,
     "temperature": true,
-    "top_p": false,
-    "top_k": false,
+    "top_p": true,
+    "top_k": true,
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Speech transcription model for accurate audio-to-text and captioning workflows",
+   "description": "Dense 27B vision-language model for coding, agent tasks, and image and video understanding",
    "open_weights": true,
-   "last_updated": "2024-10-01",
+   "last_updated": "2026-08-14",
    "modalities": {
     "input": [
-     "audio/flac",
-     "audio/mpeg",
-     "audio/mp4",
-     "audio/ogg",
-     "audio/wav",
-     "audio/webm"
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/x-matroska",
+     "video/quicktime",
+     "video/x-flv",
+     "video/x-ms-wmv"
     ],
     "output": [
      "text"
@@ -877,37 +890,37 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.0023
+      "price": 0.87
      },
      "output": {
-      "price": 0.0023
-     }
-    },
-    "audio": {
-     "output": {
-      "price": 2.3
+      "price": 3.5
      }
     }
    },
    "api": {
-    "transcriptions": {
+    "chat-completions": {
      "base_url": "https://models.think.evroc.com/v1",
      "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/protocols/openai-transcription"
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
      }
     }
    }
   },
-  "openai/whisper-large-v3": {
-   "id": "openai/whisper-large-v3",
-   "name": "Whisper 3 Large",
-   "type": "transcription",
-   "canonical_id": "openai/whisper-large-v3",
-   "family": "whisper",
-   "release_date": "2023-11-06",
+  "Qwen/Qwen3-Embedding-8B": {
+   "id": "Qwen/Qwen3-Embedding-8B",
+   "name": "Qwen3 Embedding 8B",
+   "type": "embedding",
+   "canonical_id": "alibaba/qwen3-embedding-8b",
+   "family": "qwen",
+   "release_date": "2025-06-05",
    "limit": {
-    "context": 448,
+    "context": 40960,
     "output": 4096
    },
    "capabilities": {
@@ -917,91 +930,30 @@
     "reasoning": {
      "supported": false
     },
-    "temperature": true,
+    "temperature": false,
     "top_p": false,
     "top_k": false,
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Open Whisper checkpoint for robust multilingual transcription and captioning",
-   "open_weights": true,
-   "last_updated": "2023-11-06",
-   "modalities": {
-    "input": [
-     "audio/flac",
-     "audio/mpeg",
-     "audio/mp4",
-     "audio/ogg",
-     "audio/wav",
-     "audio/webm"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.0023
-     },
-     "output": {
-      "price": 0.0023
-     }
-    },
-    "audio": {
-     "output": {
-      "price": 2.3
-     }
-    }
-   },
-   "api": {
-    "transcriptions": {
-     "base_url": "https://models.think.evroc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/protocols/openai-transcription"
-     }
-    }
-   }
-  },
-  "intfloat/multilingual-e5-large-instruct": {
-   "id": "intfloat/multilingual-e5-large-instruct",
-   "name": "E5 Multi-Lingual Large Embeddings 0.6B",
-   "type": "embedding",
-   "family": "text-embedding",
-   "release_date": "2024-06-01",
-   "limit": {
-    "context": 512,
-    "output": 512
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "system_updates": false,
-    "effort_updates": false
-   },
    "description": "Embedding model for semantic search, retrieval, clustering, and ranking pipelines",
    "open_weights": true,
-   "last_updated": "2024-06-01",
+   "last_updated": "2025-06-05",
    "modalities": {
     "input": [
      "text"
     ],
     "output": [
-     "text"
+     "embedding"
     ]
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.114
+      "price": 0.115
      },
      "output": {
-      "price": 0.114
+      "price": 0.115
      }
     }
    },
@@ -1012,6 +964,54 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
      }
+    }
+   }
+  },
+  "Qwen/Qwen3-Reranker-4B": {
+   "id": "Qwen/Qwen3-Reranker-4B",
+   "name": "Qwen3 Reranker 4B",
+   "type": "reranking",
+   "family": "qwen",
+   "release_date": "2025-07-30",
+   "limit": {
+    "context": 32000,
+    "output": 4096
+   },
+   "capabilities": {
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    },
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Reranking model for improving retrieval quality in search and recommendation systems",
+   "open_weights": true,
+   "last_updated": "2025-07-30",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.0575
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "api": {
+    "rerank": {
+     "base_url": "https://models.think.evroc.com/v1",
+     "sdk": {}
     }
    }
   }

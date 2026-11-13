@@ -6,16 +6,1018 @@
   "JIEKOU_API_KEY"
  ],
  "models": {
-  "o3-mini": {
-   "id": "o3-mini",
-   "name": "o3-mini",
+  "gemini-2.5-flash-lite": {
+   "id": "gemini-2.5-flash-lite",
+   "name": "gemini-2.5-flash-lite",
    "type": "chat",
-   "canonical_id": "openai/o3-mini",
+   "canonical_id": "google/gemini-2.5-flash-lite",
+   "family": "gemini-flash-lite",
+   "release_date": "2025-06-17",
+   "limit": {
+    "context": 1048576,
+    "output": 65535
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Lean Gemini 2.5 lane for cheap multimodal traffic and quick agents",
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2025-06-17",
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.095,
+      "cache": {
+       "read": 0.0095
+      }
+     },
+     "output": {
+      "price": 0.38
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.jiekou.ai/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "gpt-5-chat-latest": {
+   "id": "gpt-5-chat-latest",
+   "name": "gpt-5-chat-latest",
+   "type": "chat",
+   "canonical_id": "openai/gpt-5-chat-latest",
+   "family": "gpt",
+   "status": "deprecated",
+   "release_date": "2025-08-07",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    },
+    "structured_output": true,
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Chat-tuned GPT model for conversational assistance, writing, and tool workflows",
+   "open_weights": false,
+   "knowledge": "2024-09-30",
+   "last_updated": "2025-08-07",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.125
+     },
+     "output": {
+      "price": 9
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.jiekou.ai/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "claude-opus-4-6": {
+   "id": "claude-opus-4-6",
+   "name": "claude-opus-4-6",
+   "type": "chat",
+   "canonical_id": "anthropic/claude-opus-4-6",
+   "family": "claude-opus",
+   "release_date": "2026-02-05",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "explicit": {
+      "ttl": [
+       "5m",
+       "1h"
+      ]
+     }
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "max"
+     ],
+     "budget": {
+      "min": 1024
+     }
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "High-end Claude for difficult coding, planning, and slower expert reasoning",
+   "open_weights": false,
+   "knowledge": "2025-05-31",
+   "last_updated": "2026-03-13",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5,
+       "write": {
+        "5m": 6.25,
+        "1h": 10
+       }
+      }
+     },
+     "output": {
+      "price": 25
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.jiekou.ai/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "gemini-2.5-flash": {
+   "id": "gemini-2.5-flash",
+   "name": "gemini-2.5-flash",
+   "type": "chat",
+   "canonical_id": "google/gemini-2.5-flash",
+   "family": "gemini-flash",
+   "release_date": "2025-06-17",
+   "limit": {
+    "context": 1048576,
+    "output": 65535
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": {
+      "min_tokens": 1024
+     }
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Fast Gemini workhorse for multimodal apps where latency and price matter",
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2025-06-17",
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.285,
+      "cache": {
+       "read": 0.0285
+      }
+     },
+     "output": {
+      "price": 2.375
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.jiekou.ai/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "gemini-2.5-pro": {
+   "id": "gemini-2.5-pro",
+   "name": "gemini-2.5-pro",
+   "type": "chat",
+   "canonical_id": "google/gemini-2.5-pro",
+   "family": "gemini-pro",
+   "release_date": "2025-06-17",
+   "limit": {
+    "context": 1048576,
+    "output": 65535
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": {
+      "min_tokens": 4096
+     }
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Google's proven reasoning model for coding, math, and multimodal analysis",
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2025-06-17",
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.1875,
+      "cache": {
+       "read": 0.1187
+      }
+     },
+     "output": {
+      "price": 9.5
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.jiekou.ai/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "grok-4-0709": {
+   "id": "grok-4-0709",
+   "name": "grok-4-0709",
+   "type": "chat",
+   "family": "grok",
+   "release_date": "2026-01",
+   "limit": {
+    "context": 256000,
+    "output": 8192
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    },
+    "structured_output": true,
+    "temperature": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Grok model for agentic tool use, reasoning, coding, and live assistance",
+   "open_weights": false,
+   "last_updated": "2026-01",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2.85
+     },
+     "output": {
+      "price": 14.25
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.jiekou.ai/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "claude-opus-4-1-20250805": {
+   "id": "claude-opus-4-1-20250805",
+   "name": "claude-opus-4-1-20250805",
+   "type": "chat",
+   "canonical_id": "anthropic/claude-opus-4-1-20250805",
+   "family": "claude-opus",
+   "status": "deprecated",
+   "release_date": "2025-08-05",
+   "limit": {
+    "context": 200000,
+    "output": 32000
+   },
+   "capabilities": {
+    "cache": {
+     "explicit": {
+      "min_tokens": 1024
+     }
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "budget": {
+      "min": 1024
+     }
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Flagship Claude model for deep reasoning, coding, and long-horizon agents",
+   "open_weights": false,
+   "knowledge": "2025-03-31",
+   "last_updated": "2025-08-05",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 13.5
+     },
+     "output": {
+      "price": 67.5
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.jiekou.ai/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "gemini-2.5-flash-lite-preview-06-17": {
+   "id": "gemini-2.5-flash-lite-preview-06-17",
+   "name": "gemini-2.5-flash-lite-preview-06-17",
+   "type": "chat",
+   "canonical_id": "google/gemini-2.5-flash-lite-preview-06-17",
+   "family": "gemini-flash-lite",
+   "status": "deprecated",
+   "release_date": "2025-06-17",
+   "limit": {
+    "context": 1048576,
+    "output": 65535
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "First preview of Gemini 2.5 Flash-Lite, the low-cost, low-latency 2.5 model",
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2025-06-17",
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.09
+     },
+     "output": {
+      "price": 0.36
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.jiekou.ai/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "grok-4-fast-reasoning": {
+   "id": "grok-4-fast-reasoning",
+   "name": "grok-4-fast-reasoning",
+   "type": "chat",
+   "canonical_id": "xai/grok-4-fast-reasoning",
+   "family": "grok",
+   "status": "deprecated",
+   "release_date": "2025-12-18",
+   "limit": {
+    "context": 2000000,
+    "output": 2000000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Fast Grok model for responsive chat, reasoning, and tool-assisted work",
+   "open_weights": false,
+   "last_updated": "2025-12-18",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.18
+     },
+     "output": {
+      "price": 0.45
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.jiekou.ai/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "o4-mini": {
+   "id": "o4-mini",
+   "name": "o4-mini",
+   "type": "chat",
+   "canonical_id": "openai/o4-mini",
    "family": "o-mini",
-   "release_date": "2024-12-20",
+   "status": "deprecated",
+   "release_date": "2025-04-16",
    "limit": {
     "context": 200000,
     "output": 100000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    },
+    "structured_output": true,
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Fast o-series model for compact reasoning, coding, and tool use",
+   "open_weights": false,
+   "knowledge": "2024-05",
+   "last_updated": "2025-04-16",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.1
+     },
+     "output": {
+      "price": 4.4
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.jiekou.ai/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "grok-4-1-fast-reasoning": {
+   "id": "grok-4-1-fast-reasoning",
+   "name": "grok-4-1-fast-reasoning",
+   "type": "chat",
+   "canonical_id": "xai/grok-4.1-fast-reasoning",
+   "family": "grok",
+   "release_date": "2025-11-19",
+   "limit": {
+    "context": 2000000,
+    "output": 30000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "xAI's fast agentic tool-calling model with a 2M context window and built-in reasoning",
+   "open_weights": false,
+   "last_updated": "2025-11-19",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.19
+     },
+     "output": {
+      "price": 0.475
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.jiekou.ai/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "gemini-2.5-pro-preview-06-05": {
+   "id": "gemini-2.5-pro-preview-06-05",
+   "name": "gemini-2.5-pro-preview-06-05",
+   "type": "chat",
+   "canonical_id": "google/gemini-2.5-pro-preview",
+   "family": "gemini",
+   "release_date": "2025-06-05",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": {
+      "min_tokens": 4096
+     }
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Advanced Gemini model for complex reasoning, coding, and multimodal analysis",
+   "open_weights": false,
+   "knowledge": "2025-01-31",
+   "last_updated": "2025-06-05",
+   "modalities": {
+    "input": [
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "text",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.1875,
+      "cache": {
+       "read": 0.1187
+      }
+     },
+     "output": {
+      "price": 9.5
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.jiekou.ai/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "gpt-5.1-codex": {
+   "id": "gpt-5.1-codex",
+   "name": "gpt-5.1-codex",
+   "type": "chat",
+   "canonical_id": "openai/gpt-5.1-codex",
+   "family": "gpt-codex",
+   "release_date": "2025-11-13",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
    },
    "capabilities": {
     "cache": {
@@ -39,13 +1041,17 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Smaller o-series reasoner for economical coding, math, and planning tasks",
+   "description": "Codex GPT for repository edits, code review, and practical software agents",
    "open_weights": false,
-   "knowledge": "2024-05",
-   "last_updated": "2025-01-29",
+   "knowledge": "2024-09-30",
+   "last_updated": "2025-11-13",
    "modalities": {
     "input": [
-     "text"
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
     ],
     "output": [
      "text"
@@ -54,13 +1060,492 @@
    "cost": {
     "text": {
      "input": {
-      "price": 1.045,
+      "price": 1.1875,
       "cache": {
-       "read": 0.5225
+       "read": 0.1187
       }
      },
      "output": {
-      "price": 4.18
+      "price": 9.5
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.jiekou.ai/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "gpt-5.2-pro": {
+   "id": "gpt-5.2-pro",
+   "name": "gpt-5.2-pro",
+   "type": "chat",
+   "canonical_id": "openai/gpt-5.2-pro",
+   "family": "gpt-pro",
+   "release_date": "2025-12-11",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    },
+    "structured_output": true,
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Higher-accuracy GPT-5.2 variant for tougher reasoning and review workflows",
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2025-12-11",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 19.95
+     },
+     "output": {
+      "price": 159.6
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.jiekou.ai/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "claude-haiku-4-5-20251001": {
+   "id": "claude-haiku-4-5-20251001",
+   "name": "claude-haiku-4-5-20251001",
+   "type": "chat",
+   "canonical_id": "anthropic/claude-haiku-4-5-20251001",
+   "family": "claude-haiku",
+   "release_date": "2025-10-15",
+   "limit": {
+    "context": 200000,
+    "output": 64000
+   },
+   "capabilities": {
+    "cache": {
+     "explicit": {
+      "ttl": [
+       "5m",
+       "1h"
+      ],
+      "min_tokens": 2048
+     }
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "budget": {
+      "min": 1024
+     }
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Fast Claude model for responsive assistance, classification, and lightweight agents",
+   "open_weights": false,
+   "knowledge": "2025-02-28",
+   "last_updated": "2025-10-15",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1,
+      "cache": {
+       "read": 0.1,
+       "write": {
+        "5m": 1.25,
+        "1h": 2
+       }
+      }
+     },
+     "output": {
+      "price": 5
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.jiekou.ai/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "claude-opus-4-20250514": {
+   "id": "claude-opus-4-20250514",
+   "name": "claude-opus-4-20250514",
+   "type": "chat",
+   "canonical_id": "anthropic/claude-opus-4-20250514",
+   "family": "claude-opus",
+   "status": "deprecated",
+   "release_date": "2025-05-22",
+   "limit": {
+    "context": 200000,
+    "output": 32000
+   },
+   "capabilities": {
+    "cache": {
+     "explicit": {
+      "min_tokens": 1024
+     }
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "budget": {
+      "min": 1024
+     }
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Flagship Claude model for deep reasoning, coding, and long-horizon agents",
+   "open_weights": false,
+   "knowledge": "2025-03-31",
+   "last_updated": "2025-05-22",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 13.5
+     },
+     "output": {
+      "price": 67.5
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.jiekou.ai/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "gpt-5-mini": {
+   "id": "gpt-5-mini",
+   "name": "gpt-5-mini",
+   "type": "chat",
+   "canonical_id": "openai/gpt-5-mini",
+   "family": "gpt-mini",
+   "release_date": "2025-08-07",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    },
+    "structured_output": true,
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Small GPT-5 for responsive agents, coding help, and everyday automation",
+   "open_weights": false,
+   "knowledge": "2024-05-30",
+   "last_updated": "2025-08-07",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.2375,
+      "cache": {
+       "read": 0.0237
+      }
+     },
+     "output": {
+      "price": 1.9
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.jiekou.ai/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "claude-opus-4-5-20251101": {
+   "id": "claude-opus-4-5-20251101",
+   "name": "claude-opus-4-5-20251101",
+   "type": "chat",
+   "canonical_id": "anthropic/claude-opus-4-5-20251101",
+   "family": "claude-opus",
+   "release_date": "2025-11-24",
+   "limit": {
+    "context": 200000,
+    "output": 65536
+   },
+   "capabilities": {
+    "cache": {
+     "explicit": {
+      "ttl": [
+       "5m",
+       "1h"
+      ]
+     }
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ],
+     "budget": {
+      "min": 1024
+     }
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Flagship Claude model for deep reasoning, coding, and long-horizon agents",
+   "open_weights": false,
+   "knowledge": "2025-05",
+   "last_updated": "2025-11-24",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 4.75,
+      "cache": {
+       "read": 0.475,
+       "write": {
+        "5m": 5.9375,
+        "1h": 9.5
+       }
+      }
+     },
+     "output": {
+      "price": 23.75
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.jiekou.ai/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "gpt-5-nano": {
+   "id": "gpt-5-nano",
+   "name": "gpt-5-nano",
+   "type": "chat",
+   "canonical_id": "openai/gpt-5-nano",
+   "family": "gpt-nano",
+   "release_date": "2025-08-07",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    },
+    "structured_output": true,
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Tiny GPT-5 lane for routing, extraction, classification, and bulk jobs",
+   "open_weights": false,
+   "knowledge": "2024-05-30",
+   "last_updated": "2025-08-07",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.0475,
+      "cache": {
+       "read": 0.0047
+      }
+     },
+     "output": {
+      "price": 0.38
      }
     }
    },
@@ -156,24 +1641,34 @@
     }
    }
   },
-  "grok-4-fast-reasoning": {
-   "id": "grok-4-fast-reasoning",
-   "name": "grok-4-fast-reasoning",
+  "gemini-2.5-flash-preview-05-20": {
+   "id": "gemini-2.5-flash-preview-05-20",
+   "name": "gemini-2.5-flash-preview-05-20",
    "type": "chat",
-   "canonical_id": "xai/grok-4-fast-reasoning",
-   "family": "grok",
-   "status": "deprecated",
-   "release_date": "2025-12-18",
+   "canonical_id": "google/gemini-2.5-flash-preview-05-20",
+   "family": "gemini-flash",
+   "release_date": "2025-05-20",
    "limit": {
-    "context": 2000000,
-    "output": 2000000
+    "context": 1048576,
+    "output": 65536
    },
    "capabilities": {
+    "cache": {
+     "implicit": {
+      "min_tokens": 1024
+     }
+    },
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": true
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high"
+     ]
     },
     "structured_output": true,
     "temperature": true,
@@ -182,14 +1677,40 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Fast Grok model for responsive chat, reasoning, and tool-assisted work",
+   "description": "Preview snapshot of Gemini 2.5 Flash with controllable thinking budgets",
    "open_weights": false,
-   "last_updated": "2025-12-18",
+   "knowledge": "2025-01",
+   "last_updated": "2025-05-20",
    "modalities": {
     "input": [
      "text",
+     "image/png",
      "image/jpeg",
-     "image/png"
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp"
     ],
     "output": [
      "text"
@@ -198,10 +1719,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.18
+      "price": 0.1425,
+      "cache": {
+       "read": 0.0285
+      }
      },
      "output": {
-      "price": 0.45
+      "price": 3.325
      }
     }
    },
@@ -220,25 +1744,21 @@
     }
    }
   },
-  "claude-opus-4-6": {
-   "id": "claude-opus-4-6",
-   "name": "claude-opus-4-6",
+  "gpt-5.2-codex": {
+   "id": "gpt-5.2-codex",
+   "name": "gpt-5.2-codex",
    "type": "chat",
-   "canonical_id": "anthropic/claude-opus-4-6",
-   "family": "claude-opus",
-   "release_date": "2026-02-05",
+   "canonical_id": "openai/gpt-5.2-codex",
+   "family": "gpt-codex",
+   "release_date": "2025-12-11",
    "limit": {
-    "context": 1000000,
+    "context": 400000,
+    "input": 272000,
     "output": 128000
    },
    "capabilities": {
     "cache": {
-     "explicit": {
-      "ttl": [
-       "5m",
-       "1h"
-      ]
-     }
+     "implicit": true
     },
     "tools": {
      "supported": true
@@ -249,23 +1769,20 @@
       "low",
       "medium",
       "high",
-      "max"
-     ],
-     "budget": {
-      "min": 1024
-     }
+      "xhigh"
+     ]
     },
     "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "High-end Claude for difficult coding, planning, and slower expert reasoning",
+   "description": "Code-specialist GPT for repository edits, reviews, and long-running software agents",
    "open_weights": false,
-   "knowledge": "2025-05-31",
-   "last_updated": "2026-03-13",
+   "knowledge": "2025-08-31",
+   "last_updated": "2025-12-11",
    "modalities": {
     "input": [
      "text",
@@ -281,17 +1798,76 @@
    "cost": {
     "text": {
      "input": {
-      "price": 5,
+      "price": 1.75,
       "cache": {
-       "read": 0.5,
-       "write": {
-        "5m": 6.25,
-        "1h": 10
-       }
+       "read": 0.175
       }
      },
      "output": {
-      "price": 25
+      "price": 14
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.jiekou.ai/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "grok-4-1-fast-non-reasoning": {
+   "id": "grok-4-1-fast-non-reasoning",
+   "name": "grok-4-1-fast-non-reasoning",
+   "type": "chat",
+   "canonical_id": "xai/grok-4.1-fast",
+   "family": "grok",
+   "release_date": "2025-11-19",
+   "limit": {
+    "context": 2000000,
+    "output": 30000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "xAI's fast agentic tool-calling model with a 2M context window; non-reasoning variant for low-latency responses",
+   "open_weights": false,
+   "last_updated": "2025-11-19",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.19
+     },
+     "output": {
+      "price": 0.475
      }
     }
    },
@@ -422,681 +1998,6 @@
     }
    }
   },
-  "o4-mini": {
-   "id": "o4-mini",
-   "name": "o4-mini",
-   "type": "chat",
-   "canonical_id": "openai/o4-mini",
-   "family": "o-mini",
-   "status": "deprecated",
-   "release_date": "2025-04-16",
-   "limit": {
-    "context": 200000,
-    "output": 100000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Fast o-series model for compact reasoning, coding, and tool use",
-   "open_weights": false,
-   "knowledge": "2024-05",
-   "last_updated": "2025-04-16",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.1
-     },
-     "output": {
-      "price": 4.4
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.jiekou.ai/openai",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gpt-5-nano": {
-   "id": "gpt-5-nano",
-   "name": "gpt-5-nano",
-   "type": "chat",
-   "canonical_id": "openai/gpt-5-nano",
-   "family": "gpt-nano",
-   "release_date": "2025-08-07",
-   "limit": {
-    "context": 400000,
-    "input": 272000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Tiny GPT-5 lane for routing, extraction, classification, and bulk jobs",
-   "open_weights": false,
-   "knowledge": "2024-05-30",
-   "last_updated": "2025-08-07",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.0475,
-      "cache": {
-       "read": 0.0047
-      }
-     },
-     "output": {
-      "price": 0.38
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.jiekou.ai/openai",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gemini-2.5-flash": {
-   "id": "gemini-2.5-flash",
-   "name": "gemini-2.5-flash",
-   "type": "chat",
-   "canonical_id": "google/gemini-2.5-flash",
-   "family": "gemini-flash",
-   "release_date": "2025-06-17",
-   "limit": {
-    "context": 1048576,
-    "output": 65535
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": {
-      "min_tokens": 1024
-     }
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Fast Gemini workhorse for multimodal apps where latency and price matter",
-   "open_weights": false,
-   "knowledge": "2025-01",
-   "last_updated": "2025-06-17",
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "audio/wav",
-     "audio/mp3",
-     "audio/aiff",
-     "audio/aac",
-     "audio/ogg",
-     "audio/flac",
-     "audio/mpeg",
-     "audio/m4a",
-     "audio/l16",
-     "audio/opus",
-     "audio/alaw",
-     "audio/mulaw",
-     "audio/webm",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.285,
-      "cache": {
-       "read": 0.0285
-      }
-     },
-     "output": {
-      "price": 2.375
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.jiekou.ai/openai",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gemini-2.5-flash-preview-05-20": {
-   "id": "gemini-2.5-flash-preview-05-20",
-   "name": "gemini-2.5-flash-preview-05-20",
-   "type": "chat",
-   "canonical_id": "google/gemini-2.5-flash-preview-05-20",
-   "family": "gemini-flash",
-   "release_date": "2025-05-20",
-   "limit": {
-    "context": 1048576,
-    "output": 65536
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": {
-      "min_tokens": 1024
-     }
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Preview snapshot of Gemini 2.5 Flash with controllable thinking budgets",
-   "open_weights": false,
-   "knowledge": "2025-01",
-   "last_updated": "2025-05-20",
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "audio/wav",
-     "audio/mp3",
-     "audio/aiff",
-     "audio/aac",
-     "audio/ogg",
-     "audio/flac",
-     "audio/mpeg",
-     "audio/m4a",
-     "audio/l16",
-     "audio/opus",
-     "audio/alaw",
-     "audio/mulaw",
-     "audio/webm",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.1425,
-      "cache": {
-       "read": 0.0285
-      }
-     },
-     "output": {
-      "price": 3.325
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.jiekou.ai/openai",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gpt-5.2-pro": {
-   "id": "gpt-5.2-pro",
-   "name": "gpt-5.2-pro",
-   "type": "chat",
-   "canonical_id": "openai/gpt-5.2-pro",
-   "family": "gpt-pro",
-   "release_date": "2025-12-11",
-   "limit": {
-    "context": 400000,
-    "input": 272000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "medium",
-      "high",
-      "xhigh"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Higher-accuracy GPT-5.2 variant for tougher reasoning and review workflows",
-   "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2025-12-11",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 19.95
-     },
-     "output": {
-      "price": 159.6
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.jiekou.ai/openai",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "claude-sonnet-4-20250514": {
-   "id": "claude-sonnet-4-20250514",
-   "name": "claude-sonnet-4-20250514",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-sonnet-4-20250514",
-   "family": "claude-sonnet",
-   "status": "deprecated",
-   "release_date": "2025-05-22",
-   "limit": {
-    "context": 200000,
-    "output": 64000
-   },
-   "capabilities": {
-    "cache": {
-     "explicit": {
-      "min_tokens": 1024
-     }
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "budget": {
-      "min": 1024
-     }
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Balanced Claude model for coding, analysis, agent workflows, and cost control",
-   "open_weights": false,
-   "knowledge": "2025-03-31",
-   "last_updated": "2025-05-22",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2.7
-     },
-     "output": {
-      "price": 13.5
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.jiekou.ai/openai",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gemini-2.5-pro": {
-   "id": "gemini-2.5-pro",
-   "name": "gemini-2.5-pro",
-   "type": "chat",
-   "canonical_id": "google/gemini-2.5-pro",
-   "family": "gemini-pro",
-   "release_date": "2025-06-17",
-   "limit": {
-    "context": 1048576,
-    "output": 65535
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": {
-      "min_tokens": 4096
-     }
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Google's proven reasoning model for coding, math, and multimodal analysis",
-   "open_weights": false,
-   "knowledge": "2025-01",
-   "last_updated": "2025-06-17",
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "audio/wav",
-     "audio/mp3",
-     "audio/aiff",
-     "audio/aac",
-     "audio/ogg",
-     "audio/flac",
-     "audio/mpeg",
-     "audio/m4a",
-     "audio/l16",
-     "audio/opus",
-     "audio/alaw",
-     "audio/mulaw",
-     "audio/webm",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.1875,
-      "cache": {
-       "read": 0.1187
-      }
-     },
-     "output": {
-      "price": 9.5
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.jiekou.ai/openai",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gpt-5-chat-latest": {
-   "id": "gpt-5-chat-latest",
-   "name": "gpt-5-chat-latest",
-   "type": "chat",
-   "canonical_id": "openai/gpt-5-chat-latest",
-   "family": "gpt",
-   "status": "deprecated",
-   "release_date": "2025-08-07",
-   "limit": {
-    "context": 400000,
-    "input": 272000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Chat-tuned GPT model for conversational assistance, writing, and tool workflows",
-   "open_weights": false,
-   "knowledge": "2024-09-30",
-   "last_updated": "2025-08-07",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.125
-     },
-     "output": {
-      "price": 9
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.jiekou.ai/openai",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
   "grok-4-fast-non-reasoning": {
    "id": "grok-4-fast-non-reasoning",
    "name": "grok-4-fast-non-reasoning",
@@ -1143,169 +2044,6 @@
      },
      "output": {
       "price": 0.45
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.jiekou.ai/openai",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gemini-3-flash-preview": {
-   "id": "gemini-3-flash-preview",
-   "name": "gemini-3-flash-preview",
-   "type": "chat",
-   "canonical_id": "google/gemini-3-flash-preview",
-   "family": "gemini-flash",
-   "release_date": "2025-12-17",
-   "limit": {
-    "context": 1048576,
-    "output": 65536
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "New Gemini flash lane bringing frontier-style multimodal reasoning to cheaper runs",
-   "open_weights": false,
-   "knowledge": "2025-01",
-   "last_updated": "2025-12-17",
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp",
-     "audio/wav",
-     "audio/mp3",
-     "audio/aiff",
-     "audio/aac",
-     "audio/ogg",
-     "audio/flac",
-     "audio/mpeg",
-     "audio/m4a",
-     "audio/l16",
-     "audio/opus",
-     "audio/alaw",
-     "audio/mulaw",
-     "audio/webm"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.475,
-      "cache": {
-       "read": 0.0475
-      }
-     },
-     "output": {
-      "price": 2.85
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.jiekou.ai/openai",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "grok-4-1-fast-reasoning": {
-   "id": "grok-4-1-fast-reasoning",
-   "name": "grok-4-1-fast-reasoning",
-   "type": "chat",
-   "canonical_id": "xai/grok-4.1-fast-reasoning",
-   "family": "grok",
-   "release_date": "2025-11-19",
-   "limit": {
-    "context": 2000000,
-    "output": 30000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "xAI's fast agentic tool-calling model with a 2M context window and built-in reasoning",
-   "open_weights": false,
-   "last_updated": "2025-11-19",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.19
-     },
-     "output": {
-      "price": 0.475
      }
     }
    },
@@ -1422,17 +2160,17 @@
     }
    }
   },
-  "claude-opus-4-20250514": {
-   "id": "claude-opus-4-20250514",
-   "name": "claude-opus-4-20250514",
+  "claude-sonnet-4-20250514": {
+   "id": "claude-sonnet-4-20250514",
+   "name": "claude-sonnet-4-20250514",
    "type": "chat",
-   "canonical_id": "anthropic/claude-opus-4-20250514",
-   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-sonnet-4-20250514",
+   "family": "claude-sonnet",
    "status": "deprecated",
    "release_date": "2025-05-22",
    "limit": {
     "context": 200000,
-    "output": 32000
+    "output": 64000
    },
    "capabilities": {
     "cache": {
@@ -1456,7 +2194,7 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Flagship Claude model for deep reasoning, coding, and long-horizon agents",
+   "description": "Balanced Claude model for coding, analysis, agent workflows, and cost control",
    "open_weights": false,
    "knowledge": "2025-03-31",
    "last_updated": "2025-05-22",
@@ -1475,443 +2213,10 @@
    "cost": {
     "text": {
      "input": {
+      "price": 2.7
+     },
+     "output": {
       "price": 13.5
-     },
-     "output": {
-      "price": 67.5
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.jiekou.ai/openai",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "grok-code-fast-1": {
-   "id": "grok-code-fast-1",
-   "name": "grok-code-fast-1",
-   "type": "chat",
-   "canonical_id": "xai/grok-code-fast-1",
-   "family": "grok",
-   "release_date": "2025-09-02",
-   "limit": {
-    "context": 256000,
-    "output": 10000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Fast Grok model for responsive chat, reasoning, and tool-assisted work",
-   "open_weights": false,
-   "last_updated": "2025-09-02",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.19,
-      "cache": {
-       "read": 0.019
-      }
-     },
-     "output": {
-      "price": 1.425
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.jiekou.ai/openai",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "claude-haiku-4-5-20251001": {
-   "id": "claude-haiku-4-5-20251001",
-   "name": "claude-haiku-4-5-20251001",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-haiku-4-5-20251001",
-   "family": "claude-haiku",
-   "release_date": "2025-10-15",
-   "limit": {
-    "context": 200000,
-    "output": 64000
-   },
-   "capabilities": {
-    "cache": {
-     "explicit": {
-      "ttl": [
-       "5m",
-       "1h"
-      ],
-      "min_tokens": 2048
-     }
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "budget": {
-      "min": 1024
-     }
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Fast Claude model for responsive assistance, classification, and lightweight agents",
-   "open_weights": false,
-   "knowledge": "2025-02-28",
-   "last_updated": "2025-10-15",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1,
-      "cache": {
-       "read": 0.1,
-       "write": {
-        "5m": 1.25,
-        "1h": 2
-       }
-      }
-     },
-     "output": {
-      "price": 5
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.jiekou.ai/openai",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "grok-4-0709": {
-   "id": "grok-4-0709",
-   "name": "grok-4-0709",
-   "type": "chat",
-   "family": "grok",
-   "release_date": "2026-01",
-   "limit": {
-    "context": 256000,
-    "output": 8192
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "structured_output": true,
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Grok model for agentic tool use, reasoning, coding, and live assistance",
-   "open_weights": false,
-   "last_updated": "2026-01",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2.85
-     },
-     "output": {
-      "price": 14.25
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.jiekou.ai/openai",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "grok-4-1-fast-non-reasoning": {
-   "id": "grok-4-1-fast-non-reasoning",
-   "name": "grok-4-1-fast-non-reasoning",
-   "type": "chat",
-   "canonical_id": "xai/grok-4.1-fast",
-   "family": "grok",
-   "release_date": "2025-11-19",
-   "limit": {
-    "context": 2000000,
-    "output": 30000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "xAI's fast agentic tool-calling model with a 2M context window; non-reasoning variant for low-latency responses",
-   "open_weights": false,
-   "last_updated": "2025-11-19",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.19
-     },
-     "output": {
-      "price": 0.475
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.jiekou.ai/openai",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gpt-5.2-codex": {
-   "id": "gpt-5.2-codex",
-   "name": "gpt-5.2-codex",
-   "type": "chat",
-   "canonical_id": "openai/gpt-5.2-codex",
-   "family": "gpt-codex",
-   "release_date": "2025-12-11",
-   "limit": {
-    "context": 400000,
-    "input": 272000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Code-specialist GPT for repository edits, reviews, and long-running software agents",
-   "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2025-12-11",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.75,
-      "cache": {
-       "read": 0.175
-      }
-     },
-     "output": {
-      "price": 14
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.jiekou.ai/openai",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gpt-5.1": {
-   "id": "gpt-5.1",
-   "name": "gpt-5.1",
-   "type": "chat",
-   "canonical_id": "openai/gpt-5.1",
-   "family": "gpt",
-   "release_date": "2025-11-13",
-   "limit": {
-    "context": 400000,
-    "input": 272000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Sharper GPT-5 generation for coding, product work, and tool-assisted tasks",
-   "open_weights": false,
-   "knowledge": "2024-09-30",
-   "last_updated": "2025-11-13",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.1875,
-      "cache": {
-       "read": 0.1187
-      }
-     },
-     "output": {
-      "price": 9.5
      }
     }
    },
@@ -2008,11 +2313,11 @@
     }
    }
   },
-  "gpt-5.1-codex": {
-   "id": "gpt-5.1-codex",
-   "name": "gpt-5.1-codex",
+  "gpt-5.1-codex-max": {
+   "id": "gpt-5.1-codex-max",
+   "name": "gpt-5.1-codex-max",
    "type": "chat",
-   "canonical_id": "openai/gpt-5.1-codex",
+   "canonical_id": "openai/gpt-5.1-codex-max",
    "family": "gpt-codex",
    "release_date": "2025-11-13",
    "limit": {
@@ -2032,7 +2337,8 @@
      "effort": [
       "low",
       "medium",
-      "high"
+      "high",
+      "xhigh"
      ]
     },
     "structured_output": true,
@@ -2042,7 +2348,7 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Codex GPT for repository edits, code review, and practical software agents",
+   "description": "Coding-optimized GPT model for repository edits, reviews, and agentic software work",
    "open_weights": false,
    "knowledge": "2024-09-30",
    "last_updated": "2025-11-13",
@@ -2068,95 +2374,6 @@
      },
      "output": {
       "price": 9.5
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.jiekou.ai/openai",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "claude-opus-4-5-20251101": {
-   "id": "claude-opus-4-5-20251101",
-   "name": "claude-opus-4-5-20251101",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-opus-4-5-20251101",
-   "family": "claude-opus",
-   "release_date": "2025-11-24",
-   "limit": {
-    "context": 200000,
-    "output": 65536
-   },
-   "capabilities": {
-    "cache": {
-     "explicit": {
-      "ttl": [
-       "5m",
-       "1h"
-      ]
-     }
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ],
-     "budget": {
-      "min": 1024
-     }
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Flagship Claude model for deep reasoning, coding, and long-horizon agents",
-   "open_weights": false,
-   "knowledge": "2025-05",
-   "last_updated": "2025-11-24",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 4.75,
-      "cache": {
-       "read": 0.475,
-       "write": {
-        "5m": 5.9375,
-        "1h": 9.5
-       }
-      }
-     },
-     "output": {
-      "price": 23.75
      }
     }
    },
@@ -2255,17 +2472,16 @@
     }
    }
   },
-  "gemini-2.5-flash-lite-preview-06-17": {
-   "id": "gemini-2.5-flash-lite-preview-06-17",
-   "name": "gemini-2.5-flash-lite-preview-06-17",
+  "grok-code-fast-1": {
+   "id": "grok-code-fast-1",
+   "name": "grok-code-fast-1",
    "type": "chat",
-   "canonical_id": "google/gemini-2.5-flash-lite-preview-06-17",
-   "family": "gemini-flash-lite",
-   "status": "deprecated",
-   "release_date": "2025-06-17",
+   "canonical_id": "xai/grok-code-fast-1",
+   "family": "grok",
+   "release_date": "2025-09-02",
    "limit": {
-    "context": 1048576,
-    "output": 65535
+    "context": 256000,
+    "output": 10000
    },
    "capabilities": {
     "cache": {
@@ -2275,13 +2491,7 @@
      "supported": true
     },
     "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high"
-     ]
+     "supported": true
     },
     "structured_output": true,
     "temperature": true,
@@ -2290,40 +2500,12 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "First preview of Gemini 2.5 Flash-Lite, the low-cost, low-latency 2.5 model",
+   "description": "Fast Grok model for responsive chat, reasoning, and tool-assisted work",
    "open_weights": false,
-   "knowledge": "2025-01",
-   "last_updated": "2025-06-17",
+   "last_updated": "2025-09-02",
    "modalities": {
     "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "audio/wav",
-     "audio/mp3",
-     "audio/aiff",
-     "audio/aac",
-     "audio/ogg",
-     "audio/flac",
-     "audio/mpeg",
-     "audio/m4a",
-     "audio/l16",
-     "audio/opus",
-     "audio/alaw",
-     "audio/mulaw",
-     "audio/webm",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp"
+     "text"
     ],
     "output": [
      "text"
@@ -2332,10 +2514,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.09
+      "price": 0.19,
+      "cache": {
+       "read": 0.019
+      }
      },
      "output": {
-      "price": 0.36
+      "price": 1.425
      }
     }
    },
@@ -2354,25 +2539,29 @@
     }
    }
   },
-  "gpt-5-pro": {
-   "id": "gpt-5-pro",
-   "name": "gpt-5-pro",
+  "o3-mini": {
+   "id": "o3-mini",
+   "name": "o3-mini",
    "type": "chat",
-   "canonical_id": "openai/gpt-5-pro",
-   "family": "gpt-pro",
-   "release_date": "2025-10-06",
+   "canonical_id": "openai/o3-mini",
+   "family": "o-mini",
+   "release_date": "2024-12-20",
    "limit": {
-    "context": 400000,
-    "input": 272000,
-    "output": 272000
+    "context": 200000,
+    "output": 100000
    },
    "capabilities": {
+    "cache": {
+     "implicit": true
+    },
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": true,
      "effort": [
+      "low",
+      "medium",
       "high"
      ]
     },
@@ -2383,17 +2572,13 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Higher-accuracy GPT-5 tier for tough analysis, coding reviews, and planning",
+   "description": "Smaller o-series reasoner for economical coding, math, and planning tasks",
    "open_weights": false,
-   "knowledge": "2024-09-30",
-   "last_updated": "2025-10-06",
+   "knowledge": "2024-05",
+   "last_updated": "2025-01-29",
    "modalities": {
     "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
+     "text"
     ],
     "output": [
      "text"
@@ -2402,10 +2587,113 @@
    "cost": {
     "text": {
      "input": {
-      "price": 14.25
+      "price": 1.045,
+      "cache": {
+       "read": 0.5225
+      }
      },
      "output": {
-      "price": 114
+      "price": 4.18
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.jiekou.ai/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "gemini-3-flash-preview": {
+   "id": "gemini-3-flash-preview",
+   "name": "gemini-3-flash-preview",
+   "type": "chat",
+   "canonical_id": "google/gemini-3-flash-preview",
+   "family": "gemini-flash",
+   "release_date": "2025-12-17",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "New Gemini flash lane bringing frontier-style multimodal reasoning to cheaper runs",
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2025-12-17",
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.475,
+      "cache": {
+       "read": 0.0475
+      }
+     },
+     "output": {
+      "price": 2.85
      }
     }
    },
@@ -2601,170 +2889,17 @@
     }
    }
   },
-  "claude-opus-4-1-20250805": {
-   "id": "claude-opus-4-1-20250805",
-   "name": "claude-opus-4-1-20250805",
+  "gpt-5.1": {
+   "id": "gpt-5.1",
+   "name": "gpt-5.1",
    "type": "chat",
-   "canonical_id": "anthropic/claude-opus-4-1-20250805",
-   "family": "claude-opus",
-   "status": "deprecated",
-   "release_date": "2025-08-05",
-   "limit": {
-    "context": 200000,
-    "output": 32000
-   },
-   "capabilities": {
-    "cache": {
-     "explicit": {
-      "min_tokens": 1024
-     }
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "budget": {
-      "min": 1024
-     }
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Flagship Claude model for deep reasoning, coding, and long-horizon agents",
-   "open_weights": false,
-   "knowledge": "2025-03-31",
-   "last_updated": "2025-08-05",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 13.5
-     },
-     "output": {
-      "price": 67.5
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.jiekou.ai/openai",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gpt-5-mini": {
-   "id": "gpt-5-mini",
-   "name": "gpt-5-mini",
-   "type": "chat",
-   "canonical_id": "openai/gpt-5-mini",
-   "family": "gpt-mini",
-   "release_date": "2025-08-07",
+   "canonical_id": "openai/gpt-5.1",
+   "family": "gpt",
+   "release_date": "2025-11-13",
    "limit": {
     "context": 400000,
     "input": 272000,
     "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Small GPT-5 for responsive agents, coding help, and everyday automation",
-   "open_weights": false,
-   "knowledge": "2024-05-30",
-   "last_updated": "2025-08-07",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.2375,
-      "cache": {
-       "read": 0.0237
-      }
-     },
-     "output": {
-      "price": 1.9
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.jiekou.ai/openai",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gemini-2.5-flash-lite": {
-   "id": "gemini-2.5-flash-lite",
-   "name": "gemini-2.5-flash-lite",
-   "type": "chat",
-   "canonical_id": "google/gemini-2.5-flash-lite",
-   "family": "gemini-flash-lite",
-   "release_date": "2025-06-17",
-   "limit": {
-    "context": 1048576,
-    "output": 65535
    },
    "capabilities": {
     "cache": {
@@ -2785,113 +2920,11 @@
     "structured_output": true,
     "temperature": true,
     "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Lean Gemini 2.5 lane for cheap multimodal traffic and quick agents",
-   "open_weights": false,
-   "knowledge": "2025-01",
-   "last_updated": "2025-06-17",
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "audio/wav",
-     "audio/mp3",
-     "audio/aiff",
-     "audio/aac",
-     "audio/ogg",
-     "audio/flac",
-     "audio/mpeg",
-     "audio/m4a",
-     "audio/l16",
-     "audio/opus",
-     "audio/alaw",
-     "audio/mulaw",
-     "audio/webm",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.095,
-      "cache": {
-       "read": 0.0095
-      }
-     },
-     "output": {
-      "price": 0.38
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.jiekou.ai/openai",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gpt-5.1-codex-max": {
-   "id": "gpt-5.1-codex-max",
-   "name": "gpt-5.1-codex-max",
-   "type": "chat",
-   "canonical_id": "openai/gpt-5.1-codex-max",
-   "family": "gpt-codex",
-   "release_date": "2025-11-13",
-   "limit": {
-    "context": 400000,
-    "input": 272000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
     "top_k": false,
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Coding-optimized GPT model for repository edits, reviews, and agentic software work",
+   "description": "Sharper GPT-5 generation for coding, product work, and tool-assisted tasks",
    "open_weights": false,
    "knowledge": "2024-09-30",
    "last_updated": "2025-11-13",
@@ -2935,76 +2968,46 @@
     }
    }
   },
-  "gemini-2.5-pro-preview-06-05": {
-   "id": "gemini-2.5-pro-preview-06-05",
-   "name": "gemini-2.5-pro-preview-06-05",
+  "gpt-5-pro": {
+   "id": "gpt-5-pro",
+   "name": "gpt-5-pro",
    "type": "chat",
-   "canonical_id": "google/gemini-2.5-pro-preview",
-   "family": "gemini",
-   "release_date": "2025-06-05",
+   "canonical_id": "openai/gpt-5-pro",
+   "family": "gpt-pro",
+   "release_date": "2025-10-06",
    "limit": {
-    "context": 1048576,
-    "output": 65536
+    "context": 400000,
+    "input": 272000,
+    "output": 272000
    },
    "capabilities": {
-    "cache": {
-     "implicit": {
-      "min_tokens": 4096
-     }
-    },
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": true,
      "effort": [
-      "none",
-      "low",
-      "medium",
       "high"
      ]
     },
     "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Advanced Gemini model for complex reasoning, coding, and multimodal analysis",
+   "description": "Higher-accuracy GPT-5 tier for tough analysis, coding reviews, and planning",
    "open_weights": false,
-   "knowledge": "2025-01-31",
-   "last_updated": "2025-06-05",
+   "knowledge": "2024-09-30",
+   "last_updated": "2025-10-06",
    "modalities": {
     "input": [
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif",
      "text",
-     "audio/wav",
-     "audio/mp3",
-     "audio/aiff",
-     "audio/aac",
-     "audio/ogg",
-     "audio/flac",
-     "audio/mpeg",
-     "audio/m4a",
-     "audio/l16",
-     "audio/opus",
-     "audio/alaw",
-     "audio/mulaw",
-     "audio/webm",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp"
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
     ],
     "output": [
      "text"
@@ -3013,13 +3016,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 1.1875,
-      "cache": {
-       "read": 0.1187
-      }
+      "price": 14.25
      },
      "output": {
-      "price": 9.5
+      "price": 114
      }
     }
    },
@@ -3038,23 +3038,23 @@
     }
    }
   },
-  "zai-org/glm-4.5v": {
-   "id": "zai-org/glm-4.5v",
-   "name": "GLM 4.5V",
+  "qwen/qwen3-next-80b-a3b-instruct": {
+   "id": "qwen/qwen3-next-80b-a3b-instruct",
+   "name": "Qwen3 Next 80B A3B Instruct",
    "type": "chat",
-   "canonical_id": "zhipuai/glm-4.5v",
-   "family": "glm",
-   "release_date": "2025-08-11",
+   "canonical_id": "alibaba/qwen3-next-80b-a3b-instruct",
+   "family": "qwen",
+   "release_date": "2025-09",
    "limit": {
     "context": 65536,
-    "output": 16384
+    "output": 65536
    },
    "capabilities": {
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": true
+     "supported": false
     },
     "structured_output": true,
     "temperature": true,
@@ -3063,18 +3063,13 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "GLM vision model for visual reasoning, documents, and multimodal agents",
+   "description": "Qwen instruction model for multilingual chat, reasoning, and tool use",
    "open_weights": true,
    "knowledge": "2025-04",
-   "last_updated": "2025-08-11",
+   "last_updated": "2025-09",
    "modalities": {
     "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "video/mp4",
-     "video/x-matroska",
-     "video/quicktime"
+     "text"
     ],
     "output": [
      "text"
@@ -3083,10 +3078,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.6
+      "price": 0.15
      },
      "output": {
-      "price": 1.8
+      "price": 1.5
      }
     }
    },
@@ -3105,83 +3100,15 @@
     }
    }
   },
-  "zai-org/glm-4.7-flash": {
-   "id": "zai-org/glm-4.7-flash",
-   "name": "GLM-4.7-Flash",
+  "qwen/qwen3-235b-a22b-thinking-2507": {
+   "id": "qwen/qwen3-235b-a22b-thinking-2507",
+   "name": "Qwen3 235B A22b Thinking 2507",
    "type": "chat",
-   "canonical_id": "zhipuai/glm-4.7-flash",
-   "family": "glm-flash",
-   "release_date": "2026-01-19",
+   "canonical_id": "alibaba/qwen3-235b-a22b-thinking-2507",
+   "family": "qwen",
+   "release_date": "2025-07-25",
    "limit": {
-    "context": 200000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Budget GLM lane for fast coding help, routing, and everyday automation",
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2026-01-19",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.07,
-      "cache": {
-       "read": 0.01
-      }
-     },
-     "output": {
-      "price": 0.4
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.jiekou.ai/openai",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "zai-org/glm-4.7": {
-   "id": "zai-org/glm-4.7",
-   "name": "GLM-4.7",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-4.7",
-   "family": "glm",
-   "release_date": "2025-12-22",
-   "limit": {
-    "context": 204800,
+    "context": 131072,
     "output": 131072
    },
    "capabilities": {
@@ -3198,10 +3125,9 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Mature GLM model for dependable coding, reasoning, and structured agent tasks",
+   "description": "Updated large open Qwen3 MoE thinking model for reasoning, math, coding, and tool use",
    "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-12-22",
+   "last_updated": "2025-07-25",
    "modalities": {
     "input": [
      "text"
@@ -3213,10 +3139,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.6
+      "price": 0.3
      },
      "output": {
-      "price": 2.2
+      "price": 3
      }
     }
    },
@@ -3235,24 +3161,23 @@
     }
    }
   },
-  "zai-org/glm-4.5": {
-   "id": "zai-org/glm-4.5",
-   "name": "GLM-4.5",
+  "qwen/qwen3-coder-next": {
+   "id": "qwen/qwen3-coder-next",
+   "name": "qwen/qwen3-coder-next",
    "type": "chat",
-   "canonical_id": "zhipuai/glm-4.5",
-   "family": "glm",
-   "release_date": "2025-07-28",
+   "canonical_id": "alibaba/qwen3-coder-next",
+   "family": "qwen",
+   "release_date": "2026-02-03",
    "limit": {
-    "context": 131072,
-    "output": 98304
+    "context": 262144,
+    "output": 65536
    },
    "capabilities": {
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": true,
-     "toggle": true
+     "supported": false
     },
     "structured_output": true,
     "temperature": true,
@@ -3261,10 +3186,10 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Hybrid-reasoning GLM release that made the 4.5 line broadly useful",
+   "description": "Open-weight Qwen coding model for agents, repository edits, and multi-turn tool use",
    "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-07-28",
+   "knowledge": "2025-09",
+   "last_updated": "2026-02-03",
    "modalities": {
     "input": [
      "text"
@@ -3276,10 +3201,365 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.6
+      "price": 0.2
      },
      "output": {
-      "price": 2.2
+      "price": 1.5
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.jiekou.ai/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "qwen/qwen3-coder-480b-a35b-instruct": {
+   "id": "qwen/qwen3-coder-480b-a35b-instruct",
+   "name": "Qwen3 Coder 480B A35B Instruct",
+   "type": "chat",
+   "canonical_id": "alibaba/qwen3-coder-480b-a35b-instruct",
+   "family": "qwen",
+   "release_date": "2025-07-22",
+   "limit": {
+    "context": 262144,
+    "output": 65536
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Open Qwen coding heavyweight for repository reasoning and agentic engineering",
+   "open_weights": true,
+   "knowledge": "2025-04",
+   "last_updated": "2025-07-22",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.38
+     },
+     "output": {
+      "price": 1.55
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.jiekou.ai/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "qwen/qwen3-235b-a22b-fp8": {
+   "id": "qwen/qwen3-235b-a22b-fp8",
+   "name": "Qwen3 235B A22B",
+   "type": "chat",
+   "canonical_id": "alibaba/qwen3-235b-a22b",
+   "family": "qwen",
+   "release_date": "2025-04-28",
+   "limit": {
+    "context": 40960,
+    "output": 20000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": true
+    },
+    "structured_output": false,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Large open Qwen MoE for multilingual reasoning, coding, and tool use",
+   "open_weights": true,
+   "knowledge": "2025-04",
+   "last_updated": "2025-04-28",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.2
+     },
+     "output": {
+      "price": 0.8
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.jiekou.ai/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     }
+    }
+   }
+  },
+  "qwen/qwen3-235b-a22b-instruct-2507": {
+   "id": "qwen/qwen3-235b-a22b-instruct-2507",
+   "name": "Qwen3 235B A22B Instruct 2507",
+   "type": "chat",
+   "canonical_id": "alibaba/qwen3-235b-a22b-instruct-2507",
+   "family": "qwen",
+   "release_date": "2025-07-21",
+   "limit": {
+    "context": 131072,
+    "output": 16384
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Updated large open Qwen3 MoE instruct model for multilingual chat, coding, and tool use",
+   "open_weights": true,
+   "last_updated": "2025-07-21",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.15
+     },
+     "output": {
+      "price": 0.8
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.jiekou.ai/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "qwen/qwen3-32b-fp8": {
+   "id": "qwen/qwen3-32b-fp8",
+   "name": "Qwen3 32B",
+   "type": "chat",
+   "canonical_id": "alibaba/qwen3-32b",
+   "family": "qwen",
+   "release_date": "2025-04-28",
+   "limit": {
+    "context": 40960,
+    "output": 20000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": true
+    },
+    "structured_output": false,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Dense open Qwen model for self-hosted chat, reasoning, and coding",
+   "open_weights": true,
+   "knowledge": "2025-04",
+   "last_updated": "2025-04-28",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1
+     },
+     "output": {
+      "price": 0.45
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.jiekou.ai/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     }
+    }
+   }
+  },
+  "qwen/qwen3-30b-a3b-fp8": {
+   "id": "qwen/qwen3-30b-a3b-fp8",
+   "name": "Qwen3 30B A3B",
+   "type": "chat",
+   "canonical_id": "alibaba/qwen3-30b-a3b",
+   "family": "qwen",
+   "release_date": "2025-04-28",
+   "limit": {
+    "context": 40960,
+    "output": 20000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": true
+    },
+    "structured_output": false,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Sparse MoE Qwen model with 3B active parameters for efficient chat and reasoning",
+   "open_weights": true,
+   "last_updated": "2025-04-28",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.09
+     },
+     "output": {
+      "price": 0.45
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.jiekou.ai/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     }
+    }
+   }
+  },
+  "qwen/qwen3-next-80b-a3b-thinking": {
+   "id": "qwen/qwen3-next-80b-a3b-thinking",
+   "name": "Qwen3 Next 80B A3B Thinking",
+   "type": "chat",
+   "canonical_id": "alibaba/qwen3-next-80b-a3b-thinking",
+   "family": "qwen",
+   "release_date": "2025-09",
+   "limit": {
+    "context": 65536,
+    "output": 65536
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Efficient Qwen thinking model for local reasoning, math, and coding agents",
+   "open_weights": true,
+   "knowledge": "2025-04",
+   "last_updated": "2025-09",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.15
+     },
+     "output": {
+      "price": 1.5
      }
     }
    },
@@ -3341,67 +3621,6 @@
      },
      "output": {
       "price": 2.3
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.jiekou.ai/openai",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "moonshotai/kimi-k2-0905": {
-   "id": "moonshotai/kimi-k2-0905",
-   "name": "Kimi K2 0905",
-   "type": "chat",
-   "canonical_id": "moonshotai/kimi-k2-0905",
-   "family": "kimi-k2",
-   "release_date": "2025-09-05",
-   "limit": {
-    "context": 262144,
-    "output": 100352
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "September 2025 Kimi K2 instruction update with a 256K context and improved agentic coding",
-   "open_weights": true,
-   "last_updated": "2025-09-05",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.6
-     },
-     "output": {
-      "price": 2.5
      }
     }
    },
@@ -3504,6 +3723,327 @@
     }
    }
   },
+  "moonshotai/kimi-k2-0905": {
+   "id": "moonshotai/kimi-k2-0905",
+   "name": "Kimi K2 0905",
+   "type": "chat",
+   "canonical_id": "moonshotai/kimi-k2-0905",
+   "family": "kimi-k2",
+   "release_date": "2025-09-05",
+   "limit": {
+    "context": 262144,
+    "output": 100352
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "September 2025 Kimi K2 instruction update with a 256K context and improved agentic coding",
+   "open_weights": true,
+   "last_updated": "2025-09-05",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.6
+     },
+     "output": {
+      "price": 2.5
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.jiekou.ai/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "zai-org/glm-4.5": {
+   "id": "zai-org/glm-4.5",
+   "name": "GLM-4.5",
+   "type": "chat",
+   "canonical_id": "zhipuai/glm-4.5",
+   "family": "glm",
+   "release_date": "2025-07-28",
+   "limit": {
+    "context": 131072,
+    "output": 98304
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Hybrid-reasoning GLM release that made the 4.5 line broadly useful",
+   "open_weights": true,
+   "knowledge": "2025-04",
+   "last_updated": "2025-07-28",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.6
+     },
+     "output": {
+      "price": 2.2
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.jiekou.ai/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "zai-org/glm-4.7": {
+   "id": "zai-org/glm-4.7",
+   "name": "GLM-4.7",
+   "type": "chat",
+   "canonical_id": "zhipuai/glm-4.7",
+   "family": "glm",
+   "release_date": "2025-12-22",
+   "limit": {
+    "context": 204800,
+    "output": 131072
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Mature GLM model for dependable coding, reasoning, and structured agent tasks",
+   "open_weights": true,
+   "knowledge": "2025-04",
+   "last_updated": "2025-12-22",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.6
+     },
+     "output": {
+      "price": 2.2
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.jiekou.ai/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "zai-org/glm-4.7-flash": {
+   "id": "zai-org/glm-4.7-flash",
+   "name": "GLM-4.7-Flash",
+   "type": "chat",
+   "canonical_id": "zhipuai/glm-4.7-flash",
+   "family": "glm-flash",
+   "release_date": "2026-01-19",
+   "limit": {
+    "context": 200000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Budget GLM lane for fast coding help, routing, and everyday automation",
+   "open_weights": true,
+   "knowledge": "2025-04",
+   "last_updated": "2026-01-19",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.07,
+      "cache": {
+       "read": 0.01
+      }
+     },
+     "output": {
+      "price": 0.4
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.jiekou.ai/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "zai-org/glm-4.5v": {
+   "id": "zai-org/glm-4.5v",
+   "name": "GLM 4.5V",
+   "type": "chat",
+   "canonical_id": "zhipuai/glm-4.5v",
+   "family": "glm",
+   "release_date": "2025-08-11",
+   "limit": {
+    "context": 65536,
+    "output": 16384
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "GLM vision model for visual reasoning, documents, and multimodal agents",
+   "open_weights": true,
+   "knowledge": "2025-04",
+   "last_updated": "2025-08-11",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "video/mp4",
+     "video/x-matroska",
+     "video/quicktime"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.6
+     },
+     "output": {
+      "price": 1.8
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.jiekou.ai/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
   "minimaxai/minimax-m1-80k": {
    "id": "minimaxai/minimax-m1-80k",
    "name": "MiniMax M1",
@@ -3547,6 +4087,267 @@
      },
      "output": {
       "price": 2.2
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.jiekou.ai/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "baidu/ernie-4.5-300b-a47b-paddle": {
+   "id": "baidu/ernie-4.5-300b-a47b-paddle",
+   "name": "ERNIE 4.5 300B A47B",
+   "type": "chat",
+   "canonical_id": "baidu/ernie-4.5-300b-a47b",
+   "family": "ernie",
+   "release_date": "2025-06-30",
+   "limit": {
+    "context": 123000,
+    "output": 12000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Open ERNIE text MoE with 300B total and 47B active parameters",
+   "open_weights": true,
+   "last_updated": "2025-06-30",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.28
+     },
+     "output": {
+      "price": 1.1
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.jiekou.ai/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "baidu/ernie-4.5-vl-424b-a47b": {
+   "id": "baidu/ernie-4.5-vl-424b-a47b",
+   "name": "ERNIE 4.5 VL 424B A47B",
+   "type": "chat",
+   "canonical_id": "baidu/ernie-4.5-vl-424b-a47b",
+   "family": "ernie",
+   "release_date": "2025-06-30",
+   "limit": {
+    "context": 123000,
+    "output": 16000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    },
+    "structured_output": false,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
+   "open_weights": true,
+   "knowledge": "2025-03-31",
+   "last_updated": "2025-06-30",
+   "modalities": {
+    "input": [
+     "image/jpeg",
+     "image/png",
+     "image/bmp",
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.42
+     },
+     "output": {
+      "price": 1.25
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.jiekou.ai/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "xiaomimimo/mimo-v2-flash": {
+   "id": "xiaomimimo/mimo-v2-flash",
+   "name": "XiaomiMiMo/MiMo-V2-Flash",
+   "type": "chat",
+   "canonical_id": "xiaomi/mimo-v2-flash",
+   "family": "mimo",
+   "release_date": "2025-12-16",
+   "limit": {
+    "context": 262144,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "MiMo flash model for fast multimodal assistance and agent workflows",
+   "open_weights": true,
+   "knowledge": "2024-12-01",
+   "last_updated": "2026-02-04",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1,
+      "cache": {
+       "read": 0.02
+      }
+     },
+     "output": {
+      "price": 0.3
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.jiekou.ai/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "deepseek/deepseek-r1-0528": {
+   "id": "deepseek/deepseek-r1-0528",
+   "name": "DeepSeek R1 0528",
+   "type": "chat",
+   "canonical_id": "deepseek/deepseek-r1-0528",
+   "family": "deepseek-thinking",
+   "release_date": "2025-05-28",
+   "limit": {
+    "context": 163840,
+    "output": 32768
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "May 2025 DeepSeek R1 update with improved mathematics, coding, and reasoning",
+   "open_weights": true,
+   "last_updated": "2025-05-28",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.7,
+      "cache": {
+       "read": 0.35
+      }
+     },
+     "output": {
+      "price": 2.5
      }
     }
    },
@@ -3675,807 +4476,6 @@
      },
      "output": {
       "price": 1
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.jiekou.ai/openai",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "deepseek/deepseek-r1-0528": {
-   "id": "deepseek/deepseek-r1-0528",
-   "name": "DeepSeek R1 0528",
-   "type": "chat",
-   "canonical_id": "deepseek/deepseek-r1-0528",
-   "family": "deepseek-thinking",
-   "release_date": "2025-05-28",
-   "limit": {
-    "context": 163840,
-    "output": 32768
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "May 2025 DeepSeek R1 update with improved mathematics, coding, and reasoning",
-   "open_weights": true,
-   "last_updated": "2025-05-28",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.7,
-      "cache": {
-       "read": 0.35
-      }
-     },
-     "output": {
-      "price": 2.5
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.jiekou.ai/openai",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "xiaomimimo/mimo-v2-flash": {
-   "id": "xiaomimimo/mimo-v2-flash",
-   "name": "XiaomiMiMo/MiMo-V2-Flash",
-   "type": "chat",
-   "canonical_id": "xiaomi/mimo-v2-flash",
-   "family": "mimo",
-   "release_date": "2025-12-16",
-   "limit": {
-    "context": 262144,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "MiMo flash model for fast multimodal assistance and agent workflows",
-   "open_weights": true,
-   "knowledge": "2024-12-01",
-   "last_updated": "2026-02-04",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.1,
-      "cache": {
-       "read": 0.02
-      }
-     },
-     "output": {
-      "price": 0.3
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.jiekou.ai/openai",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "qwen/qwen3-30b-a3b-fp8": {
-   "id": "qwen/qwen3-30b-a3b-fp8",
-   "name": "Qwen3 30B A3B",
-   "type": "chat",
-   "canonical_id": "alibaba/qwen3-30b-a3b",
-   "family": "qwen",
-   "release_date": "2025-04-28",
-   "limit": {
-    "context": 40960,
-    "output": 20000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": true
-    },
-    "structured_output": false,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Sparse MoE Qwen model with 3B active parameters for efficient chat and reasoning",
-   "open_weights": true,
-   "last_updated": "2025-04-28",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.09
-     },
-     "output": {
-      "price": 0.45
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.jiekou.ai/openai",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     }
-    }
-   }
-  },
-  "qwen/qwen3-coder-next": {
-   "id": "qwen/qwen3-coder-next",
-   "name": "qwen/qwen3-coder-next",
-   "type": "chat",
-   "canonical_id": "alibaba/qwen3-coder-next",
-   "family": "qwen",
-   "release_date": "2026-02-03",
-   "limit": {
-    "context": 262144,
-    "output": 65536
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open-weight Qwen coding model for agents, repository edits, and multi-turn tool use",
-   "open_weights": true,
-   "knowledge": "2025-09",
-   "last_updated": "2026-02-03",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.2
-     },
-     "output": {
-      "price": 1.5
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.jiekou.ai/openai",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "qwen/qwen3-next-80b-a3b-thinking": {
-   "id": "qwen/qwen3-next-80b-a3b-thinking",
-   "name": "Qwen3 Next 80B A3B Thinking",
-   "type": "chat",
-   "canonical_id": "alibaba/qwen3-next-80b-a3b-thinking",
-   "family": "qwen",
-   "release_date": "2025-09",
-   "limit": {
-    "context": 65536,
-    "output": 65536
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Efficient Qwen thinking model for local reasoning, math, and coding agents",
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-09",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.15
-     },
-     "output": {
-      "price": 1.5
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.jiekou.ai/openai",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "qwen/qwen3-next-80b-a3b-instruct": {
-   "id": "qwen/qwen3-next-80b-a3b-instruct",
-   "name": "Qwen3 Next 80B A3B Instruct",
-   "type": "chat",
-   "canonical_id": "alibaba/qwen3-next-80b-a3b-instruct",
-   "family": "qwen",
-   "release_date": "2025-09",
-   "limit": {
-    "context": 65536,
-    "output": 65536
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Qwen instruction model for multilingual chat, reasoning, and tool use",
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-09",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.15
-     },
-     "output": {
-      "price": 1.5
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.jiekou.ai/openai",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "qwen/qwen3-235b-a22b-instruct-2507": {
-   "id": "qwen/qwen3-235b-a22b-instruct-2507",
-   "name": "Qwen3 235B A22B Instruct 2507",
-   "type": "chat",
-   "canonical_id": "alibaba/qwen3-235b-a22b-instruct-2507",
-   "family": "qwen",
-   "release_date": "2025-07-21",
-   "limit": {
-    "context": 131072,
-    "output": 16384
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Updated large open Qwen3 MoE instruct model for multilingual chat, coding, and tool use",
-   "open_weights": true,
-   "last_updated": "2025-07-21",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.15
-     },
-     "output": {
-      "price": 0.8
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.jiekou.ai/openai",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "qwen/qwen3-235b-a22b-thinking-2507": {
-   "id": "qwen/qwen3-235b-a22b-thinking-2507",
-   "name": "Qwen3 235B A22b Thinking 2507",
-   "type": "chat",
-   "canonical_id": "alibaba/qwen3-235b-a22b-thinking-2507",
-   "family": "qwen",
-   "release_date": "2025-07-25",
-   "limit": {
-    "context": 131072,
-    "output": 131072
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Updated large open Qwen3 MoE thinking model for reasoning, math, coding, and tool use",
-   "open_weights": true,
-   "last_updated": "2025-07-25",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.3
-     },
-     "output": {
-      "price": 3
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.jiekou.ai/openai",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "qwen/qwen3-32b-fp8": {
-   "id": "qwen/qwen3-32b-fp8",
-   "name": "Qwen3 32B",
-   "type": "chat",
-   "canonical_id": "alibaba/qwen3-32b",
-   "family": "qwen",
-   "release_date": "2025-04-28",
-   "limit": {
-    "context": 40960,
-    "output": 20000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": true
-    },
-    "structured_output": false,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Dense open Qwen model for self-hosted chat, reasoning, and coding",
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-04-28",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.1
-     },
-     "output": {
-      "price": 0.45
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.jiekou.ai/openai",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     }
-    }
-   }
-  },
-  "qwen/qwen3-235b-a22b-fp8": {
-   "id": "qwen/qwen3-235b-a22b-fp8",
-   "name": "Qwen3 235B A22B",
-   "type": "chat",
-   "canonical_id": "alibaba/qwen3-235b-a22b",
-   "family": "qwen",
-   "release_date": "2025-04-28",
-   "limit": {
-    "context": 40960,
-    "output": 20000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": true
-    },
-    "structured_output": false,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Large open Qwen MoE for multilingual reasoning, coding, and tool use",
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-04-28",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.2
-     },
-     "output": {
-      "price": 0.8
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.jiekou.ai/openai",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     }
-    }
-   }
-  },
-  "qwen/qwen3-coder-480b-a35b-instruct": {
-   "id": "qwen/qwen3-coder-480b-a35b-instruct",
-   "name": "Qwen3 Coder 480B A35B Instruct",
-   "type": "chat",
-   "canonical_id": "alibaba/qwen3-coder-480b-a35b-instruct",
-   "family": "qwen",
-   "release_date": "2025-07-22",
-   "limit": {
-    "context": 262144,
-    "output": 65536
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open Qwen coding heavyweight for repository reasoning and agentic engineering",
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-07-22",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.38
-     },
-     "output": {
-      "price": 1.55
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.jiekou.ai/openai",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "baidu/ernie-4.5-300b-a47b-paddle": {
-   "id": "baidu/ernie-4.5-300b-a47b-paddle",
-   "name": "ERNIE 4.5 300B A47B",
-   "type": "chat",
-   "canonical_id": "baidu/ernie-4.5-300b-a47b",
-   "family": "ernie",
-   "release_date": "2025-06-30",
-   "limit": {
-    "context": 123000,
-    "output": 12000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open ERNIE text MoE with 300B total and 47B active parameters",
-   "open_weights": true,
-   "last_updated": "2025-06-30",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.28
-     },
-     "output": {
-      "price": 1.1
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.jiekou.ai/openai",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "baidu/ernie-4.5-vl-424b-a47b": {
-   "id": "baidu/ernie-4.5-vl-424b-a47b",
-   "name": "ERNIE 4.5 VL 424B A47B",
-   "type": "chat",
-   "canonical_id": "baidu/ernie-4.5-vl-424b-a47b",
-   "family": "ernie",
-   "release_date": "2025-06-30",
-   "limit": {
-    "context": 123000,
-    "output": 16000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    },
-    "structured_output": false,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
-   "open_weights": true,
-   "knowledge": "2025-03-31",
-   "last_updated": "2025-06-30",
-   "modalities": {
-    "input": [
-     "image/jpeg",
-     "image/png",
-     "image/bmp",
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.42
-     },
-     "output": {
-      "price": 1.25
      }
     }
    },

@@ -112,23 +112,18 @@
     }
    }
   },
-  "MiniMax-M2.7": {
-   "id": "MiniMax-M2.7",
-   "name": "MiniMax-M2.7",
+  "MiniMax-M2": {
+   "id": "MiniMax-M2",
+   "name": "MiniMax-M2",
    "type": "chat",
    "family": "minimax",
    "status": "deprecated",
-   "release_date": "2026-03-18",
+   "release_date": "2025-10-27",
    "limit": {
     "context": 204800,
     "output": 131072
    },
    "capabilities": {
-    "cache": {
-     "implicit": {
-      "min_tokens": 512
-     }
-    },
     "tools": {
      "supported": true
     },
@@ -143,10 +138,122 @@
    },
    "description": "MiniMax model for chat, coding, office work, and agentic tasks",
    "open_weights": true,
-   "last_updated": "2026-03-18",
+   "last_updated": "2025-10-27",
    "modalities": {
     "input": [
      "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://api.minimax.io/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/minimax/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "https://api.minimax.io/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/minimax/chat"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://api.minimax.io/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/minimax/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "MiniMax-M3.1-Flash-Preview": {
+   "id": "MiniMax-M3.1-Flash-Preview",
+   "name": "MiniMax-M3.1-Flash-Preview",
+   "type": "chat",
+   "canonical_id": "minimax/MiniMax-M3.1-Flash-Preview",
+   "family": "minimax",
+   "status": "deprecated",
+   "release_date": "2026-09-27",
+   "limit": {
+    "context": 1000000,
+    "output": 512000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    },
+    "temperature": true,
+    "top_p": true,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Frontier multimodal coding model with 1M context window and tunable thinking depth",
+   "open_weights": false,
+   "last_updated": "2026-09-27",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/quicktime",
+     "video/x-matroska"
     ],
     "output": [
      "text"
@@ -217,16 +324,16 @@
     }
    }
   },
-  "MiniMax-M2.7-highspeed": {
-   "id": "MiniMax-M2.7-highspeed",
-   "name": "MiniMax-M2.7-highspeed",
+  "MiniMax-M3.1-Flash": {
+   "id": "MiniMax-M3.1-Flash",
+   "name": "MiniMax-M3.1-Flash",
    "type": "chat",
+   "canonical_id": "minimax/MiniMax-M3.1-Flash",
    "family": "minimax",
-   "status": "deprecated",
-   "release_date": "2026-03-18",
+   "release_date": "2026-10-19",
    "limit": {
-    "context": 204800,
-    "output": 131072
+    "context": 1000000,
+    "output": 524288
    },
    "capabilities": {
     "cache": {
@@ -238,20 +345,40 @@
      "supported": true
     },
     "reasoning": {
-     "supported": true
+     "supported": true,
+     "default": {
+      "type": "effort",
+      "value": "max"
+     },
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
     },
+    "structured_output": false,
     "temperature": true,
     "top_p": true,
     "top_k": false,
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "High-speed MiniMax model for low-latency coding and agent workflows",
+   "description": "Frontier multimodal coding model with 1M context window and tunable thinking depth",
    "open_weights": true,
-   "last_updated": "2026-03-18",
+   "last_updated": "2026-10-19",
    "modalities": {
     "input": [
-     "text"
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/quicktime",
+     "video/x-matroska"
     ],
     "output": [
      "text"
@@ -279,6 +406,7 @@
       "opencodeai": "@opencode/ai/providers/minimax/messages"
      },
      "capabilities": {
+      "system_updates": true,
       "tools": {
        "choice": [
         "auto"
@@ -532,228 +660,6 @@
     }
    }
   },
-  "MiniMax-M3.1-Flash": {
-   "id": "MiniMax-M3.1-Flash",
-   "name": "MiniMax-M3.1-Flash",
-   "type": "chat",
-   "canonical_id": "minimax/MiniMax-M3.1-Flash",
-   "family": "minimax",
-   "release_date": "2026-10-19",
-   "limit": {
-    "context": 1000000,
-    "output": 524288
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": {
-      "min_tokens": 512
-     }
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "default": {
-      "type": "effort",
-      "value": "max"
-     },
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": false,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Frontier multimodal coding model with 1M context window and tunable thinking depth",
-   "open_weights": true,
-   "last_updated": "2026-10-19",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/quicktime",
-     "video/x-matroska"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "messages": {
-     "base_url": "https://api.minimax.io/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/minimax/messages"
-     },
-     "capabilities": {
-      "system_updates": true,
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "https://api.minimax.io/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/minimax/chat"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://api.minimax.io/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/minimax/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "MiniMax-M2": {
-   "id": "MiniMax-M2",
-   "name": "MiniMax-M2",
-   "type": "chat",
-   "family": "minimax",
-   "status": "deprecated",
-   "release_date": "2025-10-27",
-   "limit": {
-    "context": 204800,
-    "output": 131072
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "MiniMax model for chat, coding, office work, and agentic tasks",
-   "open_weights": true,
-   "last_updated": "2025-10-27",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "messages": {
-     "base_url": "https://api.minimax.io/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/minimax/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "https://api.minimax.io/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/minimax/chat"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://api.minimax.io/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/minimax/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    }
-   }
-  },
   "MiniMax-M3": {
    "id": "MiniMax-M3",
    "name": "MiniMax-M3",
@@ -873,31 +779,28 @@
     }
    }
   },
-  "MiniMax-M3.1-Flash-Preview": {
-   "id": "MiniMax-M3.1-Flash-Preview",
-   "name": "MiniMax-M3.1-Flash-Preview",
+  "MiniMax-M2.7": {
+   "id": "MiniMax-M2.7",
+   "name": "MiniMax-M2.7",
    "type": "chat",
-   "canonical_id": "minimax/MiniMax-M3.1-Flash-Preview",
    "family": "minimax",
    "status": "deprecated",
-   "release_date": "2026-09-27",
+   "release_date": "2026-03-18",
    "limit": {
-    "context": 1000000,
-    "output": 512000
+    "context": 204800,
+    "output": 131072
    },
    "capabilities": {
+    "cache": {
+     "implicit": {
+      "min_tokens": 512
+     }
+    },
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
+     "supported": true
     },
     "temperature": true,
     "top_p": true,
@@ -905,20 +808,117 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Frontier multimodal coding model with 1M context window and tunable thinking depth",
-   "open_weights": false,
-   "last_updated": "2026-09-27",
+   "description": "MiniMax model for chat, coding, office work, and agentic tasks",
+   "open_weights": true,
+   "last_updated": "2026-03-18",
    "modalities": {
     "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/quicktime",
-     "video/x-matroska"
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://api.minimax.io/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/minimax/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "https://api.minimax.io/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/minimax/chat"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://api.minimax.io/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/minimax/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "MiniMax-M2.7-highspeed": {
+   "id": "MiniMax-M2.7-highspeed",
+   "name": "MiniMax-M2.7-highspeed",
+   "type": "chat",
+   "family": "minimax",
+   "status": "deprecated",
+   "release_date": "2026-03-18",
+   "limit": {
+    "context": 204800,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": {
+      "min_tokens": 512
+     }
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    },
+    "temperature": true,
+    "top_p": true,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "High-speed MiniMax model for low-latency coding and agent workflows",
+   "open_weights": true,
+   "last_updated": "2026-03-18",
+   "modalities": {
+    "input": [
+     "text"
     ],
     "output": [
      "text"

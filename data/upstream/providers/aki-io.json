@@ -6,6 +6,72 @@
   "AKI_IO_API_KEY"
  ],
  "models": {
+  "qwen3.6-35b": {
+   "id": "qwen3.6-35b",
+   "name": "Qwen3.6 35B-A3B",
+   "type": "chat",
+   "canonical_id": "alibaba/qwen3.6-35b-a3b",
+   "family": "qwen",
+   "status": "deprecated",
+   "release_date": "2026-04-17",
+   "limit": {
+    "context": 256000,
+    "output": 32768
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "high"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Open multimodal Qwen MoE for local agents that need vision, audio, and code",
+   "open_weights": true,
+   "last_updated": "2026-04-17",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.168225
+     },
+     "output": {
+      "price": 0.56075
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://aki.io/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
   "gpt-oss-120b": {
    "id": "gpt-oss-120b",
    "name": "GPT OSS 120B",
@@ -73,85 +139,15 @@
     }
    }
   },
-  "qwen3.8-27b": {
-   "id": "qwen3.8-27b",
-   "name": "Qwen3.8 27B",
+  "mistral4-119b": {
+   "id": "mistral4-119b",
+   "name": "Mistral Small 4",
    "type": "chat",
-   "canonical_id": "alibaba/qwen3.8-27b",
-   "family": "qwen",
-   "release_date": "2026-08-14",
+   "canonical_id": "mistral/mistral-small-2603",
+   "family": "mistral-small",
+   "release_date": "2026-03-16",
    "limit": {
     "context": 262144,
-    "output": 32768
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "xhigh"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Dense 27B vision-language model for coding, agent tasks, and image and video understanding",
-   "open_weights": true,
-   "last_updated": "2026-08-14",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.33645,
-      "cache": {
-       "read": 0.11215
-      }
-     },
-     "output": {
-      "price": 2.4673
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://aki.io/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "glm5.3-754b": {
-   "id": "glm5.3-754b",
-   "name": "GLM-5.3",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-5.3",
-   "family": "glm",
-   "release_date": "2026-08-14",
-   "limit": {
-    "context": 524288,
     "output": 81920
    },
    "capabilities": {
@@ -161,21 +157,20 @@
     "reasoning": {
      "supported": true,
      "effort": [
-      "low",
-      "high",
-      "max"
+      "none",
+      "high"
      ]
     },
-    "structured_output": true,
     "temperature": true,
     "top_p": true,
     "top_k": true,
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
+   "description": "Fast Mistral production model for chat, extraction, and cost-sensitive agents",
    "open_weights": true,
-   "last_updated": "2026-08-14",
+   "knowledge": "2025-06",
+   "last_updated": "2026-03-16",
    "modalities": {
     "input": [
      "text"
@@ -187,13 +182,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 1.1215,
-      "cache": {
-       "read": 0.280375
-      }
+      "price": 0.2243
      },
      "output": {
-      "price": 3.92525
+      "price": 0.6729
      }
     }
    },
@@ -284,71 +276,6 @@
     }
    }
   },
-  "mistral4-119b": {
-   "id": "mistral4-119b",
-   "name": "Mistral Small 4",
-   "type": "chat",
-   "canonical_id": "mistral/mistral-small-2603",
-   "family": "mistral-small",
-   "release_date": "2026-03-16",
-   "limit": {
-    "context": 262144,
-    "output": 81920
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "high"
-     ]
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Fast Mistral production model for chat, extraction, and cost-sensitive agents",
-   "open_weights": true,
-   "knowledge": "2025-06",
-   "last_updated": "2026-03-16",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.2243
-     },
-     "output": {
-      "price": 0.6729
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://aki.io/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
   "gemma4-26b": {
    "id": "gemma4-26b",
    "name": "Gemma 4 26B A4B IT",
@@ -414,17 +341,16 @@
     }
    }
   },
-  "qwen3.6-35b": {
-   "id": "qwen3.6-35b",
-   "name": "Qwen3.6 35B-A3B",
+  "glm5.3-754b": {
+   "id": "glm5.3-754b",
+   "name": "GLM-5.3",
    "type": "chat",
-   "canonical_id": "alibaba/qwen3.6-35b-a3b",
-   "family": "qwen",
-   "status": "deprecated",
-   "release_date": "2026-04-17",
+   "canonical_id": "zhipuai/glm-5.3",
+   "family": "glm",
+   "release_date": "2026-08-14",
    "limit": {
-    "context": 256000,
-    "output": 32768
+    "context": 524288,
+    "output": 81920
    },
    "capabilities": {
     "tools": {
@@ -433,8 +359,9 @@
     "reasoning": {
      "supported": true,
      "effort": [
-      "none",
-      "high"
+      "low",
+      "high",
+      "max"
      ]
     },
     "structured_output": true,
@@ -444,9 +371,9 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Open multimodal Qwen MoE for local agents that need vision, audio, and code",
+   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
    "open_weights": true,
-   "last_updated": "2026-04-17",
+   "last_updated": "2026-08-14",
    "modalities": {
     "input": [
      "text"
@@ -458,10 +385,83 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.168225
+      "price": 1.1215,
+      "cache": {
+       "read": 0.280375
+      }
      },
      "output": {
-      "price": 0.56075
+      "price": 3.92525
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://aki.io/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "qwen3.8-27b": {
+   "id": "qwen3.8-27b",
+   "name": "Qwen3.8 27B",
+   "type": "chat",
+   "canonical_id": "alibaba/qwen3.8-27b",
+   "family": "qwen",
+   "release_date": "2026-08-14",
+   "limit": {
+    "context": 262144,
+    "output": 32768
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "xhigh"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Dense 27B vision-language model for coding, agent tasks, and image and video understanding",
+   "open_weights": true,
+   "last_updated": "2026-08-14",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.33645,
+      "cache": {
+       "read": 0.11215
+      }
+     },
+     "output": {
+      "price": 2.4673
      }
     }
    },

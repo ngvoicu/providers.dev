@@ -6,13 +6,212 @@
   "MORPH_API_KEY"
  ],
  "models": {
-  "morph-glm53flash": {
-   "id": "morph-glm53flash",
-   "name": "GLM-5.3-Flash",
+  "morph-kimik31": {
+   "id": "morph-kimik31",
+   "name": "Kimi K3.1 Pro",
    "type": "chat",
-   "canonical_id": "zhipuai/glm-5.3-flash",
-   "family": "glm-flash",
-   "release_date": "2026-08-26",
+   "canonical_id": "moonshotai/kimi-k3.1-pro",
+   "family": "kimi-k3",
+   "release_date": "2026-10-23",
+   "limit": {
+    "context": 1048576,
+    "output": 1048576
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    },
+    "structured_output": true,
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Multimodal Kimi model with a 1M-token context window and always-on reasoning, for coding, 3D creation and financial research",
+   "open_weights": true,
+   "last_updated": "2026-10-23",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2.5,
+      "cache": {
+       "read": 0.29
+      }
+     },
+     "output": {
+      "price": 14
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.morphllm.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://api.morphllm.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "auto": {
+   "id": "auto",
+   "name": "Auto",
+   "type": "chat",
+   "family": "auto",
+   "release_date": "2024-06-01",
+   "limit": {
+    "context": 32000,
+    "output": 32000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    },
+    "temperature": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Automatic model router for matching prompts to suitable backends and budgets",
+   "open_weights": false,
+   "last_updated": "2024-06-01",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.85
+     },
+     "output": {
+      "price": 1.55
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.morphllm.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     }
+    }
+   }
+  },
+  "morph-v3-large": {
+   "id": "morph-v3-large",
+   "name": "Morph V3 Large",
+   "type": "chat",
+   "canonical_id": "morph/morph-v3-large",
+   "family": "morph",
+   "release_date": "2025-07-07",
+   "limit": {
+    "context": 262144,
+    "output": 131072
+   },
+   "capabilities": {
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    },
+    "temperature": true,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Flagship model for demanding analysis, coding, and production agent workflows",
+   "open_weights": false,
+   "last_updated": "2025-07-07",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.9
+     },
+     "output": {
+      "price": 1.9
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.morphllm.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     }
+    }
+   }
+  },
+  "morph-kimik3": {
+   "id": "morph-kimik3",
+   "name": "Kimi K3",
+   "type": "chat",
+   "canonical_id": "moonshotai/kimi-k3",
+   "family": "kimi-k3",
+   "release_date": "2026-07-16",
    "limit": {
     "context": 1048576,
     "output": 1048576
@@ -34,26 +233,26 @@
      ]
     },
     "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
     "system_updates": false,
     "effort_updates": false,
     "service_tier": [
      "standby"
     ]
    },
-   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
+   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
    "open_weights": true,
-   "last_updated": "2026-08-26",
+   "last_updated": "2026-07-16",
    "modalities": {
     "input": [
      "text",
      "image/jpeg",
      "image/png",
-     "video/mp4",
-     "video/x-matroska",
-     "video/quicktime"
+     "image/gif",
+     "image/webp",
+     "image/bmp"
     ],
     "output": [
      "text"
@@ -62,13 +261,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.2,
+      "price": 2.5,
       "cache": {
-       "read": 0.04
+       "read": 0.29
       }
      },
      "output": {
-      "price": 0.7
+      "price": 14
      }
     },
     "multipliers": [
@@ -83,6 +282,100 @@
       }
      }
     ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.morphllm.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": true
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://api.morphllm.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "morph-dsv41flash": {
+   "id": "morph-dsv41flash",
+   "name": "DeepSeek V4.1 Flash",
+   "type": "chat",
+   "canonical_id": "deepseek/deepseek-v4.1-flash",
+   "family": "deepseek-flash",
+   "release_date": "2026-09-10",
+   "limit": {
+    "context": 1048576,
+    "output": 1048576
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "DeepSeek V4.1 Flash model for reasoning and agentic coding",
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-09-10",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.12,
+      "cache": {
+       "read": 0.008
+      }
+     },
+     "output": {
+      "price": 0.8
+     }
+    }
    },
    "api": {
     "chat-completions": {
@@ -206,6 +499,114 @@
     }
    }
   },
+  "morph-glm53flash": {
+   "id": "morph-glm53flash",
+   "name": "GLM-5.3-Flash",
+   "type": "chat",
+   "canonical_id": "zhipuai/glm-5.3-flash",
+   "family": "glm-flash",
+   "release_date": "2026-08-26",
+   "limit": {
+    "context": 1048576,
+    "output": 1048576
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "high",
+      "max"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "service_tier": [
+     "standby"
+    ]
+   },
+   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
+   "open_weights": true,
+   "last_updated": "2026-08-26",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "video/mp4",
+     "video/x-matroska",
+     "video/quicktime"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.2,
+      "cache": {
+       "read": 0.04
+      }
+     },
+     "output": {
+      "price": 0.7
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "standby"
+       }
+      },
+      "factor": {
+       "text": 0.5
+      }
+     }
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.morphllm.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://api.morphllm.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
   "reflex": {
    "id": "reflex",
    "name": "Reflex",
@@ -268,418 +669,6 @@
      },
      "compatibility": {
       "media_input": "root"
-     }
-    }
-   }
-  },
-  "morph-glm53-744b": {
-   "id": "morph-glm53-744b",
-   "name": "GLM-5.3",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-5.3",
-   "family": "glm",
-   "release_date": "2026-08-14",
-   "limit": {
-    "context": 1048576,
-    "output": 1048576
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "service_tier": [
-     "standby"
-    ]
-   },
-   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
-   "open_weights": true,
-   "last_updated": "2026-08-14",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.19,
-      "cache": {
-       "read": 0.1955
-      }
-     },
-     "output": {
-      "price": 6
-     }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "service_tier": {
-        "equals": "standby"
-       }
-      },
-      "factor": {
-       "text": 0.5
-      }
-     }
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.morphllm.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.morphllm.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "morph-v3-fast": {
-   "id": "morph-v3-fast",
-   "name": "Morph V3 Fast",
-   "type": "chat",
-   "canonical_id": "morph/morph-v3-fast",
-   "family": "morph",
-   "release_date": "2025-07-07",
-   "limit": {
-    "context": 262144,
-    "output": 131072
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": true,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Efficient model for low-latency assistance, extraction, and routine automation",
-   "open_weights": false,
-   "last_updated": "2025-07-07",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.8
-     },
-     "output": {
-      "price": 1.2
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.morphllm.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     }
-    }
-   }
-  },
-  "auto": {
-   "id": "auto",
-   "name": "Auto",
-   "type": "chat",
-   "family": "auto",
-   "release_date": "2024-06-01",
-   "limit": {
-    "context": 32000,
-    "output": 32000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Automatic model router for matching prompts to suitable backends and budgets",
-   "open_weights": false,
-   "last_updated": "2024-06-01",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.85
-     },
-     "output": {
-      "price": 1.55
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.morphllm.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     }
-    }
-   }
-  },
-  "morph-dsv41flash": {
-   "id": "morph-dsv41flash",
-   "name": "DeepSeek V4.1 Flash",
-   "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4.1-flash",
-   "family": "deepseek-flash",
-   "release_date": "2026-09-10",
-   "limit": {
-    "context": 1048576,
-    "output": 1048576
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "DeepSeek V4.1 Flash model for reasoning and agentic coding",
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-09-10",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.12,
-      "cache": {
-       "read": 0.008
-      }
-     },
-     "output": {
-      "price": 0.8
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.morphllm.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.morphllm.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "morph-kimik3": {
-   "id": "morph-kimik3",
-   "name": "Kimi K3",
-   "type": "chat",
-   "canonical_id": "moonshotai/kimi-k3",
-   "family": "kimi-k3",
-   "release_date": "2026-07-16",
-   "limit": {
-    "context": 1048576,
-    "output": 1048576
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "service_tier": [
-     "standby"
-    ]
-   },
-   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
-   "open_weights": true,
-   "last_updated": "2026-07-16",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2.5,
-      "cache": {
-       "read": 0.29
-      }
-     },
-     "output": {
-      "price": 14
-     }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "service_tier": {
-        "equals": "standby"
-       }
-      },
-      "factor": {
-       "text": 0.5
-      }
-     }
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.morphllm.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": true
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.morphllm.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
      }
     }
    }
@@ -788,6 +777,61 @@
     }
    }
   },
+  "morph-v3-fast": {
+   "id": "morph-v3-fast",
+   "name": "Morph V3 Fast",
+   "type": "chat",
+   "canonical_id": "morph/morph-v3-fast",
+   "family": "morph",
+   "release_date": "2025-07-07",
+   "limit": {
+    "context": 262144,
+    "output": 131072
+   },
+   "capabilities": {
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    },
+    "temperature": true,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Efficient model for low-latency assistance, extraction, and routine automation",
+   "open_weights": false,
+   "last_updated": "2025-07-07",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.8
+     },
+     "output": {
+      "price": 1.2
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.morphllm.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     }
+    }
+   }
+  },
   "morph-glm52-744b": {
    "id": "morph-glm52-744b",
    "name": "GLM-5.2",
@@ -859,98 +903,6 @@
       }
      }
     ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.morphllm.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.morphllm.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "morph-kimik31": {
-   "id": "morph-kimik31",
-   "name": "Kimi K3.1 Pro",
-   "type": "chat",
-   "canonical_id": "moonshotai/kimi-k3.1-pro",
-   "family": "kimi-k3",
-   "release_date": "2026-10-23",
-   "limit": {
-    "context": 1048576,
-    "output": 1048576
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Multimodal Kimi model with a 1M-token context window and always-on reasoning, for coding, 3D creation and financial research",
-   "open_weights": true,
-   "last_updated": "2026-10-23",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2.5,
-      "cache": {
-       "read": 0.29
-      }
-     },
-     "output": {
-      "price": 14
-     }
-    }
    },
    "api": {
     "chat-completions": {
@@ -1076,33 +1028,46 @@
     }
    }
   },
-  "morph-v3-large": {
-   "id": "morph-v3-large",
-   "name": "Morph V3 Large",
+  "morph-glm53-744b": {
+   "id": "morph-glm53-744b",
+   "name": "GLM-5.3",
    "type": "chat",
-   "canonical_id": "morph/morph-v3-large",
-   "family": "morph",
-   "release_date": "2025-07-07",
+   "canonical_id": "zhipuai/glm-5.3",
+   "family": "glm",
+   "release_date": "2026-08-14",
    "limit": {
-    "context": 262144,
-    "output": 131072
+    "context": 1048576,
+    "output": 1048576
    },
    "capabilities": {
+    "cache": {
+     "implicit": true
+    },
     "tools": {
-     "supported": false
+     "supported": true
     },
     "reasoning": {
-     "supported": false
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "high",
+      "max"
+     ]
     },
+    "structured_output": true,
     "temperature": true,
-    "top_p": false,
-    "top_k": false,
+    "top_p": true,
+    "top_k": true,
     "system_updates": false,
-    "effort_updates": false
+    "effort_updates": false,
+    "service_tier": [
+     "standby"
+    ]
    },
-   "description": "Flagship model for demanding analysis, coding, and production agent workflows",
-   "open_weights": false,
-   "last_updated": "2025-07-07",
+   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
+   "open_weights": true,
+   "last_updated": "2026-08-14",
    "modalities": {
     "input": [
      "text"
@@ -1114,12 +1079,27 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.9
+      "price": 1.19,
+      "cache": {
+       "read": 0.1955
+      }
      },
      "output": {
-      "price": 1.9
+      "price": 6
      }
-    }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "standby"
+       }
+      },
+      "factor": {
+       "text": 0.5
+      }
+     }
+    ]
    },
    "api": {
     "chat-completions": {
@@ -1127,6 +1107,26 @@
      "sdk": {
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://api.morphllm.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
      }
     }
    }

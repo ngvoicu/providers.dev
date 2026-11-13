@@ -6,74 +6,46 @@
   "XIAOMI_API_KEY"
  ],
  "models": {
-  "mimo-v2.6-pro": {
-   "id": "mimo-v2.6-pro",
-   "name": "MiMo-V2.6-Pro",
-   "type": "chat",
-   "canonical_id": "xiaomi/mimo-v2.6-pro",
+  "mimo-v2.5-asr": {
+   "id": "mimo-v2.5-asr",
+   "name": "MiMo-V2.5-ASR",
+   "type": "transcription",
+   "canonical_id": "xiaomi/mimo-v2.5-asr",
    "family": "mimo",
-   "release_date": "2026-09-22",
+   "release_date": "2026-04-23",
    "limit": {
-    "context": 1048576,
-    "output": 131072
+    "context": 8192,
+    "output": 2048
    },
    "capabilities": {
-    "cache": {
-     "implicit": true
-    },
     "tools": {
-     "supported": true
+     "supported": false
     },
     "reasoning": {
-     "supported": true,
-     "default": {
-      "type": "toggle",
-      "value": true
-     },
-     "toggle": true
+     "supported": false
     },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
+    "temperature": false,
+    "top_p": false,
     "top_k": false,
     "system_updates": false,
-    "effort_updates": false,
-    "stream_usage": true
+    "effort_updates": false
    },
-   "description": "Stronger MiMo Pro tier for multimodal reasoning and coding-agent execution",
+   "description": "Speech recognition model for Chinese, English, dialects, and noisy multi-speaker audio",
    "open_weights": true,
-   "last_updated": "2026-09-22",
+   "last_updated": "2026-04-23",
    "modalities": {
     "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "audio/mpeg",
      "audio/wav",
-     "audio/flac",
-     "audio/mp4",
-     "audio/ogg",
-     "video/mp4",
-     "video/quicktime",
-     "video/x-msvideo",
-     "video/x-ms-wmv"
+     "audio/mpeg"
     ],
     "output": [
      "text"
     ]
    },
    "cost": {
-    "text": {
+    "audio": {
      "input": {
-      "price": 0,
-      "cache": {
-       "read": 0
-      }
-     },
-     "output": {
+      "unit": "minute",
       "price": 0
      }
     }
@@ -84,50 +56,6 @@
      "sdk": {
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "strict": true,
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://token-plan-cn.xiaomimimo.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "strict": true,
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://token-plan-cn.xiaomimimo.com/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "strict": true,
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
      }
     }
    }
@@ -242,6 +170,79 @@
      "sdk": {
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
+     }
+    }
+   }
+  },
+  "mimo-v2.5-pro": {
+   "id": "mimo-v2.5-pro",
+   "name": "MiMo-V2.5-Pro",
+   "type": "chat",
+   "canonical_id": "xiaomi/mimo-v2.5-pro",
+   "family": "mimo",
+   "status": "deprecated",
+   "release_date": "2026-04-22",
+   "limit": {
+    "context": 1048576,
+    "output": 131072
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "default": {
+      "type": "toggle",
+      "value": true
+     },
+     "toggle": true
+    },
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Stronger MiMo Pro tier for multimodal reasoning and coding-agent execution",
+   "open_weights": true,
+   "knowledge": "2024-12",
+   "last_updated": "2026-04-22",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://token-plan-cn.xiaomimimo.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
      }
     }
    }
@@ -429,133 +430,6 @@
     }
    }
   },
-  "mimo-v2.5-pro": {
-   "id": "mimo-v2.5-pro",
-   "name": "MiMo-V2.5-Pro",
-   "type": "chat",
-   "canonical_id": "xiaomi/mimo-v2.5-pro",
-   "family": "mimo",
-   "status": "deprecated",
-   "release_date": "2026-04-22",
-   "limit": {
-    "context": 1048576,
-    "output": 131072
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "default": {
-      "type": "toggle",
-      "value": true
-     },
-     "toggle": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Stronger MiMo Pro tier for multimodal reasoning and coding-agent execution",
-   "open_weights": true,
-   "knowledge": "2024-12",
-   "last_updated": "2026-04-22",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://token-plan-cn.xiaomimimo.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "mimo-v2.5-asr": {
-   "id": "mimo-v2.5-asr",
-   "name": "MiMo-V2.5-ASR",
-   "type": "transcription",
-   "canonical_id": "xiaomi/mimo-v2.5-asr",
-   "family": "mimo",
-   "release_date": "2026-04-23",
-   "limit": {
-    "context": 8192,
-    "output": 2048
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Speech recognition model for Chinese, English, dialects, and noisy multi-speaker audio",
-   "open_weights": true,
-   "last_updated": "2026-04-23",
-   "modalities": {
-    "input": [
-     "audio/wav",
-     "audio/mpeg"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "audio": {
-     "input": {
-      "unit": "minute",
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://token-plan-cn.xiaomimimo.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     }
-    }
-   }
-  },
   "mimo-v2.5": {
    "id": "mimo-v2.5",
    "name": "MiMo-V2.5",
@@ -637,6 +511,132 @@
      },
      "capabilities": {
       "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "mimo-v2.6-pro": {
+   "id": "mimo-v2.6-pro",
+   "name": "MiMo-V2.6-Pro",
+   "type": "chat",
+   "canonical_id": "xiaomi/mimo-v2.6-pro",
+   "family": "mimo",
+   "release_date": "2026-09-22",
+   "limit": {
+    "context": 1048576,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "default": {
+      "type": "toggle",
+      "value": true
+     },
+     "toggle": true
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "stream_usage": true
+   },
+   "description": "Stronger MiMo Pro tier for multimodal reasoning and coding-agent execution",
+   "open_weights": true,
+   "last_updated": "2026-09-22",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "audio/mpeg",
+     "audio/wav",
+     "audio/flac",
+     "audio/mp4",
+     "audio/ogg",
+     "video/mp4",
+     "video/quicktime",
+     "video/x-msvideo",
+     "video/x-ms-wmv"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://token-plan-cn.xiaomimimo.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     },
+     "capabilities": {
+      "tools": {
+       "strict": true,
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://token-plan-cn.xiaomimimo.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "strict": true,
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://token-plan-cn.xiaomimimo.com/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "strict": true,
+       "choice": [
+        "auto"
+       ],
        "updates": false
       }
      }

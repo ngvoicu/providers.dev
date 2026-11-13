@@ -6,88 +6,6 @@
   "PERPLEXITY_API_KEY"
  ],
  "models": {
-  "sonar-pro": {
-   "id": "sonar-pro",
-   "name": "Sonar Pro",
-   "type": "chat",
-   "canonical_id": "perplexity/sonar-pro",
-   "family": "sonar-pro",
-   "status": "deprecated",
-   "release_date": "2024-01-01",
-   "limit": {
-    "context": 200000,
-    "output": 8192
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Deeper Sonar search model with broader retrieval and stronger synthesis",
-   "open_weights": false,
-   "knowledge": "2025-09-01",
-   "last_updated": "2025-09-01",
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/gif"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 3
-     },
-     "output": {
-      "price": 15
-     }
-    },
-    "web_search": {
-     "price": 6,
-     "overrides": [
-      {
-       "when": {
-        "search_context_size": {
-         "equals": "medium"
-        }
-       },
-       "price": 10
-      },
-      {
-       "when": {
-        "search_context_size": {
-         "equals": "high"
-        }
-       },
-       "price": 14
-      }
-     ]
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.perplexity.ai",
-     "sdk": {
-      "aisdk": "@ai-sdk/perplexity",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     }
-    }
-   }
-  },
   "sonar-reasoning-pro": {
    "id": "sonar-reasoning-pro",
    "name": "Sonar Reasoning Pro",
@@ -164,6 +82,73 @@
        "price": 14
       }
      ]
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.perplexity.ai",
+     "sdk": {
+      "aisdk": "@ai-sdk/perplexity",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     }
+    }
+   }
+  },
+  "sonar-deep-research": {
+   "id": "sonar-deep-research",
+   "name": "Perplexity Sonar Deep Research",
+   "type": "chat",
+   "canonical_id": "perplexity/sonar-deep-research",
+   "family": "sonar",
+   "status": "deprecated",
+   "release_date": "2025-02-01",
+   "limit": {
+    "context": 128000,
+    "output": 32768
+   },
+   "capabilities": {
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    },
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Sonar search model for current answers, retrieval, and citation-backed chat",
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2025-09-01",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2
+     },
+     "output": {
+      "price": 8,
+      "reasoning": 3
+     }
+    },
+    "web_search": {
+     "price": 5
     }
    },
    "api": {
@@ -254,44 +239,42 @@
     }
    }
   },
-  "sonar-deep-research": {
-   "id": "sonar-deep-research",
-   "name": "Perplexity Sonar Deep Research",
+  "sonar-pro": {
+   "id": "sonar-pro",
+   "name": "Sonar Pro",
    "type": "chat",
-   "canonical_id": "perplexity/sonar-deep-research",
-   "family": "sonar",
+   "canonical_id": "perplexity/sonar-pro",
+   "family": "sonar-pro",
    "status": "deprecated",
-   "release_date": "2025-02-01",
+   "release_date": "2024-01-01",
    "limit": {
-    "context": 128000,
-    "output": 32768
+    "context": 200000,
+    "output": 8192
    },
    "capabilities": {
     "tools": {
      "supported": false
     },
     "reasoning": {
-     "supported": true,
-     "effort": [
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
+     "supported": false
     },
-    "temperature": false,
-    "top_p": false,
+    "temperature": true,
+    "top_p": true,
     "top_k": false,
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Sonar search model for current answers, retrieval, and citation-backed chat",
+   "description": "Deeper Sonar search model with broader retrieval and stronger synthesis",
    "open_weights": false,
-   "knowledge": "2025-01",
+   "knowledge": "2025-09-01",
    "last_updated": "2025-09-01",
    "modalities": {
     "input": [
-     "text"
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/gif"
     ],
     "output": [
      "text"
@@ -300,15 +283,32 @@
    "cost": {
     "text": {
      "input": {
-      "price": 2
+      "price": 3
      },
      "output": {
-      "price": 8,
-      "reasoning": 3
+      "price": 15
      }
     },
     "web_search": {
-     "price": 5
+     "price": 6,
+     "overrides": [
+      {
+       "when": {
+        "search_context_size": {
+         "equals": "medium"
+        }
+       },
+       "price": 10
+      },
+      {
+       "when": {
+        "search_context_size": {
+         "equals": "high"
+        }
+       },
+       "price": 14
+      }
+     ]
     }
    },
    "api": {

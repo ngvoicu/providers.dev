@@ -6,16 +6,95 @@
   "XAI_API_KEY"
  ],
  "models": {
-  "grok-4.6": {
-   "id": "grok-4.6",
-   "name": "Grok 4.6",
-   "type": "chat",
-   "canonical_id": "xai/grok-4.6",
+  "grok-imagine-video-1.5-lite": {
+   "id": "grok-imagine-video-1.5-lite",
+   "name": "Grok Imagine Video 1.5 Lite",
+   "type": "video",
+   "canonical_id": "xai/grok-imagine-video-1.5-lite",
    "family": "grok",
-   "release_date": "2026-08-12",
+   "release_date": "2026-10-01",
    "limit": {
-    "context": 500000,
-    "output": 500000
+    "context": 1024,
+    "output": 0
+   },
+   "capabilities": {
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    },
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Cost-efficient video model for text-to-video and image-to-video generation",
+   "open_weights": false,
+   "last_updated": "2026-10-01",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp"
+    ],
+    "output": [
+     "video/mp4"
+    ]
+   },
+   "cost": {
+    "image": {
+     "input": {
+      "unit": "image",
+      "price": 0.01
+     }
+    },
+    "video": {
+     "output": {
+      "unit": "second",
+      "price": 0.02,
+      "overrides": [
+       {
+        "when": {
+         "resolution": {
+          "equals": "720p"
+         }
+        },
+        "price": 0.03
+       },
+       {
+        "when": {
+         "resolution": {
+          "equals": "1080p"
+         }
+        },
+        "price": 0.14
+       }
+      ]
+     }
+    }
+   },
+   "api": {
+    "videos": {
+     "base_url": "https://api.x.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/xai",
+      "opencodeai": "@opencode/ai/providers/xai/videos"
+     }
+    }
+   }
+  },
+  "grok-4.20-0309-non-reasoning": {
+   "id": "grok-4.20-0309-non-reasoning",
+   "name": "Grok 4.20 (Non-Reasoning)",
+   "type": "chat",
+   "family": "grok",
+   "release_date": "2026-03-09",
+   "limit": {
+    "context": 1000000,
+    "output": 30000
    },
    "capabilities": {
     "cache": {
@@ -25,17 +104,7 @@
      "supported": true
     },
     "reasoning": {
-     "supported": true,
-     "default": {
-      "type": "effort",
-      "value": "high"
-     },
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh"
-     ]
+     "supported": false
     },
     "structured_output": true,
     "temperature": true,
@@ -50,10 +119,9 @@
      "priority"
     ]
    },
-   "description": "xAI's frontier model for long-running agents, coding, knowledge work, and visual projects",
+   "description": "Grok model for agentic tool use, reasoning, coding, and live assistance",
    "open_weights": false,
-   "knowledge": "2026-02-01",
-   "last_updated": "2026-08-12",
+   "last_updated": "2026-03-09",
    "modalities": {
     "input": [
      "text",
@@ -68,9 +136,9 @@
    "cost": {
     "text": {
      "input": {
-      "price": 2,
+      "price": 1.25,
       "cache": {
-       "read": 0.5
+       "read": 0.2
       },
       "overrides": [
        {
@@ -79,15 +147,15 @@
           "gte": 200000
          }
         },
-        "price": 4,
+        "price": 2.5,
         "cache": {
-         "read": 1
+         "read": 0.4
         }
        }
       ]
      },
      "output": {
-      "price": 6,
+      "price": 2.5,
       "overrides": [
        {
         "when": {
@@ -95,7 +163,7 @@
           "gte": 200000
          }
         },
-        "price": 12
+        "price": 5
        }
       ]
      }
@@ -112,16 +180,6 @@
       },
       "factor": {
        "text": 2
-      }
-     },
-     {
-      "when": {
-       "region": {
-        "equals": "us"
-       }
-      },
-      "factor": {
-       "text": 1.1
       }
      }
     ]
@@ -163,6 +221,200 @@
        ],
        "updates": false
       }
+     }
+    }
+   }
+  },
+  "grok-imagine-video-1.5": {
+   "id": "grok-imagine-video-1.5",
+   "name": "Grok Imagine Video 1.5",
+   "type": "video",
+   "canonical_id": "xai/grok-imagine-video-1.5",
+   "family": "grok",
+   "release_date": "2026-05-30",
+   "limit": {
+    "context": 1024,
+    "output": 0
+   },
+   "capabilities": {
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    },
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Video model for text-to-video, image-to-video, and reference-to-video generation with optional voice references",
+   "open_weights": false,
+   "last_updated": "2026-05-30",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp",
+     "audio"
+    ],
+    "output": [
+     "video/mp4"
+    ]
+   },
+   "cost": {
+    "image": {
+     "input": {
+      "unit": "image",
+      "price": 0.01
+     }
+    },
+    "video": {
+     "output": {
+      "unit": "second",
+      "price": 0.08,
+      "overrides": [
+       {
+        "when": {
+         "resolution": {
+          "equals": "720p"
+         }
+        },
+        "price": 0.14
+       },
+       {
+        "when": {
+         "resolution": {
+          "equals": "1080p"
+         }
+        },
+        "price": 0.25
+       }
+      ]
+     }
+    }
+   },
+   "api": {
+    "videos": {
+     "base_url": "https://api.x.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/xai",
+      "opencodeai": "@opencode/ai/providers/xai/videos"
+     }
+    }
+   }
+  },
+  "grok-4.20-multi-agent-0309": {
+   "id": "grok-4.20-multi-agent-0309",
+   "name": "Grok 4.20 Multi-Agent",
+   "type": "chat",
+   "family": "grok",
+   "release_date": "2026-03-09",
+   "limit": {
+    "context": 1000000,
+    "output": 30000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": true,
+    "effort_updates": false,
+    "store": true,
+    "prompt_cache_key": true,
+    "service_tier": [
+     "priority"
+    ]
+   },
+   "description": "Grok model for agentic tool use, reasoning, coding, and live assistance",
+   "open_weights": false,
+   "last_updated": "2026-03-09",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.25,
+      "cache": {
+       "read": 0.2
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gte": 200000
+         }
+        },
+        "price": 2.5,
+        "cache": {
+         "read": 0.4
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 2.5,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gte": 200000
+         }
+        },
+        "price": 5
+       }
+      ]
+     }
+    },
+    "web_search": {
+     "price": 5
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     }
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.x.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/xai",
+      "opencodeai": "@opencode/ai/providers/xai"
      }
     }
    }
@@ -315,6 +567,61 @@
     }
    }
   },
+  "grok-tts": {
+   "id": "grok-tts",
+   "name": "Grok TTS",
+   "type": "speech",
+   "canonical_id": "xai/grok-tts",
+   "release_date": "2026-03-16",
+   "limit": {
+    "context": 15000,
+    "output": 15000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    },
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Convert text into spoken audio with a single API call. The API supports a rich set of expressive voices, inline speech tags for fine-grained delivery control, and output formats from high-fidelity MP3 to telephony-optimized μ-law.",
+   "open_weights": false,
+   "last_updated": "2026-03-16",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "audio/mpeg",
+     "audio/wav",
+     "audio/pcm",
+     "audio/basic",
+     "audio/alaw"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "unit": "character",
+      "price": 15
+     }
+    }
+   },
+   "api": {
+    "speech": {
+     "base_url": "https://api.x.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/xai"
+     }
+    }
+   }
+  },
   "grok-imagine-image": {
    "id": "grok-imagine-image",
    "name": "Grok Imagine Image",
@@ -376,94 +683,13 @@
     }
    }
   },
-  "grok-imagine-video-1.5": {
-   "id": "grok-imagine-video-1.5",
-   "name": "Grok Imagine Video 1.5",
-   "type": "video",
-   "canonical_id": "xai/grok-imagine-video-1.5",
-   "family": "grok",
-   "release_date": "2026-05-30",
-   "limit": {
-    "context": 1024,
-    "output": 0
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Video model for text-to-video, image-to-video, and reference-to-video generation with optional voice references",
-   "open_weights": false,
-   "last_updated": "2026-05-30",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/webp",
-     "audio"
-    ],
-    "output": [
-     "video/mp4"
-    ]
-   },
-   "cost": {
-    "image": {
-     "input": {
-      "unit": "image",
-      "price": 0.01
-     }
-    },
-    "video": {
-     "output": {
-      "unit": "second",
-      "price": 0.08,
-      "overrides": [
-       {
-        "when": {
-         "resolution": {
-          "equals": "720p"
-         }
-        },
-        "price": 0.14
-       },
-       {
-        "when": {
-         "resolution": {
-          "equals": "1080p"
-         }
-        },
-        "price": 0.25
-       }
-      ]
-     }
-    }
-   },
-   "api": {
-    "videos": {
-     "base_url": "https://api.x.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/xai",
-      "opencodeai": "@opencode/ai/providers/xai/videos"
-     }
-    }
-   }
-  },
-  "grok-4.7": {
-   "id": "grok-4.7",
-   "name": "Grok 4.7",
+  "grok-4.5": {
+   "id": "grok-4.5",
+   "name": "Grok 4.5",
    "type": "chat",
-   "canonical_id": "xai/grok-4.7",
+   "canonical_id": "xai/grok-4.5",
    "family": "grok",
-   "release_date": "2026-09-21",
+   "release_date": "2026-07-08",
    "limit": {
     "context": 500000,
     "output": 500000
@@ -501,10 +727,9 @@
      "priority"
     ]
    },
-   "description": "xAI's frontier model for long-running agents, coding, knowledge work, and visual projects",
+   "description": "xAI's Grok model for chat, coding, agentic tools, and lower hallucination risk",
    "open_weights": false,
-   "knowledge": "2026-05",
-   "last_updated": "2026-09-21",
+   "last_updated": "2026-07-08",
    "modalities": {
     "input": [
      "text",
@@ -521,7 +746,7 @@
      "input": {
       "price": 2,
       "cache": {
-       "read": 0.5
+       "read": 0.3
       },
       "overrides": [
        {
@@ -532,7 +757,7 @@
         },
         "price": 4,
         "cache": {
-         "read": 1
+         "read": 0.6
         }
        }
       ]
@@ -563,16 +788,6 @@
       },
       "factor": {
        "text": 2
-      }
-     },
-     {
-      "when": {
-       "region": {
-        "equals": "us"
-       }
-      },
-      "factor": {
-       "text": 1.1
       }
      }
     ]
@@ -757,266 +972,13 @@
     }
    }
   },
-  "grok-4.20-multi-agent-0309": {
-   "id": "grok-4.20-multi-agent-0309",
-   "name": "Grok 4.20 Multi-Agent",
+  "grok-4.7": {
+   "id": "grok-4.7",
+   "name": "Grok 4.7",
    "type": "chat",
+   "canonical_id": "xai/grok-4.7",
    "family": "grok",
-   "release_date": "2026-03-09",
-   "limit": {
-    "context": 1000000,
-    "output": 30000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": true,
-    "effort_updates": false,
-    "store": true,
-    "prompt_cache_key": true,
-    "service_tier": [
-     "priority"
-    ]
-   },
-   "description": "Grok model for agentic tool use, reasoning, coding, and live assistance",
-   "open_weights": false,
-   "last_updated": "2026-03-09",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.25,
-      "cache": {
-       "read": 0.2
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gte": 200000
-         }
-        },
-        "price": 2.5,
-        "cache": {
-         "read": 0.4
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 2.5,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gte": 200000
-         }
-        },
-        "price": 5
-       }
-      ]
-     }
-    },
-    "web_search": {
-     "price": 5
-    },
-    "multipliers": [
-     {
-      "when": {
-       "service_tier": {
-        "equals": "priority"
-       }
-      },
-      "factor": {
-       "text": 2
-      }
-     }
-    ]
-   },
-   "api": {
-    "responses": {
-     "base_url": "https://api.x.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/xai",
-      "opencodeai": "@opencode/ai/providers/xai"
-     }
-    }
-   }
-  },
-  "grok-voice-transcribe-2.0": {
-   "id": "grok-voice-transcribe-2.0",
-   "name": "Grok Voice Transcribe 2.0",
-   "type": "transcription",
-   "canonical_id": "xai/grok-voice-transcribe-2.0",
-   "family": "grok",
-   "release_date": "2026-09-17",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Speech-to-text model with word-level timestamps, speaker diarization, multichannel audio, and streaming",
-   "open_weights": false,
-   "last_updated": "2026-09-17",
-   "modalities": {
-    "input": [
-     "audio/wav",
-     "audio/mpeg",
-     "audio/ogg",
-     "audio/flac",
-     "audio/aac",
-     "audio/mp4"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "audio": {
-     "input": {
-      "unit": "minute",
-      "price": 0.0016667,
-      "overrides": [
-       {
-        "when": {
-         "websocket": {
-          "equals": true
-         }
-        },
-        "price": 0.0033333
-       }
-      ]
-     }
-    }
-   },
-   "api": {
-    "transcriptions": {
-     "base_url": "https://api.x.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/xai"
-     }
-    }
-   }
-  },
-  "grok-voice-3.0": {
-   "id": "grok-voice-3.0",
-   "name": "Grok Voice 3.0",
-   "type": "realtime",
-   "canonical_id": "xai/grok-voice-3.0",
-   "family": "grok",
-   "release_date": "2026-10-14",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "default": {
-      "type": "effort",
-      "value": "high"
-     },
-     "effort": [
-      "none",
-      "high"
-     ]
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Speech-to-speech model for real-time voice agents with tool use and optional reasoning",
-   "open_weights": false,
-   "last_updated": "2026-10-14",
-   "modalities": {
-    "input": [
-     "text",
-     "audio/pcm",
-     "audio/pcmu",
-     "audio/pcma",
-     "audio/opus"
-    ],
-    "output": [
-     "text",
-     "audio/pcm",
-     "audio/pcmu",
-     "audio/pcma",
-     "audio/opus"
-    ]
-   },
-   "cost": {
-    "audio": {
-     "input": {
-      "unit": "minute",
-      "price": 0.08
-     }
-    }
-   },
-   "api": {
-    "realtime": {
-     "base_url": "https://api.x.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/xai"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "grok-4.5": {
-   "id": "grok-4.5",
-   "name": "Grok 4.5",
-   "type": "chat",
-   "canonical_id": "xai/grok-4.5",
-   "family": "grok",
-   "release_date": "2026-07-08",
+   "release_date": "2026-09-21",
    "limit": {
     "context": 500000,
     "output": 500000
@@ -1054,9 +1016,10 @@
      "priority"
     ]
    },
-   "description": "xAI's Grok model for chat, coding, agentic tools, and lower hallucination risk",
+   "description": "xAI's frontier model for long-running agents, coding, knowledge work, and visual projects",
    "open_weights": false,
-   "last_updated": "2026-07-08",
+   "knowledge": "2026-05",
+   "last_updated": "2026-09-21",
    "modalities": {
     "input": [
      "text",
@@ -1073,7 +1036,7 @@
      "input": {
       "price": 2,
       "cache": {
-       "read": 0.3
+       "read": 0.5
       },
       "overrides": [
        {
@@ -1084,7 +1047,7 @@
         },
         "price": 4,
         "cache": {
-         "read": 0.6
+         "read": 1
         }
        }
       ]
@@ -1116,216 +1079,15 @@
       "factor": {
        "text": 2
       }
-     }
-    ]
-   },
-   "api": {
-    "responses": {
-     "base_url": "https://api.x.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/xai",
-      "opencodeai": "@opencode/ai/providers/xai"
      },
-     "capabilities": {
-      "tools": {
-       "strict": true,
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "https://api.x.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/xai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "strict": true,
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "grok-imagine-video": {
-   "id": "grok-imagine-video",
-   "name": "Grok Imagine Video",
-   "type": "video",
-   "family": "grok",
-   "release_date": "2026-01-28",
-   "limit": {
-    "context": 1024,
-    "output": 0
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Image model for prompt-driven generation, editing, and visual design workflows",
-   "open_weights": false,
-   "last_updated": "2026-01-28",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/webp",
-     "video/mp4"
-    ],
-    "output": [
-     "video/mp4"
-    ]
-   },
-   "cost": {
-    "image": {
-     "input": {
-      "unit": "image",
-      "price": 0.002
-     }
-    },
-    "video": {
-     "output": {
-      "unit": "second",
-      "price": 0.05,
-      "overrides": [
-       {
-        "when": {
-         "resolution": {
-          "equals": "720p"
-         }
-        },
-        "price": 0.07
-       }
-      ]
-     }
-    }
-   },
-   "api": {
-    "videos": {
-     "base_url": "https://api.x.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/xai",
-      "opencodeai": "@opencode/ai/providers/xai/videos"
-     }
-    }
-   }
-  },
-  "grok-build-0.1": {
-   "id": "grok-build-0.1",
-   "name": "Grok Build 0.1",
-   "type": "chat",
-   "family": "grok-build",
-   "release_date": "2026-04-16",
-   "limit": {
-    "context": 256000,
-    "output": 256000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": true,
-    "effort_updates": false,
-    "store": true,
-    "stream_usage": true,
-    "prompt_cache_key": true,
-    "service_tier": [
-     "priority"
-    ]
-   },
-   "description": "Fast Grok coding model tuned for agentic engineering and iterative edits",
-   "open_weights": false,
-   "last_updated": "2026-04-16",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1,
-      "cache": {
-       "read": 0.2
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gte": 200000
-         }
-        },
-        "price": 2,
-        "cache": {
-         "read": 0.4
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 2,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gte": 200000
-         }
-        },
-        "price": 4
-       }
-      ]
-     }
-    },
-    "web_search": {
-     "price": 5
-    },
-    "multipliers": [
      {
       "when": {
-       "service_tier": {
-        "equals": "priority"
+       "region": {
+        "equals": "us"
        }
       },
       "factor": {
-       "text": 2
+       "text": 1.1
       }
      }
     ]
@@ -1521,13 +1283,12 @@
     }
    }
   },
-  "grok-imagine-video-1.5-lite": {
-   "id": "grok-imagine-video-1.5-lite",
-   "name": "Grok Imagine Video 1.5 Lite",
+  "grok-imagine-video": {
+   "id": "grok-imagine-video",
+   "name": "Grok Imagine Video",
    "type": "video",
-   "canonical_id": "xai/grok-imagine-video-1.5-lite",
    "family": "grok",
-   "release_date": "2026-10-01",
+   "release_date": "2026-01-28",
    "limit": {
     "context": 1024,
     "output": 0
@@ -1545,15 +1306,16 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Cost-efficient video model for text-to-video and image-to-video generation",
+   "description": "Image model for prompt-driven generation, editing, and visual design workflows",
    "open_weights": false,
-   "last_updated": "2026-10-01",
+   "last_updated": "2026-01-28",
    "modalities": {
     "input": [
      "text",
      "image/jpeg",
      "image/png",
-     "image/webp"
+     "image/webp",
+     "video/mp4"
     ],
     "output": [
      "video/mp4"
@@ -1563,13 +1325,13 @@
     "image": {
      "input": {
       "unit": "image",
-      "price": 0.01
+      "price": 0.002
      }
     },
     "video": {
      "output": {
       "unit": "second",
-      "price": 0.02,
+      "price": 0.05,
       "overrides": [
        {
         "when": {
@@ -1577,15 +1339,7 @@
           "equals": "720p"
          }
         },
-        "price": 0.03
-       },
-       {
-        "when": {
-         "resolution": {
-          "equals": "1080p"
-         }
-        },
-        "price": 0.14
+        "price": 0.07
        }
       ]
      }
@@ -1601,22 +1355,31 @@
     }
    }
   },
-  "grok-tts": {
-   "id": "grok-tts",
-   "name": "Grok TTS",
-   "type": "speech",
-   "canonical_id": "xai/grok-tts",
-   "release_date": "2026-03-16",
+  "grok-voice-3.0": {
+   "id": "grok-voice-3.0",
+   "name": "Grok Voice 3.0",
+   "type": "realtime",
+   "canonical_id": "xai/grok-voice-3.0",
+   "family": "grok",
+   "release_date": "2026-10-14",
    "limit": {
-    "context": 15000,
-    "output": 15000
+    "context": 0,
+    "output": 0
    },
    "capabilities": {
     "tools": {
-     "supported": false
+     "supported": true
     },
     "reasoning": {
-     "supported": false
+     "supported": true,
+     "default": {
+      "type": "effort",
+      "value": "high"
+     },
+     "effort": [
+      "none",
+      "high"
+     ]
     },
     "temperature": false,
     "top_p": false,
@@ -1624,47 +1387,56 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Convert text into spoken audio with a single API call. The API supports a rich set of expressive voices, inline speech tags for fine-grained delivery control, and output formats from high-fidelity MP3 to telephony-optimized μ-law.",
+   "description": "Speech-to-speech model for real-time voice agents with tool use and optional reasoning",
    "open_weights": false,
-   "last_updated": "2026-03-16",
+   "last_updated": "2026-10-14",
    "modalities": {
     "input": [
-     "text"
+     "text",
+     "audio/pcm",
+     "audio/pcmu",
+     "audio/pcma",
+     "audio/opus"
     ],
     "output": [
-     "audio/mpeg",
-     "audio/wav",
+     "text",
      "audio/pcm",
-     "audio/basic",
-     "audio/alaw"
+     "audio/pcmu",
+     "audio/pcma",
+     "audio/opus"
     ]
    },
    "cost": {
-    "text": {
+    "audio": {
      "input": {
-      "unit": "character",
-      "price": 15
+      "unit": "minute",
+      "price": 0.08
      }
     }
    },
    "api": {
-    "speech": {
+    "realtime": {
      "base_url": "https://api.x.ai/v1",
      "sdk": {
       "aisdk": "@ai-sdk/xai"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
      }
     }
    }
   },
-  "grok-4.20-0309-non-reasoning": {
-   "id": "grok-4.20-0309-non-reasoning",
-   "name": "Grok 4.20 (Non-Reasoning)",
+  "grok-build-0.1": {
+   "id": "grok-build-0.1",
+   "name": "Grok Build 0.1",
    "type": "chat",
-   "family": "grok",
-   "release_date": "2026-03-09",
+   "family": "grok-build",
+   "release_date": "2026-04-16",
    "limit": {
-    "context": 1000000,
-    "output": 30000
+    "context": 256000,
+    "output": 256000
    },
    "capabilities": {
     "cache": {
@@ -1674,7 +1446,7 @@
      "supported": true
     },
     "reasoning": {
-     "supported": false
+     "supported": true
     },
     "structured_output": true,
     "temperature": true,
@@ -1689,9 +1461,9 @@
      "priority"
     ]
    },
-   "description": "Grok model for agentic tool use, reasoning, coding, and live assistance",
+   "description": "Fast Grok coding model tuned for agentic engineering and iterative edits",
    "open_weights": false,
-   "last_updated": "2026-03-09",
+   "last_updated": "2026-04-16",
    "modalities": {
     "input": [
      "text",
@@ -1706,7 +1478,7 @@
    "cost": {
     "text": {
      "input": {
-      "price": 1.25,
+      "price": 1,
       "cache": {
        "read": 0.2
       },
@@ -1717,7 +1489,7 @@
           "gte": 200000
          }
         },
-        "price": 2.5,
+        "price": 2,
         "cache": {
          "read": 0.4
         }
@@ -1725,7 +1497,7 @@
       ]
      },
      "output": {
-      "price": 2.5,
+      "price": 2,
       "overrides": [
        {
         "when": {
@@ -1733,7 +1505,7 @@
           "gte": 200000
          }
         },
-        "price": 5
+        "price": 4
        }
       ]
      }
@@ -1750,6 +1522,234 @@
       },
       "factor": {
        "text": 2
+      }
+     }
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.x.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/xai",
+      "opencodeai": "@opencode/ai/providers/xai"
+     },
+     "capabilities": {
+      "tools": {
+       "strict": true,
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "https://api.x.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/xai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "strict": true,
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "grok-voice-transcribe-2.0": {
+   "id": "grok-voice-transcribe-2.0",
+   "name": "Grok Voice Transcribe 2.0",
+   "type": "transcription",
+   "canonical_id": "xai/grok-voice-transcribe-2.0",
+   "family": "grok",
+   "release_date": "2026-09-17",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    },
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Speech-to-text model with word-level timestamps, speaker diarization, multichannel audio, and streaming",
+   "open_weights": false,
+   "last_updated": "2026-09-17",
+   "modalities": {
+    "input": [
+     "audio/wav",
+     "audio/mpeg",
+     "audio/ogg",
+     "audio/flac",
+     "audio/aac",
+     "audio/mp4"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "audio": {
+     "input": {
+      "unit": "minute",
+      "price": 0.0016667,
+      "overrides": [
+       {
+        "when": {
+         "websocket": {
+          "equals": true
+         }
+        },
+        "price": 0.0033333
+       }
+      ]
+     }
+    }
+   },
+   "api": {
+    "transcriptions": {
+     "base_url": "https://api.x.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/xai"
+     }
+    }
+   }
+  },
+  "grok-4.6": {
+   "id": "grok-4.6",
+   "name": "Grok 4.6",
+   "type": "chat",
+   "canonical_id": "xai/grok-4.6",
+   "family": "grok",
+   "release_date": "2026-08-12",
+   "limit": {
+    "context": 500000,
+    "output": 500000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "default": {
+      "type": "effort",
+      "value": "high"
+     },
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": true,
+    "effort_updates": false,
+    "store": true,
+    "stream_usage": true,
+    "prompt_cache_key": true,
+    "service_tier": [
+     "priority"
+    ]
+   },
+   "description": "xAI's frontier model for long-running agents, coding, knowledge work, and visual projects",
+   "open_weights": false,
+   "knowledge": "2026-02-01",
+   "last_updated": "2026-08-12",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.5
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gte": 200000
+         }
+        },
+        "price": 4,
+        "cache": {
+         "read": 1
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 6,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gte": 200000
+         }
+        },
+        "price": 12
+       }
+      ]
+     }
+    },
+    "web_search": {
+     "price": 5
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     },
+     {
+      "when": {
+       "region": {
+        "equals": "us"
+       }
+      },
+      "factor": {
+       "text": 1.1
       }
      }
     ]

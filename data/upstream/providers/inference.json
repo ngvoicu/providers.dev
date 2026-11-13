@@ -6,16 +6,16 @@
   "INFERENCE_API_KEY"
  ],
  "models": {
-  "osmosis/osmosis-structure-0.6b": {
-   "id": "osmosis/osmosis-structure-0.6b",
-   "name": "Osmosis Structure 0.6B",
+  "qwen/qwen-2.5-7b-vision-instruct": {
+   "id": "qwen/qwen-2.5-7b-vision-instruct",
+   "name": "Qwen 2.5 7B Vision Instruct",
    "type": "chat",
-   "family": "osmosis",
+   "family": "qwen",
    "status": "deprecated",
    "release_date": "2025-01-01",
    "limit": {
-    "context": 4000,
-    "output": 2048
+    "context": 125000,
+    "output": 4096
    },
    "capabilities": {
     "tools": {
@@ -28,13 +28,17 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Open-weight instruction model for adaptable chat and self-hosted production workloads",
+   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
    "open_weights": true,
    "knowledge": "2024-12",
    "last_updated": "2025-01-01",
    "modalities": {
     "input": [
-     "text"
+     "text",
+     "image/webp",
+     "image/png",
+     "image/gif",
+     "image/jpeg"
     ],
     "output": [
      "text"
@@ -43,10 +47,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.1
+      "price": 0.2
      },
      "output": {
-      "price": 0.5
+      "price": 0.2
      }
     }
    },
@@ -61,6 +65,63 @@
       "tools": {
        "updates": false
       }
+     }
+    }
+   }
+  },
+  "qwen/qwen3-embedding-4b": {
+   "id": "qwen/qwen3-embedding-4b",
+   "name": "Qwen 3 Embedding 4B",
+   "type": "embedding",
+   "canonical_id": "alibaba/qwen3-embedding-4b",
+   "family": "qwen",
+   "status": "deprecated",
+   "release_date": "2025-06-05",
+   "limit": {
+    "context": 32000,
+    "output": 2048
+   },
+   "capabilities": {
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    },
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Embedding model for semantic search, retrieval, clustering, and ranking pipelines",
+   "open_weights": true,
+   "knowledge": "2024-12",
+   "last_updated": "2025-06-05",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.01
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "api": {
+    "embeddings": {
+     "base_url": "https://inference.net/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
      }
     }
    }
@@ -309,68 +370,6 @@
     }
    }
   },
-  "mistral/mistral-nemo-12b-instruct": {
-   "id": "mistral/mistral-nemo-12b-instruct",
-   "name": "Mistral Nemo 12B Instruct",
-   "type": "chat",
-   "canonical_id": "mistral/mistral-nemo",
-   "family": "mistral-nemo",
-   "status": "deprecated",
-   "release_date": "2024-07-18",
-   "limit": {
-    "context": 16000,
-    "output": 4096
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Mistral model for multilingual chat, reasoning, and tool-assisted workflows",
-   "open_weights": true,
-   "knowledge": "2024-12",
-   "last_updated": "2024-07-18",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.038
-     },
-     "output": {
-      "price": 0.1
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://inference.net/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
   "google/gemma-3": {
    "id": "google/gemma-3",
    "name": "Google Gemma 3",
@@ -433,73 +432,78 @@
     }
    }
   },
-  "qwen/qwen3-embedding-4b": {
-   "id": "qwen/qwen3-embedding-4b",
-   "name": "Qwen 3 Embedding 4B",
-   "type": "embedding",
-   "canonical_id": "alibaba/qwen3-embedding-4b",
-   "family": "qwen",
+  "mistral/mistral-nemo-12b-instruct": {
+   "id": "mistral/mistral-nemo-12b-instruct",
+   "name": "Mistral Nemo 12B Instruct",
+   "type": "chat",
+   "canonical_id": "mistral/mistral-nemo",
+   "family": "mistral-nemo",
    "status": "deprecated",
-   "release_date": "2025-06-05",
+   "release_date": "2024-07-18",
    "limit": {
-    "context": 32000,
-    "output": 2048
+    "context": 16000,
+    "output": 4096
    },
    "capabilities": {
     "tools": {
-     "supported": false
+     "supported": true
     },
     "reasoning": {
      "supported": false
     },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Embedding model for semantic search, retrieval, clustering, and ranking pipelines",
+   "description": "Mistral model for multilingual chat, reasoning, and tool-assisted workflows",
    "open_weights": true,
    "knowledge": "2024-12",
-   "last_updated": "2025-06-05",
+   "last_updated": "2024-07-18",
    "modalities": {
     "input": [
      "text"
     ],
     "output": [
-     "embedding"
+     "text"
     ]
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.01
+      "price": 0.038
      },
      "output": {
-      "price": 0
+      "price": 0.1
      }
     }
    },
    "api": {
-    "embeddings": {
+    "chat-completions": {
      "base_url": "https://inference.net/v1",
      "sdk": {
       "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
      }
     }
    }
   },
-  "qwen/qwen-2.5-7b-vision-instruct": {
-   "id": "qwen/qwen-2.5-7b-vision-instruct",
-   "name": "Qwen 2.5 7B Vision Instruct",
+  "osmosis/osmosis-structure-0.6b": {
+   "id": "osmosis/osmosis-structure-0.6b",
+   "name": "Osmosis Structure 0.6B",
    "type": "chat",
-   "family": "qwen",
+   "family": "osmosis",
    "status": "deprecated",
    "release_date": "2025-01-01",
    "limit": {
-    "context": 125000,
-    "output": 4096
+    "context": 4000,
+    "output": 2048
    },
    "capabilities": {
     "tools": {
@@ -512,17 +516,13 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
+   "description": "Open-weight instruction model for adaptable chat and self-hosted production workloads",
    "open_weights": true,
    "knowledge": "2024-12",
    "last_updated": "2025-01-01",
    "modalities": {
     "input": [
-     "text",
-     "image/webp",
-     "image/png",
-     "image/gif",
-     "image/jpeg"
+     "text"
     ],
     "output": [
      "text"
@@ -531,10 +531,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.2
+      "price": 0.1
      },
      "output": {
-      "price": 0.2
+      "price": 0.5
      }
     }
    },

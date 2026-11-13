@@ -6,16 +6,16 @@
   "ALIBABA_TOKEN_PLAN_API_KEY"
  ],
  "models": {
-  "deepseek-v4.1-flash": {
-   "id": "deepseek-v4.1-flash",
-   "name": "DeepSeek V4.1 Flash",
+  "kimi-k2.7-code": {
+   "id": "kimi-k2.7-code",
+   "name": "Kimi K2.7 Code",
    "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4.1-flash",
-   "family": "deepseek-flash",
-   "release_date": "2026-09-10",
+   "canonical_id": "moonshotai/kimi-k2.7-code",
+   "family": "kimi-k2",
+   "release_date": "2026-06-12",
    "limit": {
-    "context": 1000000,
-    "output": 384000
+    "context": 262144,
+    "output": 262144
    },
    "capabilities": {
     "tools": {
@@ -24,315 +24,38 @@
     "reasoning": {
      "supported": true,
      "toggle": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
+     "budget": {}
     },
-    "structured_output": false,
-    "temperature": true,
-    "top_p": true,
+    "structured_output": true,
+    "temperature": false,
+    "top_p": false,
     "top_k": false,
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "DeepSeek V4.1 Flash model for reasoning and agentic coding",
+   "description": "Coding-focused Kimi model, stronger on long-horizon repo work with less overthinking",
    "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-09-10",
+   "knowledge": "2025-01",
+   "last_updated": "2026-06-12",
    "modalities": {
     "input": [
      "text",
      "image/jpeg",
      "image/png",
      "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/alibaba/chat"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/alibaba/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/apps/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/alibaba/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "glm-5.3": {
-   "id": "glm-5.3",
-   "name": "GLM-5.3",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-5.3",
-   "family": "glm",
-   "release_date": "2026-08-14",
-   "limit": {
-    "context": 1000000,
-    "output": 131072
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
-   "open_weights": true,
-   "last_updated": "2026-08-14",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/alibaba/chat"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/alibaba/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/apps/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/alibaba/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "wan2.7-image": {
-   "id": "wan2.7-image",
-   "name": "Wan2.7 Image",
-   "type": "image",
-   "release_date": "2026-05-29",
-   "limit": {
-    "context": 8192,
-    "output": 0
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Image model for prompt-driven generation, editing, and visual design workflows",
-   "open_weights": false,
-   "last_updated": "2026-05-29",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "image/png"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "images": {
-     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/api/v1",
-     "sdk": {
-      "opencodeai": "@opencode/ai/providers/alibaba/images"
-     }
-    }
-   }
-  },
-  "qwen3.6-plus": {
-   "id": "qwen3.6-plus",
-   "name": "Qwen3.6 Plus",
-   "type": "chat",
-   "canonical_id": "alibaba/qwen3.6-plus",
-   "family": "qwen",
-   "release_date": "2026-04-02",
-   "limit": {
-    "context": 1000000,
-    "output": 65536
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "budget": {
-      "max": 131072
-     }
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Earlier Qwen multimodal workhorse for million-token agent and document tasks",
-   "open_weights": false,
-   "knowledge": "2025-04",
-   "last_updated": "2026-04-02",
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
      "image/webp",
+     "image/bmp",
      "image/heic",
+     "image/heif",
      "video/mp4",
-     "video/x-msvideo",
-     "video/x-matroska",
-     "video/quicktime",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
      "video/x-flv",
-     "video/x-ms-wmv"
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp"
     ],
     "output": [
      "text"
@@ -366,25 +89,7 @@
       "tools": {
        "choice": [
         "auto",
-        "none",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/alibaba/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "tool"
+        "none"
        ],
        "updates": false
       }
@@ -400,9 +105,7 @@
       "tools": {
        "choice": [
         "auto",
-        "none",
-        "required",
-        "tool"
+        "none"
        ],
        "updates": false
       }
@@ -465,6 +168,100 @@
     }
    }
   },
+  "qwen3.8-max-preview": {
+   "id": "qwen3.8-max-preview",
+   "name": "Qwen3.8 Max Preview",
+   "type": "chat",
+   "canonical_id": "alibaba/qwen3.8-max-preview",
+   "family": "qwen",
+   "status": "deprecated",
+   "release_date": "2026-07-19",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "xhigh"
+     ],
+     "budget": {
+      "min": 0,
+      "max": 262144
+     }
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Preview Qwen flagship for million-token multimodal reasoning and long-horizon agentic workflows",
+   "open_weights": false,
+   "last_updated": "2026-07-19",
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/x-matroska",
+     "video/quicktime",
+     "video/x-flv",
+     "video/x-ms-wmv"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/alibaba/chat"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   }
+  },
   "happyhorse-1.1-t2v": {
    "id": "happyhorse-1.1-t2v",
    "name": "HappyHorse 1.1 Text-to-Video",
@@ -515,395 +312,9 @@
     }
    }
   },
-  "glm-5.1": {
-   "id": "glm-5.1",
-   "name": "GLM-5.1",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-5.1",
-   "family": "glm",
-   "release_date": "2026-04-07",
-   "limit": {
-    "context": 202752,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Strong GLM coding model for agentic engineering, terminals, and repository generation",
-   "open_weights": true,
-   "last_updated": "2026-04-07",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/alibaba/chat"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/apps/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/alibaba/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "deepseek-v4.1-flash-1017": {
-   "id": "deepseek-v4.1-flash-1017",
-   "name": "DeepSeek V4.1 Flash 1017",
-   "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
-   "family": "deepseek-flash",
-   "release_date": "2026-10-17",
-   "limit": {
-    "context": 1000000,
-    "output": 384000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": false,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-10-17",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/alibaba/chat"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/alibaba/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/apps/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/alibaba/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "qwen3.6-flash": {
-   "id": "qwen3.6-flash",
-   "name": "Qwen3.6 Flash",
-   "type": "chat",
-   "canonical_id": "alibaba/qwen3.6-flash",
-   "family": "qwen3.6",
-   "release_date": "2026-04-27",
-   "limit": {
-    "context": 1000000,
-    "output": 65536
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "budget": {
-      "max": 131072
-     }
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
-   "open_weights": false,
-   "last_updated": "2026-04-27",
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/x-matroska",
-     "video/quicktime",
-     "video/x-flv",
-     "video/x-ms-wmv"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/alibaba/chat"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/alibaba/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/apps/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/alibaba/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "happyhorse-1.1-r2v": {
-   "id": "happyhorse-1.1-r2v",
-   "name": "HappyHorse 1.1 Reference-to-Video",
-   "type": "video",
-   "release_date": "2026-07-17",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Video model for reference-guided video generation",
-   "open_weights": false,
-   "last_updated": "2026-07-17",
-   "modalities": {
-    "input": [
-     "image/jpeg",
-     "image/png",
-     "image/webp",
-     "text"
-    ],
-    "output": [
-     "video/mp4"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "videos": {
-     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com",
-     "sdk": {
-      "aisdk": "@ai-sdk/alibaba"
-     }
-    }
-   }
-  },
-  "qwen-image-2.0-pro": {
-   "id": "qwen-image-2.0-pro",
-   "name": "Qwen Image 2.0 Pro",
+  "qwen-image-2.0": {
+   "id": "qwen-image-2.0",
+   "name": "Qwen Image 2.0",
    "type": "image",
    "family": "qwen",
    "release_date": "2026-03-03",
@@ -948,252 +359,6 @@
      "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/api/v1",
      "sdk": {
       "opencodeai": "@opencode/ai/providers/alibaba/images"
-     }
-    }
-   }
-  },
-  "qwen3.7-max": {
-   "id": "qwen3.7-max",
-   "name": "Qwen3.7 Max",
-   "type": "chat",
-   "canonical_id": "alibaba/qwen3.7-max",
-   "family": "qwen",
-   "release_date": "2026-05-21",
-   "limit": {
-    "context": 1000000,
-    "output": 131072
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "budget": {
-      "max": 262144
-     }
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Qwen frontier model tuned for agent frameworks, coding assistants, and long tasks",
-   "open_weights": false,
-   "last_updated": "2026-05-21",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/alibaba/chat"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/alibaba/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/apps/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/alibaba/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "wan2.7-image-pro": {
-   "id": "wan2.7-image-pro",
-   "name": "Wan2.7 Image Pro",
-   "type": "image",
-   "release_date": "2026-05-29",
-   "limit": {
-    "context": 8192,
-    "output": 0
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Image model for prompt-driven generation, editing, and visual design workflows",
-   "open_weights": false,
-   "last_updated": "2026-05-29",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "image/png"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "images": {
-     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/api/v1",
-     "sdk": {
-      "opencodeai": "@opencode/ai/providers/alibaba/images"
-     }
-    }
-   }
-  },
-  "MiniMax-M2.5": {
-   "id": "MiniMax-M2.5",
-   "name": "MiniMax-M2.5",
-   "type": "chat",
-   "canonical_id": "minimax/MiniMax-M2.5",
-   "family": "minimax",
-   "release_date": "2026-02-12",
-   "limit": {
-    "context": 196608,
-    "input": 196601,
-    "output": 32768
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Prior MiniMax coding model for agent workflows, office edits, and automation",
-   "open_weights": true,
-   "last_updated": "2026-02-12",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/alibaba/chat"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/apps/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/alibaba/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
      }
     }
    }
@@ -1412,16 +577,16 @@
     }
    }
   },
-  "qwen3.8-flash": {
-   "id": "qwen3.8-flash",
-   "name": "Qwen3.8 Flash",
+  "deepseek-v4-pro": {
+   "id": "deepseek-v4-pro",
+   "name": "DeepSeek V4 Pro",
    "type": "chat",
-   "canonical_id": "alibaba/qwen3.8-flash",
-   "family": "qwen",
-   "release_date": "2026-08-26",
+   "canonical_id": "deepseek/deepseek-v4-pro",
+   "family": "deepseek-thinking",
+   "release_date": "2026-04-24",
    "limit": {
     "context": 1000000,
-    "output": 131072
+    "output": 384000
    },
    "capabilities": {
     "tools": {
@@ -1431,12 +596,122 @@
      "supported": true,
      "toggle": true,
      "effort": [
-      "low",
-      "medium",
-      "xhigh"
-     ],
+      "high",
+      "max"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Open MoE flagship with million-token context for coding and long agent runs",
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-04-24",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/alibaba/chat"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/alibaba/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/apps/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/alibaba/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "qwen3.6-flash": {
+   "id": "qwen3.6-flash",
+   "name": "Qwen3.6 Flash",
+   "type": "chat",
+   "canonical_id": "alibaba/qwen3.6-flash",
+   "family": "qwen3.6",
+   "release_date": "2026-04-27",
+   "limit": {
+    "context": 1000000,
+    "output": 65536
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
      "budget": {
-      "max": 262144
+      "max": 131072
      }
     },
     "structured_output": true,
@@ -1448,7 +723,7 @@
    },
    "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
    "open_weights": false,
-   "last_updated": "2026-08-26",
+   "last_updated": "2026-04-27",
    "modalities": {
     "input": [
      "text",
@@ -1541,14 +816,13 @@
     }
    }
   },
-  "deepseek-v4-flash": {
-   "id": "deepseek-v4-flash",
-   "name": "DeepSeek V4 Flash",
+  "deepseek-v4.1-flash-1017": {
+   "id": "deepseek-v4.1-flash-1017",
+   "name": "DeepSeek V4.1 Flash 1017",
    "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4-flash",
+   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
    "family": "deepseek-flash",
-   "status": "deprecated",
-   "release_date": "2026-04-24",
+   "release_date": "2026-10-17",
    "limit": {
     "context": 1000000,
     "output": 384000
@@ -1561,319 +835,29 @@
      "supported": true,
      "toggle": true,
      "effort": [
+      "low",
       "high",
       "max"
      ]
     },
-    "structured_output": true,
+    "structured_output": false,
     "temperature": true,
     "top_p": true,
     "top_k": false,
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Fast DeepSeek V4 lane for economical reasoning, coding, and long-context work",
+   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
    "open_weights": true,
    "knowledge": "2025-05",
-   "last_updated": "2026-04-24",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/alibaba/chat"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "qwen3.8-max-preview": {
-   "id": "qwen3.8-max-preview",
-   "name": "Qwen3.8 Max Preview",
-   "type": "chat",
-   "canonical_id": "alibaba/qwen3.8-max-preview",
-   "family": "qwen",
-   "status": "deprecated",
-   "release_date": "2026-07-19",
-   "limit": {
-    "context": 1000000,
-    "output": 131072
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "xhigh"
-     ],
-     "budget": {
-      "min": 0,
-      "max": 262144
-     }
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Preview Qwen flagship for million-token multimodal reasoning and long-horizon agentic workflows",
-   "open_weights": false,
-   "last_updated": "2026-07-19",
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/x-matroska",
-     "video/quicktime",
-     "video/x-flv",
-     "video/x-ms-wmv"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/alibaba/chat"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "qwen-image-3.0-pro": {
-   "id": "qwen-image-3.0-pro",
-   "name": "Qwen-Image-3.0-Pro",
-   "type": "image",
-   "canonical_id": "alibaba/qwen-image-3.0-pro",
-   "family": "qwen",
-   "release_date": "2026-08-05",
-   "limit": {
-    "context": 0,
-    "input": 4500,
-    "output": 0
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Higher-quality Qwen-Image-3.0 for complex layouts, small text and photographic detail",
-   "open_weights": false,
-   "last_updated": "2026-08-05",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/bmp",
-     "image/tiff",
-     "image/webp",
-     "image/gif"
-    ],
-    "output": [
-     "image/png"
-    ]
-   },
-   "cost": {
-    "image": {
-     "output": {
-      "unit": "image",
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "images": {
-     "base_url": "https://token-plan.maas.qwencloudapi.com/api/v1",
-     "sdk": {
-      "opencodeai": "@opencode/ai/providers/alibaba/images"
-     }
-    }
-   }
-  },
-  "qwen-image-2.0": {
-   "id": "qwen-image-2.0",
-   "name": "Qwen Image 2.0",
-   "type": "image",
-   "family": "qwen",
-   "release_date": "2026-03-03",
-   "limit": {
-    "context": 8192,
-    "output": 0
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Image model for prompt-driven generation, editing, and visual design workflows",
-   "open_weights": false,
-   "last_updated": "2026-03-03",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "image/png"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "images": {
-     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/api/v1",
-     "sdk": {
-      "opencodeai": "@opencode/ai/providers/alibaba/images"
-     }
-    }
-   }
-  },
-  "kimi-k2.7-code": {
-   "id": "kimi-k2.7-code",
-   "name": "Kimi K2.7 Code",
-   "type": "chat",
-   "canonical_id": "moonshotai/kimi-k2.7-code",
-   "family": "kimi-k2",
-   "release_date": "2026-06-12",
-   "limit": {
-    "context": 262144,
-    "output": 262144
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "budget": {}
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Coding-focused Kimi model, stronger on long-horizon repo work with less overthinking",
-   "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-06-12",
+   "last_updated": "2026-10-17",
    "modalities": {
     "input": [
      "text",
      "image/jpeg",
      "image/png",
      "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/heic",
-     "image/heif",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp"
+     "image/webp"
     ],
     "output": [
      "text"
@@ -1907,7 +891,26 @@
       "tools": {
        "choice": [
         "auto",
-        "none"
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/alibaba/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "tool"
        ],
        "updates": false
       }
@@ -1923,10 +926,65 @@
       "tools": {
        "choice": [
         "auto",
-        "none"
+        "none",
+        "required",
+        "tool"
        ],
        "updates": false
       }
+     }
+    }
+   }
+  },
+  "happyhorse-1.1-i2v": {
+   "id": "happyhorse-1.1-i2v",
+   "name": "HappyHorse 1.1 Image-to-Video",
+   "type": "video",
+   "release_date": "2026-07-17",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    },
+    "temperature": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Video model for image-to-video generation",
+   "open_weights": false,
+   "last_updated": "2026-07-17",
+   "modalities": {
+    "input": [
+     "image/jpeg",
+     "image/png",
+     "image/webp",
+     "text"
+    ],
+    "output": [
+     "video/mp4"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "api": {
+    "videos": {
+     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/alibaba"
      }
     }
    }
@@ -2056,16 +1114,16 @@
     }
    }
   },
-  "deepseek-v3.2": {
-   "id": "deepseek-v3.2",
-   "name": "DeepSeek V3.2",
+  "glm-5.2": {
+   "id": "glm-5.2",
+   "name": "GLM-5.2",
    "type": "chat",
-   "family": "deepseek",
-   "status": "deprecated",
-   "release_date": "2025-12-03",
+   "canonical_id": "zhipuai/glm-5.2",
+   "family": "glm",
+   "release_date": "2026-06-13",
    "limit": {
-    "context": 131072,
-    "output": 65536
+    "context": 1000000,
+    "output": 131072
    },
    "capabilities": {
     "tools": {
@@ -2073,18 +1131,21 @@
     },
     "reasoning": {
      "supported": true,
-     "toggle": true
+     "effort": [
+      "high",
+      "max"
+     ]
     },
     "structured_output": true,
     "temperature": true,
-    "top_k": false,
+    "top_p": true,
+    "top_k": true,
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "DeepSeek chat model for instruction following, coding, and analysis",
+   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
    "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2025-12-05",
+   "last_updated": "2026-06-13",
    "modalities": {
     "input": [
      "text"
@@ -2096,7 +1157,11 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
      },
      "output": {
       "price": 0
@@ -2111,13 +1176,388 @@
       "opencodeai": "@opencode/ai/providers/alibaba/chat"
      },
      "compatibility": {
-      "max_tokens_field": "max_tokens"
+      "reasoning_field": "reasoning_content"
      },
      "capabilities": {
       "tools": {
        "choice": [
         "auto",
         "none"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/alibaba/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/apps/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/alibaba/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "qwen3.7-max": {
+   "id": "qwen3.7-max",
+   "name": "Qwen3.7 Max",
+   "type": "chat",
+   "canonical_id": "alibaba/qwen3.7-max",
+   "family": "qwen",
+   "release_date": "2026-05-21",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "budget": {
+      "max": 262144
+     }
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Qwen frontier model tuned for agent frameworks, coding assistants, and long tasks",
+   "open_weights": false,
+   "last_updated": "2026-05-21",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/alibaba/chat"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/alibaba/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/apps/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/alibaba/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "qwen-image-3.0-pro": {
+   "id": "qwen-image-3.0-pro",
+   "name": "Qwen-Image-3.0-Pro",
+   "type": "image",
+   "canonical_id": "alibaba/qwen-image-3.0-pro",
+   "family": "qwen",
+   "release_date": "2026-08-05",
+   "limit": {
+    "context": 0,
+    "input": 4500,
+    "output": 0
+   },
+   "capabilities": {
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    },
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Higher-quality Qwen-Image-3.0 for complex layouts, small text and photographic detail",
+   "open_weights": false,
+   "last_updated": "2026-08-05",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/bmp",
+     "image/tiff",
+     "image/webp",
+     "image/gif"
+    ],
+    "output": [
+     "image/png"
+    ]
+   },
+   "cost": {
+    "image": {
+     "output": {
+      "unit": "image",
+      "price": 0
+     }
+    }
+   },
+   "api": {
+    "images": {
+     "base_url": "https://token-plan.maas.qwencloudapi.com/api/v1",
+     "sdk": {
+      "opencodeai": "@opencode/ai/providers/alibaba/images"
+     }
+    }
+   }
+  },
+  "qwen-image-2.0-pro": {
+   "id": "qwen-image-2.0-pro",
+   "name": "Qwen Image 2.0 Pro",
+   "type": "image",
+   "family": "qwen",
+   "release_date": "2026-03-03",
+   "limit": {
+    "context": 8192,
+    "output": 0
+   },
+   "capabilities": {
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    },
+    "temperature": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Image model for prompt-driven generation, editing, and visual design workflows",
+   "open_weights": false,
+   "last_updated": "2026-03-03",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "image/png"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "api": {
+    "images": {
+     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/api/v1",
+     "sdk": {
+      "opencodeai": "@opencode/ai/providers/alibaba/images"
+     }
+    }
+   }
+  },
+  "qwen3.6-plus": {
+   "id": "qwen3.6-plus",
+   "name": "Qwen3.6 Plus",
+   "type": "chat",
+   "canonical_id": "alibaba/qwen3.6-plus",
+   "family": "qwen",
+   "release_date": "2026-04-02",
+   "limit": {
+    "context": 1000000,
+    "output": 65536
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "budget": {
+      "max": 131072
+     }
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Earlier Qwen multimodal workhorse for million-token agent and document tasks",
+   "open_weights": false,
+   "knowledge": "2025-04",
+   "last_updated": "2026-04-02",
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/x-matroska",
+     "video/quicktime",
+     "video/x-flv",
+     "video/x-ms-wmv"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/alibaba/chat"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/alibaba/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/apps/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/alibaba/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
        ],
        "updates": false
       }
@@ -2256,13 +1696,809 @@
     }
    }
   },
-  "deepseek-v4-pro": {
-   "id": "deepseek-v4-pro",
-   "name": "DeepSeek V4 Pro",
+  "glm-5": {
+   "id": "glm-5",
+   "name": "GLM-5",
    "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4-pro",
-   "family": "deepseek-thinking",
-   "release_date": "2026-04-24",
+   "canonical_id": "zhipuai/glm-5",
+   "family": "glm",
+   "release_date": "2026-02-12",
+   "limit": {
+    "context": 202752,
+    "output": 16384
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "General GLM flagship for coding, analysis, and tool-heavy engineering workflows",
+   "open_weights": false,
+   "last_updated": "2026-02-12",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/alibaba/chat"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/apps/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/alibaba/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "MiniMax-M2.5": {
+   "id": "MiniMax-M2.5",
+   "name": "MiniMax-M2.5",
+   "type": "chat",
+   "canonical_id": "minimax/MiniMax-M2.5",
+   "family": "minimax",
+   "release_date": "2026-02-12",
+   "limit": {
+    "context": 196608,
+    "input": 196601,
+    "output": 32768
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    },
+    "temperature": true,
+    "top_p": true,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Prior MiniMax coding model for agent workflows, office edits, and automation",
+   "open_weights": true,
+   "last_updated": "2026-02-12",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/alibaba/chat"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/apps/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/alibaba/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "deepseek-v4.1-flash": {
+   "id": "deepseek-v4.1-flash",
+   "name": "DeepSeek V4.1 Flash",
+   "type": "chat",
+   "canonical_id": "deepseek/deepseek-v4.1-flash",
+   "family": "deepseek-flash",
+   "release_date": "2026-09-10",
+   "limit": {
+    "context": 1000000,
+    "output": 384000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    },
+    "structured_output": false,
+    "temperature": true,
+    "top_p": true,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "DeepSeek V4.1 Flash model for reasoning and agentic coding",
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-09-10",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/alibaba/chat"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/alibaba/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/apps/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/alibaba/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "glm-5.1": {
+   "id": "glm-5.1",
+   "name": "GLM-5.1",
+   "type": "chat",
+   "canonical_id": "zhipuai/glm-5.1",
+   "family": "glm",
+   "release_date": "2026-04-07",
+   "limit": {
+    "context": 202752,
+    "output": 128000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Strong GLM coding model for agentic engineering, terminals, and repository generation",
+   "open_weights": true,
+   "last_updated": "2026-04-07",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/alibaba/chat"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/apps/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/alibaba/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "wan2.7-image": {
+   "id": "wan2.7-image",
+   "name": "Wan2.7 Image",
+   "type": "image",
+   "release_date": "2026-05-29",
+   "limit": {
+    "context": 8192,
+    "output": 0
+   },
+   "capabilities": {
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    },
+    "temperature": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Image model for prompt-driven generation, editing, and visual design workflows",
+   "open_weights": false,
+   "last_updated": "2026-05-29",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "image/png"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "api": {
+    "images": {
+     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/api/v1",
+     "sdk": {
+      "opencodeai": "@opencode/ai/providers/alibaba/images"
+     }
+    }
+   }
+  },
+  "glm-5.3": {
+   "id": "glm-5.3",
+   "name": "GLM-5.3",
+   "type": "chat",
+   "canonical_id": "zhipuai/glm-5.3",
+   "family": "glm",
+   "release_date": "2026-08-14",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
+   "open_weights": true,
+   "last_updated": "2026-08-14",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/alibaba/chat"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/alibaba/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/apps/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/alibaba/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "happyhorse-1.1-r2v": {
+   "id": "happyhorse-1.1-r2v",
+   "name": "HappyHorse 1.1 Reference-to-Video",
+   "type": "video",
+   "release_date": "2026-07-17",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    },
+    "temperature": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Video model for reference-guided video generation",
+   "open_weights": false,
+   "last_updated": "2026-07-17",
+   "modalities": {
+    "input": [
+     "image/jpeg",
+     "image/png",
+     "image/webp",
+     "text"
+    ],
+    "output": [
+     "video/mp4"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "api": {
+    "videos": {
+     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/alibaba"
+     }
+    }
+   }
+  },
+  "deepseek-v3.2": {
+   "id": "deepseek-v3.2",
+   "name": "DeepSeek V3.2",
+   "type": "chat",
+   "family": "deepseek",
+   "status": "deprecated",
+   "release_date": "2025-12-03",
+   "limit": {
+    "context": 131072,
+    "output": 65536
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "DeepSeek chat model for instruction following, coding, and analysis",
+   "open_weights": true,
+   "knowledge": "2025-01",
+   "last_updated": "2025-12-05",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/alibaba/chat"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "qwen3.8-flash": {
+   "id": "qwen3.8-flash",
+   "name": "Qwen3.8 Flash",
+   "type": "chat",
+   "canonical_id": "alibaba/qwen3.8-flash",
+   "family": "qwen",
+   "release_date": "2026-08-26",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "medium",
+      "xhigh"
+     ],
+     "budget": {
+      "max": 262144
+     }
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
+   "open_weights": false,
+   "last_updated": "2026-08-26",
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/x-matroska",
+     "video/quicktime",
+     "video/x-flv",
+     "video/x-ms-wmv"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/alibaba/chat"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/alibaba/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/apps/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/alibaba/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "deepseek-v4-flash-0731": {
+   "id": "deepseek-v4-flash-0731",
+   "name": "DeepSeek V4 Flash 0731",
+   "type": "chat",
+   "canonical_id": "deepseek/deepseek-v4-flash-0731",
+   "family": "deepseek-flash",
+   "release_date": "2026-07-31",
    "limit": {
     "context": 1000000,
     "output": 384000
@@ -2286,10 +2522,10 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Open MoE flagship with million-token context for coding and long agent runs",
+   "description": "Official DeepSeek V4 Flash release with enhanced agentic capabilities and integrated DSpark speculative decoding",
    "open_weights": true,
    "knowledge": "2025-05",
-   "last_updated": "2026-04-24",
+   "last_updated": "2026-07-31",
    "modalities": {
     "input": [
      "text"
@@ -2485,263 +2721,14 @@
     }
    }
   },
-  "happyhorse-1.1-i2v": {
-   "id": "happyhorse-1.1-i2v",
-   "name": "HappyHorse 1.1 Image-to-Video",
-   "type": "video",
-   "release_date": "2026-07-17",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Video model for image-to-video generation",
-   "open_weights": false,
-   "last_updated": "2026-07-17",
-   "modalities": {
-    "input": [
-     "image/jpeg",
-     "image/png",
-     "image/webp",
-     "text"
-    ],
-    "output": [
-     "video/mp4"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "videos": {
-     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com",
-     "sdk": {
-      "aisdk": "@ai-sdk/alibaba"
-     }
-    }
-   }
-  },
-  "glm-5": {
-   "id": "glm-5",
-   "name": "GLM-5",
+  "deepseek-v4-flash": {
+   "id": "deepseek-v4-flash",
+   "name": "DeepSeek V4 Flash",
    "type": "chat",
-   "canonical_id": "zhipuai/glm-5",
-   "family": "glm",
-   "release_date": "2026-02-12",
-   "limit": {
-    "context": 202752,
-    "output": 16384
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "General GLM flagship for coding, analysis, and tool-heavy engineering workflows",
-   "open_weights": false,
-   "last_updated": "2026-02-12",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/alibaba/chat"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/apps/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/alibaba/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "glm-5.2": {
-   "id": "glm-5.2",
-   "name": "GLM-5.2",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-5.2",
-   "family": "glm",
-   "release_date": "2026-06-13",
-   "limit": {
-    "context": 1000000,
-    "output": 131072
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
-   "open_weights": true,
-   "last_updated": "2026-06-13",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/alibaba/chat"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/alibaba/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/apps/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/alibaba/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "deepseek-v4-flash-0731": {
-   "id": "deepseek-v4-flash-0731",
-   "name": "DeepSeek V4 Flash 0731",
-   "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4-flash-0731",
+   "canonical_id": "deepseek/deepseek-v4-flash",
    "family": "deepseek-flash",
-   "release_date": "2026-07-31",
+   "status": "deprecated",
+   "release_date": "2026-04-24",
    "limit": {
     "context": 1000000,
     "output": 384000
@@ -2765,10 +2752,10 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Official DeepSeek V4 Flash release with enhanced agentic capabilities and integrated DSpark speculative decoding",
+   "description": "Fast DeepSeek V4 lane for economical reasoning, coding, and long-context work",
    "open_weights": true,
    "knowledge": "2025-05",
-   "last_updated": "2026-07-31",
+   "last_updated": "2026-04-24",
    "modalities": {
     "input": [
      "text"
@@ -2805,47 +2792,60 @@
       "tools": {
        "choice": [
         "auto",
-        "none",
-        "required",
-        "tool"
+        "none"
        ],
        "updates": false
       }
      }
+    }
+   }
+  },
+  "wan2.7-image-pro": {
+   "id": "wan2.7-image-pro",
+   "name": "Wan2.7 Image Pro",
+   "type": "image",
+   "release_date": "2026-05-29",
+   "limit": {
+    "context": 8192,
+    "output": 0
+   },
+   "capabilities": {
+    "tools": {
+     "supported": false
     },
-    "responses": {
-     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/alibaba/responses"
+    "reasoning": {
+     "supported": false
+    },
+    "temperature": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Image model for prompt-driven generation, editing, and visual design workflows",
+   "open_weights": false,
+   "last_updated": "2026-05-29",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "image/png"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
      },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "tool"
-       ],
-       "updates": false
-      }
+     "output": {
+      "price": 0
      }
-    },
-    "messages": {
-     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/apps/anthropic/v1",
+    }
+   },
+   "api": {
+    "images": {
+     "base_url": "https://token-plan.ap-southeast-1.maas.aliyuncs.com/api/v1",
      "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/alibaba/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
+      "opencodeai": "@opencode/ai/providers/alibaba/images"
      }
     }
    }

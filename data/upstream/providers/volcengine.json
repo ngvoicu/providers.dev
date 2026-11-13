@@ -6,6 +6,461 @@
   "ARK_API_KEY"
  ],
  "models": {
+  "doubao-seedance-2-0-260128": {
+   "id": "doubao-seedance-2-0-260128",
+   "name": "Seedance 2.0",
+   "type": "video",
+   "canonical_id": "bytedance-seed/seedance-2.0",
+   "family": "seed",
+   "release_date": "2026-02-12",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    },
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "ByteDance unified multimodal audio-video model supporting text, image, video and audio references, editing, extension and synchronized stereo sound.",
+   "open_weights": false,
+   "last_updated": "2026-10-04",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp",
+     "image/bmp",
+     "image/tiff",
+     "image/gif",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/quicktime",
+     "audio/wav",
+     "audio/mpeg"
+    ],
+    "output": [
+     "video/mp4",
+     "audio"
+    ]
+   },
+   "cost": {
+    "video": {
+     "output": {
+      "price": 6.88026,
+      "overrides": [
+       {
+        "when": {
+         "resolution": {
+          "equals": "1080p"
+         }
+        },
+        "price": 7.62811
+       },
+       {
+        "when": {
+         "resolution": {
+          "equals": "4k"
+         }
+        },
+        "price": 3.88884
+       },
+       {
+        "when": {
+         "resolution": {
+          "in": [
+           "480p",
+           "720p"
+          ]
+         },
+         "input_video": {
+          "equals": true
+         }
+        },
+        "price": 4.18798
+       },
+       {
+        "when": {
+         "resolution": {
+          "equals": "1080p"
+         },
+         "input_video": {
+          "equals": true
+         }
+        },
+        "price": 4.63669
+       },
+       {
+        "when": {
+         "resolution": {
+          "equals": "4k"
+         },
+         "input_video": {
+          "equals": true
+         }
+        },
+        "price": 2.39313
+       }
+      ]
+     }
+    }
+   },
+   "api": {
+    "videos": {
+     "base_url": "https://ark.cn-beijing.volces.com/api/v3",
+     "sdk": {
+      "aisdk": "@ai-sdk/bytedance",
+      "opencodeai": "@opencode/ai/providers/volcengine/videos"
+     }
+    }
+   }
+  },
+  "doubao-seedance-2-5-260628": {
+   "id": "doubao-seedance-2-5-260628",
+   "name": "Seedance 2.5",
+   "type": "video",
+   "canonical_id": "bytedance-seed/seedance-2.5",
+   "family": "seed",
+   "release_date": "2026-07-31",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    },
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "ByteDance multimodal audio-video model with up to 30-second single-pass generation, multi-round extension, reference inputs and timestamp-level editing.",
+   "open_weights": false,
+   "last_updated": "2026-10-04",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp",
+     "image/bmp",
+     "image/tiff",
+     "image/gif",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/quicktime",
+     "audio/wav",
+     "audio/mpeg"
+    ],
+    "output": [
+     "video/mp4",
+     "video/quicktime",
+     "audio"
+    ]
+   },
+   "cost": {
+    "video": {
+     "output": {
+      "price": 10.46996,
+      "overrides": [
+       {
+        "when": {
+         "resolution": {
+          "equals": "1080p"
+         }
+        },
+        "price": 11.51695
+       },
+       {
+        "when": {
+         "resolution": {
+          "in": [
+           "480p",
+           "720p"
+          ]
+         },
+         "input_video": {
+          "equals": true
+         }
+        },
+        "price": 6.28197
+       },
+       {
+        "when": {
+         "resolution": {
+          "equals": "1080p"
+         },
+         "input_video": {
+          "equals": true
+         }
+        },
+        "price": 6.88026
+       }
+      ]
+     }
+    }
+   },
+   "api": {
+    "videos": {
+     "base_url": "https://ark.cn-beijing.volces.com/api/v3",
+     "sdk": {
+      "aisdk": "@ai-sdk/bytedance",
+      "opencodeai": "@opencode/ai/providers/volcengine/videos"
+     }
+    }
+   }
+  },
+  "doubao-seed-character-260628": {
+   "id": "doubao-seed-character-260628",
+   "name": "Seed Character",
+   "type": "chat",
+   "canonical_id": "bytedance-seed/seed-character",
+   "family": "seed",
+   "release_date": "2026-06-23",
+   "limit": {
+    "context": 256000,
+    "output": 256000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "minimal",
+      "low",
+      "high"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "ByteDance Seed model optimized for character-driven dialogue and consistent conversational behavior",
+   "open_weights": false,
+   "last_updated": "2026-06-23",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/tiff",
+     "image/x-icon",
+     "image/x-icns",
+     "image/sgi",
+     "image/jp2",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/quicktime"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.11875,
+      "cache": {
+       "read": 0.02375
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 32000
+         }
+        },
+        "price": 0.17812,
+        "cache": {
+         "read": 0.02375
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 0.29687,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 32000
+         }
+        },
+        "price": 0.8906
+       }
+      ]
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ark.cn-beijing.volces.com/api/v3",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "doubao-seed-1-6-flash-250828": {
+   "id": "doubao-seed-1-6-flash-250828",
+   "name": "Seed 1.6 Flash",
+   "type": "chat",
+   "canonical_id": "bytedance-seed/seed-1-6-flash",
+   "family": "seed",
+   "status": "deprecated",
+   "release_date": "2025-08-28",
+   "limit": {
+    "context": 256000,
+    "output": 32000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Low-latency ByteDance Seed model for high-throughput chat, extraction, and lightweight tool use",
+   "open_weights": false,
+   "last_updated": "2025-08-28",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/tiff",
+     "image/x-icon",
+     "image/x-icns",
+     "image/sgi",
+     "image/jp2",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/quicktime"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.02227,
+      "cache": {
+       "read": 0.00445
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 32000
+         }
+        },
+        "price": 0.04453,
+        "cache": {
+         "read": 0.00445
+        }
+       },
+       {
+        "when": {
+         "context": {
+          "gt": 128000
+         }
+        },
+        "price": 0.08906,
+        "cache": {
+         "read": 0.00445
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 0.22265,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 32000
+         }
+        },
+        "price": 0.4453
+       },
+       {
+        "when": {
+         "context": {
+          "gt": 128000
+         }
+        },
+        "price": 0.8906
+       }
+      ]
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ark.cn-beijing.volces.com/api/v3",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
   "doubao-seed-2-0-mini-260428": {
    "id": "doubao-seed-2-0-mini-260428",
    "name": "Seed 2.0 Mini",
@@ -138,366 +593,6 @@
     }
    }
   },
-  "deepseek-v4-flash-ga-260731": {
-   "id": "deepseek-v4-flash-ga-260731",
-   "name": "DeepSeek V4 Flash 0731",
-   "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4-flash-0731",
-   "family": "deepseek-flash",
-   "release_date": "2026-07-31",
-   "limit": {
-    "context": 1000000,
-    "output": 384000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Official DeepSeek V4 Flash release with enhanced agentic capabilities and integrated DSpark speculative decoding",
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-07-31",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.4453,
-      "cache": {
-       "read": 0.01484
-      }
-     },
-     "output": {
-      "price": 1.3359
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ark.cn-beijing.volces.com/api/v3",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "doubao-seed-2-0-pro-260215": {
-   "id": "doubao-seed-2-0-pro-260215",
-   "name": "Seed 2.0 Pro",
-   "type": "chat",
-   "canonical_id": "bytedance-seed/seed-2.0-pro",
-   "family": "seed",
-   "status": "deprecated",
-   "release_date": "2026-02-14",
-   "limit": {
-    "context": 256000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "minimal",
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Flagship ByteDance Seed 2.0 model for complex multimodal reasoning and long-horizon agent workflows",
-   "open_weights": false,
-   "last_updated": "2026-02-14",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/tiff",
-     "image/x-icon",
-     "image/x-icns",
-     "image/sgi",
-     "image/jp2",
-     "image/heic",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/quicktime"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.47499,
-      "cache": {
-       "read": 0.095
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 32000
-         }
-        },
-        "price": 0.71248,
-        "cache": {
-         "read": 0.1425
-        }
-       },
-       {
-        "when": {
-         "context": {
-          "gt": 128000
-         }
-        },
-        "price": 1.42496,
-        "cache": {
-         "read": 0.28499
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 2.37494,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 32000
-         }
-        },
-        "price": 3.56241
-       },
-       {
-        "when": {
-         "context": {
-          "gt": 128000
-         }
-        },
-        "price": 7.12482
-       }
-      ]
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ark.cn-beijing.volces.com/api/v3",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "glm-5-2-260617": {
-   "id": "glm-5-2-260617",
-   "name": "GLM-5.2",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-5.2",
-   "family": "glm",
-   "release_date": "2026-06-13",
-   "limit": {
-    "context": 1000000,
-    "output": 131072
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
-   "open_weights": true,
-   "last_updated": "2026-06-13",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.18747,
-      "cache": {
-       "read": 0.29687
-      }
-     },
-     "output": {
-      "price": 4.15615
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ark.cn-beijing.volces.com/api/v3",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "glm-5-3-flash-260828": {
-   "id": "glm-5-3-flash-260828",
-   "name": "GLM-5.3-Flash",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-5.3-flash",
-   "family": "glm-flash",
-   "release_date": "2026-08-26",
-   "limit": {
-    "context": 1000000,
-    "output": 131072
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
-   "open_weights": true,
-   "last_updated": "2026-08-26",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "video/mp4",
-     "video/x-matroska",
-     "video/quicktime",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.11875,
-      "cache": {
-       "read": 0.03414
-      }
-     },
-     "output": {
-      "price": 0.41563
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ark.cn-beijing.volces.com/api/v3",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
   "doubao-seed-2-1-pro-260628": {
    "id": "doubao-seed-2-1-pro-260628",
    "name": "Seed 2.1 Pro",
@@ -584,199 +679,6 @@
       "tools": {
        "updates": false
       }
-     }
-    }
-   }
-  },
-  "doubao-seedance-2-0-mini-260615": {
-   "id": "doubao-seedance-2-0-mini-260615",
-   "name": "Seedance 2.0 Mini",
-   "type": "video",
-   "canonical_id": "bytedance-seed/seedance-2.0-mini",
-   "family": "seed",
-   "release_date": "2026-06-15",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Lower-cost, faster Seedance 2.0 audio-video model at 480p and 720p",
-   "open_weights": false,
-   "last_updated": "2026-06-15",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/webp",
-     "image/bmp",
-     "image/tiff",
-     "image/gif",
-     "image/heic",
-     "image/heif",
-     "video/mp4",
-     "video/quicktime",
-     "audio/wav",
-     "audio/mpeg"
-    ],
-    "output": [
-     "video/mp4"
-    ]
-   },
-   "cost": {
-    "video": {
-     "output": {
-      "price": 3.44013,
-      "overrides": [
-       {
-        "when": {
-         "input_video": {
-          "equals": true
-         }
-        },
-        "price": 2.09399
-       }
-      ]
-     }
-    }
-   },
-   "api": {
-    "videos": {
-     "base_url": "https://ark.cn-beijing.volces.com/api/v3",
-     "sdk": {
-      "aisdk": "@ai-sdk/bytedance",
-      "opencodeai": "@opencode/ai/providers/volcengine/videos"
-     }
-    }
-   }
-  },
-  "doubao-seedance-2-0-260128": {
-   "id": "doubao-seedance-2-0-260128",
-   "name": "Seedance 2.0",
-   "type": "video",
-   "canonical_id": "bytedance-seed/seedance-2.0",
-   "family": "seed",
-   "release_date": "2026-02-12",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "ByteDance unified multimodal audio-video model supporting text, image, video and audio references, editing, extension and synchronized stereo sound.",
-   "open_weights": false,
-   "last_updated": "2026-10-04",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/webp",
-     "image/bmp",
-     "image/tiff",
-     "image/gif",
-     "image/heic",
-     "image/heif",
-     "video/mp4",
-     "video/quicktime",
-     "audio/wav",
-     "audio/mpeg"
-    ],
-    "output": [
-     "video/mp4",
-     "audio"
-    ]
-   },
-   "cost": {
-    "video": {
-     "output": {
-      "price": 6.88026,
-      "overrides": [
-       {
-        "when": {
-         "resolution": {
-          "equals": "1080p"
-         }
-        },
-        "price": 7.62811
-       },
-       {
-        "when": {
-         "resolution": {
-          "equals": "4k"
-         }
-        },
-        "price": 3.88884
-       },
-       {
-        "when": {
-         "resolution": {
-          "in": [
-           "480p",
-           "720p"
-          ]
-         },
-         "input_video": {
-          "equals": true
-         }
-        },
-        "price": 4.18798
-       },
-       {
-        "when": {
-         "resolution": {
-          "equals": "1080p"
-         },
-         "input_video": {
-          "equals": true
-         }
-        },
-        "price": 4.63669
-       },
-       {
-        "when": {
-         "resolution": {
-          "equals": "4k"
-         },
-         "input_video": {
-          "equals": true
-         }
-        },
-        "price": 2.39313
-       }
-      ]
-     }
-    }
-   },
-   "api": {
-    "videos": {
-     "base_url": "https://ark.cn-beijing.volces.com/api/v3",
-     "sdk": {
-      "aisdk": "@ai-sdk/bytedance",
-      "opencodeai": "@opencode/ai/providers/volcengine/videos"
      }
     }
    }
@@ -911,16 +813,15 @@
     }
    }
   },
-  "doubao-seed-2-0-code-preview-260215": {
-   "id": "doubao-seed-2-0-code-preview-260215",
-   "name": "Seed 2.0 Code",
+  "glm-5-2-260617": {
+   "id": "glm-5-2-260617",
+   "name": "GLM-5.2",
    "type": "chat",
-   "canonical_id": "bytedance-seed/seed-2.0-code",
-   "family": "seed",
-   "status": "deprecated",
-   "release_date": "2026-02-14",
+   "canonical_id": "zhipuai/glm-5.2",
+   "family": "glm",
+   "release_date": "2026-06-13",
    "limit": {
-    "context": 262144,
+    "context": 1000000,
     "output": 131072
    },
    "capabilities": {
@@ -929,43 +830,27 @@
     },
     "reasoning": {
      "supported": true,
+     "toggle": true,
      "effort": [
-      "none",
       "minimal",
       "low",
       "medium",
-      "high",
-      "xhigh",
-      "max"
+      "high"
      ]
     },
     "structured_output": true,
     "temperature": true,
     "top_p": true,
-    "top_k": false,
+    "top_k": true,
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "ByteDance Seed coding model for multimodal software engineering and long-running agents",
-   "open_weights": false,
-   "last_updated": "2026-02-14",
+   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
+   "open_weights": true,
+   "last_updated": "2026-06-13",
    "modalities": {
     "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/tiff",
-     "image/x-icon",
-     "image/x-icns",
-     "image/sgi",
-     "image/jp2",
-     "image/heic",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/quicktime"
+     "text"
     ],
     "output": [
      "text"
@@ -974,55 +859,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.47499,
+      "price": 1.18747,
       "cache": {
-       "read": 0.095
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 32000
-         }
-        },
-        "price": 0.71248,
-        "cache": {
-         "read": 0.1425
-        }
-       },
-       {
-        "when": {
-         "context": {
-          "gt": 128000
-         }
-        },
-        "price": 1.42496,
-        "cache": {
-         "read": 0.28499
-        }
-       }
-      ]
+       "read": 0.29687
+      }
      },
      "output": {
-      "price": 2.37494,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 32000
-         }
-        },
-        "price": 3.56241
-       },
-       {
-        "when": {
-         "context": {
-          "gt": 128000
-         }
-        },
-        "price": 7.12482
-       }
-      ]
+      "price": 4.15615
      }
     }
    },
@@ -1118,13 +961,13 @@
     }
    }
   },
-  "doubao-seedance-2-5-260628": {
-   "id": "doubao-seedance-2-5-260628",
-   "name": "Seedance 2.5",
+  "doubao-seedance-2-0-mini-260615": {
+   "id": "doubao-seedance-2-0-mini-260615",
+   "name": "Seedance 2.0 Mini",
    "type": "video",
-   "canonical_id": "bytedance-seed/seedance-2.5",
+   "canonical_id": "bytedance-seed/seedance-2.0-mini",
    "family": "seed",
-   "release_date": "2026-07-31",
+   "release_date": "2026-06-15",
    "limit": {
     "context": 0,
     "output": 0
@@ -1142,9 +985,83 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "ByteDance multimodal audio-video model with up to 30-second single-pass generation, multi-round extension, reference inputs and timestamp-level editing.",
+   "description": "Lower-cost, faster Seedance 2.0 audio-video model at 480p and 720p",
    "open_weights": false,
-   "last_updated": "2026-10-04",
+   "last_updated": "2026-06-15",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp",
+     "image/bmp",
+     "image/tiff",
+     "image/gif",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/quicktime",
+     "audio/wav",
+     "audio/mpeg"
+    ],
+    "output": [
+     "video/mp4"
+    ]
+   },
+   "cost": {
+    "video": {
+     "output": {
+      "price": 3.44013,
+      "overrides": [
+       {
+        "when": {
+         "input_video": {
+          "equals": true
+         }
+        },
+        "price": 2.09399
+       }
+      ]
+     }
+    }
+   },
+   "api": {
+    "videos": {
+     "base_url": "https://ark.cn-beijing.volces.com/api/v3",
+     "sdk": {
+      "aisdk": "@ai-sdk/bytedance",
+      "opencodeai": "@opencode/ai/providers/volcengine/videos"
+     }
+    }
+   }
+  },
+  "doubao-seedance-2-0-fast-260128": {
+   "id": "doubao-seedance-2-0-fast-260128",
+   "name": "Seedance 2.0 Fast",
+   "type": "video",
+   "canonical_id": "bytedance-seed/seedance-2.0-fast",
+   "family": "seed",
+   "release_date": "2026-02-12",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    },
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Faster, lower-cost Seedance 2.0 variant for text, image, video and audio references with synchronized sound.",
+   "open_weights": false,
+   "last_updated": "2026-02-12",
    "modalities": {
     "input": [
      "text",
@@ -1163,47 +1080,21 @@
     ],
     "output": [
      "video/mp4",
-     "video/quicktime",
      "audio"
     ]
    },
    "cost": {
     "video": {
      "output": {
-      "price": 10.46996,
+      "price": 5.53412,
       "overrides": [
        {
         "when": {
-         "resolution": {
-          "equals": "1080p"
-         }
-        },
-        "price": 11.51695
-       },
-       {
-        "when": {
-         "resolution": {
-          "in": [
-           "480p",
-           "720p"
-          ]
-         },
          "input_video": {
           "equals": true
          }
         },
-        "price": 6.28197
-       },
-       {
-        "when": {
-         "resolution": {
-          "equals": "1080p"
-         },
-         "input_video": {
-          "equals": true
-         }
-        },
-        "price": 6.88026
+        "price": 3.29056
        }
       ]
      }
@@ -1563,17 +1454,17 @@
     }
    }
   },
-  "doubao-seed-1-6-flash-250828": {
-   "id": "doubao-seed-1-6-flash-250828",
-   "name": "Seed 1.6 Flash",
+  "doubao-seed-2-0-pro-260215": {
+   "id": "doubao-seed-2-0-pro-260215",
+   "name": "Seed 2.0 Pro",
    "type": "chat",
-   "canonical_id": "bytedance-seed/seed-1-6-flash",
+   "canonical_id": "bytedance-seed/seed-2.0-pro",
    "family": "seed",
    "status": "deprecated",
-   "release_date": "2025-08-28",
+   "release_date": "2026-02-14",
    "limit": {
     "context": 256000,
-    "output": 32000
+    "output": 128000
    },
    "capabilities": {
     "tools": {
@@ -1581,18 +1472,26 @@
     },
     "reasoning": {
      "supported": true,
-     "toggle": true
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
     },
     "structured_output": true,
-    "temperature": true,
-    "top_p": true,
+    "temperature": false,
+    "top_p": false,
     "top_k": false,
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Low-latency ByteDance Seed model for high-throughput chat, extraction, and lightweight tool use",
+   "description": "Flagship ByteDance Seed 2.0 model for complex multimodal reasoning and long-horizon agent workflows",
    "open_weights": false,
-   "last_updated": "2025-08-28",
+   "last_updated": "2026-02-14",
    "modalities": {
     "input": [
      "text",
@@ -1618,9 +1517,9 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.02227,
+      "price": 0.47499,
       "cache": {
-       "read": 0.00445
+       "read": 0.095
       },
       "overrides": [
        {
@@ -1629,9 +1528,9 @@
           "gt": 32000
          }
         },
-        "price": 0.04453,
+        "price": 0.71248,
         "cache": {
-         "read": 0.00445
+         "read": 0.1425
         }
        },
        {
@@ -1640,15 +1539,15 @@
           "gt": 128000
          }
         },
-        "price": 0.08906,
+        "price": 1.42496,
         "cache": {
-         "read": 0.00445
+         "read": 0.28499
         }
        }
       ]
      },
      "output": {
-      "price": 0.22265,
+      "price": 2.37494,
       "overrides": [
        {
         "when": {
@@ -1656,7 +1555,7 @@
           "gt": 32000
          }
         },
-        "price": 0.4453
+        "price": 3.56241
        },
        {
         "when": {
@@ -1664,7 +1563,7 @@
           "gt": 128000
          }
         },
-        "price": 0.8906
+        "price": 7.12482
        }
       ]
      }
@@ -1688,77 +1587,135 @@
     }
    }
   },
-  "doubao-seedance-2-0-fast-260128": {
-   "id": "doubao-seedance-2-0-fast-260128",
-   "name": "Seedance 2.0 Fast",
-   "type": "video",
-   "canonical_id": "bytedance-seed/seedance-2.0-fast",
+  "doubao-seed-2-0-code-preview-260215": {
+   "id": "doubao-seed-2-0-code-preview-260215",
+   "name": "Seed 2.0 Code",
+   "type": "chat",
+   "canonical_id": "bytedance-seed/seed-2.0-code",
    "family": "seed",
-   "release_date": "2026-02-12",
+   "status": "deprecated",
+   "release_date": "2026-02-14",
    "limit": {
-    "context": 0,
-    "output": 0
+    "context": 262144,
+    "output": 131072
    },
    "capabilities": {
     "tools": {
-     "supported": false
+     "supported": true
     },
     "reasoning": {
-     "supported": false
+     "supported": true,
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
     },
-    "temperature": false,
-    "top_p": false,
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
     "top_k": false,
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Faster, lower-cost Seedance 2.0 variant for text, image, video and audio references with synchronized sound.",
+   "description": "ByteDance Seed coding model for multimodal software engineering and long-running agents",
    "open_weights": false,
-   "last_updated": "2026-02-12",
+   "last_updated": "2026-02-14",
    "modalities": {
     "input": [
      "text",
      "image/jpeg",
      "image/png",
+     "image/gif",
      "image/webp",
      "image/bmp",
      "image/tiff",
-     "image/gif",
+     "image/x-icon",
+     "image/x-icns",
+     "image/sgi",
+     "image/jp2",
      "image/heic",
-     "image/heif",
      "video/mp4",
-     "video/quicktime",
-     "audio/wav",
-     "audio/mpeg"
+     "video/x-msvideo",
+     "video/quicktime"
     ],
     "output": [
-     "video/mp4",
-     "audio"
+     "text"
     ]
    },
    "cost": {
-    "video": {
-     "output": {
-      "price": 5.53412,
+    "text": {
+     "input": {
+      "price": 0.47499,
+      "cache": {
+       "read": 0.095
+      },
       "overrides": [
        {
         "when": {
-         "input_video": {
-          "equals": true
+         "context": {
+          "gt": 32000
          }
         },
-        "price": 3.29056
+        "price": 0.71248,
+        "cache": {
+         "read": 0.1425
+        }
+       },
+       {
+        "when": {
+         "context": {
+          "gt": 128000
+         }
+        },
+        "price": 1.42496,
+        "cache": {
+         "read": 0.28499
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 2.37494,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 32000
+         }
+        },
+        "price": 3.56241
+       },
+       {
+        "when": {
+         "context": {
+          "gt": 128000
+         }
+        },
+        "price": 7.12482
        }
       ]
      }
     }
    },
    "api": {
-    "videos": {
+    "chat-completions": {
      "base_url": "https://ark.cn-beijing.volces.com/api/v3",
      "sdk": {
-      "aisdk": "@ai-sdk/bytedance",
-      "opencodeai": "@opencode/ai/providers/volcengine/videos"
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
      }
     }
    }
@@ -1894,16 +1851,94 @@
     }
    }
   },
-  "doubao-seed-character-260628": {
-   "id": "doubao-seed-character-260628",
-   "name": "Seed Character",
+  "glm-5-3-flash-260828": {
+   "id": "glm-5-3-flash-260828",
+   "name": "GLM-5.3-Flash",
    "type": "chat",
-   "canonical_id": "bytedance-seed/seed-character",
-   "family": "seed",
-   "release_date": "2026-06-23",
+   "canonical_id": "zhipuai/glm-5.3-flash",
+   "family": "glm-flash",
+   "release_date": "2026-08-26",
    "limit": {
-    "context": 256000,
-    "output": 256000
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
+   "open_weights": true,
+   "last_updated": "2026-08-26",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "video/mp4",
+     "video/x-matroska",
+     "video/quicktime",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.11875,
+      "cache": {
+       "read": 0.03414
+      }
+     },
+     "output": {
+      "price": 0.41563
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ark.cn-beijing.volces.com/api/v3",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "deepseek-v4-flash-ga-260731": {
+   "id": "deepseek-v4-flash-ga-260731",
+   "name": "DeepSeek V4 Flash 0731",
+   "type": "chat",
+   "canonical_id": "deepseek/deepseek-v4-flash-0731",
+   "family": "deepseek-flash",
+   "release_date": "2026-07-31",
+   "limit": {
+    "context": 1000000,
+    "output": 384000
    },
    "capabilities": {
     "tools": {
@@ -1915,36 +1950,24 @@
      "effort": [
       "minimal",
       "low",
+      "medium",
       "high"
      ]
     },
     "structured_output": true,
     "temperature": true,
     "top_p": true,
-    "top_k": false,
+    "top_k": true,
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "ByteDance Seed model optimized for character-driven dialogue and consistent conversational behavior",
-   "open_weights": false,
-   "last_updated": "2026-06-23",
+   "description": "Official DeepSeek V4 Flash release with enhanced agentic capabilities and integrated DSpark speculative decoding",
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-07-31",
    "modalities": {
     "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/tiff",
-     "image/x-icon",
-     "image/x-icns",
-     "image/sgi",
-     "image/jp2",
-     "image/heic",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/quicktime"
+     "text"
     ],
     "output": [
      "text"
@@ -1953,36 +1976,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.11875,
+      "price": 0.4453,
       "cache": {
-       "read": 0.02375
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 32000
-         }
-        },
-        "price": 0.17812,
-        "cache": {
-         "read": 0.02375
-        }
-       }
-      ]
+       "read": 0.01484
+      }
      },
      "output": {
-      "price": 0.29687,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 32000
-         }
-        },
-        "price": 0.8906
-       }
-      ]
+      "price": 1.3359
      }
     }
    },

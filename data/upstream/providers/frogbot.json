@@ -6,13 +6,91 @@
   "FROGBOT_API_KEY"
  ],
  "models": {
-  "gemini-3-5-flash-lite": {
-   "id": "gemini-3-5-flash-lite",
-   "name": "Gemini 3.5 Flash Lite",
+  "claude-opus-4-6": {
+   "id": "claude-opus-4-6",
+   "name": "Claude Opus 4.6",
    "type": "chat",
-   "canonical_id": "google/gemini-3.5-flash-lite",
-   "family": "gemini-flash-lite",
-   "release_date": "2026-07-21",
+   "canonical_id": "anthropic/claude-opus-4-6",
+   "family": "claude-opus",
+   "release_date": "2026-02-05",
+   "limit": {
+    "context": 200000,
+    "output": 128000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ],
+     "budget": {
+      "min": 1024
+     }
+    },
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Flagship Claude model for deep reasoning, coding, and long-horizon agents",
+   "open_weights": false,
+   "knowledge": "2025-05-31",
+   "last_updated": "2026-03-13",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5,
+       "write": 6.25
+      }
+     },
+     "output": {
+      "price": 25
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://app.frogbot.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "gemini-2.5-flash": {
+   "id": "gemini-2.5-flash",
+   "name": "Gemini 2.5 Flash",
+   "type": "chat",
+   "canonical_id": "google/gemini-2.5-flash",
+   "family": "gemini-flash",
+   "release_date": "2025-06-17",
    "limit": {
     "context": 1048576,
     "output": 65536
@@ -23,12 +101,10 @@
     },
     "reasoning": {
      "supported": true,
-     "effort": [
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
+     "budget": {
+      "min": 0,
+      "max": 24576
+     }
     },
     "temperature": true,
     "top_p": true,
@@ -38,8 +114,8 @@
    },
    "description": "Fast Gemini model balancing multimodal reasoning, tool use, and cost",
    "open_weights": false,
-   "knowledge": "2026-03",
-   "last_updated": "2026-07-21",
+   "knowledge": "2025-01",
+   "last_updated": "2025-06-17",
    "modalities": {
     "input": [
      "text",
@@ -48,15 +124,6 @@
      "image/webp",
      "image/heic",
      "image/heif",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp",
      "audio/wav",
      "audio/mp3",
      "audio/aiff",
@@ -70,6 +137,15 @@
      "audio/alaw",
      "audio/mulaw",
      "audio/webm",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp",
      "application/pdf"
     ],
     "output": [
@@ -81,11 +157,996 @@
      "input": {
       "price": 0.3,
       "cache": {
-       "read": 0.03
+       "read": 0.075
       }
      },
      "output": {
       "price": 2.5
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://app.frogbot.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "zai-glm-5-3": {
+   "id": "zai-glm-5-3",
+   "name": "GLM 5.3",
+   "type": "chat",
+   "canonical_id": "zhipuai/glm-5.3",
+   "family": "glm",
+   "release_date": "2026-08-14",
+   "limit": {
+    "context": 1040000,
+    "output": 131072
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    },
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
+   "open_weights": true,
+   "last_updated": "2026-08-14",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.4,
+      "cache": {
+       "read": 0.26
+      }
+     },
+     "output": {
+      "price": 4.4
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://app.frogbot.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "deepseek-v4-1-flash": {
+   "id": "deepseek-v4-1-flash",
+   "name": "DeepSeek V4.1 Flash",
+   "type": "chat",
+   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
+   "family": "deepseek-flash",
+   "release_date": "2026-10-17",
+   "limit": {
+    "context": 1000000,
+    "output": 384000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-10-17",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.3,
+      "cache": {
+       "read": 0.006
+      }
+     },
+     "output": {
+      "price": 1.2
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://app.frogbot.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "gemini-2.5-pro": {
+   "id": "gemini-2.5-pro",
+   "name": "Gemini 2.5 Pro",
+   "type": "chat",
+   "canonical_id": "google/gemini-2.5-pro",
+   "family": "gemini-pro",
+   "release_date": "2025-06-17",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "budget": {
+      "min": 128,
+      "max": 32768
+     }
+    },
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Advanced Gemini model for complex reasoning, coding, and multimodal analysis",
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2025-06-17",
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.25,
+      "cache": {
+       "read": 0.31
+      }
+     },
+     "output": {
+      "price": 10
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://app.frogbot.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "claude-fable-5": {
+   "id": "claude-fable-5",
+   "name": "Claude Fable 5",
+   "type": "chat",
+   "canonical_id": "anthropic/claude-fable-5",
+   "family": "claude-fable",
+   "release_date": "2026-06-09",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    },
+    "structured_output": true,
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Claude model for creative writing, analysis, and controlled agent workflows",
+   "open_weights": false,
+   "knowledge": "2026-01-31",
+   "last_updated": "2026-06-09",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 10,
+      "cache": {
+       "read": 1,
+       "write": 12.5
+      }
+     },
+     "output": {
+      "price": 50
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://app.frogbot.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "gpt-5-6-sol": {
+   "id": "gpt-5-6-sol",
+   "name": "GPT-5.6 Sol",
+   "type": "chat",
+   "canonical_id": "openai/gpt-5.6-sol",
+   "family": "gpt-sol",
+   "release_date": "2026-07-09",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    },
+    "temperature": true,
+    "top_p": true,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Frontier GPT-5.6 model for complex professional work, coding, and agentic workflows",
+   "open_weights": false,
+   "knowledge": "2026-02-16",
+   "last_updated": "2026-07-09",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5,
+       "write": 6.25
+      }
+     },
+     "output": {
+      "price": 30
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://app.frogbot.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "gpt-5-6-luna": {
+   "id": "gpt-5-6-luna",
+   "name": "GPT-5.6 Luna",
+   "type": "chat",
+   "canonical_id": "openai/gpt-5.6-luna",
+   "family": "gpt-luna",
+   "release_date": "2026-07-09",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    },
+    "temperature": true,
+    "top_p": true,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Cost-efficient GPT-5.6 model for fast, high-volume workloads",
+   "open_weights": false,
+   "knowledge": "2026-02-16",
+   "last_updated": "2026-07-09",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.2,
+      "cache": {
+       "read": 0.02,
+       "write": 0.25
+      }
+     },
+     "output": {
+      "price": 1.2
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://app.frogbot.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "claude-haiku-4-5": {
+   "id": "claude-haiku-4-5",
+   "name": "Claude Haiku 4.5",
+   "type": "chat",
+   "canonical_id": "anthropic/claude-haiku-4-5",
+   "family": "claude-haiku",
+   "release_date": "2025-10-15",
+   "limit": {
+    "context": 200000,
+    "output": 64000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "budget": {
+      "min": 1024
+     }
+    },
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Fast Claude model for responsive assistance, classification, and lightweight agents",
+   "open_weights": false,
+   "knowledge": "2025-02-28",
+   "last_updated": "2025-10-15",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1,
+      "cache": {
+       "read": 0.1,
+       "write": 1.25
+      }
+     },
+     "output": {
+      "price": 5
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://app.frogbot.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "gpt-oss-120b": {
+   "id": "gpt-oss-120b",
+   "name": "GPT OSS 120B",
+   "type": "chat",
+   "canonical_id": "openai/gpt-oss-120b",
+   "family": "gpt-oss",
+   "release_date": "2025-08-05",
+   "limit": {
+    "context": 131072,
+    "output": 32768
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Open-weight GPT model for self-hosted reasoning and instruction-following workloads",
+   "open_weights": true,
+   "knowledge": "2024-06",
+   "last_updated": "2025-08-05",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.15
+     },
+     "output": {
+      "price": 0.6
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://app.frogbot.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "kimi-k2.5": {
+   "id": "kimi-k2.5",
+   "name": "Kimi-K2.5",
+   "type": "chat",
+   "canonical_id": "moonshotai/kimi-k2.5",
+   "family": "kimi-k2",
+   "status": "deprecated",
+   "release_date": "2026-01-27",
+   "limit": {
+    "context": 256000,
+    "output": 128000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Kimi multimodal agent model for visual understanding, coding, and planning",
+   "open_weights": true,
+   "knowledge": "2025-01",
+   "last_updated": "2026-01-27",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/heic",
+     "image/heif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.6,
+      "cache": {
+       "read": 0.1
+      }
+     },
+     "output": {
+      "price": 3
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://app.frogbot.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "claude-sonnet-5-5": {
+   "id": "claude-sonnet-5-5",
+   "name": "Claude Sonnet 5.5",
+   "type": "chat",
+   "canonical_id": "anthropic/claude-sonnet-5-5",
+   "family": "claude-sonnet",
+   "release_date": "2026-09-28",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    },
+    "structured_output": true,
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Fast Claude model for everyday coding, agents, and knowledge work",
+   "open_weights": false,
+   "knowledge": "2026-06",
+   "last_updated": "2026-09-28",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.1,
+       "write": 2.5
+      }
+     },
+     "output": {
+      "price": 10
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://app.frogbot.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "gpt-6-luna": {
+   "id": "gpt-6-luna",
+   "name": "GPT-6 Luna",
+   "type": "chat",
+   "canonical_id": "openai/gpt-6-luna",
+   "family": "gpt-luna",
+   "release_date": "2026-09-22",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    },
+    "temperature": true,
+    "top_p": true,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "OpenAI's most efficient model for focused, high-volume tasks",
+   "open_weights": false,
+   "knowledge": "2026-05-18",
+   "last_updated": "2026-09-22",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1,
+      "cache": {
+       "read": 0.01,
+       "write": 0.125
+      }
+     },
+     "output": {
+      "price": 0.5
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://app.frogbot.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "deepseek-v4-pro": {
+   "id": "deepseek-v4-pro",
+   "name": "DeepSeek v4 Pro",
+   "type": "chat",
+   "canonical_id": "deepseek/deepseek-v4-pro",
+   "family": "deepseek-thinking",
+   "release_date": "2026-04-24",
+   "limit": {
+    "context": 128000,
+    "output": 8192
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    },
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Flagship DeepSeek model for coding, reasoning, and agentic work",
+   "open_weights": true,
+   "knowledge": "2026-01",
+   "last_updated": "2026-04-24",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.32,
+      "cache": {
+       "read": 0.044
+      }
+     },
+     "output": {
+      "price": 3.96
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://app.frogbot.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "grok-4-1-fast-reasoning": {
+   "id": "grok-4-1-fast-reasoning",
+   "name": "Grok 4.1 Fast (Reasoning)",
+   "type": "chat",
+   "canonical_id": "xai/grok-4.1-fast-reasoning",
+   "family": "grok",
+   "release_date": "2025-11-19",
+   "limit": {
+    "context": 2000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    },
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Fast Grok model for responsive chat, reasoning, and tool-assisted work",
+   "open_weights": false,
+   "knowledge": "2025-11",
+   "last_updated": "2025-11-19",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.2,
+      "cache": {
+       "read": 0.05
+      }
+     },
+     "output": {
+      "price": 0.5
      }
     }
    },
@@ -201,239 +1262,11 @@
     }
    }
   },
-  "claude-opus-5-5": {
-   "id": "claude-opus-5-5",
-   "name": "Claude Opus 5.5",
+  "gpt-oss-20b": {
+   "id": "gpt-oss-20b",
+   "name": "GPT OSS 20B",
    "type": "chat",
-   "canonical_id": "anthropic/claude-opus-5-5",
-   "family": "claude-opus",
-   "release_date": "2026-09-22",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Claude model for long-running agentic coding and knowledge work",
-   "open_weights": false,
-   "knowledge": "2026-06",
-   "last_updated": "2026-09-22",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 4,
-      "cache": {
-       "read": 0.2,
-       "write": 5
-      }
-     },
-     "output": {
-      "price": 20
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://app.frogbot.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "zai-glm-5-1": {
-   "id": "zai-glm-5-1",
-   "name": "Z.AI GLM-5.1",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-5.1",
-   "family": "glm",
-   "status": "deprecated",
-   "release_date": "2026-04-07",
-   "limit": {
-    "context": 198000,
-    "output": 8192
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Flagship GLM model for hybrid reasoning, coding, and agentic engineering",
-   "open_weights": true,
-   "knowledge": "2024-10",
-   "last_updated": "2026-04-07",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.4,
-      "cache": {
-       "read": 0.26
-      }
-     },
-     "output": {
-      "price": 4.4
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://app.frogbot.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "kimi-k3": {
-   "id": "kimi-k3",
-   "name": "Kimi K3",
-   "type": "chat",
-   "canonical_id": "moonshotai/kimi-k3",
-   "family": "kimi-k3",
-   "release_date": "2026-07-16",
-   "limit": {
-    "context": 1040000,
-    "output": 131072
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "max"
-     ],
-     "budget": {
-      "min": 1024
-     }
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
-   "open_weights": true,
-   "last_updated": "2026-07-16",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 3,
-      "cache": {
-       "read": 0.3
-      }
-     },
-     "output": {
-      "price": 15
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://app.frogbot.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gpt-oss-120b": {
-   "id": "gpt-oss-120b",
-   "name": "GPT OSS 120B",
-   "type": "chat",
-   "canonical_id": "openai/gpt-oss-120b",
+   "canonical_id": "openai/gpt-oss-20b",
    "family": "gpt-oss",
    "release_date": "2025-08-05",
    "limit": {
@@ -474,10 +1307,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.15
+      "price": 0.07
      },
      "output": {
-      "price": 0.6
+      "price": 0.2
      }
     }
    },
@@ -496,313 +1329,15 @@
     }
    }
   },
-  "deepseek-v4-1-flash": {
-   "id": "deepseek-v4-1-flash",
-   "name": "DeepSeek V4.1 Flash",
+  "grok-4-3": {
+   "id": "grok-4-3",
+   "name": "Grok 4.3",
    "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
-   "family": "deepseek-flash",
-   "release_date": "2026-10-17",
+   "canonical_id": "xai/grok-4.3",
+   "family": "grok",
+   "release_date": "2026-04-17",
    "limit": {
     "context": 1000000,
-    "output": 384000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-10-17",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.3,
-      "cache": {
-       "read": 0.006
-      }
-     },
-     "output": {
-      "price": 1.2
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://app.frogbot.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gpt-6-luna": {
-   "id": "gpt-6-luna",
-   "name": "GPT-6 Luna",
-   "type": "chat",
-   "canonical_id": "openai/gpt-6-luna",
-   "family": "gpt-luna",
-   "release_date": "2026-09-22",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "OpenAI's most efficient model for focused, high-volume tasks",
-   "open_weights": false,
-   "knowledge": "2026-05-18",
-   "last_updated": "2026-09-22",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.1,
-      "cache": {
-       "read": 0.01,
-       "write": 0.125
-      }
-     },
-     "output": {
-      "price": 0.5
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://app.frogbot.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "qwen-3-6-plus": {
-   "id": "qwen-3-6-plus",
-   "name": "Qwen 3.6 Plus",
-   "type": "chat",
-   "canonical_id": "alibaba/qwen3.6-plus",
-   "family": "qwen",
-   "status": "deprecated",
-   "release_date": "2026-04-02",
-   "limit": {
-    "context": 1000000,
-    "output": 64000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
-   "open_weights": false,
-   "knowledge": "2025-04",
-   "last_updated": "2026-04-02",
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.5,
-      "cache": {
-       "read": 0.1
-      }
-     },
-     "output": {
-      "price": 3
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://app.frogbot.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gpt-4o": {
-   "id": "gpt-4o",
-   "name": "GPT-4o",
-   "type": "chat",
-   "canonical_id": "openai/gpt-4o",
-   "family": "gpt",
-   "release_date": "2024-05-13",
-   "limit": {
-    "context": 128000,
-    "output": 16384
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "GPT model for general reasoning, writing, coding, and tool-assisted tasks",
-   "open_weights": false,
-   "knowledge": "2023-09",
-   "last_updated": "2024-08-06",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2.5,
-      "cache": {
-       "read": 1.25
-      }
-     },
-     "output": {
-      "price": 10
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://app.frogbot.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "claude-opus-4-6": {
-   "id": "claude-opus-4-6",
-   "name": "Claude Opus 4.6",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-opus-4-6",
-   "family": "claude-opus",
-   "release_date": "2026-02-05",
-   "limit": {
-    "context": 200000,
     "output": 128000
    },
    "capabilities": {
@@ -815,21 +1350,94 @@
       "low",
       "medium",
       "high"
-     ],
-     "budget": {
-      "min": 1024
-     }
+     ]
     },
+    "structured_output": true,
     "temperature": true,
     "top_p": true,
     "top_k": true,
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Flagship Claude model for deep reasoning, coding, and long-horizon agents",
+   "description": "Grok model for agentic tool use, reasoning, coding, and live assistance",
    "open_weights": false,
-   "knowledge": "2025-05-31",
-   "last_updated": "2026-03-13",
+   "knowledge": "2024-11",
+   "last_updated": "2026-04-17",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "video"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.25,
+      "cache": {
+       "read": 0.2
+      }
+     },
+     "output": {
+      "price": 2.5
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://app.frogbot.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "gpt-6-1-sol": {
+   "id": "gpt-6-1-sol",
+   "name": "GPT-6.1 Sol",
+   "type": "chat",
+   "canonical_id": "openai/gpt-6.1-sol",
+   "family": "gpt-sol",
+   "release_date": "2026-09-29",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    },
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Near-Astra performance for complex coding, computer use, and professional work at a lower cost.",
+   "open_weights": false,
+   "knowledge": "2026-04-30",
+   "last_updated": "2026-09-29",
    "modalities": {
     "input": [
      "text",
@@ -846,14 +1454,14 @@
    "cost": {
     "text": {
      "input": {
-      "price": 5,
+      "price": 2,
       "cache": {
-       "read": 0.5,
-       "write": 6.25
+       "read": 0.1,
+       "write": 2.5
       }
      },
      "output": {
-      "price": 25
+      "price": 10
      }
     }
    },
@@ -947,623 +1555,6 @@
     }
    }
   },
-  "zai-glm-5-3-flash": {
-   "id": "zai-glm-5-3-flash",
-   "name": "GLM 5.3 Flash",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-5.3-flash",
-   "family": "glm-flash",
-   "release_date": "2026-08-26",
-   "limit": {
-    "context": 1040000,
-    "output": 131072
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
-   "open_weights": true,
-   "last_updated": "2026-08-26",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.15,
-      "cache": {
-       "read": 0.029
-      }
-     },
-     "output": {
-      "price": 0.5
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://app.frogbot.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gemini-2.5-flash": {
-   "id": "gemini-2.5-flash",
-   "name": "Gemini 2.5 Flash",
-   "type": "chat",
-   "canonical_id": "google/gemini-2.5-flash",
-   "family": "gemini-flash",
-   "release_date": "2025-06-17",
-   "limit": {
-    "context": 1048576,
-    "output": 65536
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "budget": {
-      "min": 0,
-      "max": 24576
-     }
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Fast Gemini model balancing multimodal reasoning, tool use, and cost",
-   "open_weights": false,
-   "knowledge": "2025-01",
-   "last_updated": "2025-06-17",
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "audio/wav",
-     "audio/mp3",
-     "audio/aiff",
-     "audio/aac",
-     "audio/ogg",
-     "audio/flac",
-     "audio/mpeg",
-     "audio/m4a",
-     "audio/l16",
-     "audio/opus",
-     "audio/alaw",
-     "audio/mulaw",
-     "audio/webm",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.3,
-      "cache": {
-       "read": 0.075
-      }
-     },
-     "output": {
-      "price": 2.5
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://app.frogbot.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gpt-oss-20b": {
-   "id": "gpt-oss-20b",
-   "name": "GPT OSS 20B",
-   "type": "chat",
-   "canonical_id": "openai/gpt-oss-20b",
-   "family": "gpt-oss",
-   "release_date": "2025-08-05",
-   "limit": {
-    "context": 131072,
-    "output": 32768
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open-weight GPT model for self-hosted reasoning and instruction-following workloads",
-   "open_weights": true,
-   "knowledge": "2024-06",
-   "last_updated": "2025-08-05",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.07
-     },
-     "output": {
-      "price": 0.2
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://app.frogbot.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gpt-6-astra": {
-   "id": "gpt-6-astra",
-   "name": "GPT-6 Astra",
-   "type": "chat",
-   "canonical_id": "openai/gpt-6-astra",
-   "family": "gpt-astra",
-   "release_date": "2026-09-04",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "GPT-6 Astra is OpenAI's most capable model for complex reasoning, coding, computer use, research, and document creation.",
-   "open_weights": false,
-   "knowledge": "2026-04-30",
-   "last_updated": "2026-09-04",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 10,
-      "cache": {
-       "read": 1,
-       "write": 12.5
-      }
-     },
-     "output": {
-      "price": 50
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://app.frogbot.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "claude-fable-5-1": {
-   "id": "claude-fable-5-1",
-   "name": "Claude Fable 5.1",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-fable-5-1",
-   "family": "claude-fable",
-   "release_date": "2026-09-01",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Claude model for demanding reasoning and long-horizon agentic work",
-   "open_weights": false,
-   "knowledge": "2026-06",
-   "last_updated": "2026-09-01",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 10,
-      "cache": {
-       "read": 0.25,
-       "write": 12.5
-      }
-     },
-     "output": {
-      "price": 50
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://app.frogbot.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "grok-4-5": {
-   "id": "grok-4-5",
-   "name": "Grok 4.5",
-   "type": "chat",
-   "canonical_id": "xai/grok-4.5",
-   "family": "grok",
-   "release_date": "2026-07-08",
-   "limit": {
-    "context": 500000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh"
-     ]
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "xAI's Grok model for chat, coding, agentic tools, and lower hallucination risk",
-   "open_weights": false,
-   "last_updated": "2026-07-08",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2,
-      "cache": {
-       "read": 0.3
-      }
-     },
-     "output": {
-      "price": 6
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://app.frogbot.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "claude-fable-5": {
-   "id": "claude-fable-5",
-   "name": "Claude Fable 5",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-fable-5",
-   "family": "claude-fable",
-   "release_date": "2026-06-09",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Claude model for creative writing, analysis, and controlled agent workflows",
-   "open_weights": false,
-   "knowledge": "2026-01-31",
-   "last_updated": "2026-06-09",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 10,
-      "cache": {
-       "read": 1,
-       "write": 12.5
-      }
-     },
-     "output": {
-      "price": 50
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://app.frogbot.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "kimi-k2-6": {
-   "id": "kimi-k2-6",
-   "name": "Kimi-K2.6",
-   "type": "chat",
-   "canonical_id": "moonshotai/kimi-k2.6",
-   "family": "kimi-k2",
-   "release_date": "2026-04-20",
-   "limit": {
-    "context": 256000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Kimi multimodal agent model for visual understanding, coding, and planning",
-   "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-04-20",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/heic",
-     "image/heif"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.95,
-      "cache": {
-       "read": 0.16
-      }
-     },
-     "output": {
-      "price": 4
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://app.frogbot.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
   "minimax-m2-7": {
    "id": "minimax-m2-7",
    "name": "MiniMax-M2.7",
@@ -1611,443 +1602,6 @@
      },
      "output": {
       "price": 1.2
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://app.frogbot.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gemini-3-6-flash": {
-   "id": "gemini-3-6-flash",
-   "name": "Gemini 3.6 Flash",
-   "type": "chat",
-   "canonical_id": "google/gemini-3.6-flash",
-   "family": "gemini-flash",
-   "release_date": "2026-07-21",
-   "limit": {
-    "context": 1048576,
-    "output": 65536
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Fast Gemini model balancing multimodal reasoning, tool use, and cost",
-   "open_weights": false,
-   "knowledge": "2026-03",
-   "last_updated": "2026-07-21",
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp",
-     "audio/wav",
-     "audio/mp3",
-     "audio/aiff",
-     "audio/aac",
-     "audio/ogg",
-     "audio/flac",
-     "audio/mpeg",
-     "audio/m4a",
-     "audio/l16",
-     "audio/opus",
-     "audio/alaw",
-     "audio/mulaw",
-     "audio/webm",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.5,
-      "cache": {
-       "read": 0.15
-      }
-     },
-     "output": {
-      "price": 7.5
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://app.frogbot.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gemini-2.5-pro": {
-   "id": "gemini-2.5-pro",
-   "name": "Gemini 2.5 Pro",
-   "type": "chat",
-   "canonical_id": "google/gemini-2.5-pro",
-   "family": "gemini-pro",
-   "release_date": "2025-06-17",
-   "limit": {
-    "context": 1048576,
-    "output": 65536
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "budget": {
-      "min": 128,
-      "max": 32768
-     }
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Advanced Gemini model for complex reasoning, coding, and multimodal analysis",
-   "open_weights": false,
-   "knowledge": "2025-01",
-   "last_updated": "2025-06-17",
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "audio/wav",
-     "audio/mp3",
-     "audio/aiff",
-     "audio/aac",
-     "audio/ogg",
-     "audio/flac",
-     "audio/mpeg",
-     "audio/m4a",
-     "audio/l16",
-     "audio/opus",
-     "audio/alaw",
-     "audio/mulaw",
-     "audio/webm",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.25,
-      "cache": {
-       "read": 0.31
-      }
-     },
-     "output": {
-      "price": 10
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://app.frogbot.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gpt-5-6-luna": {
-   "id": "gpt-5-6-luna",
-   "name": "GPT-5.6 Luna",
-   "type": "chat",
-   "canonical_id": "openai/gpt-5.6-luna",
-   "family": "gpt-luna",
-   "release_date": "2026-07-09",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Cost-efficient GPT-5.6 model for fast, high-volume workloads",
-   "open_weights": false,
-   "knowledge": "2026-02-16",
-   "last_updated": "2026-07-09",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.2,
-      "cache": {
-       "read": 0.02,
-       "write": 0.25
-      }
-     },
-     "output": {
-      "price": 1.2
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://app.frogbot.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gemini-3-flash-preview": {
-   "id": "gemini-3-flash-preview",
-   "name": "Gemini 3 Flash Preview",
-   "type": "chat",
-   "canonical_id": "google/gemini-3-flash-preview",
-   "family": "gemini-flash",
-   "release_date": "2025-12-17",
-   "limit": {
-    "context": 1048576,
-    "output": 65536
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Fast Gemini model balancing multimodal reasoning, tool use, and cost",
-   "open_weights": false,
-   "knowledge": "2025-01",
-   "last_updated": "2025-12-17",
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp",
-     "audio/wav",
-     "audio/mp3",
-     "audio/aiff",
-     "audio/aac",
-     "audio/ogg",
-     "audio/flac",
-     "audio/mpeg",
-     "audio/m4a",
-     "audio/l16",
-     "audio/opus",
-     "audio/alaw",
-     "audio/mulaw",
-     "audio/webm",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.5,
-      "cache": {
-       "read": 0.05
-      }
-     },
-     "output": {
-      "price": 3
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://app.frogbot.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "grok-4-1-fast-reasoning": {
-   "id": "grok-4-1-fast-reasoning",
-   "name": "Grok 4.1 Fast (Reasoning)",
-   "type": "chat",
-   "canonical_id": "xai/grok-4.1-fast-reasoning",
-   "family": "grok",
-   "release_date": "2025-11-19",
-   "limit": {
-    "context": 2000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Fast Grok model for responsive chat, reasoning, and tool-assisted work",
-   "open_weights": false,
-   "knowledge": "2025-11",
-   "last_updated": "2025-11-19",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.2,
-      "cache": {
-       "read": 0.05
-      }
-     },
-     "output": {
-      "price": 0.5
      }
     }
    },
@@ -2162,16 +1716,158 @@
     }
    }
   },
-  "gpt-6-1-sol": {
-   "id": "gpt-6-1-sol",
-   "name": "GPT-6.1 Sol",
+  "qwen-3-6-plus": {
+   "id": "qwen-3-6-plus",
+   "name": "Qwen 3.6 Plus",
    "type": "chat",
-   "canonical_id": "openai/gpt-6.1-sol",
-   "family": "gpt-sol",
-   "release_date": "2026-09-29",
+   "canonical_id": "alibaba/qwen3.6-plus",
+   "family": "qwen",
+   "status": "deprecated",
+   "release_date": "2026-04-02",
    "limit": {
-    "context": 1050000,
-    "input": 922000,
+    "context": 1000000,
+    "output": 64000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    },
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
+   "open_weights": false,
+   "knowledge": "2025-04",
+   "last_updated": "2026-04-02",
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.5,
+      "cache": {
+       "read": 0.1
+      }
+     },
+     "output": {
+      "price": 3
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://app.frogbot.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "grok-4-5": {
+   "id": "grok-4-5",
+   "name": "Grok 4.5",
+   "type": "chat",
+   "canonical_id": "xai/grok-4.5",
+   "family": "grok",
+   "release_date": "2026-07-08",
+   "limit": {
+    "context": 500000,
+    "output": 128000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    },
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "xAI's Grok model for chat, coding, agentic tools, and lower hallucination risk",
+   "open_weights": false,
+   "last_updated": "2026-07-08",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.3
+      }
+     },
+     "output": {
+      "price": 6
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://app.frogbot.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "claude-fable-5-1": {
+   "id": "claude-fable-5-1",
+   "name": "Claude Fable 5.1",
+   "type": "chat",
+   "canonical_id": "anthropic/claude-fable-5-1",
+   "family": "claude-fable",
+   "release_date": "2026-09-01",
+   "limit": {
+    "context": 1000000,
     "output": 128000
    },
    "capabilities": {
@@ -2188,16 +1884,17 @@
       "max"
      ]
     },
+    "structured_output": true,
     "temperature": false,
     "top_p": false,
     "top_k": false,
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Near-Astra performance for complex coding, computer use, and professional work at a lower cost.",
+   "description": "Claude model for demanding reasoning and long-horizon agentic work",
    "open_weights": false,
-   "knowledge": "2026-04-30",
-   "last_updated": "2026-09-29",
+   "knowledge": "2026-06",
+   "last_updated": "2026-09-01",
    "modalities": {
     "input": [
      "text",
@@ -2214,14 +1911,14 @@
    "cost": {
     "text": {
      "input": {
-      "price": 2,
+      "price": 10,
       "cache": {
-       "read": 0.1,
-       "write": 2.5
+       "read": 0.25,
+       "write": 12.5
       }
      },
      "output": {
-      "price": 10
+      "price": 50
      }
     }
    },
@@ -2234,91 +1931,22 @@
      },
      "capabilities": {
       "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
        "updates": false
       }
      }
     }
    }
   },
-  "claude-haiku-4-5": {
-   "id": "claude-haiku-4-5",
-   "name": "Claude Haiku 4.5",
+  "gpt-5-6-terra": {
+   "id": "gpt-5-6-terra",
+   "name": "GPT-5.6 Terra",
    "type": "chat",
-   "canonical_id": "anthropic/claude-haiku-4-5",
-   "family": "claude-haiku",
-   "release_date": "2025-10-15",
-   "limit": {
-    "context": 200000,
-    "output": 64000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "budget": {
-      "min": 1024
-     }
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Fast Claude model for responsive assistance, classification, and lightweight agents",
-   "open_weights": false,
-   "knowledge": "2025-02-28",
-   "last_updated": "2025-10-15",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1,
-      "cache": {
-       "read": 0.1,
-       "write": 1.25
-      }
-     },
-     "output": {
-      "price": 5
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://app.frogbot.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gpt-5-6-sol": {
-   "id": "gpt-5-6-sol",
-   "name": "GPT-5.6 Sol",
-   "type": "chat",
-   "canonical_id": "openai/gpt-5.6-sol",
-   "family": "gpt-sol",
+   "canonical_id": "openai/gpt-5.6-terra",
+   "family": "gpt-terra",
    "release_date": "2026-07-09",
    "limit": {
     "context": 1050000,
@@ -2346,7 +1974,7 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Frontier GPT-5.6 model for complex professional work, coding, and agentic workflows",
+   "description": "Balanced GPT-5.6 model for capable, cost-efficient everyday work",
    "open_weights": false,
    "knowledge": "2026-02-16",
    "last_updated": "2026-07-09",
@@ -2366,14 +1994,14 @@
    "cost": {
     "text": {
      "input": {
-      "price": 5,
+      "price": 2,
       "cache": {
-       "read": 0.5,
-       "write": 6.25
+       "read": 0.2,
+       "write": 2.5
       }
      },
      "output": {
-      "price": 30
+      "price": 12
      }
     }
    },
@@ -2392,88 +2020,16 @@
     }
    }
   },
-  "kimi-k2.5": {
-   "id": "kimi-k2.5",
-   "name": "Kimi-K2.5",
+  "gpt-6-sol": {
+   "id": "gpt-6-sol",
+   "name": "GPT-6 Sol",
    "type": "chat",
-   "canonical_id": "moonshotai/kimi-k2.5",
-   "family": "kimi-k2",
-   "status": "deprecated",
-   "release_date": "2026-01-27",
+   "canonical_id": "openai/gpt-6-sol",
+   "family": "gpt-sol",
+   "release_date": "2026-09-22",
    "limit": {
-    "context": 256000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Kimi multimodal agent model for visual understanding, coding, and planning",
-   "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-01-27",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/heic",
-     "image/heif"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.6,
-      "cache": {
-       "read": 0.1
-      }
-     },
-     "output": {
-      "price": 3
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://app.frogbot.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "grok-4-3": {
-   "id": "grok-4-3",
-   "name": "Grok 4.3",
-   "type": "chat",
-   "canonical_id": "xai/grok-4.3",
-   "family": "grok",
-   "release_date": "2026-04-17",
-   "limit": {
-    "context": 1000000,
+    "context": 1050000,
+    "input": 922000,
     "output": 128000
    },
    "capabilities": {
@@ -2483,143 +2039,13 @@
     "reasoning": {
      "supported": true,
      "effort": [
+      "none",
       "low",
       "medium",
-      "high"
+      "high",
+      "xhigh",
+      "max"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Grok model for agentic tool use, reasoning, coding, and live assistance",
-   "open_weights": false,
-   "knowledge": "2024-11",
-   "last_updated": "2026-04-17",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "video"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.25,
-      "cache": {
-       "read": 0.2
-      }
-     },
-     "output": {
-      "price": 2.5
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://app.frogbot.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "grok-code-fast-1": {
-   "id": "grok-code-fast-1",
-   "name": "Grok 4.1 Fast (Reasoning)",
-   "type": "chat",
-   "canonical_id": "xai/grok-code-fast-1",
-   "family": "grok",
-   "release_date": "2025-09-02",
-   "limit": {
-    "context": 256000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Fast Grok model for responsive chat, reasoning, and tool-assisted work",
-   "open_weights": false,
-   "knowledge": "2023-10",
-   "last_updated": "2025-09-02",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.2,
-      "cache": {
-       "read": 0.02
-      }
-     },
-     "output": {
-      "price": 1.5
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://app.frogbot.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "minimax-m2-5": {
-   "id": "minimax-m2-5",
-   "name": "MiniMax-M2.5",
-   "type": "chat",
-   "canonical_id": "minimax/MiniMax-M2.5",
-   "family": "minimax",
-   "status": "deprecated",
-   "release_date": "2026-02-12",
-   "limit": {
-    "context": 192000,
-    "output": 8192
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
     },
     "temperature": true,
     "top_p": true,
@@ -2627,13 +2053,18 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "MiniMax model for chat, coding, office work, and agentic tasks",
-   "open_weights": true,
-   "knowledge": "2024-09",
-   "last_updated": "2026-02-12",
+   "description": "OpenAI model for complex coding and agentic workflows",
+   "open_weights": false,
+   "knowledge": "2026-04-20",
+   "last_updated": "2026-09-22",
    "modalities": {
     "input": [
-     "text"
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
     ],
     "output": [
      "text"
@@ -2642,13 +2073,14 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.3,
+      "price": 2,
       "cache": {
-       "read": 0.03
+       "read": 0.2,
+       "write": 2.5
       }
      },
      "output": {
-      "price": 1.2
+      "price": 10
      }
     }
    },
@@ -2733,16 +2165,15 @@
     }
    }
   },
-  "gpt-5-3-codex": {
-   "id": "gpt-5-3-codex",
-   "name": "GPT-5.3 Codex",
+  "gpt-5-5": {
+   "id": "gpt-5-5",
+   "name": "GPT-5.5",
    "type": "chat",
-   "canonical_id": "openai/gpt-5.3-codex",
-   "family": "gpt-codex",
-   "release_date": "2026-02-05",
+   "canonical_id": "openai/gpt-5.5",
+   "family": "gpt",
+   "release_date": "2026-04-23",
    "limit": {
-    "context": 400000,
-    "input": 272000,
+    "context": 272000,
     "output": 128000
    },
    "capabilities": {
@@ -2757,16 +2188,16 @@
       "high"
      ]
     },
-    "temperature": false,
+    "temperature": true,
     "top_p": true,
     "top_k": false,
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Coding-optimized GPT model for repository edits, reviews, and agentic software work",
+   "description": "Frontier GPT model for professional reasoning, coding, and multimodal work",
    "open_weights": false,
-   "knowledge": "2026-01-31",
-   "last_updated": "2026-02-05",
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-04-23",
    "modalities": {
     "input": [
      "text",
@@ -2782,13 +2213,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 1.75,
+      "price": 5,
       "cache": {
-       "read": 0.175
+       "read": 0.5
       }
      },
      "output": {
-      "price": 14
+      "price": 30
      }
     }
    },
@@ -2886,106 +2317,24 @@
     }
    }
   },
-  "claude-sonnet-4-6": {
-   "id": "claude-sonnet-4-6",
-   "name": "Claude Sonnet 4.6",
+  "zai-glm-5-1": {
+   "id": "zai-glm-5-1",
+   "name": "Z.AI GLM-5.1",
    "type": "chat",
-   "canonical_id": "anthropic/claude-sonnet-4-6",
-   "family": "claude-sonnet",
-   "release_date": "2026-02-17",
-   "limit": {
-    "context": 200000,
-    "output": 64000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ],
-     "budget": {
-      "min": 1024
-     }
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Balanced Claude model for coding, analysis, agent workflows, and cost control",
-   "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2026-03-13",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 3,
-      "cache": {
-       "read": 0.3,
-       "write": 3.75
-      }
-     },
-     "output": {
-      "price": 15
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://app.frogbot.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "zai-glm-5-3": {
-   "id": "zai-glm-5-3",
-   "name": "GLM 5.3",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-5.3",
+   "canonical_id": "zhipuai/glm-5.1",
    "family": "glm",
-   "release_date": "2026-08-14",
+   "status": "deprecated",
+   "release_date": "2026-04-07",
    "limit": {
-    "context": 1040000,
-    "output": 131072
+    "context": 198000,
+    "output": 8192
    },
    "capabilities": {
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
+     "supported": false
     },
     "temperature": true,
     "top_p": true,
@@ -2993,9 +2342,10 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
+   "description": "Flagship GLM model for hybrid reasoning, coding, and agentic engineering",
    "open_weights": true,
-   "last_updated": "2026-08-14",
+   "knowledge": "2024-10",
+   "last_updated": "2026-04-07",
    "modalities": {
     "input": [
      "text"
@@ -3024,9 +2374,6 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
      "capabilities": {
       "tools": {
        "updates": false
@@ -3035,16 +2382,15 @@
     }
    }
   },
-  "gpt-5-4-mini": {
-   "id": "gpt-5-4-mini",
-   "name": "GPT-5.4 Mini",
+  "claude-haiku-5-5": {
+   "id": "claude-haiku-5-5",
+   "name": "Claude Haiku 5.5",
    "type": "chat",
-   "canonical_id": "openai/gpt-5.4-mini",
-   "family": "gpt-mini",
-   "release_date": "2026-03-17",
+   "canonical_id": "anthropic/claude-haiku-5-5",
+   "family": "claude-haiku",
+   "release_date": "2026-10-07",
    "limit": {
-    "context": 400000,
-    "input": 272000,
+    "context": 1000000,
     "output": 128000
    },
    "capabilities": {
@@ -3053,96 +2399,26 @@
     },
     "reasoning": {
      "supported": true,
+     "toggle": true,
      "effort": [
       "low",
       "medium",
-      "high"
+      "high",
+      "xhigh",
+      "max"
      ]
     },
     "structured_output": true,
-    "temperature": false,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Compact GPT model for low-latency assistance and high-volume workloads",
-   "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2026-03-17",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.75,
-      "cache": {
-       "read": 0.075
-      }
-     },
-     "output": {
-      "price": 4.5
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://app.frogbot.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "claude-opus-4-7": {
-   "id": "claude-opus-4-7",
-   "name": "Claude Opus 4.7",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-opus-4-7",
-   "family": "claude-opus",
-   "release_date": "2026-04-16",
-   "limit": {
-    "context": 200000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    },
     "temperature": false,
     "top_p": false,
     "top_k": false,
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Flagship Claude model for deep reasoning, coding, and long-horizon agents",
+   "description": "Fast Claude model for responsive assistance, classification, and lightweight agents",
    "open_weights": false,
-   "knowledge": "2026-01-31",
-   "last_updated": "2026-04-16",
+   "knowledge": "2026-06",
+   "last_updated": "2026-10-07",
    "modalities": {
     "input": [
      "text",
@@ -3159,14 +2435,14 @@
    "cost": {
     "text": {
      "input": {
-      "price": 5,
+      "price": 0.1,
       "cache": {
-       "read": 0.5,
-       "write": 6.25
+       "read": 0.01,
+       "write": 0.125
       }
      },
      "output": {
-      "price": 25
+      "price": 0.5
      }
     }
    },
@@ -3185,16 +2461,16 @@
     }
    }
   },
-  "deepseek-v4-pro": {
-   "id": "deepseek-v4-pro",
-   "name": "DeepSeek v4 Pro",
+  "gpt-4o": {
+   "id": "gpt-4o",
+   "name": "GPT-4o",
    "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4-pro",
-   "family": "deepseek-thinking",
-   "release_date": "2026-04-24",
+   "canonical_id": "openai/gpt-4o",
+   "family": "gpt",
+   "release_date": "2024-05-13",
    "limit": {
     "context": 128000,
-    "output": 8192
+    "output": 16384
    },
    "capabilities": {
     "tools": {
@@ -3203,19 +2479,24 @@
     "reasoning": {
      "supported": false
     },
+    "structured_output": true,
     "temperature": true,
     "top_p": true,
-    "top_k": true,
+    "top_k": false,
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Flagship DeepSeek model for coding, reasoning, and agentic work",
-   "open_weights": true,
-   "knowledge": "2026-01",
-   "last_updated": "2026-04-24",
+   "description": "GPT model for general reasoning, writing, coding, and tool-assisted tasks",
+   "open_weights": false,
+   "knowledge": "2023-09",
+   "last_updated": "2024-08-06",
    "modalities": {
     "input": [
-     "text"
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
     ],
     "output": [
      "text"
@@ -3224,13 +2505,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 1.32,
+      "price": 2.5,
       "cache": {
-       "read": 0.044
+       "read": 1.25
       }
      },
      "output": {
-      "price": 3.96
+      "price": 10
      }
     }
    },
@@ -3347,94 +2628,16 @@
     }
    }
   },
-  "claude-haiku-5-5": {
-   "id": "claude-haiku-5-5",
-   "name": "Claude Haiku 5.5",
+  "gpt-5-3-codex": {
+   "id": "gpt-5-3-codex",
+   "name": "GPT-5.3 Codex",
    "type": "chat",
-   "canonical_id": "anthropic/claude-haiku-5-5",
-   "family": "claude-haiku",
-   "release_date": "2026-10-07",
+   "canonical_id": "openai/gpt-5.3-codex",
+   "family": "gpt-codex",
+   "release_date": "2026-02-05",
    "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Fast Claude model for responsive assistance, classification, and lightweight agents",
-   "open_weights": false,
-   "knowledge": "2026-06",
-   "last_updated": "2026-10-07",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.1,
-      "cache": {
-       "read": 0.01,
-       "write": 0.125
-      }
-     },
-     "output": {
-      "price": 0.5
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://app.frogbot.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "claude-sonnet-5-5": {
-   "id": "claude-sonnet-5-5",
-   "name": "Claude Sonnet 5.5",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-sonnet-5-5",
-   "family": "claude-sonnet",
-   "release_date": "2026-09-28",
-   "limit": {
-    "context": 1000000,
+    "context": 400000,
+    "input": 272000,
     "output": 128000
    },
    "capabilities": {
@@ -3446,30 +2649,26 @@
      "effort": [
       "low",
       "medium",
-      "high",
-      "xhigh",
-      "max"
+      "high"
      ]
     },
-    "structured_output": true,
     "temperature": false,
-    "top_p": false,
+    "top_p": true,
     "top_k": false,
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Fast Claude model for everyday coding, agents, and knowledge work",
+   "description": "Coding-optimized GPT model for repository edits, reviews, and agentic software work",
    "open_weights": false,
-   "knowledge": "2026-06",
-   "last_updated": "2026-09-28",
+   "knowledge": "2026-01-31",
+   "last_updated": "2026-02-05",
    "modalities": {
     "input": [
      "text",
      "image/jpeg",
      "image/png",
      "image/gif",
-     "image/webp",
-     "application/pdf"
+     "image/webp"
     ],
     "output": [
      "text"
@@ -3478,97 +2677,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 2,
+      "price": 1.75,
       "cache": {
-       "read": 0.1,
-       "write": 2.5
+       "read": 0.175
       }
      },
      "output": {
-      "price": 10
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://app.frogbot.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "claude-opus-4-8": {
-   "id": "claude-opus-4-8",
-   "name": "Claude Opus 4.8",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-opus-4-8",
-   "family": "claude-opus",
-   "release_date": "2026-05-28",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Top Claude Opus tier for the hardest reasoning, coding, and long-horizon agents",
-   "open_weights": false,
-   "knowledge": "2026-01",
-   "last_updated": "2026-05-28",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 5,
-      "cache": {
-       "read": 0.5,
-       "write": 6.25
-      }
-     },
-     "output": {
-      "price": 25
+      "price": 14
      }
     }
    },
@@ -3666,16 +2781,15 @@
     }
    }
   },
-  "gpt-6-sol": {
-   "id": "gpt-6-sol",
-   "name": "GPT-6 Sol",
+  "grok-code-fast-1": {
+   "id": "grok-code-fast-1",
+   "name": "Grok 4.1 Fast (Reasoning)",
    "type": "chat",
-   "canonical_id": "openai/gpt-6-sol",
-   "family": "gpt-sol",
-   "release_date": "2026-09-22",
+   "canonical_id": "xai/grok-code-fast-1",
+   "family": "grok",
+   "release_date": "2025-09-02",
    "limit": {
-    "context": 1050000,
-    "input": 922000,
+    "context": 256000,
     "output": 128000
    },
    "capabilities": {
@@ -3683,34 +2797,21 @@
      "supported": true
     },
     "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
+     "supported": true
     },
     "temperature": true,
     "top_p": true,
-    "top_k": false,
+    "top_k": true,
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "OpenAI model for complex coding and agentic workflows",
+   "description": "Fast Grok model for responsive chat, reasoning, and tool-assisted work",
    "open_weights": false,
-   "knowledge": "2026-04-20",
-   "last_updated": "2026-09-22",
+   "knowledge": "2023-10",
+   "last_updated": "2025-09-02",
    "modalities": {
     "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
+     "text"
     ],
     "output": [
      "text"
@@ -3719,14 +2820,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 2,
+      "price": 0.2,
       "cache": {
-       "read": 0.2,
-       "write": 2.5
+       "read": 0.02
       }
      },
      "output": {
-      "price": 10
+      "price": 1.5
      }
     }
    },
@@ -3816,15 +2916,15 @@
     }
    }
   },
-  "gpt-5-5": {
-   "id": "gpt-5-5",
-   "name": "GPT-5.5",
+  "claude-opus-4-7": {
+   "id": "claude-opus-4-7",
+   "name": "Claude Opus 4.7",
    "type": "chat",
-   "canonical_id": "openai/gpt-5.5",
-   "family": "gpt",
-   "release_date": "2026-04-23",
+   "canonical_id": "anthropic/claude-opus-4-7",
+   "family": "claude-opus",
+   "release_date": "2026-04-16",
    "limit": {
-    "context": 272000,
+    "context": 200000,
     "output": 128000
    },
    "capabilities": {
@@ -3839,23 +2939,24 @@
       "high"
      ]
     },
-    "temperature": true,
-    "top_p": true,
+    "temperature": false,
+    "top_p": false,
     "top_k": false,
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Frontier GPT model for professional reasoning, coding, and multimodal work",
+   "description": "Flagship Claude model for deep reasoning, coding, and long-horizon agents",
    "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2026-04-23",
+   "knowledge": "2026-01-31",
+   "last_updated": "2026-04-16",
    "modalities": {
     "input": [
      "text",
      "image/jpeg",
      "image/png",
      "image/gif",
-     "image/webp"
+     "image/webp",
+     "application/pdf"
     ],
     "output": [
      "text"
@@ -3866,11 +2967,12 @@
      "input": {
       "price": 5,
       "cache": {
-       "read": 0.5
+       "read": 0.5,
+       "write": 6.25
       }
      },
      "output": {
-      "price": 30
+      "price": 25
      }
     }
    },
@@ -3889,17 +2991,97 @@
     }
    }
   },
-  "gpt-5-6-terra": {
-   "id": "gpt-5-6-terra",
-   "name": "GPT-5.6 Terra",
+  "kimi-k3": {
+   "id": "kimi-k3",
+   "name": "Kimi K3",
    "type": "chat",
-   "canonical_id": "openai/gpt-5.6-terra",
-   "family": "gpt-terra",
-   "release_date": "2026-07-09",
+   "canonical_id": "moonshotai/kimi-k3",
+   "family": "kimi-k3",
+   "release_date": "2026-07-16",
    "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
+    "context": 1040000,
+    "output": 131072
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "max"
+     ],
+     "budget": {
+      "min": 1024
+     }
+    },
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
+   "open_weights": true,
+   "last_updated": "2026-07-16",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 3,
+      "cache": {
+       "read": 0.3
+      }
+     },
+     "output": {
+      "price": 15
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://app.frogbot.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "claude-sonnet-4-6": {
+   "id": "claude-sonnet-4-6",
+   "name": "Claude Sonnet 4.6",
+   "type": "chat",
+   "canonical_id": "anthropic/claude-sonnet-4-6",
+   "family": "claude-sonnet",
+   "release_date": "2026-02-17",
+   "limit": {
+    "context": 200000,
+    "output": 64000
    },
    "capabilities": {
     "tools": {
@@ -3908,24 +3090,24 @@
     "reasoning": {
      "supported": true,
      "effort": [
-      "none",
       "low",
       "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
+      "high"
+     ],
+     "budget": {
+      "min": 1024
+     }
     },
     "temperature": true,
     "top_p": true,
-    "top_k": false,
+    "top_k": true,
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Balanced GPT-5.6 model for capable, cost-efficient everyday work",
+   "description": "Balanced Claude model for coding, analysis, agent workflows, and cost control",
    "open_weights": false,
-   "knowledge": "2026-02-16",
-   "last_updated": "2026-07-09",
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-03-13",
    "modalities": {
     "input": [
      "text",
@@ -3942,14 +3124,14 @@
    "cost": {
     "text": {
      "input": {
-      "price": 2,
+      "price": 3,
       "cache": {
-       "read": 0.2,
-       "write": 2.5
+       "read": 0.3,
+       "write": 3.75
       }
      },
      "output": {
-      "price": 12
+      "price": 15
      }
     }
    },
@@ -3962,6 +3144,824 @@
      },
      "capabilities": {
       "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "gpt-6-astra": {
+   "id": "gpt-6-astra",
+   "name": "GPT-6 Astra",
+   "type": "chat",
+   "canonical_id": "openai/gpt-6-astra",
+   "family": "gpt-astra",
+   "release_date": "2026-09-04",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    },
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "GPT-6 Astra is OpenAI's most capable model for complex reasoning, coding, computer use, research, and document creation.",
+   "open_weights": false,
+   "knowledge": "2026-04-30",
+   "last_updated": "2026-09-04",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 10,
+      "cache": {
+       "read": 1,
+       "write": 12.5
+      }
+     },
+     "output": {
+      "price": 50
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://app.frogbot.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "zai-glm-5-3-flash": {
+   "id": "zai-glm-5-3-flash",
+   "name": "GLM 5.3 Flash",
+   "type": "chat",
+   "canonical_id": "zhipuai/glm-5.3-flash",
+   "family": "glm-flash",
+   "release_date": "2026-08-26",
+   "limit": {
+    "context": 1040000,
+    "output": 131072
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    },
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
+   "open_weights": true,
+   "last_updated": "2026-08-26",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.15,
+      "cache": {
+       "read": 0.029
+      }
+     },
+     "output": {
+      "price": 0.5
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://app.frogbot.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "gemini-3-flash-preview": {
+   "id": "gemini-3-flash-preview",
+   "name": "Gemini 3 Flash Preview",
+   "type": "chat",
+   "canonical_id": "google/gemini-3-flash-preview",
+   "family": "gemini-flash",
+   "release_date": "2025-12-17",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Fast Gemini model balancing multimodal reasoning, tool use, and cost",
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2025-12-17",
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.5,
+      "cache": {
+       "read": 0.05
+      }
+     },
+     "output": {
+      "price": 3
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://app.frogbot.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "gemini-3-5-flash-lite": {
+   "id": "gemini-3-5-flash-lite",
+   "name": "Gemini 3.5 Flash Lite",
+   "type": "chat",
+   "canonical_id": "google/gemini-3.5-flash-lite",
+   "family": "gemini-flash-lite",
+   "release_date": "2026-07-21",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    },
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Fast Gemini model balancing multimodal reasoning, tool use, and cost",
+   "open_weights": false,
+   "knowledge": "2026-03",
+   "last_updated": "2026-07-21",
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.3,
+      "cache": {
+       "read": 0.03
+      }
+     },
+     "output": {
+      "price": 2.5
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://app.frogbot.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "claude-opus-4-8": {
+   "id": "claude-opus-4-8",
+   "name": "Claude Opus 4.8",
+   "type": "chat",
+   "canonical_id": "anthropic/claude-opus-4-8",
+   "family": "claude-opus",
+   "release_date": "2026-05-28",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    },
+    "structured_output": true,
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Top Claude Opus tier for the hardest reasoning, coding, and long-horizon agents",
+   "open_weights": false,
+   "knowledge": "2026-01",
+   "last_updated": "2026-05-28",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5,
+       "write": 6.25
+      }
+     },
+     "output": {
+      "price": 25
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://app.frogbot.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "gemini-3-6-flash": {
+   "id": "gemini-3-6-flash",
+   "name": "Gemini 3.6 Flash",
+   "type": "chat",
+   "canonical_id": "google/gemini-3.6-flash",
+   "family": "gemini-flash",
+   "release_date": "2026-07-21",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    },
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Fast Gemini model balancing multimodal reasoning, tool use, and cost",
+   "open_weights": false,
+   "knowledge": "2026-03",
+   "last_updated": "2026-07-21",
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.5,
+      "cache": {
+       "read": 0.15
+      }
+     },
+     "output": {
+      "price": 7.5
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://app.frogbot.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "minimax-m2-5": {
+   "id": "minimax-m2-5",
+   "name": "MiniMax-M2.5",
+   "type": "chat",
+   "canonical_id": "minimax/MiniMax-M2.5",
+   "family": "minimax",
+   "status": "deprecated",
+   "release_date": "2026-02-12",
+   "limit": {
+    "context": 192000,
+    "output": 8192
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    },
+    "temperature": true,
+    "top_p": true,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "MiniMax model for chat, coding, office work, and agentic tasks",
+   "open_weights": true,
+   "knowledge": "2024-09",
+   "last_updated": "2026-02-12",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.3,
+      "cache": {
+       "read": 0.03
+      }
+     },
+     "output": {
+      "price": 1.2
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://app.frogbot.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "kimi-k2-6": {
+   "id": "kimi-k2-6",
+   "name": "Kimi-K2.6",
+   "type": "chat",
+   "canonical_id": "moonshotai/kimi-k2.6",
+   "family": "kimi-k2",
+   "release_date": "2026-04-20",
+   "limit": {
+    "context": 256000,
+    "output": 128000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Kimi multimodal agent model for visual understanding, coding, and planning",
+   "open_weights": true,
+   "knowledge": "2025-01",
+   "last_updated": "2026-04-20",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/heic",
+     "image/heif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.95,
+      "cache": {
+       "read": 0.16
+      }
+     },
+     "output": {
+      "price": 4
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://app.frogbot.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "gpt-5-4-mini": {
+   "id": "gpt-5-4-mini",
+   "name": "GPT-5.4 Mini",
+   "type": "chat",
+   "canonical_id": "openai/gpt-5.4-mini",
+   "family": "gpt-mini",
+   "release_date": "2026-03-17",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    },
+    "structured_output": true,
+    "temperature": false,
+    "top_p": true,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Compact GPT model for low-latency assistance and high-volume workloads",
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-03-17",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.75,
+      "cache": {
+       "read": 0.075
+      }
+     },
+     "output": {
+      "price": 4.5
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://app.frogbot.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "claude-opus-5-5": {
+   "id": "claude-opus-5-5",
+   "name": "Claude Opus 5.5",
+   "type": "chat",
+   "canonical_id": "anthropic/claude-opus-5-5",
+   "family": "claude-opus",
+   "release_date": "2026-09-22",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    },
+    "structured_output": true,
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Claude model for long-running agentic coding and knowledge work",
+   "open_weights": false,
+   "knowledge": "2026-06",
+   "last_updated": "2026-09-22",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 4,
+      "cache": {
+       "read": 0.2,
+       "write": 5
+      }
+     },
+     "output": {
+      "price": 20
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://app.frogbot.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
        "updates": false
       }
      }

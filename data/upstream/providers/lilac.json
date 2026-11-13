@@ -6,6 +6,83 @@
   "LILAC_API_KEY"
  ],
  "models": {
+  "moonshotai/kimi-k2.6": {
+   "id": "moonshotai/kimi-k2.6",
+   "name": "Kimi K2.6",
+   "type": "chat",
+   "canonical_id": "moonshotai/kimi-k2.6",
+   "family": "kimi-k2",
+   "status": "deprecated",
+   "release_date": "2026-04-20",
+   "limit": {
+    "context": 262144,
+    "output": 262144
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Multimodal Kimi workhorse for agent loops, coding tasks, and visual context",
+   "open_weights": true,
+   "knowledge": "2025-01",
+   "last_updated": "2026-04-20",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/heic",
+     "image/heif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.7,
+      "cache": {
+       "read": 0.2
+      }
+     },
+     "output": {
+      "price": 3.5
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.getlilac.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
   "zai-org/glm-5.2": {
    "id": "zai-org/glm-5.2",
    "name": "GLM 5.2",
@@ -79,17 +156,17 @@
     }
    }
   },
-  "moonshotai/kimi-k2.6": {
-   "id": "moonshotai/kimi-k2.6",
-   "name": "Kimi K2.6",
+  "google/gemma-4-31b-it": {
+   "id": "google/gemma-4-31b-it",
+   "name": "Gemma 4 31B IT",
    "type": "chat",
-   "canonical_id": "moonshotai/kimi-k2.6",
-   "family": "kimi-k2",
+   "canonical_id": "google/gemma-4-31b-it",
+   "family": "gemma",
    "status": "deprecated",
-   "release_date": "2026-04-20",
+   "release_date": "2026-04-02",
    "limit": {
-    "context": 262144,
-    "output": 262144
+    "context": 262100,
+    "output": 262100
    },
    "capabilities": {
     "tools": {
@@ -106,20 +183,19 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Multimodal Kimi workhorse for agent loops, coding tasks, and visual context",
+   "description": "Largest Gemma 4 instruction model for open, self-hosted chat and reasoning",
    "open_weights": true,
    "knowledge": "2025-01",
-   "last_updated": "2026-04-20",
+   "last_updated": "2026-04-02",
    "modalities": {
     "input": [
      "text",
-     "image/jpeg",
      "image/png",
-     "image/gif",
+     "image/jpeg",
      "image/webp",
-     "image/bmp",
      "image/heic",
-     "image/heif"
+     "image/heif",
+     "video"
     ],
     "output": [
      "text"
@@ -128,13 +204,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.7,
-      "cache": {
-       "read": 0.2
-      }
+      "price": 0.11
      },
      "output": {
-      "price": 3.5
+      "price": 0.35
      }
     }
    },
@@ -221,79 +294,6 @@
      "sdk": {
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "google/gemma-4-31b-it": {
-   "id": "google/gemma-4-31b-it",
-   "name": "Gemma 4 31B IT",
-   "type": "chat",
-   "canonical_id": "google/gemma-4-31b-it",
-   "family": "gemma",
-   "status": "deprecated",
-   "release_date": "2026-04-02",
-   "limit": {
-    "context": 262100,
-    "output": 262100
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Largest Gemma 4 instruction model for open, self-hosted chat and reasoning",
-   "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-04-02",
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "video"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.11
-     },
-     "output": {
-      "price": 0.35
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.getlilac.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
      },
      "capabilities": {
       "tools": {

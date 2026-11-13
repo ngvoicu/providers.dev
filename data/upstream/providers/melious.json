@@ -6,16 +6,16 @@
   "MELIOUS_API_KEY"
  ],
  "models": {
-  "deepseek-v4.1-flash": {
-   "id": "deepseek-v4.1-flash",
-   "name": "DeepSeek V4.1 Flash",
+  "kimi-k2.7-code": {
+   "id": "kimi-k2.7-code",
+   "name": "Kimi K2.7 Code",
    "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4.1-flash",
-   "family": "deepseek-flash",
-   "release_date": "2026-09-10",
+   "canonical_id": "moonshotai/kimi-k2.7-code",
+   "family": "kimi-k2",
+   "release_date": "2026-06-12",
    "limit": {
-    "context": 1000000,
-    "output": 384000
+    "context": 262144,
+    "output": 262144
    },
    "capabilities": {
     "tools": {
@@ -23,90 +23,7 @@
     },
     "reasoning": {
      "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "DeepSeek V4.1 Flash model for reasoning and agentic coding",
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-09-10",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.223,
-      "cache": {
-       "read": 0.01115
-      }
-     },
-     "output": {
-      "price": 1.115
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.melious.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "kimi-k3": {
-   "id": "kimi-k3",
-   "name": "Kimi K3",
-   "type": "chat",
-   "canonical_id": "moonshotai/kimi-k3",
-   "family": "kimi-k3",
-   "release_date": "2026-07-16",
-   "limit": {
-    "context": 1000000,
-    "output": 131072
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "high",
-      "max"
-     ]
+     "toggle": true
     },
     "structured_output": true,
     "temperature": false,
@@ -115,9 +32,10 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
+   "description": "Coding-focused Kimi model, stronger on long-horizon repo work with less overthinking",
    "open_weights": true,
-   "last_updated": "2026-07-16",
+   "knowledge": "2025-01",
+   "last_updated": "2026-06-12",
    "modalities": {
     "input": [
      "text",
@@ -145,85 +63,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 3.17775,
+      "price": 0.61325,
       "cache": {
-       "read": 0.79165
+       "read": 0.16725
       }
      },
      "output": {
-      "price": 15.88875
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.melious.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "glm-5.3": {
-   "id": "glm-5.3",
-   "name": "GLM-5.3",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-5.3",
-   "family": "glm",
-   "release_date": "2026-08-14",
-   "limit": {
-    "context": 1000000,
-    "output": 131072
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
-   "open_weights": true,
-   "last_updated": "2026-08-14",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.115,
-      "cache": {
-       "read": 0.223
-      }
-     },
-     "output": {
-      "price": 3.345
+      "price": 3.28925
      }
     }
    },
@@ -301,6 +147,91 @@
      },
      "output": {
       "price": 0.446
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.melious.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "kimi-k2.6": {
+   "id": "kimi-k2.6",
+   "name": "Kimi K2.6",
+   "type": "chat",
+   "canonical_id": "moonshotai/kimi-k2.6",
+   "family": "kimi-k2",
+   "release_date": "2026-04-20",
+   "limit": {
+    "context": 256000,
+    "output": 256000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Multimodal Kimi workhorse for agent loops, coding tasks, and visual context",
+   "open_weights": true,
+   "knowledge": "2025-01",
+   "last_updated": "2026-04-20",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.669,
+      "cache": {
+       "read": 0.16725
+      }
+     },
+     "output": {
+      "price": 4.014
      }
     }
    },
@@ -454,16 +385,16 @@
     }
    }
   },
-  "kimi-k2.6": {
-   "id": "kimi-k2.6",
-   "name": "Kimi K2.6",
+  "deepseek-v4.1-flash": {
+   "id": "deepseek-v4.1-flash",
+   "name": "DeepSeek V4.1 Flash",
    "type": "chat",
-   "canonical_id": "moonshotai/kimi-k2.6",
-   "family": "kimi-k2",
-   "release_date": "2026-04-20",
+   "canonical_id": "deepseek/deepseek-v4.1-flash",
+   "family": "deepseek-flash",
+   "release_date": "2026-09-10",
    "limit": {
-    "context": 256000,
-    "output": 256000
+    "context": 1000000,
+    "output": 384000
    },
    "capabilities": {
     "tools": {
@@ -471,7 +402,12 @@
     },
     "reasoning": {
      "supported": true,
-     "toggle": true
+     "effort": [
+      "none",
+      "low",
+      "high",
+      "max"
+     ]
     },
     "structured_output": true,
     "temperature": true,
@@ -480,29 +416,17 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Multimodal Kimi workhorse for agent loops, coding tasks, and visual context",
+   "description": "DeepSeek V4.1 Flash model for reasoning and agentic coding",
    "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-04-20",
+   "knowledge": "2025-05",
+   "last_updated": "2026-09-10",
    "modalities": {
     "input": [
      "text",
      "image/jpeg",
      "image/png",
      "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/heic",
-     "image/heif",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp"
+     "image/webp"
     ],
     "output": [
      "text"
@@ -511,13 +435,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.669,
+      "price": 0.223,
       "cache": {
-       "read": 0.16725
+       "read": 0.01115
       }
      },
      "output": {
-      "price": 4.014
+      "price": 1.115
      }
     }
    },
@@ -539,16 +463,16 @@
     }
    }
   },
-  "kimi-k2.7-code": {
-   "id": "kimi-k2.7-code",
-   "name": "Kimi K2.7 Code",
+  "glm-5.3": {
+   "id": "glm-5.3",
+   "name": "GLM-5.3",
    "type": "chat",
-   "canonical_id": "moonshotai/kimi-k2.7-code",
-   "family": "kimi-k2",
-   "release_date": "2026-06-12",
+   "canonical_id": "zhipuai/glm-5.3",
+   "family": "glm",
+   "release_date": "2026-08-14",
    "limit": {
-    "context": 262144,
-    "output": 262144
+    "context": 1000000,
+    "output": 131072
    },
    "capabilities": {
     "tools": {
@@ -556,38 +480,25 @@
     },
     "reasoning": {
      "supported": true,
-     "toggle": true
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
     },
     "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Coding-focused Kimi model, stronger on long-horizon repo work with less overthinking",
+   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
    "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-06-12",
+   "last_updated": "2026-08-14",
    "modalities": {
     "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/heic",
-     "image/heif",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp"
+     "text"
     ],
     "output": [
      "text"
@@ -596,13 +507,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.61325,
+      "price": 1.115,
       "cache": {
-       "read": 0.16725
+       "read": 0.223
       }
      },
      "output": {
-      "price": 3.28925
+      "price": 3.345
      }
     }
    },
@@ -674,6 +585,95 @@
      "sdk": {
       "aisdk": "@ai-sdk/typesafe-ai",
       "opencodeai": "@opencode/ai/providers/typesafe-ai/decisions"
+     }
+    }
+   }
+  },
+  "kimi-k3": {
+   "id": "kimi-k3",
+   "name": "Kimi K3",
+   "type": "chat",
+   "canonical_id": "moonshotai/kimi-k3",
+   "family": "kimi-k3",
+   "release_date": "2026-07-16",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "high",
+      "max"
+     ]
+    },
+    "structured_output": true,
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
+   "open_weights": true,
+   "last_updated": "2026-07-16",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 3.17775,
+      "cache": {
+       "read": 0.79165
+      }
+     },
+     "output": {
+      "price": 15.88875
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.melious.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
      }
     }
    }

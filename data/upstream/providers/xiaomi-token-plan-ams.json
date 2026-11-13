@@ -6,11 +6,11 @@
   "XIAOMI_API_KEY"
  ],
  "models": {
-  "mimo-v2.6-pro": {
-   "id": "mimo-v2.6-pro",
-   "name": "MiMo-V2.6-Pro",
+  "mimo-v2.6-flash": {
+   "id": "mimo-v2.6-flash",
+   "name": "MiMo-V2.6-Flash",
    "type": "chat",
-   "canonical_id": "xiaomi/mimo-v2.6-pro",
+   "canonical_id": "xiaomi/mimo-v2.6-flash",
    "family": "mimo",
    "release_date": "2026-09-22",
    "limit": {
@@ -40,7 +40,7 @@
     "effort_updates": false,
     "stream_usage": true
    },
-   "description": "Stronger MiMo Pro tier for multimodal reasoning and coding-agent execution",
+   "description": "MiMo Flash model for multimodal coding agents and long-context automation",
    "open_weights": true,
    "last_updated": "2026-09-22",
    "modalities": {
@@ -132,11 +132,11 @@
     }
    }
   },
-  "mimo-v2.6-flash": {
-   "id": "mimo-v2.6-flash",
-   "name": "MiMo-V2.6-Flash",
+  "mimo-v2.6-pro": {
+   "id": "mimo-v2.6-pro",
+   "name": "MiMo-V2.6-Pro",
    "type": "chat",
-   "canonical_id": "xiaomi/mimo-v2.6-flash",
+   "canonical_id": "xiaomi/mimo-v2.6-pro",
    "family": "mimo",
    "release_date": "2026-09-22",
    "limit": {
@@ -166,7 +166,7 @@
     "effort_updates": false,
     "stream_usage": true
    },
-   "description": "MiMo Flash model for multimodal coding agents and long-context automation",
+   "description": "Stronger MiMo Pro tier for multimodal reasoning and coding-agent execution",
    "open_weights": true,
    "last_updated": "2026-09-22",
    "modalities": {
@@ -345,16 +345,16 @@
     }
    }
   },
-  "mimo-v2.5-asr": {
-   "id": "mimo-v2.5-asr",
-   "name": "MiMo-V2.5-ASR",
-   "type": "transcription",
-   "canonical_id": "xiaomi/mimo-v2.5-asr",
+  "mimo-v2.5-tts-voiceclone": {
+   "id": "mimo-v2.5-tts-voiceclone",
+   "name": "MiMo-V2.5-TTS-VoiceClone",
+   "type": "speech",
+   "canonical_id": "xiaomi/mimo-v2.5-tts-voiceclone",
    "family": "mimo",
-   "release_date": "2026-04-23",
+   "release_date": "2026-04-22",
    "limit": {
     "context": 8192,
-    "output": 2048
+    "output": 8192
    },
    "capabilities": {
     "tools": {
@@ -369,22 +369,25 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Speech recognition model for Chinese, English, dialects, and noisy multi-speaker audio",
-   "open_weights": true,
-   "last_updated": "2026-04-23",
+   "description": "Speech generation model for controllable voice, narration, and audio delivery",
+   "open_weights": false,
+   "last_updated": "2026-04-22",
    "modalities": {
     "input": [
-     "audio/wav",
-     "audio/mpeg"
+     "text"
     ],
     "output": [
-     "text"
+     "audio/wav",
+     "audio/mpeg",
+     "audio/pcm"
     ]
    },
    "cost": {
-    "audio": {
+    "text": {
      "input": {
-      "unit": "minute",
+      "price": 0
+     },
+     "output": {
       "price": 0
      }
     }
@@ -468,63 +471,6 @@
       "tools": {
        "updates": false
       }
-     }
-    }
-   }
-  },
-  "mimo-v2.5-tts-voiceclone": {
-   "id": "mimo-v2.5-tts-voiceclone",
-   "name": "MiMo-V2.5-TTS-VoiceClone",
-   "type": "speech",
-   "canonical_id": "xiaomi/mimo-v2.5-tts-voiceclone",
-   "family": "mimo",
-   "release_date": "2026-04-22",
-   "limit": {
-    "context": 8192,
-    "output": 8192
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Speech generation model for controllable voice, narration, and audio delivery",
-   "open_weights": false,
-   "last_updated": "2026-04-22",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "audio/wav",
-     "audio/mpeg",
-     "audio/pcm"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://token-plan-ams.xiaomimimo.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
      }
     }
    }
@@ -629,6 +575,60 @@
       "price": 0
      },
      "output": {
+      "price": 0
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://token-plan-ams.xiaomimimo.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     }
+    }
+   }
+  },
+  "mimo-v2.5-asr": {
+   "id": "mimo-v2.5-asr",
+   "name": "MiMo-V2.5-ASR",
+   "type": "transcription",
+   "canonical_id": "xiaomi/mimo-v2.5-asr",
+   "family": "mimo",
+   "release_date": "2026-04-23",
+   "limit": {
+    "context": 8192,
+    "output": 2048
+   },
+   "capabilities": {
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    },
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Speech recognition model for Chinese, English, dialects, and noisy multi-speaker audio",
+   "open_weights": true,
+   "last_updated": "2026-04-23",
+   "modalities": {
+    "input": [
+     "audio/wav",
+     "audio/mpeg"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "audio": {
+     "input": {
+      "unit": "minute",
       "price": 0
      }
     }

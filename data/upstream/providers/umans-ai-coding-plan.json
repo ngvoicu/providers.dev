@@ -6,6 +6,84 @@
   "UMANS_AI_CODING_PLAN_API_KEY"
  ],
  "models": {
+  "umans-coder": {
+   "id": "umans-coder",
+   "name": "Umans Coder",
+   "type": "chat",
+   "canonical_id": "zhipuai/glm-5.3-flash",
+   "family": "glm-flash",
+   "release_date": "2026-08-26",
+   "limit": {
+    "context": 1048576,
+    "output": 131071
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    },
+    "structured_output": true,
+    "temperature": false,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
+   "open_weights": true,
+   "last_updated": "2026-08-26",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "video/mp4",
+     "video/x-matroska",
+     "video/quicktime"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.code.umans.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
   "umans-kimi-k3": {
    "id": "umans-kimi-k3",
    "name": "Kimi K3",
@@ -50,6 +128,81 @@
      "image/bmp",
      "image/heic",
      "image/heif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.code.umans.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "umans-deepseek-v4-flash-0731": {
+   "id": "umans-deepseek-v4-flash-0731",
+   "name": "DeepSeek V4 Flash",
+   "type": "chat",
+   "canonical_id": "deepseek/deepseek-v4-flash-0731",
+   "family": "deepseek-flash",
+   "release_date": "2026-07-31",
+   "limit": {
+    "context": 1048576,
+    "output": 393215
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Official DeepSeek V4 Flash release with enhanced agentic capabilities and integrated DSpark speculative decoding",
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-07-31",
+   "modalities": {
+    "input": [
+     "text"
     ],
     "output": [
      "text"
@@ -167,16 +320,16 @@
     }
    }
   },
-  "umans-deepseek-v4-flash-0731": {
-   "id": "umans-deepseek-v4-flash-0731",
-   "name": "DeepSeek V4 Flash",
+  "umans-glm-5.3": {
+   "id": "umans-glm-5.3",
+   "name": "GLM 5.3",
    "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4-flash-0731",
-   "family": "deepseek-flash",
-   "release_date": "2026-07-31",
+   "canonical_id": "zhipuai/glm-5.3",
+   "family": "glm",
+   "release_date": "2026-08-14",
    "limit": {
     "context": 1048576,
-    "output": 393215
+    "output": 131071
    },
    "capabilities": {
     "tools": {
@@ -184,7 +337,6 @@
     },
     "reasoning": {
      "supported": true,
-     "toggle": true,
      "effort": [
       "low",
       "high",
@@ -198,10 +350,9 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Official DeepSeek V4 Flash release with enhanced agentic capabilities and integrated DSpark speculative decoding",
+   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
    "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-07-31",
+   "last_updated": "2026-08-14",
    "modalities": {
     "input": [
      "text"
@@ -322,9 +473,9 @@
     }
    }
   },
-  "umans-coder": {
-   "id": "umans-coder",
-   "name": "Umans Coder",
+  "umans-glm-5.3-flash": {
+   "id": "umans-glm-5.3-flash",
+   "name": "GLM 5.3 Flash",
    "type": "chat",
    "canonical_id": "zhipuai/glm-5.3-flash",
    "family": "glm-flash",
@@ -346,7 +497,7 @@
      ]
     },
     "structured_output": true,
-    "temperature": false,
+    "temperature": true,
     "top_p": true,
     "top_k": true,
     "system_updates": false,
@@ -363,158 +514,6 @@
      "video/mp4",
      "video/x-matroska",
      "video/quicktime"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.code.umans.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "umans-glm-5.3": {
-   "id": "umans-glm-5.3",
-   "name": "GLM 5.3",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-5.3",
-   "family": "glm",
-   "release_date": "2026-08-14",
-   "limit": {
-    "context": 1048576,
-    "output": 131071
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
-   "open_weights": true,
-   "last_updated": "2026-08-14",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.code.umans.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "umans-deepseek-v4.1-flash": {
-   "id": "umans-deepseek-v4.1-flash",
-   "name": "DeepSeek V4.1 Flash",
-   "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
-   "family": "deepseek-flash",
-   "release_date": "2026-10-17",
-   "limit": {
-    "context": 1048576,
-    "output": 393215
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-10-17",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
     ],
     "output": [
      "text"
@@ -631,16 +630,16 @@
     }
    }
   },
-  "umans-glm-5.3-flash": {
-   "id": "umans-glm-5.3-flash",
-   "name": "GLM 5.3 Flash",
+  "umans-deepseek-v4.1-flash": {
+   "id": "umans-deepseek-v4.1-flash",
+   "name": "DeepSeek V4.1 Flash",
    "type": "chat",
-   "canonical_id": "zhipuai/glm-5.3-flash",
-   "family": "glm-flash",
-   "release_date": "2026-08-26",
+   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
+   "family": "deepseek-flash",
+   "release_date": "2026-10-17",
    "limit": {
     "context": 1048576,
-    "output": 131071
+    "output": 393215
    },
    "capabilities": {
     "tools": {
@@ -648,6 +647,7 @@
     },
     "reasoning": {
      "supported": true,
+     "toggle": true,
      "effort": [
       "low",
       "high",
@@ -661,17 +661,17 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
+   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
    "open_weights": true,
-   "last_updated": "2026-08-26",
+   "knowledge": "2025-05",
+   "last_updated": "2026-10-17",
    "modalities": {
     "input": [
      "text",
      "image/jpeg",
      "image/png",
-     "video/mp4",
-     "video/x-matroska",
-     "video/quicktime"
+     "image/gif",
+     "image/webp"
     ],
     "output": [
      "text"

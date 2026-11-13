@@ -6,16 +6,15 @@
   "XPERSONA_API_KEY"
  ],
  "models": {
-  "xpersona-gpt-5.5": {
-   "id": "xpersona-gpt-5.5",
-   "name": "GPT-5.5",
+  "gpt-5.6-terra": {
+   "id": "gpt-5.6-terra",
+   "name": "GPT-5.6 Terra",
    "type": "chat",
-   "canonical_id": "openai/gpt-5.5",
-   "family": "gpt",
-   "status": "deprecated",
-   "release_date": "2026-04-23",
+   "canonical_id": "openai/gpt-5.6-terra",
+   "family": "gpt-terra",
+   "release_date": "2026-07-09",
    "limit": {
-    "context": 1000000,
+    "context": 372000,
     "output": 128000
    },
    "capabilities": {
@@ -39,10 +38,10 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Default frontier GPT for coding, computer use, research, and knowledge work",
+   "description": "Balanced GPT-5.6 model for capable, cost-efficient everyday work",
    "open_weights": false,
-   "knowledge": "2025-12-30",
-   "last_updated": "2026-04-23",
+   "knowledge": "2026-02-16",
+   "last_updated": "2026-07-09",
    "modalities": {
     "input": [
      "text",
@@ -58,14 +57,14 @@
    "cost": {
     "text": {
      "input": {
-      "price": 3,
+      "price": 1.5,
       "cache": {
-       "read": 0.3
+       "read": 0.15
       }
      },
      "output": {
-      "price": 18,
-      "reasoning": 18
+      "price": 2,
+      "reasoning": 2
      }
     }
    },
@@ -87,15 +86,15 @@
     }
    }
   },
-  "gpt-5.4": {
-   "id": "gpt-5.4",
-   "name": "GPT-5.4",
+  "gpt-5.6-sol": {
+   "id": "gpt-5.6-sol",
+   "name": "GPT-5.6 Sol",
    "type": "chat",
-   "canonical_id": "openai/gpt-5.4",
-   "family": "gpt",
-   "release_date": "2026-03-05",
+   "canonical_id": "openai/gpt-5.6-sol",
+   "family": "gpt-sol",
+   "release_date": "2026-07-09",
    "limit": {
-    "context": 1050000,
+    "context": 372000,
     "output": 128000
    },
    "capabilities": {
@@ -119,10 +118,10 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Agent-ready GPT for coding and computer-use workflows at a lower cost",
+   "description": "Frontier GPT-5.6 model for complex professional work, coding, and agentic workflows",
    "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2026-03-05",
+   "knowledge": "2026-02-16",
+   "last_updated": "2026-07-09",
    "modalities": {
     "input": [
      "text",
@@ -138,14 +137,93 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.75,
+      "price": 1.5,
       "cache": {
-       "read": 0.075
+       "read": 0.15
       }
      },
      "output": {
-      "price": 6,
-      "reasoning": 6
+      "price": 12,
+      "reasoning": 12
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://www.xpersona.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "claude-fable-5": {
+   "id": "claude-fable-5",
+   "name": "Claude Fable 5",
+   "type": "chat",
+   "canonical_id": "anthropic/claude-fable-5",
+   "family": "claude-fable",
+   "release_date": "2026-06-09",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    },
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Claude model for creative writing, analysis, and controlled agent workflows",
+   "open_weights": false,
+   "knowledge": "2026-01-31",
+   "last_updated": "2026-06-09",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 3,
+      "cache": {
+       "read": 0.3
+      }
+     },
+     "output": {
+      "price": 18.5,
+      "reasoning": 18.5
      }
     }
    },
@@ -248,15 +326,165 @@
     }
    }
   },
-  "gpt-5.6-terra": {
-   "id": "gpt-5.6-terra",
-   "name": "GPT-5.6 Terra",
+  "claude-haiku-4-5": {
+   "id": "claude-haiku-4-5",
+   "name": "Claude Haiku 4.5 (latest)",
    "type": "chat",
-   "canonical_id": "openai/gpt-5.6-terra",
-   "family": "gpt-terra",
-   "release_date": "2026-07-09",
+   "canonical_id": "anthropic/claude-haiku-4-5",
+   "family": "claude-haiku",
+   "release_date": "2025-10-15",
    "limit": {
-    "context": 372000,
+    "context": 200000,
+    "output": 128000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    },
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Fast Claude lane for lightweight agents, office tasks, and responsive chat",
+   "open_weights": false,
+   "knowledge": "2025-02-28",
+   "last_updated": "2025-10-15",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.6,
+      "cache": {
+       "read": 0.06
+      }
+     },
+     "output": {
+      "price": 3.7,
+      "reasoning": 3.7
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://www.xpersona.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "xpersona-frieren-coder": {
+   "id": "xpersona-frieren-coder",
+   "name": "Xpersona Frieren 1",
+   "type": "chat",
+   "release_date": "2026-05-01",
+   "limit": {
+    "context": 1000000,
+    "output": 384000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    },
+    "structured_output": true,
+    "temperature": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Coding model for repository understanding, refactors, and agentic engineering tasks",
+   "open_weights": false,
+   "knowledge": "2025-12-30",
+   "last_updated": "2026-05-25",
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.5,
+      "cache": {
+       "read": 0.15
+      }
+     },
+     "output": {
+      "price": 6,
+      "reasoning": 6
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://www.xpersona.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "xpersona-gpt-5.5": {
+   "id": "xpersona-gpt-5.5",
+   "name": "GPT-5.5",
+   "type": "chat",
+   "canonical_id": "openai/gpt-5.5",
+   "family": "gpt",
+   "status": "deprecated",
+   "release_date": "2026-04-23",
+   "limit": {
+    "context": 1000000,
     "output": 128000
    },
    "capabilities": {
@@ -280,89 +508,10 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Balanced GPT-5.6 model for capable, cost-efficient everyday work",
+   "description": "Default frontier GPT for coding, computer use, research, and knowledge work",
    "open_weights": false,
-   "knowledge": "2026-02-16",
-   "last_updated": "2026-07-09",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.5,
-      "cache": {
-       "read": 0.15
-      }
-     },
-     "output": {
-      "price": 2,
-      "reasoning": 2
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://www.xpersona.co/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "claude-fable-5": {
-   "id": "claude-fable-5",
-   "name": "Claude Fable 5",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-fable-5",
-   "family": "claude-fable",
-   "release_date": "2026-06-09",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Claude model for creative writing, analysis, and controlled agent workflows",
-   "open_weights": false,
-   "knowledge": "2026-01-31",
-   "last_updated": "2026-06-09",
+   "knowledge": "2025-12-30",
+   "last_updated": "2026-04-23",
    "modalities": {
     "input": [
      "text",
@@ -384,8 +533,8 @@
       }
      },
      "output": {
-      "price": 18.5,
-      "reasoning": 18.5
+      "price": 18,
+      "reasoning": 18
      }
     }
    },
@@ -487,155 +636,6 @@
     }
    }
   },
-  "xpersona-frieren-coder": {
-   "id": "xpersona-frieren-coder",
-   "name": "Xpersona Frieren 1",
-   "type": "chat",
-   "release_date": "2026-05-01",
-   "limit": {
-    "context": 1000000,
-    "output": 384000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Coding model for repository understanding, refactors, and agentic engineering tasks",
-   "open_weights": false,
-   "knowledge": "2025-12-30",
-   "last_updated": "2026-05-25",
-   "modalities": {
-    "input": [
-     "text",
-     "image"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.5,
-      "cache": {
-       "read": 0.15
-      }
-     },
-     "output": {
-      "price": 6,
-      "reasoning": 6
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://www.xpersona.co/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "claude-haiku-4-5": {
-   "id": "claude-haiku-4-5",
-   "name": "Claude Haiku 4.5 (latest)",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-haiku-4-5",
-   "family": "claude-haiku",
-   "release_date": "2025-10-15",
-   "limit": {
-    "context": 200000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Fast Claude lane for lightweight agents, office tasks, and responsive chat",
-   "open_weights": false,
-   "knowledge": "2025-02-28",
-   "last_updated": "2025-10-15",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.6,
-      "cache": {
-       "read": 0.06
-      }
-     },
-     "output": {
-      "price": 3.7,
-      "reasoning": 3.7
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://www.xpersona.co/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
   "gpt-5.6": {
    "id": "gpt-5.6",
    "name": "GPT-5.6",
@@ -716,15 +716,15 @@
     }
    }
   },
-  "gpt-5.4-mini": {
-   "id": "gpt-5.4-mini",
-   "name": "GPT-5.4 mini",
+  "gpt-5.4": {
+   "id": "gpt-5.4",
+   "name": "GPT-5.4",
    "type": "chat",
-   "canonical_id": "openai/gpt-5.4-mini",
-   "family": "gpt-mini",
-   "release_date": "2026-03-17",
+   "canonical_id": "openai/gpt-5.4",
+   "family": "gpt",
+   "release_date": "2026-03-05",
    "limit": {
-    "context": 272000,
+    "context": 1050000,
     "output": 128000
    },
    "capabilities": {
@@ -748,10 +748,10 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Strong small GPT for coding subagents, quick tool use, and high-volume work",
+   "description": "Agent-ready GPT for coding and computer-use workflows at a lower cost",
    "open_weights": false,
    "knowledge": "2025-08-31",
-   "last_updated": "2026-03-17",
+   "last_updated": "2026-03-05",
    "modalities": {
     "input": [
      "text",
@@ -767,14 +767,14 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.375,
+      "price": 0.75,
       "cache": {
-       "read": 0.0375
+       "read": 0.075
       }
      },
      "output": {
-      "price": 4,
-      "reasoning": 4
+      "price": 6,
+      "reasoning": 6
      }
     }
    },
@@ -954,15 +954,15 @@
     }
    }
   },
-  "gpt-5.6-sol": {
-   "id": "gpt-5.6-sol",
-   "name": "GPT-5.6 Sol",
+  "gpt-5.4-mini": {
+   "id": "gpt-5.4-mini",
+   "name": "GPT-5.4 mini",
    "type": "chat",
-   "canonical_id": "openai/gpt-5.6-sol",
-   "family": "gpt-sol",
-   "release_date": "2026-07-09",
+   "canonical_id": "openai/gpt-5.4-mini",
+   "family": "gpt-mini",
+   "release_date": "2026-03-17",
    "limit": {
-    "context": 372000,
+    "context": 272000,
     "output": 128000
    },
    "capabilities": {
@@ -986,10 +986,10 @@
     "system_updates": false,
     "effort_updates": false
    },
-   "description": "Frontier GPT-5.6 model for complex professional work, coding, and agentic workflows",
+   "description": "Strong small GPT for coding subagents, quick tool use, and high-volume work",
    "open_weights": false,
-   "knowledge": "2026-02-16",
-   "last_updated": "2026-07-09",
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-03-17",
    "modalities": {
     "input": [
      "text",
@@ -1005,14 +1005,14 @@
    "cost": {
     "text": {
      "input": {
-      "price": 1.5,
+      "price": 0.375,
       "cache": {
-       "read": 0.15
+       "read": 0.0375
       }
      },
      "output": {
-      "price": 12,
-      "reasoning": 12
+      "price": 4,
+      "reasoning": 4
      }
     }
    },
