@@ -151,7 +151,7 @@ export const MeasurementLabels = z.strictObject({
 });
 export type MeasurementLabels = z.infer<typeof MeasurementLabels>;
 
-// ---- measurements (observed.json from cache-ttl-probe)
+// ---- measurements (observed.json from groundtruth)
 const check = z.looseObject({ age: z.string().optional(), age_s: z.number(), warm: z.number(), total: z.number() });
 export const ObservedRun = z.looseObject({
   id: z.string(),

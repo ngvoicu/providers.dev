@@ -18,7 +18,7 @@ The baseline is imported from models.dev; our additions, corrections and measure
 | Path | What | Edited by |
 |---|---|---|
 | `data/upstream/` | the last good import of models.dev, one file per provider | `npm run sync` only |
-| `data/sources/` | the measurements file from cache-ttl-probe | `npm run sync` only |
+| `data/sources/` | the measurements file from groundtruth | `npm run sync` only |
 | `data/authored/` | our providers, overrides, access rules, route map, measurement labels | people |
 | `data/published/` | the resolved snapshot (not in git) | `npm run data` only |
 | `src/core/` | pure logic shared by scripts, Worker, pages and browser: merge, resolve, entries, query, api, render | |

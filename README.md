@@ -10,7 +10,7 @@ The baseline is imported daily from [models.dev](https://models.dev) (MIT). On t
 - **providers models.dev does not list**, mainly subscription access (a Claude login, a ChatGPT plan through Codex,
   Devin, Google Antigravity);
 - **corrections** to single fields, each with a reason and a source;
-- **evaluations** of cache lifetimes and limits from [cache-ttl-probe](https://github.com/ngvoicu/cache-ttl-probe),
+- **evaluations** of cache lifetimes and limits from [groundtruth](https://github.com/ngvoicu/groundtruth),
   shown next to the documented values, never instead of them.
 
 It publishes metadata only. There is no chat, no inference proxy, and no subscription plans, prices or quotas.
@@ -136,7 +136,7 @@ doc: https://docs.devin.ai
 access: subscription          # api | subscription | unknown
 access_basis: Reached with a Devin subscription. Devin serves other labs' models under its own model ids.
 evidence:
-  - { kind: measured, url: https://github.com/ngvoicu/cache-ttl-probe/blob/main/observed.json, date: "2026-11-12" }
+  - { kind: measured, url: https://github.com/ngvoicu/groundtruth/blob/main/observed.json, date: "2026-11-12" }
 models:
   - id: gpt-6-1-sol
     inherits: openai/gpt-6.1-sol      # optional: take the name, family and dates from this upstream entry
