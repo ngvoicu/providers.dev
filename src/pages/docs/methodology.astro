@@ -13,9 +13,11 @@ import { meta } from "../../lib/data.ts";
     { id: "kinds", label: "Kinds of value" },
     { id: "unknown", label: "Unknown values" },
     { id: "limits", label: "Limits" },
+    { id: "prices", label: "Prices" },
     { id: "access", label: "Access methods" },
     { id: "merge", label: "Merge rules" },
     { id: "sync", label: "Daily import" },
+    { id: "caching", label: "Documented caching" },
     { id: "evaluations", label: "Cache evaluations" },
     { id: "stale", label: "Dates and staleness" },
   ]}
@@ -26,6 +28,7 @@ import { meta } from "../../lib/data.ts";
       <li><span class="origin upstream">models.dev</span> <strong>Imported.</strong> Copied from models.dev and not independently checked. Imported values never carry a verification date.</li>
       <li><span class="badge documented">documented</span> <strong>Documented.</strong> Set because the provider's own documentation says so. The entry names the page and the date it was read.</li>
       <li><span class="badge measured">measured</span> <strong>Measured.</strong> Observed by sending requests. The entry names the access method, the client, the date and the raw result.</li>
+      <li><span class="origin upstream">inherited</span> <strong>Inherited.</strong> Copied from the API entry of the same model and marked as such. Only one thing is inherited: the list price on a subscription entry (see <a href="#prices">Prices</a>).</li>
     </ul>
     <p>
       A measured value never replaces a documented one: both are shown. A provider documenting a 30-minute cache and an evaluation that found the cache gone after 15 minutes are two
@@ -35,6 +38,7 @@ import { meta } from "../../lib/data.ts";
     <h2 id="unknown">Unknown values</h2>
     <ul>
       <li>A missing limit is <em>unknown</em>. It is not zero and not unlimited, and it never matches a minimum filter.</li>
+      <li>A missing price is unknown, not free. A missing release date is unknown too, and such an entry never matches the "Released" filter.</li>
       <li>For caching, models.dev distinguishes <code>cache = false</code> (the entry does not cache) from no <code>cache</code> field (nothing is stated). Both are kept: "None" and "Unknown".</li>
       <li>A field can be published as explicitly unknown where the upstream value does not hold for an access method. The field is then omitted and the reason is recorded.</li>
     </ul>
@@ -46,6 +50,23 @@ import { meta } from "../../lib/data.ts";
       <li><strong>Maximum output</strong> (<code>limit.output</code>): the most one response can hold. It is not the default a provider applies when none is requested.</li>
       <li><strong>Usable context</strong>: the window minus the system prompt and tool definitions of the client in use. That overhead varies, so no usable figure is published.</li>
       <li><strong>Compaction threshold</strong>: a setting of an agent or client. It is not a provider limit and is not published as one.</li>
+      <li>
+        <strong>Measured input</strong>: where no window is documented and an evaluation found the input limit, the catalog shows it as <span class="limit-value">≥ 915K</span> input: the
+        largest input the evaluation saw accepted, rounded down. The entry page gives both ends, the largest accepted and the smallest refused. It is an input limit, not a window: the output
+        comes on top. A window listed by a client (a default the client works with) is not taken as the limit.
+      </li>
+    </ul>
+
+    <h2 id="prices">Prices</h2>
+    <ul>
+      <li>Prices are list prices in US dollars per million tokens, as models.dev records them (<code>cost</code>). They are imported, not checked.</li>
+      <li>The catalog shows the base price of text input and output. Prices that change with the size of the context or with a service tier, and the prices of cached input, are on the entry page.</li>
+      <li>A price of 0 is shown as <code>$0</code>. It can mean free of charge, or paid for another way (a plan or a seat): the page does not decide.</li>
+      <li>A price in another unit, for example per character for speech, is not shown as a price per token.</li>
+      <li>
+        A subscription is not paid per token. So that a client can still work out what its usage is worth, an added subscription entry carries the API list price of the same model,
+        marked "API price" in the catalog and "inherited" on the entry page. It is never what the subscription costs. Plans and their prices are not listed.
+      </li>
     </ul>
 
     <h2 id="access">Access methods</h2>
@@ -107,14 +128,28 @@ import { meta } from "../../lib/data.ts";
       }.
     </p>
 
+    <h2 id="caching">Documented caching</h2>
+    <ul>
+      <li><strong>Automatic</strong> (<code>implicit</code> in the data): the provider caches the start of a prompt by itself. The request does nothing for it.</li>
+      <li><strong>Manual</strong> (<code>explicit</code>): nothing is cached unless the request marks what to cache. The mark also picks the lifetime, where there is a choice.</li>
+      <li>The times under the word are the lifetimes the provider documents. "Manual, 5 min, 1 h" means a request must mark what to cache and can ask for either lifetime.</li>
+    </ul>
+    <p>The pages use the plain words; the data and the API keep the names models.dev uses.</p>
+
     <h2 id="evaluations">Cache evaluations</h2>
     <p>
       An evaluation sends a fresh prompt once so that it is cached, then sends it again at each of several set ages, a few times per age. For each age the result records how many of those
       re-sends were served from the cache: <code>3/3</code> is all of them, <code>0/3</code> none. Entry pages show this as a table, one column per age.
     </p>
     <p>
-      "Always cached up to 30 min" means every re-send up to that age was served from the cache; in the catalog it is shortened to "At least 30 min". It is what was observed, not a
-      guaranteed lifetime, and the next age checked may be much later. A provider that spreads requests over several servers can miss at one age and hit again at a later one.
+      "Always cached up to 30 min" means every re-send up to that age was served from the cache. It is what was observed, not a guaranteed lifetime, and the next age checked may be much
+      later. A provider that spreads requests over several servers can miss at one age and hit again at a later one.
+    </p>
+    <p>
+      One evaluation has only a few re-sends per age, so a single miss moves its row a lot. Where an entry has several evaluations, they are also shown added up. In the catalog that is
+      one row of nine cells, for 5 min, 15 min, 30 min, 1 h, 2 h, 4 h, 8 h, 12 h and 24 h. A cell holds every check up to its age and above the cell before it, from every client, and
+      shows the share that was served from the cache, in percent; the counts appear on hover. Evaluations that asked the provider for a lifetime (for example 1 h or 24 h) get a row of
+      their own, because they answer a different question. On the entry page the last row of the table adds the evaluations up by exact age.
     </p>
     <p>
       Each evaluation names the access method it was taken on and the client that sent the requests: straight to the provider, through{" "}

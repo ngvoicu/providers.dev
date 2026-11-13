@@ -63,6 +63,7 @@ curl -sI https://providers.dev/api.json | grep -i x-dataset`;
     { id: "filters", label: "Filters" },
     { id: "paging", label: "Paging and order" },
     { id: "unknown", label: "Unknown values" },
+    { id: "summary", label: "Summary fields" },
     { id: "caching", label: "Versions and caching" },
     { id: "errors", label: "Errors" },
     { id: "extension", label: "The providers_dev extension" },
@@ -138,13 +139,34 @@ curl -sI https://providers.dev/api.json | grep -i x-dataset`;
       <li>A limit that is <strong>absent</strong> is unknown. It is never written as 0, and it never matches <code>min_context</code> or <code>min_output</code>.</li>
       <li><code>cache: "no"</code> means the source says the entry does not cache. <code>cache: "unknown"</code> means the source says nothing.</li>
       <li><code>max_output</code> is a maximum. A provider's default output setting is a different thing and is not published as this field.</li>
+      <li>A price that is <strong>absent</strong> is unknown, not free. A price of <code>0</code> is what the source lists: free of charge, or paid for another way.</li>
+      <li>An entry with no <code>release_date</code> never matches <code>max_age_months</code>.</li>
     </ul>
+
+    <h2 id="summary">Prices and evaluations in a summary</h2>
+    <p>A summary (an item of <code>/api/v1/models</code>) carries these fields next to the limits. Each is left out when there is nothing to say.</p>
+  </div>
+  <div class="scroll">
+    <table class="facts">
+      <thead><tr><th scope="col">Field</th><th scope="col">Meaning</th></tr></thead>
+      <tbody>
+        <tr><th scope="row"><code>price_in</code>, <code>price_out</code></th><td>The base list price of text input and output, in US dollars per million tokens (<code>cost.text.input.price</code>, <code>cost.text.output.price</code>). Prices by context size, service tier and cache are in <code>cost</code> of the full entry.</td></tr>
+        <tr><th scope="row"><code>price_from</code></th><td>Present where the price is inherited: the ref of the API entry whose list price it is. The entry itself is a subscription and is not paid per token.</td></tr>
+        <tr><th scope="row"><code>release_date</code></th><td>When the model was released, as models.dev records it. The same at every provider.</td></tr>
+        <tr><th scope="row"><code>measured_cache[]</code></th><td>The cache evaluations of the entry added up by age, across clients: per item <code>evaluations</code> and <code>bands[]</code> of <code>up_to_s</code>, <code>warm</code>, <code>total</code>. An item with <code>asked</code> holds the evaluations that asked for that lifetime; the item without it is the provider's default.</td></tr>
+        <tr><th scope="row"><code>measured_warm_min_s</code>, <code>measured_warm_max_s</code></th><td>The lowest and highest age, over the evaluations, up to which every re-send was served from the cache.</td></tr>
+        <tr><th scope="row"><code>measured_input_accepted</code>, <code>measured_input_refused</code></th><td>The largest input an evaluation saw accepted and the smallest it saw refused, in tokens. The input limit lies between them. Useful where no limit is documented.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="prose">
 
     <h2 id="caching">Versions, freshness and conditional requests</h2>
     <p>
       Every answer carries <code>X-Dataset-Version</code> (a hash of the published data; it changes only when the data does), <code>X-Dataset-Generated-At</code> and
       <code>X-Upstream-Fetched-At</code>. The <code>ETag</code> is the dataset version. Send it back as <code>If-None-Match</code> and you get <code>304</code> with no body until the data
-      changes. Answers may be cached for five minutes. Enveloped answers repeat the three values under <code>meta</code>; <code>/api.json</code> has no envelope, so there they are in the headers
+      changes. An answer filtered with <code>max_age_months</code> also changes with the day, so its <code>ETag</code> has the UTC date after the version. Answers may be cached for five minutes. Enveloped answers repeat the three values under <code>meta</code>; <code>/api.json</code> has no envelope, so there they are in the headers
       only.
     </p>
     <p>
@@ -188,6 +210,7 @@ curl -sI https://providers.dev/api.json | grep -i x-dataset`;
       <li>The root is an object keyed by provider id; each provider has <code>models</code> keyed by model id. Provider ids, model ids, <code>canonical_id</code> and field meanings are upstream's.</li>
       <li>Every provider and model has one extra key, <code>providers_dev</code>. A strict v2 parser must allow or drop it.</li>
       <li>Entries with <code>origin: "added"</code> hold only values with evidence. They can lack fields that models.dev requires (<code>modalities</code>, <code>capabilities</code>, <code>limit</code>, <code>cost</code>, <code>api</code>). Skip them, or treat missing as unknown.</li>
+      <li>An added subscription entry can have a <code>cost</code> that is not its own: the API list price of the same model. It is marked by <code>cost</code> in <code>providers_dev.inherited.fields</code>.</li>
       <li>Fields listed in <code>provenance</code> differ from upstream on purpose.</li>
     </ul>
     <p>So it is a superset in the same shape, not a byte-compatible mirror.</p>
