@@ -55,9 +55,11 @@ function sourcesHtml(entry: Pick<Summary, "origin" | "verified" | "overridden_fi
 function cacheCell(entry: Pick<Summary, "cache" | "cache_modes" | "cache_ttl_s">): string {
   if (entry.cache === "unknown") return UNKNOWN;
   if (entry.cache === "no") return '<span title="The source says this entry does not cache prompts.">None</span>';
-  const modes = entry.cache_modes.map((mode) => `<span class="chip">${mode}</span>`).join(" ");
-  const ttl = entry.cache_ttl_s.length > 0 ? ` <span class="muted">${entry.cache_ttl_s.map(duration).join(", ")}</span>` : "";
-  return modes + ttl;
+  // Two short lines, like the name and id beside them: how it caches, then for how long.
+  const words = entry.cache_modes.join(", ");
+  const modes = words ? `<span class="cache-modes">${e(words.charAt(0).toUpperCase() + words.slice(1))}</span>` : "";
+  const ttl = entry.cache_ttl_s.length > 0 ? `<span class="cache-ttl">${entry.cache_ttl_s.map(duration).join(", ")}</span>` : "";
+  return `<span class="cache">${modes}${ttl}</span>`;
 }
 
 function measuredCell(entry: Summary, href: string): string {
