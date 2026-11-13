@@ -1,0 +1,118 @@
+---
+import Base from "../../layouts/Base.astro";
+import { STALE_AFTER_DAYS } from "../../core/format.ts";
+import { IDENTITY_FIELDS } from "../../core/resolve.ts";
+import { exact } from "../../core/format.ts";
+import { meta } from "../../lib/data.ts";
+---
+
+<Base title="Method" description="Where each value on providers.dev comes from, how upstream data and our own are merged, and what unknown means.">
+  <div class="prose">
+    <h1>How values are sourced</h1>
+    <p class="lead">
+      The catalog is the latest good import of <a href="https://models.dev">models.dev</a>, plus the providers and entries we add, plus our explicit corrections, plus our measurements. This page
+      says how those are combined and what each label means.
+    </p>
+
+    <h2 id="kinds">Three kinds of value</h2>
+    <ul>
+      <li><strong>Imported</strong> (<span class="origin upstream">models.dev</span>). Copied from models.dev. We have not checked it. Imported values never carry a verification date.</li>
+      <li><strong>Documented</strong> (<span class="badge documented">documented</span>). A value we set because the provider's own documentation says so. It names the page and the date we read it.</li>
+      <li><strong>Measured</strong> (<span class="badge measured">measured</span>). A value we observed by running requests. It names the route, the client, the date and the raw result.</li>
+    </ul>
+    <p>
+      A measurement never replaces a documented value: both are shown. (Only on an entry we add, where no documented limit exists, is a measured limit published as the limit itself,
+      and it is labelled as measured.) A provider documenting a 30-minute cache and a run that found the cache gone after 15 are two different facts, and you
+      need both.
+    </p>
+
+    <h2 id="unknown">Unknown is a value</h2>
+    <ul>
+      <li>A missing limit is <em>unknown</em>. It is not 0 and not unlimited, and it does not match a minimum filter.</li>
+      <li>For caching, models.dev distinguishes <code>cache = false</code> (the entry does not cache) from no <code>cache</code> field (it says nothing). We keep that: "none" and "unknown".</li>
+      <li>We can also publish a field as explicitly unknown where upstream has a value we do not trust for that access. The field is then left out and the reason is recorded.</li>
+    </ul>
+
+    <h2 id="limits">Which limit is which</h2>
+    <ul>
+      <li><strong>Context window</strong> (<code>limit.context</code>) is what this provider and access method accepts for the model. It can be lower than the model's own window at its lab; the model pages show them side by side.</li>
+      <li><strong>Largest input</strong> (<code>limit.input</code>) is stated where the input limit is lower than the window.</li>
+      <li><strong>Maximum output</strong> (<code>limit.output</code>) is the most one response can hold. It is not the default a provider applies when you ask for nothing.</li>
+      <li><strong>Usable context</strong> is the window minus the system prompt and tool definitions of your client. That overhead varies by client and by day, so we publish no usable number.</li>
+      <li><strong>An agent's compaction threshold</strong> is a client setting. It is not a limit of the provider and is not published as one.</li>
+    </ul>
+
+    <h2 id="access">Access methods are separate entries</h2>
+    <p>
+      The same model reached with an API key and with a subscription login can have different limits and cache behaviour. They are separate entries under separate providers, linked by
+      <code>canonical_id</code>. An entry we add takes only identity from the upstream entry it names ({IDENTITY_FIELDS.map((field, i) => <><code>{field}</code>{i < IDENTITY_FIELDS.length - 1 ? ", " : ""}</>)}).
+      Limits, caching, prices and capabilities are never copied across: on an added entry, a value is there only if we have evidence for that access.
+    </p>
+    <p>
+      Access is a classification: API key, subscription, or not classified. We do not track plans, plan prices, allowances or quotas. Upstream API prices are kept as imported. Where a service
+      does not say which underlying model it serves, the entry has no <code>canonical_id</code>; we do not guess.
+    </p>
+
+    <h2 id="merge">How the merge works</h2>
+    <p>The published dataset is always computed fresh from three separate inputs. Nothing is edited in place.</p>
+    <ol>
+      <li><strong>The upstream snapshot</strong>: the last import of models.dev that passed our checks.</li>
+      <li><strong>Our additions</strong>: providers and entries models.dev does not have.</li>
+      <li><strong>Our overrides</strong>: single fields we set on upstream entries. They win.</li>
+    </ol>
+    <p>An override is a small patch applied field by field:</p>
+  </div>
+  <div class="scroll">
+    <table class="facts">
+      <thead><tr><th scope="col">In the override</th><th scope="col">Published</th><th scope="col">Example</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">field not mentioned</th><td>the upstream value, and it keeps following upstream</td><td>override sets <code>limit.context</code>; <code>limit.output</code> still tracks models.dev</td></tr>
+        <tr><th scope="row">a value (also <code>false</code> or <code>0</code>)</th><td>our value</td><td><code>temperature: false</code> is published as false, not dropped</td></tr>
+        <tr><th scope="row">an object</th><td>merged key by key</td><td><code>{`cache: { explicit: { ttl: ["30m"] } }`}</code> keeps upstream's <code>max_breakpoints</code></td></tr>
+        <tr><th scope="row">an array</th><td>replaces the upstream array whole</td><td><code>ttl: ["30m"]</code> over <code>["5m", "1h"]</code> gives <code>["30m"]</code></td></tr>
+        <tr><th scope="row"><code>null</code></th><td>explicitly unknown: the field is left out and marked unknown</td><td><code>limit.context: null</code> where upstream's number does not apply to this access</td></tr>
+        <tr><th scope="row"><code>"$delete"</code></th><td>removed: the field does not apply here</td><td><code>limit.input: "$delete"</code></td></tr>
+        <tr><th scope="row"><code>exclude: true</code></th><td>the whole entry or provider is left out, and listed as excluded</td><td>a provider that closed</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="prose">
+    <p>What follows from that:</p>
+    <ul>
+      <li>If models.dev changes a field we override, ours stays. The entry's provenance shows the new upstream value next to ours.</li>
+      <li>If we delete an override, the current upstream value is published again at the next build. Nothing needs restoring.</li>
+      <li>If models.dev catches up and says what our override says, the build reports the override as redundant so it can be removed.</li>
+      <li>If the entry an override targets disappears upstream, the override is not applied and not turned into a ghost entry. It is listed under open issues on <a href="/evidence/#issues">Our data</a> and in <code>/api/v1/meta</code>.</li>
+      <li>Every override must carry a reason and at least one piece of evidence with a URL and a date, or the build fails.</li>
+    </ul>
+    <p>The same inputs always give the same output, and the dataset version is a hash of that output.</p>
+
+    <h2 id="sync">The daily import</h2>
+    <p>
+      Once a day a scheduled job fetches models.dev once, with a conditional request. The import is checked before it replaces anything: it must be valid JSON in the expected structure, ids
+      must match their keys, and it must not be empty or have lost a large share of its entries since the last import. If any check fails, or models.dev is down, the previous snapshot stays and
+      the site keeps serving it; the footer and <code>/api/v1/meta</code> say that the last sync failed. Visitors and API requests never trigger a fetch.
+    </p>
+    <p>
+      This build: {exact(meta.upstream.providers)} providers and {exact(meta.upstream.models)} entries imported from <code>{meta.upstream.source}</code> on {meta.upstream.fetched_at.slice(0, 10)}{
+        meta.upstream.commit && <>, at models.dev commit <code>{meta.upstream.commit.slice(0, 7)}</code></>
+      }.
+    </p>
+
+    <h2 id="stale">Dates and staleness</h2>
+    <p>
+      Every value of ours has a date. A measurement describes one route on one day; providers change cache behaviour without notice. Evidence older than {STALE_AFTER_DAYS} days is marked
+      <span class="stale">stale</span> on the site. It is still published, with its date, so you can judge it.
+    </p>
+
+    <h2 id="measurements">How cache lifetimes are measured</h2>
+    <p>
+      Measurements come from <a href="https://github.com/ngvoicu/cache-ttl-probe">cache-ttl-probe</a>, which is open and publishes every raw result. A run sends a fresh prompt once to prime the
+      cache, then re-sends it once at each of several fixed ages, several times over. For each age we publish how many re-sends were served from the cache. The summary "every check warm
+      through 30 min" is the longest age at which all of them were; it is a floor that was observed, not a lifetime that is promised, and the next age tested may be far later.
+    </p>
+
+    <h2 id="licence">Licence</h2>
+    <p>See <a href="/docs/licensing/">Licensing</a>.</p>
+  </div>
+</Base>

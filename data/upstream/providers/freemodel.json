@@ -1,0 +1,805 @@
+{
+ "id": "freemodel",
+ "name": "FreeModel",
+ "doc": "https://freemodel.dev",
+ "env": [
+  "FREEMODEL_API_KEY"
+ ],
+ "models": {
+  "gpt-5.4": {
+   "id": "gpt-5.4",
+   "name": "GPT-5.4",
+   "type": "chat",
+   "canonical_id": "openai/gpt-5.4",
+   "family": "gpt",
+   "release_date": "2026-03-05",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Agent-ready GPT for coding and computer-use workflows at a lower cost",
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-03-05",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2.5,
+      "cache": {
+       "read": 0.25,
+       "write": 2.5
+      }
+     },
+     "output": {
+      "price": 15
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.freemodel.dev/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "gpt-5.3-codex": {
+   "id": "gpt-5.3-codex",
+   "name": "GPT-5.3 Codex",
+   "type": "chat",
+   "canonical_id": "openai/gpt-5.3-codex",
+   "family": "gpt-codex",
+   "release_date": "2026-02-05",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Coding-optimized GPT model for repository edits, reviews, and agentic software work",
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-02-05",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.75,
+      "cache": {
+       "read": 0.175,
+       "write": 1.75
+      }
+     },
+     "output": {
+      "price": 14
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.freemodel.dev/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "claude-opus-4-6": {
+   "id": "claude-opus-4-6",
+   "name": "Claude Opus 4.6",
+   "type": "chat",
+   "canonical_id": "anthropic/claude-opus-4-6",
+   "family": "claude-opus",
+   "release_date": "2026-02-05",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "max"
+     ],
+     "budget": {
+      "min": 1024
+     }
+    },
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "High-end Claude for difficult coding, planning, and slower expert reasoning",
+   "open_weights": false,
+   "knowledge": "2025-05-31",
+   "last_updated": "2026-03-13",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5,
+       "write": {
+        "5m": 6.25,
+        "1h": 10
+       }
+      }
+     },
+     "output": {
+      "price": 25
+     }
+    }
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://cc.freemodel.dev/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "claude-fable-5": {
+   "id": "claude-fable-5",
+   "name": "Claude Fable 5",
+   "type": "chat",
+   "canonical_id": "anthropic/claude-fable-5",
+   "family": "claude-fable",
+   "release_date": "2026-06-09",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    },
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Claude model for creative writing, analysis, and controlled agent workflows",
+   "open_weights": false,
+   "knowledge": "2026-01-31",
+   "last_updated": "2026-06-09",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 10,
+      "cache": {
+       "read": 1,
+       "write": {
+        "5m": 12.5,
+        "1h": 20
+       }
+      }
+     },
+     "output": {
+      "price": 50
+     }
+    }
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://cc.freemodel.dev/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "gpt-5.5": {
+   "id": "gpt-5.5",
+   "name": "GPT-5.5",
+   "type": "chat",
+   "canonical_id": "openai/gpt-5.5",
+   "family": "gpt",
+   "release_date": "2026-04-23",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Default frontier GPT for coding, computer use, research, and knowledge work",
+   "open_weights": false,
+   "knowledge": "2025-12-01",
+   "last_updated": "2026-04-23",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5,
+       "write": 5
+      }
+     },
+     "output": {
+      "price": 30
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.freemodel.dev/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "claude-haiku-4-5-20251001": {
+   "id": "claude-haiku-4-5-20251001",
+   "name": "Claude Haiku 4.5",
+   "type": "chat",
+   "canonical_id": "anthropic/claude-haiku-4-5-20251001",
+   "family": "claude-haiku",
+   "release_date": "2025-10-15",
+   "limit": {
+    "context": 200000,
+    "output": 64000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "budget": {
+      "min": 1024
+     }
+    },
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Fast Claude model for responsive assistance, classification, and lightweight agents",
+   "open_weights": false,
+   "knowledge": "2025-02-28",
+   "last_updated": "2025-10-15",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1,
+      "cache": {
+       "read": 0.1,
+       "write": {
+        "5m": 1.25,
+        "1h": 2
+       }
+      }
+     },
+     "output": {
+      "price": 5
+     }
+    }
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://cc.freemodel.dev/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "gpt-5.4-mini": {
+   "id": "gpt-5.4-mini",
+   "name": "GPT-5.4 mini",
+   "type": "chat",
+   "canonical_id": "openai/gpt-5.4-mini",
+   "family": "gpt-mini",
+   "release_date": "2026-03-17",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Strong small GPT for coding subagents, quick tool use, and high-volume work",
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-03-17",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.75,
+      "cache": {
+       "read": 0.075,
+       "write": 0.75
+      }
+     },
+     "output": {
+      "price": 4.5
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.freemodel.dev/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "claude-sonnet-4-6": {
+   "id": "claude-sonnet-4-6",
+   "name": "Claude Sonnet 4.6",
+   "type": "chat",
+   "canonical_id": "anthropic/claude-sonnet-4-6",
+   "family": "claude-sonnet",
+   "release_date": "2026-02-17",
+   "limit": {
+    "context": 1000000,
+    "output": 64000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "max"
+     ],
+     "budget": {
+      "min": 1024
+     }
+    },
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Claude workhorse for coding agents, careful analysis, and production cost control",
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-03-13",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 3,
+      "cache": {
+       "read": 0.3,
+       "write": {
+        "5m": 3.75,
+        "1h": 6
+       }
+      }
+     },
+     "output": {
+      "price": 15
+     }
+    }
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://cc.freemodel.dev/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "claude-opus-4-7": {
+   "id": "claude-opus-4-7",
+   "name": "Claude Opus 4.7",
+   "type": "chat",
+   "canonical_id": "anthropic/claude-opus-4-7",
+   "family": "claude-opus",
+   "release_date": "2026-04-16",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    },
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Stronger Opus tier for advanced software work and high-stakes reasoning",
+   "open_weights": false,
+   "knowledge": "2026-01-31",
+   "last_updated": "2026-04-16",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5,
+       "write": {
+        "5m": 6.25,
+        "1h": 10
+       }
+      }
+     },
+     "output": {
+      "price": 25
+     }
+    }
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://cc.freemodel.dev/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "claude-opus-4-8": {
+   "id": "claude-opus-4-8",
+   "name": "Claude Opus 4.8",
+   "type": "chat",
+   "canonical_id": "anthropic/claude-opus-4-8",
+   "family": "claude-opus",
+   "release_date": "2026-05-28",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    },
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Top Claude Opus tier for the hardest reasoning, coding, and long-horizon agents",
+   "open_weights": false,
+   "knowledge": "2026-01",
+   "last_updated": "2026-05-28",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5,
+       "write": {
+        "5m": 6.25,
+        "1h": 10
+       }
+      }
+     },
+     "output": {
+      "price": 25
+     }
+    }
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://cc.freemodel.dev/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  }
+ }
+}

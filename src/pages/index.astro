@@ -1,0 +1,117 @@
+---
+import Base from "../layouts/Base.astro";
+import { DEFAULT_LIMIT, parseQuery, runQuery, SITE_DEFAULT } from "../core/query.ts";
+import { rowHtml, tableHead } from "../core/render.ts";
+import { exact } from "../core/format.ts";
+import { index, meta, now, providerNames } from "../lib/data.ts";
+
+// The first page is built ahead of time, so the table is there before any script runs.
+// On the site, entries with our own evidence come first, newest first; the API's default order is by provider.
+const parsed = parseQuery(new URLSearchParams(SITE_DEFAULT), false);
+const first = parsed.ok ? runQuery(index.entries, parsed.query) : { data: [], total: 0 };
+const types = [...new Set(index.entries.map((entry) => entry.type).filter(Boolean))].sort() as string[];
+const ours = meta.counts.added_models + index.entries.filter((entry) => entry.origin === "modified").length;
+---
+
+<Base title="providers.dev" wide>
+  <div class="flex flex-col gap-1">
+    <h1>AI models, as each provider really exposes them</h1>
+    <p class="lead">
+      Context window, maximum output and prompt-cache behaviour for every provider and access method, API keys and subscription logins alike. The baseline is{" "}
+      <a href="https://models.dev">models.dev</a>; where we have measured or corrected a value it says so, with the evidence.
+    </p>
+  </div>
+
+  <p class="hint mt-3 sm:hidden">
+    {exact(meta.counts.models)} entries at {exact(meta.counts.providers)} providers. <a href="/?origin=modified,added">{exact(ours)} with our own data</a>, from{" "}
+    <a href="/evidence/">{exact(meta.measurements?.runs ?? 0)} cache measurements</a>.
+  </p>
+  <div class="mt-4 hidden grid-cols-4 gap-2 sm:grid">
+    <div class="stat"><strong>{exact(meta.counts.models)}</strong><span>provider-model entries</span></div>
+    <div class="stat"><strong>{exact(meta.counts.providers)}</strong><span>providers, <a href="/?access=subscription">{index.providers.filter((p) => p.access === "subscription").length} by subscription</a></span></div>
+    <div class="stat"><strong>{exact(ours)}</strong><span><a href="/?origin=modified,added">entries with our own data</a></span></div>
+    <div class="stat"><strong>{exact(meta.measurements?.runs ?? 0)}</strong><span><a href="/evidence/">cache measurements</a></span></div>
+  </div>
+
+  <form id="filters" class="mt-4" role="search" aria-label="Filter entries">
+    <label class="field">Search <input type="search" name="q" placeholder="model, provider, family…  ( / )" autocomplete="off" spellcheck="false" /></label>
+    <details id="more-filters" class="mt-2">
+      <summary class="button sm:hidden">Filters</summary>
+      <div class="mt-2 grid grid-cols-2 gap-2 sm:mt-0 sm:grid-cols-4 lg:grid-cols-8">
+        <label class="field">Provider <input name="provider" list="provider-ids" placeholder="any" autocomplete="off" spellcheck="false" /></label>
+        <label class="field">Access
+          <select name="access"><option value="">any</option><option value="api">API key</option><option value="subscription">subscription</option><option value="unknown">not classified</option></select>
+        </label>
+        <label class="field">Type
+          <select name="type"><option value="">any</option>{types.map((type) => <option value={type}>{type}</option>)}</select>
+        </label>
+        <label class="field">Cache, documented
+          <select name="cache"><option value="">any</option><option value="yes">supported</option><option value="no">not supported</option><option value="unknown">unknown</option></select>
+        </label>
+        <label class="field">Cache mode
+          <select name="cache_mode"><option value="">any</option><option value="implicit">implicit (automatic)</option><option value="explicit">explicit (marked)</option></select>
+        </label>
+        <label class="field">Source
+          <select name="origin"><option value="">any</option><option value="modified,added">with our data</option><option value="added">added by us</option><option value="upstream">models.dev only</option></select>
+        </label>
+        <label class="field">Measured by us
+          <select name="measured"><option value="">any</option><option value="true">yes</option><option value="false">no</option></select>
+        </label>
+        <div class="field justify-end"><button type="reset" class="button justify-center">Clear filters</button></div>
+        <label class="field col-span-2">Context window at least (tokens)
+          <input name="min_context" inputmode="numeric" placeholder="e.g. 200000" autocomplete="off" aria-describedby="hint-context" />
+          <span id="hint-context" class="hint">What this provider accepts for the model. Unknown windows are left out.</span>
+        </label>
+        <label class="field col-span-2">Maximum output at least (tokens)
+          <input name="min_output" inputmode="numeric" placeholder="e.g. 64000" autocomplete="off" aria-describedby="hint-output" />
+          <span id="hint-output" class="hint">The largest single response, not a default. Unknown maximums are left out.</span>
+        </label>
+      </div>
+    </details>
+    <script is:inline>
+      // Filters are always open on wide screens, and on small ones when the address already carries a filter.
+      (function () {
+        var more = document.getElementById("more-filters");
+        var filtered = /[?&](provider|access|type|cache|cache_mode|origin|measured|min_context|min_output)=/.test(location.search);
+        if (matchMedia("(min-width: 640px)").matches || filtered) more.open = true;
+      })();
+    </script>
+    <datalist id="provider-ids">{index.providers.map((provider) => <option value={provider.id}>{provider.name}</option>)}</datalist>
+  </form>
+
+  <div class="mt-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-[0.85rem]">
+    <p id="count" class="muted" aria-live="polite">{exact(first.total)} entries</p>
+    <p class="muted flex min-w-0 items-center gap-2">
+      <span class="hidden sm:inline">Same query as JSON:</span>
+      <a id="api-link" class="quiet truncate" href={`/api/v1/models?${SITE_DEFAULT}`}><code>/api/v1/models?{SITE_DEFAULT}</code></a>
+      <button type="button" id="api-copy" class="copy !opacity-100" data-copy={`/api/v1/models?${SITE_DEFAULT}`} aria-label="Copy API URL">copy</button>
+    </p>
+  </div>
+
+  <div class="scroll mt-2">
+    <table class="entries" id="entries" data-now={now.toISOString()}>
+      <caption class="sr-only">Provider-model entries</caption>
+      <thead id="head" set:html={tableHead({ sortable: true, sort: "verified", order: "desc" })} />
+      <tbody id="rows" set:html={first.data.map((entry) => rowHtml(entry, { now, providerNames })).join("")} />
+    </table>
+    <div id="empty" class="empty" hidden>
+      <p>No entry matches these filters.</p>
+      <p class="mt-1">Unknown values never match a minimum. <button type="button" class="button mt-2" id="empty-reset">Clear filters</button></p>
+    </div>
+    <div id="failed" class="empty" hidden>
+      <p>The catalog index could not be loaded, so filtering is not available.</p>
+      <p class="mt-1"><button type="button" class="button mt-2" id="retry">Try again</button></p>
+    </div>
+  </div>
+
+  <nav class="mt-3 flex items-center justify-between gap-3 text-[0.85rem]" aria-label="Pages">
+    <button type="button" class="button" id="prev" disabled>← Previous</button>
+    <span id="page" class="muted">Page 1 of {Math.max(1, Math.ceil(first.total / DEFAULT_LIMIT))}</span>
+    <button type="button" class="button" id="next" disabled={first.total <= DEFAULT_LIMIT}>Next →</button>
+  </nav>
+  <noscript><p class="note mt-3">Filtering and paging need JavaScript. The <a href="/providers/">provider pages</a> and the <a href="/docs/api/">API</a> work without it.</p></noscript>
+</Base>
+
+<script>
+  import "../client/explorer.ts";
+</script>

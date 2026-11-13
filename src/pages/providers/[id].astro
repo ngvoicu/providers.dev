@@ -1,0 +1,90 @@
+---
+import Base from "../../layouts/Base.astro";
+import { exact, duration } from "../../core/format.ts";
+import { rowHtml, tableHead } from "../../core/render.ts";
+import { providerExt } from "../../core/schema.ts";
+import { catalog, entriesByProvider, index, now } from "../../lib/data.ts";
+
+export function getStaticPaths() {
+  return index.providers.map((provider) => ({ params: { id: provider.id }, props: { provider } }));
+}
+const { provider } = Astro.props;
+const full = catalog[provider.id]!;
+const extension = providerExt(full);
+const entries = [...(entriesByProvider.get(provider.id) ?? [])].sort((a, b) => a.name.localeCompare(b.name) || a.model.localeCompare(b.model));
+const env = Array.isArray(full.env) ? (full.env as string[]) : [];
+const accessLabel = { api: "API key, billed by use", subscription: "Subscription login or plan", unknown: "Not classified" } as const;
+---
+
+<Base title={provider.name} description={`${provider.name}: ${provider.models} models with context, output and prompt-cache limits.`} wide>
+  <p class="hint"><a class="quiet" href="/providers/">Providers</a></p>
+  <h1>{provider.name}</h1>
+  <p class="id mt-1">
+    <code>{provider.id}</code>
+    <button type="button" class="copy" data-copy={provider.id} aria-label="Copy provider id">copy</button>
+    <span class:list={["origin", provider.origin]}>{provider.origin === "added" ? "ours" : "models.dev"}</span>
+    {provider.doc && <a href={provider.doc} rel="noopener">documentation</a>}
+  </p>
+
+  <dl class="mt-4 grid max-w-3xl grid-cols-[9rem_1fr] gap-x-4 gap-y-2 text-[0.9rem]">
+    <dt class="muted">Access</dt>
+    <dd>
+      <strong>{accessLabel[extension.access]}</strong>
+      <div class="hint">
+        {extension.access_basis}
+        {extension.access_source && <a href={extension.access_source} rel="noopener">source</a>}
+      </div>
+    </dd>
+    <dt class="muted">Models</dt>
+    <dd>{exact(provider.models)}{provider.ours > 0 && <>, {exact(provider.ours)} with our own data</>}</dd>
+    {env.length > 0 && <><dt class="muted">Key variables</dt><dd>{env.map((name) => <code class="mr-2">{name}</code>)}</dd></>}
+    {extension.note && <><dt class="muted">Note</dt><dd>{extension.note}</dd></>}
+    {
+      extension.evidence && (
+        <>
+          <dt class="muted">Evidence</dt>
+          <dd>
+            {extension.evidence.map((item) => (
+              <div>
+                <span class:list={["badge", item.kind]}>{item.kind}</span> <a href={item.url} rel="noopener">{new URL(item.url).hostname}</a> <span class="muted">{item.date}</span>
+                {item.note && <span class="hint"> {item.note}</span>}
+              </div>
+            ))}
+          </dd>
+        </>
+      )
+    }
+    {
+      extension.cache_known && (
+        <>
+          <dt class="muted">Cache, set by the client</dt>
+          <dd>
+            {extension.cache_known.map((item) => (
+              <div class="mb-1">
+                {item.basis} <span class="muted">({item.client}{item.when && `, when ${Object.entries(item.when).map(([k, v]) => `${k}=${v}`).join(", ")}`}: {duration(item.ttl_s)})</span>{" "}
+                <a href={item.source} rel="noopener">source</a>
+              </div>
+            ))}
+          </dd>
+        </>
+      )
+    }
+  </dl>
+
+  <p class="hint mt-5">
+    <a href={`/api/v1/providers/${provider.id}`}><code>GET /api/v1/providers/{provider.id}</code></a> · <a href={`/?provider=${provider.id}`}>open in the catalog to filter and sort</a>
+  </p>
+  {
+    entries.length > 0 ? (
+      <div class="scroll mt-2">
+        <table class="entries">
+          <caption class="sr-only">Models at {provider.name}</caption>
+          <thead set:html={tableHead({ hideProvider: true })} />
+          <tbody set:html={entries.map((entry) => rowHtml(entry, { now, hideProvider: true })).join("")} />
+        </table>
+      </div>
+    ) : (
+      <p class="empty">No models are listed for this provider.</p>
+    )
+  }
+</Base>

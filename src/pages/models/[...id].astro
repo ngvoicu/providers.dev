@@ -1,0 +1,40 @@
+---
+import Base from "../../layouts/Base.astro";
+import { exact } from "../../core/format.ts";
+import { rowHtml, tableHead } from "../../core/render.ts";
+import { entriesByCanonical, now, providerNames } from "../../lib/data.ts";
+
+export function getStaticPaths() {
+  return [...entriesByCanonical.entries()].map(([id, entries]) => ({ params: { id }, props: { id, entries } }));
+}
+const { id, entries } = Astro.props;
+const lab = id.split("/")[0]!;
+// The lab's own API first, then subscriptions, then the rest by provider.
+const rank = (provider: string, access: string): number => (provider === lab ? 0 : access === "subscription" ? 1 : 2);
+const sorted = [...entries].sort((a, b) => rank(a.provider, a.access) - rank(b.provider, b.access) || a.provider.localeCompare(b.provider) || a.model.localeCompare(b.model));
+const own = sorted.find((entry) => entry.provider === lab);
+const name = (own ?? sorted[0]!).name;
+const contexts = [...new Set(sorted.map((entry) => entry.context).filter((value): value is number => value !== undefined))].sort((a, b) => a - b);
+const outputs = [...new Set(sorted.map((entry) => entry.max_output).filter((value): value is number => value !== undefined))].sort((a, b) => a - b);
+const range = (values: number[]): string => (values.length === 0 ? "unknown" : values.length === 1 ? exact(values[0]!) : `${exact(values[0]!)} to ${exact(values.at(-1)!)}`);
+---
+
+<Base title={name} description={`${name}: ${entries.length} ways to reach it, with the context, output and cache limits of each.`} wide>
+  <p class="hint"><a class="quiet" href="/models/">Models</a></p>
+  <h1>{name}</h1>
+  <p class="id mt-1"><code>{id}</code><button type="button" class="copy" data-copy={id} aria-label="Copy canonical id">copy</button></p>
+  <p class="lead mt-3">
+    {exact(entries.length)} {entries.length === 1 ? "entry" : "entries"} for this model. Exposed context window: <strong>{range(contexts)}</strong> tokens. Maximum output:{" "}
+    <strong>{range(outputs)}</strong> tokens.{" "}
+    {own ? <>The first row is {providerNames[lab] ?? lab}'s own API, the closest thing to the model's own limits.</> : <>The lab's own API is not in the catalog, so there is no reference row for the model's own limits.</>}
+  </p>
+  <p class="hint mt-1">A lower number on another row is that provider's limit for the model, not an error. Values are per entry; nothing is copied from one access method to another.</p>
+  <div class="scroll mt-4">
+    <table class="entries">
+      <caption class="sr-only">Access methods for {name}</caption>
+      <thead set:html={tableHead({})} />
+      <tbody set:html={sorted.map((entry) => rowHtml(entry, { now, providerNames })).join("")} />
+    </table>
+  </div>
+  <p class="hint mt-3"><a href={`/api/v1/models?canonical_id=${encodeURIComponent(id)}&limit=200`}><code>GET /api/v1/models?canonical_id={id}</code></a></p>
+</Base>

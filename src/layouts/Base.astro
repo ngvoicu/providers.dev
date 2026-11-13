@@ -1,0 +1,112 @@
+---
+import "../styles/global.css";
+import { meta, shortDate } from "../lib/data.ts";
+
+interface Props {
+  title: string;
+  description?: string;
+  wide?: boolean;
+}
+const { title, description = "A reference for AI models as each provider and access method really exposes them: context, output and prompt-cache behaviour, with sources.", wide = false } = Astro.props;
+const path = Astro.url.pathname;
+const nav = [
+  { href: "/", label: "Catalog", match: (p: string) => p === "/" || p.startsWith("/entry") },
+  { href: "/providers/", label: "Providers", match: (p: string) => p.startsWith("/providers") },
+  { href: "/models/", label: "Models", match: (p: string) => p.startsWith("/models") },
+  { href: "/evidence/", label: "Our data", match: (p: string) => p.startsWith("/evidence") },
+  { href: "/docs/api/", label: "API", match: (p: string) => p.startsWith("/docs/api") },
+  { href: "/docs/methodology/", label: "Method", match: (p: string) => p.startsWith("/docs/methodology") || p.startsWith("/docs/licensing") },
+];
+const full = title === "providers.dev" ? title : `${title} · providers.dev`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{full}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={new URL(path, Astro.site)} />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%231b1b19'/%3E%3Cpath d='M4 4h5a3 3 0 0 1 0 6H6v2H4z' fill='%23fbfbfa'/%3E%3C/svg%3E" />
+    <script is:inline>
+      (function () {
+        try {
+          var saved = localStorage.getItem("theme");
+          if (saved === "light" || saved === "dark") document.documentElement.dataset.theme = saved;
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body class="flex flex-col">
+    <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:bg-bg focus:px-3 focus:py-2">Skip to content</a>
+    <header class="border-b border-line">
+      <div class="mx-auto flex max-w-[92rem] flex-wrap items-center gap-x-6 gap-y-1.5 px-4 py-2.5 sm:px-6">
+        <a href="/" class="quiet font-semibold tracking-tight no-underline">providers<span class="text-muted">.dev</span></a>
+        <nav aria-label="Main" class="order-3 flex w-full gap-x-4 overflow-x-auto whitespace-nowrap text-[0.9rem] sm:order-none sm:w-auto sm:flex-1">
+          {
+            nav.map((item) => (
+              <a href={item.href} class:list={["no-underline hover:text-fg", item.match(path) ? "text-fg font-medium" : "text-muted"]} aria-current={item.match(path) ? "page" : undefined}>
+                {item.label}
+              </a>
+            ))
+          }
+        </nav>
+        <button type="button" id="theme" class="button ml-auto !h-7 !px-2 text-[0.78rem]" aria-label="Switch between light and dark">Theme</button>
+      </div>
+    </header>
+
+    <main id="main" class:list={["mx-auto w-full flex-1 px-4 py-6 sm:px-6", wide ? "max-w-[92rem]" : "max-w-5xl"]}>
+      <slot />
+    </main>
+
+    <footer class="mt-10 border-t border-line">
+      <div class="hint mx-auto flex max-w-[92rem] flex-col gap-1 px-4 py-4 sm:px-6">
+        <p>
+          Dataset <code>{meta.dataset_version}</code>, published {shortDate(meta.generated_at)}. models.dev imported {shortDate(meta.upstream.fetched_at)}{
+            meta.upstream.commit && (
+              <>
+                {" "}at <a class="quiet" href={`https://github.com/anomalyco/models.dev/commit/${meta.upstream.commit}`}><code>{meta.upstream.commit.slice(0, 7)}</code></a>
+              </>
+            )
+          }.
+          {meta.sync.last_attempt_ok === false && <span class="stale"> The last sync failed; this is the last good snapshot.</span>}
+        </p>
+        <p>
+          The baseline is imported from <a class="quiet" href="https://models.dev">models.dev</a> (MIT, © 2025 models.dev). providers.dev is not affiliated with or endorsed by models.dev.{" "}
+          <a class="quiet" href="/docs/licensing/">Licensing</a> · <a class="quiet" href="/docs/methodology/">How values are sourced</a> · <a class="quiet" href="/api/v1/meta">/api/v1/meta</a>
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      const button = document.getElementById("theme");
+      button?.addEventListener("click", () => {
+        const root = document.documentElement;
+        const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+        root.dataset.theme = dark ? "light" : "dark";
+        try {
+          localStorage.setItem("theme", root.dataset.theme);
+        } catch {
+          // Private mode: the choice lasts for this page only.
+        }
+      });
+      // One handler for every copy button on the page, including rows rendered later.
+      document.addEventListener("click", (event) => {
+        const target = (event.target as HTMLElement).closest<HTMLButtonElement>("button[data-copy]");
+        if (!target) return;
+        const value = target.dataset.copy ?? "";
+        const text = value.startsWith("/api/") ? location.origin + value : value;
+        navigator.clipboard.writeText(text).then(() => {
+          const before = target.textContent;
+          target.textContent = "copied";
+          target.classList.add("done");
+          setTimeout(() => {
+            target.textContent = before;
+            target.classList.remove("done");
+          }, 1200);
+        });
+      });
+    </script>
+  </body>
+</html>

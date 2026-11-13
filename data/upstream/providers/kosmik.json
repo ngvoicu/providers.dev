@@ -1,0 +1,89 @@
+{
+ "id": "kosmik",
+ "name": "Kosmik Compute",
+ "doc": "https://api.koscompute.com/docs/",
+ "env": [
+  "KOSMIK_API_KEY"
+ ],
+ "models": {
+  "qwen/qwen3.8-27b": {
+   "id": "qwen/qwen3.8-27b",
+   "name": "Qwen3.8 27B",
+   "type": "chat",
+   "canonical_id": "alibaba/qwen3.8-27b",
+   "family": "qwen",
+   "release_date": "2026-08-14",
+   "limit": {
+    "context": 262144,
+    "output": 32768
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "xhigh"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Dense 27B vision-language model for coding, agent tasks, and image understanding",
+   "open_weights": true,
+   "last_updated": "2026-08-14",
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.35,
+      "cache": {
+       "read": 0.09
+      }
+     },
+     "output": {
+      "price": 2.2
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.koscompute.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  }
+ }
+}

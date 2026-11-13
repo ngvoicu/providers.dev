@@ -1,0 +1,3988 @@
+{
+ "id": "databricks",
+ "name": "Databricks",
+ "doc": "https://docs.databricks.com/aws/en/machine-learning/foundation-models/",
+ "env": [
+  "DATABRICKS_HOST",
+  "DATABRICKS_TOKEN"
+ ],
+ "models": {
+  "databricks-gpt-5-6-luna": {
+   "id": "databricks-gpt-5-6-luna",
+   "name": "GPT-5.6 Luna",
+   "type": "chat",
+   "canonical_id": "openai/gpt-5.6-luna",
+   "family": "gpt-luna",
+   "release_date": "2026-07-09",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "store": false,
+    "service_tier": [
+     "priority"
+    ]
+   },
+   "description": "Cost-efficient GPT-5.6 model for fast, high-volume workloads",
+   "open_weights": false,
+   "knowledge": "2026-02-16",
+   "last_updated": "2026-07-09",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.2,
+      "cache": {
+       "read": 0.02,
+       "write": 0.25
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 0.4,
+        "cache": {
+         "read": 0.04,
+         "write": 0.5
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 1.2,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 1.8
+       }
+      ]
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": 2
+     },
+     {
+      "when": {
+       "not": {
+        "region": {
+         "equals": "global"
+        }
+       }
+      },
+      "factor": 1.1
+     }
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${DATABRICKS_HOST}/ai-gateway/mlflow/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://${DATABRICKS_HOST}/serving-endpoints",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "experimental": {
+    "modes": {
+     "fast": {
+      "service_tier": "priority",
+      "body": {
+       "service_tier": "priority"
+      }
+     }
+    }
+   }
+  },
+  "databricks-gte-large-en": {
+   "id": "databricks-gte-large-en",
+   "name": "GTE Large EN v1.5",
+   "type": "embedding",
+   "canonical_id": "alibaba/gte-large-en-v1.5",
+   "release_date": "2024-04-20",
+   "limit": {
+    "context": 8192,
+    "output": 0
+   },
+   "capabilities": {
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    },
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "English long-context text embedding model producing 1024-dimensional vectors",
+   "open_weights": true,
+   "last_updated": "2024-04-20",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.13
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "api": {
+    "embeddings": {
+     "base_url": "https://${DATABRICKS_HOST}/ai-gateway/mlflow/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
+     }
+    }
+   }
+  },
+  "databricks-gemini-3-1-flash-lite": {
+   "id": "databricks-gemini-3-1-flash-lite",
+   "name": "Gemini 3.1 Flash Lite Preview",
+   "type": "chat",
+   "canonical_id": "google/gemini-3.1-flash-lite-preview",
+   "family": "gemini-flash-lite",
+   "release_date": "2026-03-03",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "service_tier": [
+     "priority"
+    ]
+   },
+   "description": "Low-latency Gemini model for high-volume multimodal and agent workloads",
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2026-03-03",
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.25,
+      "cache": {
+       "read": 0.025
+      }
+     },
+     "output": {
+      "price": 1.5
+     }
+    },
+    "audio": {
+     "input": {
+      "price": 0.5,
+      "cache": {
+       "read": 0.05
+      }
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": 1.8
+     },
+     {
+      "when": {
+       "date": {
+        "gte": "2027-02-01"
+       }
+      },
+      "factor": 1.25
+     },
+     {
+      "when": {
+       "not": {
+        "region": {
+         "equals": "global"
+        }
+       }
+      },
+      "factor": 1.1
+     }
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${DATABRICKS_HOST}/ai-gateway/mlflow/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "experimental": {
+    "modes": {
+     "fast": {
+      "service_tier": "priority",
+      "body": {
+       "service_tier": "priority"
+      }
+     }
+    }
+   }
+  },
+  "databricks-claude-haiku-4-5": {
+   "id": "databricks-claude-haiku-4-5",
+   "name": "Claude Haiku 4.5 (latest)",
+   "type": "chat",
+   "canonical_id": "anthropic/claude-haiku-4-5",
+   "family": "claude-haiku",
+   "release_date": "2025-10-15",
+   "limit": {
+    "context": 200000,
+    "output": 64000
+   },
+   "capabilities": {
+    "cache": {
+     "explicit": {
+      "ttl": [
+       "5m",
+       "1h"
+      ]
+     }
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Fast Claude lane for lightweight agents, office tasks, and responsive chat",
+   "open_weights": false,
+   "knowledge": "2025-02-28",
+   "last_updated": "2025-10-15",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1,
+      "cache": {
+       "read": 0.1,
+       "write": {
+        "5m": 1.25,
+        "1h": 2
+       }
+      }
+     },
+     "output": {
+      "price": 5
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "not": {
+        "region": {
+         "equals": "global"
+        }
+       }
+      },
+      "factor": 1.1
+     }
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${DATABRICKS_HOST}/ai-gateway/mlflow/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://${DATABRICKS_HOST}/serving-endpoints/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "databricks-gpt-5-2": {
+   "id": "databricks-gpt-5-2",
+   "name": "GPT-5.2",
+   "type": "chat",
+   "canonical_id": "openai/gpt-5.2",
+   "family": "gpt",
+   "release_date": "2025-12-11",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "store": false,
+    "service_tier": [
+     "priority"
+    ]
+   },
+   "description": "Reliable GPT generation for broad coding, writing, and tool-assisted product work",
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2025-12-11",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.75,
+      "cache": {
+       "read": 0.175
+      }
+     },
+     "output": {
+      "price": 14
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": 2
+     },
+     {
+      "when": {
+       "not": {
+        "region": {
+         "equals": "global"
+        }
+       }
+      },
+      "factor": 1.1
+     }
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${DATABRICKS_HOST}/ai-gateway/mlflow/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://${DATABRICKS_HOST}/serving-endpoints",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "experimental": {
+    "modes": {
+     "fast": {
+      "service_tier": "priority",
+      "body": {
+       "service_tier": "priority"
+      }
+     }
+    }
+   }
+  },
+  "databricks-bge-large-en": {
+   "id": "databricks-bge-large-en",
+   "name": "BGE Large EN v1.5",
+   "type": "embedding",
+   "canonical_id": "baai/bge-large-en-v1.5",
+   "family": "bge",
+   "release_date": "2023-09-12",
+   "limit": {
+    "context": 512,
+    "output": 0
+   },
+   "capabilities": {
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    },
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "English text embedding model for retrieval and semantic search",
+   "open_weights": true,
+   "last_updated": "2023-09-12",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "api": {
+    "embeddings": {
+     "base_url": "https://${DATABRICKS_HOST}/ai-gateway/mlflow/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
+     }
+    }
+   }
+  },
+  "databricks-gemini-2-5-flash": {
+   "id": "databricks-gemini-2-5-flash",
+   "name": "Gemini 2.5 Flash",
+   "type": "chat",
+   "canonical_id": "google/gemini-2.5-flash",
+   "family": "gemini-flash",
+   "status": "deprecated",
+   "release_date": "2025-06-17",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "budget": {
+      "min": 0,
+      "max": 24576
+     }
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Fast Gemini workhorse for multimodal apps where latency and price matter",
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2025-06-17",
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.3,
+      "cache": {
+       "read": 0.03
+      }
+     },
+     "output": {
+      "price": 2.5
+     }
+    },
+    "audio": {
+     "input": {
+      "price": 1
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${DATABRICKS_HOST}/ai-gateway/mlflow/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "databricks-gpt-5-4": {
+   "id": "databricks-gpt-5-4",
+   "name": "GPT-5.4",
+   "type": "chat",
+   "canonical_id": "openai/gpt-5.4",
+   "family": "gpt",
+   "release_date": "2026-03-05",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "store": false,
+    "service_tier": [
+     "priority"
+    ]
+   },
+   "description": "Agent-ready GPT for coding and computer-use workflows at a lower cost",
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-03-05",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2.5,
+      "cache": {
+       "read": 0.25
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 5,
+        "cache": {
+         "read": 0.5
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 15,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 22.5
+       }
+      ]
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": 2
+     },
+     {
+      "when": {
+       "not": {
+        "region": {
+         "equals": "global"
+        }
+       }
+      },
+      "factor": 1.1
+     }
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${DATABRICKS_HOST}/ai-gateway/mlflow/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://${DATABRICKS_HOST}/serving-endpoints",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "experimental": {
+    "modes": {
+     "fast": {
+      "service_tier": "priority",
+      "body": {
+       "service_tier": "priority"
+      }
+     }
+    }
+   }
+  },
+  "databricks-gemini-2-5-pro": {
+   "id": "databricks-gemini-2-5-pro",
+   "name": "Gemini 2.5 Pro",
+   "type": "chat",
+   "canonical_id": "google/gemini-2.5-pro",
+   "family": "gemini-pro",
+   "status": "deprecated",
+   "release_date": "2025-06-17",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "budget": {
+      "min": 128,
+      "max": 32768
+     }
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Google's proven reasoning model for coding, math, and multimodal analysis",
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2025-06-17",
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.25,
+      "cache": {
+       "read": 0.125
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 200000
+         }
+        },
+        "price": 2.5,
+        "cache": {
+         "read": 0.25
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 10,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 200000
+         }
+        },
+        "price": 15
+       }
+      ]
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${DATABRICKS_HOST}/ai-gateway/mlflow/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "databricks-gpt-5-5": {
+   "id": "databricks-gpt-5-5",
+   "name": "GPT-5.5",
+   "type": "chat",
+   "canonical_id": "openai/gpt-5.5",
+   "family": "gpt",
+   "release_date": "2026-04-23",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": {
+      "ttl": [
+       "24h"
+      ]
+     }
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "store": false,
+    "service_tier": [
+     "priority"
+    ]
+   },
+   "description": "Default frontier GPT for coding, computer use, research, and knowledge work",
+   "open_weights": false,
+   "knowledge": "2025-12-01",
+   "last_updated": "2026-04-23",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 10,
+        "cache": {
+         "read": 1
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 30,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 45
+       }
+      ]
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": 2.5
+     },
+     {
+      "when": {
+       "not": {
+        "region": {
+         "equals": "global"
+        }
+       }
+      },
+      "factor": 1.1
+     }
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${DATABRICKS_HOST}/ai-gateway/mlflow/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://${DATABRICKS_HOST}/serving-endpoints",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "experimental": {
+    "modes": {
+     "fast": {
+      "service_tier": "priority",
+      "body": {
+       "service_tier": "priority"
+      }
+     }
+    }
+   }
+  },
+  "databricks-gpt-5": {
+   "id": "databricks-gpt-5",
+   "name": "GPT-5",
+   "type": "chat",
+   "canonical_id": "openai/gpt-5",
+   "family": "gpt",
+   "release_date": "2025-08-07",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    },
+    "structured_output": true,
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "store": false,
+    "service_tier": [
+     "priority"
+    ]
+   },
+   "description": "Original GPT-5 workhorse for reasoning, coding, writing, and tool workflows",
+   "open_weights": false,
+   "knowledge": "2024-09-30",
+   "last_updated": "2025-08-07",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.25,
+      "cache": {
+       "read": 0.125
+      }
+     },
+     "output": {
+      "price": 10
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": 2
+     },
+     {
+      "when": {
+       "not": {
+        "region": {
+         "equals": "global"
+        }
+       }
+      },
+      "factor": 1.1
+     }
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${DATABRICKS_HOST}/ai-gateway/mlflow/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://${DATABRICKS_HOST}/serving-endpoints",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "experimental": {
+    "modes": {
+     "fast": {
+      "service_tier": "priority",
+      "body": {
+       "service_tier": "priority"
+      }
+     }
+    }
+   }
+  },
+  "databricks-gpt-oss-120b": {
+   "id": "databricks-gpt-oss-120b",
+   "name": "GPT OSS 120B",
+   "type": "chat",
+   "canonical_id": "openai/gpt-oss-120b",
+   "family": "gpt-oss",
+   "release_date": "2025-08-05",
+   "limit": {
+    "context": 131072,
+    "output": 25000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
+   "open_weights": true,
+   "knowledge": "2024-06",
+   "last_updated": "2025-08-05",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.15
+     },
+     "output": {
+      "price": 0.6
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${DATABRICKS_HOST}/ai-gateway/mlflow/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "databricks-claude-sonnet-4-5": {
+   "id": "databricks-claude-sonnet-4-5",
+   "name": "Claude Sonnet 4.5 (latest)",
+   "type": "chat",
+   "canonical_id": "anthropic/claude-sonnet-4-5",
+   "family": "claude-sonnet",
+   "release_date": "2025-09-29",
+   "limit": {
+    "context": 200000,
+    "output": 64000
+   },
+   "capabilities": {
+    "cache": {
+     "explicit": {
+      "ttl": [
+       "5m",
+       "1h"
+      ]
+     }
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "budget": {
+      "min": 1024
+     }
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Balanced Claude model for coding, analysis, agent workflows, and cost control",
+   "open_weights": false,
+   "knowledge": "2025-07-31",
+   "last_updated": "2025-09-29",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 3,
+      "cache": {
+       "read": 0.3,
+       "write": {
+        "5m": 3.75,
+        "1h": 6
+       }
+      }
+     },
+     "output": {
+      "price": 15
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "not": {
+        "region": {
+         "equals": "global"
+        }
+       }
+      },
+      "factor": 1.1
+     }
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${DATABRICKS_HOST}/ai-gateway/mlflow/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://${DATABRICKS_HOST}/serving-endpoints/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "databricks-gpt-oss-20b": {
+   "id": "databricks-gpt-oss-20b",
+   "name": "GPT OSS 20B",
+   "type": "chat",
+   "canonical_id": "openai/gpt-oss-20b",
+   "family": "gpt-oss",
+   "release_date": "2025-08-05",
+   "limit": {
+    "context": 131072,
+    "output": 25000
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
+   "open_weights": true,
+   "knowledge": "2024-06",
+   "last_updated": "2025-08-05",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.07
+     },
+     "output": {
+      "price": 0.3
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${DATABRICKS_HOST}/ai-gateway/mlflow/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "databricks-qwen3-embedding-0-6b": {
+   "id": "databricks-qwen3-embedding-0-6b",
+   "name": "Qwen3 Embedding 0.6B",
+   "type": "embedding",
+   "canonical_id": "alibaba/qwen3-embedding-0.6b",
+   "family": "qwen",
+   "release_date": "2025-06-05",
+   "limit": {
+    "context": 32768,
+    "output": 0
+   },
+   "capabilities": {
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    },
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Compact multilingual text embedding model for retrieval, code search, classification, and clustering",
+   "open_weights": true,
+   "last_updated": "2025-06-05",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.02
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "api": {
+    "embeddings": {
+     "base_url": "https://${DATABRICKS_HOST}/ai-gateway/mlflow/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
+     }
+    }
+   }
+  },
+  "databricks-claude-opus-4-5": {
+   "id": "databricks-claude-opus-4-5",
+   "name": "Claude Opus 4.5 (latest)",
+   "type": "chat",
+   "canonical_id": "anthropic/claude-opus-4-5",
+   "family": "claude-opus",
+   "release_date": "2025-11-24",
+   "limit": {
+    "context": 200000,
+    "output": 64000
+   },
+   "capabilities": {
+    "cache": {
+     "explicit": {
+      "ttl": [
+       "5m",
+       "1h"
+      ]
+     }
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "budget": {
+      "min": 1024
+     }
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Flagship Claude model for deep reasoning, coding, and long-horizon agents",
+   "open_weights": false,
+   "knowledge": "2025-05",
+   "last_updated": "2025-11-24",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5,
+       "write": {
+        "5m": 6.25,
+        "1h": 10
+       }
+      }
+     },
+     "output": {
+      "price": 25
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "not": {
+        "region": {
+         "equals": "global"
+        }
+       }
+      },
+      "factor": 1.1
+     }
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${DATABRICKS_HOST}/ai-gateway/mlflow/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://${DATABRICKS_HOST}/serving-endpoints/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "databricks-gpt-5-1": {
+   "id": "databricks-gpt-5-1",
+   "name": "GPT-5.1",
+   "type": "chat",
+   "canonical_id": "openai/gpt-5.1",
+   "family": "gpt",
+   "release_date": "2025-11-13",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "store": false,
+    "service_tier": [
+     "priority"
+    ]
+   },
+   "description": "Sharper GPT-5 generation for coding, product work, and tool-assisted tasks",
+   "open_weights": false,
+   "knowledge": "2024-09-30",
+   "last_updated": "2025-11-13",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.25,
+      "cache": {
+       "read": 0.125
+      }
+     },
+     "output": {
+      "price": 10
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": 2
+     },
+     {
+      "when": {
+       "not": {
+        "region": {
+         "equals": "global"
+        }
+       }
+      },
+      "factor": 1.1
+     }
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${DATABRICKS_HOST}/ai-gateway/mlflow/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://${DATABRICKS_HOST}/serving-endpoints",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "experimental": {
+    "modes": {
+     "fast": {
+      "service_tier": "priority",
+      "body": {
+       "service_tier": "priority"
+      }
+     }
+    }
+   }
+  },
+  "databricks-gpt-5-mini": {
+   "id": "databricks-gpt-5-mini",
+   "name": "GPT-5 Mini",
+   "type": "chat",
+   "canonical_id": "openai/gpt-5-mini",
+   "family": "gpt-mini",
+   "release_date": "2025-08-07",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    },
+    "structured_output": true,
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "store": false,
+    "service_tier": [
+     "priority"
+    ]
+   },
+   "description": "Small GPT-5 for responsive agents, coding help, and everyday automation",
+   "open_weights": false,
+   "knowledge": "2024-05-30",
+   "last_updated": "2025-08-07",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.25,
+      "cache": {
+       "read": 0.025
+      }
+     },
+     "output": {
+      "price": 2
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": 1.8
+     },
+     {
+      "when": {
+       "not": {
+        "region": {
+         "equals": "global"
+        }
+       }
+      },
+      "factor": 1.1
+     }
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${DATABRICKS_HOST}/ai-gateway/mlflow/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://${DATABRICKS_HOST}/serving-endpoints",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "experimental": {
+    "modes": {
+     "fast": {
+      "service_tier": "priority",
+      "body": {
+       "service_tier": "priority"
+      }
+     }
+    }
+   }
+  },
+  "databricks-claude-opus-4-1": {
+   "id": "databricks-claude-opus-4-1",
+   "name": "Claude Opus 4.1 (latest)",
+   "type": "chat",
+   "canonical_id": "anthropic/claude-opus-4-1",
+   "family": "claude-opus",
+   "release_date": "2025-08-05",
+   "limit": {
+    "context": 200000,
+    "output": 32000
+   },
+   "capabilities": {
+    "cache": {
+     "explicit": {
+      "ttl": [
+       "5m",
+       "1h"
+      ]
+     }
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "budget": {
+      "min": 1024
+     }
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Flagship Claude model for deep reasoning, coding, and long-horizon agents",
+   "open_weights": false,
+   "knowledge": "2025-03-31",
+   "last_updated": "2025-08-05",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 15,
+      "cache": {
+       "read": 1.5,
+       "write": {
+        "5m": 18.75,
+        "1h": 30
+       }
+      }
+     },
+     "output": {
+      "price": 75
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${DATABRICKS_HOST}/ai-gateway/mlflow/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://${DATABRICKS_HOST}/serving-endpoints/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "databricks-kimi-k2-7-code": {
+   "id": "databricks-kimi-k2-7-code",
+   "name": "Kimi K2.7 Code",
+   "type": "chat",
+   "canonical_id": "moonshotai/kimi-k2.7-code",
+   "family": "kimi-k2",
+   "status": "deprecated",
+   "release_date": "2026-06-12",
+   "limit": {
+    "context": 262144,
+    "output": 262144
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    },
+    "structured_output": true,
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Coding-focused Kimi model, stronger on long-horizon repo work with less overthinking",
+   "open_weights": true,
+   "knowledge": "2025-01",
+   "last_updated": "2026-06-12",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.95,
+      "cache": {
+       "read": 0.19
+      }
+     },
+     "output": {
+      "price": 4
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${DATABRICKS_HOST}/ai-gateway/mlflow/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "databricks-claude-opus-4-7": {
+   "id": "databricks-claude-opus-4-7",
+   "name": "Claude Opus 4.7",
+   "type": "chat",
+   "canonical_id": "anthropic/claude-opus-4-7",
+   "family": "claude-opus",
+   "release_date": "2026-04-16",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "explicit": {
+      "ttl": [
+       "5m",
+       "1h"
+      ]
+     }
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "budget": {
+      "min": 1024
+     }
+    },
+    "structured_output": true,
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Stronger Opus tier for advanced software work and high-stakes reasoning",
+   "open_weights": false,
+   "knowledge": "2026-01-31",
+   "last_updated": "2026-04-16",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5,
+       "write": {
+        "5m": 6.25,
+        "1h": 10
+       }
+      }
+     },
+     "output": {
+      "price": 25
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "not": {
+        "region": {
+         "equals": "global"
+        }
+       }
+      },
+      "factor": 1.1
+     }
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${DATABRICKS_HOST}/ai-gateway/mlflow/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://${DATABRICKS_HOST}/serving-endpoints/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "databricks-gemini-3-5-flash": {
+   "id": "databricks-gemini-3-5-flash",
+   "name": "Gemini 3.5 Flash",
+   "type": "chat",
+   "canonical_id": "google/gemini-3.5-flash",
+   "family": "gemini-flash",
+   "release_date": "2026-05-19",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "service_tier": [
+     "priority"
+    ]
+   },
+   "description": "Fast Gemini model balancing multimodal reasoning, tool use, and cost",
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2026-05-19",
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.5,
+      "cache": {
+       "read": 0.15
+      }
+     },
+     "output": {
+      "price": 9
+     }
+    },
+    "audio": {
+     "input": {
+      "price": 1.5,
+      "cache": {
+       "read": 0.15
+      }
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": 1.8
+     },
+     {
+      "when": {
+       "date": {
+        "gte": "2027-02-01"
+       }
+      },
+      "factor": 1.25
+     },
+     {
+      "when": {
+       "not": {
+        "region": {
+         "equals": "global"
+        }
+       }
+      },
+      "factor": 1.1
+     }
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${DATABRICKS_HOST}/ai-gateway/mlflow/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "experimental": {
+    "modes": {
+     "fast": {
+      "service_tier": "priority",
+      "body": {
+       "service_tier": "priority"
+      }
+     }
+    }
+   }
+  },
+  "databricks-gemini-3-1-pro": {
+   "id": "databricks-gemini-3-1-pro",
+   "name": "Gemini 3.1 Pro Preview",
+   "type": "chat",
+   "canonical_id": "google/gemini-3.1-pro-preview",
+   "family": "gemini-pro",
+   "release_date": "2026-02-19",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "service_tier": [
+     "priority"
+    ]
+   },
+   "description": "Reasoning-first Gemini preview for agentic coding and complex problem solving",
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2026-02-19",
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.2
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 200000
+         }
+        },
+        "price": 4,
+        "cache": {
+         "read": 0.4
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 12,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 200000
+         }
+        },
+        "price": 18
+       }
+      ]
+     }
+    },
+    "audio": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.2
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 200000
+         }
+        },
+        "price": 4,
+        "cache": {
+         "read": 0.4
+        }
+       }
+      ]
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": 1.8
+     },
+     {
+      "when": {
+       "date": {
+        "gte": "2027-02-01"
+       }
+      },
+      "factor": 1.25
+     }
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${DATABRICKS_HOST}/ai-gateway/mlflow/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "experimental": {
+    "modes": {
+     "fast": {
+      "service_tier": "priority",
+      "body": {
+       "service_tier": "priority"
+      }
+     }
+    }
+   }
+  },
+  "databricks-glm-5-2": {
+   "id": "databricks-glm-5-2",
+   "name": "GLM-5.2",
+   "type": "chat",
+   "canonical_id": "zhipuai/glm-5.2",
+   "family": "glm",
+   "release_date": "2026-06-13",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "high",
+      "max"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "service_tier": [
+     "priority"
+    ]
+   },
+   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
+   "open_weights": true,
+   "last_updated": "2026-06-13",
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.4,
+      "cache": {
+       "read": 0.26
+      }
+     },
+     "output": {
+      "price": 4.4
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": 1.75
+     }
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${DATABRICKS_HOST}/ai-gateway/mlflow/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "experimental": {
+    "modes": {
+     "fast": {
+      "service_tier": "priority",
+      "body": {
+       "service_tier": "priority"
+      }
+     }
+    }
+   }
+  },
+  "databricks-gpt-5-4-mini": {
+   "id": "databricks-gpt-5-4-mini",
+   "name": "GPT-5.4 mini",
+   "type": "chat",
+   "canonical_id": "openai/gpt-5.4-mini",
+   "family": "gpt-mini",
+   "release_date": "2026-03-17",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "store": false,
+    "service_tier": [
+     "priority"
+    ]
+   },
+   "description": "Strong small GPT for coding subagents, quick tool use, and high-volume work",
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-03-17",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.75,
+      "cache": {
+       "read": 0.075
+      }
+     },
+     "output": {
+      "price": 4.5
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": 2
+     },
+     {
+      "when": {
+       "not": {
+        "region": {
+         "equals": "global"
+        }
+       }
+      },
+      "factor": 1.1
+     }
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${DATABRICKS_HOST}/ai-gateway/mlflow/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://${DATABRICKS_HOST}/serving-endpoints",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "experimental": {
+    "modes": {
+     "fast": {
+      "service_tier": "priority",
+      "body": {
+       "service_tier": "priority"
+      }
+     }
+    }
+   }
+  },
+  "databricks-gemini-3-pro": {
+   "id": "databricks-gemini-3-pro",
+   "name": "Gemini 3 Pro Preview",
+   "type": "chat",
+   "canonical_id": "google/gemini-3-pro-preview",
+   "family": "gemini-pro",
+   "status": "deprecated",
+   "release_date": "2025-11-18",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Preview Gemini flagship for complex reasoning, coding, and rich multimodal prompts",
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2025-11-18",
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.2
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 200000
+         }
+        },
+        "price": 4,
+        "cache": {
+         "read": 0.4
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 12,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 200000
+         }
+        },
+        "price": 18
+       }
+      ]
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${DATABRICKS_HOST}/ai-gateway/mlflow/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "databricks-claude-sonnet-4": {
+   "id": "databricks-claude-sonnet-4",
+   "name": "Claude Sonnet 4",
+   "type": "chat",
+   "canonical_id": "anthropic/claude-sonnet-4-20250514",
+   "family": "claude-sonnet",
+   "status": "deprecated",
+   "release_date": "2025-05-22",
+   "limit": {
+    "context": 200000,
+    "output": 64000
+   },
+   "capabilities": {
+    "cache": {
+     "explicit": {
+      "ttl": [
+       "5m"
+      ]
+     }
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "budget": {
+      "min": 1024
+     }
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Balanced Claude model for coding, analysis, agent workflows, and cost control",
+   "open_weights": false,
+   "knowledge": "2025-03-31",
+   "last_updated": "2025-05-22",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 3,
+      "cache": {
+       "read": 0.3,
+       "write": 3.75
+      }
+     },
+     "output": {
+      "price": 15
+     }
+    }
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${DATABRICKS_HOST}/ai-gateway/mlflow/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://${DATABRICKS_HOST}/serving-endpoints/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "databricks-gemini-3-flash": {
+   "id": "databricks-gemini-3-flash",
+   "name": "Gemini 3 Flash Preview",
+   "type": "chat",
+   "canonical_id": "google/gemini-3-flash-preview",
+   "family": "gemini-flash",
+   "release_date": "2025-12-17",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "service_tier": [
+     "priority"
+    ]
+   },
+   "description": "New Gemini flash lane bringing frontier-style multimodal reasoning to cheaper runs",
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2025-12-17",
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.5,
+      "cache": {
+       "read": 0.05
+      }
+     },
+     "output": {
+      "price": 3
+     }
+    },
+    "audio": {
+     "input": {
+      "price": 1,
+      "cache": {
+       "read": 0.1
+      }
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": 1.8
+     },
+     {
+      "when": {
+       "date": {
+        "gte": "2027-02-01"
+       }
+      },
+      "factor": 1.25
+     }
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${DATABRICKS_HOST}/ai-gateway/mlflow/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "experimental": {
+    "modes": {
+     "fast": {
+      "service_tier": "priority",
+      "body": {
+       "service_tier": "priority"
+      }
+     }
+    }
+   }
+  },
+  "databricks-gpt-5-4-nano": {
+   "id": "databricks-gpt-5-4-nano",
+   "name": "GPT-5.4 nano",
+   "type": "chat",
+   "canonical_id": "openai/gpt-5.4-nano",
+   "family": "gpt-nano",
+   "release_date": "2026-03-17",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "store": false
+   },
+   "description": "Cheapest GPT-5.4 lane for simple routing, extraction, and bulk automation",
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-03-17",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.2,
+      "cache": {
+       "read": 0.02
+      }
+     },
+     "output": {
+      "price": 1.25
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "not": {
+        "region": {
+         "equals": "global"
+        }
+       }
+      },
+      "factor": 1.1
+     }
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${DATABRICKS_HOST}/ai-gateway/mlflow/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://${DATABRICKS_HOST}/serving-endpoints",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "databricks-claude-opus-4-6": {
+   "id": "databricks-claude-opus-4-6",
+   "name": "Claude Opus 4.6",
+   "type": "chat",
+   "canonical_id": "anthropic/claude-opus-4-6",
+   "family": "claude-opus",
+   "release_date": "2026-02-05",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "explicit": {
+      "ttl": [
+       "5m",
+       "1h"
+      ]
+     }
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "budget": {
+      "min": 1024
+     }
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "High-end Claude for difficult coding, planning, and slower expert reasoning",
+   "open_weights": false,
+   "knowledge": "2025-05-31",
+   "last_updated": "2026-03-13",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5,
+       "write": {
+        "5m": 6.25,
+        "1h": 10
+       }
+      }
+     },
+     "output": {
+      "price": 25
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "not": {
+        "region": {
+         "equals": "global"
+        }
+       }
+      },
+      "factor": 1.1
+     }
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${DATABRICKS_HOST}/ai-gateway/mlflow/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://${DATABRICKS_HOST}/serving-endpoints/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "databricks-gpt-5-6-sol": {
+   "id": "databricks-gpt-5-6-sol",
+   "name": "GPT-5.6 Sol",
+   "type": "chat",
+   "canonical_id": "openai/gpt-5.6-sol",
+   "family": "gpt-sol",
+   "release_date": "2026-07-09",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "max"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "store": false,
+    "service_tier": [
+     "priority"
+    ]
+   },
+   "description": "Frontier GPT-5.6 model for complex professional work, coding, and agentic workflows",
+   "open_weights": false,
+   "knowledge": "2026-02-16",
+   "last_updated": "2026-07-09",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 4,
+      "cache": {
+       "read": 0.4,
+       "write": 5
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 8,
+        "cache": {
+         "read": 0.8,
+         "write": 10
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 20,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 30
+       }
+      ]
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": 2
+     },
+     {
+      "when": {
+       "date": {
+        "gte": "2026-11-22"
+       }
+      },
+      "factor": {
+       "text": {
+        "input": {
+         "price": 1.25,
+         "cache": {
+          "read": 1.25,
+          "write": 1.25
+         }
+        },
+        "output": 1.5
+       }
+      }
+     },
+     {
+      "when": {
+       "not": {
+        "region": {
+         "equals": "global"
+        }
+       }
+      },
+      "factor": 1.1
+     }
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${DATABRICKS_HOST}/ai-gateway/mlflow/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://${DATABRICKS_HOST}/serving-endpoints",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "experimental": {
+    "modes": {
+     "fast": {
+      "service_tier": "priority",
+      "body": {
+       "service_tier": "priority"
+      }
+     }
+    }
+   }
+  },
+  "databricks-claude-sonnet-4-6": {
+   "id": "databricks-claude-sonnet-4-6",
+   "name": "Claude Sonnet 4.6",
+   "type": "chat",
+   "canonical_id": "anthropic/claude-sonnet-4-6",
+   "family": "claude-sonnet",
+   "release_date": "2026-02-17",
+   "limit": {
+    "context": 1000000,
+    "output": 64000
+   },
+   "capabilities": {
+    "cache": {
+     "explicit": {
+      "ttl": [
+       "5m",
+       "1h"
+      ]
+     }
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "budget": {
+      "min": 1024
+     }
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Claude workhorse for coding agents, careful analysis, and production cost control",
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-03-13",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 3,
+      "cache": {
+       "read": 0.3,
+       "write": {
+        "5m": 3.75,
+        "1h": 6
+       }
+      }
+     },
+     "output": {
+      "price": 15
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "not": {
+        "region": {
+         "equals": "global"
+        }
+       }
+      },
+      "factor": 1.1
+     }
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${DATABRICKS_HOST}/ai-gateway/mlflow/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://${DATABRICKS_HOST}/serving-endpoints/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  },
+  "databricks-gpt-5-6-terra": {
+   "id": "databricks-gpt-5-6-terra",
+   "name": "GPT-5.6 Terra",
+   "type": "chat",
+   "canonical_id": "openai/gpt-5.6-terra",
+   "family": "gpt-terra",
+   "release_date": "2026-07-09",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    },
+    "structured_output": true,
+    "temperature": true,
+    "top_p": true,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "store": false,
+    "service_tier": [
+     "priority"
+    ]
+   },
+   "description": "Balanced GPT-5.6 model for capable, cost-efficient everyday work",
+   "open_weights": false,
+   "knowledge": "2026-02-16",
+   "last_updated": "2026-07-09",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.2,
+       "write": 2.5
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 4,
+        "cache": {
+         "read": 0.4,
+         "write": 5
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 12,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 18
+       }
+      ]
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": 2
+     },
+     {
+      "when": {
+       "not": {
+        "region": {
+         "equals": "global"
+        }
+       }
+      },
+      "factor": 1.1
+     }
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${DATABRICKS_HOST}/ai-gateway/mlflow/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://${DATABRICKS_HOST}/serving-endpoints",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "experimental": {
+    "modes": {
+     "fast": {
+      "service_tier": "priority",
+      "body": {
+       "service_tier": "priority"
+      }
+     }
+    }
+   }
+  },
+  "databricks-gpt-5-nano": {
+   "id": "databricks-gpt-5-nano",
+   "name": "GPT-5 Nano",
+   "type": "chat",
+   "canonical_id": "openai/gpt-5-nano",
+   "family": "gpt-nano",
+   "release_date": "2025-08-07",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    },
+    "structured_output": true,
+    "temperature": false,
+    "top_p": false,
+    "top_k": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "store": false
+   },
+   "description": "Tiny GPT-5 lane for routing, extraction, classification, and bulk jobs",
+   "open_weights": false,
+   "knowledge": "2024-05-30",
+   "last_updated": "2025-08-07",
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.05,
+      "cache": {
+       "read": 0.005
+      }
+     },
+     "output": {
+      "price": 0.4
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "not": {
+        "region": {
+         "equals": "global"
+        }
+       }
+      },
+      "factor": 1.1
+     }
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${DATABRICKS_HOST}/ai-gateway/mlflow/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://${DATABRICKS_HOST}/serving-endpoints",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  }
+ }
+}

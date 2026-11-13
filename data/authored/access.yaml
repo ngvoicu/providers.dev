@@ -1,0 +1,24 @@
+# How each provider is reached. This is a classification only: no plans, prices or allowances.
+#   api          = an API key billed by use
+#   subscription = a login or a plan with its own endpoint or key
+#   unknown      = not classified
+# Order: a provider named under `providers` wins, then the first matching pattern, then the default.
+default: api
+default_basis: >-
+  Default. models.dev lists providers that are reached with an API key; this one was not reviewed individually.
+patterns:
+  - match: "(^|-)(coding|code)-plan(-|$)"
+    access: subscription
+    basis: >-
+      Classified by name: the provider id names a coding plan, a subscription with its own endpoint and key.
+      Not reviewed individually.
+  - match: "-plan(-|$)"
+    access: unknown
+    basis: >-
+      The provider id names a plan (a token plan or a step plan). Whether it is billed by use or by subscription
+      was not reviewed.
+providers:
+  github-copilot:
+    access: subscription
+    basis: GitHub Copilot is a paid plan; its models are reached with a GitHub token, not a per-token API key.
+    source: https://docs.github.com/en/copilot

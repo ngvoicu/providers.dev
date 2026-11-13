@@ -1,0 +1,65 @@
+{
+ "id": "liquid",
+ "name": "Liquid Inference",
+ "doc": "https://inference.ai.exchange/docs",
+ "env": [
+  "LIQUID_API_KEY"
+ ],
+ "models": {
+  "liquid.auto": {
+   "id": "liquid.auto",
+   "name": "Liquid Auto",
+   "type": "chat",
+   "family": "auto",
+   "release_date": "2026-10-20",
+   "limit": {
+    "context": 10000000,
+    "output": 1048576
+   },
+   "capabilities": {
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    },
+    "structured_output": true,
+    "temperature": true,
+    "system_updates": false,
+    "effort_updates": false
+   },
+   "description": "Routes each request to the lowest-priced eligible offer on the Liquid Inference exchange",
+   "open_weights": false,
+   "last_updated": "2026-10-20",
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/gif",
+     "audio/wav",
+     "audio/mpeg",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://router.inference.ai.exchange/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   }
+  }
+ }
+}

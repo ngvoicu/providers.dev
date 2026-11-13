@@ -1,0 +1,37 @@
+{
+  "name": "providers-dev-site",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "sync": "node scripts/sync.ts",
+    "data": "node scripts/build-data.ts",
+    "stage": "node scripts/stage.ts",
+    "dev": "npm run data && npm run stage && astro dev",
+    "build": "npm run data && npm run stage && astro build",
+    "preview": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc --noEmit && astro check",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "check": "npm run lint && npm run typecheck && npm run test"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "@cloudflare/workers-types": "^5.20261113.1",
+    "@eslint/js": "^10.0.1",
+    "@tailwindcss/vite": "^4.3.5",
+    "@types/node": "^26.6.6",
+    "astro": "^7.4.11",
+    "eslint": "^10.14.0",
+    "tailwindcss": "^4.3.5",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.72.2",
+    "vitest": "^5.1.0",
+    "wrangler": "^4.161.0",
+    "yaml": "^2.9.1",
+    "zod": "^4.6.7"
+  }
+}

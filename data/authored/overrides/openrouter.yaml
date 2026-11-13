@@ -1,0 +1,95 @@
+# OpenRouter lists a cached-input price for these models, and models.dev says nothing about caching for them
+# (no `cache` capability). OpenRouter documents that caching is automatic for these labs.
+# Proposed upstream in https://github.com/anomalyco/models.dev/pull/13412. When that is merged, the build
+# reports these overrides as redundant and they can be deleted.
+provider: openrouter
+rules:
+  - models:
+      - deepseek/deepseek-chat-v3-0324
+      - deepseek/deepseek-chat-v3.1
+      - deepseek/deepseek-r1-0528
+      - deepseek/deepseek-v3.2
+      - deepseek/deepseek-v4-flash-0731
+      - deepseek/deepseek-v4-flash-vision-exp
+      - deepseek/deepseek-v4-flash
+      - deepseek/deepseek-v4-pro-0813
+      - deepseek/deepseek-v4-pro
+      - deepseek/deepseek-v4.1-flash-1017
+      - deepseek/deepseek-v4.1-flash
+    set:
+      capabilities:
+        cache: { implicit: true }
+    reason: OpenRouter documents that prompt caching with DeepSeek is automatic. No lifetime is documented, so none is set.
+    evidence:
+      - kind: documented
+        url: https://openrouter.ai/docs/guides/best-practices/prompt-caching#deepseek
+        date: "2026-11-13"
+        note: '"Prompt caching with DeepSeek is automated and does not require any additional configuration."'
+  - models:
+      - moonshotai/kimi-k2-thinking
+      - moonshotai/kimi-k2.5
+      - moonshotai/kimi-k2.6
+      - moonshotai/kimi-k2.7-code
+      - moonshotai/kimi-k3.1-pro
+      - moonshotai/kimi-k3
+    set:
+      capabilities:
+        cache: { implicit: true }
+    reason: OpenRouter documents that prompt caching with Moonshot AI is automatic. No lifetime is documented, so none is set.
+    evidence:
+      - kind: documented
+        url: https://openrouter.ai/docs/guides/best-practices/prompt-caching#moonshot-ai
+        date: "2026-11-13"
+        note: '"Prompt caching with Moonshot AI is automated and does not require any additional configuration."'
+  - models:
+      - z-ai/glm-4.5-air
+      - z-ai/glm-4.5
+      - z-ai/glm-4.5v
+      - z-ai/glm-4.6
+      - z-ai/glm-4.6v
+      - z-ai/glm-4.7
+      - z-ai/glm-5-turbo
+      - z-ai/glm-5.1
+      - z-ai/glm-5.2
+      - z-ai/glm-5.3-flash
+      - z-ai/glm-5.3-flashx-legal
+      - z-ai/glm-5.3-flashx
+      - z-ai/glm-5.3-prime
+      - z-ai/glm-5.3
+      - z-ai/glm-5
+      - z-ai/glm-5v-turbo
+    set:
+      capabilities:
+        cache: { implicit: true }
+    reason: OpenRouter documents that prompt caching with Z.AI is automatic. No lifetime is documented, so none is set.
+    evidence:
+      - kind: documented
+        url: https://openrouter.ai/docs/guides/best-practices/prompt-caching#z-ai
+        date: "2026-11-13"
+        note: '"Prompt caching with Z.AI is automated and does not require any additional configuration."'
+  - models:
+      - meta/muse-wonder
+    set:
+      capabilities:
+        cache: { implicit: true }
+    reason: >-
+      OpenRouter lists a cached-input price for this model and has no caching section for the lab. In a live check
+      an immediate re-send was served from the cache.
+    evidence:
+      - kind: measured
+        url: https://github.com/ngvoicu/cache-ttl-probe/blob/main/results/openrouter-direct/R10-2026-11-04T19-00-07.json
+        date: "2026-11-04"
+        note: Direct to OpenRouter, Responses API with a prompt_cache_key; 20 of 27 later checks warm, the oldest at 25 minutes.
+  - models:
+      - mistralai/mistral-large-4-0
+    set:
+      capabilities:
+        cache: { implicit: true }
+    reason: >-
+      OpenRouter lists a cached-input price for this model and has no caching section for the lab. In a live check
+      an immediate re-send was served from the cache.
+    evidence:
+      - kind: measured
+        url: https://github.com/ngvoicu/cache-ttl-probe/blob/main/results/openrouter-direct/R11-2026-11-04T19-00-15.json
+        date: "2026-11-04"
+        note: Direct to OpenRouter, Responses API with a prompt_cache_key; 11 of 18 later checks warm, the oldest at 10 minutes.

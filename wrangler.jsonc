@@ -1,0 +1,15 @@
+{
+  // Cloudflare Worker with static assets. Pages and data files are served as assets;
+  // the Worker runs only for /api/v1/*.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "providers-dev",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    "html_handling": "auto-trailing-slash",
+    "run_worker_first": ["/api/v1/*"]
+  }
+}

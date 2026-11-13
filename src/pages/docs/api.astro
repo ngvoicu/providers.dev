@@ -1,0 +1,192 @@
+---
+import Base from "../../layouts/Base.astro";
+import { DEFAULT_LIMIT, MAX_LIMIT, PARAMS } from "../../core/query.ts";
+import { meta } from "../../lib/data.ts";
+
+const ts = `type Page<T> = { total: number; limit: number; offset: number; next_offset: number | null; data: T[] };
+type Entry = {
+  ref: string; provider: string; model: string; name: string;
+  access: "api" | "subscription" | "unknown";
+  origin: "upstream" | "modified" | "added";
+  context?: number; max_output?: number;          // tokens; absent = unknown
+  cache: "yes" | "no" | "unknown"; cache_ttl_s: number[];
+  measured_runs: number; verified?: string;
+};
+
+const base = "https://providers.dev/api/v1";
+
+// Every subscription entry with at least a 400k context window, largest first.
+async function* entries(params: Record<string, string>): AsyncGenerator<Entry> {
+  let offset: number | null = 0;
+  while (offset !== null) {
+    const query = new URLSearchParams({ ...params, limit: "${MAX_LIMIT}", offset: String(offset) });
+    const response = await fetch(\`\${base}/models?\${query}\`);
+    if (!response.ok) throw new Error((await response.json()).error.message);
+    const page = (await response.json()) as Page<Entry>;
+    yield* page.data;
+    offset = page.next_offset;
+  }
+}
+
+for await (const entry of entries({ access: "subscription", min_context: "400000", sort: "context", order: "desc" })) {
+  console.log(entry.ref, entry.context, entry.cache);
+}
+
+// One entry in full. The model id may contain slashes, so it goes in the query string.
+const ref = "openrouter/anthropic/claude-opus-5.5";
+const { data } = await (await fetch(\`\${base}/entry?ref=\${encodeURIComponent(ref)}\`)).json();
+console.log(data.model.limit, data.model.providers_dev.cache?.observed);`;
+
+const curl = `# Search and filter
+curl 'https://providers.dev/api/v1/models?q=opus&cache=yes&min_context=500000&sort=context&order=desc'
+
+# One entry (URL-encode the ref)
+curl 'https://providers.dev/api/v1/entry?ref=openrouter%2Fanthropic%2Fclaude-opus-5.5'
+
+# One provider with all its models
+curl https://providers.dev/api/v1/providers/anthropic
+
+# Download only when the data changed
+curl -H 'If-None-Match: "${meta.dataset_version}"' -i https://providers.dev/api/v1/catalog   # 304 Not Modified
+
+# The models.dev-shaped export
+curl -sI https://providers.dev/api.json | grep -i x-dataset`;
+---
+
+<Base title="API" description="The read-only JSON API of providers.dev: endpoints, filters, the providers_dev extension and examples.">
+  <div class="prose">
+    <h1>API</h1>
+    <p class="lead">
+      A read-only JSON API over the same published snapshot this website is built from. No key, any origin (CORS is open), <code>GET</code> only. Requests never reach models.dev: everything
+      is served from our last published snapshot.
+    </p>
+
+    <h2 id="endpoints">Endpoints</h2>
+  </div>
+  <div class="scroll">
+    <table class="facts">
+      <thead><tr><th scope="col">Request</th><th scope="col">Returns</th></tr></thead>
+      <tbody>
+        <tr><th scope="row"><a href="/api/v1/models"><code>GET /api/v1/models</code></a></th><td>Provider-model entries as summaries: searchable, filterable, sorted, paged.</td></tr>
+        <tr><th scope="row"><code>GET /api/v1/entry?ref=…</code></th><td>One entry in full, with its provider and summary.</td></tr>
+        <tr><th scope="row"><a href="/api/v1/providers"><code>GET /api/v1/providers</code></a></th><td>The provider directory: id, name, access, counts.</td></tr>
+        <tr><th scope="row"><code>GET /api/v1/providers/&#123;providerId&#125;</code></th><td>One provider and all its models in full.</td></tr>
+        <tr><th scope="row"><a href="/api/v1/catalog"><code>GET /api/v1/catalog</code></a></th><td>The complete merged catalog, <code>&#123; meta, providers &#125;</code>. About 12 MB before compression.</td></tr>
+        <tr><th scope="row"><a href="/api/v1/meta"><code>GET /api/v1/meta</code></a></th><td>Dataset version, freshness, the upstream version, sync status, open issues.</td></tr>
+        <tr><th scope="row"><a href="/api/v1/openapi.json"><code>GET /api/v1/openapi.json</code></a></th><td>The OpenAPI 3.1 document.</td></tr>
+        <tr><th scope="row"><a href="/api.json"><code>GET /api.json</code></a></th><td>The merged catalog keyed by provider id, in the models.dev v2 structure, with no envelope.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="prose">
+    <h2 id="lookup">Naming one entry</h2>
+    <p>
+      An entry is a model at a provider. Its <code>ref</code> is <code>provider/model</code>. Provider ids never contain a slash, so the provider is everything before the first slash and the
+      model id is the rest, slashes included: <code>openrouter/anthropic/claude-opus-5.5</code> is model <code>anthropic/claude-opus-5.5</code> at provider <code>openrouter</code>.
+    </p>
+    <p>
+      Because model ids contain slashes (and sometimes <code>:</code>, <code>@</code> or <code>~</code>), the lookup takes the name in the query string, not the path. Either form works; URL-encode
+      the values:
+    </p>
+    <pre>/api/v1/entry?ref=openrouter%2Fanthropic%2Fclaude-opus-5.5
+/api/v1/entry?provider=openrouter&model=anthropic%2Fclaude-opus-5.5</pre>
+
+    <h2 id="filters">Filters for <code>/api/v1/models</code></h2>
+    <p>
+      Filters combine with <em>and</em>. A parameter that is not in this list, a value that is not allowed, or the same parameter given twice is answered with <code>400</code> and a list of
+      what is wrong. The catalog page of this site uses the same parameters in its own address, so any view there can be copied as an API request.
+    </p>
+  </div>
+  <div class="scroll">
+    <table class="facts">
+      <thead><tr><th scope="col">Parameter</th><th scope="col">Value</th><th scope="col">Meaning</th></tr></thead>
+      <tbody>
+        {
+          PARAMS.map((param) => (
+            <tr>
+              <th scope="row"><code>{param.name}</code></th>
+              <td>{param.values ? param.values.join(param.kind === "list" ? ", " : " | ") : param.kind === "integer" ? "whole number" : param.kind === "boolean" ? "true | false" : param.kind === "list" ? "comma-separated" : "text"}</td>
+              <td>{param.description}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="prose">
+    <h2 id="paging">Paging and order</h2>
+    <p>
+      <code>limit</code> is 1 to {MAX_LIMIT} (default {DEFAULT_LIMIT}); <code>offset</code> skips entries. The answer holds <code>total</code> and <code>next_offset</code>, which is
+      <code>null</code> on the last page. Order is fixed: the sort key, then provider id, then model id, so paging never repeats or skips an entry within one dataset version. Entries with no
+      value for the sort key come last in both directions.
+    </p>
+
+    <h2 id="unknown">Unknown, zero and unsupported</h2>
+    <ul>
+      <li>A limit that is <strong>absent</strong> is unknown. It is never written as 0, and it never matches <code>min_context</code> or <code>min_output</code>.</li>
+      <li><code>cache: "no"</code> means the source says the entry does not cache. <code>cache: "unknown"</code> means the source says nothing.</li>
+      <li><code>max_output</code> is a maximum. A provider's default output setting is a different thing and is not published as this field.</li>
+    </ul>
+
+    <h2 id="caching">Versions, freshness and conditional requests</h2>
+    <p>
+      Every answer carries <code>X-Dataset-Version</code> (a hash of the published data; it changes only when the data does), <code>X-Dataset-Generated-At</code> and
+      <code>X-Upstream-Fetched-At</code>. The <code>ETag</code> is the dataset version. Send it back as <code>If-None-Match</code> and you get <code>304</code> with no body until the data
+      changes. Answers may be cached for five minutes. Enveloped answers repeat the three values under <code>meta</code>; <code>/api.json</code> has no envelope, so there they are in the headers
+      only.
+    </p>
+    <p>
+      There are two version numbers and they are independent. <strong><code>v1</code></strong> in the path is the version of this API: its endpoints, parameters and envelope.
+      <strong>{meta.upstream_schema}</strong> is the schema of the model fields, which models.dev still calls experimental and may change; <code>/api/v1/meta</code> reports it as
+      <code>upstream_schema</code>.
+    </p>
+
+    <h2 id="errors">Errors</h2>
+    <p>Every error has the same shape, with the matching HTTP status (<code>400</code>, <code>404</code>, <code>405</code>, <code>503</code>):</p>
+    <pre>{`{ "error": { "code": "invalid_parameters", "message": "One or more query parameters are not valid.",
+             "details": [ { "param": "min_context", "message": "Must be a whole number, 0 or more." } ] } }`}</pre>
+
+    <h2 id="extension">What we add: <code>providers_dev</code></h2>
+    <p>
+      Provider and model objects keep the models.dev v2 fields with their upstream meaning. Everything of ours is under one key, <code>providers_dev</code>, so it cannot be mistaken for
+      upstream data.
+    </p>
+  </div>
+  <div class="scroll">
+    <table class="facts">
+      <thead><tr><th scope="col">Field</th><th scope="col">On</th><th scope="col">Meaning</th></tr></thead>
+      <tbody>
+        <tr><th scope="row"><code>origin</code></th><td>both</td><td><code>upstream</code>: imported from models.dev. <code>added</code>: models.dev has no such provider or entry.</td></tr>
+        <tr><th scope="row"><code>access</code></th><td>both</td><td><code>api</code>, <code>subscription</code> or <code>unknown</code>. A classification only.</td></tr>
+        <tr><th scope="row"><code>access_basis</code>, <code>access_reviewed</code>, <code>access_source</code></th><td>provider</td><td>Why the provider is classified that way, and whether we reviewed it or it follows from the default or the provider's name.</td></tr>
+        <tr><th scope="row"><code>provenance[]</code></th><td>both</td><td>One item per field of ours that replaced, hid or removed an upstream value: <code>path</code>, <code>op</code> (<code>set</code>, <code>unknown</code>, <code>delete</code>), the <code>upstream</code> value, our <code>value</code>, the <code>reason</code> and the <code>evidence</code>.</td></tr>
+        <tr><th scope="row"><code>cache.observed[]</code></th><td>model</td><td>Our cache measurements on this entry: route, client, options, date, warm checks by age, and the three summary ages (<code>all_warm_through_s</code>, <code>last_warm_s</code>, <code>first_all_cold_s</code>). Never merged into the documented <code>capabilities.cache</code>.</td></tr>
+        <tr><th scope="row"><code>limits.measured[]</code></th><td>model</td><td>Limits we measured on this entry: context, output, and the largest input accepted or refused. On an upstream entry they sit next to the documented <code>limit</code> and replace nothing.</td></tr>
+        <tr><th scope="row"><code>limits.from_measurement[]</code></th><td>model</td><td>On an entry we add, where there is no documented limit: which of <code>limit.context</code> and <code>limit.output</code> are our measured values.</td></tr>
+        <tr><th scope="row"><code>inherited</code></th><td>model</td><td>For an entry we add: which upstream entry its name, family and dates were taken from. Limits, caching and prices are never inherited.</td></tr>
+        <tr><th scope="row"><code>evidence[]</code></th><td>both</td><td>Sources for an entry or provider we add: <code>kind</code> (<code>documented</code>, <code>measured</code>, <code>listed</code>), <code>url</code>, <code>date</code>, <code>note</code>.</td></tr>
+        <tr><th scope="row"><code>verified</code></th><td>model</td><td>The newest date among our own evidence for the entry. Imported entries have none: imported is not verified.</td></tr>
+        <tr><th scope="row"><code>cache_known[]</code></th><td>provider</td><td>Cache lifetimes that a named client sets on this access, with the source.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="prose">
+    <h2 id="compat">How compatible <code>/api.json</code> is with models.dev</h2>
+    <ul>
+      <li>The root is an object keyed by provider id; each provider has <code>models</code> keyed by model id. Provider ids, model ids, <code>canonical_id</code> and field meanings are upstream's.</li>
+      <li>Every provider and model has one extra key, <code>providers_dev</code>. A strict v2 parser must allow or drop it.</li>
+      <li>Entries with <code>origin: "added"</code> hold only what we have evidence for. They can lack fields that models.dev requires (<code>modalities</code>, <code>capabilities</code>, <code>limit</code>, <code>cost</code>, <code>api</code>). Skip them, or treat missing as unknown.</li>
+      <li>Fields listed in <code>provenance</code> differ from upstream on purpose.</li>
+    </ul>
+    <p>So it is a superset in the same shape, not a byte-compatible mirror.</p>
+
+    <h2 id="examples">Examples</h2>
+    <h3>curl</h3>
+    <pre>{curl}</pre>
+    <h3>TypeScript</h3>
+    <pre>{ts}</pre>
+  </div>
+</Base>
