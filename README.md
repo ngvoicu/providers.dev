@@ -7,7 +7,7 @@ them**: context window, maximum output and prompt-cache behaviour, for API keys 
 
 The baseline is imported daily from [models.dev](https://models.dev) (MIT). On top of it this project keeps:
 
-- **providers models.dev does not list**, mainly subscription access (a Claude login, a ChatGPT plan through Codex,
+- **providers models.dev does not list**, mainly subscription access (Claude Code subscription, Codex subscription,
   Devin, Google Antigravity);
 - **corrections** to single fields, each with a reason and a source;
 - **evaluations** of cache lifetimes and limits from [groundtruth](https://github.com/ngvoicu/groundtruth),
