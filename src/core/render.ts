@@ -22,6 +22,9 @@ import { NS, type Evidence, type MeasuredLimit, type Measurement, type ModelExte
 
 const UNKNOWN = '<span class="unknown" title="The source does not say. Unknown is not zero and not unlimited.">Unknown</span>';
 const DASH = '<span class="muted">–</span>';
+/** Every entry page has the same rows. These fill a row whose value the source does not give. */
+const NOT_STATED = '<span class="muted" title="The source states no such value for this entry.">Not stated</span>';
+const IN_PLAN = '<span class="muted" title="No price per token: the entry is paid for through a plan or subscription, which providers.dev does not list.">In plan</span>';
 const ACCESS_LABEL = { api: "API key", subscription: "Subscription", unknown: "Unclassified" } as const;
 
 function tokens(value: number | undefined): string {
@@ -187,7 +190,7 @@ const record = (value: Json | undefined): JsonObject | undefined => (isObject(va
 
 function priceCell(entry: Pick<Summary, "price_in" | "price_out" | "price_from" | "access">): string {
   const { price_in: input, price_out: output } = entry;
-  const plan = '<span class="muted" title="No price per token: the entry is paid for through a plan or subscription, which providers.dev does not list.">In plan</span>';
+  const plan = IN_PLAN;
   if (input === undefined && output === undefined) return entry.access === "subscription" ? plan : UNKNOWN;
   // A listed 0 is shown as the source has it. It can mean free, or paid for another way: the page does not decide.
   if ((input ?? 0) === 0 && (output ?? 0) === 0) {
@@ -225,21 +228,19 @@ function priceSection(model: JsonObject, summary: Summary, source: string): stri
   const words = record(cost?.text);
   const input = record(words?.input);
   const output = record(words?.output);
-  if (!input && !output) {
-    return `<p class="hint">${summary.access === "api" ? "The source gives no price per token for this entry." : "No price per token: this entry is paid for through a plan or subscription. providers.dev does not list plans or their prices."}</p>`;
-  }
-  if ((summary.price_in ?? 0) === 0 && (summary.price_out ?? 0) === 0 && summary.price_in !== undefined) {
-    return `<p class="hint">The source lists a price of 0 per token. ${summary.access === "subscription" ? "This entry is paid for through a plan or subscription, not per token." : "That can mean free of charge, or paid for another way (a plan or a seat): check the provider."} providers.dev does not list plans or their prices.</p>`;
-  }
+  // Every entry has the same table. What differs is said in a note above it.
+  const priced = Boolean(input || output);
+  const zero = priced && (summary.price_in ?? 0) === 0 && (summary.price_out ?? 0) === 0 && summary.price_in !== undefined;
+  const absent = !priced && summary.access !== "api" ? IN_PLAN : UNKNOWN;
   const unit = typeof input?.unit === "string" ? `${e(input.unit)}s` : "tokens";
-  const amount = (value: Json | undefined): string => (typeof value === "number" ? usd(value) : UNKNOWN);
+  const amount = (value: Json | undefined): string => (typeof value === "number" ? usd(value) : absent);
   const cache = record(input?.cache);
   const rows = [
     fact("Input", "<code>cost.text.input.price</code>", amount(input?.price), source),
     fact("Output", "<code>cost.text.output.price</code>", amount(output?.price), source),
-    typeof output?.reasoning === "number" ? fact("Reasoning output", "<code>cost.text.output.reasoning</code>", usd(output.reasoning), source) : "",
-    typeof cache?.read === "number" ? fact("Cached input, read", "<code>cost.text.input.cache.read</code>: input served from the prompt cache.", usd(cache.read), source) : "",
-    cacheWrite(cache?.write) ? fact("Cached input, write", "<code>cost.text.input.cache.write</code>: input stored in the prompt cache, by lifetime where it differs.", cacheWrite(cache?.write) as string, source) : "",
+    fact("Reasoning output", "<code>cost.text.output.reasoning</code>: stated where reasoning is priced apart from the rest of the output.", typeof output?.reasoning === "number" ? usd(output.reasoning) : priced ? NOT_STATED : absent, source),
+    fact("Cached input, read", "<code>cost.text.input.cache.read</code>: input served from the prompt cache.", amount(cache?.read), source),
+    fact("Cached input, write", "<code>cost.text.input.cache.write</code>: input stored in the prompt cache, by lifetime where it differs.", cacheWrite(cache?.write) ?? absent, source),
   ].join("");
 
   // Changes to those prices. Only the two common conditions are put in words; the rest stay in the raw data.
@@ -268,18 +269,23 @@ function priceSection(model: JsonObject, summary: Summary, source: string): stri
   }
   const list =
     changes.size > 0 || other > 0
-      ? `<h3>Price changes</h3><ul class="changes">${[...changes].map(([when, parts]) => `<li><strong>${when}:</strong> ${parts.join(", ")}</li>`).join("")}${
+      ? `<ul class="changes">${[...changes].map(([when, parts]) => `<li><strong>${when}:</strong> ${parts.join(", ")}</li>`).join("")}${
           other > 0 ? `<li class="muted">${plural(other, "more condition")} (by region, time or a mix): see <code>cost</code> in the full record below.</li>` : ""
         }</ul>`
-      : "";
+      : `<p class="muted">${priced ? "None listed in the source: the prices above do not change by context size or service tier." : "None listed."}</p>`;
   const note = from
     ? `<p class="note">This entry is a subscription: it is <strong>not</strong> paid per token. These are the API list prices of <a href="${e(entryHref(from))}"><code>${e(from)}</code></a>, inherited so that a client can work out what the usage is worth.</p>`
-    : "";
+    : !priced
+      ? `<p class="note">${summary.access === "api" ? "The source gives no price per token for this entry. Unknown is not the same as free." : "No price per token: this entry is paid for through a plan or subscription. providers.dev does not list plans or their prices."}</p>`
+      : zero
+        ? `<p class="note">The source lists a price of 0 per token. ${summary.access === "subscription" ? "This entry is paid for through a plan or subscription, not per token." : "That can mean free of charge, or paid for another way (a plan or a seat): check the provider."} providers.dev does not list plans or their prices.</p>`
+        : "";
   return `${note}<div class="scroll"><table class="facts">
     <thead><tr><th scope="col">Price</th><th scope="col" class="num">US dollars per million ${unit}</th><th scope="col">Source</th></tr></thead>
     <tbody>${rows}</tbody>
   </table></div>
   <p class="hint">List prices as the source records them. Other kinds of use (web search, audio, images, video) are priced in <code>cost</code> in the full record below. A subscription's price is not a price per token and is not listed.</p>
+  <h3>Price changes</h3>
   ${list}`;
 }
 
@@ -321,7 +327,7 @@ function sourceOf(path: string, provenance: Provenance[], origin: ModelExtension
 
 function fact(label: string, hint: string, value: string, source: string): string {
   // An unknown value has no source to name, unless it was published as unknown on purpose.
-  if (value === UNKNOWN && !source.includes("Corrected")) source = DASH;
+  if ((value === UNKNOWN || value === NOT_STATED || value === IN_PLAN) && !source.includes("Corrected")) source = DASH;
   return `<tr><th scope="row">${label}<div class="hint">${hint}</div></th><td class="num">${value}</td><td>${source}</td></tr>`;
 }
 
@@ -418,10 +424,10 @@ ${members.length > 0 ? rows + together : `<tr class="part-empty"><td colspan="${
     if (lifetime) asked.set(`${lifetime.parameter}=${lifetime.value}`, [...(asked.get(`${lifetime.parameter}=${lifetime.value}`) ?? []), run]);
   }
   const parts = [
-    part("Default lifetime", "The request sends no lifetime parameter. This is the cache you get without asking for one.", plain, "Not evaluated: every evaluation on this entry sent a lifetime parameter."),
+    part("Default lifetime", "The request sends no lifetime parameter. This is the cache you get without asking for one.", plain, sorted.length === 0 ? "Not evaluated on this entry." : "Not evaluated: every evaluation on this entry sent a lifetime parameter."),
     ...(asked.size > 0
       ? [...asked].map(([sent, members]) => part("Long lifetime", `The request sends <code>${e(sent)}</code>.`, members, ""))
-      : [part("Long lifetime", "The request asks for a longer lifetime with a parameter.", [], "Not evaluated: no evaluation on this entry sent a lifetime parameter.")]),
+      : [part("Long lifetime", "The request asks for a longer lifetime with a parameter.", [], sorted.length === 0 ? "Not evaluated on this entry." : "Not evaluated: no evaluation on this entry sent a lifetime parameter.")]),
   ];
   return `<p class="hint max-w-3xl">Each evaluation caches a fresh prompt, then sends it again at set ages. A cell shows how many of the re-sends at that age were served from the cache: <code>3/3</code> is all of them. Every entry has the same columns; a column holds the checks up to its age and above the column before it, so <em>15 min</em> is 5 to 15 minutes. Hover a cell for the exact ages.</p>
 <div class="scroll mt-3"><table class="facts heat"><thead>${head}</thead><tbody>${parts.join("")}</tbody></table></div>
@@ -445,30 +451,40 @@ function measuredLimitRows(limits: MeasuredLimit[]): string {
     .join("");
 }
 
+/** Documented caching. Every entry has the same table: one row for each way of caching, supported or not. */
 function cacheDocumented(model: JsonObject, provenance: Provenance[], origin: ModelExtension["origin"]): string {
   const capabilities = isObject(model.capabilities) ? model.capabilities : {};
   const cache = capabilities.cache;
   const source = sourceOf("capabilities.cache", provenance, origin);
-  if (cache === false) return `<p>Documented: <strong>no prompt caching</strong> on this entry. ${source}</p>`;
-  if (!isObject(cache)) {
-    return `<p class="muted">${origin === "added" ? "No documentation is recorded for this access method." : "models.dev says nothing about caching for this entry. That is not the same as no caching."}</p>`;
-  }
-  const rows: string[] = [];
-  for (const mode of ["implicit", "explicit"] as const) {
-    const value = cache[mode];
-    if (value === undefined) continue;
+  const known = cache === false || isObject(cache);
+  const rows = (["implicit", "explicit"] as const).map((mode) => {
+    const value = isObject(cache) ? cache[mode] : undefined;
+    const supported = value !== undefined && value !== false;
     const detail = isObject(value) ? value : {};
+    const state = !known
+      ? UNKNOWN
+      : supported
+        ? "Yes"
+        : `<span class="muted" title="${cache === false ? "The source says this entry does not cache prompts." : "The source lists the other way of caching only. A way it does not list is not supported."}">No</span>`;
     const ttl = Array.isArray(detail.ttl) && detail.ttl.length > 0 ? detail.ttl.map((item) => `<span class="chip">${e(String(item))}</span>`).join(" ") : UNKNOWN;
-    rows.push(`<tr>
+    return `<tr>
 <th scope="row">${CACHE_MODE_WORD[mode]} <span class="chip">${mode}</span><div class="hint">${mode === "implicit" ? "The provider caches on its own." : "The request marks what to cache."}</div></th>
-<td>${ttl}</td>
-<td class="num">${typeof detail.min_tokens === "number" ? exact(detail.min_tokens) : UNKNOWN}</td>
-<td class="num">${mode === "explicit" ? (typeof detail.max_breakpoints === "number" ? exact(detail.max_breakpoints) : UNKNOWN) : DASH}</td>
-<td>${Array.isArray(detail.targets) ? e(detail.targets.join(", ")) : mode === "explicit" ? UNKNOWN : DASH}</td>
-</tr>`);
-  }
-  return `<div class="scroll"><table class="facts"><thead><tr><th scope="col">Mode</th><th scope="col">Lifetimes</th><th scope="col" class="num">Min. tokens</th><th scope="col" class="num">Breakpoints</th><th scope="col">Targets</th></tr></thead><tbody>${rows.join("")}</tbody></table></div>
-<p class="hint">Documented values. Source: ${source} Whether a cache read renews the lifetime is not recorded in the source.</p>`;
+<td>${state}</td>
+<td>${supported ? ttl : DASH}</td>
+<td class="num">${supported ? (typeof detail.min_tokens === "number" ? exact(detail.min_tokens) : UNKNOWN) : DASH}</td>
+<td class="num">${supported && mode === "explicit" ? (typeof detail.max_breakpoints === "number" ? exact(detail.max_breakpoints) : UNKNOWN) : DASH}</td>
+<td>${supported && mode === "explicit" ? (Array.isArray(detail.targets) ? e(detail.targets.join(", ")) : UNKNOWN) : DASH}</td>
+</tr>`;
+  });
+  const foot = !known
+    ? origin === "added"
+      ? "No documentation is recorded for this access method. That is not the same as no caching."
+      : "models.dev says nothing about caching for this entry. That is not the same as no caching."
+    : cache === false
+      ? `Documented: no prompt caching on this entry. Source: ${source}`
+      : `Documented values. Source: ${source} Whether a cache read renews the lifetime is not recorded in the source.`;
+  return `<div class="scroll"><table class="facts"><thead><tr><th scope="col">Mode</th><th scope="col">Supported</th><th scope="col">Lifetimes</th><th scope="col" class="num">Min. tokens</th><th scope="col" class="num">Breakpoints</th><th scope="col">Targets</th></tr></thead><tbody>${rows.join("")}</tbody></table></div>
+<p class="hint">${foot}</p>`;
 }
 
 function tile(label: string, value: string, foot: string, small = false): string {
@@ -540,17 +556,15 @@ export function entryHtml(view: EntryView): string {
     <thead><tr><th scope="col">Limit</th><th scope="col" class="num">Value</th><th scope="col">Source</th></tr></thead>
     <tbody>
       ${fact("Context window", "<code>limit.context</code>: what this provider accepts for the model, input and output together.", number(limit.context), sourceOf("limit.context", provenance, extension.origin, fromMeasurement))}
-      ${limit.input !== undefined || provenance.some((item) => item.path === "limit.input") ? fact("Largest input", "<code>limit.input</code>: stated where the input limit is lower than the context window.", number(limit.input), sourceOf("limit.input", provenance, extension.origin)) : ""}
+      ${fact("Largest input", "<code>limit.input</code>: stated where the input limit is lower than the context window.", limit.input !== undefined || provenance.some((item) => item.path === "limit.input") ? number(limit.input) : NOT_STATED, sourceOf("limit.input", provenance, extension.origin))}
       ${fact("Maximum output", "<code>limit.output</code>: the most one response can hold. A maximum, not what you get by default.", number(limit.output), sourceOf("limit.output", provenance, extension.origin, fromMeasurement))}
     </tbody>
   </table></div>
   <p class="hint">Usable context is smaller than the window by the system prompt and tool definitions of the client in use. That overhead varies, so no usable figure is published. An agent's compaction threshold is a client setting, not a limit of this entry.</p>
   <h3>Measured</h3>
-  ${
-    measuredLimits.length > 0
-      ? `<div class="scroll"><table class="facts"><thead><tr><th scope="col">Date</th><th scope="col">Measured through</th><th scope="col">Result</th><th scope="col">Evidence</th></tr></thead><tbody>${measuredLimitRows(measuredLimits)}</tbody></table></div>`
-      : '<p class="muted">No limits were measured on this entry.</p>'
-  }
+  <div class="scroll"><table class="facts"><thead><tr><th scope="col">Date</th><th scope="col">Measured through</th><th scope="col">Result</th><th scope="col">Evidence</th></tr></thead><tbody>${
+    measuredLimits.length > 0 ? measuredLimitRows(measuredLimits) : '<tr class="empty-row"><td colspan="4" class="muted">No limits were measured on this entry.</td></tr>'
+  }</tbody></table></div>
 </section>
 
 <section aria-labelledby="price">
@@ -563,7 +577,7 @@ export function entryHtml(view: EntryView): string {
   <h3>Documented</h3>
   ${cacheDocumented(model, provenance, extension.origin)}
   <h3>Measured</h3>
-  ${runs.length > 0 ? heatmap(runs, now) : '<p class="muted">No evaluations on this entry.</p>'}
+  ${heatmap(runs, now)}
 </section>
 
 <section aria-labelledby="provenance">
