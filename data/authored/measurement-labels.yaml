@@ -1,15 +1,18 @@
 # How the measurement file's client ids are named in what we publish, and which note parts are left out.
 # The raw results stay linked from every measurement for anyone who wants the full setup.
+#
+# CLIProxyAPI is named (owner, 2026-11-13): a reader has to know which proxy a result went through to judge or
+# repeat it. The coding agent used on top of it is not named.
 clients:
   direct:
     id: direct
     label: Requests sent straight to the provider
   cliproxyapi:
-    id: gateway
-    label: Requests sent through an API gateway
+    id: cliproxyapi
+    label: Requests sent through CLIProxyAPI
   pi+cliproxyapi:
-    id: agent-gateway
-    label: A coding agent, through an API gateway
+    id: agent+cliproxyapi
+    label: A coding agent, through CLIProxyAPI
   codex-cli:
     id: codex-cli
     label: OpenAI's Codex CLI
@@ -19,7 +22,5 @@ clients:
   muse-code:
     id: muse-code
     label: Meta's Muse Code CLI
-# A note is split on ";". A part that mentions one of these is not published.
-omit_note_parts_mentioning:
-  - CLIProxyAPI
-  - router-for-me
+# A note is split on ";". A part that mentions one of these words is not published. Empty: nothing is left out.
+omit_note_parts_mentioning: []

@@ -51,10 +51,10 @@ The baseline is imported from models.dev; our additions, corrections and measure
   evaluations as a table with one column per age and a `3/3`-style value per cell.
 - Each source carries its own date: the import date next to `models.dev`, the newest evidence next to
   `providers.dev`.
-- Do not name the tools a measurement was taken with, other than a vendor's own CLI. Client ids from the
-  measurement file are published under the neutral names in `data/authored/measurement-labels.yaml`, note parts
-  that mention a tool on its omit list are dropped, and runs marked `lacks` are not published. A new client id must
-  be added to that file (the build warns and publishes it as "other").
+- A measurement names the client it went through: the provider directly, CLIProxyAPI, or a vendor's own CLI. The
+  coding agent used on top of CLIProxyAPI is not named ("A coding agent, through CLIProxyAPI"). The public names
+  are in `data/authored/measurement-labels.yaml`; a new client id must be added there (the build warns and publishes
+  it as "other"). Runs marked `lacks` are not published: they say something about a proxy build, not a provider.
 
 ## Commands
 

@@ -154,7 +154,7 @@ Models that exist only because they were evaluated do not need to be listed by h
 `data/authored/routes.yaml` maps to one of our providers creates the entry.
 
 `data/authored/measurement-labels.yaml` gives each client of the measurement file its public name (for example
-"Requests sent through an API gateway") and lists words whose note parts are not published. Runs marked `lacks` in
+"Requests sent through CLIProxyAPI") and can list words whose note parts are not published. Runs marked `lacks` in
 the measurement file are skipped.
 
 ### Evidence requirements
