@@ -2,7 +2,7 @@
 // built snapshot; the tests call it with the same files. It never fetches anything outside the snapshot.
 import type { Index, Summary } from "./entries.ts";
 import { openapi } from "./openapi.ts";
-import { parseQuery, runQuery } from "./query.ts";
+import { parseQuery, runQuery, utcToday } from "./query.ts";
 import type { Meta } from "./schema.ts";
 
 export interface ApiDeps {
@@ -59,12 +59,12 @@ export async function handleApi(request: Request, deps: ApiDeps): Promise<Respon
   }
 
   const etag = `"${meta.dataset_version}"`;
-  const send = (body: BodyInit | null): Response => {
-    const responseHeaders = headers(meta, { ETag: etag });
-    if (etagMatches(request, etag)) return new Response(null, { status: 304, headers: responseHeaders });
+  const send = (body: BodyInit | null, tag: string = etag): Response => {
+    const responseHeaders = headers(meta, { ETag: tag });
+    if (etagMatches(request, tag)) return new Response(null, { status: 304, headers: responseHeaders });
     return new Response(request.method === "HEAD" ? null : body, { status: 200, headers: responseHeaders });
   };
-  const sendJson = (value: unknown): Response => send(JSON.stringify(value));
+  const sendJson = (value: unknown, tag?: string): Response => send(JSON.stringify(value), tag);
   const sendFile = async (file: string): Promise<Response> => {
     if (etagMatches(request, etag)) return send(null);
     const asset = await deps.asset(file);
@@ -95,8 +95,10 @@ export async function handleApi(request: Request, deps: ApiDeps): Promise<Respon
   if (path === `${BASE}/models`) {
     const parsed = parseQuery(url.searchParams, true);
     if (!parsed.ok) return fail(meta, 400, "invalid_parameters", "One or more query parameters are not valid.", parsed.errors);
-    const result = runQuery(index.entries, parsed.query);
-    return sendJson({ meta: brief(meta), ...result });
+    // An answer that counts back from today changes with the day, so the day is part of its ETag.
+    const today = utcToday();
+    const result = runQuery(index.entries, parsed.query, today);
+    return sendJson({ meta: brief(meta), ...result }, parsed.query.max_age_months === undefined ? undefined : `"${meta.dataset_version}-${today}"`);
   }
 
   if (path === `${BASE}/entry`) {

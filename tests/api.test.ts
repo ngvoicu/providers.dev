@@ -57,6 +57,37 @@ describe("GET /api/v1/models", () => {
     expect((await get("/api/v1/models?limit=0")).status).toBe(400);
   });
 
+  it("keeps only the models released in the last N months", async () => {
+    const { monthsBefore } = await import("../src/core/query.ts");
+    expect(monthsBefore("2026-11-13", 6)).toBe("2026-05-13");
+    expect(monthsBefore("2026-01-13", 3)).toBe("2025-10-13");
+    expect(monthsBefore("2026-05-31", 3)).toBe("2026-02-28");
+    expect(monthsBefore("2026-11-13", 24)).toBe("2024-11-13");
+
+    const entry = (ref: string, release_date?: string) => ({ ref, provider: "p", model: ref, release_date }) as unknown as Summary;
+    const entries = [entry("old", "2026-05-12"), entry("edge", "2026-05-13"), entry("new", "2026-10-01"), entry("month", "2026-05"), entry("old-month", "2026-04"), entry("undated")];
+    const run = (months: string) => {
+      const parsed = parseQuery(new URLSearchParams(`max_age_months=${months}`));
+      if (!parsed.ok) throw new Error("not a valid query");
+      return runQuery(entries, parsed.query, "2026-11-13").data.map((item) => item.ref);
+    };
+    // Six months back from 13 November is 13 May. A date known only to the month counts when the month is in range. No date, no match.
+    expect(run("6")).toEqual(["edge", "month", "new"]);
+    expect(run("1")).toEqual([]);
+    expect(run("600")).toEqual(["edge", "month", "new", "old", "old-month"]);
+
+    expect((await get("/api/v1/models?max_age_months=0")).status).toBe(400);
+    expect((await get("/api/v1/models?max_age_months=601")).status).toBe(400);
+    // Every entry of the fixture has a date except the added one, which takes its date from the entry it names.
+    const all = await get("/api/v1/models?max_age_months=600&limit=1");
+    expect(((await all.json()) as Page).total).toBe(601);
+    // The answer depends on the day, so the day is in its ETag; without the filter it is the dataset version alone.
+    const today = new Date().toISOString().slice(0, 10);
+    expect(all.headers.get("ETag")).toMatch(new RegExp(`^"[0-9a-f]+-${today}"$`));
+    expect((await get("/api/v1/models?limit=1")).headers.get("ETag")).toMatch(/^"[0-9a-f]+"$/);
+    expect((await get("/api/v1/models?max_age_months=600&limit=1", { headers: { "If-None-Match": all.headers.get("ETag") ?? "" } })).status).toBe(304);
+  });
+
   it("filters by provider, access, origin and type", async () => {
     const byProvider = await json<Page>("/api/v1/models?provider=provider-03,provider-04&limit=200");
     expect(byProvider.total).toBe(40);

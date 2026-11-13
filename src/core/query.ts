@@ -9,6 +9,7 @@ export type SortKey = (typeof SORT_KEYS)[number];
 export const SITE_DEFAULT = "sort=verified&order=desc";
 
 export const MAX_LIMIT = 200;
+export const MAX_AGE_MONTHS = 600;
 export const DEFAULT_LIMIT = 50;
 
 export interface Query {
@@ -23,6 +24,7 @@ export interface Query {
   cache_mode?: string[];
   min_context?: number;
   min_output?: number;
+  max_age_months?: number;
   measured?: boolean;
   sort: SortKey;
   order: "asc" | "desc";
@@ -50,6 +52,7 @@ export const PARAMS: ParamDoc[] = [
   { name: "cache_mode", kind: "list", values: ["implicit", "explicit"], description: "implicit = the provider caches on its own; explicit = the request marks what to cache." },
   { name: "min_context", kind: "integer", description: "Smallest context window, in tokens, that this provider exposes for the model (limit.context). Entries with an unknown window do not match." },
   { name: "min_output", kind: "integer", description: "Smallest maximum response size, in tokens (limit.output). A maximum, not a default. Entries with an unknown maximum do not match." },
+  { name: "max_age_months", kind: "integer", description: `Only models released in the last N months, counted back from today (UTC), 1 to ${MAX_AGE_MONTHS}. A release date given only to the month counts when that month is in range. Entries with an unknown release date do not match.` },
   { name: "measured", kind: "boolean", description: "true = only entries with providers.dev cache evaluations; false = only entries without." },
   { name: "sort", kind: "enum", values: SORT_KEYS, description: "Sort key. Ties are broken by provider id, then model id. Entries with no value for the key come last in either order." },
   { name: "order", kind: "enum", values: ["asc", "desc"], description: "Sort direction." },
@@ -107,6 +110,7 @@ export function parseQuery(params: URLSearchParams, strict = true): ParseResult 
       const number = /^\d+$/.test(value) ? Number(value) : Number.NaN;
       if (!Number.isSafeInteger(number)) errors.push({ param: name, message: "Must be a whole number, 0 or more." });
       else if (name === "limit" && (number < 1 || number > MAX_LIMIT)) errors.push({ param: name, message: `Must be between 1 and ${MAX_LIMIT}.` });
+      else if (name === "max_age_months" && (number < 1 || number > MAX_AGE_MONTHS)) errors.push({ param: name, message: `Must be between 1 and ${MAX_AGE_MONTHS}.` });
       else query[name] = number;
     }
   }
@@ -128,7 +132,22 @@ export function serializeQuery(query: Partial<Query>): string {
   return out.toString();
 }
 
-function matches(entry: Summary, query: Query, words: string[]): boolean {
+/** The date `months` calendar months before `today` (both YYYY-MM-DD). The 31st counts back to the last day of a shorter month. */
+export function monthsBefore(today: string, months: number): string {
+  const [year = 0, month = 1, day = 1] = today.split("-").map(Number);
+  const index = year * 12 + (month - 1) - months;
+  const y = Math.floor(index / 12);
+  const m = index - y * 12;
+  const lastDay = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
+  return `${String(y).padStart(4, "0")}-${String(m + 1).padStart(2, "0")}-${String(Math.min(day, lastDay)).padStart(2, "0")}`;
+}
+
+/** Today in UTC, as YYYY-MM-DD. */
+export const utcToday = (): string => new Date().toISOString().slice(0, 10);
+
+function matches(entry: Summary, query: Query, words: string[], releasedSince: string | undefined): boolean {
+  // A date known only to the month ("2026-05") is compared at that precision.
+  if (releasedSince !== undefined && !(entry.release_date !== undefined && entry.release_date >= releasedSince.slice(0, entry.release_date.length))) return false;
   if (query.provider && !query.provider.includes(entry.provider)) return false;
   if (query.family && entry.family !== query.family) return false;
   if (query.canonical_id && entry.canonical_id !== query.canonical_id) return false;
@@ -180,9 +199,11 @@ export interface QueryResult {
   data: Summary[];
 }
 
-export function runQuery(entries: readonly Summary[], query: Query): QueryResult {
+/** `today` (YYYY-MM-DD, UTC) is what max_age_months counts back from. Everything else is a pure function of the entries and the query. */
+export function runQuery(entries: readonly Summary[], query: Query, today: string = utcToday()): QueryResult {
   const words = (query.q ?? "").toLowerCase().split(/\s+/).filter(Boolean);
-  const found = entries.filter((entry) => matches(entry, query, words));
+  const releasedSince = query.max_age_months === undefined ? undefined : monthsBefore(today, query.max_age_months);
+  const found = entries.filter((entry) => matches(entry, query, words, releasedSince));
   const direction = query.order === "desc" ? -1 : 1;
   found.sort((a, b) => {
     const left = sortValue(a, query.sort);

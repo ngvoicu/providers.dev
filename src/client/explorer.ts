@@ -2,7 +2,7 @@
 // and it keeps the filters in the URL so a view can be shared.
 import type { Index } from "../core/entries.ts";
 import { exact, importDate } from "../core/format.ts";
-import { parseQuery, runQuery, serializeQuery, SITE_DEFAULT, type Query, type SortKey } from "../core/query.ts";
+import { parseQuery, runQuery, serializeQuery, SITE_DEFAULT, utcToday, type Query, type SortKey } from "../core/query.ts";
 import { rowHtml, tableHead } from "../core/render.ts";
 
 const form = document.getElementById("filters") as HTMLFormElement;
@@ -19,7 +19,7 @@ const apiLink = document.getElementById("api-link") as HTMLAnchorElement;
 const apiCopy = document.getElementById("api-copy") as HTMLButtonElement;
 const now = new Date(table.dataset.now ?? Date.now());
 
-const FIELDS = ["q", "provider", "access", "type", "cache", "cache_mode", "origin", "min_context", "min_output", "measured"] as const;
+const FIELDS = ["q", "provider", "access", "type", "cache", "cache_mode", "origin", "min_context", "min_output", "max_age_months", "measured"] as const;
 
 let index: Index | undefined;
 let providerNames: Record<string, string> = {};
@@ -66,7 +66,12 @@ function fillForm(): void {
     const element = control(name);
     if (!element) continue;
     const value = query[name];
-    element.value = value === undefined ? "" : Array.isArray(value) ? value.join(",") : String(value);
+    const text = value === undefined ? "" : Array.isArray(value) ? value.join(",") : String(value);
+    // A shared link may carry a number of months the list does not offer: it gets its own option.
+    if (name === "max_age_months" && element instanceof HTMLSelectElement && text && ![...element.options].some((option) => option.value === text)) {
+      element.add(new Option(`Last ${text} months`, text));
+    }
+    element.value = text;
   }
 }
 
@@ -105,7 +110,7 @@ function render(): void {
   head.innerHTML = tableHead({ sortable: true, sort: query.sort, order: query.order });
   if (!index) return;
 
-  const result = runQuery(index.entries, query);
+  const result = runQuery(index.entries, query, utcToday());
   const imported = importDate(index);
   rows.innerHTML = result.data.map((entry) => rowHtml(entry, { now, providerNames, ...(imported ? { imported } : {}) })).join("");
   const all = index.entries.length;
@@ -147,7 +152,7 @@ head.addEventListener("click", (event) => {
   if (!button) return;
   const key = button.dataset.sort as SortKey;
   // Numbers and dates are most useful largest or newest first.
-  const firstOrder = key === "context" || key === "max_output" || key === "verified" || key === "release_date" ? "desc" : "asc" // a price starts at the cheapest;
+  const firstOrder = key === "context" || key === "max_output" || key === "verified" || key === "release_date" ? "desc" : "asc"; // a price starts at the cheapest
   query.order = query.sort === key ? (query.order === "asc" ? "desc" : "asc") : firstOrder;
   query.sort = key;
   query.offset = 0;

@@ -1,5 +1,5 @@
 // The OpenAPI document, generated from the same parameter list the API validates with.
-import { DEFAULT_LIMIT, MAX_LIMIT, PARAMS } from "./query.ts";
+import { DEFAULT_LIMIT, MAX_AGE_MONTHS, MAX_LIMIT, PARAMS } from "./query.ts";
 
 const errorResponse = (description: string) => ({
   description,
@@ -21,7 +21,9 @@ function queryParameters(): Record<string, unknown>[] {
   return PARAMS.map((param) => {
     const schema: Record<string, unknown> =
       param.kind === "integer"
-        ? { type: "integer", minimum: param.name === "limit" ? 1 : 0, ...(param.name === "limit" ? { maximum: MAX_LIMIT, default: DEFAULT_LIMIT } : {}) }
+        ? param.name === "max_age_months"
+          ? { type: "integer", minimum: 1, maximum: MAX_AGE_MONTHS }
+          : { type: "integer", minimum: param.name === "limit" ? 1 : 0, ...(param.name === "limit" ? { maximum: MAX_LIMIT, default: DEFAULT_LIMIT } : {}) }
         : param.kind === "boolean"
           ? { type: "boolean" }
           : param.kind === "enum"

@@ -74,13 +74,24 @@ const subscriptions = index.providers.filter((provider) => provider.access === "
           <input name="min_output" inputmode="numeric" placeholder="64000" autocomplete="off" aria-describedby="hint-output" />
           <span id="hint-output" class="hint">The largest single response, not a default. Entries with an unknown maximum are excluded.</span>
         </label>
+        <label class="field col-span-2">Released
+          <select name="max_age_months" aria-describedby="hint-released">
+            <option value="">Any time</option>
+            <option value="1">Last month</option>
+            <option value="3">Last 3 months</option>
+            <option value="6">Last 6 months</option>
+            <option value="12">Last 12 months</option>
+            <option value="24">Last 2 years</option>
+          </select>
+          <span id="hint-released" class="hint">Hides older models. Entries with an unknown release date are excluded.</span>
+        </label>
       </div>
     </details>
     <script is:inline>
       // Filters are always open on wide screens, and on small ones when the address already carries a filter.
       (function () {
         var more = document.getElementById("more-filters");
-        var filtered = /[?&](provider|access|type|cache|cache_mode|origin|measured|min_context|min_output)=/.test(location.search);
+        var filtered = /[?&](provider|access|type|cache|cache_mode|origin|measured|min_context|min_output|max_age_months)=/.test(location.search);
         if (matchMedia("(min-width: 640px)").matches || filtered) more.open = true;
       })();
     </script>
