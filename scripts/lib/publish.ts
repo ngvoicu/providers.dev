@@ -104,7 +104,10 @@ export function publish(input: PublishOptions): PublishReport {
   if (errors.length > 0) return { ok: false, errors, issues };
 
   const generatedAt = options.now().toISOString();
-  const datasetVersion = sha256(compact({ catalog, exclusions })).slice(0, 16);
+  // The version covers everything a reader can get: the catalog and the summaries made from it. A new summary field
+  // changes the version (and with it every ETag) also when the catalog itself did not change.
+  const draft = buildIndex(catalog, "", generatedAt, upstream.meta.fetched_at);
+  const datasetVersion = sha256(compact({ catalog, exclusions, providers: draft.providers, entries: draft.entries })).slice(0, 16);
   const index = buildIndex(catalog, datasetVersion, generatedAt, upstream.meta.fetched_at);
   const observedMeta = readJsonIfExists<SourceMeta>(join(dataDir, "sources", "observed.meta.json"));
   const status = readJsonIfExists<SyncStatus>(join(dataDir, "sync-status.json"));

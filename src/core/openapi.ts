@@ -194,7 +194,8 @@ export function openapi(): Record<string, unknown> {
                 type: "object",
                 required: ["evaluations", "bands"],
                 properties: {
-                  asked: { type: "string", description: "The lifetime the requests asked for (ttl or prompt_cache_retention), for example 1h. Absent = none asked." },
+                  asked: { type: "string", description: "The lifetime the requests asked for, for example 1h. Absent = none asked: the default lifetime." },
+                  parameter: { type: "string", description: "The request parameter that carried `asked`: ttl or prompt_cache_retention. Present with `asked`." },
                   evaluations: { type: "integer" },
                   bands: {
                     type: "array",

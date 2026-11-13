@@ -104,8 +104,8 @@ describe("cache evaluations taken together", () => {
     expect(pooled).toEqual([
       // 2.5 minutes has its own band; 10 and 15 minutes share one; two days falls in the last one. A check that was not made counts nowhere.
       { evaluations: 2, bands: [{ up_to_s: 150, warm: 3, total: 3 }, { up_to_s: 300, warm: 5, total: 6 }, { up_to_s: 900, warm: 4, total: 6 }, { up_to_s: 43200, warm: 0, total: 3 }, { up_to_s: 86400, warm: 0, total: 3 }] },
-      { asked: "1h", evaluations: 1, bands: [{ up_to_s: 3600, warm: 3, total: 3 }] },
-      { asked: "24h", evaluations: 1, bands: [{ up_to_s: 3600, warm: 2, total: 3 }] },
+      { asked: "1h", parameter: "ttl", evaluations: 1, bands: [{ up_to_s: 3600, warm: 3, total: 3 }] },
+      { asked: "24h", parameter: "prompt_cache_retention", evaluations: 1, bands: [{ up_to_s: 3600, warm: 2, total: 3 }] },
     ]);
     expect(poolCache([])).toEqual([]);
   });

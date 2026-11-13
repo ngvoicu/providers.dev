@@ -652,12 +652,19 @@
       display: table-cell;
     }
   }
-  /* With every column shown the catalog is nine wide: a little less air between them keeps it inside the page */
+  /* From seven columns up, a little less air between them keeps the catalog inside the page */
+  @media (min-width: 1200px) {
+    table.entries th,
+    table.entries td {
+      padding-left: 0.6rem;
+      padding-right: 0.6rem;
+    }
+  }
   @media (min-width: 1440px) {
     table.entries th,
     table.entries td {
-      padding-left: 0.7rem;
-      padding-right: 0.7rem;
+      padding-left: 0.5rem;
+      padding-right: 0.5rem;
     }
   }
   .entry-head .released {
@@ -718,7 +725,31 @@
     }
   }
   table.heat tr.together > * {
+    border-top: 1px dashed var(--line);
+  }
+  /* The two parts of every entry's table: the default lifetime and the long one */
+  table.heat tbody tr.part > th {
+    position: static;
+    padding-top: 0.7rem;
+    padding-bottom: 0.55rem;
     border-top: 2px solid var(--line);
+    background: var(--bg-subtle);
+    font-weight: 400;
+  }
+  table.heat tbody tr.part:first-child > th {
+    border-top: 0;
+  }
+  table.heat tr.part strong {
+    margin-right: 0.6rem;
+    font-weight: 600;
+  }
+  table.heat tr.part .hint {
+    display: inline;
+  }
+  table.heat tr.part-empty > td {
+    padding-top: 0.8rem;
+    padding-bottom: 0.8rem;
+    font-size: 0.86rem;
   }
   table.heat td.heat {
     min-width: 0;
@@ -896,29 +927,42 @@
   .strip .skip {
     border: 1px dashed var(--line);
   }
-  .strip-head {
-    margin-top: 0.3rem;
-  }
-  .strip-head > span {
+
+  .strip-head .strip > span {
     height: auto;
     color: var(--muted);
     font-size: 0.64rem;
     font-weight: 400;
     line-height: 1.2;
   }
-  a.heat-strip {
-    display: inline-flex;
-    flex-direction: column;
-    gap: 0.2rem;
+  /* Every line of the measured cell: what the requests sent, then the cells. The column head has the same grid. */
+  .heat-strip {
+    display: inline-grid;
+    grid-template-columns: 3.4rem auto;
+    gap: 3px 0.4rem;
+    align-items: center;
     text-decoration: none;
   }
-  .strip-note {
-    color: var(--muted);
-    font-size: 0.72rem;
-    line-height: 1.2;
+  /* In the column head the ages sit on a line of their own, under the title, over the cells of every row */
+  .heat-strip.strip-head {
+    display: grid;
+    justify-content: start;
+    margin-top: 0.3rem;
   }
-  .strip + .strip-note + .strip {
-    margin-top: 0.25rem;
+  .strip-label {
+    color: var(--fg-soft);
+    font-size: 0.72rem;
+    line-height: 1.25rem;
+    white-space: nowrap;
+  }
+  .strip-label b {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 500;
+    color: var(--fg);
+  }
+  .strip-label.none {
+    color: var(--muted);
   }
 
   /* Labels */

@@ -1,6 +1,6 @@
 // HTML for the entry table and the entry detail view. The same functions build the static pages and
 // re-render in the browser, so a row looks and reads the same wherever it appears.
-import { CACHE_BANDS_S, type PooledCache, type ProviderSummary, type Summary } from "./entries.ts";
+import { askedLifetime, cacheBand, CACHE_BANDS_S, type PooledCache, type ProviderSummary, type Summary } from "./entries.ts";
 import {
   compactTokens,
   duration,
@@ -91,30 +91,45 @@ function contextCell(entry: Summary, href: string): string {
 
 const bandLabel = (seconds: number): string => (seconds < 3600 ? `${seconds / 60}m` : `${seconds / 3600}h`); // 150 -> "2.5m"
 
-/** The ages of the heat strip, written once in the column head so that every row lines up under them. */
-const STRIP_HEAD = `<span class="strip strip-head" aria-hidden="true">${CACHE_BANDS_S.map((limit) => `<span>${bandLabel(limit)}</span>`).join("")}</span>`;
+/** What a band covers, in words: "Up to 2.5 min", "5 min to 15 min". */
+const bandSpan = (limit: number): string => {
+  const at = CACHE_BANDS_S.indexOf(limit as (typeof CACHE_BANDS_S)[number]);
+  return `${at <= 0 ? "Up to" : `${shortAge(CACHE_BANDS_S[at - 1] as number)} to`} ${shortAge(limit)}`;
+};
 
-/** One row of cells, one per age band: the share of re-sends at that age that were served from the cache, in percent. */
-function strip(group: PooledCache): string {
-  const byBand = new Map(group.bands.map((band) => [band.up_to_s, band]));
-  const cells = CACHE_BANDS_S.map((limit, at) => {
-    const from = at === 0 ? "Up to" : `${duration(CACHE_BANDS_S[at - 1] as number)} to`;
+/** The ages of the heat strip, written once in the column head so that every row lines up under them. */
+const STRIP_HEAD = `<span class="heat-strip strip-head" aria-hidden="true"><span></span><span class="strip">${CACHE_BANDS_S.map((limit) => `<span>${bandLabel(limit)}</span>`).join("")}</span></span>`;
+
+/**
+ * One line of the measured cell: what the requests sent, then one cell per age band with the share of re-sends at that
+ * age that were served from the cache, in percent. A line without evaluations keeps its place, with empty cells.
+ */
+function strip(group: PooledCache | undefined, long: boolean): string {
+  const byBand = new Map((group?.bands ?? []).map((band) => [band.up_to_s, band]));
+  const cells = CACHE_BANDS_S.map((limit) => {
     const band = byBand.get(limit);
-    if (!band) return `<span class="skip" title="${from} ${duration(limit)}: not checked"></span>`;
+    if (!band) return `<span class="skip" title="${bandSpan(limit)}: not checked"></span>`;
     const share = band.warm / band.total;
     const level = share === 1 ? "all" : share === 0 ? "none" : share >= 0.5 ? "most" : "few";
-    return `<span class="${level}" title="${from} ${duration(limit)}: ${band.warm} of ${band.total} re-sends served from the cache">${Math.round(share * 100)}</span>`;
+    return `<span class="${level}" title="${bandSpan(limit)}: ${band.warm} of ${band.total} re-sends served from the cache">${Math.round(share * 100)}</span>`;
   }).join("");
-  const note = `${group.asked ? `asked for ${e(group.asked)} · ` : ""}${plural(group.evaluations, "evaluation")}`;
-  return `<span class="strip">${cells}</span><span class="strip-note">${note}</span>`;
+  const count = group ? plural(group.evaluations, "evaluation") : "Not evaluated";
+  const label = long
+    ? `<span class="strip-label${group ? "" : " none"}" title="${e(group?.asked ? `The requests asked for a longer lifetime with ${group.parameter ?? "a parameter"}=${group.asked}. ${count}.` : "A longer cache lifetime, asked for with a request parameter. Not evaluated on this entry.")}">Long${group?.asked ? ` <b>${e(group.asked)}</b>` : ""}</span>`
+    : `<span class="strip-label${group ? "" : " none"}" title="The requests sent no lifetime parameter: the provider's default cache. ${count}.">Default</span>`;
+  return `${label}<span class="strip">${cells}</span>`;
 }
 
+/**
+ * Every evaluated entry shows the same lines: Default (no lifetime parameter sent) and Long (a lifetime parameter sent),
+ * each over the same ages. Measured limits are not shown here: they are on the entry's page.
+ */
 function measuredCell(entry: Summary, href: string): string {
-  if (entry.evaluations === 0) return entry.measured_limits > 0 ? `<a class="measured" href="${e(href)}#limits">Limits measured</a>` : DASH;
-  const groups = (entry.measured_cache ?? []).filter((group) => group.bands.length > 0);
-  // Evaluations that made no check have nothing to draw.
-  if (groups.length === 0) return `<a class="measured" href="${e(href)}#cache" title="Open the entry for the results.">${plural(entry.evaluations, "evaluation")}</a>`;
-  return `<a class="plain heat-strip" href="${e(href)}#cache" aria-label="Cache evaluations by age. Open the entry for each one.">${groups.map(strip).join("")}</a>`;
+  if (entry.evaluations === 0) return DASH;
+  const groups = entry.measured_cache ?? [];
+  const asked = groups.filter((group) => group.asked);
+  const lines = [strip(groups.find((group) => !group.asked), false), ...(asked.length > 0 ? asked.map((group) => strip(group, true)) : [strip(undefined, true)])];
+  return `<a class="plain heat-strip" href="${e(href)}#cache" aria-label="Cache evaluations by age. Open the entry for each one.">${lines.join("")}</a>`;
 }
 
 export interface RowOptions {
@@ -143,7 +158,7 @@ ${column("max_output", "Max output", "Largest single response in tokens (limit.o
 ${column("price_in", "Price in / out", "List price in US dollars per million tokens, input then output, as models.dev records it. Before the changes some providers make by context size or service tier: open the entry for those. On a subscription entry, the line API price marks the price of the same model at the API.", "num mid-only")}
 ${column("release_date", "Released", "When the model was released, as models.dev records it. It is the model's date: the same at every provider.", "wide-only")}
 ${column(null, "Cache, documented", "Prompt caching as the source documents it: mode and lifetimes.")}
-<th scope="col" class="strip-col"><span title="providers.dev evaluations, all clients together. Each cell is an age since the prompt was cached; the number is the share of re-sends at that age that were served from the cache, in percent. Hover a cell for the counts.">Cache, measured <span class="muted">% by age</span></span>${STRIP_HEAD}</th>
+<th scope="col" class="strip-col"><span title="providers.dev evaluations, all clients together. Each cell is an age since the prompt was cached; the number is the share of re-sends at that age that were served from the cache, in percent. Default: the requests sent no lifetime parameter. Long: they asked for a longer lifetime with a parameter (ttl or prompt_cache_retention), and the value is shown. Hover a cell for the counts.">Cache, measured <span class="muted">% by age</span></span>${STRIP_HEAD}</th>
 ${column("verified", "Source", "Where the entry comes from, with a date per source: the import from models.dev, and the newest providers.dev evidence.")}
 </tr>`;
 }
@@ -318,64 +333,98 @@ function optionsText(options: JsonObject | undefined): string {
 }
 
 type Check = { warm: number; total: number };
+type AgedCheck = Check & { age_s: number };
 
-function heatCell(check: Check | undefined, when: string): string {
-  if (!check || check.total === 0) return `<td class="heat"><span class="skip" title="${e(when)}: not checked">·</span></td>`;
-  const share = check.warm / check.total;
+/** One cell of the entry's table: the checks of one age band added up. The title names the exact ages they were made at. */
+function heatCell(checks: readonly AgedCheck[], when: string): string {
+  const made = checks.filter((check) => check.total > 0);
+  if (made.length === 0) return `<td class="heat"><span class="skip" title="${e(when)}: not checked">·</span></td>`;
+  const warm = made.reduce((sum, check) => sum + check.warm, 0);
+  const total = made.reduce((sum, check) => sum + check.total, 0);
+  const share = warm / total;
   const level = share === 1 ? "all" : share === 0 ? "none" : share >= 0.5 ? "most" : "few";
-  return `<td class="heat"><span class="${level}" title="${e(when)}: ${check.warm} of ${check.total} re-sends served from the cache">${check.warm}/${check.total}</span></td>`;
+  // Several ages in one cell (7.5, 10 and 15 minutes in the 15 min column) are listed, each with its own count.
+  const byAge = new Map<number, Check>();
+  for (const check of made) {
+    const sum = byAge.get(check.age_s) ?? { warm: 0, total: 0 };
+    byAge.set(check.age_s, { warm: sum.warm + check.warm, total: sum.total + check.total });
+  }
+  const ages = [...byAge].sort(([a], [b]) => a - b);
+  const at = ages.every(([age]) => age < 0)
+    ? when
+    : ages.length === 1
+      ? `Checked at ${exactAge((ages[0] as [number, Check])[0])}`
+      : `Checked at ${ages.map(([age, check]) => `${exactAge(age)} (${check.warm}/${check.total})`).join(", ")}`;
+  return `<td class="heat"><span class="${level}" title="${e(at)}: ${warm} of ${total} re-sends served from the cache">${warm}/${total}</span></td>`;
 }
 
-/** One row per evaluation, one column per age: how many of the re-sends at that age were served from the cache. */
+/** An age as it was checked: "7.5 min", "1 h 5 min", "24 h" (not "1 d": the columns count in hours). */
+const exactAge = (seconds: number): string => (seconds % 86400 === 0 ? shortAge(seconds) : duration(seconds));
+
+/** The control of a run as a check: it has no age of its own, so it is given a negative one. */
+const controlOf = (run: Measurement): AgedCheck[] => (run.control ? [{ age_s: -1, ...run.control }] : []);
+
+/**
+ * The cache evaluations of one entry. Every entry has the same table: the same columns (at once, then the ages from
+ * 2.5 minutes to 24 hours) and the same two parts, the default lifetime and the long one, also where one of them
+ * was not evaluated. A column holds the checks up to its age and above the column before it.
+ */
 function heatmap(runs: Measurement[], now: Date): string {
   const sorted = [...runs].sort((a, b) => b.date.localeCompare(a.date));
-  const ages = [...new Set(sorted.flatMap((run) => (run.checks ?? []).map((check) => check.age_s)))].sort((a, b) => a - b);
-  const control = sorted.some((run) => run.control);
-  const columns = ages.length + (control ? 1 : 0);
-  const span = columns > 0 ? ' rowspan="2"' : "";
-  const head = `<tr><th scope="col"${span}>Evaluation</th><th scope="col"${span}>Result</th>${
-    columns > 0 ? `<th scope="colgroup" colspan="${columns}" class="span">Time since the prompt was cached · re-sends served from the cache</th>` : ""
-  }<th scope="col"${span}>Evidence</th></tr>${
-    columns > 0
-      ? `<tr>${control ? '<th scope="col" class="age" title="Sent again immediately, to confirm the prompt was cached at all.">At once</th>' : ""}${ages.map((age) => `<th scope="col" class="age">${shortAge(age)}</th>`).join("")}</tr>`
-      : ""
-  }`;
-  const rows = sorted
-    .map((run) => {
-      const verdict = runVerdict(run);
-      const byAge = new Map((run.checks ?? []).map((check) => [check.age_s, check]));
-      const options = optionsText(run.options);
-      return `<tr>
+  const columns = CACHE_BANDS_S.length + 1;
+  const width = columns + 3;
+  const head = `<tr><th scope="col" rowspan="2">Evaluation</th><th scope="col" rowspan="2">Result</th><th scope="colgroup" colspan="${columns}" class="span">Time since the prompt was cached · re-sends served from the cache</th><th scope="col" rowspan="2">Evidence</th></tr>
+<tr><th scope="col" class="age" title="Sent again immediately, to confirm the prompt was cached at all.">At once</th>${CACHE_BANDS_S.map((limit) => `<th scope="col" class="age" title="${e(bandSpan(limit))}">${shortAge(limit)}</th>`).join("")}</tr>`;
+
+  const cells = (members: readonly Measurement[]): string =>
+    `${heatCell(members.flatMap(controlOf), "Sent again at once")}${CACHE_BANDS_S.map((limit) =>
+      heatCell(
+        members.flatMap((run) => (run.checks ?? []).filter((check) => cacheBand(check.age_s) === limit)),
+        bandSpan(limit),
+      ),
+    ).join("")}`;
+
+  const part = (title: string, hint: string, members: Measurement[], missing: string): string => {
+    const rows = members
+      .map((run) => {
+        const verdict = runVerdict(run);
+        const options = optionsText(run.options);
+        return `<tr>
 <th scope="row">${e(run.route_label)} ${dateTag(run.date, now)}<div class="hint">${e(run.client_label)}${options ? ` · ${e(options)}` : ""}</div></th>
 <td class="result"><strong>${e(verdict.head)}</strong>${verdict.detail ? `<div class="hint">${e(verdict.detail)}</div>` : ""}${run.note ? `<div class="hint">${e(run.note)}</div>` : ""}</td>
-${control ? heatCell(run.control, "Sent again at once") : ""}${ages.map((age) => heatCell(byAge.get(age), `After ${duration(age)}`)).join("")}
+${cells([run])}
 <td class="nowrap"><a href="${e(run.source)}" rel="noopener">Raw result</a></td>
 </tr>`;
-    })
-    .join("");
-  // Rows of three re-sends jump about. Where an entry has several evaluations that asked for the same lifetime, a last row adds them up.
-  const groups = new Map<string, Measurement[]>();
-  for (const run of sorted) {
-    const asked = typeof run.options?.ttl === "string" ? run.options.ttl : typeof run.options?.prompt_cache_retention === "string" ? run.options.prompt_cache_retention : "";
-    groups.set(asked, [...(groups.get(asked) ?? []), run]);
-  }
-  const together = [...groups]
-    .filter(([, members]) => members.length > 1)
-    .map(([asked, members]) => {
-      const sum = (checks: (Check | undefined)[]): Check => ({
-        warm: checks.reduce((total, check) => total + (check?.warm ?? 0), 0),
-        total: checks.reduce((total, check) => total + (check?.total ?? 0), 0),
-      });
-      return `<tr class="together">
-<th scope="row">All ${members.length} together<div class="hint">${asked ? `The evaluations that asked for ${e(asked)}` : groups.size > 1 ? "The evaluations that asked for no lifetime" : "Every client, added up by age"}</div></th>
+      })
+      .join("");
+    // Rows of three re-sends jump about. Where a part has several evaluations, a last row adds them up.
+    const together =
+      members.length > 1
+        ? `<tr class="together">
+<th scope="row">All ${members.length} together<div class="hint">Every client, added up by age</div></th>
 <td class="result"><span class="hint">Single rows have three re-sends per age, so one miss moves them a lot. The sum is steadier.</span></td>
-${control ? heatCell(sum(members.map((run) => run.control)), "Sent again at once") : ""}${ages.map((age) => heatCell(sum(members.map((run) => (run.checks ?? []).find((check) => check.age_s === age))), `After ${duration(age)}`)).join("")}
+${cells(members)}
 <td></td>
-</tr>`;
-    })
-    .join("");
-  return `<p class="hint max-w-3xl">Each evaluation caches a fresh prompt, then sends it again at set ages. A cell shows how many of the re-sends at that age were served from the cache: <code>3/3</code> is all of them.</p>
-<div class="scroll mt-3"><table class="facts heat"><thead>${head}</thead><tbody>${rows}${together}</tbody></table></div>
+</tr>`
+        : "";
+    return `<tr class="part"><th scope="colgroup" colspan="${width}"><strong>${title}</strong><span class="hint">${hint}</span></th></tr>
+${members.length > 0 ? rows + together : `<tr class="part-empty"><td colspan="${width}" class="muted">${missing}</td></tr>`}`;
+  };
+
+  const plain = sorted.filter((run) => !askedLifetime(run));
+  const asked = new Map<string, Measurement[]>();
+  for (const run of sorted) {
+    const lifetime = askedLifetime(run);
+    if (lifetime) asked.set(`${lifetime.parameter}=${lifetime.value}`, [...(asked.get(`${lifetime.parameter}=${lifetime.value}`) ?? []), run]);
+  }
+  const parts = [
+    part("Default lifetime", "The request sends no lifetime parameter. This is the cache you get without asking for one.", plain, "Not evaluated: every evaluation on this entry sent a lifetime parameter."),
+    ...(asked.size > 0
+      ? [...asked].map(([sent, members]) => part("Long lifetime", `The request sends <code>${e(sent)}</code>.`, members, ""))
+      : [part("Long lifetime", "The request asks for a longer lifetime with a parameter.", [], "Not evaluated: no evaluation on this entry sent a lifetime parameter.")]),
+  ];
+  return `<p class="hint max-w-3xl">Each evaluation caches a fresh prompt, then sends it again at set ages. A cell shows how many of the re-sends at that age were served from the cache: <code>3/3</code> is all of them. Every entry has the same columns; a column holds the checks up to its age and above the column before it, so <em>15 min</em> is 5 to 15 minutes. Hover a cell for the exact ages.</p>
+<div class="scroll mt-3"><table class="facts heat"><thead>${head}</thead><tbody>${parts.join("")}</tbody></table></div>
 <p class="legend"><span><span class="heat-key all">3/3</span> All served from the cache</span><span><span class="heat-key most">2/3</span> Most</span><span><span class="heat-key few">1/3</span> Few</span><span><span class="heat-key none">0/3</span> None</span><span><span class="heat-key skip">·</span> Not checked at that age</span></p>
 <p class="hint">A result holds for the access method and client named, on that date. It is what was observed, not a guaranteed lifetime. <a href="/docs/methodology/#evaluations">How evaluations work</a></p>`;
 }
@@ -486,6 +535,7 @@ export function entryHtml(view: EntryView): string {
 
 <section aria-labelledby="limits">
   <h2 id="limits">Limits</h2>
+  <h3>Documented</h3>
   <div class="scroll"><table class="facts">
     <thead><tr><th scope="col">Limit</th><th scope="col" class="num">Value</th><th scope="col">Source</th></tr></thead>
     <tbody>
@@ -495,10 +545,11 @@ export function entryHtml(view: EntryView): string {
     </tbody>
   </table></div>
   <p class="hint">Usable context is smaller than the window by the system prompt and tool definitions of the client in use. That overhead varies, so no usable figure is published. An agent's compaction threshold is a client setting, not a limit of this entry.</p>
+  <h3>Measured</h3>
   ${
     measuredLimits.length > 0
-      ? `<h3>Measured limits</h3><div class="scroll"><table class="facts"><thead><tr><th scope="col">Date</th><th scope="col">Measured through</th><th scope="col">Result</th><th scope="col">Evidence</th></tr></thead><tbody>${measuredLimitRows(measuredLimits)}</tbody></table></div>`
-      : ""
+      ? `<div class="scroll"><table class="facts"><thead><tr><th scope="col">Date</th><th scope="col">Measured through</th><th scope="col">Result</th><th scope="col">Evidence</th></tr></thead><tbody>${measuredLimitRows(measuredLimits)}</tbody></table></div>`
+      : '<p class="muted">No limits were measured on this entry.</p>'
   }
 </section>
 

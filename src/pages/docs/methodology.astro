@@ -143,7 +143,7 @@ import { meta } from "../../lib/data.ts";
     <h2 id="evaluations">Cache evaluations</h2>
     <p>
       An evaluation sends a fresh prompt once so that it is cached, then sends it again at each of several set ages, a few times per age. For each age the result records how many of those
-      re-sends were served from the cache: <code>3/3</code> is all of them, <code>0/3</code> none. Entry pages show this as a table, one column per age.
+      re-sends were served from the cache: <code>3/3</code> is all of them, <code>0/3</code> none.
     </p>
     <p>
       Every evaluation made since 14 November 2026 starts the same way: the prompt is sent again at once, then checked at 2.5, 5 and 7.5 minutes, and on from there (10, 15, 20, 25, 30, 40
@@ -155,10 +155,24 @@ import { meta } from "../../lib/data.ts";
       later. A provider that spreads requests over several servers can miss at one age and hit again at a later one.
     </p>
     <p>
-      One evaluation has only a few re-sends per age, so a single miss moves its row a lot. Where an entry has several evaluations, they are also shown added up. In the catalog that is
-      one row of ten cells, for 2.5 min, 5 min, 15 min, 30 min, 1 h, 2 h, 4 h, 8 h, 12 h and 24 h. A cell holds every check up to its age and above the cell before it, from every client, and
-      shows the share that was served from the cache, in percent; the counts appear on hover. Evaluations that asked the provider for a lifetime (for example 1 h or 24 h) get a row of
-      their own, because they answer a different question. On the entry page the last row of the table adds the evaluations up by exact age.
+      Results are shown the same way for every entry: ten cells, for 2.5 min, 5 min, 15 min, 30 min, 1 h, 2 h, 4 h, 8 h, 12 h and 24 h. A cell holds every check up to its age and above the
+      cell before it, so the 15 min cell holds the checks at 7.5, 10 and 15 minutes. A cell with no check stays empty; it is not a miss.
+    </p>
+    <p>There are two lines of cells, because a request can ask for the cache in two ways, and the two answer different questions:</p>
+    <ul>
+      <li><strong>Default:</strong> the request sends no lifetime parameter. This is the cache you get without asking for one.</li>
+      <li>
+        <strong>Long:</strong> the request asks for a longer lifetime with a parameter, <code>ttl</code> (for example <code>1h</code>) or <code>prompt_cache_retention</code> (for example{" "}
+        <code>24h</code>). The value asked for is shown next to the word, and the entry page names the parameter.
+      </li>
+    </ul>
+    <p>
+      Both lines are there on every evaluated entry. A line that was not evaluated is empty: that says nothing about whether the provider accepts the parameter.
+    </p>
+    <p>
+      In the catalog a line adds up every evaluation of the entry, from every client, and a cell shows the share that was served from the cache, in percent; the counts appear on hover. One
+      evaluation has only a few re-sends per age, so a single miss moves it a lot, and the sum is steadier. The entry page has one row per evaluation with the counts, and where a part has
+      several evaluations a last row that adds them up. Measured limits are on the entry page only.
     </p>
     <p>
       Each evaluation names the access method it was taken on and the client that sent the requests: straight to the provider, through{" "}

@@ -14,6 +14,8 @@ export const CACHE_BANDS_S = [150, 300, 900, 1800, 3600, 7200, 14400, 28800, 432
 export interface PooledCache {
   /** The lifetime the requests asked for (`ttl` or `prompt_cache_retention`). Absent = they asked for none: the provider's default. */
   asked?: string;
+  /** The request parameter that carried it: `ttl` or `prompt_cache_retention`. Present with `asked`. */
+  parameter?: string;
   evaluations: number;
   /** Per band with at least one check: re-sends served from the cache, and re-sends made. */
   bands: { up_to_s: number; warm: number; total: number }[];
@@ -144,22 +146,35 @@ function basePrice(model: JsonObject, side: "input" | "output"): number | undefi
   return isObject(part) && part.unit === undefined ? count(part.price) : undefined;
 }
 
+/** The band an age falls in: the first one that reaches it. Ages past the last band count in the last. */
+export function cacheBand(ageS: number): number {
+  return CACHE_BANDS_S.find((limit) => ageS <= limit) ?? (CACHE_BANDS_S[CACHE_BANDS_S.length - 1] as number);
+}
+
+/** The cache lifetime an evaluation's requests asked for, and the parameter that carried it. Undefined = none: the provider's default. */
+export function askedLifetime(run: Pick<Measurement, "options">): { parameter: string; value: string } | undefined {
+  for (const parameter of ["ttl", "prompt_cache_retention"]) {
+    const value = text(run.options?.[parameter]);
+    if (value) return { parameter, value };
+  }
+  return undefined;
+}
+
 /**
  * Evaluations of one entry merged by age, across the clients they were sent through. Evaluations that asked for
  * different cache lifetimes are kept apart: they answer different questions.
  */
 export function poolCache(runs: readonly Measurement[]): PooledCache[] {
-  const groups = new Map<string, { asked?: string; evaluations: number; counts: Map<number, [number, number]> }>();
-  const last = CACHE_BANDS_S[CACHE_BANDS_S.length - 1] as number;
+  const groups = new Map<string, { asked?: string; parameter?: string; evaluations: number; counts: Map<number, [number, number]> }>();
   for (const run of runs) {
-    const asked = text(run.options?.ttl) ?? text(run.options?.prompt_cache_retention);
-    const key = asked ?? "";
-    const group = groups.get(key) ?? { ...(asked ? { asked } : {}), evaluations: 0, counts: new Map() };
+    const lifetime = askedLifetime(run);
+    const key = lifetime?.value ?? "";
+    const group = groups.get(key) ?? { ...(lifetime ? { asked: lifetime.value, parameter: lifetime.parameter } : {}), evaluations: 0, counts: new Map() };
     groups.set(key, group);
     group.evaluations += 1;
     for (const check of run.checks ?? []) {
       if (check.total === 0) continue;
-      const band = CACHE_BANDS_S.find((limit) => check.age_s <= limit) ?? last;
+      const band = cacheBand(check.age_s);
       const sum = group.counts.get(band) ?? [0, 0];
       group.counts.set(band, [sum[0] + check.warm, sum[1] + check.total]);
     }
@@ -167,7 +182,7 @@ export function poolCache(runs: readonly Measurement[]): PooledCache[] {
   return [...groups.entries()]
     .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
     .map(([, group]) => ({
-      ...(group.asked ? { asked: group.asked } : {}),
+      ...(group.asked ? { asked: group.asked, parameter: group.parameter } : {}),
       evaluations: group.evaluations,
       bands: CACHE_BANDS_S.flatMap((limit) => {
         const sum = group.counts.get(limit);
