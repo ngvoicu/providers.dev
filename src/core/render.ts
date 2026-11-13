@@ -63,13 +63,16 @@ const CACHE_MODE_TITLE = {
 function cacheCell(entry: Pick<Summary, "cache" | "cache_modes" | "cache_ttl_by_mode_s">): string {
   if (entry.cache === "unknown") return UNKNOWN;
   if (entry.cache === "no") return '<span title="The source says this entry does not cache prompts.">None</span>';
-  // One line per way of caching: the word, then its documented lifetimes in a box. No box where the source gives no lifetime.
+  // One line per way of caching: the word, then a box with its documented lifetimes. Every word has its box, so that a value
+  // is never read as belonging to the line above or below; where the source gives no lifetime the box says so.
   const lines = entry.cache_modes
     .map((mode) => {
       const ttl = entry.cache_ttl_by_mode_s?.[mode] ?? [];
-      const box = ttl.length > 0 ? `<span class="cache-box">${ttl.map(duration).join(", ")}</span>` : "";
-      const title = `${CACHE_MODE_TITLE[mode]}${ttl.length > 0 ? "" : " The source gives no lifetime for it."}`;
-      return `<span class="cache-mode" title="${e(title)}">${CACHE_MODE_WORD[mode]}</span>${box || "<span></span>"}`;
+      const box =
+        ttl.length > 0
+          ? `<span class="cache-box" title="How long this cache lasts, as documented.">${ttl.map(duration).join(", ")}</span>`
+          : '<span class="cache-box none" title="The source gives no lifetime for this way of caching. Unknown is not the same as short.">Unknown</span>';
+      return `<span class="cache-mode" title="${e(CACHE_MODE_TITLE[mode])}">${CACHE_MODE_WORD[mode]}</span>${box}`;
     })
     .join("");
   return lines ? `<span class="cache">${lines}</span>` : UNKNOWN;
