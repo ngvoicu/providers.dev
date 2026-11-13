@@ -8,7 +8,7 @@ export type CacheMode = "implicit" | "explicit";
 export type Origin = "upstream" | "modified" | "added";
 
 /** The ages a pooled cache result is given at. A band holds the checks up to its age and above the band before it. */
-export const CACHE_BANDS_S = [300, 900, 1800, 3600, 7200, 14400, 28800, 43200, 86400] as const;
+export const CACHE_BANDS_S = [150, 300, 900, 1800, 3600, 7200, 14400, 28800, 43200, 86400] as const;
 
 /** Every evaluation of an entry that asked for the same cache lifetime, taken together. */
 export interface PooledCache {
@@ -43,6 +43,8 @@ export interface Summary {
   cache_modes: CacheMode[];
   /** Cache lifetimes the provider documents, in seconds, shortest first. */
   cache_ttl_s: number[];
+  /** The documented lifetimes of each mode, in seconds. A mode with no documented lifetime has no key. */
+  cache_ttl_by_mode_s?: Partial<Record<CacheMode, number[]>>;
   /** Our cache measurements on this entry. */
   evaluations: number;
   /** Across those runs: the shortest and longest age at which every check was still warm, in seconds. */
@@ -100,7 +102,7 @@ export function durationSeconds(value: unknown): number | undefined {
   return Number(match[1]) * (UNIT_SECONDS[match[2] as string] as number);
 }
 
-export function cacheFacts(model: JsonObject): Pick<Summary, "cache" | "cache_modes" | "cache_ttl_s"> {
+export function cacheFacts(model: JsonObject): Pick<Summary, "cache" | "cache_modes" | "cache_ttl_s" | "cache_ttl_by_mode_s"> {
   const capabilities = isObject(model.capabilities) ? model.capabilities : {};
   const cache = capabilities.cache;
   // models.dev: a missing `cache` says nothing; `false` says the entry does not cache.
@@ -108,18 +110,27 @@ export function cacheFacts(model: JsonObject): Pick<Summary, "cache" | "cache_mo
   if (!isObject(cache)) return { cache: "unknown", cache_modes: [], cache_ttl_s: [] };
   const modes: CacheMode[] = [];
   const ttl = new Set<number>();
+  const byMode: Partial<Record<CacheMode, number[]>> = {};
   for (const mode of ["implicit", "explicit"] as const) {
     const value = cache[mode];
     if (value === undefined) continue;
     modes.push(mode);
     if (isObject(value) && Array.isArray(value.ttl)) {
+      const own = new Set<number>();
       for (const item of value.ttl) {
         const seconds = durationSeconds(item);
-        if (seconds !== undefined) ttl.add(seconds);
+        if (seconds !== undefined) own.add(seconds);
       }
+      for (const seconds of own) ttl.add(seconds);
+      if (own.size > 0) byMode[mode] = [...own].sort((a, b) => a - b);
     }
   }
-  return { cache: modes.length > 0 ? "yes" : "unknown", cache_modes: modes, cache_ttl_s: [...ttl].sort((a, b) => a - b) };
+  return {
+    cache: modes.length > 0 ? "yes" : "unknown",
+    cache_modes: modes,
+    cache_ttl_s: [...ttl].sort((a, b) => a - b),
+    ...(Object.keys(byMode).length > 0 ? { cache_ttl_by_mode_s: byMode } : {}),
+  };
 }
 
 const text = (value: unknown): string | undefined => (typeof value === "string" && value ? value : undefined);

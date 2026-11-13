@@ -178,7 +178,12 @@ export function openapi(): Record<string, unknown> {
             price_from: { type: "string", description: "Present where the price is inherited: the ref of the API entry whose list price this is. The entry itself is a subscription and is not paid per token." },
             cache: { enum: ["yes", "no", "unknown"] },
             cache_modes: { type: "array", items: { enum: ["implicit", "explicit"] } },
-            cache_ttl_s: { type: "array", items: { type: "number" }, description: "Documented lifetimes in seconds." },
+            cache_ttl_s: { type: "array", items: { type: "number" }, description: "Documented lifetimes in seconds, of every mode together." },
+            cache_ttl_by_mode_s: {
+              type: "object",
+              description: "The documented lifetimes of each mode, in seconds. A mode with no documented lifetime has no key.",
+              properties: { implicit: { type: "array", items: { type: "number" } }, explicit: { type: "array", items: { type: "number" } } },
+            },
             evaluations: { type: "integer" },
             measured_warm_min_s: { type: "number" },
             measured_warm_max_s: { type: "number" },
@@ -198,7 +203,7 @@ export function openapi(): Record<string, unknown> {
                       type: "object",
                       required: ["up_to_s", "warm", "total"],
                       properties: {
-                        up_to_s: { type: "integer", description: "The upper age of the band, in seconds: 300, 900, 1800, 3600, 7200, 14400, 28800, 43200 or 86400." },
+                        up_to_s: { type: "integer", description: "The upper age of the band, in seconds: 150, 300, 900, 1800, 3600, 7200, 14400, 28800, 43200 or 86400." },
                         warm: { type: "integer", description: "Re-sends served from the cache." },
                         total: { type: "integer", description: "Re-sends made." },
                       },

@@ -181,7 +181,8 @@ document.addEventListener("keydown", (event) => {
 async function load(): Promise<void> {
   failed.hidden = true;
   try {
-    const response = await fetch("/data/index.json");
+    // Ask the server every time whether the data changed (it answers 304 when not): a stored copy must never show an old table.
+    const response = await fetch("/data/index.json", { cache: "no-cache" });
     if (!response.ok) throw new Error(String(response.status));
     index = (await response.json()) as Index;
     providerNames = Object.fromEntries(index.providers.map((provider) => [provider.id, provider.name]));

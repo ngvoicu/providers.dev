@@ -60,15 +60,19 @@ const CACHE_MODE_TITLE = {
   explicit: "Manual (explicit): nothing is cached unless the request marks what to cache. The mark also picks the lifetime.",
 } as const;
 
-function cacheCell(entry: Pick<Summary, "cache" | "cache_modes" | "cache_ttl_s">): string {
+function cacheCell(entry: Pick<Summary, "cache" | "cache_modes" | "cache_ttl_by_mode_s">): string {
   if (entry.cache === "unknown") return UNKNOWN;
   if (entry.cache === "no") return '<span title="The source says this entry does not cache prompts.">None</span>';
-  // Two short lines, like the name and id beside them: how it is switched on, then for how long.
-  const words = entry.cache_modes.map((mode, at) => (at === 0 ? CACHE_MODE_WORD[mode] : CACHE_MODE_WORD[mode].toLowerCase())).join(" + ");
-  const title = entry.cache_modes.map((mode) => CACHE_MODE_TITLE[mode]).join(" ");
-  const modes = words ? `<span class="cache-modes">${words}</span>` : "";
-  const ttl = entry.cache_ttl_s.length > 0 ? `<span class="cache-ttl">${entry.cache_ttl_s.map(duration).join(", ")}</span>` : "";
-  return `<span class="cache" title="${e(title)}">${modes}${ttl}</span>`;
+  // One line per way of caching: the word, then its documented lifetimes in a box. No box where the source gives no lifetime.
+  const lines = entry.cache_modes
+    .map((mode) => {
+      const ttl = entry.cache_ttl_by_mode_s?.[mode] ?? [];
+      const box = ttl.length > 0 ? `<span class="cache-box">${ttl.map(duration).join(", ")}</span>` : "";
+      const title = `${CACHE_MODE_TITLE[mode]}${ttl.length > 0 ? "" : " The source gives no lifetime for it."}`;
+      return `<span class="cache-mode" title="${e(title)}">${CACHE_MODE_WORD[mode]}</span>${box || "<span></span>"}`;
+    })
+    .join("");
+  return lines ? `<span class="cache">${lines}</span>` : UNKNOWN;
 }
 
 /** The documented window. Where there is none, the largest input an evaluation saw accepted, said as what it is. */
@@ -82,7 +86,7 @@ function contextCell(entry: Summary, href: string): string {
   return `<a class="plain limit-measured" href="${e(href)}#limits" title="${e(title)}"><span class="limit-value">≥ ${floor}</span><span class="limit-note">input</span></a>`;
 }
 
-const bandLabel = (seconds: number): string => (seconds < 3600 ? `${seconds / 60}m` : `${seconds / 3600}h`);
+const bandLabel = (seconds: number): string => (seconds < 3600 ? `${seconds / 60}m` : `${seconds / 3600}h`); // 150 -> "2.5m"
 
 /** The ages of the heat strip, written once in the column head so that every row lines up under them. */
 const STRIP_HEAD = `<span class="strip strip-head" aria-hidden="true">${CACHE_BANDS_S.map((limit) => `<span>${bandLabel(limit)}</span>`).join("")}</span>`;

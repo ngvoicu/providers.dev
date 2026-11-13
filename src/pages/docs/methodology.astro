@@ -132,7 +132,11 @@ import { meta } from "../../lib/data.ts";
     <ul>
       <li><strong>Automatic</strong> (<code>implicit</code> in the data): the provider caches the start of a prompt by itself. The request does nothing for it.</li>
       <li><strong>Manual</strong> (<code>explicit</code>): nothing is cached unless the request marks what to cache. The mark also picks the lifetime, where there is a choice.</li>
-      <li>The times under the word are the lifetimes the provider documents. "Manual, 5 min, 1 h" means a request must mark what to cache and can ask for either lifetime.</li>
+      <li>
+        The box after the word holds the lifetimes the provider documents for that way of caching. "Manual <span class="cache-box">5 min, 1 h</span>" means a request must mark what to
+        cache and can ask for either lifetime. No box means the source gives no lifetime, which is not the same as a short one.
+      </li>
+      <li>An entry can have both: it caches by itself, and a request can also mark parts. Then each has its own line.</li>
     </ul>
     <p>The pages use the plain words; the data and the API keep the names models.dev uses.</p>
 
@@ -147,7 +151,7 @@ import { meta } from "../../lib/data.ts";
     </p>
     <p>
       One evaluation has only a few re-sends per age, so a single miss moves its row a lot. Where an entry has several evaluations, they are also shown added up. In the catalog that is
-      one row of nine cells, for 5 min, 15 min, 30 min, 1 h, 2 h, 4 h, 8 h, 12 h and 24 h. A cell holds every check up to its age and above the cell before it, from every client, and
+      one row of ten cells, for 2.5 min, 5 min, 15 min, 30 min, 1 h, 2 h, 4 h, 8 h, 12 h and 24 h. A cell holds every check up to its age and above the cell before it, from every client, and
       shows the share that was served from the cache, in percent; the counts appear on hover. Evaluations that asked the provider for a lifetime (for example 1 h or 24 h) get a row of
       their own, because they answer a different question. On the entry page the last row of the table adds the evaluations up by exact age.
     </p>
