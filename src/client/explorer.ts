@@ -147,7 +147,7 @@ head.addEventListener("click", (event) => {
   if (!button) return;
   const key = button.dataset.sort as SortKey;
   // Numbers and dates are most useful largest or newest first.
-  const firstOrder = key === "context" || key === "max_output" || key === "verified" ? "desc" : "asc";
+  const firstOrder = key === "context" || key === "max_output" || key === "verified" || key === "release_date" ? "desc" : "asc";
   query.order = query.sort === key ? (query.order === "asc" ? "desc" : "asc") : firstOrder;
   query.sort = key;
   query.offset = 0;

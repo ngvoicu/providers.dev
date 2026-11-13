@@ -93,6 +93,7 @@ ${column("name", "Model", "The model's name and its id at this provider.")}
 ${options.hideProvider ? "" : column("provider", "Provider", "Who serves it, and how it is reached.")}
 ${column("context", "Context", "Exposed context window in tokens (limit.context): what this provider accepts for the model.", "num")}
 ${column("max_output", "Max output", "Largest single response in tokens (limit.output). A maximum, not a default.", "num")}
+${column("release_date", "Released", "When the model was released, as models.dev records it. It is the model's date: the same at every provider.", "wide-only")}
 ${column(null, "Cache, documented", "Prompt caching as the source documents it: mode and lifetimes.")}
 ${column(null, "Cache, measured", "providers.dev evaluations: the age up to which every re-send was still served from the cache.")}
 ${column("verified", "Source", "Where the entry comes from, with a date per source: the import from models.dev, and the newest providers.dev evidence.")}
@@ -109,6 +110,7 @@ export function rowHtml(entry: Summary, options: RowOptions): string {
 ${options.hideProvider ? "" : `<td><a class="plain" href="/providers/${e(entry.provider)}/">${e(provider)}</a>${access}</td>`}
 <td class="num">${tokens(entry.context)}</td>
 <td class="num">${tokens(entry.max_output)}</td>
+<td class="wide-only">${entry.release_date ? `<span class="muted date">${e(entry.release_date)}</span>` : UNKNOWN}</td>
 <td>${cacheCell(entry)}</td>
 <td>${measuredCell(entry, href)}</td>
 <td class="nowrap">${sourcesHtml(entry, options)}</td>
@@ -294,6 +296,11 @@ export function entryHtml(view: EntryView): string {
   <h1>${e(summary.name)}</h1>
   <p class="id"><code>${e(summary.ref)}</code>${copyButton(summary.ref, "entry id")} <span class="badge ${summary.access}">${ACCESS_LABEL[summary.access]}</span>
   ${sourcesHtml(summary, view, true)}${summary.status ? ` <span class="badge">${e(summary.status)}</span>` : ""}</p>
+  <p class="released muted">${
+    summary.release_date
+      ? `Released <span class="date" title="The model's release date, as models.dev records it. It is the same at every provider.">${e(summary.release_date)}</span>`
+      : "Release date unknown"
+  }</p>
   ${typeof model.description === "string" ? `<p class="lead">${e(model.description)}</p>` : ""}
   ${inherited}
 </header>
