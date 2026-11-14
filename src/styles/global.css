@@ -603,6 +603,23 @@
   table.facts td.wide {
     min-width: 17rem;
   }
+  /* Conditional rates: one block of rows per condition. The line runs between conditions, not between its charges. */
+  table.facts.conditional tbody th,
+  table.facts.conditional tbody td {
+    border-bottom: 0;
+  }
+  table.facts.conditional tbody tr.group:not(:first-child) > * {
+    border-top: 1px solid var(--line);
+  }
+  table.facts.conditional tbody tr:not(.group):not(.empty-row) > td {
+    padding-top: 0.1rem;
+  }
+  table.facts.conditional tbody tr:has(+ tr:not(.group)) > td:not([rowspan]) {
+    padding-bottom: 0.1rem;
+  }
+  table.facts.conditional tbody th {
+    max-width: 26rem;
+  }
   thead th button {
     font: inherit;
     color: inherit;

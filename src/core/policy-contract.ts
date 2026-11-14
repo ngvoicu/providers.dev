@@ -26,28 +26,53 @@ export const BillingUnitSchema = z.strictObject({
   quantity: z.number().positive().nullable().describe("Amount is charged per this many units. Null = the source does not establish the scale."),
 });
 
-export const PricingRuleSchema = z.strictObject({
+/** A rule as an author writes it and as the import reads it. The published rule adds what follows from it. */
+export const PricingRuleInputSchema = z.strictObject({
   id: z.string().min(1),
   when: ConditionSchema.nullable().describe("Null = unconditional base rule. A condition with kind=unknown remains unresolved."),
-  meter: z.string().min(1).describe("The charge affected, e.g. text.input, text.output, text.cache_read, text.cache_write or text.cache_storage. text.* and * are multiplier scopes."),
+  meter: z.string().min(1).describe("The charge affected: text.input, text.output, text.reasoning_output, text.cache_read, text.cache_write or text.cache_storage. A multiply rule names one charge or a scope: text.* is every text charge, * is every charge."),
   operation: z.enum(["set", "multiply"]),
   amount: z.number().nonnegative().describe("A price for set, or a factor for multiply. Zero is a known zero, never missing."),
   currency: z.string().nullable().describe("ISO currency for a price; null for multipliers or an unknown currency."),
   unit: BillingUnitSchema.nullable().describe("Billing unit and scale. Null for multipliers or an unknown unit."),
-  applies_to: z.enum(["all_usage", "above_threshold"]).nullable().describe("Whether the rate applies to all matching usage or only the portion above the threshold. Null = not established; never infer marginal billing."),
+  applies_to: z.enum(["all_usage", "above_threshold"]).nullable().describe("all_usage = the rate holds for the whole request that matches the condition. above_threshold = only for the part above a size threshold. Imported rules are all_usage: models.dev evaluates a condition per request, and a matching rule prices that request. Null = not established; never infer marginal billing."),
   source_path: z.string().nullable().describe("Field in the original cost record. Null for a separately authored rule."),
 });
-export const PricingSchema = z.strictObject({
+export const ResultingRateSchema = z.strictObject({
+  meter: z.string().min(1),
+  amount: z.number().nonnegative(),
+  currency: z.string().nullable(),
+  unit: BillingUnitSchema.nullable(),
+}).describe("A base rate after a multiplier.");
+export const PricingRuleSchema = PricingRuleInputSchema.extend({
+  period: z.enum(["peak", "off_peak"]).nullable().describe("Set on a rule whose condition reads the time of day or the day of the week (request.utc_hours, request.utc_days): peak = the rule raises the base rate in its window, off_peak = it lowers it. The base rate is the price outside the window. Null = not a time rule, or one that leaves the base rate as it is."),
+  resulting_rates: z.array(ResultingRateSchema).nullable().describe("On a multiply rule: each unconditional base rate in its scope times the factor, which is the price when this rule applies and no other conditional rule does. Null on a set rule, whose amount is the rate itself, and on a multiply rule with no base rate in its scope."),
+});
+const pricingShape = {
   coverage: CoverageSchema,
-  billing: z.enum(["per_use", "reference", "not_applicable", "unknown"]).describe("reference = prices inherited from another entry, not the subscription's bill."),
-  reference_ref: z.string().nullable(),
-  rules: z.array(PricingRuleSchema).nullable().describe("Base prices, conditional replacements and multipliers. Null = unknown. [] proves no rules only with complete coverage."),
-  rule_order: z.literal("listed").nullable().describe("listed = process matching rules in array order per meter: set replaces the rate and multiply scales it. Null = combination precedence is unconfirmed; this record cannot produce an authoritative combined quote."),
+  billing: z.enum(["per_use", "reference", "not_applicable", "unknown"]).describe("per_use = the entry is billed at these rates. reference = a subscription entry: the rates are the API list prices of reference_ref, not the subscription's bill. not_applicable = a subscription entry with no API entry of the same model to refer to. unknown = rates are listed for the entry and what they bill is not established."),
+  reference_ref: z.string().nullable().describe("With billing = reference: the API entry the rates are taken from. That is the entry a providers.dev entry inherits from, or the entry of the lab's own provider for the same canonical model. Otherwise null."),
+  rule_order: z.literal("listed").nullable().describe("listed = process matching rules in array order per meter: set replaces the rate and multiply scales it. Imported rules are listed: base rates first, then models.dev's overrides in their order, then its multipliers, which is how models.dev defines a price. Null = combination precedence is unconfirmed; this record cannot produce an authoritative combined quote."),
   unparsed: z.array(z.strictObject({ path: z.string(), value: z.json() })).describe("Source fields not normalized, retained without loss. Nonempty means coverage is partial."),
   evidence: z.array(PolicyEvidenceSchema),
+};
+const rulesText = "Base prices, conditional replacements and multipliers. Null = unknown. [] proves no rules only with complete coverage.";
+/** Pricing before `period` and `resulting_rates` are worked out: what the import produces and what an author declares. */
+export const PricingInputSchema = z.strictObject({ ...pricingShape, rules: z.array(PricingRuleInputSchema).nullable().describe(rulesText) });
+export const PricingSchema = z.strictObject({
+  coverage: pricingShape.coverage,
+  billing: pricingShape.billing,
+  reference_ref: pricingShape.reference_ref,
+  rules: z.array(PricingRuleSchema).nullable().describe(rulesText),
+  rule_order: pricingShape.rule_order,
+  unparsed: pricingShape.unparsed,
+  evidence: pricingShape.evidence,
 }).describe("Normalized pricing present on every entry and summary. Source imports are partial unless completeness is explicitly confirmed. Unknown applicability, units or rule interactions must not silently resolve to a base price.");
 export type Pricing = z.infer<typeof PricingSchema>;
+export type PricingInput = z.infer<typeof PricingInputSchema>;
 export type PricingRule = z.infer<typeof PricingRuleSchema>;
+export type PricingRuleInput = z.infer<typeof PricingRuleInputSchema>;
+export type ResultingRate = z.infer<typeof ResultingRateSchema>;
 export type PolicyEvidence = z.infer<typeof PolicyEvidenceSchema>;
 
 export const RequestBindingSchema = z.strictObject({
@@ -79,7 +104,8 @@ export const RequestControlsSchema = z.strictObject({
 export type RequestControls = z.infer<typeof RequestControlsSchema>;
 export type RequestControl = z.infer<typeof RequestControlSchema>;
 
-export const PricingDeclarationSchema = PricingSchema.superRefine((value, ctx) => {
+/** An authored pricing record. The author writes the rules; `period` and `resulting_rates` are worked out from them. */
+export const PricingDeclarationSchema = PricingInputSchema.superRefine((value, ctx) => {
   if (value.coverage !== "unknown" && value.evidence.length === 0) ctx.addIssue({ code: "custom", path: ["evidence"], message: "Pricing declarations need source evidence." });
   if (value.coverage === "complete" && (value.rules === null || value.unparsed.length > 0)) ctx.addIssue({ code: "custom", path: ["coverage"], message: "Complete pricing needs rules and no unparsed fields." });
   if (value.evidence.some((source) => source.date === null || source.note.trim() === "")) ctx.addIssue({ code: "custom", path: ["evidence"], message: "Authored evidence needs a date and confirmation note." });

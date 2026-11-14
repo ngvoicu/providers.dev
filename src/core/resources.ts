@@ -85,12 +85,14 @@ function describe(id: string, entries: Summary[]): CanonicalModelDetail {
   const lab = id.split("/")[0] as string;
   const rank = (entry: Summary): number => (entry.provider === lab ? 0 : entry.access === "subscription" ? 1 : 2);
   const sorted = [...entries].sort((a, b) => rank(a) - rank(b) || compareText(a.provider, b.provider) || compareText(a.model, b.model));
-  const own = sorted.find((entry) => entry.provider === lab);
+  // The lab's own entry: the one with the canonical id itself, else its first by id. Subscription entries take
+  // their API reference price by the same choice (resolve.ts, labEntry).
+  const own = sorted.find((entry) => entry.ref === id) ?? sorted.find((entry) => entry.provider === lab);
   const [contextMin, contextMax] = range(sorted.map((entry) => entry.context));
   const [outputMin, outputMax] = range(sorted.map((entry) => entry.max_output));
   return {
     id,
-    name: (sorted.find((entry) => entry.ref === id) ?? own ?? (sorted[0] as Summary)).name,
+    name: (own ?? (sorted[0] as Summary)).name,
     lab,
     reference_ref: own?.ref ?? null,
     entry_count: sorted.length,

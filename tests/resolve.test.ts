@@ -253,6 +253,37 @@ describe("resolve: access and additions", () => {
     expect(catalog["lab-coding-plan"]!.models["model-a"]!.cost).toEqual({ text: { input: { price: 0 }, output: { price: 0 } } });
   });
 
+  it("shows the API list price on every subscription entry by one rule, and leaves an imported cost as it is", () => {
+    const priced = upstream();
+    priced.lab!.models["model-a"] = { ...priced.lab!.models["model-a"]!, canonical_id: "lab/model-a", cost: { text: { input: { price: 4, overrides: [{ when: { context: { gt: 200000 } }, price: 8 }] }, output: { price: 20 } } } };
+    // A dated copy of the same model comes first by id; the entry with the canonical id itself is the reference.
+    priced.lab!.models["model-a-0101"] = { id: "model-a-0101", name: "Model A 0101", canonical_id: "lab/model-a", cost: { text: { input: { price: 9 }, output: { price: 9 } } } };
+    const zero = { text: { input: { price: 0 }, output: { price: 0 } } };
+    priced["lab-coding-plan"]!.models = {
+      "model-a": { id: "model-a", name: "Model A", canonical_id: "lab/model-a", cost: zero },
+      listed: { id: "listed", name: "Listed", canonical_id: "elsewhere/model-x", cost: { text: { input: { price: 0.2 }, output: { price: 1.2 } } } },
+      free: { id: "free", name: "Free", cost: zero },
+    };
+    const { catalog } = resolve(input([], { upstream: priced }));
+    const plan = catalog["lab-coding-plan"]!.models;
+    // The plan lists 0 for the model. The entry shows the lab's API price instead and says whose it is; its own
+    // `cost` stays as models.dev has it, and nothing is marked as inherited.
+    expect(plan["model-a"]!.cost).toEqual(zero);
+    expect(ext(plan["model-a"]!).inherited).toBeNull();
+    expect(ext(plan["model-a"]!).pricing).toMatchObject({ billing: "reference", reference_ref: "lab/model-a", rule_order: "listed" });
+    expect(summarize("lab-coding-plan", plan["model-a"]!, 0)).toMatchObject({ price_in: 4, price_out: 20, price_from: "lab/model-a", origin: "upstream" });
+    // The conditional rates come with it: base prices first, then the override.
+    expect(ext(plan["model-a"]!).pricing.rules!.map((rule) => rule.amount)).toEqual([4, 20, 8]);
+    // No API entry of the same model: a listed price stays and is not called an API price, and a listed zero is the plan.
+    expect(ext(plan.listed!).pricing).toMatchObject({ billing: "unknown", reference_ref: null });
+    expect(summarize("lab-coding-plan", plan.listed!, 0)).toMatchObject({ price_in: 0.2, price_out: 1.2, price_from: null });
+    expect(ext(plan.free!).pricing).toMatchObject({ billing: "not_applicable", coverage: "not_applicable", rules: null });
+    expect(summarize("lab-coding-plan", plan.free!, 0)).toMatchObject({ price_in: null, price_out: null, price_from: null });
+    // The API entries are billed by their own rates and refer to nothing.
+    expect(ext(catalog.lab!.models["model-a"]!).pricing).toMatchObject({ billing: "per_use", reference_ref: null });
+    expect(summarize("lab", catalog.lab!.models["model-a-0101"]!, 0)).toMatchObject({ price_in: 9, price_from: null });
+  });
+
   it("flags an addition that upstream now has too", () => {
     const { issues } = resolve(
       input([], { additions: [{ id: "lab", name: "Lab", access: "api", access_basis: "b", evidence, models: [] }] }),

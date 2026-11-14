@@ -5,6 +5,7 @@ import type { Json } from "../src/core/merge.ts";
 import { entryHtml, rowHtml } from "../src/core/render.ts";
 import { resolve } from "../src/core/resolve.ts";
 import { UpstreamModel } from "../src/core/schema.ts";
+import { pricingOf } from "../src/core/policies.ts";
 import { summaryOf } from "./helpers.ts";
 
 const row = (more: Partial<Summary>): string => rowHtml(summaryOf(more), { now: new Date("2026-11-13T00:00:00Z") });
@@ -76,6 +77,25 @@ describe("the cache summary in a table row", () => {
     expect(never).not.toContain('class="strip"');
     // An entry that does not cache cannot be asked for a longer lifetime: the long line says so.
     expect(row({ evaluation_count: 1, cache_retention: "unsupported", cache_results: [line("short", [[300, 0, 3]]), line("long", null)] })).toContain(">Unsupported</span>");
+  });
+
+  it("says whose price a subscription entry shows", () => {
+    const cost = { text: { input: { price: 4 }, output: { price: 20 } } };
+    // The API list price of the same model, named.
+    const reference = row({ access: "subscription", price_in: 4, price_out: 20, price_from: "lab/model", pricing: pricingOf({ cost }, "subscription", "lab/model", []) });
+    expect(reference).toContain('<span class="price-from">API price</span>');
+    expect(reference).toContain("the API list price of lab/model");
+    // A price the source lists for a subscription entry, with no API entry to compare it with.
+    expect(row({ access: "subscription", price_in: 4, price_out: 20, pricing: pricingOf({ cost }, "subscription", null, []) })).toContain('<span class="price-from">Listed price</span>');
+    // No price per token at all.
+    const plan = row({ access: "subscription", pricing: pricingOf({ cost: { text: { input: { price: 0 }, output: { price: 0 } } } }, "subscription", null, []) });
+    expect(plan).toContain(">In plan</span>");
+    expect(plan).not.toContain("$0");
+    // An API entry has neither label, and a listed zero is shown as the source has it.
+    const api = row({ price_in: 0, price_out: 0, pricing: pricingOf({ cost: { text: { input: { price: 0 }, output: { price: 0 } } } }, "api", null, []) });
+    expect(api).toContain("$0");
+    expect(api).not.toContain("price-from");
+    expect(row({})).not.toContain("In plan");
   });
 
   it("shows no measured limit in the table: those are on the entry's page", () => {

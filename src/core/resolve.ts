@@ -471,6 +471,20 @@ export function resolve(input: ResolveInput): ResolveResult {
     }
   }
 
+  /**
+   * The API entry of a lab's own provider for the canonical model of `model`: the entry with that very id, else the
+   * first by id. Null where the lab is not in the catalog, is not reached by API key, or lists no price for it.
+   */
+  const labEntry = (model: PublishedModel): string | null => {
+    const canonical = typeof model.canonical_id === "string" ? model.canonical_id : null;
+    const parts = canonical ? splitRef(canonical) : null;
+    const provider = parts ? catalog[parts.provider] : undefined;
+    if (!parts || !provider || provExt(provider).access !== "api") return null;
+    const serving = Object.values(provider.models).filter((item) => item !== model && isObject(item.cost) && (typeof item.canonical_id === "string" ? item.canonical_id : `${parts.provider}/${item.id}`) === canonical);
+    const chosen = serving.find((item) => item.id === parts.model) ?? serving.sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))[0];
+    return chosen ? `${parts.provider}/${chosen.id}` : null;
+  };
+
   // 6. Deterministic order, and every record published with all of its keys.
   const sorted: Catalog = {};
   for (const id of Object.keys(catalog).sort()) {
@@ -489,22 +503,31 @@ export function resolve(input: ResolveInput): ResolveResult {
       const cacheEvidence: RetentionEvidence[] = cacheSources.flatMap((source) => source.kind === "listed" ? [] : [{ ...source, kind: source.kind, note: source.note ?? "Source for this entry's cache capabilities." }]);
       if (extension.origin === "upstream") cacheEvidence.unshift({ kind: "documented", url: "https://models.dev", date: input.upstreamDate ?? null, note: "Cache capabilities imported from models.dev; any corrections are recorded in provenance." });
       const cache: EntryCache = { documented, retention: retentionOf(documented, cacheEvidence, declaration), results: summarizeCache(own), evaluations: own };
-      const sourcesFor = (field: string): RetentionEvidence[] => {
-        const inheritedSource = extension.inherited?.fields.includes(field) ? lookup(extension.inherited.from) : undefined;
-        const sourceExtension = inheritedSource ? modelExt(inheritedSource) : extension;
+      /** Where a field of `owner` comes from: the models.dev import, or providers.dev's own sources for it. */
+      const sourcesOf = (owner: PublishedModel, field: string, imported: string): RetentionEvidence[] => {
+        const ownerExtension = modelExt(owner);
         const sources: RetentionEvidence[] = [
-          ...(sourceExtension.origin === "added" ? sourceExtension.evidence ?? [] : []),
-          ...(sourceExtension.provenance ?? []).filter((change) => change.path === field || change.path.startsWith(`${field}.`) || field.startsWith(`${change.path}.`)).flatMap((change) => change.evidence),
-        ].flatMap((source) => source.kind === "listed" ? [] : [{ ...source, kind: source.kind, note: source.note ?? `Source for ${field}.` }]);
-        if (sourceExtension.origin === "upstream") sources.unshift({ kind: "documented", url: "https://models.dev", date: input.upstreamDate ?? null, note: `Imported ${field}; corrections and inheritance are recorded in providers_dev.` });
+          ...(ownerExtension.origin === "added" ? ownerExtension.evidence ?? [] : []),
+          ...(ownerExtension.provenance ?? []).filter((change) => change.path === field || change.path.startsWith(`${field}.`) || field.startsWith(`${change.path}.`)).flatMap((change) => change.evidence),
+        ].flatMap((source) => source.kind === "listed" ? [] : [{ kind: source.kind, url: source.url, date: source.date, note: source.note ?? `Source for ${field}.` }]);
+        if (ownerExtension.origin === "upstream") sources.unshift({ kind: "documented", url: "https://models.dev", date: input.upstreamDate ?? null, note: imported });
         return sources;
       };
-      const priceReference = extension.inherited?.fields.includes("cost") ? extension.inherited.from : null;
-      const priceSource = priceReference ? lookup(priceReference) : undefined;
-      const sourceDeclaration = priceSource ? pricingDeclarations.get(priceSource) : undefined;
-      const priceDeclaration = pricingDeclarations.get(model) ?? (sourceDeclaration ? { ...sourceDeclaration, billing: "reference" as const, reference_ref: priceReference } : undefined);
-      const pricing = pricingOf(model, extension.access, priceReference, sourcesFor("cost"), priceDeclaration);
-      const requestControls = controlsOf(model, cache.retention, sourcesFor("capabilities"), controlDeclarations.get(model));
+      // What the entry's rates are. A subscription entry is not paid per token, so it has no price of its own: it
+      // shows the API list price of the same model, and says whose it is (`reference_ref`). That is the entry it
+      // inherits from (step 5b), or the lab's own API entry for its canonical model. One rule for every subscription
+      // entry, imported or added. An entry providers.dev added with a price of its own keeps that price.
+      const named = extension.inherited?.fields.includes("cost") ? extension.inherited.from : null;
+      const ownPrice = extension.origin === "added" && model.cost !== undefined && named === null;
+      const reference = extension.access !== "subscription" || ownPrice ? null : named ?? labEntry(model);
+      const priced = (reference ? lookup(reference) : undefined) ?? model;
+      const sourceDeclaration = reference ? pricingDeclarations.get(priced) : undefined;
+      const priceDeclaration = pricingDeclarations.get(model) ?? (sourceDeclaration ? { ...sourceDeclaration, billing: "reference" as const, reference_ref: reference } : undefined);
+      const priceNote = reference
+        ? `The cost models.dev records for ${reference}: the API list price this subscription entry refers to. Rules are in the order models.dev applies them.`
+        : "The cost models.dev records for this entry. Rules are in the order models.dev applies them: base prices, overrides in their order, then multipliers.";
+      const pricing = pricingOf(priced, extension.access, reference, sourcesOf(priced, "cost", priceNote), priceDeclaration);
+      const requestControls = controlsOf(model, cache.retention, sourcesOf(model, "capabilities", "Imported capabilities; corrections are recorded in providers_dev.provenance."), controlDeclarations.get(model));
       let evidence: Evidence[] = extension.evidence ?? [];
       if (declaration) evidence = [...evidence, ...declaration.evidence.flatMap((source) => source.date === null ? [] : [{ ...source, date: source.date }])];
       const policyEvidence = [...(pricingDeclarations.get(model)?.evidence ?? []), ...(controlDeclarations.get(model) ?? []).flatMap((control) => control.evidence)];

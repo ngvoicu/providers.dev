@@ -2,7 +2,8 @@
 // re-render in the browser, so a row looks and reads the same wherever it appears.
 import { CACHE_AGES_S, settingsText, type CacheDocumentation, type CacheResult, type CacheSummaryRow, type EntryCache } from "./cache.ts";
 import type { ProviderSummary, Summary } from "./entries.ts";
-import type { Condition, PricingRule, RequestControl } from "./policy-contract.ts";
+import { conditionText } from "./conditions.ts";
+import type { PricingRule, RequestControl } from "./policy-contract.ts";
 import {
   compactTokens,
   duration,
@@ -176,7 +177,7 @@ ${column("name", "Model", "The model's name and its id at this provider.")}
 ${options.hideProvider ? "" : column("provider", "Provider", "Who serves it, and how it is reached.")}
 ${column("context", "Context", "Exposed context window in tokens (limit.context): what this provider accepts for the model.", "num")}
 ${column("max_output", "Max output", "Largest single response in tokens (limit.output). A maximum, not a default.", "num")}
-${column("price_in", "Price in / out", "List price in US dollars per million tokens, input then output, as models.dev records it. Before the changes some providers make by context size or service tier: open the entry for those. On a subscription entry, the line API price marks the price of the same model at the API.", "num mid-only")}
+${column("price_in", "Price in / out", "Base list price in US dollars per million tokens, input then output, as models.dev records it. Conditional rates marks an entry whose price changes with context size, service tier, region, date or the time of day: open the entry for those. A subscription is not paid per token: it shows the API list price of the same model, marked API price, or In plan where the catalog has no API entry of that model.", "num mid-only")}
 ${column("release_date", "Released", "When the model was released, as models.dev records it. It is the model's date: the same at every provider.", "wide-only")}
 ${column(null, "Cache, documented", "Prompt caching as the source documents it: mode and lifetimes.")}
 <th scope="col" class="strip-col"><span title="providers.dev evaluations, all clients together. Each cell is an age since the prompt was cached, starting with the prompt sent again at once; the number is the share of re-sends at that age that were served from the cache, in percent. Short: the requests asked for no lifetime. Long: they asked for a longer one, and the value is shown. Hover a cell for the counts.">Cache, measured <span class="muted">% by age</span></span>${STRIP_HEAD}</th>
@@ -202,64 +203,105 @@ ${options.hideProvider ? "" : `<td><a class="plain" href="/providers/${e(entry.p
 </tr>`;
 }
 
-// ---- prices (cost.text, as models.dev records it)
+// ---- prices: `pricing` as the API publishes it. Nothing here multiplies or compares: a multiplier's prices are its
+// `resulting_rates`, and a time rule's name is its `period`.
+
+const LISTED_PRICE = "The price models.dev lists for this entry. The entry is a subscription; what the listed price bills is not established.";
 
 function priceCell(entry: Pick<Summary, "price_in" | "price_out" | "price_from" | "access" | "pricing">): string {
   const { price_in: input, price_out: output } = entry;
-  const plan = IN_PLAN;
   const conditional = entry.pricing.rules?.some((rule) => rule.when !== null || rule.operation === "multiply");
   const conditionNote = conditional ? '<div class="hint">Conditional rates</div>' : "";
-  if (input === null && output === null) return (entry.access === "subscription" ? plan : UNKNOWN) + conditionNote;
+  // A subscription entry with no API entry of the same model to refer to has no price per token at all.
+  if (input === null && output === null) return (entry.pricing.billing === "not_applicable" ? IN_PLAN : UNKNOWN) + conditionNote;
   // A listed 0 is shown as the source has it. It can mean free, or paid for another way: the page does not decide.
-  if (input === 0 && output === 0) {
-    return (entry.access === "subscription" ? plan : `<span class="price">$0 <span class="muted">/</span> $0</span>`) + conditionNote;
-  }
   const price = `<span class="price">${input === null ? DASH : usd(input)} <span class="muted">/</span> ${output === null ? DASH : usd(output)}</span>${conditionNote}`;
-  if (!entry.price_from) return price;
   // Two short lines: the price, then whose price it is.
-  return `<span class="price-inherited" title="Not what this entry costs: a subscription is not paid per token. This is the API list price of ${e(entry.price_from)}, inherited from it.">${price}<span class="price-from">API price</span></span>`;
+  if (entry.price_from) {
+    return `<span class="price-inherited" title="Not what this entry costs: a subscription is not paid per token. This is the API list price of ${e(entry.price_from)}.">${price}<span class="price-from">API price</span></span>`;
+  }
+  if (entry.access === "subscription") return `<span class="price-inherited" title="${e(LISTED_PRICE)}">${price}<span class="price-from">Listed price</span></span>`;
+  return price;
 }
 
+const METER_ORDER = ["text.input", "text.output", "text.reasoning_output", "text.cache_read", "text.cache_write", "text.cache_storage"];
 const METER_LABEL: Record<string, string> = { "text.input": "Input", "text.output": "Output", "text.reasoning_output": "Reasoning output", "text.cache_read": "Cache read", "text.cache_write": "Cache write", "text.cache_storage": "Cache storage", "text.*": "All text charges", "*": "All charges" };
-const CONDITION_LABEL: Record<string, string> = { "request.context_tokens": "Context tokens", "request.input_tokens": "Input tokens", "request.service_tier": "Service tier", "request.region": "Region", "request.date": "Date", "request.utc_hours": "UTC hours", "request.utc_days": "UTC days", "request.holiday": "Holiday", "request.thinking": "Thinking", "request.endpoint": "Endpoint", "cache.mode": "Cache mode", "cache.retention_s": "Cache lifetime (seconds)", "cache.retention_value": "Cache lifetime" };
+const meterLabel = (meter: string): string => METER_LABEL[meter] ?? meter;
+const meterRank = (meter: string): number => { const at = METER_ORDER.indexOf(meter); return at === -1 ? METER_ORDER.length : at; };
+const PERIOD_LABEL = { peak: "Peak hours", off_peak: "Off-peak hours" } as const;
+const APPLIES_TO = { all_usage: "Whole request", above_threshold: "Only the part above the threshold" } as const;
 
-function conditionHtml(value: Condition | null): string {
-  if (value === null) return "Default";
-  if (value.kind === "unknown") return `<span class="muted">Unresolved condition</span> <code>${e(JSON.stringify(value.raw))}</code>`;
-  if (value.kind === "not") return `Not (${conditionHtml(value.condition)})`;
-  if (value.kind === "all" || value.kind === "any") return value.conditions.map((item) => `(${conditionHtml(item)})`).join(value.kind === "all" ? " and " : " or ");
-  if (value.kind !== "predicate") return UNKNOWN;
-  const op = { eq: "=", in: "in", gt: ">", gte: "≥", lt: "<", lte: "≤" }[value.op];
-  const display = typeof value.value === "number" ? exact(value.value) : typeof value.value === "string" ? value.value : JSON.stringify(value.value);
-  return `${e(CONDITION_LABEL[value.field] ?? value.field)} ${e(op)} <code>${e(display)}</code>`;
+/** "$2 / 1M tokens". */
+function rateHtml(rate: Pick<PricingRule, "amount" | "currency" | "unit">): string {
+  const amount = rate.currency === "USD" ? usd(rate.amount) : `${e(rate.currency ?? "Currency unknown")} ${e(String(rate.amount))}`;
+  if (!rate.unit) return `${amount} <span class="muted">· unit unknown</span>`;
+  const { name, quantity } = rate.unit;
+  const per = quantity === null ? `${name}s · quantity unknown` : quantity === 1 ? name : `${quantity === 1000000 ? "1M" : quantity === 1000 ? "1K" : exact(quantity)} ${name}s`;
+  return `${amount} <span class="muted">/ ${e(per)}</span>`;
 }
 
-function rateHtml(rule: PricingRule): string {
-  if (rule.operation === "multiply") return `× ${e(String(rule.amount))}`;
-  const amount = rule.currency === "USD" ? usd(rule.amount) : `${e(rule.currency ?? "Currency unknown")} ${e(String(rule.amount))}`;
-  if (!rule.unit) return `${amount} <span class="muted">· unit unknown</span>`;
-  return `${amount} <span class="muted">/ ${rule.unit.quantity === null ? "unknown quantity of" : exact(rule.unit.quantity)} ${e(rule.unit.name)}${rule.unit.quantity === 1 ? "" : "s"}</span>`;
+/** A cache write price that differs by lifetime only is a base price with a lifetime, not a conditional rate. */
+function lifetimeOf(rule: PricingRule): string | null {
+  const when = rule.when;
+  if (rule.operation !== "set" || when?.kind !== "predicate" || when.op !== "eq") return null;
+  if (when.field === "cache.retention_s" && typeof when.value === "number") return duration(when.value);
+  return when.field === "cache.retention_value" && typeof when.value === "string" ? when.value : null;
 }
 
 function priceSection(summary: Summary): string {
   const pricing = summary.pricing;
   const rules = pricing.rules ?? [];
   const base = rules.filter((rule) => rule.when === null && rule.operation === "set");
-  const conditional = rules.filter((rule) => rule.when !== null || rule.operation === "multiply");
-  const meters = [...new Set(["text.input", "text.output", "text.reasoning_output", "text.cache_read", "text.cache_write", ...base.map((rule) => rule.meter)])];
-  const absent = pricing.billing === "not_applicable" ? NOT_APPLICABLE : UNKNOWN;
-  const rows = meters.map((meter) => {
-    const own = base.filter((rule) => rule.meter === meter);
-    return `<tr><th scope="row">${e(METER_LABEL[meter] ?? meter)}</th><td class="num">${own.length ? own.map(rateHtml).join("<br>") : absent}</td></tr>`;
-  }).join("");
-  const note = pricing.reference_ref ? `<p class="hint">API reference prices from <a href="${e(entryHref(pricing.reference_ref))}">${e(pricing.reference_ref)}</a>. This access uses a subscription.</p>` : "";
-  const changes = conditional.length ? `<div class="scroll"><table class="facts"><thead><tr><th>Condition</th><th>Charge</th><th>Rate</th><th>Applies to</th></tr></thead><tbody>${conditional.map((rule) => `<tr><td>${conditionHtml(rule.when)}</td><td>${e(METER_LABEL[rule.meter] ?? rule.meter)}</td><td>${rateHtml(rule)}</td><td>${rule.applies_to === "all_usage" ? "All matching usage" : rule.applies_to === "above_threshold" ? "Usage above threshold" : UNKNOWN}</td></tr>`).join("")}</tbody></table></div>` : `<p class="muted">${pricing.coverage === "complete" ? "No conditional rates." : pricing.coverage === "not_applicable" ? "Not applicable." : "No conditional rates recorded."}</p>`;
+  const byLifetime = rules.filter((rule) => lifetimeOf(rule) !== null);
+  const conditional = rules.filter((rule) => (rule.when !== null || rule.operation === "multiply") && lifetimeOf(rule) === null);
+  // Every entry has the same five rows; a charge the source prices beyond them gets a row too.
+  const meters = [...new Set([...METER_ORDER.slice(0, 5), ...base.map((rule) => rule.meter), ...byLifetime.map((rule) => rule.meter)])].sort((a, b) => meterRank(a) - meterRank(b));
+  const absent = pricing.billing === "not_applicable" ? IN_PLAN : UNKNOWN;
+  const rows = meters
+    .map((meter) => {
+      const own = base.filter((rule) => rule.meter === meter).map(rateHtml);
+      const lifetimes = byLifetime.filter((rule) => rule.meter === meter).map((rule) => `${rateHtml(rule)} <span class="muted">· ${e(lifetimeOf(rule)!)} lifetime</span>`);
+      const value = [...own, ...lifetimes];
+      return `<tr><th scope="row">${e(meterLabel(meter))}</th><td class="num">${value.length ? value.join("<br>") : absent}</td></tr>`;
+    })
+    .join("");
+
+  // One block per condition, in the order of the API: its charges and what each costs when the condition holds.
+  const groups = new Map<string, PricingRule[]>();
+  for (const rule of conditional) {
+    const key = JSON.stringify(rule.when);
+    groups.set(key, [...(groups.get(key) ?? []), rule]);
+  }
+  const changes = [...groups.values()]
+    .map((members) => {
+      const first = members[0]!;
+      const lines = members
+        .flatMap((rule) => {
+          if (rule.operation === "set") return [{ meter: rule.meter, rate: rateHtml(rule) }];
+          const factor = `<span class="muted">· × ${e(String(rule.amount))}</span>`;
+          if (!rule.resulting_rates) return [{ meter: rule.meter, rate: `× ${e(String(rule.amount))}` }];
+          return rule.resulting_rates.map((rate) => ({ meter: rate.meter, rate: `${rateHtml(rate)} ${factor}` }));
+        })
+        .sort((a, b) => meterRank(a.meter) - meterRank(b.meter));
+      const period = members.find((rule) => rule.period !== null)?.period;
+      const label = period ? `<strong>${PERIOD_LABEL[period]}</strong><div class="hint">${e(first.when ? conditionText(first.when) : "")}</div>` : e(first.when ? conditionText(first.when) : "Always");
+      const applies = members.every((rule) => rule.applies_to === first.applies_to) && first.applies_to ? APPLIES_TO[first.applies_to] : UNKNOWN;
+      const span = lines.length > 1 ? ` rowspan="${lines.length}"` : "";
+      return lines.map((line, at) => `<tr${at === 0 ? ' class="group"' : ""}>${at === 0 ? `<th scope="rowgroup"${span}>${label}</th>` : ""}<td>${e(meterLabel(line.meter))}</td><td class="num">${line.rate}</td>${at === 0 ? `<td${span}>${applies}</td>` : ""}</tr>`).join("");
+    })
+    .join("");
+  const none = pricing.coverage === "complete" ? "No conditional rates." : pricing.billing === "not_applicable" ? "Not applicable: the entry has no price per token." : "No conditional rates recorded.";
+  const note = pricing.reference_ref
+    ? `<p class="hint">API list prices of <a href="${e(entryHref(pricing.reference_ref))}"><code>${e(pricing.reference_ref)}</code></a>. This entry is a subscription and is not paid per token.</p>`
+    : summary.access === "subscription" && pricing.rules !== null
+      ? `<p class="hint">${e(LISTED_PRICE)}</p>`
+      : "";
   const source = pricing.evidence.map((item) => `<a href="${e(item.url)}" rel="noopener">${e(shortUrl(item.url))}</a>${item.date ? ` <span class="date">${e(item.date)}</span>` : ""}`).join(" · ");
-  return `${note}<div class="scroll"><table class="facts"><thead><tr><th>Base charge</th><th class="num">Rate</th></tr></thead><tbody>${rows}</tbody></table></div>
-<h3>Conditional rates</h3>${changes}
-${pricing.coverage === "partial" ? '<p class="hint">Additional pricing conditions may apply. <a href="/docs/api/#pricing-rules">Pricing coverage</a></p>' : ""}
-${source ? `<p class="hint">Source: ${source}</p>` : ""}
-${pricing.unparsed.length ? `<details><summary>Additional source pricing (${pricing.unparsed.length})</summary><pre>${e(JSON.stringify(pricing.unparsed, null, 2))}</pre></details>` : ""}`;
+  return `${note}<div class="scroll"><table class="facts"><thead><tr><th scope="col">Base charge</th><th scope="col" class="num">Rate</th></tr></thead><tbody>${rows}</tbody></table></div>
+<h3>Conditional rates</h3>
+<div class="scroll"><table class="facts conditional"><thead><tr><th scope="col">Condition</th><th scope="col">Charge</th><th scope="col" class="num">Rate</th><th scope="col">Applies to</th></tr></thead><tbody>${changes || `<tr class="empty-row"><td colspan="4" class="muted">${none}</td></tr>`}</tbody></table></div>
+<p class="hint">Source: ${source || (pricing.billing === "not_applicable" ? NOT_APPLICABLE : UNKNOWN)}</p>
+${pricing.unparsed.length ? `<details><summary>Other prices in the source, not shown above (${pricing.unparsed.length})</summary><pre>${e(JSON.stringify(pricing.unparsed, null, 2))}</pre></details>` : ""}`;
 }
 
 function evidenceList(items: PublishedEvidence[]): string {
@@ -359,21 +401,38 @@ ${
 </details>`;
 }
 
-/** What a request can do about the cache lifetime. The same rows on every entry. */
+/** A JSON Pointer into the request body as the field a developer writes: /cache_control/ttl -> cache_control.ttl. */
+const dotted = (pointer: string): string => pointer.replace(/^\//, "").split("/").map((part) => part.replaceAll("~1", "/").replaceAll("~0", "~")).join(".");
+const fieldOf = (binding: { location: string; path: string }): string => (binding.location === "body" ? dotted(binding.path) : binding.path);
+const BINDING_PLACE = { body: "Request body", header: "Request header", query: "Query string" } as const;
+const BINDING_SCOPE = { content_block: ", on a content block", request: ", top level" } as const;
+const jsonText = (value: Json): string => (typeof value === "string" ? value : JSON.stringify(value));
+const CONTROL_LABEL: Record<string, string> = { "cache.retention": "Cache retention", service_tier: "Service tier" };
+
+/**
+ * What a request can set, one row per control. The same columns on every entry: a control nobody documented says
+ * Unknown in each of them. The sources of the rows are named under the table.
+ */
 function requestControlTable(controls: RequestControl[]): string {
   const rows = controls.map((control) => {
-    const support = { supported: "Supported", unsupported: "Unsupported", unknown: "Unknown" }[control.support];
+    const support = { supported: "Supported", unsupported: "Unsupported", unknown: UNKNOWN }[control.support];
     const absent = control.support === "unsupported" ? NOT_APPLICABLE : UNKNOWN;
-    const bindings = control.bindings?.map((binding) => `${e(binding.location)} <code>${e(binding.path)}</code>${binding.scope === "content_block" ? " (per content block)" : ""}`).join("<br>") || absent;
+    const bindings = control.bindings?.map((binding) => `<code>${e(fieldOf(binding))}</code><div class="hint">${BINDING_PLACE[binding.location]}${binding.location === "body" && binding.scope ? BINDING_SCOPE[binding.scope] : ""}</div>`).join("") || absent;
     const options = control.options?.map((option) => {
       const profile = option.attributes?.profile;
-      return `${profile === "short" || profile === "long" ? `${e(profile)}: ` : ""}<code>${e(typeof option.value === "string" ? option.value : JSON.stringify(option.value))}</code>${option.when ? `<div class="hint">${conditionHtml(option.when)}</div>` : ""}`;
-    }).join("<br>") || absent;
-    const conditions = [control.when ? conditionHtml(control.when) : "", ...control.conditions.map(e)].filter(Boolean).join("<br>") || (control.support === "unknown" ? UNKNOWN : "None recorded");
-    return `<tr><th scope="row">${e(control.id === "cache.retention" ? "Cache retention" : control.id === "service_tier" ? "Service tier" : control.id)}</th><td>${support}</td><td>${bindings}</td><td>${options}</td><td>${control.default === null ? absent : `<code>${e(JSON.stringify(control.default.value))}</code>`}</td><td>${conditions}</td></tr>`;
+      const name = profile === "short" ? "Short: " : profile === "long" ? "Long: " : "";
+      const value = option.value === null ? "leave the field out" : `<code>${e(jsonText(option.value))}</code>`;
+      // The exact fields an option is sent with, where they are more than the field itself: a companion field or header.
+      const sent = (option.settings ?? []).length > 1 ? option.settings!.map((setting) => `${fieldOf(setting)}${setting.location === "header" ? ": " : "="}${jsonText(setting.value)}`).join(", ") : "";
+      return `<div>${name}${value}${sent ? `<div class="hint"><code>${e(sent)}</code></div>` : ""}${option.when ? `<div class="hint">${e(conditionText(option.when))}</div>` : ""}</div>`;
+    }).join("") || absent;
+    const conditions = [control.when ? conditionText(control.when) : "", ...control.conditions].filter(Boolean).map(e).join("<br>") || (control.support === "unknown" ? UNKNOWN : "None recorded");
+    return `<tr><th scope="row">${e(CONTROL_LABEL[control.id] ?? control.id)}</th><td>${support}</td><td>${bindings}</td><td>${options}</td><td>${control.default === null ? absent : `<code>${e(jsonText(control.default.value))}</code>`}</td><td>${conditions}</td></tr>`;
   }).join("");
-  const details = controls.filter((control) => control.bindings !== null || control.evidence.length > 0 || control.options?.some((option) => option.settings !== null));
-  return `<div class="scroll"><table class="facts"><thead><tr><th>Control</th><th>Support</th><th>Request field</th><th>Accepted values</th><th>Default</th><th>Conditions</th></tr></thead><tbody>${rows}</tbody></table></div>${details.length ? `<details><summary>Request settings and sources</summary><pre>${e(JSON.stringify(details, null, 2))}</pre></details>` : ""}`;
+  const sources = controls.flatMap((control) => control.evidence).filter((item, at, all) => all.findIndex((other) => other.url === item.url && other.date === item.date) === at);
+  const source = sources.map((item) => `<a href="${e(item.url)}" rel="noopener" title="${e(item.note)}">${e(shortUrl(item.url))}</a>${item.date ? ` <span class="date">${e(item.date)}</span>` : ""}`).join(" · ");
+  return `<div class="scroll"><table class="facts"><thead><tr><th scope="col">Control</th><th scope="col">Support</th><th scope="col">Request field</th><th scope="col">Accepted values</th><th scope="col">Default</th><th scope="col">Conditions</th></tr></thead><tbody>${rows}</tbody></table></div>
+<p class="hint">Source: ${source || UNKNOWN}</p>`;
 }
 
 function measuredLimitRows(limits: MeasuredLimit[]): string {

@@ -3,7 +3,7 @@ import { buildIndex } from "../src/core/entries.ts";
 import { openapi } from "../src/core/openapi.ts";
 import { conditionOf, controlsOf, pricingOf } from "../src/core/policies.ts";
 import { PricingDeclarationSchema, PricingSchema, RequestControlDeclarationSchema, RequestControlsSchema } from "../src/core/policy-contract.ts";
-import { CONTROL_EXAMPLE, PRICING_EXAMPLE } from "../src/core/policy-examples.ts";
+import { CONTROL_EXAMPLE, PRICING_DECLARATION_EXAMPLE, PRICING_EXAMPLE } from "../src/core/policy-examples.ts";
 import { entryHtml, rowHtml } from "../src/core/render.ts";
 import { resolve } from "../src/core/resolve.ts";
 import { ext, OverrideFile, UpstreamModel } from "../src/core/schema.ts";
@@ -17,7 +17,7 @@ function fixture(authored = false) {
   return resolve({
     upstream: { p: { id: "p", name: "P", models: { m: model, other: { ...model, id: "other" } } } },
     additions: [{ id: "plan", name: "Plan", access: "subscription", access_basis: "Fixture", evidence, models: [{ id: "m", inherits: "p/m", evidence: [{ ...evidence[0]!, url: "https://example.com/unrelated-measurement", kind: "measured" }] }] }], routes: {},
-    overrides: authored ? [OverrideFile.parse({ provider: "p", rules: [{ models: ["m"], pricing: PRICING_EXAMPLE, request_controls: [CONTROL_EXAMPLE], reason: "Fixture", evidence }] })] : [],
+    overrides: authored ? [OverrideFile.parse({ provider: "p", rules: [{ models: ["m"], pricing: PRICING_DECLARATION_EXAMPLE, request_controls: [CONTROL_EXAMPLE], reason: "Fixture", evidence }] })] : [],
     access: { default: "api", default_basis: "Fixture", patterns: [], providers: {} }, upstreamDate: "2026-11-14",
   }).catalog;
 }
@@ -26,12 +26,59 @@ describe("uniform pricing and controls", () => {
   it("preserves context thresholds, TTL write prices, zero and combined conditions", () => {
     const pricing = PricingSchema.parse(pricingOf({ cost }, "api", null, evidence));
     expect(pricing.coverage).toBe("partial");
-    expect(pricing.rule_order).toBeNull();
+    // models.dev defines how its rules combine, so an imported record says so: base prices, then the overrides in
+    // their order, then every matching multiplier.
+    expect(pricing.rule_order).toBe("listed");
+    expect(pricing.rules!.map((rule) => (rule.operation === "multiply" ? "multiply" : rule.when === null ? "base" : "override")).join(" ")).toMatch(/^(base )+(override )+multiply$/);
     expect(pricing.unparsed).toEqual([]);
     expect(pricing.rules?.find((rule) => rule.id === "cost.text.input.cache.read")?.amount).toBe(0);
-    expect(pricing.rules?.find((rule) => rule.id === "cost.text.input.overrides[0].price")).toMatchObject({ when: { kind: "predicate", field: "request.context_tokens", op: "gt", value: 200000 }, applies_to: null, amount: 4 });
+    expect(pricing.rules?.find((rule) => rule.id === "cost.text.input.overrides[0].price")).toMatchObject({ when: { kind: "predicate", field: "request.context_tokens", op: "gt", value: 200000 }, applies_to: "all_usage", amount: 4 });
     expect(pricing.rules?.find((rule) => rule.id === "cost.text.input.overrides[0].cache.write.1h")).toMatchObject({ meter: "text.cache_write", amount: 8, when: { kind: "all", conditions: [{ field: "request.context_tokens", value: 200000 }, { field: "cache.retention_s", value: 3600 }] } });
     expect(pricing.rules?.at(-1)).toMatchObject({ operation: "multiply", meter: "text.*", amount: 2, when: { field: "request.service_tier", value: "priority" } });
+  });
+
+  it("reads a factor the way models.dev defines it: a number scales every price under it, an object only what it names", () => {
+    const priced = { text: { input: { price: 1, cache: { read: 0.1, write: { "5m": 1.25 } } }, output: { price: 4, reasoning: 5 } } };
+    const rulesOf = (factor: unknown) => pricingOf({ cost: { ...priced, multipliers: [{ when: { service_tier: { equals: "flex" } }, factor }] } } as never, "api", null, evidence);
+    const scaled = (factor: unknown) => rulesOf(factor).rules!.filter((rule) => rule.operation === "multiply").map((rule) => [rule.meter, rule.amount]);
+    expect(scaled(0.5)).toEqual([["*", 0.5]]);
+    expect(scaled({ text: 0.5 })).toEqual([["text.*", 0.5]]);
+    // The shape Google's entries use: the input price and its cache read are named, the output side is one number.
+    expect(scaled({ text: { input: { price: 0.5, cache: { read: 0.5 } }, output: 0.5 } })).toEqual([["text.input", 0.5], ["text.cache_read", 0.5], ["text.output", 0.5], ["text.reasoning_output", 0.5]]);
+    // A number for the input side scales every input price that exists: here input, cache read and cache write.
+    expect(scaled({ text: { input: 2, output: { price: 3 } } })).toEqual([["text.input", 2], ["text.cache_read", 2], ["text.cache_write", 2], ["text.output", 3]]);
+    // Another modality is not normalized: its factor is kept as the source has it, and the text part still counts.
+    const mixed = rulesOf({ text: 1.8, audio: 1.8 });
+    expect(mixed.rules!.at(-1)).toMatchObject({ meter: "text.*", amount: 1.8 });
+    expect(mixed.unparsed).toEqual([{ path: "cost.multipliers[0].factor.audio", value: 1.8 }]);
+    // Every rule of a fan-out has its own id.
+    const ids = rulesOf({ text: { input: 2 } }).rules!.map((rule) => rule.id);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it("names peak and off-peak hours and publishes the prices a multiplier makes", () => {
+    const hours = { utc_days: { in: ["mon", "tue", "wed", "thu", "fri"] }, any: [{ all: [{ utc_hours: { gte: "01:00" } }, { utc_hours: { lt: "04:00" } }] }], not: { holiday: { equals: "CN" } } };
+    const priced = { text: { input: { price: 0.15, cache: { read: 0.003 } }, output: { price: 0.6 } } };
+    const peak = pricingOf({ cost: { ...priced, multipliers: [{ when: hours, factor: 2 }] } } as never, "api", null, evidence).rules!.at(-1)!;
+    // The base price is the price outside the window, so a rule that raises it in a window marks the peak hours.
+    expect(peak).toMatchObject({ operation: "multiply", meter: "*", amount: 2, period: "peak", applies_to: "all_usage" });
+    expect(peak.resulting_rates).toEqual([
+      { meter: "text.input", amount: 0.3, currency: "USD", unit: { name: "token", quantity: 1000000 } },
+      { meter: "text.cache_read", amount: 0.006, currency: "USD", unit: { name: "token", quantity: 1000000 } },
+      { meter: "text.output", amount: 1.2, currency: "USD", unit: { name: "token", quantity: 1000000 } },
+    ]);
+    const offPeak = pricingOf({ cost: { ...priced, multipliers: [{ when: { utc_hours: { gte: "14:00" } }, factor: { text: 0.5 } }] } } as never, "api", null, evidence).rules!.at(-1)!;
+    expect(offPeak).toMatchObject({ period: "off_peak", meter: "text.*" });
+    expect(offPeak.resulting_rates!.map((rate) => rate.amount)).toEqual([0.075, 0.0015, 0.3]);
+    // A price set for a window is named by how it compares with the base price; one equal to it has no name.
+    const windows = pricingOf({ cost: { text: { input: { price: 0.132, overrides: [{ when: { utc_hours: { lt: "16:00" } }, price: 0.132 }, { when: { utc_hours: { gte: "16:00" } }, price: 0.0825 }] } } } } as never, "api", null, evidence).rules!;
+    expect(windows.map((rule) => [rule.amount, rule.period, rule.resulting_rates])).toEqual([[0.132, null, null], [0.132, null, null], [0.0825, "off_peak", null]]);
+    // Not every conditional rule is a time rule: a tier or a date has no period, and still gets its prices.
+    const tier = pricingOf({ cost: { ...priced, multipliers: [{ when: { service_tier: { equals: "priority" } }, factor: 1.1 }, { when: { date: { gte: "2026-12-01" } }, factor: { text: { input: { price: 2 } } } }] } } as never, "api", null, evidence).rules!;
+    expect(tier.at(-2)).toMatchObject({ period: null, resulting_rates: [{ meter: "text.input", amount: 0.165 }, { meter: "text.cache_read", amount: 0.0033 }, { meter: "text.output", amount: 0.66 }] });
+    expect(tier.at(-1)).toMatchObject({ period: null, meter: "text.input", resulting_rates: [{ meter: "text.input", amount: 0.3 }] });
+    // A multiplier with no base price in its scope has nothing to multiply.
+    expect(pricingOf({ cost: { text: { input: { overrides: [{ when: { context: { gt: 1 } }, price: 2 }] } }, multipliers: [{ when: { service_tier: { equals: "flex" } }, factor: 0.5 }] } } as never, "api", null, evidence).rules!.at(-1)!.resulting_rates).toBeNull();
   });
 
   it("keeps nested and unfamiliar conditions instead of treating them as unconditional", () => {
@@ -45,6 +92,12 @@ describe("uniform pricing and controls", () => {
     expect(pricingOf({}, "api", null, [])).toMatchObject({ coverage: "unknown", billing: "unknown", rules: null });
     expect(pricingOf({}, "subscription", null, [])).toMatchObject({ coverage: "not_applicable", billing: "not_applicable", rules: null });
     expect(pricingOf({ cost }, "subscription", "p/m", [])).toMatchObject({ billing: "reference", reference_ref: "p/m" });
+    // A subscription entry with no API entry to refer to: a listed zero is the plan and not a price per token, so
+    // nothing is published as a rate. A price that is listed stays, and what it bills is not claimed.
+    const free = { text: { input: { price: 0, cache: { read: 0, write: 0 } }, output: { price: 0 } } };
+    expect(pricingOf({ cost: free }, "subscription", null, evidence)).toEqual({ coverage: "not_applicable", billing: "not_applicable", reference_ref: null, rules: null, rule_order: null, unparsed: [], evidence: [{ ...evidence[0], note: "The source lists a price of 0 for this entry, which is a subscription: no price per token is published." }] });
+    expect(pricingOf({ cost: free }, "api", null, evidence)).toMatchObject({ billing: "per_use", rules: [{ amount: 0 }, { amount: 0 }, { amount: 0 }, { amount: 0 }] });
+    expect(pricingOf({ cost }, "subscription", null, evidence)).toMatchObject({ billing: "unknown", reference_ref: null, coverage: "partial" });
     expect(pricingOf({ cost: { future_modality: { price: 5 }, text: { input: { unit: "character", price: 1 } } } }, "api", null, [])).toMatchObject({ coverage: "partial", unparsed: [{ path: "cost.future_modality", value: { price: 5 } }], rules: [{ unit: { name: "character", quantity: null } }] });
   });
 
@@ -56,12 +109,15 @@ describe("uniform pricing and controls", () => {
   });
 
   it("validates documentation examples, body paths, evidence and unsupported states", () => {
-    expect(PricingDeclarationSchema.parse(PRICING_EXAMPLE)).toEqual(PRICING_EXAMPLE);
+    expect(PricingDeclarationSchema.parse(PRICING_DECLARATION_EXAMPLE)).toEqual(PRICING_DECLARATION_EXAMPLE);
+    // The published form adds what follows from the rules; an author does not write it.
+    expect(PricingSchema.parse(PRICING_EXAMPLE)).toEqual(PRICING_EXAMPLE);
+    expect(PricingDeclarationSchema.safeParse(PRICING_EXAMPLE).success).toBe(false);
     expect(RequestControlDeclarationSchema.parse(CONTROL_EXAMPLE)).toEqual(CONTROL_EXAMPLE);
     expect(RequestControlDeclarationSchema.safeParse({ ...CONTROL_EXAMPLE, support: "unsupported" }).success).toBe(false);
     expect(RequestControlDeclarationSchema.safeParse({ ...CONTROL_EXAMPLE, bindings: [{ location: "body", path: "cache.ttl", scope: "request" }] }).success).toBe(false);
     expect(RequestControlDeclarationSchema.safeParse({ ...CONTROL_EXAMPLE, evidence: [] }).success).toBe(false);
-    expect(PricingDeclarationSchema.safeParse({ ...PRICING_EXAMPLE, unparsed: [{ path: "future", value: 1 }] }).success).toBe(false);
+    expect(PricingDeclarationSchema.safeParse({ ...PRICING_DECLARATION_EXAMPLE, unparsed: [{ path: "future", value: 1 }] }).success).toBe(false);
   });
 
   it("publishes one object in summaries and full records, scoped to the declared entry", () => {
@@ -94,7 +150,12 @@ describe("uniform pricing and controls", () => {
     expect(visibleLimits).toContain("915,011");
     expect(visibleLimits).not.toContain("accepted an input");
     expect(visibleLimits).not.toContain("A free-text claim");
-    expect(html).toContain("Input tokens &gt;");
+    // A condition is said in words, and a multiplier comes with the prices it makes of the base rates.
+    expect(html).toContain("Input above 200,000 tokens");
+    expect(html).toContain("<strong>Off-peak hours</strong>");
+    expect(html).toContain("From 16:00 UTC");
+    expect(html).toContain('$1 <span class="muted">/ 1M tokens</span> <span class="muted">· × 0.5</span>');
+    expect(html).toContain("Whole request");
     expect(html).toContain("x-example-cache");
     expect(html).not.toContain("the prices above do not change");
     expect(rowHtml(summary, { now: new Date("2026-11-14T00:00:00Z") })).toContain("Conditional rates");

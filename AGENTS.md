@@ -34,13 +34,22 @@ The baseline is imported from models.dev; our additions, corrections and measure
   `kind`, `url` and `date`. The build fails without them. Do not invent limits, lifetimes, model mappings or dates.
 - Unknown is not zero and not unsupported. A missing value stays missing; `null` in an override means "publish as
   unknown"; `"$delete"` removes a field.
+- One structure. Everything providers.dev publishes of its own (a summary, a `providers_dev` record, an evaluation,
+  a correction, evidence, `/api/v1/meta`) has a fixed set of keys: `null` for a value that is not known, `[]` for
+  an empty list, never a missing key, and the same keys whatever the query parameters. Do not add an optional field
+  to a published type or to `src/core/contract.ts`; the contract test fails on two objects of a kind with different
+  keys. Only the models.dev part of an entry keeps models.dev's shape, where a field can be absent.
 - A measurement never replaces a documented value on an upstream entry. It goes under `providers_dev`.
 - Everything we add to a provider or model object lives under the `providers_dev` key. Do not add other top-level
   fields to upstream objects.
 - An entry we add inherits identity fields only (`IDENTITY_FIELDS` in `src/core/resolve.ts`), never limits, cache
   behaviour or capabilities. One exception: an added subscription entry takes `cost` from the API entry it names,
-  marked in `providers_dev.inherited.fields` and as `price_from` in the summary. It is the API list price, never
-  shown as what the subscription costs.
+  marked in `providers_dev.inherited.fields`.
+- A subscription entry is not paid per token. One rule for all of them, imported or added: `providers_dev.pricing`
+  is the API list price of the same model (`billing: reference`, `reference_ref`, and `price_from` in the summary):
+  the entry it inherits from, else the lab's own API entry for its canonical model (`labEntry` in
+  `src/core/resolve.ts`). Never shown as what the subscription costs. With no such API entry the record is
+  `not_applicable` ("In plan"). An imported entry's own `cost` field is left as models.dev has it.
 - No subscription plans, plan prices, allowances or quota data. Access is a classification only.
 - The website and the API must read the same published snapshot and use the same query code (`src/core/query.ts`).
   Do not add a second filter implementation. Pages consume API responses through `PageDeps.api`; never import a
@@ -56,6 +65,12 @@ The baseline is imported from models.dev; our additions, corrections and measure
 - Pricing and request controls come from `providers_dev.pricing` and `providers_dev.request_controls`, also present
   on every summary. Normalize conditions once; preserve unfamiliar source shapes and mark coverage partial. Never
   infer flat pricing from absent rules or invent request headers from free-text locations.
+- Imported pricing follows the models.dev v2 schema (`packages/core/src/schema-v2.ts` there): rules are published in
+  the order models.dev applies them (`rule_order: listed`: base, overrides in order, then multipliers), each for the
+  whole matching request (`applies_to: all_usage`), and a factor scales every price under it. What follows from the
+  rules is worked out once in `derivePricing` (`src/core/policies.ts`): `period` (peak or off-peak for a time rule)
+  and `resulting_rates` (the prices a multiplier makes of the base rates). A page never multiplies or compares; it
+  says a condition in words with `src/core/conditions.ts`.
 - Measured limits use numeric columns, not generated sentences. Free-text evaluation notes belong in raw evidence.
 - Each source carries its own date: the import date next to `models.dev`, the newest evidence next to
   `providers.dev`.
