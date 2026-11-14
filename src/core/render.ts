@@ -25,6 +25,8 @@ const UNKNOWN = '<span class="unknown" title="The source does not say. Unknown i
 const DASH = '<span class="muted">–</span>';
 /** Every entry page has the same rows. These fill a row whose value the source does not give. */
 const NOT_APPLICABLE = '<span class="muted" title="This field does not apply to this entry.">Not applicable</span>';
+/** A list with nothing in it: a known nothing, not a missing value. */
+const NONE = '<span class="muted">None</span>';
 const IN_PLAN = '<span class="muted" title="No price per token: the entry is paid for through a plan or subscription, which providers.dev does not list.">In plan</span>';
 const ACCESS_LABEL = { api: "API key", subscription: "Subscription", unknown: "Unclassified" } as const;
 
@@ -301,7 +303,7 @@ function priceSection(summary: Summary): string {
 <h3>Conditional rates</h3>
 <div class="scroll"><table class="facts conditional"><thead><tr><th scope="col">Condition</th><th scope="col">Charge</th><th scope="col" class="num">Rate</th><th scope="col">Applies to</th></tr></thead><tbody>${changes || `<tr class="empty-row"><td colspan="4" class="muted">${none}</td></tr>`}</tbody></table></div>
 <p class="hint">Source: ${source || (pricing.billing === "not_applicable" ? NOT_APPLICABLE : UNKNOWN)}</p>
-${pricing.unparsed.length ? `<details><summary>Other prices in the source, not shown above (${pricing.unparsed.length})</summary><pre>${e(JSON.stringify(pricing.unparsed, null, 2))}</pre></details>` : ""}`;
+<details><summary>Other prices in the source, not shown above (${pricing.unparsed.length})</summary>${pricing.unparsed.length ? `<pre>${e(JSON.stringify(pricing.unparsed, null, 2))}</pre>` : `<p class="muted mt-3">${NONE}</p>`}</details>`;
 }
 
 function evidenceList(items: PublishedEvidence[]): string {
@@ -393,11 +395,7 @@ ${COLUMNS.map((column) => heatCell(inColumn(run.results, column), column, true))
 <div class="scroll mt-3"><table class="facts heat summary"><thead><tr><th scope="col" rowspan="2">Retention</th><th scope="colgroup" colspan="${columns}" class="span">Time since the prompt was cached · served from the cache, in percent</th></tr><tr>${HEAT_HEAD}</tr></thead><tbody>${summary}</tbody></table></div>
 <p class="legend"><span><span class="heat-key all">100</span> All served from the cache</span><span><span class="heat-key most">67</span> Half or more</span><span><span class="heat-key few">33</span> Fewer</span><span><span class="heat-key none">0</span> None</span><span><span class="heat-key skip">·</span> Not checked at that age</span></p>
 <details class="evaluations"><summary>Individual evaluations (${cache.evaluations.length})</summary>
-${
-  cache.evaluations.length > 0
-    ? `<div class="scroll mt-3"><table class="facts heat"><thead><tr><th scope="col" rowspan="2">Evaluation</th><th scope="colgroup" colspan="${columns}" class="span">Time since the prompt was cached · re-sends served from the cache, of those made</th><th scope="col" rowspan="2">Evidence</th></tr><tr>${HEAT_HEAD}</tr></thead><tbody>${evaluations}</tbody></table></div>`
-    : '<p class="muted mt-3">No evaluations on this entry.</p>'
-}
+<div class="scroll mt-3"><table class="facts heat"><thead><tr><th scope="col" rowspan="2">Evaluation</th><th scope="colgroup" colspan="${columns}" class="span">Time since the prompt was cached · re-sends served from the cache, of those made</th><th scope="col" rowspan="2">Evidence</th></tr><tr>${HEAT_HEAD}</tr></thead><tbody>${evaluations || `<tr class="empty-row"><td colspan="${columns + 2}" class="muted">No evaluations on this entry.</td></tr>`}</tbody></table></div>
 </details>`;
 }
 
@@ -480,7 +478,6 @@ export function entryHtml(view: EntryView): string {
   const provenance = extension.provenance;
   const limit = isObject(model.limit) ? model.limit : {};
   const cache = extension.cache;
-  const runs = cache.evaluations;
   const measuredLimits = extension.limits.measured;
   const fromMeasurement = extension.limits.from_measurement;
   const number = (value: Json | undefined): string => (typeof value === "number" ? `${exact(value)} <span class="muted">tokens</span>` : UNKNOWN);
@@ -496,23 +493,17 @@ export function entryHtml(view: EntryView): string {
         ? "None"
         : `${summary.cache_modes.map((mode, at) => (at === 0 ? CACHE_MODE_WORD[mode] : CACHE_MODE_WORD[mode].toLowerCase())).join(" + ")}${summary.cache_ttl_s.length > 0 ? ` <span class="unit">${summary.cache_ttl_s.map(duration).join(", ")}</span>` : ""}`;
 
-  const inherited = extension.inherited
-    ? `<p class="note">Name, family and dates are taken from <a href="${e(entryHref(extension.inherited.from))}"><code>${e(extension.inherited.from)}</code></a>. Limits and caching are <strong>not</strong> copied from it, because this access method can differ.${extension.inherited.fields.includes("cost") ? " The prices are that entry's API list prices, marked as inherited." : ""}</p>`
-    : "";
-
   return `
 <header class="entry-head">
   <p class="crumbs"><a href="/providers/">Providers</a> / <a href="/providers/${e(provider.id)}/">${e(provider.name)}</a>${summary.canonical_id ? ` · <a href="${e(modelHref(summary.canonical_id))}">All access methods for ${e(summary.canonical_id)}</a>` : ""}</p>
   <h1>${e(summary.name)}</h1>
   <p class="id"><code>${e(summary.ref)}</code>${copyButton(summary.ref, "entry id")} <span class="badge ${summary.access}">${ACCESS_LABEL[summary.access]}</span>
   ${sourcesHtml(summary, view, true)}${summary.status ? ` <span class="badge">${e(summary.status)}</span>` : ""}</p>
-  <p class="released muted">${
+  <p class="released muted">Type <span title="The kind of model, as models.dev records it.">${summary.type ? e(summary.type) : "unknown"}</span> · ${
     summary.release_date
       ? `Released <span class="date" title="The model's release date, as models.dev records it. It is the same at every provider.">${e(summary.release_date)}</span>`
       : "Release date unknown"
   }</p>
-  ${typeof model.description === "string" ? `<p class="lead">${e(model.description)}</p>` : ""}
-  ${inherited}
 </header>
 
 <div class="tiles mt-6">
@@ -533,7 +524,6 @@ export function entryHtml(view: EntryView): string {
       ${fact("Maximum output", "<code>limit.output</code>: the most one response can hold. A maximum, not what you get by default.", number(limit.output), sourceOf("limit.output", provenance, extension.origin, fromMeasurement))}
     </tbody>
   </table></div>
-  <p class="hint">Usable context is smaller than the window by the system prompt and tool definitions of the client in use. That overhead varies, so no usable figure is published. An agent's compaction threshold is a client setting, not a limit of this entry.</p>
   <h3>Measured <span class="hint">tokens</span></h3>
   <div class="scroll"><table class="facts"><thead><tr><th scope="col">Date</th><th scope="col">Measured through</th><th scope="col" class="num">Context</th><th scope="col" class="num">Input accepted</th><th scope="col" class="num">Input refused</th><th scope="col" class="num">Output limit</th><th scope="col" class="num">Requested output accepted</th><th scope="col">Evidence</th></tr></thead><tbody>${
     measuredLimits.length > 0 ? measuredLimitRows(measuredLimits) : '<tr class="empty-row"><td colspan="8" class="muted">No limits were measured on this entry.</td></tr>'
@@ -559,23 +549,31 @@ export function entryHtml(view: EntryView): string {
 
 <section aria-labelledby="provenance">
   <h2 id="provenance">Provenance</h2>
-  ${
-    extension.origin === "added"
-      ? `<p>models.dev has no entry for this access method. Every value here is published by providers.dev.</p>${evidenceList(extension.evidence)}`
-      : provenance.length === 0
-        ? `<p>Every documented field is imported from models.dev as is and has not been independently checked.${runs.length + measuredLimits.length > 0 ? " The providers.dev evaluations above are shown next to the documented values and replace none of them." : ""}</p>`
-        : `<p>Imported from models.dev, with these corrections by providers.dev:</p>`
-  }
-  ${provenance
-    .map(
-      (change) => `<div class="change">
-    <p><code>${e(change.path)}</code> ${change.op === "set" ? `is <strong>${show(change.value)}</strong>` : change.op === "unknown" ? "is published as <strong>unknown</strong>" : "is <strong>removed</strong>"}. models.dev says: ${change.had_upstream ? show(change.upstream) : '<span class="muted">nothing</span>'}.</p>
-    <p class="muted">${e(change.reason)}</p>
-    ${evidenceList(change.evidence)}
-  </div>`,
-    )
-    .join("")}
-  ${extension.origin !== "added" && extension.evidence.length ? evidenceList(extension.evidence) : ""}
+  <div class="scroll"><table class="facts">
+    <thead><tr><th scope="col">Provenance</th><th scope="col">Value</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Source</th><td>${sourcesHtml(summary, view, true)}</td></tr>
+      <tr><th scope="row">Inherited from</th><td>${
+        extension.inherited
+          ? `<a href="${e(entryHref(extension.inherited.from))}"><code>${e(extension.inherited.from)}</code></a><div class="hint">${extension.inherited.fields.map((field) => `<code>${e(field)}</code>`).join(", ")}</div>`
+          : NONE
+      }</td></tr>
+      <tr><th scope="row">Corrections</th><td>${
+        provenance.length === 0
+          ? NONE
+          : provenance
+              .map(
+                (change) => `<div class="change">
+        <p><code>${e(change.path)}</code> ${change.op === "set" ? `is <strong>${show(change.value)}</strong>` : change.op === "unknown" ? "is published as <strong>unknown</strong>" : "is <strong>removed</strong>"}. models.dev says: ${change.had_upstream ? show(change.upstream) : '<span class="muted">nothing</span>'}.</p>
+        <p class="muted">${e(change.reason)}</p>
+        ${evidenceList(change.evidence)}
+      </div>`,
+              )
+              .join("")
+      }</td></tr>
+      <tr><th scope="row">Evidence</th><td>${extension.evidence.length > 0 ? evidenceList(extension.evidence) : NONE}</td></tr>
+    </tbody>
+  </table></div>
 </section>
 
 <section aria-labelledby="raw">

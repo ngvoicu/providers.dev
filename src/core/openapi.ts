@@ -79,9 +79,6 @@ const pathParam = (name: string, description: string, example: string): Schema =
 
 /** Every endpoint, once. The documentation page lists them from here too. */
 export const ENDPOINTS: { path: string; summary: string; description?: string; params: readonly ParamDoc[]; returns: string }[] = [
-  { path: "/api/v1/facets", summary: "Catalog filter options and counts", params: [], returns: "Facets" },
-  { path: "/api/v1/corrections", summary: "Corrections grouped by identical change and evidence", params: CORRECTION_PARAMS, returns: "A page of Correction" },
-  { path: "/api/v1/docs/{document}", summary: "Authored reference documentation", description: "The methodology and licensing text shown by the website. Compiled with the templates; contains no dataset values. API documentation is generated from /api/v1/openapi.json.", params: [], returns: "Documentation" },
   { path: "/api/v1/entries", summary: "Search and filter entries", description: "An entry is a model at a provider and access method. Returns entry summaries. The order is fixed: the sort key, then provider id, then model id.", params: PARAMS, returns: "A page of EntrySummary" },
   { path: "/api/v1/entries/{provider}/{model}", summary: "One entry in full", description: "The provider is the first path segment; the model id is the rest of the path and may contain slashes. URL-encode each segment.", params: [], returns: "provider, summary and entry" },
   { path: "/api/v1/providers", summary: "List providers", params: PROVIDER_PARAMS, returns: "A page of ProviderSummary" },
@@ -92,6 +89,10 @@ export const ENDPOINTS: { path: string; summary: string; description?: string; p
   { path: "/api/v1/meta", summary: "The dataset: version, counts, freshness, open issues", params: [], returns: "Meta" },
   { path: "/api/v1/catalog", summary: "Everything in one file", description: "`{ meta, providers }`, where `providers` is keyed by provider id and each provider holds `models` keyed by model id. Includes full pricing and request controls; use paginated resources when a full download is unnecessary.", params: [], returns: "meta and providers" },
   { path: "/api/v1/openapi.json", summary: "This document", params: [], returns: "OpenAPI 3.1" },
+  // What the pages of the website are drawn from, beyond the resources above.
+  { path: "/api/v1/facets", summary: "Catalog filter options and counts", params: [], returns: "Facets" },
+  { path: "/api/v1/corrections", summary: "Corrections grouped by identical change and evidence", params: CORRECTION_PARAMS, returns: "A page of Correction" },
+  { path: "/api/v1/docs/{document}", summary: "Authored reference documentation", description: "The methodology and licensing text shown by the website. Compiled with the templates; contains no dataset values. API documentation is generated from /api/v1/openapi.json.", params: [], returns: "Documentation" },
 ];
 
 export function openapi(): Record<string, unknown> {
@@ -106,15 +107,14 @@ export function openapi(): Record<string, unknown> {
       title: "providers.dev API",
       version: "1.2.0",
       description:
-        "Read-only metadata about AI models as each provider and access method exposes them. The baseline is imported from models.dev (MIT); providers.dev additions, corrections and evaluations are under the `providers_dev` key. " +
-        "Four resources: providers, entries (a model at a provider), models (canonical) and evaluations. Every collection answers `{ meta, total, limit, offset, next_offset, data }` and pages with `limit` and `offset`; every single object answers `{ meta, data }`. " +
-        "Every entry summary contains pricing and request_controls, also available under providers_dev on full entries. Conditions share a recursive typed grammar; headers, body fields and query parameters have explicit bindings. " +
-        "Unknown is never zero: null means no source gives the value. Every object providers.dev publishes has all of its keys on every entry, so no field needs checking for presence; only the models.dev part of an entry or provider can leave a field out. Pricing coverage is partial unless completeness is explicitly confirmed; unsupported, unknown and not_applicable are distinct. This API describes rates, not a billing quote.",
+        "Read-only data about AI models as each provider and access method exposes them: limits, prices, prompt caching, and what providers.dev measured. " +
+        "The baseline is imported from models.dev (MIT); everything providers.dev adds is under the `providers_dev` key. No key is needed.",
       license: { name: "MIT", url: "https://providers.dev/docs/licensing/" },
     },
     servers: [{ url: "https://providers.dev" }],
     "x-guide": [
       { id: "usage", title: "Requests and pagination", paragraphs: [
+        "Four resources: providers, entries (a model at a provider and access method), models (canonical: a model as its lab names it) and evaluations. Limits, prices and caching belong to an entry, because the same model differs from one provider to the next.",
         "No authentication is required. GET and HEAD are supported; OPTIONS answers CORS preflights. Public requests read a published snapshot and never fetch upstream providers.",
         `Every collection returns { meta, total, limit, offset, next_offset, data }. Use limit from 1 to ${MAX_LIMIT} (default ${DEFAULT_LIMIT}) and continue with next_offset until it is null. Every single resource returns { meta, data }; /meta and /openapi.json return their documents directly.`,
         "Filters combine with AND. Unknown parameters, duplicate parameters and invalid values return 400 with details. URL-encode each provider/model path segment; model ids may contain slashes. Keep dataset_version and generated_at when joining pages; restart pagination if either changes.",
@@ -151,9 +151,6 @@ export function openapi(): Record<string, unknown> {
       ] },
     ],
     paths: {
-      "/api/v1/facets": get("/api/v1/facets", { 200: ok("Filter options and counts", oneOf(ref("Facets"))), 304: notModified, 400: badParams }),
-      "/api/v1/corrections": get("/api/v1/corrections", { 200: ok("A page of corrections", pageOf(ref("Correction"))), 304: notModified, 400: badParams }),
-      "/api/v1/docs/{document}": get("/api/v1/docs/{document}", { 200: ok("Reference text", oneOf(ref("Documentation"))), 304: notModified, 400: badParams, 404: errorResponse("No such document") }, [pathParam("document", "methodology or licensing.", "methodology")]),
       "/api/v1/entries": get("/api/v1/entries", { 200: ok("A page of entries", pageOf(ref("EntrySummary"))), 304: notModified, 400: badParams }),
       "/api/v1/entries/{provider}/{model}": get(
         "/api/v1/entries/{provider}/{model}",
@@ -201,6 +198,9 @@ export function openapi(): Record<string, unknown> {
         304: notModified,
       }),
       "/api/v1/openapi.json": get("/api/v1/openapi.json", { 200: ok("OpenAPI 3.1", { type: "object" }) }),
+      "/api/v1/facets": get("/api/v1/facets", { 200: ok("Filter options and counts", oneOf(ref("Facets"))), 304: notModified, 400: badParams }),
+      "/api/v1/corrections": get("/api/v1/corrections", { 200: ok("A page of corrections", pageOf(ref("Correction"))), 304: notModified, 400: badParams }),
+      "/api/v1/docs/{document}": get("/api/v1/docs/{document}", { 200: ok("Reference text", oneOf(ref("Documentation"))), 304: notModified, 400: badParams, 404: errorResponse("No such document") }, [pathParam("document", "methodology or licensing.", "methodology")]),
       "/api.json": {
         get: {
           summary: "Compatibility export",

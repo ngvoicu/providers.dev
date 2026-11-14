@@ -56,6 +56,10 @@ The baseline is imported from models.dev; our additions, corrections and measure
   catalog or index into a renderer. Browser filtering must call the public API.
 - Public requests never fetch upstream. Only `npm run sync` does.
 - Text on the site: plain, short, professional, no marketing. Say what a number means and where it comes from.
+- An entry page states values and their sources, in the same sections, tables and rows on every entry: a row with
+  nothing in it says so (Unknown, Not evaluated, Not applicable, None) and is never left out. It carries no sentence
+  that would repeat on every page: how a value is made is said once, in the methodology. The source's own
+  `description` of a model is in the API and not on the page.
 - Wording: the two sources are named `models.dev` and `providers.dev` (never "ours"). A cache run is an
   "evaluation". Pages use the full width of the home page (`.page`).
 - Cache summaries use the API's exact ages, hit percentages and counts, with separate short/long settings on every

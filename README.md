@@ -14,7 +14,7 @@ The baseline is imported daily from [models.dev](https://models.dev) (MIT). On t
   shown next to the documented values, never instead of them.
 
 It publishes metadata only. There is no chat and no inference proxy. List prices per token are shown as models.dev
-records them; a subscription entry carries the API list price of the same model, marked as inherited. Subscription
+records them; a subscription entry shows the API list price of the same model, marked as an API price. Subscription
 plans, their prices and their quotas are not listed.
 It is not affiliated with models.dev.
 
@@ -156,6 +156,12 @@ capabilities are never copied from another access method: leave them out unless 
 One exception: a subscription entry is not paid per token, so it takes the API list price (`cost`) of the entry it
 names. It is marked: `providers_dev.inherited.fields` includes `cost`, and the summary has `price_from`. If a service does not say which model it serves, leave `inherits` out; do not guess.
 
+That price rule is the same for every subscription entry, imported ones too: `providers_dev.pricing` is the API list
+price of the same model (`billing: reference`, with `reference_ref` naming the API entry). The API entry is the one
+the entry inherits from, or else the lab's own entry for its canonical model. An imported subscription entry keeps
+its own `cost` field as models.dev has it. With no API entry of the same model the record is `not_applicable` and the
+pages say "In plan".
+
 Models that exist only because they were evaluated do not need to be listed by hand: an evaluation on a route that
 `data/authored/routes.yaml` maps to one of our providers creates the entry.
 
@@ -239,6 +245,13 @@ console.log(data.entry.limit, data.entry.providers_dev.cache.retention, data.ent
 
 ### One contract
 
+One structure: everything providers.dev publishes of its own (a summary, a `providers_dev` record, an evaluation, a
+correction, evidence, `/api/v1/meta`) has the same keys on every object of its kind. A value that is not known is
+`null`, a list with nothing in it is `[]`, and no key is ever left out, whatever the query parameters. The contract
+has no optional field for these objects, and a test fails when two objects of a kind differ in their keys. Only the
+fields imported from models.dev (`limit`, `cost`, `capabilities` and the like) keep its shape, where a field can be
+absent.
+
 `src/core/contract.ts` defines the shape of everything the API returns. The OpenAPI document and the field tables of
 `/docs/api/` are generated from it, and the tests check every published object against it (all entries, all
 providers, every list). Every public page consumes serialized API responses through the same HTTP handler used by
@@ -284,7 +297,42 @@ rules:
           note: The documentation confirms this request field and its allowed values.
 ```
 
-Declarations apply only to their named entries and are never inherited by another access method.
+The richer form of the same declaration is a `request_controls` item with id `cache.retention`: the request field
+as a binding, each value as an option with its profile (short or long), and the default. That is the form the
+declarations in `data/authored/overrides/` use; the flat retention record is made from it.
+
+A rule that names its entries (`models`) applies to those entries and counts as evidence about them. Where the
+provider's page speaks for its API as a whole, a rule selects its entries instead:
+
+```yaml
+provider: anthropic
+rules:
+  - select: { cache_mode: explicit, cache_ttl: ["5m", "1h"] }   # every entry here that documents both lifetimes
+    reason: Anthropic's API reference names the field that sets the lifetime of a cache breakpoint.
+    evidence: &source
+      - kind: documented
+        url: https://platform.claude.com/docs/en/api/messages/create
+        date: "2026-11-14"
+        note: >-
+          cache_control: 'ttl: optional "5m" or "1h". [...] Defaults to 5m.'
+    request_controls:
+      - id: cache.retention
+        support: supported
+        when: null
+        bindings: [{ location: body, path: /cache_control/ttl, scope: content_block }]
+        options:
+          - { value: "5m", attributes: { retention_s: 300, profile: short }, settings: null, when: null }
+          - { value: "1h", attributes: { retention_s: 3600, profile: long }, settings: null, when: null }
+        default: { value: "5m" }
+        conditions: []
+        evidence: *source
+```
+
+A `select` rule follows the catalog as models come and go, declares request controls only, and does not mark the
+entries as corrected: its source stays with the control. List only the values the provider's page shows. Where the
+short lifetime is what a request gets by leaving the field out, the option has `value: null`. A selection that
+matches no entry is reported as an issue. No declaration is copied to another provider or access method: a
+reseller needs its own page.
 
 `pricing` and `request_controls` are present on every summary and under `providers_dev` on every full entry. They
 are normalized once in `src/core/policies.ts`, including entries nested in provider, canonical-model and catalog
@@ -294,8 +342,17 @@ conditional prices are in `pricing.rules`. Original source fields are preserved.
 The shared contract is in `src/core/policy-contract.ts`. It covers context thresholds, cache lifetimes, service
 tiers, region/date conditions, nested AND/OR/NOT conditions, rates and multipliers, and body/header/query bindings.
 Unknown source shapes remain in `unparsed` or an unknown condition. Imported records have partial coverage;
-absence of a rule never proves a flat price. Null rule ordering, units or applicability must not be guessed when
-calculating a bill. Subscription reference rates identify their source entry and are not a subscription price.
+absence of a rule never proves a flat price. Subscription reference rates identify their source entry and are not a
+subscription price.
+
+Imported pricing follows the models.dev v2 schema. The rules are published in the order models.dev applies them
+(`rule_order: listed`: base prices, its overrides in order, then every matching multiplier), each for the whole
+request that matches its condition (`applies_to: all_usage`), and a factor scales every price under it. Two fields
+are worked out from the rules, once, in `derivePricing`: `period` names a rule that depends on the hour or the day
+(`peak` where it raises the base rate in its window, `off_peak` where it lowers it), and `resulting_rates` gives the
+prices a multiplier makes of the base rates. A page multiplies nothing; it says a condition in words with
+`src/core/conditions.ts`. Prices of other modalities (audio, image, video, web search) are not normalized yet and
+stay in `unparsed`.
 
 An authored model or override rule may contain `pricing` (the complete normalized object) and `request_controls`
 (an array of control declarations). Each declaration needs dated source evidence with a confirmation note.
@@ -310,9 +367,10 @@ exact threshold boundaries, whole-usage versus marginal rates, and rule ordering
 Measured-limit pages show numeric fields and their source links. Free-text evaluation notes remain in the API
 and raw evidence, not in the main results table.
 
-Full catalog exports are stored as gzip assets and streamed through the Worker at their existing JSON URLs.
-Staging excludes uncompressed copies from upload; they remain in `data/published/site/` for validation.
-This keeps the expanded catalog within static-asset limits without loading the entire export in Worker memory.
+Full catalog exports and the index of summaries are stored as gzip assets and served by the Worker at their
+existing JSON URLs. Staging excludes uncompressed copies from upload; they remain in `data/published/site/` for
+validation. This keeps them within static-asset limits (25 MiB per file) as the catalog grows; an export is
+streamed without being loaded in Worker memory, and the index is parsed once per publication.
 
 Every successful versioned API answer has an opaque representation `ETag`, `X-Dataset-Version`, `X-Dataset-Generated-At` and
 `X-Upstream-Fetched-At`. Errors are always `{ "error": { "code", "message", "details"? } }`.

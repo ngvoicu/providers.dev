@@ -27,7 +27,7 @@ import { IDENTITY_FIELDS } from "../../../core/resolve.ts";
       <li><span class="origin upstream">models.dev</span> <strong>Imported.</strong> Copied from models.dev and not independently checked. Imported values never carry a verification date.</li>
       <li><span class="badge documented">documented</span> <strong>Documented.</strong> Set because the provider's own documentation says so. The entry names the page and the date it was read.</li>
       <li><span class="badge measured">measured</span> <strong>Measured.</strong> Observed by sending requests. The entry names the access method, the client, the date and the raw result.</li>
-      <li><span class="origin upstream">inherited</span> <strong>Inherited.</strong> Copied from the API entry of the same model and marked as such. Only one thing is inherited: the list price on a subscription entry (see <a href="#prices">Prices</a>).</li>
+      <li><strong>API price.</strong> The list price of the API entry of the same model, shown on a subscription entry and marked "API price". It is the only value an entry takes from another one (see <a href="#prices">Prices</a>).</li>
     </ul>
     <p>
       A measured value never replaces a documented one: both are shown. A provider documenting a 30-minute cache and an evaluation that found the cache gone after 15 minutes are two
@@ -42,8 +42,13 @@ import { IDENTITY_FIELDS } from "../../../core/resolve.ts";
       <li>A field can be published as explicitly unknown where the upstream value does not hold for an access method. The field is then omitted and the reason is recorded.</li>
       <li>
         Every entry page has the same sections, the same tables and the same rows, so that two entries can be read side by side. A row with no value is not left out. It says one of four
-        things: <em>Unknown</em> (no source gives the value), <em>Unsupported</em> (a source says the entry cannot do it), <em>Not evaluated</em> (providers.dev has not measured it) or
-        <em>Not applicable</em> (the field has no meaning for this entry). A price on a subscription entry says <em>In plan</em>: there is no price per token.
+        things: <em>Unknown</em> (no source gives the value), <em>Unsupported</em> (a source says the entry cannot do it), <em>Not evaluated</em> (providers.dev has not measured it) or{" "}
+        <em>Not applicable</em> (the field has no meaning for this entry). A subscription entry with no API price to refer to says <em>In plan</em>: there is no price per token.
+        A list with nothing in it, such as the corrections of an entry, says <em>None</em>.
+      </li>
+      <li>
+        The API follows the same rule. Every object providers.dev publishes has all of its fields on every entry: an unknown value is <code>null</code>, never a missing field
+        (<a href="/docs/api/#unknown">unknown values in the API</a>).
       </li>
     </ul>
 
@@ -64,12 +69,27 @@ import { IDENTITY_FIELDS } from "../../../core/resolve.ts";
     <h2 id="prices">Prices</h2>
     <ul>
       <li>Prices are list prices in US dollars per million tokens, as models.dev records them (<code>cost</code>). They are imported, not checked.</li>
-      <li>The catalog shows the base price of text input and output. Prices that change with the size of the context or with a service tier, and the prices of cached input, are on the entry page.</li>
+      <li>
+        The catalog shows the base price of text input and output, and marks an entry that has conditional rates. Those are on the entry page, one block per condition with the price of each
+        charge: a context size ("Context above 272,000 tokens"), a service tier, a region, a date from which a price changes, or the time of day.
+      </li>
+      <li>
+        <strong>Peak and off-peak hours.</strong> Some providers charge by the hour or the day of the week. The base price is the price outside the window. A rule that raises it in its
+        window is marked <em>Peak hours</em>, one that lowers it <em>Off-peak hours</em>, with the window in UTC and the resulting prices.
+      </li>
+      <li>
+        A conditional rate holds for the whole request that matches its condition: a request above a context threshold is priced at the higher rate as a whole, not only for the part
+        above it. That is how models.dev defines its rules, and the order in which they apply: base prices, then its overrides in order, then every matching multiplier. Where a multiplier
+        applies, the page shows the price it makes of each base price and the factor. It does not combine several conditions into one bill.
+      </li>
+      <li>A cache write price that differs by lifetime is shown with each lifetime.</li>
       <li>A price of 0 is shown as <code>$0</code>. It can mean free of charge, or paid for another way (a plan or a seat): the page does not decide.</li>
       <li>A price in another unit, for example per character for speech, is not shown as a price per token.</li>
       <li>
-        A subscription is not paid per token. So that a client can still work out what its usage is worth, an added subscription entry carries the API list price of the same model,
-        marked "API price" in the catalog and "inherited" on the entry page. It is never what the subscription costs. Plans and their prices are not listed.
+        A subscription is not paid per token. So that a client can still work out what its usage is worth, every subscription entry shows the API list price of the same model, marked{" "}
+        <em>API price</em>, and its page names the API entry the price is from. That is the entry a providers.dev entry was added from, or else the entry of the lab's own provider for the
+        same canonical model. It is never what the subscription costs. Where the catalog has no API entry of that model, the entry says <em>In plan</em>; a price the source lists for it all
+        the same is kept and marked <em>Listed price</em>. Plans and their prices are not listed.
       </li>
     </ul>
 
@@ -78,9 +98,9 @@ import { IDENTITY_FIELDS } from "../../../core/resolve.ts";
       The same model reached with an API key and with a subscription can have different limits and cache behaviour. Each access method is a separate entry under its own provider, linked to the
       same model by <code>canonical_id</code>. An added entry takes only identity from the upstream entry it names
       ({IDENTITY_FIELDS.map((field, i) => <><code>{field}</code>{i < IDENTITY_FIELDS.length - 1 ? ", " : ""}</>)}). Limits, caching and capabilities are never copied across access
-      methods: on an added entry a value appears only when there is evidence for that access method. The one exception is the price: a subscription is not paid per token, so an added
-      subscription entry carries the API list price of the entry it names, marked as inherited (<code>providers_dev.inherited.fields</code> includes <code>cost</code>), so that a client
-      can work out what the usage is worth.
+      methods: on an added entry a value appears only when there is evidence for that access method. The one exception is the price: a subscription is not paid per token, so a
+      subscription entry shows the API list price of the same model (<code>providers_dev.pricing</code> has <code>billing: reference</code> and names the API entry in{" "}
+      <code>reference_ref</code>), so that a client can work out what the usage is worth.
     </p>
     <p>
       Access is a classification: API key, subscription, or unclassified. Plans, plan prices, allowances and quotas are not tracked. API prices are kept as imported. Where a service does not
@@ -167,8 +187,10 @@ import { IDENTITY_FIELDS } from "../../../core/resolve.ts";
     <p>
       Both lines are there on every evaluated entry. A line with no measurement says <em>Not evaluated</em>; that is not 0 %, and it says nothing about whether the provider accepts a
       lifetime. What a request can ask for is a separate record, <em>Retention</em>, on every entry's page: whether a lifetime is accepted, the request field, the accepted values and which
-      value gives which line. Parameter support requires a sourced declaration that identifies the parameter and confirms it was recognized. Sending a value, receiving a cache hit, or
-      listing multiple documented lifetimes is not enough. Requested settings stay visible in evaluations even when support is unknown. The results show observed behavior, not a guaranteed lifetime.
+      value gives which line. It is filled from the provider's own documentation, quoted with the record: the field as a request sends it (<code>cache_control.ttl</code>, say), its
+      values, and the default. Where the short lifetime is what a request gets by leaving the field out, the record says so instead of naming a value. Sending a value, receiving a cache
+      hit, or listing several documented lifetimes is not enough to call a field supported, and nothing is copied from one provider to another: a reseller of the same model stays{" "}
+      <em>Unknown</em> until its own page says it. Requested settings stay visible in evaluations even when support is unknown. The results show observed behavior, not a guaranteed lifetime.
     </p>
     <p>
       A line adds up every evaluation of the entry with that retention setting, from every client. One evaluation has only a few re-sends per age, so a single miss moves it a lot, and the
