@@ -16,7 +16,8 @@ export function exact(value: number): string {
 /** 1048576 -> "1.05M", 128000 -> "128K". Always pair it with the exact number. */
 /** A price in US dollars: `$10`, `$12.50`, `$0.075`. */
 export function usd(value: number): string {
-  const digits = value !== 0 && Math.abs(value) < 1 ? 4 : 2;
+  // A price per second or per image can be a small fraction of a cent: show what it is, not a rounded zero.
+  const digits = value === 0 || Math.abs(value) >= 100 ? 2 : Math.abs(value) >= 0.01 ? 4 : 8;
   const text = value.toLocaleString("en-US", { minimumFractionDigits: Number.isInteger(value) ? 0 : 2, maximumFractionDigits: digits });
   return `$${text}`;
 }

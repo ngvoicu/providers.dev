@@ -47,10 +47,10 @@ describe("uniform pricing and controls", () => {
     expect(scaled({ text: { input: { price: 0.5, cache: { read: 0.5 } }, output: 0.5 } })).toEqual([["text.input", 0.5], ["text.cache_read", 0.5], ["text.output", 0.5], ["text.reasoning_output", 0.5]]);
     // A number for the input side scales every input price that exists: here input, cache read and cache write.
     expect(scaled({ text: { input: 2, output: { price: 3 } } })).toEqual([["text.input", 2], ["text.cache_read", 2], ["text.cache_write", 2], ["text.output", 3]]);
-    // Another modality is not normalized: its factor is kept as the source has it, and the text part still counts.
-    const mixed = rulesOf({ text: 1.8, audio: 1.8 });
-    expect(mixed.rules!.at(-1)).toMatchObject({ meter: "text.*", amount: 1.8 });
-    expect(mixed.unparsed).toEqual([{ path: "cost.multipliers[0].factor.audio", value: 1.8 }]);
+    // Every kind of content is scaled the same way, and a web search is a charge of its own.
+    expect(scaled({ text: 1.8, audio: 1.8, web_search: 2 })).toEqual([["text.*", 1.8], ["audio.*", 1.8], ["web_search", 2]]);
+    // What is not a kind of content models.dev prices stays as the source has it.
+    expect(rulesOf({ text: 1.8, hologram: 3 }).unparsed).toEqual([{ path: "cost.multipliers[0].factor.hologram", value: 3 }]);
     // Every rule of a fan-out has its own id.
     const ids = rulesOf({ text: { input: 2 } }).rules!.map((rule) => rule.id);
     expect(new Set(ids).size).toBe(ids.length);
@@ -98,7 +98,37 @@ describe("uniform pricing and controls", () => {
     expect(pricingOf({ cost: free }, "subscription", null, evidence)).toEqual({ coverage: "not_applicable", billing: "not_applicable", reference_ref: null, rules: null, rule_order: null, unparsed: [], evidence: [{ ...evidence[0], note: "The source lists a price of 0 for this entry, which is a subscription: no price per token is published." }] });
     expect(pricingOf({ cost: free }, "api", null, evidence)).toMatchObject({ billing: "per_use", rules: [{ amount: 0 }, { amount: 0 }, { amount: 0 }, { amount: 0 }] });
     expect(pricingOf({ cost }, "subscription", null, evidence)).toMatchObject({ billing: "unknown", reference_ref: null, coverage: "partial" });
-    expect(pricingOf({ cost: { future_modality: { price: 5 }, text: { input: { unit: "character", price: 1 } } } }, "api", null, [])).toMatchObject({ coverage: "partial", unparsed: [{ path: "cost.future_modality", value: { price: 5 } }], rules: [{ unit: { name: "character", quantity: null } }] });
+    expect(pricingOf({ cost: { future_modality: { price: 5 }, text: { input: { unit: "character", price: 1 } } } }, "api", null, [])).toMatchObject({ coverage: "partial", unparsed: [{ path: "cost.future_modality", value: { price: 5 } }], rules: [{ unit: { name: "character", quantity: 1000000 } }] });
+  });
+
+  it("reads audio, image, video and web search prices as charges like the text ones, each with its unit", () => {
+    const cost = {
+      audio: { input: { price: 3, cache: { read: 0.3 }, overrides: [{ when: { context: { gt: 32000 } }, price: 6 }] }, output: { unit: "second", price: 0.01 } },
+      image: { output: { unit: "image", price: 0.035, overrides: [{ when: { quality: { equals: "low" } }, price: 0.01 }] } },
+      video: { output: { unit: "second", price: 0.24, overrides: [{ when: { resolution: { equals: "720P" }, generate_audio: { equals: false } }, price: 0.14 }] } },
+      web_search: { price: 5, overrides: [{ when: { search_context_size: { equals: "high" } }, price: 12 }] },
+      multipliers: [{ when: { service_tier: { equals: "flex" } }, factor: { audio: { input: { price: 0.5, cache: { read: 0.5 } } }, image: 0.5 } }],
+    };
+    const pricing = pricingOf({ cost } as never, "api", null, evidence);
+    expect(pricing.unparsed).toEqual([]);
+    const said = (rule: (typeof pricing.rules & object)[number]) => [rule.meter, rule.amount, rule.unit && `${rule.unit.quantity} ${rule.unit.name}`];
+    // models.dev: per 1M for a token and a character, per 1 unit otherwise, and per 1,000 web searches.
+    expect(pricing.rules!.filter((rule) => rule.when === null).map(said)).toEqual([
+      ["audio.input", 3, "1000000 token"], ["audio.cache_read", 0.3, "1000000 token"], ["audio.output", 0.01, "1 second"],
+      ["image.output", 0.035, "1 image"], ["video.output", 0.24, "1 second"], ["web_search", 5, "1000 search"],
+    ]);
+    const when = (id: string) => pricing.rules!.find((rule) => rule.id === id)!;
+    expect(when("cost.image.output.overrides[0].price")).toMatchObject({ meter: "image.output", amount: 0.01, unit: { name: "image", quantity: 1 }, when: { field: "request.quality", op: "eq", value: "low" } });
+    expect(when("cost.video.output.overrides[0].price")).toMatchObject({ when: { kind: "all", conditions: [{ field: "request.resolution", value: "720P" }, { field: "request.generate_audio", value: false }] } });
+    expect(when("cost.web_search.overrides[0].price")).toMatchObject({ meter: "web_search", amount: 12, unit: { name: "search", quantity: 1000 }, when: { field: "request.search_context_size", value: "high" } });
+    // A factor names the charges it scales, and the prices it makes are published with their units.
+    expect(when("cost.multipliers[0].factor.audio.input.price")).toMatchObject({ meter: "audio.input", amount: 0.5, resulting_rates: [{ meter: "audio.input", amount: 1.5 }] });
+    expect(when("cost.multipliers[0].factor.image")).toMatchObject({ meter: "image.*", resulting_rates: [{ meter: "image.output", amount: 0.0175, unit: { name: "image", quantity: 1 } }] });
+    // models.dev's operator for a list ("at least this many items") is one of the grammar's. One it does not have is
+    // kept as the source wrote it, and the rule is still published.
+    const listed = (when: object) => pricingOf({ cost: { audio: { input: { unit: "minute", price: 1, overrides: [{ when, price: 2 }] } } } } as never, "api", null, evidence).rules!.at(-1);
+    expect(listed({ keyterms_prompt: { min_items: 1 } })).toMatchObject({ amount: 2, unit: { name: "minute", quantity: 1 }, when: { kind: "predicate", field: "request.keyterms_prompt", op: "min_items", value: 1 } });
+    expect(listed({ keyterms_prompt: { longest: 1 } })).toMatchObject({ amount: 2, when: { kind: "unknown", raw: { keyterms_prompt: { longest: 1 } } } });
   });
 
   it("keeps controls present without inventing request headers or accepting measured settings", () => {

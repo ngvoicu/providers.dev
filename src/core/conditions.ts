@@ -78,6 +78,17 @@ function daysText(values: Json): string {
 }
 
 const SIZE: Record<string, string> = { "request.context_tokens": "context", "request.input_tokens": "input" };
+/** What a request for an image, a video, speech or a transcription asks for: the name of the setting, and for a switch what on and off are called. */
+const SETTING: Record<string, string> = {
+  "request.resolution": "resolution", "request.quality": "quality", "request.style": "style", "request.mode": "mode", "request.domain": "domain", "request.aspect_ratio": "aspect ratio",
+  "request.search_context_size": "search context size", "request.duration": "duration", "request.megapixels": "megapixels", "request.input_images": "input images", "request.fps": "frames per second",
+  "request.steps": "steps", "request.keyterms_prompt": "key terms",
+};
+const SWITCH: Record<string, [on: string, off: string]> = {
+  "request.generate_audio": ["with generated audio", "without generated audio"], "request.input_video": ["with video input", "without video input"],
+  "request.speaker_labels": ["with speaker labels", "without speaker labels"], "request.voice_control": ["with voice control", "without voice control"],
+  "request.websocket": ["over a WebSocket", "not over a WebSocket"],
+};
 
 function predicate(condition: Predicate): string {
   const { field, op, value } = condition;
@@ -97,10 +108,18 @@ function predicate(condition: Predicate): string {
   if (field === "request.utc_days" && (op === "eq" || op === "in")) return `${daysText(value)} (UTC)`;
   if (field === "request.holiday" && op === "eq") return `holidays (${text(value)})`;
   if (field === "request.thinking" && op === "eq" && typeof value === "boolean") return value ? "thinking on" : "thinking off";
+  const switched = SWITCH[field];
+  if (switched && op === "eq" && typeof value === "boolean") return value ? switched[0] : switched[1];
+  const setting = SETTING[field];
+  if (setting) {
+    if (op === "min_items") return `${text(value)} or more ${setting}`;
+    if (op === "eq" || op === "in") return `${setting} ${oneOf(value)}`;
+    return op === "gt" ? `${setting} above ${text(value)}` : op === "gte" ? `${setting} of ${text(value)} or more` : op === "lt" ? `${setting} below ${text(value)}` : `${setting} of ${text(value)} or less`;
+  }
   if (field === "cache.retention_s" && op === "eq" && typeof value === "number") return `cache lifetime ${duration(value)}`;
   if (field === "cache.retention_value" && op === "eq") return `cache lifetime ${text(value)}`;
   if (field === "cache.mode" && op === "eq" && typeof value === "string" && CACHE_MODE[value]) return CACHE_MODE[value];
-  const word = { eq: "is", in: "is one of", gt: "above", gte: "at least", lt: "below", lte: "at most" }[op];
+  const word = { eq: "is", in: "is one of", gt: "above", gte: "at least", lt: "below", lte: "at most", min_items: "has items, at least" }[op];
   return `${field} ${word} ${op === "in" ? oneOf(value) : text(value)}`;
 }
 

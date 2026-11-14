@@ -36,9 +36,20 @@ describe("a condition in words", () => {
     expect(said({ utc_days: { in: ["mon", "wed", "fri"] } })).toBe("Mon, Wed, Fri (UTC)");
   });
 
+  it("says what a request for an image, a video or a transcription asks for", () => {
+    expect(said({ resolution: { equals: "720P" }, generate_audio: { equals: false } })).toBe("Resolution 720P and without generated audio");
+    expect(said({ input_video: { equals: true } })).toBe("With video input");
+    expect(said({ quality: { in: ["low", "medium"] } })).toBe("Quality low or medium");
+    expect(said({ search_context_size: { equals: "high" } })).toBe("Search context size high");
+    expect(said({ input_images: { gte: 1 } })).toBe("Input images of 1 or more");
+    expect(said({ duration: { equals: 6 } })).toBe("Duration 6");
+    expect(said({ keyterms_prompt: { min_items: 1 } })).toBe("1 or more key terms");
+    expect(said({ websocket: { equals: true } })).toBe("Over a WebSocket");
+  });
+
   it("still says something for a shape it has no words for, and never hides it", () => {
     expect(said({ future: { foo: 1 } })).toBe('A condition this page cannot read: {"future":{"foo":1}}');
-    expect(conditionText({ kind: "predicate", field: "request.quality", op: "eq", value: "hd" })).toBe("Request.quality is hd");
+    expect(conditionText({ kind: "predicate", field: "request.batch", op: "eq", value: "nightly" })).toBe("Request.batch is nightly");
     expect(conditionText({ kind: "not", condition: { kind: "predicate", field: "request.thinking", op: "eq", value: true } })).toBe("Not (thinking on)");
     expect(said({ any: [{ context: { gt: 1000 } }, { service_tier: { equals: "flex" } }] })).toBe("Context above 1,000 tokens or service tier flex");
   });

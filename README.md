@@ -352,8 +352,12 @@ request that matches its condition (`applies_to: all_usage`), and a factor scale
 are worked out from the rules, once, in `derivePricing`: `period` names a rule that depends on the hour or the day
 (`peak` where it raises the base rate in its window, `off_peak` where it lowers it), and `resulting_rates` gives the
 prices a multiplier makes of the base rates. A page multiplies nothing; it says a condition in words with
-`src/core/conditions.ts`. Prices of other modalities (audio, image, video, web search) are not normalized yet and
-stay in `unparsed`.
+`src/core/conditions.ts`.
+
+Every kind of content is a set of charges of the same shape: `text.input`, `audio.input`, `image.output`,
+`video.output` and so on, plus `web_search`. Each rule carries its unit as models.dev defines it: per 1,000,000 for
+a token or a character, per 1 for a second, a minute, an image or a megapixel, and per 1,000 web searches.
+`price_in` and `price_out` are the text prices per million tokens only.
 
 An authored model or override rule may contain `pricing` (the complete normalized object) and `request_controls`
 (an array of control declarations). Each declaration needs dated source evidence with a confirmation note.

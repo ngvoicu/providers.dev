@@ -3,17 +3,17 @@ import { z } from "zod";
 import type { Json } from "./merge.ts";
 
 export type Condition =
-  | { kind: "predicate"; field: string; op: "eq" | "in" | "gt" | "gte" | "lt" | "lte"; value: Json }
+  | { kind: "predicate"; field: string; op: "eq" | "in" | "gt" | "gte" | "lt" | "lte" | "min_items"; value: Json }
   | { kind: "all" | "any"; conditions: Condition[] }
   | { kind: "not"; condition: Condition }
   | { kind: "unknown"; raw: Json };
 
 export const ConditionSchema: z.ZodType<Condition> = z.lazy(() => z.union([
-  z.strictObject({ kind: z.literal("predicate"), field: z.string().min(1), op: z.enum(["eq", "in", "gt", "gte", "lt", "lte"]), value: z.json() }),
+  z.strictObject({ kind: z.literal("predicate"), field: z.string().min(1), op: z.enum(["eq", "in", "gt", "gte", "lt", "lte", "min_items"]), value: z.json() }),
   z.strictObject({ kind: z.enum(["all", "any"]), conditions: z.array(ConditionSchema).min(1) }),
   z.strictObject({ kind: z.literal("not"), condition: ConditionSchema }),
   z.strictObject({ kind: z.literal("unknown"), raw: z.json() }),
-])).describe("Shared condition tree. all = AND, any = OR, not = negation. Unknown conditions cannot be assumed true or false. request.context_tokens preserves the source's context threshold; it does not mean the model's maximum window or necessarily input-only tokens. Authored rules may use request.input_tokens explicitly.");
+])).describe("Shared condition tree. all = AND, any = OR, not = negation. Unknown conditions cannot be assumed true or false. min_items = the field is a list with at least that many items. request.context_tokens preserves the source's context threshold; it does not mean the model's maximum window or necessarily input-only tokens. Authored rules may use request.input_tokens explicitly.");
 
 export const PolicyEvidenceSchema = z.strictObject({
   kind: z.enum(["documented", "measured"]), url: z.url(), date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable(), note: z.string(),
@@ -30,7 +30,7 @@ export const BillingUnitSchema = z.strictObject({
 export const PricingRuleInputSchema = z.strictObject({
   id: z.string().min(1),
   when: ConditionSchema.nullable().describe("Null = unconditional base rule. A condition with kind=unknown remains unresolved."),
-  meter: z.string().min(1).describe("The charge affected: text.input, text.output, text.reasoning_output, text.cache_read, text.cache_write or text.cache_storage. A multiply rule names one charge or a scope: text.* is every text charge, * is every charge."),
+  meter: z.string().min(1).describe("The charge affected. For text: text.input, text.output, text.reasoning_output, text.cache_read, text.cache_write, text.cache_storage. The same charges exist for audio, image and video (audio.input, image.output, video.output and so on), each priced in its own unit. web_search is the charge for web searches. A multiply rule names one charge or a scope: text.* is every text charge, audio.* every audio charge, * every charge."),
   operation: z.enum(["set", "multiply"]),
   amount: z.number().nonnegative().describe("A price for set, or a factor for multiply. Zero is a known zero, never missing."),
   currency: z.string().nullable().describe("ISO currency for a price; null for multipliers or an unknown currency."),

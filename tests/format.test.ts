@@ -23,7 +23,7 @@ describe("the date of the models.dev import", () => {
 describe("prices", () => {
   it("writes a price in dollars without noise", async () => {
     const { usd } = await import("../src/core/format.ts");
-    expect([usd(10), usd(12.5), usd(0.075), usd(0), usd(1250), usd(0.132)]).toEqual(["$10", "$12.50", "$0.075", "$0", "$1,250", "$0.132"]);
+    expect([usd(10), usd(12.5), usd(0.075), usd(0), usd(1250), usd(0.132), usd(0.000463), usd(0.00001), usd(1.35615), usd(250.126)]).toEqual(["$10", "$12.50", "$0.075", "$0", "$1,250", "$0.132", "$0.000463", "$0.00001", "$1.3562", "$250.13"]);
   });
 
   it("takes the base price per token and nothing in another unit", async () => {

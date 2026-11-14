@@ -215,7 +215,13 @@ function priceCell(entry: Pick<Summary, "price_in" | "price_out" | "price_from" 
   const conditional = entry.pricing.rules?.some((rule) => rule.when !== null || rule.operation === "multiply");
   const conditionNote = conditional ? '<div class="hint">Conditional rates</div>' : "";
   // A subscription entry with no API entry of the same model to refer to has no price per token at all.
-  if (input === null && output === null) return (entry.pricing.billing === "not_applicable" ? IN_PLAN : UNKNOWN) + conditionNote;
+  if (input === null && output === null) {
+    // No price per token for text: a model that makes video or transcribes speech is priced by the second, the image
+    // or the minute. The first of its base charges stands in the cell, with its name; the rest are on its page.
+    const other = (entry.pricing.rules ?? []).filter((rule) => rule.when === null && rule.operation === "set").sort((a, b) => meterRank(a.meter) - meterRank(b.meter))[0];
+    if (other) return `<span class="price">${rateHtml(other)}</span><div class="hint">${e(meterLabel(other.meter))}</div>${conditionNote}`;
+    return (entry.pricing.billing === "not_applicable" ? IN_PLAN : UNKNOWN) + conditionNote;
+  }
   // A listed 0 is shown as the source has it. It can mean free, or paid for another way: the page does not decide.
   const price = `<span class="price">${input === null ? DASH : usd(input)} <span class="muted">/</span> ${output === null ? DASH : usd(output)}</span>${conditionNote}`;
   // Two short lines: the price, then whose price it is.
@@ -226,9 +232,22 @@ function priceCell(entry: Pick<Summary, "price_in" | "price_out" | "price_from" 
   return price;
 }
 
-const METER_ORDER = ["text.input", "text.output", "text.reasoning_output", "text.cache_read", "text.cache_write", "text.cache_storage"];
-const METER_LABEL: Record<string, string> = { "text.input": "Input", "text.output": "Output", "text.reasoning_output": "Reasoning output", "text.cache_read": "Cache read", "text.cache_write": "Cache write", "text.cache_storage": "Cache storage", "text.*": "All text charges", "*": "All charges" };
-const meterLabel = (meter: string): string => METER_LABEL[meter] ?? meter;
+// A charge is a kind of content and what is charged for it: `text.input`, `audio.cache_read`, `video.output`. The
+// text charges come first and are named without their kind, since they are what the page is mostly about.
+const CHARGE: Record<string, string> = { input: "Input", output: "Output", reasoning_output: "Reasoning output", cache_read: "Cache read", cache_write: "Cache write", cache_storage: "Cache storage" };
+const CONTENT = ["text", "audio", "image", "video"];
+const WEB_SEARCH = "web_search";
+const METER_ORDER = [...CONTENT.flatMap((content) => Object.keys(CHARGE).map((charge) => `${content}.${charge}`)), WEB_SEARCH];
+function meterLabel(meter: string): string {
+  if (meter === "*") return "All charges";
+  if (meter === WEB_SEARCH) return "Web search";
+  const [content = "", charge = ""] = meter.split(".");
+  if (!CONTENT.includes(content)) return meter;
+  const name = content.charAt(0).toUpperCase() + content.slice(1);
+  if (charge === "*") return `All ${content} charges`;
+  const label = CHARGE[charge];
+  return !label ? meter : content === "text" ? label : `${name} ${label.toLowerCase()}`;
+}
 const meterRank = (meter: string): number => { const at = METER_ORDER.indexOf(meter); return at === -1 ? METER_ORDER.length : at; };
 const PERIOD_LABEL = { peak: "Peak hours", off_peak: "Off-peak hours" } as const;
 const APPLIES_TO = { all_usage: "Whole request", above_threshold: "Only the part above the threshold" } as const;
@@ -238,7 +257,8 @@ function rateHtml(rate: Pick<PricingRule, "amount" | "currency" | "unit">): stri
   const amount = rate.currency === "USD" ? usd(rate.amount) : `${e(rate.currency ?? "Currency unknown")} ${e(String(rate.amount))}`;
   if (!rate.unit) return `${amount} <span class="muted">· unit unknown</span>`;
   const { name, quantity } = rate.unit;
-  const per = quantity === null ? `${name}s · quantity unknown` : quantity === 1 ? name : `${quantity === 1000000 ? "1M" : quantity === 1000 ? "1K" : exact(quantity)} ${name}s`;
+  const plural = name.endsWith("ch") ? `${name}es` : `${name}s`;
+  const per = quantity === null ? `${plural} · quantity unknown` : quantity === 1 ? name : `${quantity === 1000000 ? "1M" : exact(quantity)} ${plural}`;
   return `${amount} <span class="muted">/ ${e(per)}</span>`;
 }
 
@@ -256,7 +276,8 @@ function priceSection(summary: Summary): string {
   const base = rules.filter((rule) => rule.when === null && rule.operation === "set");
   const byLifetime = rules.filter((rule) => lifetimeOf(rule) !== null);
   const conditional = rules.filter((rule) => (rule.when !== null || rule.operation === "multiply") && lifetimeOf(rule) === null);
-  // Every entry has the same five rows; a charge the source prices beyond them gets a row too.
+  // Every entry has the same five rows, the text charges; a charge the source prices beyond them gets a row too
+  // (cache storage, and audio, image, video and web search, each in its own unit).
   const meters = [...new Set([...METER_ORDER.slice(0, 5), ...base.map((rule) => rule.meter), ...byLifetime.map((rule) => rule.meter)])].sort((a, b) => meterRank(a) - meterRank(b));
   const absent = pricing.billing === "not_applicable" ? IN_PLAN : UNKNOWN;
   const rows = meters

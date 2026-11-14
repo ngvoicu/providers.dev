@@ -3,8 +3,13 @@ import { durationSeconds, type CacheRetention } from "./cache.ts";
 import { isObject, type Json, type JsonObject } from "./merge.ts";
 import type { Condition, PolicyEvidence, Pricing, PricingInput, PricingRule, PricingRuleInput, RequestControl, RequestControls, ResultingRate } from "./policy-contract.ts";
 
-const fields: Record<string, string> = { context: "request.context_tokens", service_tier: "request.service_tier", region: "request.region", date: "request.date", utc_hours: "request.utc_hours", utc_days: "request.utc_days", holiday: "request.holiday", thinking: "request.thinking" };
-const operators = { equals: "eq", in: "in", gt: "gt", gte: "gte", lt: "lt", lte: "lte" } as const;
+// The condition keys of models.dev's cost schema (`CostConditionKeyV2Values`), as fields of a request.
+const fields: Record<string, string> = {
+  context: "request.context_tokens", service_tier: "request.service_tier", region: "request.region", date: "request.date", utc_hours: "request.utc_hours", utc_days: "request.utc_days", holiday: "request.holiday", thinking: "request.thinking",
+  // What a request for an image, a video, speech or a transcription can ask for, and a web search with it.
+  ...Object.fromEntries(["duration", "megapixels", "input_images", "resolution", "quality", "aspect_ratio", "generate_audio", "mode", "input_video", "fps", "steps", "search_context_size", "speaker_labels", "keyterms_prompt", "domain", "websocket", "style", "voice_control"].map((key) => [key, `request.${key}`])),
+};
+const operators = { equals: "eq", in: "in", gt: "gt", gte: "gte", lt: "lt", lte: "lte", min_items: "min_items" } as const;
 const unknown = (raw: Json): Condition => ({ kind: "unknown", raw });
 const and = (...values: (Condition | null)[]): Condition | null => {
   const conditions = values.filter((value): value is Condition => value !== null);
@@ -79,8 +84,15 @@ export function derivePricing(pricing: PricingInput): Pricing {
   return { coverage: pricing.coverage, billing: pricing.billing, reference_ref: pricing.reference_ref, rules: derived, rule_order: pricing.rule_order, unparsed: pricing.unparsed, evidence: pricing.evidence };
 }
 
-const TEXT_INPUT_METERS = ["text.input", "text.cache_read", "text.cache_write", "text.cache_storage"] as const;
-const TEXT_OUTPUT_METERS = ["text.output", "text.reasoning_output"] as const;
+/** What models.dev prices by: text, and the other kinds of content a request can carry or return. */
+const MODALITIES: readonly string[] = ["text", "image", "audio", "video"];
+const inputMeters = (modality: string): string[] => [`${modality}.input`, `${modality}.cache_read`, `${modality}.cache_write`, `${modality}.cache_storage`];
+const outputMeters = (modality: string): string[] => [`${modality}.output`, `${modality}.reasoning_output`];
+/** models.dev: "Prices are USD per 1M for `token` and `character`, and per 1 unit otherwise." */
+const unitOf = (name: string): NonNullable<PricingRuleInput["unit"]> => ({ name, quantity: name === "token" || name === "character" ? 1000000 : 1 });
+/** models.dev: "USD per 1,000 web searches (or search requests, as the host bills them)." */
+const WEB_SEARCH = "web_search";
+const SEARCH_UNIT = { name: "search", quantity: 1000 };
 
 /**
  * The pricing record of an entry, from the `cost` of `model` as models.dev records it.
@@ -92,6 +104,10 @@ const TEXT_OUTPUT_METERS = ["text.output", "text.reasoning_output"] as const;
  * The rules come out in the order models.dev applies them: base prices, then its overrides in their order ("matching
  * overrides merge field by field in order"), then its multipliers ("then every matching multiplier applies"). Each
  * holds for the whole request that matches its condition, which is how models.dev evaluates one.
+ *
+ * Every kind of content is read the same way, since models.dev records them the same way: the charges of `cost.audio`
+ * are `audio.input`, `audio.cache_read` and so on, each with the unit the source gives (a second, an image, a
+ * megapixel; a token where it gives none). A web search is the charge `web_search`, per 1,000 searches.
  */
 export function pricingOf(model: JsonObject, access: string, reference: string | null, evidence: PolicyEvidence[], declaration?: PricingInput): Pricing {
   if (declaration) return derivePricing(structuredClone(declaration));
@@ -114,41 +130,55 @@ export function pricingOf(model: JsonObject, access: string, reference: string |
     const seconds = durationSeconds(ttl);
     return { kind: "predicate", field: seconds === undefined ? "cache.retention_value" : "cache.retention_s", op: "eq", value: seconds ?? ttl };
   };
-  const cache = (value: Json, path: string, when: Condition | null, unit: PricingRuleInput["unit"]): void => {
+  const cache = (modality: string, value: Json, path: string, when: Condition | null, unit: PricingRuleInput["unit"]): void => {
     if (!isObject(value)) { unparsed(path, value); return; }
     for (const [key, amount] of Object.entries(value)) {
       const here = `${path}.${key}`;
-      if (key === "explicit") cache(amount, here, and(when, explicitMode), unit);
+      if (key === "explicit") cache(modality, amount, here, and(when, explicitMode), unit);
       else if (key === "write" && isObject(amount)) {
-        for (const [ttl, price] of Object.entries(amount)) rate(`${here}.${ttl}`, "text.cache_write", price, and(when, lifetime(ttl)), unit);
-      } else if (["read", "write", "storage"].includes(key)) rate(here, `text.cache_${key}`, amount, when, key === "storage" ? null : unit);
+        for (const [ttl, price] of Object.entries(amount)) rate(`${here}.${ttl}`, `${modality}.cache_write`, price, and(when, lifetime(ttl)), unit);
+      } else if (["read", "write", "storage"].includes(key)) rate(here, `${modality}.cache_${key}`, amount, when, key === "storage" ? null : unit);
       else unparsed(here, amount);
     }
   };
-  const side = (value: Json, name: "input" | "output", path: string, when: Condition | null, inheritedUnit: PricingRuleInput["unit"]): void => {
+  const side = (modality: string, value: Json, name: "input" | "output", path: string, when: Condition | null, inheritedUnit: PricingRuleInput["unit"]): void => {
     if (!isObject(value)) { unparsed(path, value); return; }
-    const unit = typeof value.unit === "string" ? { name: value.unit, quantity: null } : inheritedUnit;
+    const unit = typeof value.unit === "string" ? unitOf(value.unit) : inheritedUnit;
     for (const [key, amount] of Object.entries(value)) {
       const here = `${path}.${key}`;
-      if (key === "price" || (name === "output" && key === "reasoning")) rate(here, key === "reasoning" ? "text.reasoning_output" : `text.${name}`, amount, when, unit);
-      else if (name === "input" && key === "cache") cache(amount, here, when, unit);
+      if (key === "price" || (name === "output" && key === "reasoning")) rate(here, key === "reasoning" ? `${modality}.reasoning_output` : `${modality}.${name}`, amount, when, unit);
+      else if (name === "input" && key === "cache") cache(modality, amount, here, when, unit);
       else if (key === "overrides" && Array.isArray(amount)) {
         amount.forEach((override, index) => {
           if (!isObject(override) || override.when === undefined) { unparsed(`${here}[${index}]`, override); return; }
           const { when: rule, ...prices } = override;
-          side(prices, name, `${here}[${index}]`, and(when, conditionOf(rule)), unit);
+          side(modality, prices, name, `${here}[${index}]`, and(when, conditionOf(rule)), unit);
         });
       } else if (key !== "unit" || typeof amount !== "string") unparsed(here, amount);
     }
   };
+  const webSearch = (value: JsonObject, path: string, when: Condition | null): void => {
+    for (const [key, amount] of Object.entries(value)) {
+      const here = `${path}.${key}`;
+      if (key === "price") rate(here, WEB_SEARCH, amount, when, SEARCH_UNIT);
+      else if (key === "overrides" && Array.isArray(amount)) {
+        amount.forEach((override, index) => {
+          if (!isObject(override) || override.when === undefined) { unparsed(`${here}[${index}]`, override); return; }
+          const { when: rule, ...prices } = override;
+          webSearch(prices, `${here}[${index}]`, and(when, conditionOf(rule)));
+        });
+      } else unparsed(here, amount);
+    }
+  };
   const multiplierEntries: { path: string; factor: Json; when: Condition | null }[] = [];
   for (const [key, value] of Object.entries(cost)) {
-    if (key === "text" && isObject(value)) {
+    if (MODALITIES.includes(key) && isObject(value)) {
       for (const [name, prices] of Object.entries(value)) {
-        if (name === "input" || name === "output") side(prices, name, `cost.text.${name}`, null, { name: "token", quantity: 1000000 });
-        else unparsed(`cost.text.${name}`, prices);
+        if (name === "input" || name === "output") side(key, prices, name, `cost.${key}.${name}`, null, unitOf("token"));
+        else unparsed(`cost.${key}.${name}`, prices);
       }
-    } else if (key === "multipliers" && Array.isArray(value)) {
+    } else if (key === WEB_SEARCH && isObject(value)) webSearch(value, `cost.${WEB_SEARCH}`, null);
+    else if (key === "multipliers" && Array.isArray(value)) {
       value.forEach((item, index) => {
         const path = `cost.multipliers[${index}]`;
         if (!isObject(item) || item.when === undefined) { unparsed(path, item); return; }
@@ -161,33 +191,33 @@ export function pricingOf(model: JsonObject, access: string, reference: string |
 
   // Factors, after every price is known. models.dev: "A plain number multiplies every price in the cost; an object
   // multiplies only the prices it names." A number part-way down the tree therefore scales every price under it,
-  // which here is one rule per charge that has a price. Other modalities are not normalized and stay as they are.
+  // which here is one rule per charge that has a price.
   const priced = new Set([...base, ...overrides].map((rule) => rule.meter));
   const each = (path: string, meters: readonly string[], factor: number, when: Condition | null): void => {
     const present = meters.filter((meter) => priced.has(meter));
     if (present.length === 0) { unparsed(path, factor); return; }
     for (const meter of present) rate(path, meter, factor, when, null, "multiply", present.length === 1 ? path : `${path}:${meter}`);
   };
-  const cacheFactor = (value: Json, path: string, when: Condition | null): void => {
-    if (typeof value === "number") { each(path, TEXT_INPUT_METERS.slice(1), value, when); return; }
+  const cacheFactor = (modality: string, value: Json, path: string, when: Condition | null): void => {
+    if (typeof value === "number") { each(path, inputMeters(modality).slice(1), value, when); return; }
     if (!isObject(value)) { unparsed(path, value); return; }
     for (const [key, detail] of Object.entries(value)) {
       const here = `${path}.${key}`;
-      if (key === "explicit") cacheFactor(detail, here, and(when, explicitMode));
+      if (key === "explicit") cacheFactor(modality, detail, here, and(when, explicitMode));
       else if (key === "write" && isObject(detail)) {
-        for (const [ttl, factor] of Object.entries(detail)) rate(`${here}.${ttl}`, "text.cache_write", factor, and(when, lifetime(ttl)), null, "multiply");
-      } else if (["read", "write", "storage"].includes(key)) rate(here, `text.cache_${key}`, detail, when, null, "multiply");
+        for (const [ttl, factor] of Object.entries(detail)) rate(`${here}.${ttl}`, `${modality}.cache_write`, factor, and(when, lifetime(ttl)), null, "multiply");
+      } else if (["read", "write", "storage"].includes(key)) rate(here, `${modality}.cache_${key}`, detail, when, null, "multiply");
       else unparsed(here, detail);
     }
   };
-  const sideFactor = (value: Json, name: "input" | "output", path: string, when: Condition | null): void => {
-    if (typeof value === "number") { each(path, name === "input" ? TEXT_INPUT_METERS : TEXT_OUTPUT_METERS, value, when); return; }
+  const sideFactor = (modality: string, value: Json, name: "input" | "output", path: string, when: Condition | null): void => {
+    if (typeof value === "number") { each(path, name === "input" ? inputMeters(modality) : outputMeters(modality), value, when); return; }
     if (!isObject(value)) { unparsed(path, value); return; }
     for (const [key, detail] of Object.entries(value)) {
       const here = `${path}.${key}`;
-      if (key === "price") rate(here, `text.${name}`, detail, when, null, "multiply");
-      else if (name === "output" && key === "reasoning") rate(here, "text.reasoning_output", detail, when, null, "multiply");
-      else if (name === "input" && key === "cache") cacheFactor(detail, here, when);
+      if (key === "price") rate(here, `${modality}.${name}`, detail, when, null, "multiply");
+      else if (name === "output" && key === "reasoning") rate(here, `${modality}.reasoning_output`, detail, when, null, "multiply");
+      else if (name === "input" && key === "cache") cacheFactor(modality, detail, here, when);
       else unparsed(here, detail);
     }
   };
@@ -196,11 +226,16 @@ export function pricingOf(model: JsonObject, access: string, reference: string |
     if (!isObject(factor)) { unparsed(path, factor); continue; }
     for (const [modality, value] of Object.entries(factor)) {
       const here = `${path}.${modality}`;
-      if (modality !== "text") unparsed(here, value);
-      else if (typeof value === "number") rate(here, "text.*", value, when, null, "multiply");
+      if (modality === WEB_SEARCH) {
+        // A factor for the web search alone: a number, or the price it names.
+        const own = isObject(value) && Object.keys(value).length === 1 ? value.price : value;
+        if (typeof own === "number") rate(here, WEB_SEARCH, own, when, null, "multiply");
+        else unparsed(here, value);
+      } else if (!MODALITIES.includes(modality)) unparsed(here, value);
+      else if (typeof value === "number") rate(here, `${modality}.*`, value, when, null, "multiply");
       else if (isObject(value)) {
         for (const [name, detail] of Object.entries(value)) {
-          if (name === "input" || name === "output") sideFactor(detail, name, `${here}.${name}`, when);
+          if (name === "input" || name === "output") sideFactor(modality, detail, name, `${here}.${name}`, when);
           else unparsed(`${here}.${name}`, detail);
         }
       } else unparsed(here, value);

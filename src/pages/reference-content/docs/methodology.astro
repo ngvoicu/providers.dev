@@ -68,7 +68,11 @@ import { IDENTITY_FIELDS } from "../../../core/resolve.ts";
 
     <h2 id="prices">Prices</h2>
     <ul>
-      <li>Prices are list prices in US dollars per million tokens, as models.dev records them (<code>cost</code>). They are imported, not checked.</li>
+      <li>Prices are list prices in US dollars, as models.dev records them (<code>cost</code>). They are imported, not checked.</li>
+      <li>
+        Text is priced per million tokens. Audio, images, video and web search are charges of their own, each in the unit the source gives: per million tokens or characters, per second
+        or minute, per image or megapixel, and per 1,000 web searches. The entry page lists them under the text charges, and the catalog shows one where an entry has no text price.
+      </li>
       <li>
         The catalog shows the base price of text input and output, and marks an entry that has conditional rates. Those are on the entry page, one block per condition with the price of each
         charge: a context size ("Context above 272,000 tokens"), a service tier, a region, a date from which a price changes, or the time of day.
@@ -84,7 +88,6 @@ import { IDENTITY_FIELDS } from "../../../core/resolve.ts";
       </li>
       <li>A cache write price that differs by lifetime is shown with each lifetime.</li>
       <li>A price of 0 is shown as <code>$0</code>. It can mean free of charge, or paid for another way (a plan or a seat): the page does not decide.</li>
-      <li>A price in another unit, for example per character for speech, is not shown as a price per token.</li>
       <li>
         A subscription is not paid per token. So that a client can still work out what its usage is worth, every subscription entry shows the API list price of the same model, marked{" "}
         <em>API price</em>, and its page names the API entry the price is from. That is the entry a providers.dev entry was added from, or else the entry of the lab's own provider for the
