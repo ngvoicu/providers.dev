@@ -222,8 +222,9 @@ method), **models** (canonical: a model as its lab names it) and **evaluations**
 | `GET /api/v1/providers/{id}` | one provider with the summaries of its entries; `?view=full` adds the entries in full |
 | `GET /api/v1/models` | canonical models |
 | `GET /api/v1/models/{lab}/{model}` | one canonical model with every entry that serves it |
-| `GET /api/v1/evaluations` | every cache and limit evaluation, with the entry it was made on |
-| `GET /api/v1/catalog` | the complete merged catalog, `{ meta, providers }` |
+| `GET /api/v1/evaluations/cache` | every cache evaluation, with the entry it was made on |
+| `GET /api/v1/evaluations/limits` | every limit evaluation, with the entry it was made on |
+| `GET /api/v1/catalog` | the complete merged catalog, `{ meta, data }` with `data` keyed by provider id |
 | `GET /api/v1/meta` | dataset version, counts, freshness, upstream commit, sync status, open issues |
 | `GET /api/v1/openapi.json` | the OpenAPI 3.1 document |
 | `GET /api.json` | the merged catalog keyed by provider id, in the models.dev v2 structure, no envelope |

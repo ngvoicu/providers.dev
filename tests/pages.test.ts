@@ -71,9 +71,9 @@ describe("API response boundary", () => {
   it("uses response values even when they differ from internal dataset objects", async () => {
     const response = await page("/models/lab/model-4/", async (path) => {
       const response = await api(path);
-      const body = await response.json() as { data: { name: string; entry_count: number }; generated_at: string };
+      const body = await response.json() as { data: { name: string; entry_count: number; generated_at: string } };
       if (path === "/api/v1/models/lab/model-4") { body.data.name = "API response only"; body.data.entry_count = 12345; }
-      if (path === "/api/v1/meta") body.generated_at = "2030-01-02T03:04:00Z";
+      if (path === "/api/v1/meta") body.data.generated_at = "2030-01-02T03:04:00Z";
       return Response.json(body);
     });
     const html = await response.text();

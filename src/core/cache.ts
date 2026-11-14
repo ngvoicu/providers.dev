@@ -54,7 +54,7 @@ export interface CacheSummaryRow {
   value: string | null;
   /** How many evaluations the line adds up. 0 = this setting was not evaluated. */
   evaluations: number;
-  /** Their ids, as in `evaluations[].id` of the entry and in /api/v1/evaluations. */
+  /** Their ids, as in `evaluations[].id` of the entry and in /api/v1/evaluations/cache. */
   evaluation_ids: string[];
   /** The date of the newest of them. Null when not evaluated. */
   last_date: string | null;

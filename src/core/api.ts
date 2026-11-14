@@ -8,7 +8,8 @@ import { openapi } from "./openapi.ts";
 import {
   DEFAULT_LIMIT,
   CORRECTION_PARAMS,
-  EVALUATION_PARAMS,
+  CACHE_EVALUATION_PARAMS,
+  LIMIT_EVALUATION_PARAMS,
   MODEL_PARAMS,
   parseParams,
   parseQuery,
@@ -128,7 +129,7 @@ export async function handleApi(request: Request, deps: ApiDeps): Promise<Respon
 
   if (path === `${BASE}/meta`) {
     const values = params([]);
-    return values instanceof Response ? values : sendJson(meta);
+    return values instanceof Response ? values : one(meta);
   }
   if (path === `${BASE}/openapi.json`) {
     const values = params([]);
@@ -234,9 +235,11 @@ export async function handleApi(request: Request, deps: ApiDeps): Promise<Respon
     return one(model);
   }
 
-  // ---- evaluations
-  if (path === `${BASE}/evaluations`) {
-    const values = params(EVALUATION_PARAMS);
+  // ---- evaluations: two lists, since a cache evaluation and a limit evaluation are different records
+  const kind = path === `${BASE}/evaluations/cache` ? "cache" : path === `${BASE}/evaluations/limits` ? "limit" : null;
+  if (path === `${BASE}/evaluations`) return fail(meta, 404, "not_found", `Evaluations are listed by kind: GET ${BASE}/evaluations/cache and GET ${BASE}/evaluations/limits.`);
+  if (kind) {
+    const values = params(kind === "cache" ? CACHE_EVALUATION_PARAMS : LIMIT_EVALUATION_PARAMS);
     if (values instanceof Response) return values;
     const asset = await deps.asset("/data/evaluations.json");
     if (!asset) return missing("/data/evaluations.json");
@@ -245,7 +248,7 @@ export async function handleApi(request: Request, deps: ApiDeps): Promise<Respon
     const clients = values.client as string[] | undefined;
     const found = all.filter(
       (item) =>
-        (!values.kind || item.kind === values.kind) &&
+        item.kind === kind &&
         (!providers || providers.includes(item.entry_ref.slice(0, item.entry_ref.indexOf("/")))) &&
         (!values.entry || item.entry_ref === values.entry) &&
         (!values.retention_profile || (item.kind === "cache" && item.retention_profile === values.retention_profile)) &&

@@ -11,7 +11,8 @@ import {
   CanonicalModelSchema,
   EntryDetailSchema,
   EntrySummarySchema,
-  EvaluationRecordSchema,
+  CacheEvaluationRecordSchema,
+  LimitEvaluationRecordSchema,
   MetaSchema,
   one,
   pageOf,
@@ -24,7 +25,7 @@ import { entryHref } from "../src/core/format.ts";
 import { ENDPOINTS, openapi } from "../src/core/openapi.ts";
 import { handlePage } from "../src/core/pages.ts";
 import { MARK } from "../src/core/page-shell.ts";
-import { EVALUATION_PARAMS, PARAMS, parseQuery, runQuery } from "../src/core/query.ts";
+import { CACHE_EVALUATION_PARAMS, LIMIT_EVALUATION_PARAMS, PARAMS, parseQuery, runQuery } from "../src/core/query.ts";
 import { canonicalModels, listEvaluations, withoutEntries } from "../src/core/resources.ts";
 import type { Catalog, ModelExtension } from "../src/core/schema.ts";
 import { depsFrom, fetchReturning, fixtureUpstream, ROOT, summaryOf, tempDataDir, writeAuthored } from "./helpers.ts";
@@ -74,7 +75,7 @@ describe("GET /api/v1/entries", () => {
     const collection = pageOf(EntrySummarySchema).parse(await json("/api/v1/entries?provider=provider-02"));
     const provider = one(ProviderDetailSchema).parse(await json("/api/v1/providers/provider-02?view=full"));
     const model = one(CanonicalModelDetailSchema).parse(await json("/api/v1/models/lab/model-4"));
-    const catalog = await json<{ providers: Catalog }>("/api/v1/catalog");
+    const catalog = { providers: (await json<{ data: Catalog }>("/api/v1/catalog")).data };
     for (const summary of [detail.data.summary, collection.data.find((entry) => entry.ref === detail.data.summary.ref)!, provider.data.entries.find((entry) => entry.ref === detail.data.summary.ref)!, model.data.entries.find((entry) => entry.ref === detail.data.summary.ref)!]) {
       expect(summary.pricing).toEqual(expected.pricing);
       expect(summary.request_controls).toEqual(expected.request_controls);
@@ -213,7 +214,11 @@ describe("lookups", () => {
       ["/api/v1/providers/nope", 404, "provider_not_found"],
       ["/api/v1/providers/provider-01?view=everything", 400, "invalid_parameters"],
       ["/api/v1/models/lab/nope", 404, "model_not_found"],
-      ["/api/v1/evaluations?kind=other", 400, "invalid_parameters"],
+      ["/api/v1/evaluations/cache?retention_profile=other", 400, "invalid_parameters"],
+      // One kind per list: the filters of the other kind are not parameters here, and there is no list of both.
+      ["/api/v1/evaluations/limits?retention_profile=long", 400, "invalid_parameters"],
+      ["/api/v1/evaluations/cache?kind=cache", 400, "invalid_parameters"],
+      ["/api/v1/evaluations", 404, "not_found"],
       ["/api/v1/nope", 404, "not_found"],
       ["/api/v1/entry?ref=provider-02/lab/model-4", 404, "not_found"],
       ["/api/v1/meta?x=1", 400, "invalid_parameters"],
@@ -260,14 +265,18 @@ describe("lookups", () => {
     expect(model.data.reference_ref).toBeNull();
     expect(model.data.entries[0]?.ref).toBe("added-login/lab/model-2");
 
-    const evaluations = await json<Page>("/api/v1/evaluations");
-    expect(evaluations).toMatchObject({ total: 0, limit: 50, offset: 0, next_offset: null, data: [] });
+    for (const list of ["cache", "limits"]) expect(await json<Page>(`/api/v1/evaluations/${list}`)).toMatchObject({ total: 0, limit: 50, offset: 0, next_offset: null, data: [] });
   });
 
   it("serves the catalog and the metadata", async () => {
-    const catalog = await json<{ meta: { dataset_version: string }; providers: Catalog }>("/api/v1/catalog");
-    expect(Object.keys(catalog.providers)).toHaveLength(31);
-    const meta = await json<{ dataset_version: string; counts: { entries: number; models: number }; cache_ages_s: number[]; upstream: { commit: string } }>("/api/v1/meta");
+    // Both answer as every single object does: { meta, data }.
+    const catalog = await json<{ meta: { dataset_version: string }; data: Catalog }>("/api/v1/catalog");
+    expect(Object.keys(catalog)).toEqual(["meta", "data"]);
+    expect(Object.keys(catalog.data)).toHaveLength(31);
+    const answer = await json<{ meta: { dataset_version: string }; data: { dataset_version: string; counts: { entries: number; models: number }; cache_ages_s: number[]; upstream: { commit: string } } }>("/api/v1/meta");
+    expect(Object.keys(answer)).toEqual(["meta", "data"]);
+    expect(answer.meta).toEqual(catalog.meta);
+    const meta = answer.data;
     expect(meta.dataset_version).toBe(catalog.meta.dataset_version);
     expect(meta.counts.entries).toBe(601);
     expect(meta.counts.models).toBe(20);
@@ -283,7 +292,7 @@ describe("HTTP behaviour", () => {
     expect(etag).toMatch(/^"[0-9a-f]{64}"$/);
     expect(first.headers.get("X-Dataset-Version")).toBe(deps.meta.dataset_version);
     expect(first.headers.get("Cache-Control")).toContain("max-age=300");
-    for (const path of ["/api/v1/entries", "/api/v1/catalog", "/api/v1/entries/provider-02/lab/model-4", "/api/v1/providers/provider-01", "/api/v1/models", "/api/v1/evaluations"]) {
+    for (const path of ["/api/v1/entries", "/api/v1/catalog", "/api/v1/entries/provider-02/lab/model-4", "/api/v1/providers/provider-01", "/api/v1/models", "/api/v1/evaluations/cache", "/api/v1/evaluations/limits", "/api/v1/meta"]) {
       const tag = (await get(path)).headers.get("ETag");
       const second = await get(path, { headers: { "If-None-Match": `W/${tag}, "other"` } });
       expect(second.status, path).toBe(304);
@@ -310,7 +319,8 @@ describe("HTTP behaviour", () => {
     expect(Object.keys(document.paths).sort()).toEqual([...ENDPOINTS.map((endpoint) => endpoint.path), "/api.json"].sort());
     const query = (path: string): string[] => document.paths[path]!.get.parameters!.filter((parameter) => parameter.in === "query").map((parameter) => parameter.name);
     expect(query("/api/v1/entries")).toEqual(PARAMS.map((param) => param.name));
-    expect(query("/api/v1/evaluations")).toEqual(EVALUATION_PARAMS.map((param) => param.name));
+    expect(query("/api/v1/evaluations/cache")).toEqual(CACHE_EVALUATION_PARAMS.map((param) => param.name));
+    expect(query("/api/v1/evaluations/limits")).toEqual(LIMIT_EVALUATION_PARAMS.map((param) => param.name));
     // No reference in the document points at nothing.
     const text = JSON.stringify(document);
     for (const [, path] of text.matchAll(/"\$ref":"#\/([^"]+)"/g)) {
@@ -340,13 +350,14 @@ describe("the contract", () => {
       const result = schema.safeParse(value);
       expect(result.success ? [] : result.error.issues.slice(0, 3).map((issue) => `${issue.path.join(".")}: ${issue.message}`), what).toEqual([]);
     };
-    valid(MetaSchema, await ask("/api/v1/meta"), "meta");
+    valid(one(MetaSchema), await ask("/api/v1/meta"), "meta");
     for (const entry of local.index.entries) valid(EntrySummarySchema, entry, entry.ref);
     for (const provider of local.index.providers) valid(ProviderSummarySchema, provider, provider.id);
     valid(pageOf(EntrySummarySchema), await ask("/api/v1/entries?limit=200"), "entries");
     valid(pageOf(ProviderSummarySchema), await ask("/api/v1/providers?limit=200"), "providers");
     valid(pageOf(CanonicalModelSchema), await ask("/api/v1/models?limit=200"), "models");
-    valid(pageOf(EvaluationRecordSchema), await ask("/api/v1/evaluations?limit=200"), "evaluations");
+    valid(pageOf(CacheEvaluationRecordSchema), await ask("/api/v1/evaluations/cache?limit=200"), "cache evaluations");
+    valid(pageOf(LimitEvaluationRecordSchema), await ask("/api/v1/evaluations/limits?limit=200"), "limit evaluations");
     const model = modelsFor(local.index)[0]!;
     valid(one(CanonicalModelDetailSchema), await ask(`/api/v1/models/${model.id}`), model.id);
     // Every entry in full, straight from the export: thousands of them, so no request each.
@@ -383,8 +394,7 @@ describe("the contract", () => {
     same(extensions.flatMap((extension) => extension.limits.measured), "limit evaluations");
     same(extensions.flatMap((extension) => extension.provenance), "corrections");
     same(extensions.flatMap((extension) => [...extension.evidence, ...extension.provenance.flatMap((change) => change.evidence)]), "evidence");
-    const evaluations = (await ask("/api/v1/evaluations?limit=200")) as { data: { kind: string }[] };
-    for (const kind of ["cache", "limit"]) same(evaluations.data.filter((item) => item.kind === kind), `${kind} evaluations in the list`);
+    for (const list of ["cache", "limits"]) same(((await ask(`/api/v1/evaluations/${list}?limit=200`)) as { data: object[] }).data, `the list of ${list} evaluations`);
     same(modelsFor(local.index).map(withoutEntries), "canonical models");
   };
 
@@ -493,8 +503,11 @@ describe("one dataset for the website and the API", () => {
     // The lists the pages are built from are the lists the API returns.
     const fromApi = await json<{ data: unknown[] }>("/api/v1/models?limit=200");
     expect(fromApi.data).toEqual(canonicalModels(deps.index.entries).map(withoutEntries));
-    const evaluations = await json<{ data: unknown[] }>("/api/v1/evaluations?limit=200");
-    expect(evaluations.data).toEqual(listEvaluations(exported, deps.index).slice(0, 200));
+    const listed = listEvaluations(exported, deps.index);
+    for (const [list, kind] of [["cache", "cache"], ["limits", "limit"]] as const) {
+      const evaluations = await json<{ data: unknown[] }>(`/api/v1/evaluations/${list}?limit=200`);
+      expect(evaluations.data).toEqual(listed.filter((item) => item.kind === kind).slice(0, 200));
+    }
   });
 
   const real = join(ROOT, "data", "published");

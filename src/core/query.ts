@@ -76,14 +76,17 @@ export const MODEL_PARAMS: ParamDoc[] = [
   { name: "lab", kind: "text", description: "Exact lab, the first part of the id, for example anthropic." },
   ...PAGING,
 ];
-export const EVALUATION_PARAMS: ParamDoc[] = [
-  { name: "kind", kind: "enum", values: ["cache", "limit"], description: "cache = cache evaluations; limit = limit evaluations. Without it, both." },
+const EVALUATION_FILTERS: ParamDoc[] = [
   { name: "provider", kind: "list", description: "Provider ids, comma-separated." },
   { name: "entry", kind: "text", description: "Exact entry, provider/model." },
-  { name: "retention_profile", kind: "enum", values: ["short", "long"], description: "Only cache evaluations with this retention profile." },
   { name: "client", kind: "list", description: "Client ids, comma-separated, for example direct or cliproxyapi." },
+];
+export const CACHE_EVALUATION_PARAMS: ParamDoc[] = [
+  ...EVALUATION_FILTERS,
+  { name: "retention_profile", kind: "enum", values: ["short", "long"], description: "Only evaluations with this retention profile." },
   ...PAGING,
 ];
+export const LIMIT_EVALUATION_PARAMS: ParamDoc[] = [...EVALUATION_FILTERS, ...PAGING];
 export const PROVIDER_VIEW_PARAMS: ParamDoc[] = [
   { name: "view", kind: "enum", values: ["summary", "full"], description: "summary (default) = the provider and the summaries of its entries; models is null. full = also every entry in full, under models." },
 ];

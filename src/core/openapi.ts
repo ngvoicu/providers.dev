@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { BriefMetaSchema, COMPONENTS } from "./contract.ts";
 import { CONTROL_EXAMPLE, PRICING_EXAMPLE } from "./policy-examples.ts";
-import { CORRECTION_PARAMS, DEFAULT_LIMIT, EVALUATION_PARAMS, MAX_AGE_MONTHS, MAX_LIMIT, MODEL_PARAMS, PARAMS, PROVIDER_PARAMS, PROVIDER_VIEW_PARAMS, type ParamDoc } from "./query.ts";
+import { CACHE_EVALUATION_PARAMS, CORRECTION_PARAMS, DEFAULT_LIMIT, LIMIT_EVALUATION_PARAMS, MAX_AGE_MONTHS, MAX_LIMIT, MODEL_PARAMS, PARAMS, PROVIDER_PARAMS, PROVIDER_VIEW_PARAMS, type ParamDoc } from "./query.ts";
 
 type Schema = Record<string, unknown>;
 
@@ -85,9 +85,10 @@ export const ENDPOINTS: { path: string; summary: string; description?: string; p
   { path: "/api/v1/providers/{provider}", summary: "One provider with its entries", params: PROVIDER_VIEW_PARAMS, returns: "provider, entries and models (null unless view=full)" },
   { path: "/api/v1/models", summary: "List canonical models", description: "A canonical model is a model as its lab names it. Several entries can serve the same one.", params: MODEL_PARAMS, returns: "A page of CanonicalModel" },
   { path: "/api/v1/models/{lab}/{model}", summary: "One canonical model with every entry that serves it", params: [], returns: "CanonicalModelDetail" },
-  { path: "/api/v1/evaluations", summary: "List evaluations", description: "Every cache and limit evaluation, each with the entry it was made on: cache evaluations newest first, then limit evaluations.", params: EVALUATION_PARAMS, returns: "A page of Evaluation" },
+  { path: "/api/v1/evaluations/cache", summary: "List cache evaluations", description: "Every cache evaluation, newest first, each with the entry it was made on.", params: CACHE_EVALUATION_PARAMS, returns: "A page of CacheEvaluationRecord" },
+  { path: "/api/v1/evaluations/limits", summary: "List limit evaluations", description: "Every limit evaluation, newest first, each with the entry it was made on.", params: LIMIT_EVALUATION_PARAMS, returns: "A page of LimitEvaluationRecord" },
   { path: "/api/v1/meta", summary: "The dataset: version, counts, freshness, open issues", params: [], returns: "Meta" },
-  { path: "/api/v1/catalog", summary: "Everything in one file", description: "`{ meta, providers }`, where `providers` is keyed by provider id and each provider holds `models` keyed by model id. Includes full pricing and request controls; use paginated resources when a full download is unnecessary.", params: [], returns: "meta and providers" },
+  { path: "/api/v1/catalog", summary: "Everything in one file", description: "`{ meta, data }`, where `data` is keyed by provider id and each provider holds `models` keyed by model id. Includes full pricing and request controls; use paginated resources when a full download is unnecessary.", params: [], returns: "The catalog, keyed by provider id" },
   { path: "/api/v1/openapi.json", summary: "This document", params: [], returns: "OpenAPI 3.1" },
   // What the pages of the website are drawn from, beyond the resources above.
   { path: "/api/v1/facets", summary: "Catalog filter options and counts", params: [], returns: "Facets" },
@@ -114,9 +115,9 @@ export function openapi(): Record<string, unknown> {
     servers: [{ url: "https://providers.dev" }],
     "x-guide": [
       { id: "usage", title: "Requests and pagination", paragraphs: [
-        "Four resources: providers, entries (a model at a provider and access method), models (canonical: a model as its lab names it) and evaluations. Limits, prices and caching belong to an entry, because the same model differs from one provider to the next.",
+        "Four resources: providers, entries (a model at a provider and access method), models (canonical: a model as its lab names it) and evaluations (of the cache at /evaluations/cache, of limits at /evaluations/limits). Limits, prices and caching belong to an entry, because the same model differs from one provider to the next.",
         "No authentication is required. GET and HEAD are supported; OPTIONS answers CORS preflights. Public requests read a published snapshot and never fetch upstream providers.",
-        `Every collection returns { meta, total, limit, offset, next_offset, data }. Use limit from 1 to ${MAX_LIMIT} (default ${DEFAULT_LIMIT}) and continue with next_offset until it is null. Every single resource returns { meta, data }; /meta and /openapi.json return their documents directly.`,
+        `Every collection returns { meta, total, limit, offset, next_offset, data }. Use limit from 1 to ${MAX_LIMIT} (default ${DEFAULT_LIMIT}) and continue with next_offset until it is null. Every single resource returns { meta, data }, /meta and /catalog included. Only /openapi.json and the compatibility export /api.json return their documents directly.`,
         "Filters combine with AND. Unknown parameters, duplicate parameters and invalid values return 400 with details. URL-encode each provider/model path segment; model ids may contain slashes. Keep dataset_version and generated_at when joining pages; restart pagination if either changes.",
       ] },
       { id: "unknown", title: "Unknown values", paragraphs: [
@@ -139,7 +140,7 @@ export function openapi(): Record<string, unknown> {
       { id: "cache", title: "Cache evaluations", paragraphs: [
         "cache_results on a summary equals providers_dev.cache.results on the full entry. It contains separate short and long rows with parameter, value and results. Null results mean not evaluated, never a zero hit rate.",
         "Each result records kind, exact age_s, hits, checks and hit_rate_pct. kind: control at age_s: 0 means the immediate resend. A check at 450 seconds remains 7.5 minutes. /meta lists shared display ages; other measured ages remain in results. Missing ages were not checked.",
-        "Each row identifies its evaluations. /evaluations and the full entry retain the client, route, date, request settings and raw evidence. Results describe that access method and date, not a guaranteed cache lifetime.",
+        "Each row identifies its evaluations. /evaluations/cache and the full entry retain the client, route, date, request settings and raw evidence. Results describe that access method and date, not a guaranteed cache lifetime.",
       ] },
       { id: "caching", title: "Versions and caching", paragraphs: [
         "X-Dataset-Version identifies the catalog and summaries. X-Dataset-Generated-At identifies publication time. Each response has an opaque ETag; reuse it only for the same URL. A 304 has no body. Fresh responses can be cached for 300 seconds with stale-while-revalidate for 3600 seconds.",
@@ -147,7 +148,7 @@ export function openapi(): Record<string, unknown> {
       ] },
       { id: "errors", title: "Errors and exports", paragraphs: [
         "Errors return { error: { code, message, details? } }. 400 means invalid parameters, 404 an unknown resource, 405 an unsupported method, and 503 an incomplete or unavailable snapshot. Errors are not cached.",
-        "/api.json is the provider-keyed compatibility export without an envelope. /api/v1/catalog returns { meta, providers }. Both preserve the models.dev structure and additions under providers_dev. Added entries can lack upstream-required fields. Data is MIT licensed; retain attribution and notices.",
+        "/api.json is the provider-keyed compatibility export without an envelope. /api/v1/catalog returns the same catalog as { meta, data }. Both preserve the models.dev structure and additions under providers_dev. Added entries can lack upstream-required fields. Data is MIT licensed; retain attribution and notices.",
       ] },
     ],
     paths: {
@@ -191,10 +192,11 @@ export function openapi(): Record<string, unknown> {
         { 200: ok("The model", oneOf(ref("CanonicalModelDetail"))), 304: notModified, 400: badParams, 404: errorResponse("No such model") },
         [pathParam("lab", "The first part of the canonical id.", "anthropic"), pathParam("model", "The rest of the canonical id.", "claude-opus-5-5")],
       ),
-      "/api/v1/evaluations": get("/api/v1/evaluations", { 200: ok("A page of evaluations", pageOf(ref("Evaluation"))), 304: notModified, 400: badParams }),
-      "/api/v1/meta": get("/api/v1/meta", { 200: ok("The dataset", ref("Meta")), 304: notModified }),
+      "/api/v1/evaluations/cache": get("/api/v1/evaluations/cache", { 200: ok("A page of cache evaluations", pageOf(ref("CacheEvaluationRecord"))), 304: notModified, 400: badParams }),
+      "/api/v1/evaluations/limits": get("/api/v1/evaluations/limits", { 200: ok("A page of limit evaluations", pageOf(ref("LimitEvaluationRecord"))), 304: notModified, 400: badParams }),
+      "/api/v1/meta": get("/api/v1/meta", { 200: ok("The dataset", oneOf(ref("Meta"))), 304: notModified, 400: badParams }),
       "/api/v1/catalog": get("/api/v1/catalog", {
-        200: ok("The catalog", { type: "object", required: ["meta", "providers"], properties: { meta: ref("BriefMeta"), providers: { type: "object", additionalProperties: ref("Provider") } } }),
+        200: ok("The catalog", oneOf({ type: "object", description: "Keyed by provider id.", additionalProperties: ref("Provider") })),
         304: notModified,
       }),
       "/api/v1/openapi.json": get("/api/v1/openapi.json", { 200: ok("OpenAPI 3.1", { type: "object" }) }),

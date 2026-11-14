@@ -50,7 +50,7 @@ export const CacheSummaryRowSchema = z
   .strictObject({
     ...retentionSetting,
     evaluations: z.int().min(0).describe("How many evaluations the line adds up. 0 = this retention setting was not evaluated."),
-    evaluation_ids: z.array(z.string()).describe("Their ids, as in the entry's evaluations and in /api/v1/evaluations."),
+    evaluation_ids: z.array(z.string()).describe("Their ids, as in the entry's evaluations and in /api/v1/evaluations/cache."),
     last_date: date.nullable().describe("The date of the newest of them. Null when not evaluated."),
     results: z.array(CacheResultSchema).nullable().describe("One result per exact age that was checked, the control first. Null = not evaluated, which is not 0 %."),
   })
@@ -245,12 +245,12 @@ export const ProviderSchema = z
 
 // ---- evaluations as a list
 const ofEntry = { entry_ref: z.string().describe("The entry the evaluation was made on."), entry_name: z.string(), access: Access };
-export const EvaluationRecordSchema = z
-  .discriminatedUnion("kind", [
-    z.strictObject({ kind: z.literal("cache"), ...ofEntry, ...CacheEvaluationSchema.shape }),
-    z.strictObject({ kind: z.literal("limit"), ...ofEntry, ...MeasuredLimitSchema.shape }),
-  ])
-  .describe("One evaluation with the entry it was made on. kind = cache or limit.");
+export const CacheEvaluationRecordSchema = z
+  .strictObject({ kind: z.literal("cache"), ...ofEntry, ...CacheEvaluationSchema.shape })
+  .describe("One cache evaluation with the entry it was made on.");
+export const LimitEvaluationRecordSchema = z
+  .strictObject({ kind: z.literal("limit"), ...ofEntry, ...MeasuredLimitSchema.shape })
+  .describe("One limit evaluation with the entry it was made on.");
 
 // ---- metadata, envelopes, errors
 const issue = z.looseObject({ level: z.enum(["error", "warning", "notice"]), code: z.string(), target: z.string(), message: z.string() });
@@ -393,7 +393,8 @@ export const COMPONENTS = {
   Provider: ProviderSchema,
   CanonicalModel: CanonicalModelSchema,
   CanonicalModelDetail: CanonicalModelDetailSchema,
-  Evaluation: EvaluationRecordSchema,
+  CacheEvaluationRecord: CacheEvaluationRecordSchema,
+  LimitEvaluationRecord: LimitEvaluationRecordSchema,
   Meta: MetaSchema,
   Error: ErrorSchema,
 } as const;

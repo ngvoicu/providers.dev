@@ -9,7 +9,7 @@ import type { JsonObject } from "./merge.ts";
 import { fillShell, PAGE_SHELL } from "./page-shell.ts";
 import { parseQuery, serializeQuery, SITE_DEFAULT } from "./query.ts";
 import { entryHtml } from "./render.ts";
-import type { CanonicalModel, CanonicalModelDetail, Correction, Documentation, EvaluationRecord, Facets } from "./resources.ts";
+import type { CanonicalModel, CanonicalModelDetail, Correction, CacheEvaluationRecord, Documentation, Facets, LimitEvaluationRecord } from "./resources.ts";
 import type { Meta } from "./schema.ts";
 
 export interface PageDeps {
@@ -55,7 +55,7 @@ export async function handlePage(request: Request, deps: PageDeps): Promise<Resp
   let meta: Meta | undefined;
   let view: View;
   try {
-    meta = await read<Meta>("/api/v1/meta");
+    meta = await one<Meta>("/api/v1/meta");
     const imported = meta.upstream.fetched_at.slice(0, 10);
     if (path === "/") {
       const params = new URLSearchParams(url.search);
@@ -84,8 +84,8 @@ export async function handlePage(request: Request, deps: PageDeps): Promise<Resp
       const [corrections, added, cache, measured] = await Promise.all([
         read<Envelope<Correction>>(`/api/v1/corrections?offset=${encodeURIComponent(url.searchParams.get("corrections_offset") ?? "0")}`),
         all<ProviderSummary>("/api/v1/providers?origin=added"),
-        read<Envelope<EvaluationRecord>>(`/api/v1/evaluations?kind=cache&offset=${encodeURIComponent(url.searchParams.get("cache_offset") ?? "0")}`),
-        read<Envelope<EvaluationRecord>>(`/api/v1/evaluations?kind=limit&offset=${encodeURIComponent(url.searchParams.get("limits_offset") ?? "0")}`),
+        read<Envelope<CacheEvaluationRecord>>(`/api/v1/evaluations/cache?offset=${encodeURIComponent(url.searchParams.get("cache_offset") ?? "0")}`),
+        read<Envelope<LimitEvaluationRecord>>(`/api/v1/evaluations/limits?offset=${encodeURIComponent(url.searchParams.get("limits_offset") ?? "0")}`),
       ]);
       view = { title: "Evidence", description: "Corrections and evaluations with sources and dates.", html: evidenceHtml(meta, corrections, added, cache, measured, url, now) };
     } else if (path === "/docs/api") {
