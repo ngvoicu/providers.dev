@@ -120,6 +120,16 @@ describe("resolve: overrides", () => {
     const none = resolve(input([OverrideFileSchema.parse({ provider: "lab", rules: [{ ...rule, select: { cache_mode: "explicit", cache_ttl: ["30m", "12h"] } }] })], { upstream: documented }));
     expect(none.issues).toEqual([expect.objectContaining({ level: "warning", code: "orphan-override", target: "lab#select" })]);
 
+    // A selection can be narrowed to the models the provider's page names. It is still not evidence about the entry,
+    // and a named model it does not reach is reported.
+    const wider = upstream();
+    for (const id of ["model-a", "model-b"]) wider.lab!.models[id]!.capabilities = { cache: { explicit: { ttl: ["5m", "1h"] } } };
+    const narrowed = resolve(input([OverrideFileSchema.parse({ provider: "lab", rules: [{ ...rule, select: { ...rule.select, models: ["model-a", "model-gone"] } }] })], { upstream: wider }));
+    expect(ext(narrowed.catalog.lab!.models["model-a"]!).cache.retention.support).toBe("supported");
+    expect(summarize("lab", narrowed.catalog.lab!.models["model-a"]!, 0)).toMatchObject({ origin: "upstream", verified: null });
+    expect(ext(narrowed.catalog.lab!.models["model-b"]!).cache.retention.support).toBe("unknown");
+    expect(narrowed.issues).toEqual([expect.objectContaining({ level: "warning", code: "orphan-override", target: "lab/model-gone" })]);
+
     // A selection declares controls and nothing else, and a rule has `models` or `select`, never both or neither.
     const invalid = (more: object) => OverrideFileSchema.safeParse({ provider: "lab", rules: [{ reason: "r", evidence, ...more }] }).success;
     expect(invalid({ select: rule.select, request_controls: [control] })).toBe(true);

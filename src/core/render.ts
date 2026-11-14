@@ -425,7 +425,7 @@ function requestControlTable(controls: RequestControl[]): string {
       return `<div>${name}${value}${sent ? `<div class="hint"><code>${e(sent)}</code></div>` : ""}${option.when ? `<div class="hint">${e(conditionText(option.when))}</div>` : ""}</div>`;
     }).join("") || absent;
     const conditions = [control.when ? conditionText(control.when) : "", ...control.conditions].filter(Boolean).map(e).join("<br>") || (control.support === "unknown" ? UNKNOWN : "None recorded");
-    return `<tr><th scope="row">${e(CONTROL_LABEL[control.id] ?? control.id)}</th><td>${support}</td><td>${bindings}</td><td>${options}</td><td>${control.default === null ? absent : `<code>${e(jsonText(control.default.value))}</code>`}</td><td>${conditions}</td></tr>`;
+    return `<tr><th scope="row">${e(CONTROL_LABEL[control.id] ?? control.id)}</th><td>${support}</td><td>${bindings}</td><td>${options}</td><td>${control.default === null ? absent : control.default.value === null ? "The field left out" : `<code>${e(jsonText(control.default.value))}</code>`}</td><td>${conditions}</td></tr>`;
   }).join("");
   const sources = controls.flatMap((control) => control.evidence).filter((item, at, all) => all.findIndex((other) => other.url === item.url && other.date === item.date) === at);
   const source = sources.map((item) => `<a href="${e(item.url)}" rel="noopener" title="${e(item.note)}">${e(shortUrl(item.url))}</a>${item.date ? ` <span class="date">${e(item.date)}</span>` : ""}`).join(" · ");

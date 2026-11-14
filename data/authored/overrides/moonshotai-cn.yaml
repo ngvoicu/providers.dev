@@ -1,0 +1,49 @@
+# What a request can ask of the prompt cache at Moonshot AI China (Kimi API).
+# models.dev documents that these entries cache automatically with two lifetimes (5m, 1h); this names the request
+# fields, from the Kimi API reference and its context caching guide. The field differs by API.
+# The rule applies to every entry here that documents both lifetimes.
+provider: moonshotai-cn
+rules:
+  - select: { cache_mode: implicit, cache_ttl: ["5m", "1h"] }
+    reason: The Kimi API reference names the field that sets the lifetime of the automatic cache, and its two values.
+    evidence: &source
+      - kind: documented
+        url: https://platform.moonshot.cn/docs/api/chat
+        date: "2026-11-14"
+        note: >-
+          'Cache Write 适用于 kimi-k3.1-pro、kimi-k3.1-pro-highspeed 和 kimi-k3。' 'prompt_cache_options.ttl | "5m" |
+          "1h" | 缓存写入的有效期，仅支持 5m、1h 两档（默认 5m），两档缓存相互独立' (the lifetime of the written cache:
+          only 5m and 1h, default 5m). 'prompt_cache_options.mode | "implicit" | 缓存写入模式，仅支持 implicit'.
+      - kind: documented
+        url: https://platform.moonshot.cn/docs/guide/context-caching
+        date: "2026-11-14"
+        note: >-
+          'Anthropic Messages API 使用顶层 cache_control 设置缓存 TTL。省略该字段时，默认按 5m TTL 读写缓存；传入该字段时，
+          可通过 cache_control.ttl 选择 5m 或 1h' (the Anthropic Messages API sets the lifetime with the top-level
+          cache_control; left out, 5m; cache_control.ttl selects 5m or 1h). 'cache_control 只在请求顶层生效，消息体内的
+          同名标记会被忽略。'
+    request_controls:
+      - id: cache.retention
+        support: supported
+        when: null
+        bindings:
+          - { location: body, path: /prompt_cache_options/ttl, scope: request }
+          - { location: body, path: /cache_control/ttl, scope: request }
+        options:
+          - value: "5m"
+            attributes: { retention_s: 300, profile: short }
+            settings:
+              - { location: body, path: /prompt_cache_options/mode, scope: request, value: implicit }
+              - { location: body, path: /prompt_cache_options/ttl, scope: request, value: "5m" }
+            when: null
+          - value: "1h"
+            attributes: { retention_s: 3600, profile: long }
+            settings:
+              - { location: body, path: /prompt_cache_options/mode, scope: request, value: implicit }
+              - { location: body, path: /prompt_cache_options/ttl, scope: request, value: "1h" }
+            when: null
+        default: { value: "5m" }
+        conditions:
+          - The field is prompt_cache_options.ttl in the Chat Completions and Responses APIs, and the top-level cache_control.ttl in the Anthropic Messages API.
+          - In the Anthropic Messages API, cache_control counts only at the top level of the request. The same marker inside a message is ignored.
+        evidence: *source

@@ -1,0 +1,39 @@
+# What a request can ask of the prompt cache for Claude models at Merge Gateway.
+# models.dev documents the two lifetimes (5m, 1h); this names the request field, from Merge Gateway's page on prompt caching.
+# The rule applies to every entry here that documents both lifetimes.
+provider: merge-gateway
+rules:
+  - select: { cache_mode: explicit, cache_ttl: ["5m", "1h"] }
+    reason: Merge Gateway's prompt caching page says which lifetime values a cache marker accepts and that they are passed through.
+    evidence: &source
+      - kind: documented
+        url: https://docs.merge.dev/merge-gateway/capabilities/prompt-caching
+        date: "2026-11-14"
+        note: >-
+          "Markers accept Anthropic's ttl values, 5m (default) or 1h, passed through unchanged. Anthropic rejects a
+          request whose top-level marker and targeted block carry different ttl values." 'Or send one top-level
+          cache_control'.
+    request_controls:
+      - id: cache.retention
+        support: supported
+        when: null
+        bindings:
+          - { location: body, path: /cache_control/ttl, scope: content_block }
+          - { location: body, path: /cache_control/ttl, scope: request }
+        options:
+          - value: "5m"
+            attributes: { retention_s: 300, profile: short }
+            settings:
+              - { location: body, path: /cache_control/type, scope: content_block, value: ephemeral }
+              - { location: body, path: /cache_control/ttl, scope: content_block, value: "5m" }
+            when: null
+          - value: "1h"
+            attributes: { retention_s: 3600, profile: long }
+            settings:
+              - { location: body, path: /cache_control/type, scope: content_block, value: ephemeral }
+              - { location: body, path: /cache_control/ttl, scope: content_block, value: "1h" }
+            when: null
+        default: { value: "5m" }
+        conditions:
+          - A top-level marker and a marker on a block must carry the same ttl in one request.
+        evidence: *source

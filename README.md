@@ -331,7 +331,8 @@ rules:
 A `select` rule follows the catalog as models come and go, declares request controls only, and does not mark the
 entries as corrected: its source stays with the control. List only the values the provider's page shows. Where the
 short lifetime is what a request gets by leaving the field out, the option has `value: null`. A selection that
-matches no entry is reported as an issue. No declaration is copied to another provider or access method: a
+matches no entry is reported as an issue. Where the provider's page names the models its statement holds for,
+`select.models` narrows the selection to them. No declaration is copied to another provider or access method: a
 reseller needs its own page.
 
 `pricing` and `request_controls` are present on every summary and under `providers_dev` on every full entry. They

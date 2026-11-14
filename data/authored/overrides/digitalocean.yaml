@@ -1,0 +1,36 @@
+# What a request can ask of the prompt cache for Claude models at DigitalOcean.
+# models.dev documents the two lifetimes (5m, 1h); this names the request field, from DigitalOcean's guide to prompt caching in serverless inference.
+# The rule applies to every entry here that documents both lifetimes.
+provider: digitalocean
+rules:
+  - select: { cache_mode: explicit, cache_ttl: ["5m", "1h"] }
+    reason: DigitalOcean's prompt caching guide names the field that sets the cache lifetime for Anthropic models, and its two values.
+    evidence: &source
+      - kind: documented
+        url: https://docs.digitalocean.com/products/inference/how-to/use-prompt-caching/
+        date: "2026-11-14"
+        note: >-
+          Manual Prompt Caching for Anthropic Models: 'you can manually specify the cache_control parameter with type:
+          ephemeral and ttl in your JSON request body. The ttl value can be 5m (default) or 1h.'
+    request_controls:
+      - id: cache.retention
+        support: supported
+        when: null
+        bindings:
+          - { location: body, path: /cache_control/ttl, scope: content_block }
+        options:
+          - value: "5m"
+            attributes: { retention_s: 300, profile: short }
+            settings:
+              - { location: body, path: /cache_control/type, scope: content_block, value: ephemeral }
+              - { location: body, path: /cache_control/ttl, scope: content_block, value: "5m" }
+            when: null
+          - value: "1h"
+            attributes: { retention_s: 3600, profile: long }
+            settings:
+              - { location: body, path: /cache_control/type, scope: content_block, value: ephemeral }
+              - { location: body, path: /cache_control/ttl, scope: content_block, value: "1h" }
+            when: null
+        default: { value: "5m" }
+        conditions: []
+        evidence: *source

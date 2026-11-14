@@ -1,0 +1,49 @@
+# What a request can ask of the prompt cache for Claude models at AI/ML API.
+# models.dev documents the two lifetimes (5m, 1h); this names the request field, from the request schema on the API
+# reference page of each model. Only the models whose page shows the field are named: the pages of Claude 4.5
+# Haiku, 4.5 Opus, 4.7 Opus, 4.8 Opus, 4.5 Sonnet and 4.6 Sonnet do not show it, and those entries stay unknown.
+provider: aimlapi
+rules:
+  - select:
+      cache_mode: explicit
+      cache_ttl: ["5m", "1h"]
+      models:
+        - anthropic/claude-fable-5
+        - anthropic/claude-fable-5.1
+        - anthropic/claude-haiku-5.5
+        - anthropic/claude-opus-5
+        - anthropic/claude-opus-5.5
+        - anthropic/claude-sonnet-5
+        - anthropic/claude-sonnet-5.5
+    reason: The request schema on the API reference page of each of these models has the field that sets the cache lifetime, with its two values.
+    evidence: &source
+      - kind: documented
+        url: https://docs.aimlapi.com/api-references/text-models-llm/anthropic/claude-opus-5
+        date: "2026-11-14"
+        note: >-
+          The request schema of POST /v1/chat/completions gives a content part
+          "cache_control": {"type": "object", "properties": {"type": {"enum": ["ephemeral"]}, "ttl": {"enum": ["5m",
+          "1h"]}}}. The same schema is on the pages of Claude Fable 5, Fable 5.1, Haiku 5.5, Opus 5.5, Sonnet 5 and
+          Sonnet 5.5. The pages give no default.
+    request_controls:
+      - id: cache.retention
+        support: supported
+        when: null
+        bindings:
+          - { location: body, path: /cache_control/ttl, scope: content_block }
+        options:
+          - value: "5m"
+            attributes: { retention_s: 300, profile: short }
+            settings:
+              - { location: body, path: /cache_control/type, scope: content_block, value: ephemeral }
+              - { location: body, path: /cache_control/ttl, scope: content_block, value: "5m" }
+            when: null
+          - value: "1h"
+            attributes: { retention_s: 3600, profile: long }
+            settings:
+              - { location: body, path: /cache_control/type, scope: content_block, value: ephemeral }
+              - { location: body, path: /cache_control/ttl, scope: content_block, value: "1h" }
+            when: null
+        default: null
+        conditions: []
+        evidence: *source

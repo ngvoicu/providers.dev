@@ -337,11 +337,23 @@ export function resolve(input: ResolveInput): ResolveResult {
     for (const rule of file.rules) {
       const select = rule.select;
       if (!select || !rule.request_controls) continue;
-      const matched = Object.values(provider.models).filter((model) => {
+      const documents = (model: PublishedModel): boolean => {
         const mode = documentedCache(model).modes[select.cache_mode];
         return mode.support === "supported" && (select.cache_ttl ?? []).every((ttl) => mode.ttl?.includes(ttl));
-      });
-      if (matched.length === 0) {
+      };
+      const matched = Object.entries(provider.models).filter(([id, model]) => (!select.models || select.models.includes(id)) && documents(model)).map(([, model]) => model);
+      // A model the rule names and the selection does not reach is reported: gone from the catalog, or no longer documented so.
+      for (const id of select.models ?? []) {
+        const model = provider.models[id];
+        if (model && documents(model)) continue;
+        issues.push({
+          level: "warning",
+          code: "orphan-override",
+          target: `${file.provider}/${id}`,
+          message: `A rule for ${file.provider} names ${id}, which ${model ? `does not document ${select.cache_mode} caching${select.cache_ttl ? ` with ${select.cache_ttl.join(", ")}` : ""}` : "is not in the upstream snapshot"}. Reason on file: ${rule.reason}`,
+        });
+      }
+      if (matched.length === 0 && !select.models) {
         issues.push({
           level: "warning",
           code: "orphan-override",

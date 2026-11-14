@@ -1,0 +1,47 @@
+# What a request can ask of the prompt cache at DeepInfra.
+# models.dev documents two lifetimes (5m, 1h) for four entries. DeepInfra's page on prompt cache retention names the
+# request fields and lists the models that support them; of the four, only Kimi K2.7 Code is on that list. The
+# other three stay unknown.
+provider: deepinfra
+rules:
+  - select:
+      cache_mode: explicit
+      cache_ttl: ["5m", "1h"]
+      models:
+        - moonshotai/Kimi-K2.7-Code
+    reason: DeepInfra's page on prompt cache retention names the field that sets the retention window and lists this model as supporting both values.
+    evidence: &source
+      - kind: documented
+        url: https://docs.deepinfra.com/chat/prompt-cache-retention
+        date: "2026-11-14"
+        note: >-
+          Request parameters: 'prompt_cache_options.ttl | "5m" | "1h" | Retention window. Sending it opens the window,
+          or extends an open one. Omit it on reuse requests.' 'prompt_cache_options.mode | Currently "explicit".'
+          'prompt_cache_key [...] Required for retention'. Model support: 'moonshotai/Kimi-K2.7-Code | 5m, 1h'. 'On a
+          model without retention support, prompt_cache_options is ignored and the request is billed as standard
+          input.'
+    request_controls:
+      - id: cache.retention
+        support: supported
+        when: null
+        bindings:
+          - { location: body, path: /prompt_cache_options/ttl, scope: request }
+        options:
+          - value: "5m"
+            attributes: { retention_s: 300, profile: short }
+            settings:
+              - { location: body, path: /prompt_cache_options/mode, scope: request, value: explicit }
+              - { location: body, path: /prompt_cache_options/ttl, scope: request, value: "5m" }
+            when: null
+          - value: "1h"
+            attributes: { retention_s: 3600, profile: long }
+            settings:
+              - { location: body, path: /prompt_cache_options/mode, scope: request, value: explicit }
+              - { location: body, path: /prompt_cache_options/ttl, scope: request, value: "1h" }
+            when: null
+        default: { value: null }
+        conditions:
+          - The request also needs a prompt_cache_key.
+          - Without ttl a request opens no retention window. It reuses a window that is open, or is cached best-effort.
+          - Every request that sends ttl is charged a cache write, also when it only extends the window.
+        evidence: *source

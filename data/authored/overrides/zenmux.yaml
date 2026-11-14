@@ -1,0 +1,42 @@
+# What a request can ask of the prompt cache for Claude models at ZenMux.
+# models.dev documents the two lifetimes (5m, 1h); this names the request field, from ZenMux's reference for its Anthropic Messages endpoint and its prompt cache guide.
+# The rule applies to every entry here that documents both lifetimes.
+provider: zenmux
+rules:
+  - select: { cache_mode: explicit, cache_ttl: ["5m", "1h"] }
+    reason: ZenMux's API reference names the field that sets the cache lifetime of a breakpoint, and its two values.
+    evidence: &source
+      - kind: documented
+        url: https://zenmux.ai/docs/api/anthropic/create-messages.html
+        date: "2026-11-14"
+        note: >-
+          cache_control: 'CacheControlEphemeral = { type: "ephemeral", ttl: "5m" | "1h" }'. 'ttl: cache TTL, "5m" /
+          "1h", default is 5 minutes.'
+      - kind: documented
+        url: https://zenmux.ai/docs/guide/advanced/prompt-cache.html
+        date: "2026-11-14"
+        note: >-
+          'Default TTL: 5 minutes. Extended TTL: 1 hour (requires additional fee)'. Extending Cache Time (1-hour TTL):
+          "cache_control": { "type": "ephemeral", "ttl": "1h" }.
+    request_controls:
+      - id: cache.retention
+        support: supported
+        when: null
+        bindings:
+          - { location: body, path: /cache_control/ttl, scope: content_block }
+        options:
+          - value: "5m"
+            attributes: { retention_s: 300, profile: short }
+            settings:
+              - { location: body, path: /cache_control/type, scope: content_block, value: ephemeral }
+              - { location: body, path: /cache_control/ttl, scope: content_block, value: "5m" }
+            when: null
+          - value: "1h"
+            attributes: { retention_s: 3600, profile: long }
+            settings:
+              - { location: body, path: /cache_control/type, scope: content_block, value: ephemeral }
+              - { location: body, path: /cache_control/ttl, scope: content_block, value: "1h" }
+            when: null
+        default: { value: "5m" }
+        conditions: []
+        evidence: *source

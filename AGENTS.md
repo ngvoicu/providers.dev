@@ -71,7 +71,8 @@ The baseline is imported from models.dev; our additions, corrections and measure
   `profile`: short or long), the default, and the provider's own page quoted in the evidence note. Where the page
   speaks for the provider's API as a whole, use a `select` rule instead of listing model ids: it applies to every
   entry of the provider that documents the lifetimes, follows the catalog as models come and go, and does not mark
-  the entries as corrected (its source stays with the control). List only values the page shows; where the short
+  the entries as corrected (its source stays with the control). Where the page names the models its statement holds
+  for, add them as `select.models`, and check each model's page. List only values the page shows; where the short
   lifetime is what a request gets by leaving the field out, the option is `value: null`. No control is copied from
   one provider to another: a reseller needs its own page.
 - Pricing and request controls come from `providers_dev.pricing` and `providers_dev.request_controls`, also present

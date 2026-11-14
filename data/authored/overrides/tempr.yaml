@@ -1,0 +1,45 @@
+# What a request can ask of the prompt cache for Claude models at Tempr.
+# models.dev documents the two lifetimes (5m, 1h). Tempr places the cache breakpoints itself, and a request header
+# chooses their lifetime; this names it, from Tempr's gateway reference.
+# The rule applies to every entry here that documents both lifetimes.
+provider: tempr
+rules:
+  - select: { cache_mode: explicit, cache_ttl: ["5m", "1h"] }
+    reason: Tempr's gateway reference names the request header that chooses the lifetime of the cache breakpoints it places.
+    evidence: &source
+      - kind: documented
+        url: https://temprhq.io/docs/gateway-chat-completions.html
+        date: "2026-11-14"
+        note: >-
+          'x-tempr-prompt-cache: Optional: on, off, 5m, or 1h. Overrides your account's prompt caching setting for
+          this request; 5m/1h also choose the cache lifetime.'
+      - kind: documented
+        url: https://temprhq.io/docs/gateway-reference.html#prompt-caching
+        date: "2026-11-14"
+        note: >-
+          'Account default: Off, On (5-minute cache), or On (1-hour cache)'. 'Pick 1 hour when requests sharing a
+          prefix arrive more than 5 minutes apart; the conversation tail always uses 5 minutes.' 'A request that
+          already sets its own cache_control anywhere is sent exactly as written'.
+    request_controls:
+      - id: cache.retention
+        support: supported
+        when: null
+        bindings:
+          - { location: header, path: x-tempr-prompt-cache, scope: request }
+        options:
+          - value: "5m"
+            attributes: { retention_s: 300, profile: short }
+            settings:
+              - { location: header, path: x-tempr-prompt-cache, scope: request, value: "5m" }
+            when: null
+          - value: "1h"
+            attributes: { retention_s: 3600, profile: long }
+            settings:
+              - { location: header, path: x-tempr-prompt-cache, scope: request, value: "1h" }
+            when: null
+        default: null
+        conditions:
+          - Without the header, the prompt caching setting of the account decides (off, 5-minute cache or 1-hour cache).
+          - The breakpoint Tempr places on the conversation tail always uses 5 minutes.
+          - A request that sets its own cache_control is sent as written.
+        evidence: *source

@@ -1,0 +1,41 @@
+# What a request can ask of the prompt cache for Claude models at Vercel AI Gateway.
+# models.dev documents the two lifetimes (5m, 1h); this names the request field Vercel documents for the lifetime,
+# from its page on prompt caching. The rule applies to every entry here that documents both lifetimes.
+provider: vercel
+rules:
+  - select: { cache_mode: explicit, cache_ttl: ["5m", "1h"] }
+    reason: Vercel's prompt caching page names the field that asks for the 1-hour cache, and where it applies.
+    evidence: &source
+      - kind: documented
+        url: https://vercel.com/docs/ai-gateway/models-and-providers/automatic-caching
+        date: "2026-11-14"
+        note: >-
+          Cache lifetime: 'Anthropic cache entries expire after five minutes by default. [...] you can request a
+          one-hour lifetime with the cache_ttl field on the Responses API'. 'The field accepts 5m (five minutes) or 1h
+          (one hour).' 'The field has no effect unless you also set caching: 'auto' at the top level of the same
+          request'. 'cache_ttl is advisory. AI Gateway uses the default lifetime for unsupported values and never
+          rejects the request because of the hint.'
+    request_controls:
+      - id: cache.retention
+        support: supported
+        when: null
+        bindings:
+          - { location: body, path: /cache_ttl, scope: request }
+        options:
+          - value: "5m"
+            attributes: { retention_s: 300, profile: short }
+            settings:
+              - { location: body, path: /caching, scope: request, value: auto }
+              - { location: body, path: /cache_ttl, scope: request, value: "5m" }
+            when: null
+          - value: "1h"
+            attributes: { retention_s: 3600, profile: long }
+            settings:
+              - { location: body, path: /caching, scope: request, value: auto }
+              - { location: body, path: /cache_ttl, scope: request, value: "1h" }
+            when: null
+        default: { value: "5m" }
+        conditions:
+          - "Documented for the Responses API, and only together with caching: 'auto' at the top level of the same request."
+          - The field is advisory. Where the lifetime is not supported the default is used, with a warning in the response.
+        evidence: *source

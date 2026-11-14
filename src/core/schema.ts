@@ -91,6 +91,8 @@ export const RuleSelect = z.strictObject({
   cache_mode: z.enum(["implicit", "explicit"]),
   /** Lifetimes the entry must document for that mode, all of them, as the source writes them ("5m", "1h"). Left out = any lifetime, or none. */
   cache_ttl: z.array(z.string().min(1)).min(1).optional(),
+  /** Only among these model ids: where the provider's page names the models its statement holds for. Left out = every entry of the provider. */
+  models: z.array(z.string().min(1)).min(1).optional(),
 });
 export type RuleSelect = z.infer<typeof RuleSelect>;
 

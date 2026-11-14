@@ -1,0 +1,37 @@
+# What a request can ask of the prompt cache for Claude models at Opper.
+# models.dev documents the two lifetimes (5m, 1h); this names the request field, from Opper's page on prompt caching.
+# The rule applies to every entry here that documents both lifetimes.
+provider: opper
+rules:
+  - select: { cache_mode: explicit, cache_ttl: ["5m", "1h"] }
+    reason: Opper's prompt caching page names the field that asks for the 1-hour cache, at the top level of a request or on a content block.
+    evidence: &source
+      - kind: documented
+        url: https://docs.opper.ai/build/gateway/prompt-caching
+        date: "2026-11-14"
+        note: >-
+          Reference: 'Field: cache_control, top-level (automatic) or on a content block (explicit). Value: { "type":
+          "ephemeral" }, optionally "ttl": "1h" (default is 5 minutes).' Extend the lifetime to 1 hour: 'Add a ttl, at
+          the top level or on a block.'
+    request_controls:
+      - id: cache.retention
+        support: supported
+        when: null
+        bindings:
+          - { location: body, path: /cache_control/ttl, scope: content_block }
+          - { location: body, path: /cache_control/ttl, scope: request }
+        options:
+          - value: null
+            attributes: { retention_s: 300, profile: short }
+            settings:
+              - { location: body, path: /cache_control/type, scope: content_block, value: ephemeral }
+            when: null
+          - value: "1h"
+            attributes: { retention_s: 3600, profile: long }
+            settings:
+              - { location: body, path: /cache_control/type, scope: content_block, value: ephemeral }
+              - { location: body, path: /cache_control/ttl, scope: content_block, value: "1h" }
+            when: null
+        default: { value: "5m" }
+        conditions: []
+        evidence: *source

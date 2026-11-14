@@ -1,0 +1,38 @@
+# What a request can ask of the prompt cache for Claude models at LLM Gateway.
+# models.dev documents the two lifetimes (5m, 1h); this names the request field, from LLM Gateway's page on provider cache control.
+# The rule applies to every entry here that documents both lifetimes.
+provider: llmgateway
+rules:
+  - select: { cache_mode: explicit, cache_ttl: ["5m", "1h"] }
+    reason: LLM Gateway's page on provider cache control names the field that sets the cache lifetime for Claude models, and its two values.
+    evidence: &source
+      - kind: documented
+        url: https://docs.llmgateway.io/features/caching/provider-cache-control
+        date: "2026-11-14"
+        note: >-
+          'Claude models take cache_control markers with a 5m (default) or 1h TTL wherever they are served, including
+          Anthropic, AWS Bedrock, and the Vertex and Azure Anthropic endpoints. On AWS Bedrock, 1h is only forwarded
+          for models priced for it; an unsupported 1h hint is silently downgraded to the default 5m.'
+    request_controls:
+      - id: cache.retention
+        support: supported
+        when: null
+        bindings:
+          - { location: body, path: /cache_control/ttl, scope: content_block }
+        options:
+          - value: "5m"
+            attributes: { retention_s: 300, profile: short }
+            settings:
+              - { location: body, path: /cache_control/type, scope: content_block, value: ephemeral }
+              - { location: body, path: /cache_control/ttl, scope: content_block, value: "5m" }
+            when: null
+          - value: "1h"
+            attributes: { retention_s: 3600, profile: long }
+            settings:
+              - { location: body, path: /cache_control/type, scope: content_block, value: ephemeral }
+              - { location: body, path: /cache_control/ttl, scope: content_block, value: "1h" }
+            when: null
+        default: { value: "5m" }
+        conditions:
+          - Where a request is served through AWS Bedrock, "1h" is forwarded only for models priced for it; otherwise the request gets the default "5m".
+        evidence: *source
