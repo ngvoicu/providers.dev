@@ -256,16 +256,22 @@ export function controlsOf(model: JsonObject, retention: CacheRetention, evidenc
 export function retentionFromControl(control: RequestControl): CacheRetention {
   const binding = control.bindings?.[0];
   const name = binding?.location === "body" ? binding.path.slice(1).split("/").map((part) => part.replaceAll("~1", "/").replaceAll("~0", "~")).join(".") : binding?.path;
+  const place = { body: "Request body", header: "Request header", query: "Query string" } as const;
+  const scope = { content_block: ", on a content block", request: ", top level" } as const;
+  // An option with value null is "leave the field out": a profile of its own, and not a value a request sends.
+  const values = (control.options ?? []).map((option) => option.value).filter((value): value is string => typeof value === "string");
   return {
     support: control.support,
-    parameter: binding && name ? { name, location: `${binding.location}${binding.scope ? ` (${binding.scope})` : ""}` } : null,
-    accepted_values: control.options?.every((option) => typeof option.value === "string") ? control.options.map((option) => option.value as string) : null,
+    parameter: binding && name ? { name, location: `${place[binding.location]}${binding.location === "body" && binding.scope ? scope[binding.scope] : ""}` } : null,
+    accepted_values: values.length > 0 ? values : null,
     default: typeof control.default?.value === "string" ? control.default.value : null,
     profiles: (control.options ?? []).flatMap((option) => {
       const profile = option.attributes?.profile;
-      return (profile === "short" || profile === "long") && typeof option.value === "string" ? [{ profile, value: option.value }] : [];
+      return (profile === "short" || profile === "long") && (typeof option.value === "string" || option.value === null) ? [{ profile, value: option.value }] : [];
     }),
-    conditions: [...control.conditions, ...(control.when === null && !control.options?.some((option) => option.when !== null || (option.settings?.length ?? 0) > 1) ? [] : ["See the cache.retention request control for endpoint, option and companion-setting conditions."])],
+    // A condition the control holds as a tree cannot be said in this flat record: point to it. A companion field of
+    // an option (`type: ephemeral` next to `ttl`) is part of how the value is sent, not a condition.
+    conditions: [...control.conditions, ...(control.when === null && !control.options?.some((option) => option.when !== null) ? [] : ["See the cache.retention request control for the conditions of the control and of its options."])],
     evidence: control.evidence,
   };
 }

@@ -1,0 +1,35 @@
+# What a request can ask of the prompt cache at Meta's Model API.
+# models.dev documents that these entries cache automatically and gives no lifetime. Meta documents a request field
+# that asks for longer retention. The rule applies to every entry here with automatic caching.
+provider: meta
+rules:
+  - select: { cache_mode: implicit }
+    reason: Meta's prompt caching page names the field that asks for longer retention, and its two values.
+    evidence: &source
+      - kind: documented
+        url: https://dev.meta.ai/docs/prompt-caching#cache-retention
+        date: "2026-11-14"
+        note: >-
+          'On the Responses API, prompt_cache_retention optionally requests longer retention': "in_memory", 'Keep
+          the cache in memory (the default behavior)'; "24h", 'Request extended retention, keeping the cached prefix
+          active for longer, up to 24 hours.'
+    request_controls:
+      - id: cache.retention
+        support: supported
+        when: null
+        bindings:
+          - { location: body, path: /prompt_cache_retention, scope: request }
+        options:
+          - value: in_memory
+            attributes: { profile: short }
+            settings: null
+            when: null
+          - value: "24h"
+            attributes: { profile: long }
+            settings: null
+            when: null
+        default: { value: in_memory }
+        conditions:
+          - Documented for the Responses API.
+          - '"24h" asks for up to 24 hours. It is not a lifetime the cache is sure to have.'
+        evidence: *source

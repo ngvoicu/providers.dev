@@ -1,0 +1,35 @@
+# What a request can ask of the prompt cache for Claude models at Amazon Bedrock.
+# models.dev documents the two lifetimes (5m, 1h); this names the request field, from the Bedrock user guide. The
+# field differs by API. The rule applies to every entry here that documents both lifetimes.
+provider: amazon-bedrock
+rules:
+  - select: { cache_mode: explicit, cache_ttl: ["5m", "1h"] }
+    reason: The Bedrock user guide names the field that asks for the 1-hour cache, in the Converse API and in the InvokeModel API.
+    evidence: &source
+      - kind: documented
+        url: https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-caching.html
+        date: "2026-11-14"
+        note: >-
+          'In the Converse API, add "ttl": "1h" to your cachePoint object. In the InvokeModel API for Claude
+          models, add "ttl": "1h" to your cache_control object. [...] If no ttl value is provided, the default
+          5-minute caching behavior applies.'
+    request_controls:
+      - id: cache.retention
+        support: supported
+        when: null
+        bindings:
+          - { location: body, path: /cachePoint/ttl, scope: content_block }
+          - { location: body, path: /cache_control/ttl, scope: content_block }
+        options:
+          - value: null
+            attributes: { retention_s: 300, profile: short }
+            settings: null
+            when: null
+          - value: "1h"
+            attributes: { retention_s: 3600, profile: long }
+            settings: null
+            when: null
+        default: { value: "5m" }
+        conditions:
+          - The field is cachePoint.ttl in the Converse API and cache_control.ttl in the InvokeModel API.
+        evidence: *source

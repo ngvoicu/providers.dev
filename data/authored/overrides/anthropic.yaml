@@ -1,0 +1,36 @@
+# What a request can ask of the prompt cache at Anthropic's API.
+# models.dev documents the two lifetimes of the manual cache (5m, 1h). This names the request field that picks
+# one, from Anthropic's API reference. The rule applies to every entry here that documents both lifetimes.
+provider: anthropic
+rules:
+  - select: { cache_mode: explicit, cache_ttl: ["5m", "1h"] }
+    reason: Anthropic's API reference names the field that sets the lifetime of a cache breakpoint, and its two values.
+    evidence: &source
+      - kind: documented
+        url: https://platform.claude.com/docs/en/api/messages/create
+        date: "2026-11-14"
+        note: >-
+          cache_control: 'ttl: optional "5m" or "1h". The time-to-live for the cache control breakpoint. [...]
+          Defaults to 5m.'
+    request_controls:
+      - id: cache.retention
+        support: supported
+        when: null
+        bindings:
+          - { location: body, path: /cache_control/ttl, scope: content_block }
+        options:
+          - value: "5m"
+            attributes: { retention_s: 300, profile: short }
+            settings:
+              - { location: body, path: /cache_control/type, scope: content_block, value: ephemeral }
+              - { location: body, path: /cache_control/ttl, scope: content_block, value: "5m" }
+            when: null
+          - value: "1h"
+            attributes: { retention_s: 3600, profile: long }
+            settings:
+              - { location: body, path: /cache_control/type, scope: content_block, value: ephemeral }
+              - { location: body, path: /cache_control/ttl, scope: content_block, value: "1h" }
+            when: null
+        default: { value: "5m" }
+        conditions: []
+        evidence: *source

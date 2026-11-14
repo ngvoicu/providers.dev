@@ -1,0 +1,36 @@
+# What a request can ask of the prompt cache for Claude models at AIHubMix.
+# models.dev documents the two lifetimes (5m, 1h); this names the request field, from AIHubMix's own page on
+# Claude prompt caching. The rule applies to every entry here that documents both lifetimes.
+provider: aihubmix
+rules:
+  - select: { cache_mode: explicit, cache_ttl: ["5m", "1h"] }
+    reason: AIHubMix documents the field that sets the cache lifetime for Claude models, and its two values.
+    evidence: &source
+      - kind: documented
+        url: https://docs.aihubmix.com/en/api/Claude-Cache
+        date: "2026-11-14"
+        note: >-
+          'Currently supported cache lifetimes: "ephemeral": Default 5-minute lifetime. 1-hour cache: Set "ttl": "1h"
+          in cache_control'. The field is given as { "cache_control": { "type": "ephemeral", "ttl": "5m" | "1h" } }.
+    request_controls:
+      - id: cache.retention
+        support: supported
+        when: null
+        bindings:
+          - { location: body, path: /cache_control/ttl, scope: content_block }
+        options:
+          - value: "5m"
+            attributes: { retention_s: 300, profile: short }
+            settings:
+              - { location: body, path: /cache_control/type, scope: content_block, value: ephemeral }
+              - { location: body, path: /cache_control/ttl, scope: content_block, value: "5m" }
+            when: null
+          - value: "1h"
+            attributes: { retention_s: 3600, profile: long }
+            settings:
+              - { location: body, path: /cache_control/type, scope: content_block, value: ephemeral }
+              - { location: body, path: /cache_control/ttl, scope: content_block, value: "1h" }
+            when: null
+        default: { value: "5m" }
+        conditions: []
+        evidence: *source

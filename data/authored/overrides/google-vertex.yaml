@@ -1,0 +1,38 @@
+# What a request can ask of the prompt cache for Claude models at Google Vertex AI.
+# models.dev documents the two lifetimes (5m, 1h). Anthropic's prompt caching guide says the 1-hour cache is
+# available on this platform ("Claude Models on Google Cloud (Google managed)") and names the field. The rule applies to every entry here that
+# documents both lifetimes.
+provider: google-vertex
+rules:
+  - select: { cache_mode: explicit, cache_ttl: ["5m", "1h"] }
+    reason: Anthropic's prompt caching guide lists this platform among those with the 1-hour cache and names the field that asks for it.
+    evidence: &source
+      - kind: documented
+        url: https://platform.claude.com/docs/en/build-with-claude/prompt-caching#1-hour-cache-duration
+        date: "2026-11-14"
+        note: >-
+          'The 1-hour cache duration is available on the Claude API, Amazon Bedrock [...], Claude Models on Google
+          Cloud (Google managed), and Microsoft Foundry.' 'To use the extended cache, include ttl in the
+          cache_control definition like this: "cache_control": { "type": "ephemeral", "ttl": "1h" }'. 'By default,
+          the cache has a 5-minute lifetime.'
+    request_controls:
+      - id: cache.retention
+        support: supported
+        when: null
+        bindings:
+          - { location: body, path: /cache_control/ttl, scope: content_block }
+        options:
+          - value: null
+            attributes: { retention_s: 300, profile: short }
+            settings:
+              - { location: body, path: /cache_control/type, scope: content_block, value: ephemeral }
+            when: null
+          - value: "1h"
+            attributes: { retention_s: 3600, profile: long }
+            settings:
+              - { location: body, path: /cache_control/type, scope: content_block, value: ephemeral }
+              - { location: body, path: /cache_control/ttl, scope: content_block, value: "1h" }
+            when: null
+        default: { value: "5m" }
+        conditions: []
+        evidence: *source

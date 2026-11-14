@@ -93,3 +93,37 @@ rules:
         url: https://github.com/ngvoicu/groundtruth/blob/main/results/openrouter-direct/R11-2026-11-04T19-00-15.json
         date: "2026-11-04"
         note: Direct to OpenRouter, Responses API with a prompt_cache_key; 11 of 18 later re-sends were served from the cache, the oldest at 10 minutes.
+  # What a request can ask of the prompt cache for Claude models at OpenRouter. models.dev documents the two
+  # lifetimes (5m, 1h); this names the request field. The rule applies to every entry here that documents both.
+  - select: { cache_mode: explicit, cache_ttl: ["5m", "1h"] }
+    reason: OpenRouter documents the field that asks for the 1-hour cache with Claude models, and through which of its APIs.
+    evidence: &retention
+      - kind: documented
+        url: https://openrouter.ai/docs/guides/best-practices/prompt-caching#cache-ttl-options
+        date: "2026-11-14"
+        note: >-
+          'OpenRouter supports two cache TTL values for Anthropic: 5 minutes (default): "cache_control": { "type":
+          "ephemeral" }. 1 hour: "cache_control": { "type": "ephemeral", "ttl": "1h" }.' On the Responses API: 'if
+          you need to set a cache ttl, use the Chat Completions or Anthropic Messages API with cache_control.'
+    request_controls:
+      - id: cache.retention
+        support: supported
+        when: null
+        bindings:
+          - { location: body, path: /cache_control/ttl, scope: content_block }
+        options:
+          - value: null
+            attributes: { retention_s: 300, profile: short }
+            settings:
+              - { location: body, path: /cache_control/type, scope: content_block, value: ephemeral }
+            when: null
+          - value: "1h"
+            attributes: { retention_s: 3600, profile: long }
+            settings:
+              - { location: body, path: /cache_control/type, scope: content_block, value: ephemeral }
+              - { location: body, path: /cache_control/ttl, scope: content_block, value: "1h" }
+            when: null
+        default: { value: "5m" }
+        conditions:
+          - Set through the Chat Completions or the Anthropic Messages API. The Responses API has no field for a cache ttl.
+        evidence: *retention

@@ -76,6 +76,59 @@ describe("resolve: overrides", () => {
     expect(OverrideFileSchema.safeParse({ provider: "lab", rules: [{ models: ["model-a"], cache_retention: withoutEvidence, reason: "No source", evidence }] }).success).toBe(false);
   });
 
+  it("applies a provider-wide control to every entry that documents the lifetimes, without marking them", () => {
+    const source = { kind: "documented" as const, url: "https://example.com/api-reference", date: "2026-11-14", note: "The reference names the field and its values." };
+    const control = {
+      id: "cache.retention", support: "supported", when: null,
+      bindings: [{ location: "body", path: "/cache_control/ttl", scope: "content_block" }],
+      options: [
+        // Leaving the field out is the short profile here: the source documents no value for it.
+        { value: null, attributes: { retention_s: 300, profile: "short" }, settings: [{ location: "body", path: "/cache_control/type", scope: "content_block", value: "ephemeral" }], when: null },
+        { value: "1h", attributes: { retention_s: 3600, profile: "long" }, settings: null, when: null },
+      ],
+      default: { value: "5m" }, conditions: [], evidence: [source],
+    };
+    const documented = upstream();
+    documented.lab!.models["model-a"]!.capabilities = { cache: { explicit: { ttl: ["5m", "1h"] } } };
+    documented.lab!.models["model-b"]!.capabilities = { cache: { explicit: { ttl: ["5m"] } } };
+    documented.lab!.models["model-c"] = { id: "model-c", name: "Model C", capabilities: { cache: { implicit: { ttl: ["5m", "1h"] } } } };
+    const rule = { select: { cache_mode: "explicit", cache_ttl: ["5m", "1h"] }, request_controls: [control], reason: "The provider documents the field", evidence };
+    const { catalog, issues } = resolve(input([OverrideFileSchema.parse({ provider: "lab", rules: [rule] })], { upstream: documented }));
+    const a = catalog.lab!.models["model-a"]!;
+    // The entry that documents both lifetimes for that mode gets the control, and the flat cache record says the same.
+    expect(ext(a).request_controls.items.find((item) => item.id === "cache.retention")).toMatchObject({ support: "supported", bindings: control.bindings, evidence: [source] });
+    expect(ext(a).cache.retention).toEqual({
+      support: "supported", parameter: { name: "cache_control.ttl", location: "Request body, on a content block" }, accepted_values: ["1h"], default: "5m",
+      profiles: [{ profile: "short", value: null }, { profile: "long", value: "1h" }], conditions: [], evidence: [source],
+    });
+    // It is a statement about the provider's API, not evidence about the entry: the entry stays as imported.
+    expect(summarize("lab", a, 0)).toMatchObject({ cache_retention: "supported", origin: "upstream", verified: null });
+    expect(ext(a).evidence).toEqual([]);
+    // One lifetime only, the lifetimes under the other mode, or another provider: not selected.
+    for (const model of [catalog.lab!.models["model-b"]!, catalog.lab!.models["model-c"]!, catalog["lab-coding-plan"]!.models["model-a"]!]) expect(ext(model).cache.retention.support).toBe("unknown");
+    expect(issues).toEqual([]);
+
+    // A rule that names the entry wins over the selection, and that one is evidence about the entry.
+    const own = { ...control, options: [{ value: "5m", attributes: { profile: "short" }, settings: null, when: null }], default: { value: "5m" } };
+    const both = resolve(input([OverrideFileSchema.parse({ provider: "lab", rules: [rule, { models: ["model-a"], request_controls: [own], reason: "Checked for this model", evidence }] })], { upstream: documented }));
+    expect(ext(both.catalog.lab!.models["model-a"]!).cache.retention.accepted_values).toEqual(["5m"]);
+    expect(summarize("lab", both.catalog.lab!.models["model-a"]!, 0)).toMatchObject({ origin: "modified", verified: "2026-11-14" });
+    // The same source is listed once.
+    expect(ext(both.catalog.lab!.models["model-a"]!).evidence).toEqual([source]);
+
+    // A selection that finds nothing is reported, so that a stale rule is seen.
+    const none = resolve(input([OverrideFileSchema.parse({ provider: "lab", rules: [{ ...rule, select: { cache_mode: "explicit", cache_ttl: ["30m", "12h"] } }] })], { upstream: documented }));
+    expect(none.issues).toEqual([expect.objectContaining({ level: "warning", code: "orphan-override", target: "lab#select" })]);
+
+    // A selection declares controls and nothing else, and a rule has `models` or `select`, never both or neither.
+    const invalid = (more: object) => OverrideFileSchema.safeParse({ provider: "lab", rules: [{ reason: "r", evidence, ...more }] }).success;
+    expect(invalid({ select: rule.select, request_controls: [control] })).toBe(true);
+    expect(invalid({ select: rule.select, request_controls: [control], set: { limit: { context: 1 } } })).toBe(false);
+    expect(invalid({ select: rule.select })).toBe(false);
+    expect(invalid({ select: rule.select, models: ["model-a"], request_controls: [control] })).toBe(false);
+    expect(invalid({ request_controls: [control] })).toBe(false);
+  });
+
   it("publishes our value for an overridden field and upstream for the rest", () => {
     const { catalog } = resolve(input([contextOverride]));
     const model = catalog.lab?.models["model-a"];

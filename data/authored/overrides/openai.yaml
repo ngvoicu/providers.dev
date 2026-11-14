@@ -1,0 +1,36 @@
+# What a request can ask of the prompt cache at OpenAI's API, for the models with explicit cache breakpoints
+# (GPT-5.6 and later). models.dev documents their two lifetimes (30m, 12h); this names the request fields, from
+# OpenAI's prompt caching guide. Earlier models use another field (prompt_cache_retention) and are not covered here.
+provider: openai
+rules:
+  - select: { cache_mode: explicit, cache_ttl: ["30m", "12h"] }
+    reason: OpenAI's prompt caching guide names the fields that set the minimum cache lifetime, and their two values.
+    evidence: &source
+      - kind: documented
+        url: https://developers.openai.com/api/docs/guides/prompt-caching#cache-lifetime-gpt-5-6-and-later
+        date: "2026-11-14"
+        note: >-
+          GPT-5.6 and later: 'In the Responses API, set prompt_cache_options.ttl to choose the minimum cache
+          lifetime': "30m" (default) or "12h". 'Set prompt_cache_breakpoint.ttl to override it for an individual
+          explicit breakpoint. Omitting both settings preserves the default "30m" behavior.' The summary of model
+          differences gives the supported values as '"30m" (default), or "12h" in the Responses API'.
+    request_controls:
+      - id: cache.retention
+        support: supported
+        when: null
+        bindings:
+          - { location: body, path: /prompt_cache_options/ttl, scope: request }
+          - { location: body, path: /prompt_cache_breakpoint/ttl, scope: content_block }
+        options:
+          - value: "30m"
+            attributes: { retention_s: 1800, profile: short }
+            settings: null
+            when: null
+          - value: "12h"
+            attributes: { retention_s: 43200, profile: long }
+            settings: null
+            when: null
+        default: { value: "30m" }
+        conditions:
+          - '"12h" is documented for the Responses API only.'
+        evidence: *source

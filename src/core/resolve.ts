@@ -295,7 +295,7 @@ export function resolve(input: ResolveInput): ResolveResult {
       }
     }
     for (const rule of file.rules) {
-      for (const id of rule.models) {
+      for (const id of rule.models ?? []) {
         const target = `${file.provider}/${id}`;
         const model = provider.models[id];
         if (!model) {
@@ -322,6 +322,40 @@ export function resolve(input: ResolveInput): ResolveResult {
           continue;
         }
         applyPatch(model, rule.set as JsonObject, rule.reason, rule.evidence, target, modelExt(model), issues);
+      }
+    }
+  }
+
+  // 4b. Rules that select their entries by what is documented for them, after every correction is in. Such a rule
+  // is a statement about the provider's API ("a request sets the cache lifetime with this field"), applied to each
+  // entry that documents the lifetimes. It is not evidence about any one entry: the control carries its source, and
+  // the entry is not marked as corrected or evaluated because of it. An entry named by a rule of its own keeps that.
+  const providerWide = new Map<PublishedModel, Set<string>>();
+  for (const file of input.overrides) {
+    const provider = catalog[file.provider];
+    if (!provider) continue;
+    for (const rule of file.rules) {
+      const select = rule.select;
+      if (!select || !rule.request_controls) continue;
+      const matched = Object.values(provider.models).filter((model) => {
+        const mode = documentedCache(model).modes[select.cache_mode];
+        return mode.support === "supported" && (select.cache_ttl ?? []).every((ttl) => mode.ttl?.includes(ttl));
+      });
+      if (matched.length === 0) {
+        issues.push({
+          level: "warning",
+          code: "orphan-override",
+          target: `${file.provider}#select`,
+          message: `A rule for ${file.provider} selects no entry (${select.cache_mode} caching${select.cache_ttl ? ` with ${select.cache_ttl.join(", ")}` : ""}). Reason on file: ${rule.reason}`,
+        });
+      }
+      for (const model of matched) {
+        const named = controlDeclarations.get(model) ?? [];
+        const fresh = rule.request_controls.filter((control) => !named.some((item) => item.id === control.id));
+        if (fresh.length === 0) continue;
+        controlDeclarations.set(model, [...named, ...fresh]);
+        const wide = providerWide.get(model) ?? providerWide.set(model, new Set()).get(model)!;
+        for (const control of fresh) wide.add(control.id);
       }
     }
   }
@@ -528,10 +562,18 @@ export function resolve(input: ResolveInput): ResolveResult {
         : "The cost models.dev records for this entry. Rules are in the order models.dev applies them: base prices, overrides in their order, then multipliers.";
       const pricing = pricingOf(priced, extension.access, reference, sourcesOf(priced, "cost", priceNote), priceDeclaration);
       const requestControls = controlsOf(model, cache.retention, sourcesOf(model, "capabilities", "Imported capabilities; corrections are recorded in providers_dev.provenance."), controlDeclarations.get(model));
-      let evidence: Evidence[] = extension.evidence ?? [];
-      if (declaration) evidence = [...evidence, ...declaration.evidence.flatMap((source) => source.date === null ? [] : [{ ...source, date: source.date }])];
-      const policyEvidence = [...(pricingDeclarations.get(model)?.evidence ?? []), ...(controlDeclarations.get(model) ?? []).flatMap((control) => control.evidence)];
-      if (policyEvidence.length > 0) evidence = [...evidence, ...policyEvidence.flatMap((source) => source.date === null ? [] : [{ ...source, date: source.date }])];
+      // A declaration made for this entry by name is evidence about the entry. One that reached it through a
+      // provider-wide selection is not: its source stays with the control.
+      const wide = providerWide.get(model);
+      const declared = [
+        ...(declaration && !wide?.has("cache.retention") ? declaration.evidence : []),
+        ...(pricingDeclarations.get(model)?.evidence ?? []),
+        ...(controlDeclarations.get(model) ?? []).filter((control) => !wide?.has(control.id)).flatMap((control) => control.evidence),
+      ].flatMap((source): Evidence[] => (source.date === null ? [] : [{ kind: source.kind, url: source.url, date: source.date, note: source.note }]));
+      const evidence: Evidence[] = [...(extension.evidence ?? [])];
+      for (const source of declared) {
+        if (!evidence.some((item) => item.kind === source.kind && item.url === source.url && item.date === source.date && (item.note ?? null) === (source.note ?? null))) evidence.push(source);
+      }
       const verified = newestDate([
         ...evidence.map((e) => e.date),
         ...(extension.provenance ?? []).flatMap((p) => p.evidence.map((e) => e.date)),

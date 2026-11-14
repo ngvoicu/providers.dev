@@ -1,0 +1,40 @@
+# What a request can ask of the prompt cache for Claude models at NanoGPT.
+# models.dev documents the two lifetimes (5m, 1h); this names the request fields, from NanoGPT's prompt caching
+# reference. The rule applies to every entry here that documents both lifetimes.
+provider: nano-gpt
+rules:
+  - select: { cache_mode: explicit, cache_ttl: ["5m", "1h"] }
+    reason: NanoGPT's prompt caching reference names the helper field that sets the cache lifetime for Claude models, and its two values.
+    evidence: &source
+      - kind: documented
+        url: https://docs.nano-gpt.com/api-reference/miscellaneous/prompt-caching
+        date: "2026-11-14"
+        note: >-
+          The prompt_caching helper: 'ttl | "5m" or "1h" | "5m" | Cache time-to-live. Only the exact string "1h"
+          selects one hour; omitted or unrecognized helper values use "5m".' 'enabled [...] A helper containing only
+          ttl does not enable caching.' Claude caching 'uses request controls (prompt_caching/promptCaching/body-level
+          cache_control, or inline cache_control) to mark reusable prefixes and select TTLs'.
+    request_controls:
+      - id: cache.retention
+        support: supported
+        when: null
+        bindings:
+          - { location: body, path: /prompt_caching/ttl, scope: request }
+          - { location: body, path: /cache_control/ttl, scope: content_block }
+        options:
+          - value: "5m"
+            attributes: { retention_s: 300, profile: short }
+            settings:
+              - { location: body, path: /prompt_caching/enabled, scope: request, value: true }
+              - { location: body, path: /prompt_caching/ttl, scope: request, value: "5m" }
+            when: null
+          - value: "1h"
+            attributes: { retention_s: 3600, profile: long }
+            settings:
+              - { location: body, path: /prompt_caching/enabled, scope: request, value: true }
+              - { location: body, path: /prompt_caching/ttl, scope: request, value: "1h" }
+            when: null
+        default: { value: "5m" }
+        conditions:
+          - 'The prompt_caching helper needs enabled: true. A helper with only ttl does not enable caching.'
+        evidence: *source

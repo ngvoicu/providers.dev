@@ -82,19 +82,40 @@ export const AuthoredProvider = z.strictObject({
 export type AuthoredProvider = z.infer<typeof AuthoredProvider>;
 
 // ---- authored: overrides on upstream entries (data/authored/overrides/<provider>.yaml)
-export const OverrideRule = z.strictObject({
-  /** Model ids this rule applies to. */
-  models: z.array(z.string().min(1)).min(1),
-  /** Fields to merge over the upstream entry. null = explicitly unknown, "$delete" = remove. */
-  set: z.record(z.string(), z.json()).optional(),
-  cache_retention: CacheRetentionDeclarationSchema.optional(),
-  pricing: PricingDeclarationSchema.optional(),
-  request_controls: RequestControlDeclarationsSchema.optional(),
-  /** True removes the entries from the published catalog (a tombstone). */
-  exclude: z.boolean().optional(),
-  reason: z.string().min(1),
-  evidence: z.array(Evidence).min(1),
+/**
+ * Which entries of the provider a rule is about, by what the source documents for them. For a statement about the
+ * provider's API rather than about one model: "at this provider, a request sets the cache lifetime with this field".
+ */
+export const RuleSelect = z.strictObject({
+  /** The way of caching the entry must be documented to support. */
+  cache_mode: z.enum(["implicit", "explicit"]),
+  /** Lifetimes the entry must document for that mode, all of them, as the source writes them ("5m", "1h"). Left out = any lifetime, or none. */
+  cache_ttl: z.array(z.string().min(1)).min(1).optional(),
 });
+export type RuleSelect = z.infer<typeof RuleSelect>;
+
+export const OverrideRule = z
+  .strictObject({
+    /** Model ids this rule applies to. */
+    models: z.array(z.string().min(1)).min(1).optional(),
+    /** Instead of `models`: every entry of the provider that documents this. Only for declaring request controls. */
+    select: RuleSelect.optional(),
+    /** Fields to merge over the upstream entry. null = explicitly unknown, "$delete" = remove. */
+    set: z.record(z.string(), z.json()).optional(),
+    cache_retention: CacheRetentionDeclarationSchema.optional(),
+    pricing: PricingDeclarationSchema.optional(),
+    request_controls: RequestControlDeclarationsSchema.optional(),
+    /** True removes the entries from the published catalog (a tombstone). */
+    exclude: z.boolean().optional(),
+    reason: z.string().min(1),
+    evidence: z.array(Evidence).min(1),
+  })
+  .superRefine((rule, ctx) => {
+    if ((rule.models === undefined) === (rule.select === undefined)) ctx.addIssue({ code: "custom", message: "A rule names its entries with `models` or selects them with `select`: exactly one of the two." });
+    // A correction changes what is published for an entry, so it names the entry. A selection follows the catalog.
+    if (rule.select && (rule.set !== undefined || rule.exclude !== undefined || rule.pricing !== undefined || rule.cache_retention !== undefined)) ctx.addIssue({ code: "custom", path: ["select"], message: "A `select` rule declares `request_controls` only. A correction, an exclusion or a price names its entries with `models`." });
+    if (rule.select && !rule.request_controls?.length) ctx.addIssue({ code: "custom", path: ["request_controls"], message: "A `select` rule needs `request_controls`." });
+  });
 export type OverrideRule = z.infer<typeof OverrideRule>;
 
 export const OverrideFile = z.strictObject({

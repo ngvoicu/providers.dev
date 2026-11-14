@@ -62,6 +62,14 @@ The baseline is imported from models.dev; our additions, corrections and measure
   page. Do not generate narrative lifetime verdicts. Individual evaluations are collapsed by default.
 - Cache mode support comes from `providers_dev.cache.documented`; retention parameter support requires a sourced
   declaration. A requested setting or cache hit alone does not confirm parameter support.
+- A retention declaration is a `request_controls` item with id `cache.retention` in
+  `data/authored/overrides/<provider>.yaml`: the request field (`bindings`), the values (`options`, each with its
+  `profile`: short or long), the default, and the provider's own page quoted in the evidence note. Where the page
+  speaks for the provider's API as a whole, use a `select` rule instead of listing model ids: it applies to every
+  entry of the provider that documents the lifetimes, follows the catalog as models come and go, and does not mark
+  the entries as corrected (its source stays with the control). List only values the page shows; where the short
+  lifetime is what a request gets by leaving the field out, the option is `value: null`. No control is copied from
+  one provider to another: a reseller needs its own page.
 - Pricing and request controls come from `providers_dev.pricing` and `providers_dev.request_controls`, also present
   on every summary. Normalize conditions once; preserve unfamiliar source shapes and mark coverage partial. Never
   infer flat pricing from absent rules or invent request headers from free-text locations.
