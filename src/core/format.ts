@@ -48,7 +48,7 @@ export function importDate(index: { upstream_fetched_at?: string }): string | un
   return index.upstream_fetched_at?.slice(0, 10);
 }
 
-export function isStale(date: string | undefined, now: Date): boolean {
+export function isStale(date: string | null | undefined, now: Date): boolean {
   if (!date) return false;
   return now.getTime() - new Date(`${date}T00:00:00Z`).getTime() > STALE_AFTER_DAYS * 86400 * 1000;
 }

@@ -133,6 +133,11 @@ it("publishes new data without rebuilding the shell, while in-flight API reads s
     return existsSync(file) ? new Response(readFileSync(file)) : new Response(null, { status: 404 });
   } };
   const pinned = await readSnapshot(assets, "https://providers.dev");
+  // The index is staged as gzip only, well under the per-file limit of static assets, and served as plain JSON.
+  const staged = join(destination, "snapshots", (JSON.parse(readFileSync(join(destination, "current.json"), "utf8")) as { id: string }).id, "data");
+  expect([existsSync(join(staged, "index.json")), existsSync(join(staged, "index.json.gz"))]).toEqual([false, true]);
+  const servedIndex = await worker.fetch(new Request("https://providers.dev/data/index.json"), { ASSETS: assets });
+  expect(await servedIndex.json()).toEqual(JSON.parse(readFileSync(join(dataDir, "published", "site", "data", "index.json"), "utf8")));
   const first = await worker.fetch(new Request("https://providers.dev/providers/provider-02/"), { ASSETS: assets });
   const etag = first.headers.get("etag")!;
   expect(first.status).toBe(200);

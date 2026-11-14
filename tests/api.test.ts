@@ -26,8 +26,8 @@ import { handlePage } from "../src/core/pages.ts";
 import { MARK } from "../src/core/page-shell.ts";
 import { EVALUATION_PARAMS, PARAMS, parseQuery, runQuery } from "../src/core/query.ts";
 import { canonicalModels, listEvaluations, withoutEntries } from "../src/core/resources.ts";
-import type { Catalog } from "../src/core/schema.ts";
-import { depsFrom, fetchReturning, fixtureUpstream, ROOT, tempDataDir, writeAuthored } from "./helpers.ts";
+import type { Catalog, ModelExtension } from "../src/core/schema.ts";
+import { depsFrom, fetchReturning, fixtureUpstream, ROOT, summaryOf, tempDataDir, writeAuthored } from "./helpers.ts";
 
 let deps: ApiDeps;
 let published: string;
@@ -112,7 +112,7 @@ describe("GET /api/v1/entries", () => {
     expect(monthsBefore("2026-05-31", 3)).toBe("2026-02-28");
     expect(monthsBefore("2026-11-13", 24)).toBe("2024-11-13");
 
-    const entry = (ref: string, release_date?: string) => ({ ref, provider: "p", model: ref, release_date }) as unknown as Summary;
+    const entry = (ref: string, release_date: string | null = null) => summaryOf({ ref, provider: "p", model: ref, release_date });
     const entries = [entry("old", "2026-05-12"), entry("edge", "2026-05-13"), entry("new", "2026-10-01"), entry("month", "2026-05"), entry("old-month", "2026-04"), entry("undated")];
     const run = (months: string) => {
       const parsed = parseQuery(new URLSearchParams(`max_age_months=${months}`));
@@ -179,10 +179,10 @@ describe("GET /api/v1/entries", () => {
     const descending = await json<Page>("/api/v1/entries?provider=provider-00&sort=context&order=desc&limit=200");
     const values = descending.data.map((entry) => entry.context);
     expect(values[0]).toBe(2000000);
-    expect(values.at(-1)).toBeUndefined();
+    expect(values.at(-1)).toBeNull();
     const ascending = await json<Page>("/api/v1/entries?provider=provider-00&sort=context&order=asc&limit=200");
     expect(ascending.data[0]?.context).toBe(100000);
-    expect(ascending.data.at(-1)?.context).toBeUndefined();
+    expect(ascending.data.at(-1)?.context).toBeNull();
   });
 
   it("rejects unknown and malformed parameters with details", async () => {
@@ -228,12 +228,15 @@ describe("lookups", () => {
   });
 
   it("serves a provider with its entries, and in full on request", async () => {
-    const provider = await json<{ data: { provider: { id: string; entry_count: number; env: string[] }; entries: Summary[]; models?: Record<string, unknown> } }>("/api/v1/providers/provider-01");
+    const provider = await json<{ data: { provider: { id: string; entry_count: number; env: string[] }; entries: Summary[]; models: Record<string, unknown> | null } }>("/api/v1/providers/provider-01");
     expect(provider.data.provider.id).toBe("provider-01");
     expect(provider.data.provider.entry_count).toBe(20);
     expect(provider.data.entries).toHaveLength(20);
-    expect(provider.data.models).toBeUndefined();
+    // The answer has the same keys whatever the view: `models` is null until it is asked for.
+    expect(Object.keys(provider.data)).toEqual(["provider", "entries", "models"]);
+    expect(provider.data.models).toBeNull();
     const full = await json<typeof provider>("/api/v1/providers/provider-01?view=full");
+    expect(Object.keys(full.data)).toEqual(Object.keys(provider.data));
     expect(Object.keys(full.data.models ?? {})).toHaveLength(20);
     expect(full.data.entries).toEqual(provider.data.entries);
   });
@@ -354,7 +357,35 @@ describe("the contract", () => {
     for (const entry of picks) {
       valid(one(EntryDetailSchema), await ask(`/api/v1${entryHref(entry.ref)}`), entry.ref);
       valid(one(ProviderDetailSchema), await ask(`/api/v1/providers/${entry.provider}?view=full`), entry.provider);
+      valid(one(ProviderDetailSchema), await ask(`/api/v1/providers/${entry.provider}`), entry.provider);
     }
+
+    // One structure. Everything providers.dev publishes of its own has the same keys on every object of its kind:
+    // what is not known is null, what is empty is an empty list, and nothing is left out.
+    const shapes = (items: readonly object[]): string[] => [...new Set(items.map((item) => Object.keys(item).sort().join(",")))];
+    const same = (items: readonly object[], what: string): void => expect(shapes(items).length, `${what}: ${shapes(items).slice(0, 2).join(" | ")}`).toBeLessThanOrEqual(1);
+    same(local.index.entries, "entry summaries");
+    // The summaries also list their keys in one order.
+    expect(new Set(local.index.entries.map((entry) => Object.keys(entry).join(","))).size).toBe(1);
+    same(local.index.providers, "provider summaries");
+    same(local.index.providers.map((provider) => provider.providers_dev), "providers_dev of a provider");
+    const extensions = Object.values(exported).flatMap((provider) => Object.values(provider.models).map((entry) => entry.providers_dev as unknown as ModelExtension));
+    same(extensions, "providers_dev of an entry");
+    same(extensions.map((extension) => extension.limits), "limits");
+    same(extensions.map((extension) => extension.cache), "cache");
+    same(extensions.map((extension) => extension.cache.retention), "cache.retention");
+    same(extensions.map((extension) => extension.pricing), "pricing");
+    same(extensions.flatMap((extension) => extension.pricing.rules ?? []), "pricing rules");
+    same(extensions.flatMap((extension) => extension.request_controls.items), "request controls");
+    same(extensions.flatMap((extension) => extension.cache.evaluations), "cache evaluations");
+    same(extensions.flatMap((extension) => extension.cache.evaluations.flatMap((evaluation) => evaluation.results)), "cache results");
+    same(extensions.flatMap((extension) => extension.cache.results ?? []), "cache summary lines");
+    same(extensions.flatMap((extension) => extension.limits.measured), "limit evaluations");
+    same(extensions.flatMap((extension) => extension.provenance), "corrections");
+    same(extensions.flatMap((extension) => [...extension.evidence, ...extension.provenance.flatMap((change) => change.evidence)]), "evidence");
+    const evaluations = (await ask("/api/v1/evaluations?limit=200")) as { data: { kind: string }[] };
+    for (const kind of ["cache", "limit"]) same(evaluations.data.filter((item) => item.kind === kind), `${kind} evaluations in the list`);
+    same(modelsFor(local.index).map(withoutEntries), "canonical models");
   };
 
   it("holds for every answer of the fixture", async () => {

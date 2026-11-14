@@ -3,8 +3,9 @@ import { pricingOf } from "../src/core/policies.ts";
 import { addResults, cacheResult, documentedCache, profileOf, retentionOf, summarizeCache, type CacheEvaluation } from "../src/core/cache.ts";
 import { importDate, shortAge } from "../src/core/format.ts";
 import type { JsonObject } from "../src/core/merge.ts";
+import type { MeasuredLimit } from "../src/core/schema.ts";
 
-const NO_CACHE = { documented: documentedCache({}), retention: { support: "unknown", parameter: null, accepted_values: null, default: null, profiles: [], conditions: [], evidence: [] }, results: null, evaluations: [] };
+import { extensionOf, limitOf } from "./helpers.ts";
 
 describe("ages", () => {
   it("keeps age headings short", () => {
@@ -27,12 +28,12 @@ describe("prices", () => {
 
   it("takes the base price per token and nothing in another unit", async () => {
     const { summarize } = await import("../src/core/entries.ts");
-    const model = (cost: unknown) => ({ id: "m", name: "M", cost, providers_dev: { origin: "upstream", access: "api", cache: NO_CACHE, pricing: pricingOf({ cost } as JsonObject, "api", null, []) } }) as never;
+    const model = (cost: unknown) => ({ id: "m", name: "M", cost, providers_dev: extensionOf({ pricing: pricingOf({ cost } as JsonObject, "api", null, []) }) }) as never;
     const priced = summarize("p", model({ text: { input: { price: 10, overrides: [{ when: { context: { gt: 1 } }, price: 20 }] }, output: { price: 50 } } }), 0);
     expect([priced.price_in, priced.price_out]).toEqual([10, 50]);
     const perCharacter = summarize("p", model({ text: { input: { price: 15, unit: "character" } } }), 0);
-    expect([perCharacter.price_in, perCharacter.price_out]).toEqual([undefined, undefined]);
-    expect(summarize("p", model(undefined), 0).price_in).toBeUndefined();
+    expect([perCharacter.price_in, perCharacter.price_out]).toEqual([null, null]);
+    expect(summarize("p", model(undefined), 0).price_in).toBeNull();
     // A listed 0 is kept as 0: the page says "Free" or "In plan" by the access method, never "Unknown".
     expect(summarize("p", model({ text: { input: { price: 0 }, output: { price: 0 } } }), 0).price_in).toBe(0);
   });
@@ -41,12 +42,12 @@ describe("prices", () => {
 describe("measured input", () => {
   it("puts the bounds of an evaluated input limit in the summary", async () => {
     const { summarize } = await import("../src/core/entries.ts");
-    const model = (measured: unknown[]) => ({ id: "m", name: "M", providers_dev: { origin: "added", access: "subscription", limits: { measured }, cache: NO_CACHE, pricing: pricingOf({}, "subscription", null, []) } }) as never;
-    const two = summarize("p", model([{ input_accepted: 915011, input_refused: 922500 }, { input_accepted: 920870, input_refused: 921875 }]), 0);
+    const model = (measured: MeasuredLimit[]) => ({ id: "m", name: "M", providers_dev: extensionOf({ origin: "added", access: "subscription", limits: { measured, from_measurement: [] } }) }) as never;
+    const two = summarize("p", model([limitOf({ input_accepted: 915011, input_refused: 922500 }), limitOf({ input_accepted: 920870, input_refused: 921875 })]), 0);
     // The widest accepted and the narrowest refused: the real limit is between them.
-    expect([two.measured_input_accepted, two.measured_input_refused, two.context]).toEqual([920870, 921875, undefined]);
-    const none = summarize("p", model([{ context: 1000000, output: 128000 }]), 0);
-    expect([none.measured_input_accepted, none.measured_input_refused]).toEqual([undefined, undefined]);
+    expect([two.measured_input_accepted, two.measured_input_refused, two.context]).toEqual([920870, 921875, null]);
+    const none = summarize("p", model([limitOf({ context: 1000000, output: 128000 })]), 0);
+    expect([none.measured_input_accepted, none.measured_input_refused]).toEqual([null, null]);
   });
 });
 
@@ -63,6 +64,8 @@ describe("cache evaluations as the API publishes them", () => {
     parameter: null,
     value: null,
     results: results.map(([age, hits, checks]) => cacheResult(age === 0 ? "control" : "timed", age, hits, checks)),
+    late_excluded: 0,
+    note: null,
     source: `https://example.com/${id}`,
     ...sent,
   });

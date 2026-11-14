@@ -7,6 +7,7 @@ import { CONTROL_EXAMPLE, PRICING_EXAMPLE } from "../src/core/policy-examples.ts
 import { entryHtml, rowHtml } from "../src/core/render.ts";
 import { resolve } from "../src/core/resolve.ts";
 import { ext, OverrideFile, UpstreamModel } from "../src/core/schema.ts";
+import { limitOf } from "./helpers.ts";
 
 const evidence = [{ kind: "documented" as const, url: "https://example.com/docs", date: "2026-11-14", note: "Fixture source" }];
 const noRetention = { support: "unknown" as const, parameter: null, accepted_values: null, default: null, profiles: [], conditions: [], evidence: [] };
@@ -84,7 +85,7 @@ describe("uniform pricing and controls", () => {
   it("renders the normalized rates and numeric limits without narrative notes", () => {
     const catalog = fixture(true);
     const model = catalog.p!.models.m!;
-    ext(model).limits = { measured: [{ route: "p", route_label: "P", client: "direct", client_label: "Direct", source: "https://example.com/result", input_accepted: 915011, input_refused: 922500, note: "A free-text claim that should stay in raw evidence" }] };
+    ext(model).limits = { measured: [limitOf({ route: "p", route_label: "P", input_accepted: 915011, input_refused: 922500, note: "A free-text claim that should stay in raw evidence" })], from_measurement: [] };
     const index = buildIndex(catalog, "fixture", "2026-11-14T00:00:00Z", "2026-11-14T00:00:00Z");
     const summary = index.entries.find((entry) => entry.ref === "p/m")!;
     const html = entryHtml({ summary, provider: index.providers[0]!, model, now: new Date("2026-11-14T00:00:00Z"), imported: "2026-11-14" });

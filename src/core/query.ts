@@ -85,7 +85,7 @@ export const EVALUATION_PARAMS: ParamDoc[] = [
   ...PAGING,
 ];
 export const PROVIDER_VIEW_PARAMS: ParamDoc[] = [
-  { name: "view", kind: "enum", values: ["summary", "full"], description: "summary (default) = the provider and the summaries of its entries. full = also every entry in full, under models." },
+  { name: "view", kind: "enum", values: ["summary", "full"], description: "summary (default) = the provider and the summaries of its entries; models is null. full = also every entry in full, under models." },
 ];
 export const CORRECTION_PARAMS: ParamDoc[] = [
   { name: "provider", kind: "text", description: "Exact provider id." },
@@ -188,7 +188,7 @@ export const utcToday = (): string => new Date().toISOString().slice(0, 10);
 
 function matches(entry: Summary, query: Query, words: string[], releasedSince: string | undefined): boolean {
   // A date known only to the month ("2026-05") is compared at that precision.
-  if (releasedSince !== undefined && !(entry.release_date !== undefined && entry.release_date >= releasedSince.slice(0, entry.release_date.length))) return false;
+  if (releasedSince !== undefined && !(entry.release_date !== null && entry.release_date >= releasedSince.slice(0, entry.release_date.length))) return false;
   if (query.provider && !query.provider.includes(entry.provider)) return false;
   if (query.family && entry.family !== query.family) return false;
   if (query.canonical_id && entry.canonical_id !== query.canonical_id) return false;
@@ -197,8 +197,8 @@ function matches(entry: Summary, query: Query, words: string[], releasedSince: s
   if (query.origin && !query.origin.includes(entry.origin)) return false;
   if (query.cache && !query.cache.includes(entry.cache)) return false;
   if (query.cache_mode && !query.cache_mode.some((mode) => (entry.cache_modes as string[]).includes(mode))) return false;
-  if (query.min_context !== undefined && !(entry.context !== undefined && entry.context >= query.min_context)) return false;
-  if (query.min_output !== undefined && !(entry.max_output !== undefined && entry.max_output >= query.min_output)) return false;
+  if (query.min_context !== undefined && !(entry.context !== null && entry.context >= query.min_context)) return false;
+  if (query.min_output !== undefined && !(entry.max_output !== null && entry.max_output >= query.min_output)) return false;
   if (query.evaluated !== undefined && query.evaluated !== entry.evaluation_count > 0) return false;
   if (words.length > 0) {
     const haystack = `${entry.provider} ${entry.model} ${entry.name} ${entry.family ?? ""} ${entry.canonical_id ?? ""}`.toLowerCase();
@@ -207,7 +207,8 @@ function matches(entry: Summary, query: Query, words: string[], releasedSince: s
   return true;
 }
 
-function sortValue(entry: Summary, key: SortKey): string | number | undefined {
+/** The value an entry is sorted by. Null = the entry has none, and comes last in either order. */
+function sortValue(entry: Summary, key: SortKey): string | number | null {
   switch (key) {
     case "provider":
       return entry.provider;
@@ -250,8 +251,8 @@ export function runQuery(entries: readonly Summary[], query: Query, today: strin
     const left = sortValue(a, query.sort);
     const right = sortValue(b, query.sort);
     if (left !== right) {
-      if (left === undefined) return 1;
-      if (right === undefined) return -1;
+      if (left === null) return 1;
+      if (right === null) return -1;
       const result = typeof left === "number" && typeof right === "number" ? left - right : compareText(String(left), String(right));
       if (result !== 0) return result * direction;
     }

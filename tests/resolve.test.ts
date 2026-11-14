@@ -80,11 +80,12 @@ describe("resolve: overrides", () => {
     const { catalog } = resolve(input([contextOverride]));
     const model = catalog.lab?.models["model-a"];
     expect(model?.limit).toEqual({ context: 1000000, output: 64000 });
+    // A published correction has every key, and so has its evidence: the note is null where none was written.
     expect(ext(model!).provenance).toEqual([
-      { path: "limit.context", op: "set", had_upstream: true, upstream: 200000, value: 1000000, reason: "documented higher", evidence },
+      { path: "limit.context", op: "set", had_upstream: true, upstream: 200000, value: 1000000, reason: "documented higher", evidence: evidence.map((source) => ({ ...source, note: null })) },
     ]);
     expect(catalog.lab?.models["model-b"]?.limit).toEqual({ context: 100000, output: 8000 });
-    expect(ext(catalog.lab!.models["model-b"]!).provenance).toBeUndefined();
+    expect(ext(catalog.lab!.models["model-b"]!).provenance).toEqual([]);
   });
 
   it("keeps our value when upstream changes that field, and follows upstream on the others", () => {
@@ -98,7 +99,7 @@ describe("resolve: overrides", () => {
   it("shows upstream again when the override is removed", () => {
     const { catalog } = resolve(input([]));
     expect(catalog.lab?.models["model-a"]?.limit).toEqual({ context: 200000, output: 64000 });
-    expect(ext(catalog.lab!.models["model-a"]!).provenance).toBeUndefined();
+    expect(ext(catalog.lab!.models["model-a"]!).provenance).toEqual([]);
   });
 
   it("publishes false and zero, hides an unknown, and removes a deletion", () => {
@@ -143,7 +144,7 @@ describe("resolve: overrides", () => {
       input([{ provider: "lab", rules: [{ models: ["model-a"], set: { limit: { context: 200000 } }, reason: "r", evidence }] }]),
     );
     expect(issues).toEqual([expect.objectContaining({ level: "notice", code: "redundant-override", target: "lab/model-a#limit.context" })]);
-    expect(ext(catalog.lab!.models["model-a"]!).provenance).toBeUndefined();
+    expect(ext(catalog.lab!.models["model-a"]!).provenance).toEqual([]);
   });
 
   it("removes excluded models and providers and lists them", () => {
@@ -239,7 +240,7 @@ describe("resolve: access and additions", () => {
     expect(summarize("lab-subscription", models.a!, 0)).toMatchObject({ price_in: 4, price_out: 25, price_from: "lab/model-a", access: "subscription" });
     // A price of its own is kept and is not marked.
     expect(models.own!.cost).toEqual({ text: { input: { price: 1 }, output: { price: 2 } } });
-    expect(summarize("lab-subscription", models.own!, 0).price_from).toBeUndefined();
+    expect(summarize("lab-subscription", models.own!, 0).price_from).toBeNull();
     // Nothing is taken from another plan, from an entry without a price, or without a named entry.
     for (const id of ["from-plan", "unpriced", "alone"]) {
       expect(models[id]!.cost).toBeUndefined();
@@ -248,7 +249,7 @@ describe("resolve: access and additions", () => {
     // An API entry we add has a price of its own to find: it does not take the lab's.
     expect(catalog["lab-api"]!.models.a!.cost).toBeUndefined();
     // The entries it was taken from are untouched.
-    expect(ext(catalog.lab!.models["model-a"]!).inherited).toBeUndefined();
+    expect(ext(catalog.lab!.models["model-a"]!).inherited).toBeNull();
     expect(catalog["lab-coding-plan"]!.models["model-a"]!.cost).toEqual({ text: { input: { price: 0 }, output: { price: 0 } } });
   });
 
@@ -316,7 +317,7 @@ describe("resolve: measurements", () => {
     // Every entry has the same cache record, also one nobody evaluated.
     expect(ext(catalog.lab!.models["model-b"] ?? Object.values(catalog.lab!.models).find((item) => item.id !== "model-a")!).cache).toMatchObject({ results: null, evaluations: [] });
     expect(ext(model).verified).toBe("2026-11-05");
-    expect(ext(model).provenance).toBeUndefined();
+    expect(ext(model).provenance).toEqual([]);
   });
 
   it("creates an entry for a route upstream does not list, and reports routes it cannot place", () => {
@@ -344,8 +345,9 @@ describe("resolve: measurements", () => {
     // The upstream entry keeps its documented window; the measurement sits next to it.
     const imported = catalog.lab!.models["model-a"]!;
     expect(imported.limit).toEqual({ context: 200000, output: 64000 });
-    expect(ext(imported).limits?.from_measurement).toBeUndefined();
-    expect(ext(imported).limits?.measured?.[0]?.context).toBe(150000);
+    expect(ext(imported).limits.from_measurement).toEqual([]);
+    // A limit evaluation has every field: what it did not measure is null, never left out.
+    expect(ext(imported).limits.measured[0]).toMatchObject({ context: 150000, output: null, input_accepted: null, input_refused: null, output_accepted: null, note: null });
   });
 
   it("names clients by their public label, drops note parts on the omit list and skips runs marked as lacking", () => {
@@ -362,7 +364,7 @@ describe("resolve: measurements", () => {
     const cache = ext(catalog.lab!.models["model-a"]!).cache;
     const runs = cache.evaluations;
     expect(runs.map((run) => [run.id, run.client, run.client_label, run.note])).toEqual([
-      ["other/R9", "other", "Another client", undefined],
+      ["other/R9", "other", "Another client", null],
       ["runs-1.0/R7", "gateway", "Through a gateway", "5 samples per age"],
     ]);
     // The run that sent a lifetime is the long line, with the request field it stands for; the control comes first.

@@ -1,6 +1,6 @@
 // resolve(): upstream snapshot + our additions + our overrides + our measurements -> the published catalog.
 // Pure: no files, no network, no clock. The same inputs always give the same output.
-import { cacheResult, documentedCache, lifetimeAsked, profileOf, retentionOf, summarizeCache, type CacheEvaluation, type CacheRetention, type RetentionEvidence } from "./cache.ts";
+import { cacheResult, documentedCache, lifetimeAsked, profileOf, retentionOf, summarizeCache, type CacheEvaluation, type CacheRetention, type EntryCache, type RetentionEvidence } from "./cache.ts";
 import { clone, isObject, mergePatch, type Change, type Json, type JsonObject } from "./merge.ts";
 import { controlsOf, pricingOf, retentionFromControl } from "./policies.ts";
 import {
@@ -9,6 +9,7 @@ import {
   type AuthoredModel,
   type AuthoredProvider,
   type Catalog,
+  type DraftProvenance,
   type Evidence,
   type Exclusion,
   type Issue,
@@ -19,6 +20,7 @@ import {
   type OverrideFile,
   type ProviderExtension,
   type Provenance,
+  type PublishedEvidence,
   type PublishedModel,
   type PublishedProvider,
   type RouteMap,
@@ -61,11 +63,46 @@ export const IDENTITY_FIELDS = [
 
 const RESERVED = new Set(["id", "models", NS]);
 
-function modelExt(model: JsonObject): ModelExtension {
-  return model[NS] as unknown as ModelExtension;
+/**
+ * The providers_dev records while the catalog is being put together: only the classification is there from the
+ * start, and the steps below add to it. Step 6 publishes each record with every key (`publishModel`, `publishProvider`).
+ */
+type DraftModel = Pick<ModelExtension, "origin" | "access"> & {
+  provenance?: DraftProvenance[];
+  inherited?: { from: string; fields: string[] };
+  limits?: { measured?: MeasuredLimit[]; from_measurement?: ("context" | "output")[] };
+  evidence?: Evidence[];
+};
+type DraftProvider = Pick<ProviderExtension, "origin" | "access" | "access_basis" | "access_reviewed"> & {
+  access_source?: string;
+  note?: string;
+  evidence?: Evidence[];
+  provenance?: DraftProvenance[];
+};
+
+function modelExt(model: JsonObject): DraftModel {
+  return model[NS] as unknown as DraftModel;
 }
-function provExt(provider: JsonObject): ProviderExtension {
-  return provider[NS] as unknown as ProviderExtension;
+function provExt(provider: JsonObject): DraftProvider {
+  return provider[NS] as unknown as DraftProvider;
+}
+
+/** Published evidence always has its note, null where none was written. */
+function publishEvidence(items: readonly Evidence[] | undefined): PublishedEvidence[] {
+  return (items ?? []).map((item) => ({ kind: item.kind, url: item.url, date: item.date, note: item.note ?? null }));
+}
+
+/** A published correction always has `value` and `upstream`: null where the operation or models.dev has none. */
+function publishProvenance(items: readonly DraftProvenance[] | undefined): Provenance[] {
+  return (items ?? []).map((change) => ({
+    path: change.path,
+    op: change.op,
+    value: change.value ?? null,
+    had_upstream: change.had_upstream,
+    upstream: change.upstream ?? null,
+    reason: change.reason,
+    evidence: publishEvidence(change.evidence),
+  }));
 }
 
 /** `provider/model`: provider ids never contain a slash, model ids often do. */
@@ -75,7 +112,7 @@ export function splitRef(ref: string): { provider: string; model: string } | nul
   return { provider: ref.slice(0, at), model: ref.slice(at + 1) };
 }
 
-function classify(id: string, rules: AccessRules): Pick<ProviderExtension, "access" | "access_basis" | "access_reviewed" | "access_source"> {
+function classify(id: string, rules: AccessRules): Pick<DraftProvider, "access" | "access_basis" | "access_reviewed" | "access_source"> {
   const named = rules.providers[id];
   if (named) {
     return { access: named.access, access_basis: named.basis, access_reviewed: true, ...(named.source ? { access_source: named.source } : {}) };
@@ -241,7 +278,7 @@ export function resolve(input: ResolveInput): ResolveResult {
     }
     if (file.exclude) {
       delete catalog[file.provider];
-      exclusions.push({ target: file.provider, reason: file.exclude.reason, evidence: file.exclude.evidence });
+      exclusions.push({ target: file.provider, reason: file.exclude.reason, evidence: publishEvidence(file.exclude.evidence) });
       continue;
     }
     if (file.set) {
@@ -272,7 +309,7 @@ export function resolve(input: ResolveInput): ResolveResult {
         }
         if (rule.exclude) {
           delete provider.models[id];
-          exclusions.push({ target, reason: rule.reason, evidence: rule.evidence });
+          exclusions.push({ target, reason: rule.reason, evidence: publishEvidence(rule.evidence) });
           continue;
         }
         if (rule.cache_retention) retentionDeclarations.set(model, rule.cache_retention);
@@ -370,8 +407,8 @@ export function resolve(input: ResolveInput): ResolveResult {
           ...(run.control && run.control.total > 0 ? [cacheResult("control", 0, run.control.warm, run.control.total)] : []),
           ...(run.checks ?? []).filter((c) => c.total > 0).sort((a, b) => a.age_s - b.age_s).map((c) => cacheResult("timed", c.age_s, c.warm, c.total)),
         ],
-        ...(run.late_excluded ? { late_excluded: run.late_excluded } : {}),
-        ...(note ? { note } : {}),
+        late_excluded: typeof run.late_excluded === "number" ? run.late_excluded : null,
+        note: note ?? null,
         source: sourceUrl(run.source),
       };
       (evaluations.get(model) ?? evaluations.set(model, []).get(model)!).push(evaluation);
@@ -385,17 +422,18 @@ export function resolve(input: ResolveInput): ResolveResult {
       }
       const date = /(\d{4}-\d{2}-\d{2})/.exec(limit.source)?.[1];
       const limitNote = publicNote(limit.note);
+      const tokens = (value: number | null | undefined): number | null => (typeof value === "number" ? value : null);
       const measured: MeasuredLimit = {
         route: limit.route,
         route_label: routeLabel(limit.route),
         ...clientOf(limit.client),
-        ...(typeof limit.context === "number" ? { context: limit.context } : {}),
-        ...(typeof limit.output === "number" ? { output: limit.output } : {}),
-        ...(limit.input_accepted !== undefined ? { input_accepted: limit.input_accepted } : {}),
-        ...(limit.input_refused !== undefined ? { input_refused: limit.input_refused } : {}),
-        ...(limit.output_accepted !== undefined ? { output_accepted: limit.output_accepted } : {}),
-        ...(limitNote ? { note: limitNote } : {}),
-        ...(date ? { date } : {}),
+        context: tokens(limit.context),
+        output: tokens(limit.output),
+        input_accepted: tokens(limit.input_accepted),
+        input_refused: tokens(limit.input_refused),
+        output_accepted: tokens(limit.output_accepted),
+        note: limitNote ?? null,
+        date: date ?? null,
         source: sourceUrl(limit.source),
       };
       const extension = modelExt(model);
@@ -407,7 +445,7 @@ export function resolve(input: ResolveInput): ResolveResult {
         const limits = (isObject(model.limit) ? model.limit : (model.limit = {})) as JsonObject;
         for (const field of ["context", "output"] as const) {
           const value = measured[field];
-          if (value === undefined || limits[field] !== undefined) continue;
+          if (value === null || limits[field] !== undefined) continue;
           limits[field] = value;
           (extension.limits.from_measurement ??= []).push(field);
         }
@@ -433,7 +471,7 @@ export function resolve(input: ResolveInput): ResolveResult {
     }
   }
 
-  // 6. Deterministic order, and the newest date of our own evidence per entry.
+  // 6. Deterministic order, and every record published with all of its keys.
   const sorted: Catalog = {};
   for (const id of Object.keys(catalog).sort()) {
     const provider = catalog[id] as PublishedProvider;
@@ -450,7 +488,7 @@ export function resolve(input: ResolveInput): ResolveResult {
       ];
       const cacheEvidence: RetentionEvidence[] = cacheSources.flatMap((source) => source.kind === "listed" ? [] : [{ ...source, kind: source.kind, note: source.note ?? "Source for this entry's cache capabilities." }]);
       if (extension.origin === "upstream") cacheEvidence.unshift({ kind: "documented", url: "https://models.dev", date: input.upstreamDate ?? null, note: "Cache capabilities imported from models.dev; any corrections are recorded in provenance." });
-      extension.cache = { documented, retention: retentionOf(documented, cacheEvidence, declaration), results: summarizeCache(own), evaluations: own };
+      const cache: EntryCache = { documented, retention: retentionOf(documented, cacheEvidence, declaration), results: summarizeCache(own), evaluations: own };
       const sourcesFor = (field: string): RetentionEvidence[] => {
         const inheritedSource = extension.inherited?.fields.includes(field) ? lookup(extension.inherited.from) : undefined;
         const sourceExtension = inheritedSource ? modelExt(inheritedSource) : extension;
@@ -465,19 +503,45 @@ export function resolve(input: ResolveInput): ResolveResult {
       const priceSource = priceReference ? lookup(priceReference) : undefined;
       const sourceDeclaration = priceSource ? pricingDeclarations.get(priceSource) : undefined;
       const priceDeclaration = pricingDeclarations.get(model) ?? (sourceDeclaration ? { ...sourceDeclaration, billing: "reference" as const, reference_ref: priceReference } : undefined);
-      extension.pricing = pricingOf(model, extension.access, priceReference, sourcesFor("cost"), priceDeclaration);
-      extension.request_controls = controlsOf(model, extension.cache.retention, sourcesFor("capabilities"), controlDeclarations.get(model));
-      if (declaration) extension.evidence = [...(extension.evidence ?? []), ...declaration.evidence.flatMap((source) => source.date === null ? [] : [{ ...source, date: source.date }])];
+      const pricing = pricingOf(model, extension.access, priceReference, sourcesFor("cost"), priceDeclaration);
+      const requestControls = controlsOf(model, cache.retention, sourcesFor("capabilities"), controlDeclarations.get(model));
+      let evidence: Evidence[] = extension.evidence ?? [];
+      if (declaration) evidence = [...evidence, ...declaration.evidence.flatMap((source) => source.date === null ? [] : [{ ...source, date: source.date }])];
       const policyEvidence = [...(pricingDeclarations.get(model)?.evidence ?? []), ...(controlDeclarations.get(model) ?? []).flatMap((control) => control.evidence)];
-      if (policyEvidence.length > 0) extension.evidence = [...(extension.evidence ?? []), ...policyEvidence.flatMap((source) => source.date === null ? [] : [{ ...source, date: source.date }])];
+      if (policyEvidence.length > 0) evidence = [...evidence, ...policyEvidence.flatMap((source) => source.date === null ? [] : [{ ...source, date: source.date }])];
       const verified = newestDate([
-        ...(extension.evidence ?? []).map((e) => e.date),
+        ...evidence.map((e) => e.date),
         ...(extension.provenance ?? []).flatMap((p) => p.evidence.map((e) => e.date)),
         ...own.map((m) => m.date),
-        ...(extension.limits?.measured ?? []).map((m) => m.date),
+        ...(extension.limits?.measured ?? []).map((m) => m.date ?? undefined),
       ]);
-      if (verified) extension.verified = verified;
+      // One fixed set of keys, in one order, on every entry.
+      const published: ModelExtension = {
+        origin: extension.origin,
+        access: extension.access,
+        provenance: publishProvenance(extension.provenance),
+        inherited: extension.inherited ?? null,
+        cache,
+        pricing,
+        request_controls: requestControls,
+        limits: { measured: extension.limits?.measured ?? [], from_measurement: extension.limits?.from_measurement ?? [] },
+        evidence: publishEvidence(evidence),
+        verified: verified ?? null,
+      };
+      model[NS] = published as unknown as Json;
     }
+    const draft = provExt(provider);
+    const publishedProvider: ProviderExtension = {
+      origin: draft.origin,
+      access: draft.access,
+      access_basis: draft.access_basis,
+      access_reviewed: draft.access_reviewed,
+      access_source: draft.access_source ?? null,
+      note: draft.note ?? null,
+      evidence: publishEvidence(draft.evidence),
+      provenance: publishProvenance(draft.provenance),
+    };
+    provider[NS] = publishedProvider as unknown as Json;
     provider.models = sortKeys(provider.models);
     sorted[id] = provider;
   }
@@ -500,7 +564,7 @@ function applyPatch(
   reason: string,
   evidence: Evidence[],
   ref: string,
-  extension: { provenance?: Provenance[] },
+  extension: { provenance?: DraftProvenance[] },
   issues: Issue[],
 ): void {
   const changes: Change[] = [];
@@ -521,17 +585,6 @@ function applyPatch(
     }
     (extension.provenance ??= []).push({ ...change, reason, evidence });
   }
-}
-
-export function isOurs(model: JsonObject): boolean {
-  const extension = modelExt(model);
-  return (
-    extension.origin === "added" ||
-    Boolean(extension.provenance?.length) ||
-    Boolean(extension.evidence?.length) ||
-    Boolean(extension.cache?.evaluations.length) ||
-    Boolean(extension.limits?.measured?.length)
-  );
 }
 
 export { isObject };

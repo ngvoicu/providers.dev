@@ -140,13 +140,24 @@ export function publish(input: PublishOptions): PublishReport {
       limit_evaluations: index.entries.reduce((sum, entry) => sum + entry.measured_limit_count, 0),
     },
     cache_ages_s: [...CACHE_AGES_S],
-    upstream: upstream.meta,
-    ...(observed && observedMeta
-      ? { measurements: { ...observedMeta, repository: observed.repository } }
-      : {}),
-    sync: status
-      ? { last_attempt_at: status.last_attempt_at, last_attempt_ok: status.last_attempt_ok, ...(status.last_error ? { last_error: status.last_error } : {}) }
-      : {},
+    // Every key is always there: what is not known is null.
+    upstream: {
+      source: upstream.meta.source,
+      schema: upstream.meta.schema,
+      fetched_at: upstream.meta.fetched_at,
+      checked_at: upstream.meta.checked_at,
+      etag: upstream.meta.etag ?? null,
+      commit: upstream.meta.commit ?? null,
+      commit_date: upstream.meta.commit_date ?? null,
+      sha256: upstream.meta.sha256,
+      providers: upstream.meta.providers,
+      models: upstream.meta.models,
+    },
+    measurements:
+      observed && observedMeta
+        ? { source: observedMeta.source, fetched_at: observedMeta.fetched_at, checked_at: observedMeta.checked_at, etag: observedMeta.etag ?? null, sha256: observedMeta.sha256, repository: observed.repository }
+        : null,
+    sync: { last_attempt_at: status?.last_attempt_at ?? null, last_attempt_ok: status?.last_attempt_ok ?? null, last_error: status?.last_error ?? null },
     exclusions,
     issues,
     license: {
@@ -183,6 +194,8 @@ function writeSnapshot(dir: string, catalog: Catalog, index: Index, meta: Meta, 
   writeFileSync(join(site, "data", "catalog.json.gz"), gzipSync(compact({ meta: short, providers: catalog }), { level: 9 }));
   writeFileSync(join(site, "data", "meta.json"), compact(meta));
   writeFileSync(join(site, "data", "index.json"), compact(index));
+  // The index holds every summary with its pricing record and grows with the catalog: it is staged as gzip too.
+  writeFileSync(join(site, "data", "index.json.gz"), gzipSync(compact(index), { level: 9 }));
   // Every evaluation with the entry it was made on: what /api/v1/evaluations answers from.
   writeFileSync(join(site, "data", "evaluations.json"), compact({ meta: short, data: listEvaluations(catalog, index) }));
   writeFileSync(join(site, "data", "corrections.json"), compact({ meta: short, data: listCorrections(catalog, index) }));

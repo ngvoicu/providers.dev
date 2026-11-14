@@ -202,9 +202,35 @@ export interface SourceMeta {
 }
 
 // ---- published
-export interface Provenance extends Change {
+// Everything providers.dev publishes of its own has a fixed set of keys: a value that is not known is null, a list
+// with nothing in it is empty, and no key is ever left out. Only the models.dev part of a provider or an entry keeps
+// models.dev's own shape, where an absent field means models.dev has no value.
+
+/** The same object with every optional field made a required one that can be null. */
+export type Nulled<T> = { [K in keyof T]-?: undefined extends T[K] ? Exclude<T[K], undefined> | null : T[K] };
+
+/** Evidence as published: the note is always there, null where the author wrote none. */
+export type PublishedEvidence = Nulled<Evidence>;
+
+/** A correction as it is being worked out. */
+export interface DraftProvenance extends Change {
   reason: string;
   evidence: Evidence[];
+}
+
+/** One correction to a field imported from models.dev. */
+export interface Provenance {
+  /** Dot path of the field, for example `limit.context`. */
+  path: string;
+  op: Change["op"];
+  /** The published value. Null unless `op` is `set`. */
+  value: Json | null;
+  /** True when models.dev has a value at this path. */
+  had_upstream: boolean;
+  /** What models.dev says. Null unless `had_upstream`. */
+  upstream: Json | null;
+  reason: string;
+  evidence: PublishedEvidence[];
 }
 
 export interface MeasuredLimit {
@@ -212,35 +238,37 @@ export interface MeasuredLimit {
   route_label: string;
   client: string;
   client_label: string;
-  context?: number;
-  output?: number;
-  input_accepted?: number;
-  input_refused?: number;
-  output_accepted?: number;
-  note?: string;
-  date?: string;
+  /** Tokens. Null = this evaluation did not measure it. */
+  context: number | null;
+  output: number | null;
+  input_accepted: number | null;
+  input_refused: number | null;
+  output_accepted: number | null;
+  note: string | null;
+  date: string | null;
   source: string;
 }
 
 export interface ModelExtension {
   origin: "upstream" | "added";
   access: Access;
-  /** Fields of with_evidence that replaced, hid or removed an upstream value. */
-  provenance?: Provenance[];
-  /** Fields copied from another entry, for entries we add: identity, and `cost` where a subscription entry carries the API list price. */
-  inherited?: { from: string; fields: string[] };
+  /** Corrections that replaced, hid or removed an upstream value. Empty = none. */
+  provenance: Provenance[];
+  /** Fields copied from another entry, for entries we add: identity, and `cost` where a subscription entry carries the API list price. Null = nothing is inherited. */
+  inherited: { from: string; fields: string[] } | null;
   /** Prompt caching beyond what the source documents: what a request can ask for, and what evaluations measured. On every entry. */
   cache: EntryCache;
   pricing: Pricing;
   request_controls: RequestControls;
-  limits?: {
-    measured?: MeasuredLimit[];
+  limits: {
+    /** Limit evaluations. Empty = none. */
+    measured: MeasuredLimit[];
     /** On an entry we add: which of limit.context and limit.output are our measured values. */
-    from_measurement?: ("context" | "output")[];
+    from_measurement: ("context" | "output")[];
   };
-  evidence?: Evidence[];
-  /** The newest date among our evidence and measurements for this entry. */
-  verified?: string;
+  evidence: PublishedEvidence[];
+  /** The newest date among our evidence and measurements for this entry. Null = none. */
+  verified: string | null;
 }
 
 export interface ProviderExtension {
@@ -248,10 +276,10 @@ export interface ProviderExtension {
   access: Access;
   access_basis: string;
   access_reviewed: boolean;
-  access_source?: string;
-  note?: string;
-  evidence?: Evidence[];
-  provenance?: Provenance[];
+  access_source: string | null;
+  note: string | null;
+  evidence: PublishedEvidence[];
+  provenance: Provenance[];
 }
 
 export type PublishedModel = JsonObject & { id: string; name: string };
@@ -273,13 +301,12 @@ export interface Issue {
     | "reserved-field";
   target: string;
   message: string;
-  file?: string;
 }
 
 export interface Exclusion {
   target: string;
   reason: string;
-  evidence: Evidence[];
+  evidence: PublishedEvidence[];
 }
 
 export interface Meta {
@@ -303,9 +330,10 @@ export interface Meta {
   };
   /** The ages, in seconds, that every cache summary table has a column for, after the control at age 0. */
   cache_ages_s: number[];
-  upstream: UpstreamMeta;
-  measurements?: SourceMeta & { repository: string };
-  sync: { last_attempt_at?: string; last_attempt_ok?: boolean; last_error?: string };
+  upstream: Nulled<UpstreamMeta>;
+  /** The results repository the evaluations come from. Null = the dataset has none. */
+  measurements: (Nulled<SourceMeta> & { repository: string }) | null;
+  sync: { last_attempt_at: string | null; last_attempt_ok: boolean | null; last_error: string | null };
   exclusions: Exclusion[];
   issues: Issue[];
   license: { data: string; upstream: string; notice: string };

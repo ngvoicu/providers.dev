@@ -76,8 +76,8 @@ export interface CanonicalModelDetail extends CanonicalModel {
 }
 
 const compareText = (a: string, b: string): number => (a < b ? -1 : a > b ? 1 : 0);
-const range = (values: (number | undefined)[]): [number | null, number | null] => {
-  const known = values.filter((value): value is number => value !== undefined);
+const range = (values: (number | null)[]): [number | null, number | null] => {
+  const known = values.filter((value): value is number => value !== null);
   return known.length === 0 ? [null, null] : [Math.min(...known), Math.max(...known)];
 };
 
@@ -139,7 +139,7 @@ export function listEvaluations(catalog: Catalog, index: Pick<Index, "entries">)
     if (!extension) continue;
     const of: OfEntry = { entry_ref: entry.ref, entry_name: entry.name, access: entry.access };
     for (const evaluation of extension.cache.evaluations) cache.push({ kind: "cache", ...of, ...evaluation });
-    for (const limit of extension.limits?.measured ?? []) limits.push({ kind: "limit", ...of, ...limit });
+    for (const limit of extension.limits.measured) limits.push({ kind: "limit", ...of, ...limit });
   }
   cache.sort((a, b) => compareText(b.date, a.date) || compareText(a.entry_ref, b.entry_ref) || compareText(a.id, b.id));
   limits.sort((a, b) => compareText(b.date ?? "", a.date ?? "") || compareText(a.entry_ref, b.entry_ref));

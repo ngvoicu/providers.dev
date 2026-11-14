@@ -2,6 +2,10 @@
 // of the documentation are generated from these definitions, and the tests check every published object against them.
 // Each schema is tied to the TypeScript type the code uses (`satisfies`), so the two cannot drift apart.
 // Build-time and server only: nothing in the browser imports this file.
+//
+// One rule for everything providers.dev publishes of its own: every object has all of its keys. A value that is not
+// known is null and a list with nothing in it is empty; no key is left out. So none of these schemas has an optional
+// field. Only the models.dev part of an entry or a provider keeps models.dev's shape, where a field can be absent.
 import { z } from "zod";
 import type { CacheEvaluation, CacheResult, CacheSummaryRow, EntryCache } from "./cache.ts";
 import { CacheDocumentationSchema, CacheModeDocumentationSchema, CacheRetentionSchema, RetentionProfileSchema, SupportSchema } from "./cache-contract.ts";
@@ -9,10 +13,19 @@ import { ApiEndpointSchema, CapabilitiesSchema, CachePriceSchema, CostSchema, Do
 import { BillingUnitSchema, ConditionSchema, PolicyEvidenceSchema, PricingRuleSchema, PricingSchema, RequestBindingSchema, RequestControlSchema, RequestControlsSchema, RequestOptionSchema, RequestSettingSchema } from "./policy-contract.ts";
 import type { ProviderSummary, Summary } from "./entries.ts";
 import type { CanonicalModel, CanonicalModelDetail, Correction, Documentation, Facets } from "./resources.ts";
-import { Access, Evidence, type MeasuredLimit, type ModelExtension, type ProviderExtension, type Provenance } from "./schema.ts";
+import { Access, type Exclusion, type MeasuredLimit, type ModelExtension, type ProviderExtension, type Provenance, type PublishedEvidence } from "./schema.ts";
 
 const date = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
 const json = z.json();
+
+export const EvidenceSchema = z
+  .strictObject({
+    kind: z.enum(["documented", "measured", "listed"]).describe("documented = the provider says so. measured = providers.dev ran it. listed = the provider's own model list reports it."),
+    url: z.url(),
+    date: date.describe("When the source was read or the measurement taken."),
+    note: z.string().nullable().describe("What the source says. Null = no note."),
+  })
+  .describe("A source for something providers.dev publishes.") satisfies z.ZodType<PublishedEvidence>;
 
 // ---- cache: results, summary lines, evaluations, retention
 export { CacheRetentionSchema } from "./cache-contract.ts";
@@ -54,8 +67,8 @@ export const CacheEvaluationSchema = z
     request_settings: z.record(z.string(), json).describe("What the requests were sent with, as recorded: format, reasoning effort, lifetime and so on."),
     ...retentionSetting,
     results: z.array(CacheResultSchema).describe("One result per exact age, the control first."),
-    late_excluded: z.int().optional().describe("Checks left out because they ran too late for their age."),
-    note: z.string().optional(),
+    late_excluded: z.int().min(0).nullable().describe("Checks left out because they ran too late for their age. Null = the evaluation does not record it."),
+    note: z.string().nullable().describe("Null = no note."),
     source: z.url().describe("The raw result."),
   })
   .describe("One cache evaluation: a fresh prompt cached once, then sent again at once and at set ages.") satisfies z.ZodType<CacheEvaluation>;
@@ -76,53 +89,50 @@ export const MeasuredLimitSchema = z
     route_label: z.string(),
     client: z.string(),
     client_label: z.string(),
-    context: z.number().optional().describe("Tokens: the context window found."),
-    output: z.number().optional().describe("Tokens: the largest response found."),
-    input_accepted: z.number().optional().describe("Tokens: the largest input seen accepted. The real limit is at least this."),
-    input_refused: z.number().optional().describe("Tokens: the smallest input seen refused. The real limit is below this."),
-    output_accepted: z.number().optional().describe("Tokens: the largest requested output seen accepted."),
-    note: z.string().optional(),
-    date: date.optional(),
+    context: z.number().nullable().describe("Tokens: the context window found. Null = this evaluation did not measure it."),
+    output: z.number().nullable().describe("Tokens: the largest response found. Null = not measured."),
+    input_accepted: z.number().nullable().describe("Tokens: the largest input seen accepted. The real limit is at least this. Null = not measured."),
+    input_refused: z.number().nullable().describe("Tokens: the smallest input seen refused. The real limit is below this. Null = not measured."),
+    output_accepted: z.number().nullable().describe("Tokens: the largest requested output seen accepted. Null = not measured."),
+    note: z.string().nullable().describe("Null = no note."),
+    date: date.nullable().describe("Null = the result carries no date."),
     source: z.url(),
   })
-  .describe("One limit evaluation.") satisfies z.ZodType<MeasuredLimit>;
+  .describe("One limit evaluation. Every evaluation has every field; what it did not measure is null.") satisfies z.ZodType<MeasuredLimit>;
 
 export const ProvenanceSchema = z
   .strictObject({
     path: z.string().describe("The field, for example limit.context."),
     op: z.enum(["set", "unknown", "delete"]).describe("set = a value is published; unknown = published as unknown on purpose; delete = removed."),
-    value: json.optional(),
+    value: json.describe("The published value. Null unless op is set."),
     had_upstream: z.boolean().describe("Whether models.dev has a value for the field."),
-    upstream: json.optional().describe("What models.dev says."),
-    redundant: z.boolean().optional(),
+    upstream: json.describe("What models.dev says. Null unless had_upstream is true."),
     reason: z.string(),
-    evidence: z.array(Evidence),
+    evidence: z.array(EvidenceSchema),
   })
-  .describe("One correction by providers.dev to a field imported from models.dev.");
+  .describe("One correction by providers.dev to a field imported from models.dev.") satisfies z.ZodType<Provenance>;
 
 // ---- the providers_dev record of an entry and of a provider
 export const EntryExtensionSchema = z
   .strictObject({
     origin: z.enum(["upstream", "added"]).describe("upstream = the entry is imported from models.dev. added = models.dev has no entry for this access method."),
     access: Access,
-    provenance: z.array(ProvenanceSchema).optional().describe("Corrections to imported fields."),
+    provenance: z.array(ProvenanceSchema).describe("Corrections to imported fields. Empty = none."),
     inherited: z
       .strictObject({ from: z.string(), fields: z.array(z.string()) })
-      .optional()
-      .describe("Fields an added entry takes from another entry: identity, and cost where a subscription entry carries the API list price."),
+      .nullable()
+      .describe("Fields an added entry takes from another entry: identity, and cost where a subscription entry carries the API list price. Null = nothing is inherited."),
     cache: EntryCacheSchema,
     pricing: PricingSchema,
     request_controls: RequestControlsSchema,
-    limits: z
-      .strictObject({
-        measured: z.array(MeasuredLimitSchema).optional(),
-        from_measurement: z.array(z.enum(["context", "output"])).optional().describe("On an added entry: which of limit.context and limit.output are measured values."),
-      })
-      .optional(),
-    evidence: z.array(Evidence).optional(),
-    verified: date.optional().describe("The newest date of providers.dev evidence or evaluations for this entry."),
+    limits: z.strictObject({
+      measured: z.array(MeasuredLimitSchema).describe("Limit evaluations on this entry. Empty = none."),
+      from_measurement: z.array(z.enum(["context", "output"])).describe("On an added entry: which of limit.context and limit.output are measured values. Empty = none."),
+    }),
+    evidence: z.array(EvidenceSchema).describe("Sources for an added entry and for authored declarations. Empty = none."),
+    verified: date.nullable().describe("The newest date of providers.dev evidence or evaluations for this entry. Null = it has none."),
   })
-  .describe("Everything providers.dev adds to an entry.");
+  .describe("Everything providers.dev adds to an entry. The same keys on every entry.") satisfies z.ZodType<ModelExtension>;
 
 export const ProviderExtensionSchema = z
   .strictObject({
@@ -130,12 +140,12 @@ export const ProviderExtensionSchema = z
     access: Access,
     access_basis: z.string().describe("Why the provider is classified this way."),
     access_reviewed: z.boolean().describe("False = classified by a general rule, not looked at one by one."),
-    access_source: z.url().optional(),
-    note: z.string().optional(),
-    evidence: z.array(Evidence).optional(),
-    provenance: z.array(ProvenanceSchema).optional(),
+    access_source: z.url().nullable().describe("The source of the classification. Null = none recorded."),
+    note: z.string().nullable(),
+    evidence: z.array(EvidenceSchema).describe("Sources for a provider that providers.dev added. Empty = none."),
+    provenance: z.array(ProvenanceSchema).describe("Corrections to the provider's imported fields. Empty = none."),
   })
-  .describe("Everything providers.dev adds to a provider.");
+  .describe("Everything providers.dev adds to a provider. The same keys on every provider.") satisfies z.ZodType<ProviderExtension>;
 
 // ---- summaries
 export const EntrySummarySchema = z
@@ -144,49 +154,48 @@ export const EntrySummarySchema = z
     provider: z.string(),
     model: z.string().describe("The model's id at this provider."),
     name: z.string(),
-    type: z.string().optional(),
-    family: z.string().optional(),
-    canonical_id: z.string().optional().describe("The canonical model this entry serves, as in /api/v1/models."),
-    status: z.string().optional(),
-    release_date: z.string().optional().describe("When the model was released, as models.dev records it. Absent = unknown."),
+    type: z.string().nullable().describe("chat, embedding, image and so on, as models.dev records it. Null = unknown."),
+    family: z.string().nullable(),
+    canonical_id: z.string().nullable().describe("The canonical model this entry serves, as in /api/v1/models. Null = none is recorded."),
+    status: z.string().nullable().describe("alpha, beta or deprecated. Null = none of these."),
+    release_date: z.string().nullable().describe("When the model was released, as models.dev records it. Null = unknown."),
     access: Access,
     origin: z.enum(["upstream", "modified", "added"]).describe("upstream = as imported. modified = imported, with providers.dev corrections or evaluations. added = an entry models.dev does not have."),
-    context: z.number().optional().describe("limit.context in tokens: the window this provider exposes for the model. Absent = unknown."),
-    input: z.number().optional().describe("limit.input in tokens, stated where the input limit is lower than the window. Absent = unknown."),
-    max_output: z.number().optional().describe("limit.output in tokens: the most one response can hold. A maximum, not a default. Absent = unknown."),
+    context: z.number().nullable().describe("limit.context in tokens: the window this provider exposes for the model. Null = unknown."),
+    input: z.number().nullable().describe("limit.input in tokens, stated where the input limit is lower than the window. Null = not stated."),
+    max_output: z.number().nullable().describe("limit.output in tokens: the most one response can hold. A maximum, not a default. Null = unknown."),
     cache: z.enum(["yes", "no", "unknown"]).describe("Prompt caching as documented. unknown = the source says nothing, which is not the same as no."),
     cache_modes: z.array(z.enum(["implicit", "explicit"])).describe("implicit = the provider caches on its own. explicit = the request marks what to cache."),
     cache_mode_support: z.strictObject({ implicit: SupportSchema, explicit: SupportSchema }).describe("Support for each mode, from providers_dev.cache.documented.modes. An omitted mode stays unknown."),
     cache_ttl_s: z.array(z.number()).describe("Documented cache lifetimes in seconds, of every mode together, shortest first."),
     cache_ttl_by_mode_s: z
-      .strictObject({ implicit: z.array(z.number()).optional(), explicit: z.array(z.number()).optional() })
-      .optional()
-      .describe("The documented lifetimes of each mode, in seconds. A mode with no documented lifetime has no key."),
+      .strictObject({ implicit: z.array(z.number()).nullable(), explicit: z.array(z.number()).nullable() })
+      .describe("The documented lifetimes of each mode, in seconds, shortest first. Null = no lifetime is documented for that mode."),
     cache_retention: CacheRetentionSchema.shape.support.describe("Whether a request can ask for a cache lifetime: providers_dev.cache.retention.support of the full entry."),
     evaluation_count: z.int().min(0).describe("How many cache evaluations this entry has."),
     cache_results: z
       .array(CacheSummaryRowSchema)
       .nullable()
       .describe("The cache evaluations as one table: a line per retention setting, short before long, each with its results by exact age. Null = not evaluated. Every page of the website draws this object as it is."),
-    price_in: z.number().optional().describe("cost.text.input.price: the list price of input in US dollars per million tokens, before any change by context size or service tier. Absent = unknown."),
-    price_out: z.number().optional().describe("The same for output."),
+    price_in: z.number().nullable().describe("The base price of text input in US dollars per million tokens, before any conditional rate. On a subscription entry it is the API reference price named by price_from. Null = unknown, or priced in another unit."),
+    price_out: z.number().nullable().describe("The same for output."),
+    price_from: z.string().nullable().describe("On a subscription entry: the ref of the API entry whose list price this is. The entry itself is not paid per token. Null = the price is the entry's own."),
     pricing: PricingSchema.describe("The same normalized pricing record as providers_dev.pricing on the full entry, including all conditions and unparsed source fields."),
     request_controls: RequestControlsSchema.describe("The same controls as providers_dev.request_controls on the full entry. Unknown and unsupported are distinct."),
-    price_from: z.string().optional().describe("Present where the price is inherited: the ref of the API entry whose list price this is. The entry itself is a subscription and is not paid per token."),
-    measured_input_accepted: z.number().optional().describe("Tokens: the largest input a limit evaluation saw accepted. The real limit is at least this."),
-    measured_input_refused: z.number().optional().describe("Tokens: the smallest input a limit evaluation saw refused. The real limit is below this."),
+    measured_input_accepted: z.number().nullable().describe("Tokens: the largest input a limit evaluation saw accepted. The real limit is at least this. Null = not measured."),
+    measured_input_refused: z.number().nullable().describe("Tokens: the smallest input a limit evaluation saw refused. The real limit is below this. Null = not measured."),
     measured_limit_count: z.int().min(0).describe("How many limit evaluations this entry has."),
     overridden_fields: z.array(z.string()).describe("The imported fields providers.dev corrected."),
-    verified: date.optional().describe("The newest date of providers.dev evidence. Imported entries have none."),
+    verified: date.nullable().describe("The newest date of providers.dev evidence. Null = the entry has none."),
     shard: z.int().min(0).describe("Which file under /data/entries/<provider>/ holds the full entry."),
   })
-  .describe("One provider-model entry in short: what the lists return and what the tables of the website show.") satisfies z.ZodType<Summary>;
+  .describe("One provider-model entry in short: what the lists return and what the tables of the website show. Every summary has every field; a value no source gives is null.") satisfies z.ZodType<Summary>;
 
 export const ProviderSummarySchema = z
   .strictObject({
     id: z.string(),
     name: z.string(),
-    doc: z.string().optional().describe("The provider's documentation."),
+    doc: z.string().nullable().describe("The provider's documentation. Null = none recorded."),
     env: z.array(z.string()).describe("The environment variables a client reads the key from."),
     access: Access,
     access_reviewed: z.boolean(),
@@ -264,10 +273,28 @@ export const MetaSchema = z
       limit_evaluations: z.int(),
     }),
     cache_ages_s: z.array(z.int()).describe("The ages, in seconds, that every cache summary table has a column for, after the control at age 0. Results at other ages are in the data at their exact age."),
-    upstream: z.looseObject({ source: z.string(), fetched_at: z.string(), providers: z.int(), models: z.int() }).describe("The models.dev import this dataset is built on."),
-    measurements: z.looseObject({ repository: z.url() }).optional().describe("The results repository the evaluations come from."),
-    sync: z.looseObject({}),
-    exclusions: z.array(z.looseObject({ target: z.string(), reason: z.string() })),
+    upstream: z
+      .strictObject({
+        source: z.string(),
+        schema: z.string(),
+        fetched_at: z.string(),
+        checked_at: z.string(),
+        etag: z.string().nullable(),
+        commit: z.string().nullable().describe("The models.dev commit of the import. Null = not known."),
+        commit_date: z.string().nullable(),
+        sha256: z.string(),
+        providers: z.int(),
+        models: z.int(),
+      })
+      .describe("The models.dev import this dataset is built on."),
+    measurements: z
+      .strictObject({ source: z.string(), fetched_at: z.string(), checked_at: z.string(), etag: z.string().nullable(), sha256: z.string(), repository: z.url() })
+      .nullable()
+      .describe("The results repository the evaluations come from. Null = the dataset has no evaluations file."),
+    sync: z
+      .strictObject({ last_attempt_at: z.string().nullable(), last_attempt_ok: z.boolean().nullable(), last_error: z.string().nullable() })
+      .describe("The last attempt to import. All null = no attempt is recorded."),
+    exclusions: z.array(z.strictObject({ target: z.string(), reason: z.string(), evidence: z.array(EvidenceSchema) }) satisfies z.ZodType<Exclusion>),
     issues: z.array(issue).describe("Corrections and evaluations that no longer match an entry."),
     license: z.looseObject({ data: z.string(), upstream: z.string(), notice: z.string() }),
   })
@@ -305,7 +332,7 @@ export const ProviderDetailSchema = z
   .strictObject({
     provider: ProviderSummarySchema,
     entries: z.array(EntrySummarySchema).describe("The provider's entries, by name."),
-    models: z.record(z.string(), EntrySchema).optional().describe("With view=full: the entries in full, by model id."),
+    models: z.record(z.string(), EntrySchema).nullable().describe("With view=full: the entries in full, by model id. Null with view=summary, so that the answer has the same keys in both views."),
   })
   .describe("One provider with its entries.");
 
@@ -328,6 +355,7 @@ export const DocumentationSchema = z.strictObject({
 
 /** The named parts of the contract: the components of the OpenAPI document and the tables of the documentation. */
 export const COMPONENTS = {
+  Evidence: EvidenceSchema,
   Facets: FacetsSchema,
   Correction: CorrectionSchema,
   Documentation: DocumentationSchema,
@@ -369,7 +397,3 @@ export const COMPONENTS = {
   Meta: MetaSchema,
   Error: ErrorSchema,
 } as const;
-
-// The types the code uses for the providers_dev records must fit their schemas.
-type Fits<T, S extends z.ZodType> = T extends z.input<S> ? true : never;
-export const _fits: [Fits<ModelExtension, typeof EntryExtensionSchema>, Fits<ProviderExtension, typeof ProviderExtensionSchema>, Fits<Provenance, typeof ProvenanceSchema>] = [true, true, true];

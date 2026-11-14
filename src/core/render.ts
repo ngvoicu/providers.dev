@@ -18,7 +18,7 @@ import {
   usd,
 } from "./format.ts";
 import { isObject, type Json, type JsonObject } from "./merge.ts";
-import { NS, type Evidence, type MeasuredLimit, type ModelExtension, type Provenance } from "./schema.ts";
+import { NS, type MeasuredLimit, type ModelExtension, type Provenance, type PublishedEvidence } from "./schema.ts";
 
 const UNKNOWN = '<span class="unknown" title="The source does not say. Unknown is not zero and not unlimited.">Unknown</span>';
 const DASH = '<span class="muted">–</span>';
@@ -27,15 +27,15 @@ const NOT_APPLICABLE = '<span class="muted" title="This field does not apply to 
 const IN_PLAN = '<span class="muted" title="No price per token: the entry is paid for through a plan or subscription, which providers.dev does not list.">In plan</span>';
 const ACCESS_LABEL = { api: "API key", subscription: "Subscription", unknown: "Unclassified" } as const;
 
-function tokens(value: number | undefined): string {
-  return value === undefined ? UNKNOWN : `<span title="${exact(value)} tokens">${compactTokens(value)}</span>`;
+function tokens(value: number | null): string {
+  return value === null ? UNKNOWN : `<span title="${exact(value)} tokens">${compactTokens(value)}</span>`;
 }
 
 function copyButton(value: string, label: string): string {
   return `<button type="button" class="copy" data-copy="${e(value)}" aria-label="Copy ${e(label)}" title="Copy ${e(label)}">Copy</button>`;
 }
 
-function dateTag(date: string | undefined, now: Date): string {
+function dateTag(date: string | null, now: Date): string {
   if (!date) return "";
   return isStale(date, now)
     ? `<span class="stale" title="The newest providers.dev evidence for this entry is from ${e(date)}, more than 90 days ago.">${e(date)} · stale</span>`
@@ -70,7 +70,7 @@ function cacheCell(entry: Pick<Summary, "cache" | "cache_modes" | "cache_ttl_by_
   // is never read as belonging to the line above or below; where the source gives no lifetime the box says so.
   const lines = entry.cache_modes
     .map((mode) => {
-      const ttl = entry.cache_ttl_by_mode_s?.[mode] ?? [];
+      const ttl = entry.cache_ttl_by_mode_s[mode] ?? [];
       const box =
         ttl.length > 0
           ? `<span class="cache-box" title="How long this cache lasts, as documented.">${ttl.map(duration).join(", ")}</span>`
@@ -84,11 +84,11 @@ function cacheCell(entry: Pick<Summary, "cache" | "cache_modes" | "cache_ttl_by_
 /** The documented window. Where there is none, the largest input an evaluation saw accepted, said as what it is. */
 function contextCell(entry: Summary, href: string): string {
   const accepted = entry.measured_input_accepted;
-  if (entry.context !== undefined || accepted === undefined) return tokens(entry.context);
+  if (entry.context !== null || accepted === null) return tokens(entry.context);
   // Rounded down: "at least" must stay true.
   const floor = compactTokens(Math.floor(accepted / 1000) * 1000);
   const refused = entry.measured_input_refused;
-  const title = `Measured, not documented: no window is documented for this entry. An evaluation saw an input of ${exact(accepted)} tokens accepted${refused === undefined ? "" : ` and one of ${exact(refused)} refused`}. Input only: the output comes on top.`;
+  const title = `Measured, not documented: no window is documented for this entry. An evaluation saw an input of ${exact(accepted)} tokens accepted${refused === null ? "" : ` and one of ${exact(refused)} refused`}. Input only: the output comes on top.`;
   return `<a class="plain limit-measured" href="${e(href)}#limits" title="${e(title)}"><span class="limit-value">≥ ${floor}</span><span class="limit-note">input</span></a>`;
 }
 
@@ -209,12 +209,12 @@ function priceCell(entry: Pick<Summary, "price_in" | "price_out" | "price_from" 
   const plan = IN_PLAN;
   const conditional = entry.pricing.rules?.some((rule) => rule.when !== null || rule.operation === "multiply");
   const conditionNote = conditional ? '<div class="hint">Conditional rates</div>' : "";
-  if (input === undefined && output === undefined) return (entry.access === "subscription" ? plan : UNKNOWN) + conditionNote;
+  if (input === null && output === null) return (entry.access === "subscription" ? plan : UNKNOWN) + conditionNote;
   // A listed 0 is shown as the source has it. It can mean free, or paid for another way: the page does not decide.
   if (input === 0 && output === 0) {
     return (entry.access === "subscription" ? plan : `<span class="price">$0 <span class="muted">/</span> $0</span>`) + conditionNote;
   }
-  const price = `<span class="price">${input === undefined ? DASH : usd(input)} <span class="muted">/</span> ${output === undefined ? DASH : usd(output)}</span>${conditionNote}`;
+  const price = `<span class="price">${input === null ? DASH : usd(input)} <span class="muted">/</span> ${output === null ? DASH : usd(output)}</span>${conditionNote}`;
   if (!entry.price_from) return price;
   // Two short lines: the price, then whose price it is.
   return `<span class="price-inherited" title="Not what this entry costs: a subscription is not paid per token. This is the API list price of ${e(entry.price_from)}, inherited from it.">${price}<span class="price-from">API price</span></span>`;
@@ -262,7 +262,7 @@ ${source ? `<p class="hint">Source: ${source}</p>` : ""}
 ${pricing.unparsed.length ? `<details><summary>Additional source pricing (${pricing.unparsed.length})</summary><pre>${e(JSON.stringify(pricing.unparsed, null, 2))}</pre></details>` : ""}`;
 }
 
-function evidenceList(items: Evidence[]): string {
+function evidenceList(items: PublishedEvidence[]): string {
   return `<ul class="evidence">${items
     .map(
       (item) =>
@@ -281,8 +281,7 @@ function shortUrl(url: string): string {
   }
 }
 
-function show(value: Json | undefined): string {
-  if (value === undefined) return '<span class="muted">nothing</span>';
+function show(value: Json): string {
   if (typeof value === "number") return exact(value);
   if (typeof value === "string") return e(value);
   return `<code>${e(JSON.stringify(value))}</code>`;
@@ -378,7 +377,7 @@ function requestControlTable(controls: RequestControl[]): string {
 }
 
 function measuredLimitRows(limits: MeasuredLimit[]): string {
-  const cell = (value: number | undefined): string => `<td class="num">${value === undefined ? UNKNOWN : exact(value)}</td>`;
+  const cell = (value: number | null): string => `<td class="num">${value === null ? UNKNOWN : exact(value)}</td>`;
   return limits.map((limit) => `<tr><td>${limit.date ? `<span class="muted date">${e(limit.date)}</span>` : UNKNOWN}</td><td>${e(limit.route_label)}<div class="hint">${e(limit.client_label)}</div></td>${cell(limit.context)}${cell(limit.input_accepted)}${cell(limit.input_refused)}${cell(limit.output)}${cell(limit.output_accepted)}<td><a href="${e(limit.source)}" rel="noopener">Raw result</a></td></tr>`).join("");
 }
 
@@ -419,12 +418,12 @@ export interface EntryView {
 export function entryHtml(view: EntryView): string {
   const { summary, provider, model, now } = view;
   const extension = model[NS] as unknown as ModelExtension;
-  const provenance = extension.provenance ?? [];
+  const provenance = extension.provenance;
   const limit = isObject(model.limit) ? model.limit : {};
   const cache = extension.cache;
   const runs = cache.evaluations;
-  const measuredLimits = extension.limits?.measured ?? [];
-  const fromMeasurement = extension.limits?.from_measurement ?? [];
+  const measuredLimits = extension.limits.measured;
+  const fromMeasurement = extension.limits.from_measurement;
   const number = (value: Json | undefined): string => (typeof value === "number" ? `${exact(value)} <span class="muted">tokens</span>` : UNKNOWN);
   const big = (value: Json | undefined): string => (typeof value === "number" ? `${exact(value)} <span class="unit">tokens</span>` : '<span class="muted">Unknown</span>');
   const api = `/api/v1${entryHref(summary.ref)}`;
@@ -503,7 +502,7 @@ export function entryHtml(view: EntryView): string {
   <h2 id="provenance">Provenance</h2>
   ${
     extension.origin === "added"
-      ? `<p>models.dev has no entry for this access method. Every value here is published by providers.dev.</p>${evidenceList(extension.evidence ?? [])}`
+      ? `<p>models.dev has no entry for this access method. Every value here is published by providers.dev.</p>${evidenceList(extension.evidence)}`
       : provenance.length === 0
         ? `<p>Every documented field is imported from models.dev as is and has not been independently checked.${runs.length + measuredLimits.length > 0 ? " The providers.dev evaluations above are shown next to the documented values and replace none of them." : ""}</p>`
         : `<p>Imported from models.dev, with these corrections by providers.dev:</p>`
@@ -517,7 +516,7 @@ export function entryHtml(view: EntryView): string {
   </div>`,
     )
     .join("")}
-  ${extension.origin !== "added" && extension.evidence?.length ? evidenceList(extension.evidence) : ""}
+  ${extension.origin !== "added" && extension.evidence.length ? evidenceList(extension.evidence) : ""}
 </section>
 
 <section aria-labelledby="raw">

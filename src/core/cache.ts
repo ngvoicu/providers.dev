@@ -75,9 +75,9 @@ export interface CacheEvaluation {
   parameter: string | null;
   value: string | null;
   results: CacheResult[];
-  /** Checks left out because they ran too late for their age. */
-  late_excluded?: number;
-  note?: string;
+  /** Checks left out because they ran too late for their age. Null = the evaluation does not record it. */
+  late_excluded: number | null;
+  note: string | null;
   /** The raw result. */
   source: string;
 }
@@ -131,8 +131,8 @@ export interface CacheFacts {
   cache_mode_support: Record<CacheMode, Support>;
   /** Cache lifetimes the provider documents, in seconds, shortest first. */
   cache_ttl_s: number[];
-  /** The documented lifetimes of each mode, in seconds. A mode with no documented lifetime has no key. */
-  cache_ttl_by_mode_s?: Partial<Record<CacheMode, number[]>>;
+  /** The documented lifetimes of each mode, in seconds, shortest first. Null = no lifetime is documented for the mode. */
+  cache_ttl_by_mode_s: Record<CacheMode, number[] | null>;
 }
 
 /** Missing fields stay unknown, including a mode omitted from an otherwise populated cache object. */
@@ -160,7 +160,7 @@ export function documentedCache(model: JsonObject): CacheDocumentation {
 export function cacheFacts(documented: CacheDocumentation): CacheFacts {
   const modes: CacheMode[] = [];
   const ttl = new Set<number>();
-  const byMode: Partial<Record<CacheMode, number[]>> = {};
+  const byMode: Record<CacheMode, number[] | null> = { implicit: null, explicit: null };
   for (const mode of ["implicit", "explicit"] as const) {
     const value = documented.modes[mode];
     if (value.support !== "supported") continue;
@@ -180,7 +180,7 @@ export function cacheFacts(documented: CacheDocumentation): CacheFacts {
     cache_modes: modes,
     cache_mode_support: { implicit: documented.modes.implicit.support, explicit: documented.modes.explicit.support },
     cache_ttl_s: [...ttl].sort((a, b) => a - b),
-    ...(Object.keys(byMode).length > 0 ? { cache_ttl_by_mode_s: byMode } : {}),
+    cache_ttl_by_mode_s: byMode,
   };
 }
 

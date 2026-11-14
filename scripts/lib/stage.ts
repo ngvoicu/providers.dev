@@ -15,8 +15,8 @@ export function stageSnapshot(published: string, destination: string): string {
   rmSync(next, { recursive: true, force: true });
   cpSync(source, next, {
     recursive: true,
-    // Full exports are streamed from gzip; raw copies exceed Cloudflare's per-asset size limit.
-    filter: (file) => !["api.json", "catalog.json", "_headers"].includes(basename(file)),
+    // The full exports and the index are read from gzip; raw copies exceed, or come close to, Cloudflare's per-asset size limit.
+    filter: (file) => !["api.json", "catalog.json", "index.json", "_headers"].includes(basename(file)),
   });
   const target = join(snapshots, id);
   if (existsSync(target)) rmSync(next, { recursive: true });

@@ -5,27 +5,9 @@ import type { Json } from "../src/core/merge.ts";
 import { entryHtml, rowHtml } from "../src/core/render.ts";
 import { resolve } from "../src/core/resolve.ts";
 import { UpstreamModel } from "../src/core/schema.ts";
-import { pricingOf } from "../src/core/policies.ts";
+import { summaryOf } from "./helpers.ts";
 
-const base = {
-  ref: "p/m",
-  provider: "p",
-  model: "m",
-  name: "M",
-  access: "api",
-  origin: "upstream",
-  cache: "unknown",
-  cache_modes: [],
-  cache_ttl_s: [],
-  cache_retention: "unknown",
-  evaluation_count: 0,
-  cache_results: null,
-  pricing: pricingOf({}, "api", null, []),
-  measured_limit_count: 0,
-  overridden_fields: [],
-  shard: 0,
-} as unknown as Summary;
-const row = (more: Partial<Summary>): string => rowHtml({ ...base, ...more }, { now: new Date("2026-11-13T00:00:00Z") });
+const row = (more: Partial<Summary>): string => rowHtml(summaryOf(more), { now: new Date("2026-11-13T00:00:00Z") });
 const count = (html: string, part: string): number => html.split(part).length - 1;
 const line = (profile: "short" | "long", results: [number, number, number][] | null, sent: Partial<CacheSummaryRow> = {}): CacheSummaryRow => ({
   retention_profile: profile,

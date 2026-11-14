@@ -78,7 +78,7 @@ export async function handlePage(request: Request, deps: PageDeps): Promise<Resp
     } else if (path.startsWith("/entries/")) {
       if (!refFromPath(path.slice("/entries/".length))) throw new ApiError(404);
       const { provider, summary, entry } = await one<{ provider: ProviderSummary; summary: Summary; entry: JsonObject }>(`/api/v1${path}`);
-      const facts = [summary.context === undefined ? "" : `context window ${summary.context.toLocaleString("en-US")} tokens`, summary.max_output === undefined ? "" : `maximum output ${summary.max_output.toLocaleString("en-US")} tokens`].filter(Boolean);
+      const facts = [summary.context === null ? "" : `context window ${summary.context.toLocaleString("en-US")} tokens`, summary.max_output === null ? "" : `maximum output ${summary.max_output.toLocaleString("en-US")} tokens`].filter(Boolean);
       view = { title: `${summary.name} at ${provider.name}`, description: `${summary.name} at ${provider.name} (${summary.ref})${facts.length ? `: ${facts.join(", ")}` : ""}. Limits, prices and prompt caching, with sources.`, canonical: entryHref(summary.ref), html: entryHtml({ summary, provider, model: entry, imported, now }) };
     } else if (path === "/evidence") {
       const [corrections, added, cache, measured] = await Promise.all([

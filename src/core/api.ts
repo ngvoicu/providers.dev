@@ -185,7 +185,8 @@ export async function handleApi(request: Request, deps: ApiDeps): Promise<Respon
     const values = params(PROVIDER_VIEW_PARAMS);
     if (values instanceof Response) return values;
     const entries = index.entries.filter((entry) => entry.provider === id).sort((a, b) => a.name.localeCompare(b.name) || a.model.localeCompare(b.model));
-    if (values.view !== "full") return one({ provider, entries });
+    // The same keys in both views: `models` is null until it is asked for.
+    if (values.view !== "full") return one({ provider, entries, models: null });
     const asset = await deps.asset(`/data/providers/${id}.json`);
     if (!asset) return missing(`/data/providers/${id}.json`);
     const full = (await asset.json()) as { data: { models: Record<string, unknown> } };

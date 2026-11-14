@@ -85,7 +85,7 @@ export const ENDPOINTS: { path: string; summary: string; description?: string; p
   { path: "/api/v1/entries", summary: "Search and filter entries", description: "An entry is a model at a provider and access method. Returns entry summaries. The order is fixed: the sort key, then provider id, then model id.", params: PARAMS, returns: "A page of EntrySummary" },
   { path: "/api/v1/entries/{provider}/{model}", summary: "One entry in full", description: "The provider is the first path segment; the model id is the rest of the path and may contain slashes. URL-encode each segment.", params: [], returns: "provider, summary and entry" },
   { path: "/api/v1/providers", summary: "List providers", params: PROVIDER_PARAMS, returns: "A page of ProviderSummary" },
-  { path: "/api/v1/providers/{provider}", summary: "One provider with its entries", params: PROVIDER_VIEW_PARAMS, returns: "provider and entries; with view=full also models" },
+  { path: "/api/v1/providers/{provider}", summary: "One provider with its entries", params: PROVIDER_VIEW_PARAMS, returns: "provider, entries and models (null unless view=full)" },
   { path: "/api/v1/models", summary: "List canonical models", description: "A canonical model is a model as its lab names it. Several entries can serve the same one.", params: MODEL_PARAMS, returns: "A page of CanonicalModel" },
   { path: "/api/v1/models/{lab}/{model}", summary: "One canonical model with every entry that serves it", params: [], returns: "CanonicalModelDetail" },
   { path: "/api/v1/evaluations", summary: "List evaluations", description: "Every cache and limit evaluation, each with the entry it was made on: cache evaluations newest first, then limit evaluations.", params: EVALUATION_PARAMS, returns: "A page of Evaluation" },
@@ -109,7 +109,7 @@ export function openapi(): Record<string, unknown> {
         "Read-only metadata about AI models as each provider and access method exposes them. The baseline is imported from models.dev (MIT); providers.dev additions, corrections and evaluations are under the `providers_dev` key. " +
         "Four resources: providers, entries (a model at a provider), models (canonical) and evaluations. Every collection answers `{ meta, total, limit, offset, next_offset, data }` and pages with `limit` and `offset`; every single object answers `{ meta, data }`. " +
         "Every entry summary contains pricing and request_controls, also available under providers_dev on full entries. Conditions share a recursive typed grammar; headers, body fields and query parameters have explicit bindings. " +
-        "Unknown is never zero: an absent optional field, or null, means no source gives the value. Pricing coverage is partial unless completeness is explicitly confirmed; unsupported, unknown and not_applicable are distinct. This API describes rates, not a billing quote.",
+        "Unknown is never zero: null means no source gives the value. Every object providers.dev publishes has all of its keys on every entry, so no field needs checking for presence; only the models.dev part of an entry or provider can leave a field out. Pricing coverage is partial unless completeness is explicitly confirmed; unsupported, unknown and not_applicable are distinct. This API describes rates, not a billing quote.",
       license: { name: "MIT", url: "https://providers.dev/docs/licensing/" },
     },
     servers: [{ url: "https://providers.dev" }],
@@ -120,7 +120,8 @@ export function openapi(): Record<string, unknown> {
         "Filters combine with AND. Unknown parameters, duplicate parameters and invalid values return 400 with details. URL-encode each provider/model path segment; model ids may contain slashes. Keep dataset_version and generated_at when joining pages; restart pagination if either changes.",
       ] },
       { id: "unknown", title: "Unknown values", paragraphs: [
-        "An absent optional field or null means no value is known. Zero is a real value. Unsupported means explicitly unavailable; not_applicable means the field has no meaning for this access method. Limits are tokens; max_output is a maximum, not a default.",
+        "Null means no value is known. Zero is a real value. Unsupported means explicitly unavailable; not_applicable means the field has no meaning for this access method. Limits are tokens; max_output is a maximum, not a default.",
+        "One structure. An entry summary, the providers_dev record of an entry or a provider, an evaluation, a correction and a piece of evidence each have the same keys on every object: an unknown value is null and an empty list is [], never a missing key. The answer of an endpoint has the same keys whatever its parameters: /providers/{provider} has models: null until view=full asks for it. The fields imported from models.dev (limit, cost, capabilities, modalities and the like) keep the models.dev shape, where an absent field means models.dev has no value.",
         "Unknown limits do not match minimum filters. Unknown release dates do not match max_age_months. Cache mode support is separate for automatic and manual caching. Evaluations do not establish documented parameter support.",
       ] },
       { id: "pricing-rules", title: "Pricing and request controls", paragraphs: [
@@ -169,12 +170,12 @@ export function openapi(): Record<string, unknown> {
             "The provider",
             oneOf({
               type: "object",
-              required: ["provider", "entries"],
+              required: ["provider", "entries", "models"],
               additionalProperties: false,
               properties: {
                 provider: ref("ProviderSummary"),
                 entries: { type: "array", items: ref("EntrySummary"), description: "The provider's entries, by name." },
-                models: { type: "object", additionalProperties: ref("Entry"), description: "With view=full: the entries in full, by model id." },
+                models: { type: ["object", "null"], additionalProperties: ref("Entry"), description: "With view=full: the entries in full, by model id. Null with view=summary, so that the answer has the same keys in both views." },
               },
             }),
           ),

@@ -9,33 +9,37 @@ export { cacheFacts, durationSeconds } from "./cache.ts";
 export type { CacheMode, CacheSupport } from "./cache.ts";
 export type Origin = "upstream" | "modified" | "added";
 
+/**
+ * One entry in short. Every summary has every field: a value no source gives is null, never left out, so that a
+ * client can read any field of any entry without checking that it is there.
+ */
 export interface Summary {
   /** `provider/model`. Provider ids never contain a slash, so the first slash ends the provider. */
   ref: string;
   provider: string;
   model: string;
   name: string;
-  type?: string;
-  family?: string;
-  canonical_id?: string;
-  status?: string;
-  release_date?: string;
+  type: string | null;
+  family: string | null;
+  canonical_id: string | null;
+  status: string | null;
+  release_date: string | null;
   access: Access;
   /** upstream = as imported; modified = an upstream entry with our overrides or measurements; added = an entry models.dev does not have. */
   origin: Origin;
-  /** limit.context: the context window this provider exposes for the model, in tokens. */
-  context?: number;
-  /** limit.input: the largest input this provider accepts, where it is lower than the context window. */
-  input?: number;
-  /** limit.output: the most tokens one response can hold. A maximum, not a default. */
-  max_output?: number;
+  /** limit.context: the context window this provider exposes for the model, in tokens. Null = unknown. */
+  context: number | null;
+  /** limit.input: the largest input this provider accepts, where it is lower than the context window. Null = not stated. */
+  input: number | null;
+  /** limit.output: the most tokens one response can hold. A maximum, not a default. Null = unknown. */
+  max_output: number | null;
   cache: CacheSupport;
   cache_modes: CacheMode[];
   cache_mode_support: Record<CacheMode, Support>;
   /** Cache lifetimes the provider documents, in seconds, shortest first. */
   cache_ttl_s: number[];
-  /** The documented lifetimes of each mode, in seconds. A mode with no documented lifetime has no key. */
-  cache_ttl_by_mode_s?: Partial<Record<CacheMode, number[]>>;
+  /** The documented lifetimes of each mode, in seconds. Null = no lifetime is documented for the mode. */
+  cache_ttl_by_mode_s: Record<CacheMode, number[] | null>;
   /** Whether a request can ask for a cache lifetime on this entry: `providers_dev.cache.retention.support` of the full entry. */
   cache_retention: CacheRetention["support"];
   /** How many cache evaluations this entry has. */
@@ -45,23 +49,23 @@ export interface Summary {
    * its results by exact age. The same object as `providers_dev.cache.results` of the full entry. Null = not evaluated.
    */
   cache_results: CacheSummaryRow[] | null;
-  /** cost.text.input.price: the list price of input, in US dollars per million tokens, before any change by context size or tier. */
-  price_in?: number;
-  /** cost.text.output.price: the same for output. */
-  price_out?: number;
+  /** The base price of text input, in US dollars per million tokens, before any conditional rate. Null = unknown, or priced in another unit. */
+  price_in: number | null;
+  /** The same for output. */
+  price_out: number | null;
+  /** The ref of the API entry whose list price this is, on a subscription entry. Null = the price is the entry's own. */
+  price_from: string | null;
   pricing: Pricing;
   request_controls: RequestControls;
-  /** Set where the price is inherited: the ref of the API entry whose list price this is. The entry itself is not paid per token. */
-  price_from?: string;
-  /** The largest input an evaluation saw accepted on this entry, in tokens. The real limit is at least this. */
-  measured_input_accepted?: number;
-  /** The smallest input an evaluation saw refused. The real limit is below this. */
-  measured_input_refused?: number;
+  /** The largest input an evaluation saw accepted on this entry, in tokens. The real limit is at least this. Null = not measured. */
+  measured_input_accepted: number | null;
+  /** The smallest input an evaluation saw refused. The real limit is below this. Null = not measured. */
+  measured_input_refused: number | null;
   /** How many limit evaluations this entry has. */
   measured_limit_count: number;
   overridden_fields: string[];
-  /** Newest date of our own evidence for this entry. Imported data has none. */
-  verified?: string;
+  /** Newest date of our own evidence for this entry. Null = it has none. */
+  verified: string | null;
   /** Which file under /data/entries/<provider>/ holds the full entry. */
   shard: number;
 }
@@ -69,8 +73,8 @@ export interface Summary {
 export interface ProviderSummary {
   id: string;
   name: string;
-  /** The provider's documentation. */
-  doc?: string;
+  /** The provider's documentation. Null = models.dev records none. */
+  doc: string | null;
   /** The environment variables a client reads the key from, as models.dev records them. */
   env: string[];
   access: Access;
@@ -95,61 +99,56 @@ export interface Index {
 
 export const SHARD_SIZE = 40;
 
-const text = (value: unknown): string | undefined => (typeof value === "string" && value ? value : undefined);
-const count = (value: unknown): number | undefined => (typeof value === "number" && Number.isFinite(value) ? value : undefined);
+const text = (value: unknown): string | null => (typeof value === "string" && value ? value : null);
+const count = (value: unknown): number | null => (typeof value === "number" && Number.isFinite(value) ? value : null);
 
 /** The base price of one side of `cost.text`. A price in another unit (per character) is not a price per token. */
-function basePrice(pricing: Pricing, side: "input" | "output"): number | undefined {
+function basePrice(pricing: Pricing, side: "input" | "output"): number | null {
   const rules = pricing.rules?.filter((rule) => rule.meter === `text.${side}` && rule.when === null && rule.operation === "set" && rule.currency === "USD" && rule.unit?.name === "token" && rule.unit.quantity === 1000000) ?? [];
-  return rules.length === 1 ? rules[0]!.amount : pricing.rule_order === "listed" ? rules.at(-1)?.amount : undefined;
+  return (rules.length === 1 ? rules[0]!.amount : pricing.rule_order === "listed" ? rules.at(-1)?.amount : undefined) ?? null;
 }
 
 export function summarize(providerId: string, model: JsonObject, shard: number): Summary {
   const extension = model[NS] as unknown as ModelExtension;
   const limit = isObject(model.limit) ? model.limit : {};
   const runs = extension.cache.evaluations;
-  const overridden = (extension.provenance ?? []).map((change) => change.path);
-  const measuredLimits = extension.limits?.measured ?? [];
+  const overridden = extension.provenance.map((change) => change.path);
+  const measuredLimits = extension.limits.measured;
   const accepted = measuredLimits.map((item) => item.input_accepted).filter((value): value is number => typeof value === "number");
   const refused = measuredLimits.map((item) => item.input_refused).filter((value): value is number => typeof value === "number");
-  const touched = overridden.length > 0 || runs.length > 0 || (extension.evidence?.length ?? 0) > 0 || (extension.limits?.measured?.length ?? 0) > 0;
-  const summary: Summary = {
+  const touched = overridden.length > 0 || runs.length > 0 || extension.evidence.length > 0 || measuredLimits.length > 0;
+  // One fixed order of keys, the same on every entry.
+  return {
     ref: `${providerId}/${String(model.id)}`,
     provider: providerId,
     model: String(model.id),
     name: String(model.name),
-    access: extension.access,
-    origin: extension.origin === "added" ? "added" : touched ? "modified" : "upstream",
-    ...cacheFacts(extension.cache.documented),
-    cache_retention: extension.cache.retention.support,
-    evaluation_count: runs.length,
-    cache_results: extension.cache.results,
-    pricing: extension.pricing,
-    request_controls: extension.request_controls,
-    measured_limit_count: extension.limits?.measured?.length ?? 0,
-    overridden_fields: overridden,
-    shard,
-  };
-  const optional: Partial<Summary> = {
     type: text(model.type),
     family: text(model.family),
     canonical_id: text(model.canonical_id),
     status: text(model.status),
     release_date: text(model.release_date),
+    access: extension.access,
+    origin: extension.origin === "added" ? "added" : touched ? "modified" : "upstream",
     context: count(limit.context),
     input: count(limit.input),
     max_output: count(limit.output),
+    ...cacheFacts(extension.cache.documented),
+    cache_retention: extension.cache.retention.support,
+    evaluation_count: runs.length,
+    cache_results: extension.cache.results,
     price_in: basePrice(extension.pricing, "input"),
     price_out: basePrice(extension.pricing, "output"),
-    price_from: extension.pricing.billing === "reference" ? extension.pricing.reference_ref ?? undefined : undefined,
-    measured_input_accepted: accepted.length > 0 ? Math.max(...accepted) : undefined,
-    measured_input_refused: refused.length > 0 ? Math.min(...refused) : undefined,
+    price_from: extension.pricing.billing === "reference" ? extension.pricing.reference_ref : null,
+    pricing: extension.pricing,
+    request_controls: extension.request_controls,
+    measured_input_accepted: accepted.length > 0 ? Math.max(...accepted) : null,
+    measured_input_refused: refused.length > 0 ? Math.min(...refused) : null,
+    measured_limit_count: measuredLimits.length,
+    overridden_fields: overridden,
     verified: extension.verified,
+    shard,
   };
-  for (const [key, value] of Object.entries(optional)) {
-    if (value !== undefined) (summary as unknown as Record<string, unknown>)[key] = value;
-  }
-  return summary;
 }
 
 export function buildIndex(catalog: Catalog, datasetVersion: string, generatedAt: string, upstreamFetchedAt: string): Index {
@@ -167,7 +166,7 @@ export function buildIndex(catalog: Catalog, datasetVersion: string, generatedAt
     providers.push({
       id,
       name: provider.name,
-      ...(typeof provider.doc === "string" ? { doc: provider.doc } : {}),
+      doc: typeof provider.doc === "string" ? provider.doc : null,
       env: Array.isArray(provider.env) ? provider.env.filter((name): name is string => typeof name === "string") : [],
       access: extension.access,
       access_reviewed: extension.access_reviewed,
