@@ -1,7 +1,7 @@
 // Writes dist/og-card.html, the 1200 x 630 card that public/og.png is a screenshot of. It needs a built site,
 // because it uses the site's stylesheet for the fonts:
 //   npm run build && npm run og-card && npm run preview
-// then save a 1200 x 630 screenshot of http://localhost:8787/og-card as public/og.png and rebuild.
+// then save a 1200 x 630 screenshot of http://localhost:8787/og-card.html as public/og.png and rebuild.
 import { readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { MARK_BOX, markSvg, tileSvg } from "../src/core/brand.ts";

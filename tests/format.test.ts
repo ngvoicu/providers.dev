@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { addResults, cacheResult, profileOf, retentionOf, summarizeCache, type CacheEvaluation } from "../src/core/cache.ts";
+import { pricingOf } from "../src/core/policies.ts";
+import { addResults, cacheResult, documentedCache, profileOf, retentionOf, summarizeCache, type CacheEvaluation } from "../src/core/cache.ts";
 import { importDate, shortAge } from "../src/core/format.ts";
+import type { JsonObject } from "../src/core/merge.ts";
 
-const NO_CACHE = { retention: { support: "unknown", parameter: null, accepted_values: null, default: null, profiles: [], conditions: [], evidence: [] }, results: null, evaluations: [] };
+const NO_CACHE = { documented: documentedCache({}), retention: { support: "unknown", parameter: null, accepted_values: null, default: null, profiles: [], conditions: [], evidence: [] }, results: null, evaluations: [] };
 
 describe("ages", () => {
   it("keeps age headings short", () => {
@@ -25,7 +27,7 @@ describe("prices", () => {
 
   it("takes the base price per token and nothing in another unit", async () => {
     const { summarize } = await import("../src/core/entries.ts");
-    const model = (cost: unknown) => ({ id: "m", name: "M", cost, providers_dev: { origin: "upstream", access: "api", cache: NO_CACHE } }) as never;
+    const model = (cost: unknown) => ({ id: "m", name: "M", cost, providers_dev: { origin: "upstream", access: "api", cache: NO_CACHE, pricing: pricingOf({ cost } as JsonObject, "api", null, []) } }) as never;
     const priced = summarize("p", model({ text: { input: { price: 10, overrides: [{ when: { context: { gt: 1 } }, price: 20 }] }, output: { price: 50 } } }), 0);
     expect([priced.price_in, priced.price_out]).toEqual([10, 50]);
     const perCharacter = summarize("p", model({ text: { input: { price: 15, unit: "character" } } }), 0);
@@ -39,7 +41,7 @@ describe("prices", () => {
 describe("measured input", () => {
   it("puts the bounds of an evaluated input limit in the summary", async () => {
     const { summarize } = await import("../src/core/entries.ts");
-    const model = (measured: unknown[]) => ({ id: "m", name: "M", providers_dev: { origin: "added", access: "subscription", limits: { measured }, cache: NO_CACHE } }) as never;
+    const model = (measured: unknown[]) => ({ id: "m", name: "M", providers_dev: { origin: "added", access: "subscription", limits: { measured }, cache: NO_CACHE, pricing: pricingOf({}, "subscription", null, []) } }) as never;
     const two = summarize("p", model([{ input_accepted: 915011, input_refused: 922500 }, { input_accepted: 920870, input_refused: 921875 }]), 0);
     // The widest accepted and the narrowest refused: the real limit is between them.
     expect([two.measured_input_accepted, two.measured_input_refused, two.context]).toEqual([920870, 921875, undefined]);
@@ -111,22 +113,12 @@ describe("cache evaluations as the API publishes them", () => {
     expect([profileOf(null, documented), profileOf("5m", documented), profileOf("1h", documented), profileOf("24h", {})]).toEqual(["short", "short", "long", "long"]);
   });
 
-  it("says what a request can ask for only from what is documented or was accepted", () => {
-    expect(retentionOf({}, [], null)).toEqual({ support: "unknown", parameter: null, accepted_values: null, default: null, profiles: [], conditions: [], evidence: [] });
-    expect(retentionOf({ capabilities: { cache: false } }, [], "2026-11-13")).toMatchObject({ support: "unsupported", profiles: [], evidence: [{ kind: "documented", date: "2026-11-13" }] });
-    // One documented lifetime is no choice: nothing is claimed.
-    expect(retentionOf({ capabilities: { cache: { explicit: { ttl: ["5m"] } } } }, [], null).support).toBe("unknown");
-
-    const documented = retentionOf({ capabilities: { cache: { explicit: { ttl: ["5m", "1h"] } } } }, [], "2026-11-13");
-    expect(documented).toMatchObject({ support: "supported", parameter: null, accepted_values: ["5m", "1h"], default: null });
-    expect(documented.profiles).toEqual([{ profile: "short", value: null }, { profile: "short", value: "5m" }, { profile: "long", value: "1h" }]);
-
-    // An evaluation that sent a lifetime names the request field, when its control shows the request was accepted and cached.
-    const sent = { request_settings: { prompt_cache_retention: "24h" }, retention_profile: "long" as const, parameter: "prompt_cache_retention", value: "24h" };
-    const accepted = retentionOf({ capabilities: { cache: { implicit: true } } }, [evaluation("m", [[0, 1, 1], [14400, 3, 3]], sent)], null);
-    expect(accepted).toMatchObject({ support: "supported", parameter: { name: "prompt_cache_retention", location: "Request body, top level" }, accepted_values: ["24h"] });
-    expect(accepted.evidence).toEqual([expect.objectContaining({ kind: "measured", url: "https://example.com/m", date: "2026-11-10" })]);
-    const refused = retentionOf({}, [evaluation("n", [[0, 0, 1]], sent)], null);
-    expect(refused.support).toBe("unknown");
+  it("does not turn documented lifetimes into confirmed request parameters", () => {
+    expect(retentionOf(documentedCache({}), [])).toEqual({ support: "unknown", parameter: null, accepted_values: null, default: null, profiles: [], conditions: [], evidence: [] });
+    expect(retentionOf(documentedCache({ capabilities: { cache: false } }), [])).toMatchObject({ support: "unsupported", profiles: [] });
+    const cases: JsonObject[] = [{ explicit: { ttl: ["5m", "1h"] } }, { implicit: { ttl: ["5m"] }, explicit: { ttl: ["1h"] } }];
+    for (const cache of cases) {
+      expect(retentionOf(documentedCache({ capabilities: { cache } }), [])).toMatchObject({ support: "unknown", parameter: null, accepted_values: null });
+    }
   });
 });

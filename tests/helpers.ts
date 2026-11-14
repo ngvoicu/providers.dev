@@ -80,12 +80,15 @@ export function fetchReturning(body: string, init: ResponseInit = { status: 200,
 }
 
 export function depsFrom(publishedDir: string): ApiDeps {
-  const index = JSON.parse(readFileSync(join(publishedDir, "worker", "index.json"), "utf8")) as Index;
-  const meta = JSON.parse(readFileSync(join(publishedDir, "worker", "meta.json"), "utf8")) as Meta;
+  const index = JSON.parse(readFileSync(join(publishedDir, "site", "data", "index.json"), "utf8")) as Index;
+  const meta = JSON.parse(readFileSync(join(publishedDir, "site", "data", "meta.json"), "utf8")) as Meta;
   return {
     index,
     meta,
     async asset(path) {
+      if (/^\/reference-content\/docs\/(methodology|licensing)\.json$/.test(path)) {
+        return new Response(JSON.stringify({ title: "Reference fixture", description: "Reference", lead: "Reference", toc: [], body_html: "<p>Reference fixture</p>" }));
+      }
       const file = join(publishedDir, "site", path);
       return existsSync(file) ? new Response(readFileSync(file)) : null;
     },

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { clone } from "../src/core/merge.ts";
 import { summarize } from "../src/core/entries.ts";
 import { resolve, type ResolveInput } from "../src/core/resolve.ts";
-import { ext, providerExt, type AccessRules, type AuthoredProvider, type Evidence, type ObservedFile, type OverrideFile, type UpstreamCatalog } from "../src/core/schema.ts";
+import { OverrideFile as OverrideFileSchema, ext, providerExt, type AccessRules, type AuthoredProvider, type Evidence, type ObservedFile, type OverrideFile, type UpstreamCatalog } from "../src/core/schema.ts";
 
 const evidence: Evidence[] = [{ kind: "documented", url: "https://example.com/docs", date: "2026-11-01" }];
 
@@ -43,6 +43,39 @@ const contextOverride: OverrideFile = {
 };
 
 describe("resolve: overrides", () => {
+  it("keeps authored and override sources for unsupported caching", () => {
+    const added: AuthoredProvider = {
+      id: "added", name: "Added", access: "api", access_basis: "Fixture", evidence,
+      models: [{ id: "model-a", fields: { capabilities: { cache: false } }, evidence }],
+    };
+    const override: OverrideFile = { provider: "lab", rules: [{ models: ["model-a"], set: { capabilities: { cache: { implicit: false, explicit: false } } }, reason: "Explicitly unsupported", evidence }] };
+    const { catalog } = resolve(input([override], { additions: [added], upstreamDate: "2026-11-13" }));
+    const authored = ext(catalog.added!.models["model-a"]!).cache.retention;
+    expect(authored).toMatchObject({ support: "unsupported", evidence: [{ url: evidence[0]!.url, date: evidence[0]!.date }] });
+    expect(authored.evidence.some((source) => source.url === "https://models.dev")).toBe(false);
+    const corrected = ext(catalog.lab!.models["model-a"]!).cache.retention;
+    expect(corrected.support).toBe("unsupported");
+    expect(corrected.evidence.some((source) => source.url === evidence[0]!.url)).toBe(true);
+    expect(corrected.evidence.some((source) => source.note.includes("capabilities.cache is false"))).toBe(false);
+  });
+
+  it("publishes sourced retention declarations only on the named entry", () => {
+    const declaration = {
+      support: "supported", parameter: { name: "cache_control.ttl", location: "Cache marker" },
+      accepted_values: ["5m", "1h"], default: "5m", profiles: [{ profile: "short", value: "5m" }, { profile: "long", value: "1h" }],
+      conditions: ["Fixture protocol only"], evidence: [{ kind: "documented", url: "https://example.com/retention", date: "2026-11-14", note: "The fixture documentation confirms this parameter and these values." }],
+    };
+    const override = OverrideFileSchema.parse({ provider: "lab", rules: [{ models: ["model-a"], cache_retention: declaration, reason: "Confirmed parameter", evidence }] });
+    const { catalog } = resolve(input([override]));
+    const model = catalog.lab!.models["model-a"]!;
+    expect(ext(model).cache.retention).toEqual(declaration);
+    expect(summarize("lab", model, 0)).toMatchObject({ cache_retention: "supported", origin: "modified", verified: "2026-11-14" });
+    expect(ext(catalog.lab!.models["model-b"]!).cache.retention.support).toBe("unknown");
+    expect(ext(catalog["lab-coding-plan"]!.models["model-a"]!).cache.retention.support).toBe("unknown");
+    const withoutEvidence = { ...declaration, evidence: [] };
+    expect(OverrideFileSchema.safeParse({ provider: "lab", rules: [{ models: ["model-a"], cache_retention: withoutEvidence, reason: "No source", evidence }] }).success).toBe(false);
+  });
+
   it("publishes our value for an overridden field and upstream for the rest", () => {
     const { catalog } = resolve(input([contextOverride]));
     const model = catalog.lab?.models["model-a"];
@@ -336,7 +369,8 @@ describe("resolve: measurements", () => {
     expect(runs[1]).toMatchObject({ retention_profile: "long", parameter: "cache_control.ttl", value: "1h", request_settings: { ttl: "1h" } });
     expect(runs[1]!.results.map((item) => [item.kind, item.age_s])).toEqual([["control", 0], ["timed", 300]]);
     expect(cache.results!.map((row) => [row.retention_profile, row.value, row.evaluations])).toEqual([["short", null, 1], ["long", "1h", 1]]);
-    expect(cache.retention).toMatchObject({ support: "supported", parameter: { name: "cache_control.ttl" }, accepted_values: ["1h"] });
+    // Sending the value and getting a cache hit cannot prove the parameter was recognized.
+    expect(cache.retention).toMatchObject({ support: "unknown", parameter: null, accepted_values: null });
     expect(JSON.stringify(runs)).not.toMatch(/tool-x|ToolX/);
     expect(issues).toContainEqual(expect.objectContaining({ code: "unmapped-client", target: "mystery" }));
   });

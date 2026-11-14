@@ -1,6 +1,5 @@
 {
-  // Cloudflare Worker with static assets. Pages and data files are served as assets;
-  // the Worker runs for the API (/api/v1/*) and the entry pages (/entries/*, and the old /entry/?ref= address).
+  // The Worker renders pages from API responses; static assets hold templates and versioned snapshots.
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "providers-dev",
   "main": "worker/index.ts",
@@ -10,6 +9,6 @@
     "binding": "ASSETS",
     "not_found_handling": "404-page",
     "html_handling": "auto-trailing-slash",
-    "run_worker_first": ["/api/v1/*", "/entries/*", "/entry", "/entry/"]
+    "run_worker_first": true
   }
 }

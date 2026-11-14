@@ -1,69 +1,117 @@
-// Entry pages, rendered on request from the same objects the API returns. An entry page is
-// GET /entries/{provider}/{model}: its own address, title and description, and no script needed to read it.
-// The page around the entry (header, footer, styles) is a file built ahead of time, with marks where the entry goes.
-import { etagMatches, loadEntry, refFromPath, type ApiDeps } from "./api.ts";
-import { entryHref, escapeHtml } from "./format.ts";
+// Every page is a view of public API responses. This module has no catalog/index/file-data access.
+import { etagMatches, refFromPath, representationTag } from "./api.ts";
+import { catalogHtml, modelsHtml, providersHtml, type Envelope, type One } from "./catalog-view.ts";
+import { evidenceHtml, modelHtml, providerHtml } from "./detail-view.ts";
+import { documentHtml, openapiHtml, type OpenApiDocument } from "./docs-view.ts";
+import type { ProviderSummary, Summary } from "./entries.ts";
+import { entryHref, escapeHtml as e } from "./format.ts";
 import type { JsonObject } from "./merge.ts";
+import { fillShell, PAGE_SHELL } from "./page-shell.ts";
+import { parseQuery, serializeQuery, SITE_DEFAULT } from "./query.ts";
 import { entryHtml } from "./render.ts";
+import type { CanonicalModel, CanonicalModelDetail, Correction, Documentation, EvaluationRecord, Facets } from "./resources.ts";
+import type { Meta } from "./schema.ts";
 
-export const ENTRY_SHELL = "/entry/";
-/** The marks in the shell. They are replaced everywhere they appear. */
-export const MARK = { title: "%%ENTRY_TITLE%%", description: "%%ENTRY_DESCRIPTION%%", canonical: "%%ENTRY_CANONICAL%%", html: "%%ENTRY_HTML%%" } as const;
-
-const fill = (shell: string, values: Record<keyof typeof MARK, string>): string =>
-  (Object.keys(MARK) as (keyof typeof MARK)[]).reduce((page, key) => page.split(MARK[key]).join(values[key]), shell);
-
-const htmlHeaders = (extra: Record<string, string> = {}): Headers =>
-  new Headers({ "Content-Type": "text/html; charset=utf-8", "X-Content-Type-Options": "nosniff", ...extra });
-
-export interface PageDeps extends ApiDeps {
-  /** The address the site is published at, for canonical links. */
+export interface PageDeps {
+  /** Dispatch the same HTTP handler used by external API callers, pinned to one publication. */
+  api(path: string): Promise<Response>;
+  shell(): Promise<Response | null>;
   site: string;
   now(): Date;
 }
-
-/** True for the paths this file answers. */
-export function isEntryPage(pathname: string): boolean {
-  return pathname.startsWith("/entries/") || pathname === "/entry" || pathname === "/entry/";
+interface View { title: string; description: string; html: string; canonical?: string }
+class ApiError extends Error {
+  status: number;
+  constructor(status: number) { super(`API response ${status}`); this.status = status; }
 }
 
-export async function handleEntryPage(request: Request, deps: PageDeps): Promise<Response> {
-  const url = new URL(request.url);
-  const notFound = async (): Promise<Response> => {
-    const page = await deps.asset("/404.html");
-    return new Response(page ? await page.text() : "Not found", { status: 404, headers: htmlHeaders({ "Cache-Control": "no-store" }) });
-  };
+export function isPage(path: string): boolean {
+  return path === "/" || /^(\/providers|\/models|\/entries|\/entry|\/evidence|\/docs)(\/|$)/.test(path);
+}
+
+export async function handlePage(request: Request, deps: PageDeps): Promise<Response> {
   if (request.method !== "GET" && request.method !== "HEAD") return new Response(null, { status: 405, headers: { Allow: "GET, HEAD" } });
-
-  // The address entries had before they got pages of their own.
-  if (!url.pathname.startsWith("/entries/")) {
-    const old = url.searchParams.get("ref");
-    return old && old.includes("/") ? Response.redirect(new URL(entryHref(old), url.origin).toString(), 301) : notFound();
+  const url = new URL(request.url);
+  const path = url.pathname.replace(/\/+$/, "") || "/";
+  if (path === "/entry" && url.searchParams.get("ref")?.includes("/")) return Response.redirect(new URL(entryHref(url.searchParams.get("ref")!), url.origin).toString(), 301);
+  const read = async <T>(api: string): Promise<T> => {
+    const response = await deps.api(api);
+    if (!response.ok) throw new ApiError(response.status);
+    return await response.json() as T;
+  };
+  const one = async <T>(api: string): Promise<T> => (await read<One<T>>(api)).data;
+  const all = async <T>(api: string): Promise<T[]> => {
+    const items: T[] = [];
+    let offset: number | null = 0;
+    while (offset !== null) {
+      const result: Envelope<T> = await read(`${api}${api.includes("?") ? "&" : "?"}limit=200&offset=${offset}`);
+      items.push(...result.data);
+      offset = result.next_offset;
+    }
+    return items;
+  };
+  const now = new Date(`${deps.now().toISOString().slice(0, 10)}T00:00:00Z`);
+  let status = 200;
+  let meta: Meta | undefined;
+  let view: View;
+  try {
+    meta = await read<Meta>("/api/v1/meta");
+    const imported = meta.upstream.fetched_at.slice(0, 10);
+    if (path === "/") {
+      const params = new URLSearchParams(url.search);
+      if (!params.has("sort")) for (const [name, value] of new URLSearchParams(SITE_DEFAULT)) if (!params.has(name)) params.set(name, value);
+      const parsed = parseQuery(params, true);
+      if (!parsed.ok) throw new ApiError(400);
+      const [result, facets] = await Promise.all([read<Envelope<Summary>>(`/api/v1/entries?${serializeQuery(parsed.query)}`), one<Facets>("/api/v1/facets")]);
+      view = { title: "AI model catalog", description: "Context, output, pricing and prompt caching by model, provider and access method.", html: catalogHtml(result, parsed.query, facets, meta, url, now) };
+    } else if (path === "/providers") {
+      view = { title: "Providers", description: "Providers and access methods in the catalog.", html: providersHtml(await read<Envelope<ProviderSummary>>(`/api/v1/providers${url.search}`), url) };
+    } else if (path.startsWith("/providers/")) {
+      const { provider, entries } = await one<{ provider: ProviderSummary; entries: Summary[] }>(`/api/v1${path}`);
+      view = { title: provider.name, description: `${provider.name}: ${provider.entry_count} model entries.`, html: providerHtml(provider, entries, imported, now) };
+    } else if (path === "/models") {
+      view = { title: "Models", description: "Canonical models and the providers that serve them.", html: modelsHtml(await read<Envelope<CanonicalModel>>(`/api/v1/models${url.search}`), url) };
+    } else if (path.startsWith("/models/")) {
+      if (!refFromPath(path.slice("/models/".length))) throw new ApiError(404);
+      const [model, facets] = await Promise.all([one<CanonicalModelDetail>(`/api/v1${path}`), one<Facets>("/api/v1/facets")]);
+      view = { title: model.name, description: `${model.name}: ${model.entry_count} entries across providers and access methods.`, html: modelHtml(model, Object.fromEntries(facets.providers.map((provider) => [provider.id, provider.name])), imported, now) };
+    } else if (path.startsWith("/entries/")) {
+      if (!refFromPath(path.slice("/entries/".length))) throw new ApiError(404);
+      const { provider, summary, entry } = await one<{ provider: ProviderSummary; summary: Summary; entry: JsonObject }>(`/api/v1${path}`);
+      const facts = [summary.context === undefined ? "" : `context window ${summary.context.toLocaleString("en-US")} tokens`, summary.max_output === undefined ? "" : `maximum output ${summary.max_output.toLocaleString("en-US")} tokens`].filter(Boolean);
+      view = { title: `${summary.name} at ${provider.name}`, description: `${summary.name} at ${provider.name} (${summary.ref})${facts.length ? `: ${facts.join(", ")}` : ""}. Limits, prices and prompt caching, with sources.`, canonical: entryHref(summary.ref), html: entryHtml({ summary, provider, model: entry, imported, now }) };
+    } else if (path === "/evidence") {
+      const [corrections, added, cache, measured] = await Promise.all([
+        read<Envelope<Correction>>(`/api/v1/corrections?offset=${encodeURIComponent(url.searchParams.get("corrections_offset") ?? "0")}`),
+        all<ProviderSummary>("/api/v1/providers?origin=added"),
+        read<Envelope<EvaluationRecord>>(`/api/v1/evaluations?kind=cache&offset=${encodeURIComponent(url.searchParams.get("cache_offset") ?? "0")}`),
+        read<Envelope<EvaluationRecord>>(`/api/v1/evaluations?kind=limit&offset=${encodeURIComponent(url.searchParams.get("limits_offset") ?? "0")}`),
+      ]);
+      view = { title: "Evidence", description: "Corrections and evaluations with sources and dates.", html: evidenceHtml(meta, corrections, added, cache, measured, url, now) };
+    } else if (path === "/docs/api") {
+      view = { title: "API", description: "The providers.dev API: endpoints, parameters, response schemas and examples.", html: openapiHtml(await read<OpenApiDocument>("/api/v1/openapi.json")) };
+    } else if (path === "/docs/methodology" || path === "/docs/licensing") {
+      const document = await one<Documentation>(`/api/v1${path}`);
+      view = { title: document.title, description: document.description, html: documentHtml(document) };
+    } else throw new ApiError(404);
+  } catch (error) {
+    status = error instanceof ApiError && (error.status === 400 || error.status === 404) ? error.status : 503;
+    const title = status === 404 ? "Nothing at this address" : status === 400 ? "Invalid filters" : "The catalog is temporarily unavailable";
+    view = { title, description: title, html: `<h1>${title}</h1><p class="lead mt-3">${status === 400 ? 'Use the <a href="/docs/api/">documented API parameters</a> for this view.' : status === 404 ? "This provider or model may no longer be listed." : "The API could not load a complete published snapshot. Try again shortly."}</p><p class="mt-6"><a class="button" href="/">Search the catalog</a></p>` };
   }
-
-  const ref = refFromPath(url.pathname.slice("/entries/".length).replace(/\/+$/, ""));
-  const summary = ref ? deps.index.entries.find((entry) => entry.ref === ref) : undefined;
-  const provider = summary ? deps.index.providers.find((item) => item.id === summary.provider) : undefined;
-  if (!summary || !provider) return notFound();
-
-  // A date turns stale with time, so the day is part of what the page is.
-  const now = deps.now();
-  const etag = `"${deps.meta.dataset_version}-${now.toISOString().slice(0, 10)}"`;
-  const headers = htmlHeaders({ ETag: etag, "Cache-Control": "public, max-age=300, stale-while-revalidate=3600", "X-Dataset-Version": deps.meta.dataset_version });
-  if (etagMatches(request, etag)) return new Response(null, { status: 304, headers });
-
-  const [shell, entry] = await Promise.all([deps.asset(ENTRY_SHELL), loadEntry(deps, summary)]);
-  if (!shell || !entry) return new Response("The published snapshot is incomplete. Try again after the next publication.", { status: 503, headers: htmlHeaders({ "Cache-Control": "no-store" }) });
-
-  const limit = (value: number | undefined, word: string): string => (value === undefined ? "" : `${word} ${value.toLocaleString("en-US")} tokens`);
-  const facts = [limit(summary.context, "context window"), limit(summary.max_output, "maximum output")].filter(Boolean);
-  const page = fill(await shell.text(), {
-    title: escapeHtml(`${summary.name} at ${provider.name}`),
-    description: escapeHtml(
-      `${summary.name} at ${provider.name} (${summary.ref})${facts.length > 0 ? `: ${facts.join(", ")}` : ""}. Limits, prices and prompt caching as documented and as evaluated, with sources.`,
-    ),
-    canonical: escapeHtml(new URL(entryHref(summary.ref), deps.site).toString()),
-    html: entryHtml({ summary, provider, model: entry as JsonObject, now, imported: deps.meta.upstream.fetched_at.slice(0, 10) }),
+  const shell = await deps.shell();
+  if (!shell) return new Response("Page template unavailable", { status: 503, headers: { "Cache-Control": "no-store" } });
+  const nav = [["/", "Catalog"], ["/providers/", "Providers"], ["/models/", "Models"], ["/evidence/", "Evidence"], ["/docs/api/", "API"], ["/docs/methodology/", "Methodology"]];
+  const html = fillShell(await shell.text(), {
+    title: e(view.title), description: e(view.description), canonical: e(new URL(view.canonical ?? url.pathname, deps.site).toString()), html: view.html,
+    nav: nav.map(([href, label]) => `<a href="${href}"${href === "/" ? path === "/" || path.startsWith("/entr") ? ' aria-current="page"' : "" : `${path}/`.startsWith(href!) || (path === "/docs/licensing" && label === "Methodology") ? ' aria-current="page"' : ""}>${label}</a>`).join(""),
+    dataset: meta ? `<li>Version <code>${e(meta.dataset_version)}</code></li><li>Published ${e(meta.generated_at.slice(0, 10))} ${e(meta.generated_at.slice(11, 16))} UTC</li><li>models.dev imported ${e(meta.upstream.fetched_at.slice(0, 10))}${meta.upstream.commit ? ` (<a href="https://github.com/anomalyco/models.dev/commit/${e(meta.upstream.commit)}"><code>${e(meta.upstream.commit.slice(0, 7))}</code></a>)` : ""}</li>${meta.sync.last_attempt_ok === false ? '<li class="stale">The last import failed. This is the last good snapshot.</li>' : ""}` : '<li>Metadata unavailable</li>',
   });
-  return new Response(request.method === "HEAD" ? null : page, { status: 200, headers });
+  const etag = await representationTag(html);
+  const headers = new Headers({ "Content-Type": "text/html; charset=utf-8", "X-Content-Type-Options": "nosniff", ETag: etag, "Cache-Control": status === 200 ? "public, max-age=300, stale-while-revalidate=3600" : "no-store" });
+  if (meta) { headers.set("X-Dataset-Version", meta.dataset_version); headers.set("X-Dataset-Generated-At", meta.generated_at); }
+  if (status === 200 && etagMatches(request, etag)) return new Response(null, { status: 304, headers });
+  return new Response(request.method === "HEAD" ? null : html, { status, headers });
 }
+
+export { PAGE_SHELL };

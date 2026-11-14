@@ -1,4 +1,4 @@
-// How values are written on the site. Shared by the pages built ahead of time and the code that runs in the browser.
+// How values are written on the site. Shared by server-rendered pages and browser table updates.
 import type { Summary } from "./entries.ts";
 
 /** Our evidence older than this is marked as stale. */

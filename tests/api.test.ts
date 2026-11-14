@@ -5,6 +5,7 @@ import { publish } from "../scripts/lib/publish.ts";
 import { sync } from "../scripts/lib/sync.ts";
 import type { z } from "zod";
 import { handleApi, modelsFor, type ApiDeps } from "../src/core/api.ts";
+import { snapshotAsset } from "../src/core/assets.ts";
 import {
   CanonicalModelDetailSchema,
   CanonicalModelSchema,
@@ -21,7 +22,8 @@ import {
 import { summarize, type Summary } from "../src/core/entries.ts";
 import { entryHref } from "../src/core/format.ts";
 import { ENDPOINTS, openapi } from "../src/core/openapi.ts";
-import { ENTRY_SHELL, handleEntryPage, MARK } from "../src/core/pages.ts";
+import { handlePage } from "../src/core/pages.ts";
+import { MARK } from "../src/core/page-shell.ts";
 import { EVALUATION_PARAMS, PARAMS, parseQuery, runQuery } from "../src/core/query.ts";
 import { canonicalModels, listEvaluations, withoutEntries } from "../src/core/resources.ts";
 import type { Catalog } from "../src/core/schema.ts";
@@ -52,6 +54,35 @@ interface Page {
 }
 
 describe("GET /api/v1/entries", () => {
+  it("streams full exports from gzip assets with unchanged JSON and conditional headers", async () => {
+    const compressedDeps = { ...deps, asset: (path: string) => snapshotAsset(path, async (file) => (await deps.asset(file)) ?? new Response(null, { status: 404 })) };
+    for (const [url, file] of [["/api.json", "/api.json"], ["/api/v1/catalog", "/data/catalog.json"], ["/data/catalog.json", "/data/catalog.json"]]) {
+      const response = await handleApi(new Request(`https://providers.dev${url}`), compressedDeps);
+      expect(response.status).toBe(200);
+      expect(response.headers.get("content-type")).toContain("application/json");
+      expect(await response.text()).toBe(await (await deps.asset(file!))!.text());
+      const etag = response.headers.get("etag")!;
+      expect((await handleApi(new Request(`https://providers.dev${url}`, { headers: { "If-None-Match": etag } }), compressedDeps)).status).toBe(304);
+      expect(await (await handleApi(new Request(`https://providers.dev${url}`, { method: "HEAD" }), compressedDeps)).text()).toBe("");
+    }
+    expect(await snapshotAsset("/api.json", async () => new Response(null, { status: 404 }))).toBeNull();
+  });
+
+  it("returns the same pricing and controls on entry, provider, model and catalog routes", async () => {
+    const detail = one(EntryDetailSchema).parse(await json("/api/v1/entries/provider-02/lab/model-4"));
+    const expected = detail.data.entry.providers_dev;
+    const collection = pageOf(EntrySummarySchema).parse(await json("/api/v1/entries?provider=provider-02"));
+    const provider = one(ProviderDetailSchema).parse(await json("/api/v1/providers/provider-02?view=full"));
+    const model = one(CanonicalModelDetailSchema).parse(await json("/api/v1/models/lab/model-4"));
+    const catalog = await json<{ providers: Catalog }>("/api/v1/catalog");
+    for (const summary of [detail.data.summary, collection.data.find((entry) => entry.ref === detail.data.summary.ref)!, provider.data.entries.find((entry) => entry.ref === detail.data.summary.ref)!, model.data.entries.find((entry) => entry.ref === detail.data.summary.ref)!]) {
+      expect(summary.pricing).toEqual(expected.pricing);
+      expect(summary.request_controls).toEqual(expected.request_controls);
+    }
+    expect(provider.data.models?.["lab/model-4"]?.providers_dev.pricing).toEqual(expected.pricing);
+    expect(catalog.providers["provider-02"]!.models["lab/model-4"]!.providers_dev).toMatchObject({ pricing: expected.pricing, request_controls: expected.request_controls });
+  });
+
   it("pages through every entry once, in a fixed order", async () => {
     const seen: string[] = [];
     let offset: number | null = 0;
@@ -98,9 +129,8 @@ describe("GET /api/v1/entries", () => {
     // Every entry of the fixture has a date except the added one, which takes its date from the entry it names.
     const all = await get("/api/v1/entries?max_age_months=600&limit=1");
     expect(((await all.json()) as Page).total).toBe(601);
-    // The answer depends on the day, so the day is in its ETag; without the filter it is the dataset version alone.
-    const today = new Date().toISOString().slice(0, 10);
-    expect(all.headers.get("ETag")).toMatch(new RegExp(`^"[0-9a-f]+-${today}"$`));
+    // Validators cover the actual representation, including date-relative results.
+    expect(all.headers.get("ETag")).toMatch(/^"[0-9a-f]{64}"$/);
     expect((await get("/api/v1/entries?limit=1")).headers.get("ETag")).toMatch(/^"[0-9a-f]+"$/);
     expect((await get("/api/v1/entries?max_age_months=600&limit=1", { headers: { "If-None-Match": all.headers.get("ETag") ?? "" } })).status).toBe(304);
   });
@@ -247,11 +277,12 @@ describe("HTTP behaviour", () => {
   it("answers 304 to a matching If-None-Match and sends freshness headers", async () => {
     const first = await get("/api/v1/entries");
     const etag = first.headers.get("ETag")!;
-    expect(etag).toBe(`"${deps.meta.dataset_version}"`);
+    expect(etag).toMatch(/^"[0-9a-f]{64}"$/);
     expect(first.headers.get("X-Dataset-Version")).toBe(deps.meta.dataset_version);
     expect(first.headers.get("Cache-Control")).toContain("max-age=300");
     for (const path of ["/api/v1/entries", "/api/v1/catalog", "/api/v1/entries/provider-02/lab/model-4", "/api/v1/providers/provider-01", "/api/v1/models", "/api/v1/evaluations"]) {
-      const second = await get(path, { headers: { "If-None-Match": `W/${etag}, "other"` } });
+      const tag = (await get(path)).headers.get("ETag");
+      const second = await get(path, { headers: { "If-None-Match": `W/${tag}, "other"` } });
       expect(second.status, path).toBe(304);
       expect(await second.text()).toBe("");
     }
@@ -279,9 +310,13 @@ describe("HTTP behaviour", () => {
     expect(query("/api/v1/evaluations")).toEqual(EVALUATION_PARAMS.map((param) => param.name));
     // No reference in the document points at nothing.
     const text = JSON.stringify(document);
-    for (const [, name] of text.matchAll(/"\$ref":"#\/components\/schemas\/([^"]+)"/g)) expect(document.components.schemas[name as string], name).toBeDefined();
+    for (const [, path] of text.matchAll(/"\$ref":"#\/([^"]+)"/g)) {
+      const target = path!.split("/").reduce<unknown>((node, key) => (node as Record<string, unknown> | undefined)?.[key.replaceAll("~1", "/").replaceAll("~0", "~")], document);
+      expect(target, path).toBeDefined();
+    }
     expect(text).not.toContain("#/$defs/");
     const example: Record<string, string> = {
+      "/api/v1/docs/{document}": "/api/v1/docs/methodology",
       "/api/v1/entries/{provider}/{model}": "/api/v1/entries/provider-02/model-1",
       "/api/v1/providers/{provider}": "/api/v1/providers/provider-02",
       "/api/v1/models/{lab}/{model}": "/api/v1/models/lab/model-1",
@@ -334,12 +369,12 @@ describe("the contract", () => {
 
 describe("entry pages", () => {
   const shell = `<html><head><title>${MARK.title} · providers.dev</title><meta name="description" content="${MARK.description}"><link rel="canonical" href="${MARK.canonical}"></head><body><div id="entry">${MARK.html}</div></body></html>`;
-  const page = (path: string, init?: RequestInit): Promise<Response> =>
-    handleEntryPage(new Request(`https://providers.dev${path}`, init), {
-      ...deps,
+  const page = (path: string, init?: RequestInit, pageShell = shell, index = deps.index): Promise<Response> =>
+    handlePage(new Request(`https://providers.dev${path}`, init), {
+      api: (path) => handleApi(new Request(`https://providers.dev${path}`), { ...deps, index }),
       site: "https://providers.dev",
       now: () => new Date("2026-11-13T12:00:00Z"),
-      asset: async (file) => (file === ENTRY_SHELL ? new Response(shell) : file === "/404.html" ? new Response("<h1>Not found</h1>") : deps.asset(file)),
+      shell: async () => new Response(pageShell),
     });
 
   it("gives every entry its own page, title, description and canonical address", async () => {
@@ -351,7 +386,7 @@ describe("entry pages", () => {
     expect(html).toContain('<link rel="canonical" href="https://providers.dev/entries/provider-02/lab/model-4">');
     expect(html).toContain("context window 500,000 tokens");
     expect(html).toContain("<h1>Model 4</h1>");
-    expect(html).not.toContain("%%ENTRY");
+    expect(html).not.toContain("%%PAGE");
     // The page is the API's entry, drawn: the address of the same entry in the API is on it.
     expect(html).toContain("/api/v1/entries/provider-02/lab/model-4");
     const again = await page("/entries/provider-02/lab/model-4", { headers: { "If-None-Match": response.headers.get("ETag") ?? "" } });
@@ -367,6 +402,27 @@ describe("entry pages", () => {
     expect((await page("/entry/")).status).toBe(404);
     expect((await page("/entries/provider-02/lab/model-4", { method: "POST" })).status).toBe(405);
   });
+
+  it("invalidates cached HTML when the shell or rendered content changes without a dataset change", async () => {
+    const path = "/entries/provider-02/lab/model-4";
+    const first = await page(path);
+    const tag = first.headers.get("ETag")!;
+    const changedShell = shell.replace("</head>", '<link rel="stylesheet" href="/new-build.css"></head>');
+    const rebuilt = await page(path, { headers: { "If-None-Match": tag } }, changedShell);
+    expect(rebuilt.status).toBe(200);
+    expect(rebuilt.headers.get("ETag")).not.toBe(tag);
+    expect(await rebuilt.text()).toContain("/new-build.css");
+    const index = structuredClone(deps.index);
+    index.entries.find((entry) => entry.ref === "provider-02/lab/model-4")!.name = "New presentation";
+    const rendered = await page(path, { headers: { "If-None-Match": tag } }, shell, index);
+    expect(rendered.status).toBe(200);
+    expect(rendered.headers.get("ETag")).not.toBe(tag);
+    expect(await rendered.text()).toContain("New presentation");
+    const head = await page(path, { method: "HEAD" });
+    expect(head.headers.get("ETag")).toBe(tag);
+    expect(await head.text()).toBe("");
+    expect((await page(path, { headers: { "If-None-Match": `W/${tag}` } })).status).toBe(304);
+  });
 });
 
 describe("one dataset for the website and the API", () => {
@@ -374,7 +430,7 @@ describe("one dataset for the website and the API", () => {
     const local = depsFrom(dir);
     const exported = JSON.parse(readFileSync(join(dir, "site", "api.json"), "utf8")) as Catalog;
     const browserIndex = JSON.parse(readFileSync(join(dir, "site", "data", "index.json"), "utf8"));
-    // The index the website downloads is the index the Worker answers from.
+    // The internal snapshot index is the index the API answers from.
     expect(browserIndex).toEqual(local.index);
     // Every summary is exactly what the compatibility export says about that entry.
     const refs = new Set<string>();
@@ -389,7 +445,7 @@ describe("one dataset for the website and the API", () => {
 
   it("holds for the fixture", async () => {
     check(published);
-    // What the website computes in the browser is what the API returns for the same URL parameters.
+    // The API uses the shared query engine for these parameters.
     const params = new URLSearchParams("min_context=500000&cache=yes&sort=context&order=desc&limit=7&offset=3");
     const parsed = parseQuery(params, false);
     expect(parsed.ok).toBe(true);

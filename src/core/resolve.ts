@@ -1,10 +1,12 @@
 // resolve(): upstream snapshot + our additions + our overrides + our measurements -> the published catalog.
 // Pure: no files, no network, no clock. The same inputs always give the same output.
-import { cacheResult, lifetimeAsked, profileOf, retentionOf, summarizeCache, type CacheEvaluation } from "./cache.ts";
+import { cacheResult, documentedCache, lifetimeAsked, profileOf, retentionOf, summarizeCache, type CacheEvaluation, type CacheRetention, type RetentionEvidence } from "./cache.ts";
 import { clone, isObject, mergePatch, type Change, type Json, type JsonObject } from "./merge.ts";
+import { controlsOf, pricingOf, retentionFromControl } from "./policies.ts";
 import {
   NS,
   type AccessRules,
+  type AuthoredModel,
   type AuthoredProvider,
   type Catalog,
   type Evidence,
@@ -96,6 +98,9 @@ export function resolve(input: ResolveInput): ResolveResult {
   const issues: Issue[] = [];
   const exclusions: Exclusion[] = [];
   const catalog: Catalog = {};
+  const retentionDeclarations = new Map<PublishedModel, CacheRetention>();
+  const pricingDeclarations = new Map<PublishedModel, NonNullable<AuthoredModel["pricing"]>>();
+  const controlDeclarations = new Map<PublishedModel, NonNullable<AuthoredModel["request_controls"]>>();
 
   // 1. The upstream baseline, untouched except for our namespaced block.
   for (const [id, upstream] of Object.entries(input.upstream)) {
@@ -174,6 +179,9 @@ export function resolve(input: ResolveInput): ResolveResult {
       if (authored.inherits) inherit(model, authored.inherits, target);
       if (!model.name) model.name = authored.id;
       provider.models[authored.id] = model;
+      if (authored.cache_retention) retentionDeclarations.set(model, authored.cache_retention);
+      if (authored.pricing) pricingDeclarations.set(model, authored.pricing);
+      if (authored.request_controls) controlDeclarations.set(model, authored.request_controls);
     }
   }
 
@@ -267,6 +275,9 @@ export function resolve(input: ResolveInput): ResolveResult {
           exclusions.push({ target, reason: rule.reason, evidence: rule.evidence });
           continue;
         }
+        if (rule.cache_retention) retentionDeclarations.set(model, rule.cache_retention);
+        if (rule.pricing) pricingDeclarations.set(model, rule.pricing);
+        if (rule.request_controls) controlDeclarations.set(model, [...new Map([...(controlDeclarations.get(model) ?? []), ...rule.request_controls].map((control) => [control.id, control])).values()]);
         if (!rule.set) continue;
         const reserved = Object.keys(rule.set).filter((key) => RESERVED.has(key));
         if (reserved.length > 0) {
@@ -276,6 +287,12 @@ export function resolve(input: ResolveInput): ResolveResult {
         applyPatch(model, rule.set as JsonObject, rule.reason, rule.evidence, target, modelExt(model), issues);
       }
     }
+  }
+
+  // A richer cache control is also the source for the legacy cache representation and evaluation profiles.
+  for (const [model, controls] of controlDeclarations) {
+    const cache = controls.find((control) => control.id === "cache.retention");
+    if (cache) retentionDeclarations.set(model, retentionFromControl(cache));
   }
 
   // 5. Measurements land on the entry they were taken on. They never replace a documented value.
@@ -334,6 +351,10 @@ export function resolve(input: ResolveInput): ResolveResult {
       const note = publicNote(run.note);
       const settings = (run.options ?? {}) as JsonObject;
       const asked = lifetimeAsked(settings);
+      const declared = retentionDeclarations.get(model);
+      const declaredProfile = (!asked || declared?.parameter?.name === asked.parameter)
+        ? declared?.profiles.find((profile) => profile.value === (asked?.value ?? null))?.profile
+        : undefined;
       const evaluation: CacheEvaluation = {
         id: run.id,
         route: run.route,
@@ -341,7 +362,7 @@ export function resolve(input: ResolveInput): ResolveResult {
         ...clientOf(run.client),
         date: run.date,
         request_settings: settings,
-        retention_profile: profileOf(asked?.value ?? null, model),
+        retention_profile: declaredProfile ?? profileOf(asked?.value ?? null, model),
         parameter: asked?.parameter ?? null,
         value: asked?.value ?? null,
         // One result per exact age, the control first. An age with no check made has no result.
@@ -421,7 +442,34 @@ export function resolve(input: ResolveInput): ResolveResult {
       // Every entry gets the same cache record: what a request can ask for, the summary table, and the evaluations
       // under it. The sums and percentages are made here, once; pages and API answers only pass them on.
       const own = (evaluations.get(model) ?? []).sort((a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id));
-      extension.cache = { retention: retentionOf(model, own, input.upstreamDate ?? null), results: summarizeCache(own), evaluations: own };
+      const declaration = retentionDeclarations.get(model);
+      const documented = documentedCache(model);
+      const cacheSources = [
+        ...(extension.origin === "added" ? extension.evidence ?? [] : []),
+        ...(extension.provenance ?? []).filter((change) => change.path === "capabilities" || change.path === "capabilities.cache" || change.path.startsWith("capabilities.cache.")).flatMap((change) => change.evidence),
+      ];
+      const cacheEvidence: RetentionEvidence[] = cacheSources.flatMap((source) => source.kind === "listed" ? [] : [{ ...source, kind: source.kind, note: source.note ?? "Source for this entry's cache capabilities." }]);
+      if (extension.origin === "upstream") cacheEvidence.unshift({ kind: "documented", url: "https://models.dev", date: input.upstreamDate ?? null, note: "Cache capabilities imported from models.dev; any corrections are recorded in provenance." });
+      extension.cache = { documented, retention: retentionOf(documented, cacheEvidence, declaration), results: summarizeCache(own), evaluations: own };
+      const sourcesFor = (field: string): RetentionEvidence[] => {
+        const inheritedSource = extension.inherited?.fields.includes(field) ? lookup(extension.inherited.from) : undefined;
+        const sourceExtension = inheritedSource ? modelExt(inheritedSource) : extension;
+        const sources: RetentionEvidence[] = [
+          ...(sourceExtension.origin === "added" ? sourceExtension.evidence ?? [] : []),
+          ...(sourceExtension.provenance ?? []).filter((change) => change.path === field || change.path.startsWith(`${field}.`) || field.startsWith(`${change.path}.`)).flatMap((change) => change.evidence),
+        ].flatMap((source) => source.kind === "listed" ? [] : [{ ...source, kind: source.kind, note: source.note ?? `Source for ${field}.` }]);
+        if (sourceExtension.origin === "upstream") sources.unshift({ kind: "documented", url: "https://models.dev", date: input.upstreamDate ?? null, note: `Imported ${field}; corrections and inheritance are recorded in providers_dev.` });
+        return sources;
+      };
+      const priceReference = extension.inherited?.fields.includes("cost") ? extension.inherited.from : null;
+      const priceSource = priceReference ? lookup(priceReference) : undefined;
+      const sourceDeclaration = priceSource ? pricingDeclarations.get(priceSource) : undefined;
+      const priceDeclaration = pricingDeclarations.get(model) ?? (sourceDeclaration ? { ...sourceDeclaration, billing: "reference" as const, reference_ref: priceReference } : undefined);
+      extension.pricing = pricingOf(model, extension.access, priceReference, sourcesFor("cost"), priceDeclaration);
+      extension.request_controls = controlsOf(model, extension.cache.retention, sourcesFor("capabilities"), controlDeclarations.get(model));
+      if (declaration) extension.evidence = [...(extension.evidence ?? []), ...declaration.evidence.flatMap((source) => source.date === null ? [] : [{ ...source, date: source.date }])];
+      const policyEvidence = [...(pricingDeclarations.get(model)?.evidence ?? []), ...(controlDeclarations.get(model) ?? []).flatMap((control) => control.evidence)];
+      if (policyEvidence.length > 0) extension.evidence = [...(extension.evidence ?? []), ...policyEvidence.flatMap((source) => source.date === null ? [] : [{ ...source, date: source.date }])];
       const verified = newestDate([
         ...(extension.evidence ?? []).map((e) => e.date),
         ...(extension.provenance ?? []).flatMap((p) => p.evidence.map((e) => e.date)),
@@ -480,6 +528,7 @@ export function isOurs(model: JsonObject): boolean {
   return (
     extension.origin === "added" ||
     Boolean(extension.provenance?.length) ||
+    Boolean(extension.evidence?.length) ||
     Boolean(extension.cache?.evaluations.length) ||
     Boolean(extension.limits?.measured?.length)
   );

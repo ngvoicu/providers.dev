@@ -29,7 +29,8 @@ npm run build     # resolve the dataset and build the site into dist/
 npm run preview   # http://localhost:8787 : the site and the API, as on Cloudflare
 ```
 
-`npm run dev` starts Astro's dev server for working on pages (the `/api/v1/*` endpoints need `npm run preview`).
+`npm run dev` builds and starts Wrangler locally. All public routes require the Worker.
+After editing templates, run `npm run build:site`; Wrangler serves the new assets.
 `npm run check` runs ESLint, the type checks and the tests.
 
 The repository already holds an imported snapshot, so `npm run build` works without `npm run sync`.
@@ -45,8 +46,10 @@ data/authored/    our providers, overrides and rules      written by people
         ▼  npm run data   (src/core/resolve.ts: deterministic, no network)
 data/published/   the resolved snapshot                   not in git
         │
-        ├─▶ the website (built from it)
-        └─▶ the API and /api.json (served from it)
+        ▼  npm run stage
+versioned snapshot + current.json
+        ▼
+public API responses ──▶ HTML pages rendered on request
 ```
 
 The published dataset is always `upstream + our additions + our overrides`, computed from scratch. Nothing is
@@ -238,15 +241,84 @@ console.log(data.entry.limit, data.entry.providers_dev.cache.retention, data.ent
 
 `src/core/contract.ts` defines the shape of everything the API returns. The OpenAPI document and the field tables of
 `/docs/api/` are generated from it, and the tests check every published object against it (all entries, all
-providers, every list). The pages are built from the same objects the API returns: a page formats a value and works
-out nothing of its own.
+providers, every list). Every public page consumes serialized API responses through the same HTTP handler used by
+external callers. The page layer has no index, catalog or filesystem access. Filtering and aggregation belong to
+the API; the website formats its response. The homepage sends searches to `/api/v1/entries` instead of downloading
+the entire index. Provider and model lists use API search and pagination, including without JavaScript.
 
 Cache evaluations are published as counts and percentages at exact ages (`cache_results` of a summary,
 `providers_dev.cache` of an entry): one line per retention setting, short before long, the control ("at once") first.
 `null` means not evaluated, never 0 %. The sums are made once, in `src/core/cache.ts`, when the data is built.
 
-Every answer has an `ETag` (the dataset version), `X-Dataset-Version`, `X-Dataset-Generated-At` and
+`providers_dev.cache.documented` publishes a support state and details for each cache mode. Its compact support
+states are also in `cache_mode_support` on summaries. Pages render these states directly: an absent mode remains
+unknown. Known prices, capabilities and API endpoint fields are described in OpenAPI, while additional upstream
+fields are preserved.
+
+Retention parameters require explicit evidence. Requested settings remain in evaluations, but sending a setting
+or receiving a cache hit never promotes it to a supported parameter. Add a `cache_retention` declaration to an
+authored model or an override rule when a source confirms the parameter, values and any restrictions. The fields
+match the public retention record; evidence needs a URL, date and a note explaining the confirmation. For example
+(placeholder provider and documentation):
+
+```yaml
+provider: example-provider
+rules:
+  - models: [example-model]
+    reason: Document the confirmed retention parameter
+    evidence:
+      - { kind: documented, url: "https://example.com/cache", date: "2026-11-14" }
+    cache_retention:
+      support: supported
+      parameter: { name: retention, location: Request body }
+      accepted_values: [5m, 1h]
+      default: 5m
+      profiles:
+        - { profile: short, value: 5m }
+        - { profile: long, value: 1h }
+      conditions: []
+      evidence:
+        - kind: documented
+          url: https://example.com/cache
+          date: "2026-11-14"
+          note: The documentation confirms this request field and its allowed values.
+```
+
+Declarations apply only to their named entries and are never inherited by another access method.
+
+`pricing` and `request_controls` are present on every summary and under `providers_dev` on every full entry. They
+are normalized once in `src/core/policies.ts`, including entries nested in provider, canonical-model and catalog
+responses. The website renders these objects. `price_in` and `price_out` remain base rates per million tokens;
+conditional prices are in `pricing.rules`. Original source fields are preserved.
+
+The shared contract is in `src/core/policy-contract.ts`. It covers context thresholds, cache lifetimes, service
+tiers, region/date conditions, nested AND/OR/NOT conditions, rates and multipliers, and body/header/query bindings.
+Unknown source shapes remain in `unparsed` or an unknown condition. Imported records have partial coverage;
+absence of a rule never proves a flat price. Null rule ordering, units or applicability must not be guessed when
+calculating a bill. Subscription reference rates identify their source entry and are not a subscription price.
+
+An authored model or override rule may contain `pricing` (the complete normalized object) and `request_controls`
+(an array of control declarations). Each declaration needs dated source evidence with a confirmation note.
+Control declarations merge by semantic id and apply only to named entries. A `cache.retention` control is also
+projected into the older cache-retention fields; use this richer declaration for new records with endpoint
+conditions, structured bindings or companion headers. Do not maintain two competing cache declarations.
+
+`src/core/policy-examples.ts` contains validated, fictional examples used by `/docs/api/` and OpenAPI. They are
+documentation fixtures, never provider data. The public documentation explains coverage, null/default semantics,
+exact threshold boundaries, whole-usage versus marginal rates, and rule ordering.
+
+Measured-limit pages show numeric fields and their source links. Free-text evaluation notes remain in the API
+and raw evidence, not in the main results table.
+
+Full catalog exports are stored as gzip assets and streamed through the Worker at their existing JSON URLs.
+Staging excludes uncompressed copies from upload; they remain in `data/published/site/` for validation.
+This keeps the expanded catalog within static-asset limits without loading the entire export in Worker memory.
+
+Every successful versioned API answer has an opaque representation `ETag`, `X-Dataset-Version`, `X-Dataset-Generated-At` and
 `X-Upstream-Fetched-At`. Errors are always `{ "error": { "code", "message", "details"? } }`.
+ETags cover response metadata as well as content. Reuse a validator only for the same URL. HTML validators
+include the rendered page, so a template, stylesheet or metadata change invalidates cached pages even when the
+catalog hash is unchanged.
 
 `v1` is the version of this API. The model fields follow the models.dev **v2** schema, which is experimental
 upstream; `/api/v1/meta` reports it as `upstream_schema`.
@@ -256,8 +328,10 @@ and model has an extra `providers_dev` key, and entries we add can lack fields t
 
 ## Deploying to Cloudflare
 
-The site is static files plus one small Worker (`wrangler.jsonc`) for the API (`/api/v1/*`) and the entry pages
-(`/entries/{provider}/{model}`), which it renders on request from the same objects the API returns.
+The Worker (`wrangler.jsonc`) serves the API and renders every public HTML route from API responses. Astro
+compiles one shared shell with CSS and scripts, plus authored methodology/licensing documents. It does not
+enumerate entries, providers or models. `/docs/api/` renders the actual `/api/v1/openapi.json` response, including
+its guide, parameters, schemas and examples. Authored text is also public through `/api/v1/docs/{document}`.
 
 1. `npx wrangler login`
 2. `npm run build`
@@ -272,9 +346,28 @@ For the custom domain, add the zone to Cloudflare and then, in `wrangler.jsonc`:
 For the scheduled workflow, add the repository secrets `CLOUDFLARE_API_TOKEN` (a token that can edit Workers) and
 `CLOUDFLARE_ACCOUNT_ID`. Without them the workflow builds and tests but does not deploy.
 
-A deployment replaces the whole site at once, and a failed build deploys nothing, so visitors always see one
-complete snapshot. The other pages, `/api.json` and `/data/*` are static assets; `/api/v1/*` and `/entries/*` use
-Worker requests, and their answers may be cached for five minutes.
+A deployment publishes the Worker and assets together. Each request reads `current.json` and pins its API calls
+and data files to one immutable snapshot directory. The parsed index is cached by publication id, not bundled in
+the Worker. A publication id includes all metadata, including its generated timestamp. No public request imports
+upstream data. The preceding local publication is retained for requests already using it.
+
+To refresh data after the initial template build:
+
+```sh
+npm run refresh:data  # resolve and stage into public/ and dist/; no Astro/template build
+npm run deploy        # publish the prepared assets when ready
+```
+
+To rebuild templates without resolving the dataset, use `npm run build:site`. A full `npm run build` still does
+both. Data refreshes update the API, page content, filter options and footer together. Existing client/HTTP caches
+can retain responses for the advertised cache period (300 seconds, with stale revalidation up to 3600 seconds).
+A browser filter response from a new publication triggers a page reload so its counts and footer stay consistent.
+No model/provider HTML files are generated or maintained individually.
+
+`/api/v1/facets` exposes catalog filter options and counts. `/api/v1/corrections` exposes grouped corrections and
+their entry references. Evidence pages use those responses and independently paginated cache/limit evaluations.
+The scheduled workflow currently runs the full build on clean CI checkouts; local data refreshes can reuse built
+templates. Production still needs a publication/deployment step; editing a local source file does not update it.
 
 ## Licensing
 

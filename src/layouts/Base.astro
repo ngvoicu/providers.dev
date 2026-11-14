@@ -1,7 +1,7 @@
 ---
 import "../styles/global.css";
 import Mark from "../components/Mark.astro";
-import { meta, shortDate } from "../lib/data.ts";
+import { MARK } from "../core/page-shell.ts";
 
 interface Props {
   title: string;
@@ -11,14 +11,6 @@ interface Props {
 }
 const { title, description = "A reference for AI models as each provider and access method actually exposes them: context, output and prompt-cache behaviour, with sources.", canonical } = Astro.props;
 const path = Astro.url.pathname;
-const nav = [
-  { href: "/", label: "Catalog", match: (p: string) => p === "/" || p.startsWith("/entry") },
-  { href: "/providers/", label: "Providers", match: (p: string) => p.startsWith("/providers") },
-  { href: "/models/", label: "Models", match: (p: string) => p.startsWith("/models") },
-  { href: "/evidence/", label: "Evidence", match: (p: string) => p.startsWith("/evidence") },
-  { href: "/docs/api/", label: "API", match: (p: string) => p.startsWith("/docs/api") },
-  { href: "/docs/methodology/", label: "Methodology", match: (p: string) => p.startsWith("/docs/methodology") || p.startsWith("/docs/licensing") },
-];
 const full = title === "providers.dev" ? "providers.dev · AI models as each provider exposes them" : `${title} · providers.dev`;
 ---
 
@@ -58,7 +50,7 @@ const full = title === "providers.dev" ? "providers.dev · AI models as each pro
           <span>providers<span class="text-muted">.dev</span></span>
         </a>
         <nav aria-label="Main" class="nav order-3 -mx-1 flex w-full gap-x-1 overflow-x-auto sm:order-none sm:mx-0 sm:w-auto sm:flex-1">
-          {nav.map((item) => <a href={item.href} aria-current={item.match(path) ? "page" : undefined}>{item.label}</a>)}
+          <Fragment set:html={MARK.nav} />
         </nav>
         <div class="ml-auto flex items-center gap-2">
           <a class="button hidden !h-[2.1rem] sm:inline-flex" href="/api.json"><code>/api.json</code></a>
@@ -88,14 +80,7 @@ const full = title === "providers.dev" ? "providers.dev · AI models as each pro
         </div>
         <div>
           <h2>Dataset</h2>
-          <ul class="space-y-1">
-            <li>Version <code>{meta.dataset_version}</code></li>
-            <li>Published {shortDate(meta.generated_at)}</li>
-            <li>
-              models.dev imported {shortDate(meta.upstream.fetched_at)}{meta.upstream.commit && <> (<a href={`https://github.com/anomalyco/models.dev/commit/${meta.upstream.commit}`}><code>{meta.upstream.commit.slice(0, 7)}</code></a>)</>}
-            </li>
-            {meta.sync.last_attempt_ok === false && <li class="stale">The last import failed. This is the last good snapshot.</li>}
-          </ul>
+          <ul class="space-y-1" set:html={MARK.dataset} />
         </div>
         <div>
           <h2>Reference</h2>

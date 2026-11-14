@@ -1,8 +1,7 @@
 ---
-import Doc from "../../layouts/Doc.astro";
-import { exact, STALE_AFTER_DAYS } from "../../core/format.ts";
-import { IDENTITY_FIELDS } from "../../core/resolve.ts";
-import { meta } from "../../lib/data.ts";
+import Doc from "../../../layouts/Doc.astro";
+import { STALE_AFTER_DAYS } from "../../../core/format.ts";
+import { IDENTITY_FIELDS } from "../../../core/resolve.ts";
 ---
 
 <Doc
@@ -127,11 +126,7 @@ import { meta } from "../../lib/data.ts";
       must match their keys, and it must not be empty or have lost a large share of its entries since the previous import. If validation fails or models.dev is unavailable, the previous
       snapshot stays in place and keeps being served; the footer and <code>/api/v1/meta</code> report the failed import. Visitors and API requests never trigger a fetch.
     </p>
-    <p>
-      This dataset: {exact(meta.upstream.providers)} providers and {exact(meta.upstream.models)} entries imported from <code>{meta.upstream.source}</code> on {meta.upstream.fetched_at.slice(0, 10)}{
-        meta.upstream.commit && <>, at models.dev commit <code>{meta.upstream.commit.slice(0, 7)}</code></>
-      }.
-    </p>
+    <p>The current import, source commit and counts are published at <a href="/api/v1/meta"><code>/api/v1/meta</code></a>.</p>
 
     <h2 id="caching">Documented caching</h2>
     <ul>
@@ -139,11 +134,11 @@ import { meta } from "../../lib/data.ts";
       <li><strong>Manual</strong> (<code>explicit</code>): nothing is cached unless the request marks what to cache. The mark also picks the lifetime, where there is a choice.</li>
       <li>
         The box after the word holds the lifetimes the provider documents for that way of caching. "Manual <span class="cache-box">5 min, 1 h</span>" means a request must mark what to
-        cache and can ask for either lifetime. A box that says <span class="cache-box none">Unknown</span> means the source gives no lifetime, which is not the same as a short one.
+        cache, and the source lists those lifetimes. The request parameter and accepted values are recorded separately under Retention. A box that says <span class="cache-box none">Unknown</span> means the source gives no lifetime.
       </li>
       <li>An entry can have both: it caches by itself, and a request can also mark parts. Then each has its own line.</li>
     </ul>
-    <p>The pages use the plain words; the data and the API keep the names models.dev uses.</p>
+    <p>The pages render <code>providers_dev.cache.documented</code>. An omitted mode remains unknown; only an explicit negative makes it unsupported.</p>
 
     <h2 id="evaluations">Cache evaluations</h2>
     <p>
@@ -172,8 +167,8 @@ import { meta } from "../../lib/data.ts";
     <p>
       Both lines are there on every evaluated entry. A line with no measurement says <em>Not evaluated</em>; that is not 0 %, and it says nothing about whether the provider accepts a
       lifetime. What a request can ask for is a separate record, <em>Retention</em>, on every entry's page: whether a lifetime is accepted, the request field, the accepted values and which
-      value gives which line, each from documentation or from an evaluation that sent it. "Supported" there means the value is accepted; the lifetime the provider then gives is what the
-      lines show.
+      value gives which line. Parameter support requires a sourced declaration that identifies the parameter and confirms it was recognized. Sending a value, receiving a cache hit, or
+      listing multiple documented lifetimes is not enough. Requested settings stay visible in evaluations even when support is unknown. The results show observed behavior, not a guaranteed lifetime.
     </p>
     <p>
       A line adds up every evaluation of the entry with that retention setting, from every client. One evaluation has only a few re-sends per age, so a single miss moves it a lot, and the
@@ -187,7 +182,7 @@ import { meta } from "../../lib/data.ts";
     <p>
       Each evaluation names the access method it was taken on and the client that sent the requests: straight to the provider, through{" "}
       <a href="https://github.com/router-for-me/CLIProxyAPI" rel="noopener">CLIProxyAPI</a> (an open-source proxy, and for a subscription login often the only way in besides the
-      vendor's own tool), or through the vendor's own command-line tool. A result holds for that combination on that date. The probe is <a href={meta.measurements?.repository}>open source</a>, and every evaluation links to its raw result.
+      vendor's own tool), or through the vendor's own command-line tool. A result holds for that combination on that date. The evaluation source repository is listed in <a href="/api/v1/meta"><code>/api/v1/meta</code></a>, and every evaluation links to its raw result.
     </p>
 
     <h2 id="stale">Dates and staleness</h2>

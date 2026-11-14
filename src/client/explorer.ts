@@ -1,8 +1,8 @@
-// The catalog table. It downloads the same index the API answers from and runs the same query code,
-// and it keeps the filters in the URL so a view can be shared.
-import type { Index } from "../core/entries.ts";
-import { exact, importDate } from "../core/format.ts";
-import { parseQuery, runQuery, serializeQuery, SITE_DEFAULT, utcToday, type Query, type SortKey } from "../core/query.ts";
+// Enhance the server-rendered table. Every filter and sort is answered by the public API.
+import type { Summary } from "../core/entries.ts";
+import type { Envelope } from "../core/catalog-view.ts";
+import { exact } from "../core/format.ts";
+import { parseQuery, serializeQuery, SITE_DEFAULT, type Query, type SortKey } from "../core/query.ts";
 import { rowHtml, tableHead } from "../core/render.ts";
 
 const form = document.getElementById("filters") as HTMLFormElement;
@@ -11,8 +11,8 @@ const head = document.getElementById("head") as HTMLElement;
 const rows = document.getElementById("rows") as HTMLElement;
 const count = document.getElementById("count") as HTMLElement;
 const page = document.getElementById("page") as HTMLElement;
-const prev = document.getElementById("prev") as HTMLButtonElement;
-const next = document.getElementById("next") as HTMLButtonElement;
+const prev = document.getElementById("prev") as HTMLAnchorElement;
+const next = document.getElementById("next") as HTMLAnchorElement;
 const empty = document.getElementById("empty") as HTMLElement;
 const failed = document.getElementById("failed") as HTMLElement;
 const apiLink = document.getElementById("api-link") as HTMLAnchorElement;
@@ -21,8 +21,8 @@ const now = new Date(table.dataset.now ?? Date.now());
 
 const FIELDS = ["q", "provider", "access", "type", "cache", "cache_mode", "origin", "min_context", "min_output", "max_age_months", "evaluated"] as const;
 
-let index: Index | undefined;
-let providerNames: Record<string, string> = {};
+const providerNames = Object.fromEntries([...document.querySelectorAll<HTMLOptionElement>("#provider-ids option")].map((option) => [option.value, option.textContent ?? option.value]));
+let active: AbortController | undefined;
 let query: Query = readUrl();
 
 const siteDefault = (): Query => {
@@ -34,7 +34,7 @@ const siteDefault = (): Query => {
 function readUrl(): Query {
   const params = new URLSearchParams(location.search);
   // Without a sort in the address, the site's own order applies (our evidence first).
-  if (!params.has("sort")) for (const [name, value] of new URLSearchParams(SITE_DEFAULT)) params.set(name, value);
+  if (!params.has("sort")) for (const [name, value] of new URLSearchParams(SITE_DEFAULT)) if (!params.has(name)) params.set(name, value);
   let parsed = parseQuery(params, false);
   if (!parsed.ok) {
     // A shared link with a bad value still opens: the bad parameters are dropped.
@@ -68,15 +68,16 @@ function fillForm(): void {
     const value = query[name];
     const text = value === undefined ? "" : Array.isArray(value) ? value.join(",") : String(value);
     // A shared link may carry a number of months the list does not offer: it gets its own option.
-    if (name === "max_age_months" && element instanceof HTMLSelectElement && text && ![...element.options].some((option) => option.value === text)) {
-      element.add(new Option(`Last ${text} months`, text));
+    if (element instanceof HTMLSelectElement && text && ![...element.options].some((option) => option.value === text)) {
+      element.add(new Option(name === "max_age_months" ? `Last ${text} months` : text, text));
     }
     element.value = text;
   }
 }
 
 function readForm(): void {
-  const params = new URLSearchParams();
+  const params = new URLSearchParams(serializeQuery(query));
+  for (const name of FIELDS) params.delete(name);
   for (const name of FIELDS) {
     let value = control(name)?.value.trim() ?? "";
     // "200,000" and "200 000" are accepted in the two number fields.
@@ -85,6 +86,7 @@ function readForm(): void {
   }
   params.set("sort", query.sort);
   params.set("order", query.order);
+  params.set("limit", String(query.limit));
   const parsed = parseQuery(params, false);
   for (const name of FIELDS) control(name)?.removeAttribute("aria-invalid");
   if (!parsed.ok) {
@@ -99,34 +101,63 @@ function readForm(): void {
   query = parsed.query;
 }
 
-function render(): void {
+async function render(): Promise<void> {
+  active?.abort();
+  const request = new AbortController();
+  active = request;
   const search = serializeQuery(query);
   const address = siteSearch();
   history.replaceState(null, "", address ? `?${address}` : location.pathname);
   const api = `/api/v1/entries${search ? `?${search}` : ""}`;
   apiLink.href = api;
-  apiLink.innerHTML = `<code>${api.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</code>`;
+  apiLink.textContent = api;
   apiCopy.dataset.copy = api;
   head.innerHTML = tableHead({ sortable: true, sort: query.sort, order: query.order });
-  if (!index) return;
-
-  const result = runQuery(index.entries, query, utcToday());
-  const imported = importDate(index);
-  rows.innerHTML = result.data.map((entry) => rowHtml(entry, { now, providerNames, ...(imported ? { imported } : {}) })).join("");
-  const all = index.entries.length;
-  count.textContent = result.total === all ? `${exact(all)} entries` : `${exact(result.total)} of ${exact(all)} entries`;
-  const pages = Math.max(1, Math.ceil(result.total / query.limit));
-  page.textContent = `Page ${Math.floor(query.offset / query.limit) + 1} of ${exact(pages)}`;
-  prev.disabled = query.offset === 0;
-  next.disabled = result.next_offset === null;
-  empty.hidden = result.total > 0;
-  table.hidden = result.total === 0;
+  const sort = control("sort");
+  const order = control("order");
+  if (sort) sort.value = query.sort;
+  if (order) order.value = query.order;
+  table.setAttribute("aria-busy", "true");
+  table.hidden = true;
+  empty.hidden = true;
+  failed.hidden = true;
+  count.textContent = "Loading entries…";
+  for (const link of [prev, next]) { link.removeAttribute("href"); link.setAttribute("aria-disabled", "true"); }
+  try {
+    const response = await fetch(api, { cache: "no-cache", signal: request.signal });
+    if (!response.ok) throw new Error(String(response.status));
+    const result = await response.json() as Envelope<Summary>;
+    if (active !== request) return;
+    // Reload the surrounding API-derived counts, filters and footer if publication changed.
+    if (result.meta.dataset_version !== table.dataset.version || result.meta.generated_at !== table.dataset.publication) {
+      location.reload();
+      return;
+    }
+    rows.innerHTML = result.data.map((entry) => rowHtml(entry, { now, providerNames, imported: result.meta.upstream_fetched_at.slice(0, 10) })).join("");
+    count.textContent = `${exact(result.total)} entries`;
+    page.textContent = `Page ${Math.floor(result.offset / result.limit) + 1} of ${exact(Math.max(1, Math.ceil(result.total / result.limit)))}`;
+    const linkTo = (link: HTMLAnchorElement, offset: number | null): void => {
+      if (offset === null) return;
+      link.removeAttribute("aria-disabled");
+      link.href = `?${serializeQuery({ ...query, offset })}`;
+    };
+    linkTo(prev, result.offset > 0 ? Math.max(0, result.offset - result.limit) : null);
+    linkTo(next, result.next_offset);
+    empty.hidden = result.total > 0;
+    table.hidden = result.total === 0;
+  } catch {
+    if (request.signal.aborted || active !== request) return;
+    count.textContent = "Entries unavailable";
+    failed.hidden = false;
+  } finally {
+    if (active === request) table.removeAttribute("aria-busy");
+  }
 }
 
 function update(): void {
   readForm();
   query.offset = 0;
-  render();
+  void render();
 }
 
 let timer: number | undefined;
@@ -142,7 +173,7 @@ form.addEventListener("reset", () => {
   window.setTimeout(() => {
     query = siteDefault();
     fillForm();
-    render();
+    void render();
   });
 });
 document.getElementById("empty-reset")?.addEventListener("click", () => form.reset());
@@ -156,18 +187,22 @@ head.addEventListener("click", (event) => {
   query.order = query.sort === key ? (query.order === "asc" ? "desc" : "asc") : firstOrder;
   query.sort = key;
   query.offset = 0;
-  render();
+  void render();
   head.querySelector<HTMLButtonElement>(`button[data-sort="${key}"]`)?.focus();
 });
 
-prev.addEventListener("click", () => {
+prev.addEventListener("click", (event) => {
+  event.preventDefault();
+  if (!prev.hasAttribute("href")) return;
   query.offset = Math.max(0, query.offset - query.limit);
-  render();
+  void render();
   table.scrollIntoView({ block: "start" });
 });
-next.addEventListener("click", () => {
+next.addEventListener("click", (event) => {
+  event.preventDefault();
+  if (!next.hasAttribute("href")) return;
   query.offset += query.limit;
-  render();
+  void render();
   table.scrollIntoView({ block: "start" });
 });
 
@@ -178,24 +213,7 @@ document.addEventListener("keydown", (event) => {
   control("q")?.focus();
 });
 
-async function load(): Promise<void> {
-  failed.hidden = true;
-  try {
-    // Ask the server every time whether the data changed (it answers 304 when not): a stored copy must never show an old table.
-    const response = await fetch("/data/index.json", { cache: "no-cache" });
-    if (!response.ok) throw new Error(String(response.status));
-    index = (await response.json()) as Index;
-    providerNames = Object.fromEntries(index.providers.map((provider) => [provider.id, provider.name]));
-    table.hidden = false;
-    render();
-  } catch {
-    // The rows built ahead of time stay visible when the URL has no filters; otherwise say what happened.
-    if (siteSearch()) table.hidden = true;
-    failed.hidden = false;
-  }
-}
-document.getElementById("retry")?.addEventListener("click", load);
-
+document.getElementById("retry")?.addEventListener("click", () => { void render(); });
+window.addEventListener("popstate", () => { query = readUrl(); fillForm(); void render(); });
 fillForm();
-render();
-void load();
+// The first filtered page is already rendered from the API. No second fetch on hydration.

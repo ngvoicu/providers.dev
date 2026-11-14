@@ -1,7 +1,8 @@
-// HTML for the entry table and the entry detail view. The same functions build the static pages and
+// HTML for the entry table and the entry detail view. The same functions render server responses and
 // re-render in the browser, so a row looks and reads the same wherever it appears.
-import { CACHE_AGES_S, settingsText, type CacheResult, type CacheRetention, type CacheSummaryRow, type EntryCache } from "./cache.ts";
+import { CACHE_AGES_S, settingsText, type CacheDocumentation, type CacheResult, type CacheSummaryRow, type EntryCache } from "./cache.ts";
 import type { ProviderSummary, Summary } from "./entries.ts";
+import type { Condition, PricingRule, RequestControl } from "./policy-contract.ts";
 import {
   compactTokens,
   duration,
@@ -203,110 +204,63 @@ ${options.hideProvider ? "" : `<td><a class="plain" href="/providers/${e(entry.p
 
 // ---- prices (cost.text, as models.dev records it)
 
-const record = (value: Json | undefined): JsonObject | undefined => (isObject(value) ? value : undefined);
-
-function priceCell(entry: Pick<Summary, "price_in" | "price_out" | "price_from" | "access">): string {
+function priceCell(entry: Pick<Summary, "price_in" | "price_out" | "price_from" | "access" | "pricing">): string {
   const { price_in: input, price_out: output } = entry;
   const plan = IN_PLAN;
-  if (input === undefined && output === undefined) return entry.access === "subscription" ? plan : UNKNOWN;
+  const conditional = entry.pricing.rules?.some((rule) => rule.when !== null || rule.operation === "multiply");
+  const conditionNote = conditional ? '<div class="hint">Conditional rates</div>' : "";
+  if (input === undefined && output === undefined) return (entry.access === "subscription" ? plan : UNKNOWN) + conditionNote;
   // A listed 0 is shown as the source has it. It can mean free, or paid for another way: the page does not decide.
-  if ((input ?? 0) === 0 && (output ?? 0) === 0) {
-    return entry.access === "subscription" ? plan : `<span class="price" title="The source lists a price of 0. That can mean free of charge, or paid for another way (a plan or a seat).">$0 <span class="muted">/</span> $0</span>`;
+  if (input === 0 && output === 0) {
+    return (entry.access === "subscription" ? plan : `<span class="price">$0 <span class="muted">/</span> $0</span>`) + conditionNote;
   }
-  const price = `<span class="price">${input === undefined ? DASH : usd(input)} <span class="muted">/</span> ${output === undefined ? DASH : usd(output)}</span>`;
+  const price = `<span class="price">${input === undefined ? DASH : usd(input)} <span class="muted">/</span> ${output === undefined ? DASH : usd(output)}</span>${conditionNote}`;
   if (!entry.price_from) return price;
   // Two short lines: the price, then whose price it is.
   return `<span class="price-inherited" title="Not what this entry costs: a subscription is not paid per token. This is the API list price of ${e(entry.price_from)}, inherited from it.">${price}<span class="price-from">API price</span></span>`;
 }
 
-/** A condition of a price change, in words. Undefined for the shapes not handled here: they stay in the raw data. */
-function condition(value: Json | undefined): string | undefined {
-  const when = record(value);
-  if (!when || Object.keys(when).length !== 1) return undefined;
-  const context = record(when.context);
-  if (context && typeof context.gt === "number" && Object.keys(context).length === 1) return `Above ${exact(context.gt)} tokens of context`;
-  const tier = record(when.service_tier);
-  if (tier && typeof tier.equals === "string" && Object.keys(tier).length === 1) return `Service tier <code>${e(tier.equals)}</code>`;
-  return undefined;
+const METER_LABEL: Record<string, string> = { "text.input": "Input", "text.output": "Output", "text.reasoning_output": "Reasoning output", "text.cache_read": "Cache read", "text.cache_write": "Cache write", "text.cache_storage": "Cache storage", "text.*": "All text charges", "*": "All charges" };
+const CONDITION_LABEL: Record<string, string> = { "request.context_tokens": "Context tokens", "request.input_tokens": "Input tokens", "request.service_tier": "Service tier", "request.region": "Region", "request.date": "Date", "request.utc_hours": "UTC hours", "request.utc_days": "UTC days", "request.holiday": "Holiday", "request.thinking": "Thinking", "request.endpoint": "Endpoint", "cache.mode": "Cache mode", "cache.retention_s": "Cache lifetime (seconds)", "cache.retention_value": "Cache lifetime" };
+
+function conditionHtml(value: Condition | null): string {
+  if (value === null) return "Default";
+  if (value.kind === "unknown") return `<span class="muted">Unresolved condition</span> <code>${e(JSON.stringify(value.raw))}</code>`;
+  if (value.kind === "not") return `Not (${conditionHtml(value.condition)})`;
+  if (value.kind === "all" || value.kind === "any") return value.conditions.map((item) => `(${conditionHtml(item)})`).join(value.kind === "all" ? " and " : " or ");
+  if (value.kind !== "predicate") return UNKNOWN;
+  const op = { eq: "=", in: "in", gt: ">", gte: "≥", lt: "<", lte: "≤" }[value.op];
+  const display = typeof value.value === "number" ? exact(value.value) : typeof value.value === "string" ? value.value : JSON.stringify(value.value);
+  return `${e(CONDITION_LABEL[value.field] ?? value.field)} ${e(op)} <code>${e(display)}</code>`;
 }
 
-function cacheWrite(value: Json | undefined): string | undefined {
-  if (typeof value === "number") return usd(value);
-  const byLifetime = record(value);
-  if (!byLifetime) return undefined;
-  const parts = Object.entries(byLifetime).flatMap(([lifetime, amount]) => (typeof amount === "number" ? [`${usd(amount)} <span class="muted">for ${e(lifetime)}</span>`] : []));
-  return parts.length > 0 ? parts.join(", ") : undefined;
+function rateHtml(rule: PricingRule): string {
+  if (rule.operation === "multiply") return `× ${e(String(rule.amount))}`;
+  const amount = rule.currency === "USD" ? usd(rule.amount) : `${e(rule.currency ?? "Currency unknown")} ${e(String(rule.amount))}`;
+  if (!rule.unit) return `${amount} <span class="muted">· unit unknown</span>`;
+  return `${amount} <span class="muted">/ ${rule.unit.quantity === null ? "unknown quantity of" : exact(rule.unit.quantity)} ${e(rule.unit.name)}${rule.unit.quantity === 1 ? "" : "s"}</span>`;
 }
 
-function priceSection(model: JsonObject, summary: Summary, source: string): string {
-  const from = summary.price_from;
-  if (from) source = `<span class="origin upstream" title="Inherited from ${e(from)}, where it is imported from models.dev.">inherited</span>`;
-  const cost = record(model.cost);
-  const words = record(cost?.text);
-  const input = record(words?.input);
-  const output = record(words?.output);
-  // Every entry has the same table. What differs is said in a note above it.
-  const priced = Boolean(input || output);
-  const zero = priced && (summary.price_in ?? 0) === 0 && (summary.price_out ?? 0) === 0 && summary.price_in !== undefined;
-  const absent = !priced && summary.access !== "api" ? IN_PLAN : UNKNOWN;
-  const unit = typeof input?.unit === "string" ? `${e(input.unit)}s` : "tokens";
-  const amount = (value: Json | undefined): string => (typeof value === "number" ? usd(value) : absent);
-  const cache = record(input?.cache);
-  const rows = [
-    fact("Input", "<code>cost.text.input.price</code>", amount(input?.price), source),
-    fact("Output", "<code>cost.text.output.price</code>", amount(output?.price), source),
-    fact("Reasoning output", "<code>cost.text.output.reasoning</code>: stated where reasoning is priced apart from the rest of the output.", typeof output?.reasoning === "number" ? usd(output.reasoning) : absent, source),
-    fact("Cached input, read", "<code>cost.text.input.cache.read</code>: input served from the prompt cache.", amount(cache?.read), source),
-    fact("Cached input, write", "<code>cost.text.input.cache.write</code>: input stored in the prompt cache, by lifetime where it differs.", cacheWrite(cache?.write) ?? absent, source),
-  ].join("");
-
-  // Changes to those prices. Only the two common conditions are put in words; the rest stay in the raw data.
-  const changes = new Map<string, string[]>();
-  let other = 0;
-  const add = (when: Json | undefined, part: string): void => {
-    const key = condition(when);
-    if (!key) other += 1;
-    else changes.set(key, [...(changes.get(key) ?? []), part]);
-  };
-  for (const [side, value] of [["input", input], ["output", output]] as const) {
-    for (const item of Array.isArray(value?.overrides) ? value.overrides : []) {
-      const change = record(item);
-      if (!change) continue;
-      const parts = [typeof change.price === "number" ? `${side} ${usd(change.price)}` : ""];
-      const changedCache = record(change.cache);
-      if (typeof changedCache?.read === "number") parts.push(`cached read ${usd(changedCache.read)}`);
-      add(change.when, parts.filter(Boolean).join(", "));
-    }
-  }
-  for (const item of Array.isArray(cost?.multipliers) ? cost.multipliers : []) {
-    const multiplier = record(item);
-    const factor = record(multiplier?.factor);
-    if (multiplier && typeof factor?.text === "number") add(multiplier.when, `every price × ${factor.text}`);
-    else other += 1;
-  }
-  const list =
-    changes.size > 0 || other > 0
-      ? `<ul class="changes">${[...changes].map(([when, parts]) => `<li><strong>${when}:</strong> ${parts.join(", ")}</li>`).join("")}${
-          other > 0 ? `<li class="muted">${plural(other, "more condition")} (by region, time or a mix): see <code>cost</code> in the full record below.</li>` : ""
-        }</ul>`
-      : `<p class="muted">${priced ? "None listed in the source: the prices above do not change by context size or service tier." : "None listed."}</p>`;
-  const note = from
-    ? `<p class="note">This entry is a subscription: it is <strong>not</strong> paid per token. These are the API list prices of <a href="${e(entryHref(from))}"><code>${e(from)}</code></a>, inherited so that a client can work out what the usage is worth.</p>`
-    : !priced
-      ? `<p class="note">${summary.access === "api" ? "The source gives no price per token for this entry. Unknown is not the same as free." : "No price per token: this entry is paid for through a plan or subscription. providers.dev does not list plans or their prices."}</p>`
-      : zero
-        ? `<p class="note">The source lists a price of 0 per token. ${summary.access === "subscription" ? "This entry is paid for through a plan or subscription, not per token." : "That can mean free of charge, or paid for another way (a plan or a seat): check the provider."} providers.dev does not list plans or their prices.</p>`
-        : "";
-  return `${note}<div class="scroll"><table class="facts">
-    <thead><tr><th scope="col">Price</th><th scope="col" class="num">US dollars per million ${unit}</th><th scope="col">Source</th></tr></thead>
-    <tbody>${rows}</tbody>
-  </table></div>
-  <p class="hint">List prices as the source records them. Other kinds of use (web search, audio, images, video) are priced in <code>cost</code> in the full record below. A subscription's price is not a price per token and is not listed.</p>
-  <h3>Price changes</h3>
-  ${list}`;
+function priceSection(summary: Summary): string {
+  const pricing = summary.pricing;
+  const rules = pricing.rules ?? [];
+  const base = rules.filter((rule) => rule.when === null && rule.operation === "set");
+  const conditional = rules.filter((rule) => rule.when !== null || rule.operation === "multiply");
+  const meters = [...new Set(["text.input", "text.output", "text.reasoning_output", "text.cache_read", "text.cache_write", ...base.map((rule) => rule.meter)])];
+  const absent = pricing.billing === "not_applicable" ? NOT_APPLICABLE : UNKNOWN;
+  const rows = meters.map((meter) => {
+    const own = base.filter((rule) => rule.meter === meter);
+    return `<tr><th scope="row">${e(METER_LABEL[meter] ?? meter)}</th><td class="num">${own.length ? own.map(rateHtml).join("<br>") : absent}</td></tr>`;
+  }).join("");
+  const note = pricing.reference_ref ? `<p class="hint">API reference prices from <a href="${e(entryHref(pricing.reference_ref))}">${e(pricing.reference_ref)}</a>. This access uses a subscription.</p>` : "";
+  const changes = conditional.length ? `<div class="scroll"><table class="facts"><thead><tr><th>Condition</th><th>Charge</th><th>Rate</th><th>Applies to</th></tr></thead><tbody>${conditional.map((rule) => `<tr><td>${conditionHtml(rule.when)}</td><td>${e(METER_LABEL[rule.meter] ?? rule.meter)}</td><td>${rateHtml(rule)}</td><td>${rule.applies_to === "all_usage" ? "All matching usage" : rule.applies_to === "above_threshold" ? "Usage above threshold" : UNKNOWN}</td></tr>`).join("")}</tbody></table></div>` : `<p class="muted">${pricing.coverage === "complete" ? "No conditional rates." : pricing.coverage === "not_applicable" ? "Not applicable." : "No conditional rates recorded."}</p>`;
+  const source = pricing.evidence.map((item) => `<a href="${e(item.url)}" rel="noopener">${e(shortUrl(item.url))}</a>${item.date ? ` <span class="date">${e(item.date)}</span>` : ""}`).join(" · ");
+  return `${note}<div class="scroll"><table class="facts"><thead><tr><th>Base charge</th><th class="num">Rate</th></tr></thead><tbody>${rows}</tbody></table></div>
+<h3>Conditional rates</h3>${changes}
+${pricing.coverage === "partial" ? '<p class="hint">Additional pricing conditions may apply. <a href="/docs/api/#pricing-rules">Pricing coverage</a></p>' : ""}
+${source ? `<p class="hint">Source: ${source}</p>` : ""}
+${pricing.unparsed.length ? `<details><summary>Additional source pricing (${pricing.unparsed.length})</summary><pre>${e(JSON.stringify(pricing.unparsed, null, 2))}</pre></details>` : ""}`;
 }
-
-// ---- the entry detail view
 
 function evidenceList(items: Evidence[]): string {
   return `<ul class="evidence">${items
@@ -394,98 +348,59 @@ ${COLUMNS.map((column) => heatCell(inColumn(run.results, column), column, true))
 </tr>`;
     })
     .join("");
-  return `<p class="hint max-w-3xl">An evaluation caches a fresh prompt, sends it again at once, and then again at set ages. A cell is the share of those re-sends that were served from the cache, in percent, with the counts under it. Short is the cache a request gets without asking for a lifetime; Long is what it gets when it asks for a longer one.</p>
+  return `<p class="hint">Cache hits by age: percentage, with hits/checks below. Rows are grouped by requested retention. <a href="/docs/methodology/#evaluations">Methodology</a></p>
 <div class="scroll mt-3"><table class="facts heat summary"><thead><tr><th scope="col" rowspan="2">Retention</th><th scope="colgroup" colspan="${columns}" class="span">Time since the prompt was cached · served from the cache, in percent</th></tr><tr>${HEAT_HEAD}</tr></thead><tbody>${summary}</tbody></table></div>
 <p class="legend"><span><span class="heat-key all">100</span> All served from the cache</span><span><span class="heat-key most">67</span> Half or more</span><span><span class="heat-key few">33</span> Fewer</span><span><span class="heat-key none">0</span> None</span><span><span class="heat-key skip">·</span> Not checked at that age</span></p>
-<details class="evaluations"${cache.evaluations.length > 0 ? " open" : ""}><summary>Individual evaluations (${cache.evaluations.length})</summary>
+<details class="evaluations"><summary>Individual evaluations (${cache.evaluations.length})</summary>
 ${
   cache.evaluations.length > 0
     ? `<div class="scroll mt-3"><table class="facts heat"><thead><tr><th scope="col" rowspan="2">Evaluation</th><th scope="colgroup" colspan="${columns}" class="span">Time since the prompt was cached · re-sends served from the cache, of those made</th><th scope="col" rowspan="2">Evidence</th></tr><tr>${HEAT_HEAD}</tr></thead><tbody>${evaluations}</tbody></table></div>`
     : '<p class="muted mt-3">No evaluations on this entry.</p>'
 }
-</details>
-<p class="hint">A result holds for the access method and client named, on that date. It is what was observed, not a guaranteed lifetime. <a href="/docs/methodology/#evaluations">How evaluations work</a></p>`;
+</details>`;
 }
 
 /** What a request can do about the cache lifetime. The same rows on every entry. */
-function retentionTable(retention: CacheRetention): string {
-  const support = { supported: "Supported", unsupported: '<span class="muted">Unsupported</span>', unknown: UNKNOWN }[retention.support];
-  const none = retention.support === "unsupported" ? NOT_APPLICABLE : UNKNOWN;
-  const profile = (name: "short" | "long"): string => {
-    const items = retention.profiles.filter((item) => item.profile === name);
-    if (items.length === 0) return none;
-    return items.map((item) => (item.value === null ? "Leave the parameter out" : `<code>${e(item.value)}</code>`)).join(", ");
-  };
-  const row = (label: string, hint: string, value: string): string => `<tr><th scope="row">${label}<div class="hint">${hint}</div></th><td>${value}</td></tr>`;
-  const evidence =
-    retention.evidence.length > 0
-      ? `<ul class="evidence">${retention.evidence.map((item) => `<li><span class="badge ${item.kind}">${item.kind}</span> <a href="${e(item.url)}" rel="noopener">${e(shortUrl(item.url))}</a>${item.date ? ` <span class="muted date">${e(item.date)}</span>` : ""}<div class="hint">${e(item.note)}</div></li>`).join("")}</ul>`
-      : none;
-  return `<div class="scroll"><table class="facts"><thead><tr><th scope="col">Retention</th><th scope="col">Value</th></tr></thead><tbody>
-${row("Support", "<code>support</code>: whether a request can ask for a cache lifetime on this entry.", support)}
-${row("Parameter", "<code>parameter</code>: the request field, and where it goes.", retention.parameter ? `<code>${e(retention.parameter.name)}</code><div class="hint">${e(retention.parameter.location)}</div>` : none)}
-${row("Accepted values", "<code>accepted_values</code>: documented, or accepted in an evaluation.", retention.accepted_values ? retention.accepted_values.map((value) => `<code>${e(value)}</code>`).join(", ") : none)}
-${row("Default", "<code>default</code>: the lifetime when the parameter is left out.", retention.default ? `<code>${e(retention.default)}</code>` : none)}
-${row("Short", "<code>profiles</code>: what gives the short retention.", profile("short"))}
-${row("Long", "<code>profiles</code>: what gives the long retention.", profile("long"))}
-${row("Conditions", "<code>conditions</code>: a client, protocol or header this depends on.", retention.conditions.length > 0 ? retention.conditions.map(e).join("<br>") : retention.support === "unknown" ? UNKNOWN : "None recorded")}
-${row("Evidence", "<code>evidence</code>: the source of the rows above, and its date.", evidence)}
-</tbody></table></div>
-<p class="hint">Supported means the access method accepts the value. The lifetime it then gives is in the measured results below, not here.</p>`;
+function requestControlTable(controls: RequestControl[]): string {
+  const rows = controls.map((control) => {
+    const support = { supported: "Supported", unsupported: "Unsupported", unknown: "Unknown" }[control.support];
+    const absent = control.support === "unsupported" ? NOT_APPLICABLE : UNKNOWN;
+    const bindings = control.bindings?.map((binding) => `${e(binding.location)} <code>${e(binding.path)}</code>${binding.scope === "content_block" ? " (per content block)" : ""}`).join("<br>") || absent;
+    const options = control.options?.map((option) => {
+      const profile = option.attributes?.profile;
+      return `${profile === "short" || profile === "long" ? `${e(profile)}: ` : ""}<code>${e(typeof option.value === "string" ? option.value : JSON.stringify(option.value))}</code>${option.when ? `<div class="hint">${conditionHtml(option.when)}</div>` : ""}`;
+    }).join("<br>") || absent;
+    const conditions = [control.when ? conditionHtml(control.when) : "", ...control.conditions.map(e)].filter(Boolean).join("<br>") || (control.support === "unknown" ? UNKNOWN : "None recorded");
+    return `<tr><th scope="row">${e(control.id === "cache.retention" ? "Cache retention" : control.id === "service_tier" ? "Service tier" : control.id)}</th><td>${support}</td><td>${bindings}</td><td>${options}</td><td>${control.default === null ? absent : `<code>${e(JSON.stringify(control.default.value))}</code>`}</td><td>${conditions}</td></tr>`;
+  }).join("");
+  const details = controls.filter((control) => control.bindings !== null || control.evidence.length > 0 || control.options?.some((option) => option.settings !== null));
+  return `<div class="scroll"><table class="facts"><thead><tr><th>Control</th><th>Support</th><th>Request field</th><th>Accepted values</th><th>Default</th><th>Conditions</th></tr></thead><tbody>${rows}</tbody></table></div>${details.length ? `<details><summary>Request settings and sources</summary><pre>${e(JSON.stringify(details, null, 2))}</pre></details>` : ""}`;
 }
 
 function measuredLimitRows(limits: MeasuredLimit[]): string {
-  return limits
-    .map((limit) => {
-      const parts = [
-        limit.context !== undefined ? `Context ${exact(limit.context)}` : "",
-        limit.output !== undefined ? `output ${exact(limit.output)}` : "",
-        limit.input_accepted !== undefined ? `accepted an input of ${exact(limit.input_accepted)}` : "",
-        limit.input_refused !== undefined ? `refused an input of ${exact(limit.input_refused)}` : "",
-        limit.output_accepted !== undefined ? `accepted a requested output of ${exact(limit.output_accepted)}` : "",
-      ].filter(Boolean);
-      const text = parts.join("; ");
-      return `<tr><td>${limit.date ? `<span class="muted date">${e(limit.date)}</span>` : '<span class="muted">Undated</span>'}</td><td>${e(limit.route_label)}<div class="hint">${e(limit.client_label)}</div></td><td class="wide">${e(text.charAt(0).toUpperCase() + text.slice(1))} <span class="muted">tokens</span>${limit.note ? `<div class="hint">${e(limit.note)}</div>` : ""}</td><td><a href="${e(limit.source)}" rel="noopener">Raw result</a></td></tr>`;
-    })
-    .join("");
+  const cell = (value: number | undefined): string => `<td class="num">${value === undefined ? UNKNOWN : exact(value)}</td>`;
+  return limits.map((limit) => `<tr><td>${limit.date ? `<span class="muted date">${e(limit.date)}</span>` : UNKNOWN}</td><td>${e(limit.route_label)}<div class="hint">${e(limit.client_label)}</div></td>${cell(limit.context)}${cell(limit.input_accepted)}${cell(limit.input_refused)}${cell(limit.output)}${cell(limit.output_accepted)}<td><a href="${e(limit.source)}" rel="noopener">Raw result</a></td></tr>`).join("");
 }
 
 /** Documented caching. Every entry has the same table: one row for each way of caching, supported or not. */
-function cacheDocumented(model: JsonObject, provenance: Provenance[], origin: ModelExtension["origin"]): string {
-  const capabilities = isObject(model.capabilities) ? model.capabilities : {};
-  const cache = capabilities.cache;
-  const source = sourceOf("capabilities.cache", provenance, origin);
-  const known = cache === false || isObject(cache);
+function cacheDocumented(documented: CacheDocumentation, source: string): string {
   const rows = (["implicit", "explicit"] as const).map((mode) => {
-    const value = isObject(cache) ? cache[mode] : undefined;
-    const supported = value !== undefined && value !== false;
-    const detail = isObject(value) ? value : {};
-    const state = !known
-      ? UNKNOWN
-      : supported
-        ? "Supported"
-        : `<span class="muted" title="${cache === false ? "The source says this entry does not cache prompts." : "The source lists the other way of caching only. A way it does not list is not supported."}">Unsupported</span>`;
-    const ttl = Array.isArray(detail.ttl) && detail.ttl.length > 0 ? detail.ttl.map((item) => `<span class="chip">${e(String(item))}</span>`).join(" ") : UNKNOWN;
-    // A way of caching the entry does not have has no details; where the source says nothing, the details are unknown too.
-    const blank = known ? NOT_APPLICABLE : UNKNOWN;
+    const detail = documented.modes[mode];
+    const state = { supported: "Supported", unsupported: '<span class="muted">Unsupported</span>', unknown: UNKNOWN }[detail.support];
+    const supported = detail.support === "supported";
+    const ttl = detail.ttl === null ? UNKNOWN : detail.ttl.length > 0 ? detail.ttl.map((item) => `<span class="chip">${e(item)}</span>`).join(" ") : "None listed";
+    const blank = detail.support === "unsupported" ? NOT_APPLICABLE : UNKNOWN;
     return `<tr>
-<th scope="row">${CACHE_MODE_WORD[mode]} <span class="chip">${mode}</span><div class="hint">${mode === "implicit" ? "The provider caches on its own." : "The request marks what to cache."}</div></th>
+<th scope="row">${CACHE_MODE_WORD[mode]} <span class="chip">${mode}</span></th>
 <td>${state}</td>
 <td>${supported ? ttl : blank}</td>
-<td class="num">${supported ? (typeof detail.min_tokens === "number" ? exact(detail.min_tokens) : UNKNOWN) : blank}</td>
-<td class="num">${supported && mode === "explicit" ? (typeof detail.max_breakpoints === "number" ? exact(detail.max_breakpoints) : UNKNOWN) : mode === "implicit" && known ? NOT_APPLICABLE : blank}</td>
-<td>${supported && mode === "explicit" ? (Array.isArray(detail.targets) ? e(detail.targets.join(", ")) : UNKNOWN) : mode === "implicit" && known ? NOT_APPLICABLE : blank}</td>
+<td class="num">${supported ? (detail.min_tokens === null ? UNKNOWN : exact(detail.min_tokens)) : blank}</td>
+<td class="num">${supported && mode === "explicit" ? (detail.max_breakpoints === null ? UNKNOWN : exact(detail.max_breakpoints)) : supported ? NOT_APPLICABLE : blank}</td>
+<td>${supported && mode === "explicit" ? (detail.targets === null ? UNKNOWN : e(detail.targets.join(", "))) : supported ? NOT_APPLICABLE : blank}</td>
 </tr>`;
   });
-  const foot = !known
-    ? origin === "added"
-      ? "No documentation is recorded for this access method. That is not the same as no caching."
-      : "models.dev says nothing about caching for this entry. That is not the same as no caching."
-    : cache === false
-      ? `Documented: no prompt caching on this entry. Source: ${source}`
-      : `Documented values. Source: ${source} Whether a cache read renews the lifetime is not recorded in the source.`;
   return `<div class="scroll"><table class="facts"><thead><tr><th scope="col">Mode</th><th scope="col">Supported</th><th scope="col">Lifetimes</th><th scope="col" class="num">Min. tokens</th><th scope="col" class="num">Breakpoints</th><th scope="col">Targets</th></tr></thead><tbody>${rows.join("")}</tbody></table></div>
-<p class="hint">${foot}</p>`;
+<p class="hint">Source: ${source} · <a href="/docs/methodology/#caching">Cache modes</a></p>`;
 }
 
 function tile(label: string, value: string, foot: string, small = false): string {
@@ -561,23 +476,25 @@ export function entryHtml(view: EntryView): string {
     </tbody>
   </table></div>
   <p class="hint">Usable context is smaller than the window by the system prompt and tool definitions of the client in use. That overhead varies, so no usable figure is published. An agent's compaction threshold is a client setting, not a limit of this entry.</p>
-  <h3>Measured</h3>
-  <div class="scroll"><table class="facts"><thead><tr><th scope="col">Date</th><th scope="col">Measured through</th><th scope="col">Result</th><th scope="col">Evidence</th></tr></thead><tbody>${
-    measuredLimits.length > 0 ? measuredLimitRows(measuredLimits) : '<tr class="empty-row"><td colspan="4" class="muted">No limits were measured on this entry.</td></tr>'
+  <h3>Measured <span class="hint">tokens</span></h3>
+  <div class="scroll"><table class="facts"><thead><tr><th scope="col">Date</th><th scope="col">Measured through</th><th scope="col" class="num">Context</th><th scope="col" class="num">Input accepted</th><th scope="col" class="num">Input refused</th><th scope="col" class="num">Output limit</th><th scope="col" class="num">Requested output accepted</th><th scope="col">Evidence</th></tr></thead><tbody>${
+    measuredLimits.length > 0 ? measuredLimitRows(measuredLimits) : '<tr class="empty-row"><td colspan="8" class="muted">No limits were measured on this entry.</td></tr>'
   }</tbody></table></div>
 </section>
 
 <section aria-labelledby="price">
   <h2 id="price">Price</h2>
-  ${priceSection(model, summary, sourceOf("cost", provenance, extension.origin))}
+  ${priceSection(summary)}
+  <h3>Request controls</h3>
+  ${requestControlTable(summary.request_controls.items.filter((control) => control.id !== "cache.retention"))}
 </section>
 
 <section aria-labelledby="cache">
   <h2 id="cache">Prompt caching</h2>
   <h3>Documented</h3>
-  ${cacheDocumented(model, provenance, extension.origin)}
+  ${cacheDocumented(cache.documented, sourceOf("capabilities.cache", provenance, extension.origin))}
   <h3>Retention</h3>
-  ${retentionTable(cache.retention)}
+  ${requestControlTable(summary.request_controls.items.filter((control) => control.id === "cache.retention"))}
   <h3>Measured</h3>
   ${cacheMeasured(cache, now)}
 </section>
@@ -600,6 +517,7 @@ export function entryHtml(view: EntryView): string {
   </div>`,
     )
     .join("")}
+  ${extension.origin !== "added" && extension.evidence?.length ? evidenceList(extension.evidence) : ""}
 </section>
 
 <section aria-labelledby="raw">

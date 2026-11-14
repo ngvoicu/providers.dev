@@ -2,11 +2,12 @@
 // data/published/ is replaced only when everything succeeded; otherwise the last good publication stays.
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { gzipSync } from "node:zlib";
 import { parse as parseYaml } from "yaml";
 import type { ZodType } from "zod";
 import { CACHE_AGES_S } from "../../src/core/cache.ts";
 import { buildIndex, SHARD_SIZE, type Index } from "../../src/core/entries.ts";
-import { listEvaluations } from "../../src/core/resources.ts";
+import { listCorrections, listEvaluations } from "../../src/core/resources.ts";
 import { resolve } from "../../src/core/resolve.ts";
 import {
   AccessRules,
@@ -177,11 +178,14 @@ function writeSnapshot(dir: string, catalog: Catalog, index: Index, meta: Meta, 
 
   // The compatibility export: provider-keyed, no envelope.
   writeFileSync(join(site, "api.json"), compact(catalog));
+  writeFileSync(join(site, "api.json.gz"), gzipSync(compact(catalog), { level: 9 }));
   writeFileSync(join(site, "data", "catalog.json"), compact({ meta: short, providers: catalog }));
+  writeFileSync(join(site, "data", "catalog.json.gz"), gzipSync(compact({ meta: short, providers: catalog }), { level: 9 }));
   writeFileSync(join(site, "data", "meta.json"), compact(meta));
   writeFileSync(join(site, "data", "index.json"), compact(index));
   // Every evaluation with the entry it was made on: what /api/v1/evaluations answers from.
   writeFileSync(join(site, "data", "evaluations.json"), compact({ meta: short, data: listEvaluations(catalog, index) }));
+  writeFileSync(join(site, "data", "corrections.json"), compact({ meta: short, data: listCorrections(catalog, index) }));
   for (const [id, provider] of Object.entries(catalog)) {
     writeFileSync(join(site, "data", "providers", `${id}.json`), compact({ meta: short, data: provider }));
     const models = Object.entries(provider.models);
@@ -221,10 +225,6 @@ function writeSnapshot(dir: string, catalog: Catalog, index: Index, meta: Meta, 
   ].join("\n");
   writeFileSync(join(site, "_headers"), `/api.json\n${freshness}\n\n/data/*\n${freshness}\n`);
 
-  // What the Worker bundles: the index, which answers every list of the API, and the metadata.
-  mkdirSync(join(dir, "worker"), { recursive: true });
-  writeFileSync(join(dir, "worker", "index.json"), compact(index));
-  writeFileSync(join(dir, "worker", "meta.json"), compact(meta));
 }
 
 /** Read the snapshot back the way a client would: every entry of the index must be found in its file. */

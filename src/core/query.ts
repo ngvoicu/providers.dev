@@ -66,6 +66,7 @@ const PAGING: ParamDoc[] = [
 ];
 /** The parameters of the other lists. Every list pages the same way. */
 export const PROVIDER_PARAMS: ParamDoc[] = [
+  { name: "q", kind: "text", description: "Words to find in the provider's id or name. Every word must match." },
   { name: "access", kind: "list", values: ["api", "subscription", "unknown"], description: "How the provider is reached." },
   { name: "origin", kind: "list", values: ["upstream", "added"], description: "upstream = imported from models.dev; added = a provider models.dev does not list." },
   ...PAGING,
@@ -85,6 +86,10 @@ export const EVALUATION_PARAMS: ParamDoc[] = [
 ];
 export const PROVIDER_VIEW_PARAMS: ParamDoc[] = [
   { name: "view", kind: "enum", values: ["summary", "full"], description: "summary (default) = the provider and the summaries of its entries. full = also every entry in full, under models." },
+];
+export const CORRECTION_PARAMS: ParamDoc[] = [
+  { name: "provider", kind: "text", description: "Exact provider id." },
+  ...PAGING,
 ];
 
 export interface QueryError {

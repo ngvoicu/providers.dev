@@ -1,7 +1,8 @@
 // The flat view of the catalog: one summary per provider-model entry.
 // The website tables, /api/v1/entries and the compact index all use these summaries, built once by buildIndex().
-import { cacheFacts, type CacheMode, type CacheRetention, type CacheSummaryRow, type CacheSupport } from "./cache.ts";
+import { cacheFacts, type CacheMode, type CacheRetention, type CacheSummaryRow, type CacheSupport, type Support } from "./cache.ts";
 import { isObject, type JsonObject } from "./merge.ts";
+import type { Pricing, RequestControls } from "./policy-contract.ts";
 import { NS, type Access, type Catalog, type ModelExtension, type ProviderExtension } from "./schema.ts";
 
 export { cacheFacts, durationSeconds } from "./cache.ts";
@@ -30,6 +31,7 @@ export interface Summary {
   max_output?: number;
   cache: CacheSupport;
   cache_modes: CacheMode[];
+  cache_mode_support: Record<CacheMode, Support>;
   /** Cache lifetimes the provider documents, in seconds, shortest first. */
   cache_ttl_s: number[];
   /** The documented lifetimes of each mode, in seconds. A mode with no documented lifetime has no key. */
@@ -47,6 +49,8 @@ export interface Summary {
   price_in?: number;
   /** cost.text.output.price: the same for output. */
   price_out?: number;
+  pricing: Pricing;
+  request_controls: RequestControls;
   /** Set where the price is inherited: the ref of the API entry whose list price this is. The entry itself is not paid per token. */
   price_from?: string;
   /** The largest input an evaluation saw accepted on this entry, in tokens. The real limit is at least this. */
@@ -95,11 +99,9 @@ const text = (value: unknown): string | undefined => (typeof value === "string" 
 const count = (value: unknown): number | undefined => (typeof value === "number" && Number.isFinite(value) ? value : undefined);
 
 /** The base price of one side of `cost.text`. A price in another unit (per character) is not a price per token. */
-function basePrice(model: JsonObject, side: "input" | "output"): number | undefined {
-  const cost = model.cost;
-  const words = isObject(cost) ? cost.text : undefined;
-  const part = isObject(words) ? words[side] : undefined;
-  return isObject(part) && part.unit === undefined ? count(part.price) : undefined;
+function basePrice(pricing: Pricing, side: "input" | "output"): number | undefined {
+  const rules = pricing.rules?.filter((rule) => rule.meter === `text.${side}` && rule.when === null && rule.operation === "set" && rule.currency === "USD" && rule.unit?.name === "token" && rule.unit.quantity === 1000000) ?? [];
+  return rules.length === 1 ? rules[0]!.amount : pricing.rule_order === "listed" ? rules.at(-1)?.amount : undefined;
 }
 
 export function summarize(providerId: string, model: JsonObject, shard: number): Summary {
@@ -110,7 +112,7 @@ export function summarize(providerId: string, model: JsonObject, shard: number):
   const measuredLimits = extension.limits?.measured ?? [];
   const accepted = measuredLimits.map((item) => item.input_accepted).filter((value): value is number => typeof value === "number");
   const refused = measuredLimits.map((item) => item.input_refused).filter((value): value is number => typeof value === "number");
-  const touched = overridden.length > 0 || runs.length > 0 || (extension.limits?.measured?.length ?? 0) > 0;
+  const touched = overridden.length > 0 || runs.length > 0 || (extension.evidence?.length ?? 0) > 0 || (extension.limits?.measured?.length ?? 0) > 0;
   const summary: Summary = {
     ref: `${providerId}/${String(model.id)}`,
     provider: providerId,
@@ -118,10 +120,12 @@ export function summarize(providerId: string, model: JsonObject, shard: number):
     name: String(model.name),
     access: extension.access,
     origin: extension.origin === "added" ? "added" : touched ? "modified" : "upstream",
-    ...cacheFacts(model),
+    ...cacheFacts(extension.cache.documented),
     cache_retention: extension.cache.retention.support,
     evaluation_count: runs.length,
     cache_results: extension.cache.results,
+    pricing: extension.pricing,
+    request_controls: extension.request_controls,
     measured_limit_count: extension.limits?.measured?.length ?? 0,
     overridden_fields: overridden,
     shard,
@@ -135,9 +139,9 @@ export function summarize(providerId: string, model: JsonObject, shard: number):
     context: count(limit.context),
     input: count(limit.input),
     max_output: count(limit.output),
-    price_in: basePrice(model, "input"),
-    price_out: basePrice(model, "output"),
-    price_from: extension.inherited?.fields.includes("cost") ? extension.inherited.from : undefined,
+    price_in: basePrice(extension.pricing, "input"),
+    price_out: basePrice(extension.pricing, "output"),
+    price_from: extension.pricing.billing === "reference" ? extension.pricing.reference_ref ?? undefined : undefined,
     measured_input_accepted: accepted.length > 0 ? Math.max(...accepted) : undefined,
     measured_input_refused: refused.length > 0 ? Math.min(...refused) : undefined,
     verified: extension.verified,

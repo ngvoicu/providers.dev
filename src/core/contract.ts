@@ -3,16 +3,19 @@
 // Each schema is tied to the TypeScript type the code uses (`satisfies`), so the two cannot drift apart.
 // Build-time and server only: nothing in the browser imports this file.
 import { z } from "zod";
-import type { CacheEvaluation, CacheResult, CacheRetention, CacheSummaryRow, EntryCache } from "./cache.ts";
+import type { CacheEvaluation, CacheResult, CacheSummaryRow, EntryCache } from "./cache.ts";
+import { CacheDocumentationSchema, CacheModeDocumentationSchema, CacheRetentionSchema, RetentionProfileSchema, SupportSchema } from "./cache-contract.ts";
+import { ApiEndpointSchema, CapabilitiesSchema, CachePriceSchema, CostSchema, DocumentedCacheSchema, ModelMetadataShape, PriceConditionSchema, TextPriceSchema } from "./metadata-contract.ts";
+import { BillingUnitSchema, ConditionSchema, PolicyEvidenceSchema, PricingRuleSchema, PricingSchema, RequestBindingSchema, RequestControlSchema, RequestControlsSchema, RequestOptionSchema, RequestSettingSchema } from "./policy-contract.ts";
 import type { ProviderSummary, Summary } from "./entries.ts";
-import type { CanonicalModel, CanonicalModelDetail } from "./resources.ts";
+import type { CanonicalModel, CanonicalModelDetail, Correction, Documentation, Facets } from "./resources.ts";
 import { Access, Evidence, type MeasuredLimit, type ModelExtension, type ProviderExtension, type Provenance } from "./schema.ts";
 
 const date = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
 const json = z.json();
 
 // ---- cache: results, summary lines, evaluations, retention
-const RetentionProfile = z.enum(["short", "long"]).describe("short = the cache a request gets without asking for a lifetime, or with the shortest documented one. long = a longer lifetime it asked for.");
+export { CacheRetentionSchema } from "./cache-contract.ts";
 
 export const CacheResultSchema = z
   .strictObject({
@@ -25,7 +28,7 @@ export const CacheResultSchema = z
   .describe("What was seen at one age.") satisfies z.ZodType<CacheResult>;
 
 const retentionSetting = {
-  retention_profile: RetentionProfile,
+  retention_profile: RetentionProfileSchema,
   parameter: z.string().nullable().describe("The request field that asked for the lifetime, for example cache_control.ttl or prompt_cache_retention. Null = no lifetime was asked for."),
   value: z.string().nullable().describe("The value sent in it, for example 1h. Null together with parameter."),
 };
@@ -57,32 +60,14 @@ export const CacheEvaluationSchema = z
   })
   .describe("One cache evaluation: a fresh prompt cached once, then sent again at once and at set ages.") satisfies z.ZodType<CacheEvaluation>;
 
-export const CacheRetentionSchema = z
-  .strictObject({
-    support: z.enum(["supported", "unsupported", "unknown"]).describe("supported = the access method accepts a cache lifetime from the request. unsupported = it does not. unknown = no source says."),
-    parameter: z
-      .strictObject({ name: z.string().describe("The request field."), location: z.string().describe("Where in the request it goes.") })
-      .nullable()
-      .describe("Null = not known."),
-    accepted_values: z.array(z.string()).nullable().describe("Values that are documented, or were accepted in an evaluation. Null = not known."),
-    default: z.string().nullable().describe("The lifetime a request gets when it leaves the parameter out. Null = not known."),
-    profiles: z
-      .array(z.strictObject({ profile: RetentionProfile, value: z.string().nullable().describe("Null = leave the parameter out.") }))
-      .describe("Which value gives which retention profile. Empty = not known."),
-    conditions: z.array(z.string()).describe("What this depends on: a client, a protocol, a header."),
-    evidence: z
-      .array(z.strictObject({ kind: z.enum(["documented", "measured"]), url: z.url(), date: date.nullable(), note: z.string() }))
-      .describe("The source of the fields above, with its date."),
-  })
-  .describe("What a request can do about the cache lifetime on this entry. Every entry has every field. Acceptance is not a promise: the lifetime the provider then gives is in the results.") satisfies z.ZodType<CacheRetention>;
-
 export const EntryCacheSchema = z
   .strictObject({
+    documented: CacheDocumentationSchema,
     retention: CacheRetentionSchema,
     results: z.array(CacheSummaryRowSchema).nullable().describe("The summary table: a line per retention setting, short before long. Null = no evaluation on this entry."),
     evaluations: z.array(CacheEvaluationSchema).describe("The evaluations the summary adds up, newest first."),
   })
-  .describe("Prompt caching beyond what the source documents.") satisfies z.ZodType<EntryCache>;
+  .describe("Documented caching, confirmed retention controls and evaluations, shared by the website and API.") satisfies z.ZodType<EntryCache>;
 
 // ---- limits, provenance
 export const MeasuredLimitSchema = z
@@ -126,6 +111,8 @@ export const EntryExtensionSchema = z
       .optional()
       .describe("Fields an added entry takes from another entry: identity, and cost where a subscription entry carries the API list price."),
     cache: EntryCacheSchema,
+    pricing: PricingSchema,
+    request_controls: RequestControlsSchema,
     limits: z
       .strictObject({
         measured: z.array(MeasuredLimitSchema).optional(),
@@ -169,6 +156,7 @@ export const EntrySummarySchema = z
     max_output: z.number().optional().describe("limit.output in tokens: the most one response can hold. A maximum, not a default. Absent = unknown."),
     cache: z.enum(["yes", "no", "unknown"]).describe("Prompt caching as documented. unknown = the source says nothing, which is not the same as no."),
     cache_modes: z.array(z.enum(["implicit", "explicit"])).describe("implicit = the provider caches on its own. explicit = the request marks what to cache."),
+    cache_mode_support: z.strictObject({ implicit: SupportSchema, explicit: SupportSchema }).describe("Support for each mode, from providers_dev.cache.documented.modes. An omitted mode stays unknown."),
     cache_ttl_s: z.array(z.number()).describe("Documented cache lifetimes in seconds, of every mode together, shortest first."),
     cache_ttl_by_mode_s: z
       .strictObject({ implicit: z.array(z.number()).optional(), explicit: z.array(z.number()).optional() })
@@ -182,6 +170,8 @@ export const EntrySummarySchema = z
       .describe("The cache evaluations as one table: a line per retention setting, short before long, each with its results by exact age. Null = not evaluated. Every page of the website draws this object as it is."),
     price_in: z.number().optional().describe("cost.text.input.price: the list price of input in US dollars per million tokens, before any change by context size or service tier. Absent = unknown."),
     price_out: z.number().optional().describe("The same for output."),
+    pricing: PricingSchema.describe("The same normalized pricing record as providers_dev.pricing on the full entry, including all conditions and unparsed source fields."),
+    request_controls: RequestControlsSchema.describe("The same controls as providers_dev.request_controls on the full entry. Unknown and unsupported are distinct."),
     price_from: z.string().optional().describe("Present where the price is inherited: the ref of the API entry whose list price this is. The entry itself is a subscription and is not paid per token."),
     measured_input_accepted: z.number().optional().describe("Tokens: the largest input a limit evaluation saw accepted. The real limit is at least this."),
     measured_input_refused: z.number().optional().describe("Tokens: the smallest input a limit evaluation saw refused. The real limit is below this."),
@@ -226,18 +216,9 @@ export const CanonicalModelDetailSchema = z
   .describe("A canonical model with every entry that serves it.") satisfies z.ZodType<CanonicalModelDetail>;
 
 // ---- full objects. The part that comes from models.dev is theirs and grows with it, so unknown fields are allowed there.
-const limit = z.looseObject({ context: z.number().optional(), input: z.number().optional(), output: z.number().optional() });
 export const EntrySchema = z
   .looseObject({
-    id: z.string(),
-    name: z.string(),
-    type: z.string().optional(),
-    family: z.string().optional(),
-    canonical_id: z.string().optional(),
-    release_date: z.string().optional(),
-    limit: limit.optional().describe("Token limits as documented. A missing field is unknown."),
-    capabilities: z.looseObject({}).optional().describe("As models.dev records them, including capabilities.cache: false, or the implicit and explicit ways of caching with their lifetimes."),
-    cost: z.looseObject({}).optional().describe("List prices as models.dev records them."),
+    ...ModelMetadataShape,
     providers_dev: EntryExtensionSchema,
   })
   .describe("One entry in full: the models.dev record of the model at this provider, with providers_dev added. Fields not listed here are passed on from models.dev unchanged.");
@@ -269,7 +250,7 @@ export const MetaSchema = z
     api_version: z.literal("v1"),
     schema_version: z.int(),
     upstream_schema: z.string(),
-    dataset_version: z.string().describe("A hash of everything published. It changes only when the data does, and it is the ETag of every answer."),
+    dataset_version: z.string().describe("A hash of the catalog and summaries. It changes when their data changes. ETags identify each response representation separately."),
     generated_at: z.iso.datetime(),
     counts: z.strictObject({
       providers: z.int(),
@@ -328,16 +309,55 @@ export const ProviderDetailSchema = z
   })
   .describe("One provider with its entries.");
 
+export const FacetsSchema = z.strictObject({
+  providers: z.array(z.strictObject({ id: z.string(), name: z.string() })).describe("Provider options, ordered by name then id."),
+  types: z.array(z.string()).describe("Known entry types, sorted alphabetically."),
+  evidence_entries: z.int().min(0),
+  subscription_providers: z.int().min(0),
+}).describe("Catalog filter options and counts, calculated by the API.") satisfies z.ZodType<Facets>;
+export const CorrectionSchema = z.strictObject({
+  provider: z.string(),
+  change: ProvenanceSchema,
+  entry_refs: z.array(z.string()).describe("Entries with this exact correction, original value and evidence."),
+}).describe("An identical correction grouped across entries.") satisfies z.ZodType<Correction>;
+export const DocumentationSchema = z.strictObject({
+  title: z.string(), description: z.string(), lead: z.string(),
+  toc: z.array(z.strictObject({ id: z.string(), label: z.string() })),
+  body_html: z.string().describe("Authored reference content as an HTML fragment, compiled with the site templates. It contains no dataset values."),
+}).describe("The reference text displayed by the website.") satisfies z.ZodType<Documentation>;
+
 /** The named parts of the contract: the components of the OpenAPI document and the tables of the documentation. */
 export const COMPONENTS = {
+  Facets: FacetsSchema,
+  Correction: CorrectionSchema,
+  Documentation: DocumentationSchema,
   EntrySummary: EntrySummarySchema,
   Entry: EntrySchema,
   EntryExtension: EntryExtensionSchema,
   EntryCache: EntryCacheSchema,
+  CacheDocumentation: CacheDocumentationSchema,
+  CacheModeDocumentation: CacheModeDocumentationSchema,
   CacheRetention: CacheRetentionSchema,
   CacheSummaryRow: CacheSummaryRowSchema,
   CacheResult: CacheResultSchema,
   CacheEvaluation: CacheEvaluationSchema,
+  Capabilities: CapabilitiesSchema,
+  DocumentedCache: DocumentedCacheSchema,
+  Cost: CostSchema,
+  TextPrice: TextPriceSchema,
+  CachePrice: CachePriceSchema,
+  PriceCondition: PriceConditionSchema,
+  ApiEndpoint: ApiEndpointSchema,
+  Condition: ConditionSchema,
+  PolicyEvidence: PolicyEvidenceSchema,
+  BillingUnit: BillingUnitSchema,
+  PricingRule: PricingRuleSchema,
+  Pricing: PricingSchema,
+  RequestBinding: RequestBindingSchema,
+  RequestSetting: RequestSettingSchema,
+  RequestOption: RequestOptionSchema,
+  RequestControl: RequestControlSchema,
+  RequestControls: RequestControlsSchema,
   MeasuredLimit: MeasuredLimitSchema,
   Provenance: ProvenanceSchema,
   ProviderSummary: ProviderSummarySchema,

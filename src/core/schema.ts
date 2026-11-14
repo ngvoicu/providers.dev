@@ -2,6 +2,9 @@
 // the measurements file, and the published catalog.
 import { z } from "zod";
 import type { EntryCache } from "./cache.ts";
+import { CacheRetentionDeclarationSchema } from "./cache-contract.ts";
+import { ModelMetadataShape } from "./metadata-contract.ts";
+import { PricingDeclarationSchema, RequestControlDeclarationsSchema, type Pricing, type RequestControls } from "./policy-contract.ts";
 import type { Change, Json, JsonObject } from "./merge.ts";
 
 export const SCHEMA_VERSION = 1;
@@ -13,37 +16,7 @@ export const PROVIDER_ID = /^[a-z0-9][a-z0-9._-]*$/;
 const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use a date like 2026-11-13");
 
 // ---- upstream (models.dev v2). Lenient on purpose: we check identity and the fields we read, and keep the rest.
-const upstreamCache = z.union([
-  z.literal(false),
-  z.looseObject({
-    implicit: z.union([z.literal(true), z.looseObject({ ttl: z.array(z.string()).optional(), min_tokens: z.number().optional() })]).optional(),
-    explicit: z
-      .union([
-        z.literal(true),
-        z.looseObject({
-          ttl: z.array(z.string()).optional(),
-          max_breakpoints: z.number().optional(),
-          targets: z.array(z.string()).optional(),
-          min_tokens: z.number().optional(),
-        }),
-      ])
-      .optional(),
-  }),
-]);
-
-export const UpstreamModel = z.looseObject({
-  id: z.string().min(1),
-  name: z.string().min(1),
-  type: z.string().optional(),
-  canonical_id: z.string().optional(),
-  family: z.string().optional(),
-  status: z.string().optional(),
-  release_date: z.string().optional(),
-  limit: z
-    .looseObject({ context: z.number().min(0).optional(), input: z.number().min(0).optional(), output: z.number().min(0).optional() })
-    .optional(),
-  capabilities: z.looseObject({ cache: upstreamCache.optional() }).optional(),
-});
+export const UpstreamModel = z.looseObject(ModelMetadataShape);
 
 export const UpstreamProvider = z.looseObject({
   id: z.string().regex(PROVIDER_ID),
@@ -89,6 +62,9 @@ export const AuthoredModel = z.strictObject({
   /** `provider/model` of an upstream entry to take identity fields from (never limits, cache or prices). */
   inherits: z.string().optional(),
   fields: z.record(z.string(), z.json()).optional(),
+  cache_retention: CacheRetentionDeclarationSchema.optional(),
+  pricing: PricingDeclarationSchema.optional(),
+  request_controls: RequestControlDeclarationsSchema.optional(),
   evidence: z.array(Evidence).min(1),
 });
 export type AuthoredModel = z.infer<typeof AuthoredModel>;
@@ -111,6 +87,9 @@ export const OverrideRule = z.strictObject({
   models: z.array(z.string().min(1)).min(1),
   /** Fields to merge over the upstream entry. null = explicitly unknown, "$delete" = remove. */
   set: z.record(z.string(), z.json()).optional(),
+  cache_retention: CacheRetentionDeclarationSchema.optional(),
+  pricing: PricingDeclarationSchema.optional(),
+  request_controls: RequestControlDeclarationsSchema.optional(),
   /** True removes the entries from the published catalog (a tombstone). */
   exclude: z.boolean().optional(),
   reason: z.string().min(1),
@@ -252,6 +231,8 @@ export interface ModelExtension {
   inherited?: { from: string; fields: string[] };
   /** Prompt caching beyond what the source documents: what a request can ask for, and what evaluations measured. On every entry. */
   cache: EntryCache;
+  pricing: Pricing;
+  request_controls: RequestControls;
   limits?: {
     measured?: MeasuredLimit[];
     /** On an entry we add: which of limit.context and limit.output are our measured values. */

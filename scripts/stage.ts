@@ -1,17 +1,13 @@
-// npm run stage
-// Copy the published snapshot to where the site build and the Worker read it.
-import { cpSync, existsSync, mkdirSync, rmSync } from "node:fs";
+// Stage data independently of templates. --dist refreshes an already-built site.
+import { existsSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { DATA, ROOT } from "./lib/files.ts";
+import { stageSnapshot } from "./lib/stage.ts";
 
-const published = join(DATA, "published");
-if (!existsSync(join(published, "site", "api.json"))) {
-  console.error("No published snapshot. Run `npm run sync` and `npm run data` first.");
-  process.exit(1);
+const destination = join(ROOT, process.argv.includes("--dist") ? "dist" : "public");
+if (process.argv.includes("--dist") && !existsSync(join(destination, "site-shell", "index.html"))) {
+  throw new Error("Build the site templates once with `npm run build` before refreshing data.");
 }
-for (const name of ["data", "api.json", "_headers"]) rmSync(join(ROOT, "public", name), { recursive: true, force: true });
-cpSync(join(published, "site"), join(ROOT, "public"), { recursive: true });
+const id = stageSnapshot(join(DATA, "published"), destination);
 rmSync(join(ROOT, "worker", "generated"), { recursive: true, force: true });
-mkdirSync(join(ROOT, "worker", "generated"), { recursive: true });
-cpSync(join(published, "worker"), join(ROOT, "worker", "generated"), { recursive: true });
-console.log("staged the snapshot into public/ and worker/generated/");
+console.log(`staged publication ${id} into ${destination}`);

@@ -7,6 +7,7 @@ import type { Index, Summary } from "./entries.ts";
 import { openapi } from "./openapi.ts";
 import {
   DEFAULT_LIMIT,
+  CORRECTION_PARAMS,
   EVALUATION_PARAMS,
   MODEL_PARAMS,
   parseParams,
@@ -17,7 +18,7 @@ import {
   utcToday,
   type ParamDoc,
 } from "./query.ts";
-import { canonicalModels, page, withoutEntries, type CanonicalModelDetail, type EvaluationRecord } from "./resources.ts";
+import { canonicalModels, facets, page, withoutEntries, type CanonicalModelDetail, type Correction, type Documentation, type EvaluationRecord } from "./resources.ts";
 import type { Meta } from "./schema.ts";
 
 export interface ApiDeps {
@@ -63,6 +64,12 @@ export function etagMatches(request: Request, etag: string): boolean {
   });
 }
 
+/** A validator for the actual representation, including metadata and contract/template changes. */
+export async function representationTag(value: string): Promise<string> {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
+  return `"${Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("")}"`;
+}
+
 /** The canonical models of an index, worked out once per index. */
 const modelsOf = new WeakMap<Index, CanonicalModelDetail[]>();
 export function modelsFor(index: Index): CanonicalModelDetail[] {
@@ -91,14 +98,17 @@ export async function handleApi(request: Request, deps: ApiDeps): Promise<Respon
     return fail(meta, 405, "method_not_allowed", "This API is read-only. Use GET.", undefined, { Allow: "GET, HEAD, OPTIONS" });
   }
 
-  const etag = `"${meta.dataset_version}"`;
+  const etag = await representationTag(`${meta.dataset_version}:${meta.generated_at}:${path}`);
   const send = (body: BodyInit | null, tag: string = etag): Response => {
     const responseHeaders = apiHeaders(meta, { ETag: tag });
     if (etagMatches(request, tag)) return new Response(null, { status: 304, headers: responseHeaders });
     return new Response(request.method === "HEAD" ? null : body, { status: 200, headers: responseHeaders });
   };
-  const sendJson = (value: unknown, tag?: string): Response => send(JSON.stringify(value), tag);
-  const one = (data: unknown): Response => sendJson({ meta: brief(meta), data });
+  const sendJson = async (value: unknown): Promise<Response> => {
+    const body = JSON.stringify(value);
+    return send(body, await representationTag(body));
+  };
+  const one = (data: unknown): Promise<Response> => sendJson({ meta: brief(meta), data });
   const missing = (file: string): Response => fail(meta, 503, "snapshot_incomplete", `The published snapshot has no ${file}. Try again after the next publication.`);
   const sendFile = async (file: string): Promise<Response> => {
     if (etagMatches(request, etag)) return send(null);
@@ -113,6 +123,9 @@ export async function handleApi(request: Request, deps: ApiDeps): Promise<Respon
   const paging = (values: Record<string, unknown>): [number, number] => [(values.limit as number | undefined) ?? DEFAULT_LIMIT, (values.offset as number | undefined) ?? 0];
   const under = (prefix: string): string | null => (path.startsWith(`${BASE}/${prefix}/`) ? path.slice(`${BASE}/${prefix}/`.length) : null);
 
+  // The compatibility exports share headers and conditional/HEAD behaviour with the versioned API.
+  if (path === "/api.json" || path === "/data/catalog.json") return sendFile(path);
+
   if (path === `${BASE}/meta`) {
     const values = params([]);
     return values instanceof Response ? values : sendJson(meta);
@@ -125,6 +138,28 @@ export async function handleApi(request: Request, deps: ApiDeps): Promise<Respon
     const values = params([]);
     return values instanceof Response ? values : sendFile("/data/catalog.json");
   }
+  if (path === `${BASE}/facets`) {
+    const values = params([]);
+    return values instanceof Response ? values : one(facets(index));
+  }
+  if (path === `${BASE}/corrections`) {
+    const values = params(CORRECTION_PARAMS);
+    if (values instanceof Response) return values;
+    const asset = await deps.asset("/data/corrections.json");
+    if (!asset) return missing("/data/corrections.json");
+    const all = ((await asset.json()) as { data: Correction[] }).data;
+    const found = all.filter((item) => !values.provider || item.provider === values.provider);
+    return sendJson({ meta: brief(meta), ...page(found, ...paging(values)) });
+  }
+  const document = under("docs");
+  if (document !== null) {
+    const values = params([]);
+    if (values instanceof Response) return values;
+    if (document !== "methodology" && document !== "licensing") return fail(meta, 404, "not_found", "No such reference document.");
+    const asset = await deps.asset(`/reference-content/docs/${document}.json`);
+    if (!asset) return missing(`the ${document} document`);
+    return one(await asset.json() as Documentation);
+  }
 
   // ---- providers
   if (path === `${BASE}/providers`) {
@@ -132,7 +167,9 @@ export async function handleApi(request: Request, deps: ApiDeps): Promise<Respon
     if (values instanceof Response) return values;
     const access = values.access as string[] | undefined;
     const origin = values.origin as string[] | undefined;
-    const found = index.providers.filter((provider) => (!access || access.includes(provider.access)) && (!origin || origin.includes(provider.origin)));
+    const words = String(values.q ?? "").toLowerCase().split(/\s+/).filter(Boolean);
+    const found = index.providers.filter((provider) => (!access || access.includes(provider.access)) && (!origin || origin.includes(provider.origin)) && words.every((word) => `${provider.id} ${provider.name}`.toLowerCase().includes(word)))
+      .sort((a, b) => a.name.localeCompare(b.name) || a.id.localeCompare(b.id));
     return sendJson({ meta: brief(meta), ...page(found, ...paging(values)) });
   }
   const providerId = under("providers");
@@ -147,7 +184,6 @@ export async function handleApi(request: Request, deps: ApiDeps): Promise<Respon
     if (!provider) return fail(meta, 404, "provider_not_found", `No provider "${id}". GET ${BASE}/providers lists them.`);
     const values = params(PROVIDER_VIEW_PARAMS);
     if (values instanceof Response) return values;
-    if (etagMatches(request, etag)) return send(null);
     const entries = index.entries.filter((entry) => entry.provider === id).sort((a, b) => a.name.localeCompare(b.name) || a.model.localeCompare(b.model));
     if (values.view !== "full") return one({ provider, entries });
     const asset = await deps.asset(`/data/providers/${id}.json`);
@@ -160,10 +196,10 @@ export async function handleApi(request: Request, deps: ApiDeps): Promise<Respon
   if (path === `${BASE}/entries`) {
     const parsed = parseQuery(url.searchParams, true);
     if (!parsed.ok) return fail(meta, 400, "invalid_parameters", "One or more query parameters are not valid.", parsed.errors);
-    // An answer that counts back from today changes with the day, so the day is part of its ETag.
+    // The representation hash changes when a date-relative result changes.
     const today = utcToday();
     const result = runQuery(index.entries, parsed.query, today);
-    return sendJson({ meta: brief(meta), ...result }, parsed.query.max_age_months === undefined ? undefined : `"${meta.dataset_version}-${today}"`);
+    return sendJson({ meta: brief(meta), ...result });
   }
   const entryPath = under("entries");
   if (entryPath !== null) {
@@ -173,7 +209,6 @@ export async function handleApi(request: Request, deps: ApiDeps): Promise<Respon
     if (values instanceof Response) return values;
     const summary = index.entries.find((entry) => entry.ref === ref);
     if (!summary) return fail(meta, 404, "entry_not_found", `No entry "${ref}". GET ${BASE}/entries?q=… searches them.`);
-    if (etagMatches(request, etag)) return send(null);
     const entry = await loadEntry(deps, summary);
     if (!entry) return missing("this entry's file");
     return one({ provider: index.providers.find((item) => item.id === summary.provider), summary, entry });
@@ -202,7 +237,6 @@ export async function handleApi(request: Request, deps: ApiDeps): Promise<Respon
   if (path === `${BASE}/evaluations`) {
     const values = params(EVALUATION_PARAMS);
     if (values instanceof Response) return values;
-    if (etagMatches(request, etag)) return send(null);
     const asset = await deps.asset("/data/evaluations.json");
     if (!asset) return missing("/data/evaluations.json");
     const all = ((await asset.json()) as { data: EvaluationRecord[] }).data;

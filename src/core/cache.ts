@@ -13,6 +13,21 @@ export const CACHE_AGES_S = [150, 300, 450, 600, 900, 1200, 1500, 1800, 2400, 30
 
 export type CacheSupport = "yes" | "no" | "unknown";
 export type CacheMode = "implicit" | "explicit";
+export type Support = "supported" | "unsupported" | "unknown";
+
+export interface CacheModeDocumentation {
+  support: Support;
+  ttl: string[] | null;
+  min_tokens: number | null;
+  max_breakpoints: number | null;
+  targets: string[] | null;
+}
+
+/** Normalized once for both the API and the website. An absent mode remains unknown. */
+export interface CacheDocumentation {
+  support: Support;
+  modes: Record<CacheMode, CacheModeDocumentation>;
+}
 /** short = the cache a request gets without asking for a lifetime, or with the shortest one; long = a longer lifetime it asked for. */
 export type RetentionProfile = "short" | "long";
 export const RETENTION_PROFILES = ["short", "long"] as const;
@@ -81,7 +96,7 @@ export interface CacheRetention {
   support: "supported" | "unsupported" | "unknown";
   /** The request field, and where in the request it goes. Null = not known. */
   parameter: { name: string; location: string } | null;
-  /** Values the access method is documented to accept, or accepted in an evaluation. Null = not known. */
+  /** Values explicitly confirmed by the evidence. Sending a value is not confirmation. Null = not known. */
   accepted_values: string[] | null;
   /** The lifetime a request gets when it leaves the parameter out. Null = not known. */
   default: string | null;
@@ -94,6 +109,7 @@ export interface CacheRetention {
 
 /** `providers_dev.cache` of an entry. */
 export interface EntryCache {
+  documented: CacheDocumentation;
   retention: CacheRetention;
   /** The summary table. Null = no evaluation on this entry. */
   results: CacheSummaryRow[] | null;
@@ -112,27 +128,44 @@ export function durationSeconds(value: unknown): number | undefined {
 export interface CacheFacts {
   cache: CacheSupport;
   cache_modes: CacheMode[];
+  cache_mode_support: Record<CacheMode, Support>;
   /** Cache lifetimes the provider documents, in seconds, shortest first. */
   cache_ttl_s: number[];
   /** The documented lifetimes of each mode, in seconds. A mode with no documented lifetime has no key. */
   cache_ttl_by_mode_s?: Partial<Record<CacheMode, number[]>>;
 }
 
-/** Documented caching, from `capabilities.cache` as models.dev records it. */
-export function cacheFacts(model: JsonObject): CacheFacts {
+/** Missing fields stay unknown, including a mode omitted from an otherwise populated cache object. */
+export function documentedCache(model: JsonObject): CacheDocumentation {
   const capabilities = isObject(model.capabilities) ? model.capabilities : {};
   const cache = capabilities.cache;
-  // models.dev: a missing `cache` says nothing; `false` says the entry does not cache.
-  if (cache === false) return { cache: "no", cache_modes: [], cache_ttl_s: [] };
-  if (!isObject(cache)) return { cache: "unknown", cache_modes: [], cache_ttl_s: [] };
+  const mode = (name: CacheMode): CacheModeDocumentation => {
+    const value = isObject(cache) ? cache[name] : undefined;
+    const support = cache === false || value === false ? "unsupported" : value === true || isObject(value) ? "supported" : "unknown";
+    const detail = isObject(value) ? value : {};
+    return {
+      support,
+      ttl: Array.isArray(detail.ttl) ? detail.ttl.filter((item): item is string => typeof item === "string") : null,
+      min_tokens: typeof detail.min_tokens === "number" ? detail.min_tokens : null,
+      max_breakpoints: typeof detail.max_breakpoints === "number" ? detail.max_breakpoints : null,
+      targets: Array.isArray(detail.targets) ? detail.targets.filter((item): item is string => typeof item === "string") : null,
+    };
+  };
+  const modes = { implicit: mode("implicit"), explicit: mode("explicit") };
+  const states = Object.values(modes).map((item) => item.support);
+  return { support: states.includes("supported") ? "supported" : states.every((state) => state === "unsupported") ? "unsupported" : "unknown", modes };
+}
+
+/** The compact API fields are a projection of the full entry's published documentation. */
+export function cacheFacts(documented: CacheDocumentation): CacheFacts {
   const modes: CacheMode[] = [];
   const ttl = new Set<number>();
   const byMode: Partial<Record<CacheMode, number[]>> = {};
   for (const mode of ["implicit", "explicit"] as const) {
-    const value = cache[mode];
-    if (value === undefined) continue;
+    const value = documented.modes[mode];
+    if (value.support !== "supported") continue;
     modes.push(mode);
-    if (isObject(value) && Array.isArray(value.ttl)) {
+    if (value.ttl) {
       const own = new Set<number>();
       for (const item of value.ttl) {
         const seconds = durationSeconds(item);
@@ -143,8 +176,9 @@ export function cacheFacts(model: JsonObject): CacheFacts {
     }
   }
   return {
-    cache: modes.length > 0 ? "yes" : "unknown",
+    cache: documented.support === "supported" ? "yes" : documented.support === "unsupported" ? "no" : "unknown",
     cache_modes: modes,
+    cache_mode_support: { implicit: documented.modes.implicit.support, explicit: documented.modes.explicit.support },
     cache_ttl_s: [...ttl].sort((a, b) => a - b),
     ...(Object.keys(byMode).length > 0 ? { cache_ttl_by_mode_s: byMode } : {}),
   };
@@ -252,16 +286,12 @@ export function summarizeCache(evaluations: readonly CacheEvaluation[]): CacheSu
 }
 
 /**
- * What a request can do about the cache lifetime on this entry, from what is documented and what evaluations sent.
- * Nothing is assumed: an entry no source speaks about is `unknown`.
- * - The source documents more than one lifetime: supported, with those values.
- * - An evaluation sent a lifetime and the control was served from the cache: the access method accepts that value.
- *   That is acceptance, not a promise: what lifetime it then gives is in the results.
- * - The source says the entry does not cache: unsupported.
+ * Parameter support needs an explicit, sourced declaration. Documented cache lifetimes do not identify a request
+ * parameter, and a cache hit does not show that a parameter was recognized. Requested settings stay in evaluations.
  */
-export function retentionOf(model: JsonObject, evaluations: readonly CacheEvaluation[], documentedOn: string | null): CacheRetention {
-  const facts = cacheFacts(model);
-  if (facts.cache === "no") {
+export function retentionOf(documented: CacheDocumentation, evidence: readonly RetentionEvidence[], declaration?: CacheRetention): CacheRetention {
+  if (declaration) return structuredClone(declaration);
+  if (documented.support === "unsupported") {
     return {
       support: "unsupported",
       parameter: null,
@@ -269,36 +299,10 @@ export function retentionOf(model: JsonObject, evaluations: readonly CacheEvalua
       default: null,
       profiles: [],
       conditions: ["The source says this entry does not cache prompts."],
-      evidence: [{ kind: "documented", url: "https://models.dev", date: documentedOn, note: "capabilities.cache is false in models.dev." }],
+      evidence: structuredClone([...evidence]),
     };
   }
-  const documented = documentedLifetimes(model);
-  const evidence: RetentionEvidence[] = [];
-  const values = new Map<string, number>();
-  let parameter: CacheRetention["parameter"] = null;
-  if (documented.length > 1) {
-    for (const value of documented) values.set(value, durationSeconds(value) ?? 0);
-    evidence.push({ kind: "documented", url: "https://models.dev", date: documentedOn, note: `models.dev lists the lifetimes ${documented.join(" and ")} in capabilities.cache.` });
-  }
-  for (const evaluation of evaluations) {
-    const asked = lifetimeAsked(evaluation.request_settings);
-    const control = evaluation.results.find((item) => item.kind === "control");
-    if (!asked || !control || control.hits === 0) continue;
-    parameter ??= { name: asked.parameter, location: asked.location };
-    values.set(asked.value, durationSeconds(asked.value) ?? 0);
-    evidence.push({ kind: "measured", url: evaluation.source, date: evaluation.date, note: `A request with ${asked.parameter}=${asked.value} was accepted and cached (${evaluation.client_label}).` });
-  }
-  if (values.size === 0) return { support: "unknown", parameter: null, accepted_values: null, default: null, profiles: [], conditions: [], evidence: [] };
-  const accepted = [...values].sort((a, b) => a[1] - b[1] || a[0].localeCompare(b[0])).map(([value]) => value);
-  return {
-    support: "supported",
-    parameter,
-    accepted_values: accepted,
-    default: null,
-    profiles: [{ profile: "short", value: null }, ...accepted.map((value) => ({ profile: profileOf(value, model), value }))],
-    conditions: [],
-    evidence,
-  };
+  return { support: "unknown", parameter: null, accepted_values: null, default: null, profiles: [], conditions: [], evidence: [] };
 }
 
 /** The settings of an evaluation in one line: `format=messages, ttl=1h`. */

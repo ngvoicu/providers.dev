@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { CACHE_AGES_S, cacheResult, type CacheSummaryRow } from "../src/core/cache.ts";
-import type { Summary } from "../src/core/entries.ts";
-import { rowHtml } from "../src/core/render.ts";
+import { buildIndex, type Summary } from "../src/core/entries.ts";
+import type { Json } from "../src/core/merge.ts";
+import { entryHtml, rowHtml } from "../src/core/render.ts";
+import { resolve } from "../src/core/resolve.ts";
+import { UpstreamModel } from "../src/core/schema.ts";
+import { pricingOf } from "../src/core/policies.ts";
 
 const base = {
   ref: "p/m",
@@ -16,6 +20,7 @@ const base = {
   cache_retention: "unknown",
   evaluation_count: 0,
   cache_results: null,
+  pricing: pricingOf({}, "api", null, []),
   measured_limit_count: 0,
   overridden_fields: [],
   shard: 0,
@@ -31,6 +36,35 @@ const line = (profile: "short" | "long", results: [number, number, number][] | n
   last_date: results ? "2026-11-10" : null,
   results: results ? results.map(([age, hits, checks]) => cacheResult(age === 0 ? "control" : "timed", age, hits, checks)) : null,
   ...sent,
+});
+
+describe("documented cache support on an entry page", () => {
+  const entry = (cache: Json | undefined) => {
+    const model = UpstreamModel.parse({ id: "m", name: "M", capabilities: { cache } });
+    const { catalog } = resolve({
+      upstream: { p: { id: "p", name: "P", models: { m: model } } }, additions: [], overrides: [], routes: {},
+      access: { default: "api", default_basis: "fixture", patterns: [], providers: {} },
+    });
+    const index = buildIndex(catalog, "fixture", "2026-11-14T00:00:00Z", "2026-11-14T00:00:00Z");
+    const summary = index.entries[0]!;
+    const html = entryHtml({ summary, provider: index.providers[0]!, model: catalog.p!.models.m!, now: new Date("2026-11-14T00:00:00Z") });
+    return { summary, html, documented: html.split('<h2 id="cache">')[1]!.split("<h3>Retention</h3>")[0]! };
+  };
+
+  it("keeps absent modes unknown on both the API summary and detail page", () => {
+    for (const cache of [undefined, {}]) {
+      const { summary, documented } = entry(cache);
+      expect(summary).toMatchObject({ cache: "unknown", cache_mode_support: { implicit: "unknown", explicit: "unknown" } });
+      expect(documented).not.toContain("Unsupported");
+    }
+    const partial = entry({ implicit: true });
+    expect(partial.summary.cache_mode_support).toEqual({ implicit: "supported", explicit: "unknown" });
+    expect(partial.documented).toContain("Supported");
+    expect(partial.documented).not.toContain("Unsupported");
+    const unsupported = entry(false);
+    expect(unsupported.summary.cache_mode_support).toEqual({ implicit: "unsupported", explicit: "unsupported" });
+    expect(count(unsupported.documented, ">Unsupported</span>")).toBe(2);
+  });
 });
 const cells = (html: string): number => ["skip", "all", "most", "few", "none"].reduce((sum, name) => sum + count(html, `class="${name}"`) + count(html, `class="${name} control"`), 0);
 

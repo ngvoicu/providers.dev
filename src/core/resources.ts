@@ -2,7 +2,53 @@
 // index as everything else, by the same functions for the API and for the pages, so that a page shows what the API returns.
 import type { CacheEvaluation } from "./cache.ts";
 import type { Index, Summary } from "./entries.ts";
-import { NS, type Access, type Catalog, type MeasuredLimit, type ModelExtension } from "./schema.ts";
+import { NS, type Access, type Catalog, type MeasuredLimit, type ModelExtension, type Provenance } from "./schema.ts";
+
+export interface Facets {
+  providers: { id: string; name: string }[];
+  types: string[];
+  evidence_entries: number;
+  subscription_providers: number;
+}
+
+export function facets(index: Index): Facets {
+  return {
+    providers: index.providers.map(({ id, name }) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name) || a.id.localeCompare(b.id)),
+    types: [...new Set(index.entries.flatMap((entry) => entry.type ? [entry.type] : []))].sort(),
+    evidence_entries: index.entries.filter((entry) => entry.origin !== "upstream").length,
+    subscription_providers: index.providers.filter((provider) => provider.access === "subscription").length,
+  };
+}
+
+export interface Correction {
+  provider: string;
+  change: Provenance;
+  entry_refs: string[];
+}
+
+/** Group only identical corrections, including the original value and all evidence. */
+export function listCorrections(catalog: Catalog, index: Index): Correction[] {
+  const groups = new Map<string, Correction>();
+  for (const entry of index.entries) {
+    const extension = catalog[entry.provider]?.models[entry.model]?.[NS] as unknown as ModelExtension | undefined;
+    for (const change of extension?.provenance ?? []) {
+      const key = JSON.stringify([entry.provider, change]);
+      const group = groups.get(key) ?? { provider: entry.provider, change, entry_refs: [] };
+      group.entry_refs.push(entry.ref);
+      groups.set(key, group);
+    }
+  }
+  return [...groups.values()];
+}
+
+/** Authored reference text, published through the API along with the machine-readable contract. */
+export interface Documentation {
+  title: string;
+  description: string;
+  lead: string;
+  toc: { id: string; label: string }[];
+  body_html: string;
+}
 
 /** A model as its lab names it, and how the catalog's entries for it compare. */
 export interface CanonicalModel {

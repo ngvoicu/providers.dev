@@ -1,16 +1,16 @@
 # providers.dev site
 
-A static reference site and read-only JSON API for AI models as each provider and access method exposes them.
+An API-driven reference site and read-only JSON API for AI models as each provider and access method exposes them.
 The baseline is imported from models.dev; our additions, corrections and measurements are merged on top.
 
 ## Stack
 
 - TypeScript everywhere, run directly by Node 24+ (no build step for scripts: use `.ts` import paths, type-only
   imports with `import type`, no enums or parameter properties).
-- Astro (static output) + Tailwind 4 for the pages. No UI framework: the small amount of browser code is plain
+- Astro (static output) + Tailwind 4 for the shared shell and authored reference fragments. No UI framework: the small amount of browser code is plain
   TypeScript in `src/client/`.
 - Zod for every input. YAML for authored data.
-- Cloudflare Worker with static assets (`wrangler.jsonc`). The Worker runs only for `/api/v1/*`.
+- Cloudflare Worker with static assets (`wrangler.jsonc`) for the API and all public HTML routes.
 - Vitest, ESLint, `tsc`, `astro check`.
 
 ## Layout
@@ -43,14 +43,20 @@ The baseline is imported from models.dev; our additions, corrections and measure
   shown as what the subscription costs.
 - No subscription plans, plan prices, allowances or quota data. Access is a classification only.
 - The website and the API must read the same published snapshot and use the same query code (`src/core/query.ts`).
-  Do not add a second filter implementation.
+  Do not add a second filter implementation. Pages consume API responses through `PageDeps.api`; never import a
+  catalog or index into a renderer. Browser filtering must call the public API.
 - Public requests never fetch upstream. Only `npm run sync` does.
 - Text on the site: plain, short, professional, no marketing. Say what a number means and where it comes from.
 - Wording: the two sources are named `models.dev` and `providers.dev` (never "ours"). A cache run is an
   "evaluation". Pages use the full width of the home page (`.page`).
-- Cache evaluations are described in plain words: a prompt is "cached", a re-send is "served from the cache", and
-  the catalog summary is "At least 30 min". "Warm" and "cold" stay in field names only. An entry page shows the
-  evaluations as a table with one column per age and a `3/3`-style value per cell.
+- Cache summaries use the API's exact ages, hit percentages and counts, with separate short/long settings on every
+  page. Do not generate narrative lifetime verdicts. Individual evaluations are collapsed by default.
+- Cache mode support comes from `providers_dev.cache.documented`; retention parameter support requires a sourced
+  declaration. A requested setting or cache hit alone does not confirm parameter support.
+- Pricing and request controls come from `providers_dev.pricing` and `providers_dev.request_controls`, also present
+  on every summary. Normalize conditions once; preserve unfamiliar source shapes and mark coverage partial. Never
+  infer flat pricing from absent rules or invent request headers from free-text locations.
+- Measured limits use numeric columns, not generated sentences. Free-text evaluation notes belong in raw evidence.
 - Each source carries its own date: the import date next to `models.dev`, the newest evidence next to
   `providers.dev`.
 - A measurement names the client it went through: the provider directly, CLIProxyAPI, or a vendor's own CLI. The
@@ -63,13 +69,16 @@ The baseline is imported from models.dev; our additions, corrections and measure
 ```
 npm run sync        # import models.dev and the measurements (network)
 npm run data        # resolve into data/published/
-npm run build       # data + stage + astro build -> dist/
-npm run dev         # astro dev server (pages only; the API needs `npm run preview`)
+npm run build       # data + stage + template build -> dist/
+npm run build:site  # rebuild templates only
+npm run refresh:data # data + stage into public/ and dist/; no template build
+npm run dev         # build + Wrangler dev (all pages and API)
 npm run preview     # wrangler dev: the built site and the API as on Cloudflare
 npm run check       # eslint + tsc + astro check + vitest
 ```
 
-Run `npm run build` before `npm run check` on a fresh clone: type-checking the Worker needs `worker/generated/`.
+The Worker reads versioned snapshot assets at runtime; no dataset is bundled into its code.
+Run `npm run build` before previewing a fresh clone. Data updates can use `npm run refresh:data` afterward.
 Before finishing a change: `npm run build && npm run check`, and look at the affected page in a browser.
 
 ## Logo and icons

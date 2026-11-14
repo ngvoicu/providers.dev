@@ -1,29 +1,7 @@
 ---
-import Base from "./Base.astro";
-
-interface Props {
-  title: string;
-  description: string;
-  lead: string;
-  toc: { id: string; label: string }[];
-}
-const { title, description, lead, toc } = Astro.props;
+// Build authored reference text once. The API serves this JSON; pages consume that response.
+import type { Documentation } from "../core/resources.ts";
+interface Props extends Omit<Documentation, "body_html"> {}
+const document: Documentation = { ...Astro.props, body_html: await Astro.slots.render("default") };
 ---
-
-<Base title={title} description={description}>
-  <div class="grid gap-10 lg:grid-cols-[13rem_minmax(0,1fr)]">
-    <aside class="hidden lg:block">
-      <nav class="toc" aria-label="On this page">
-        <p>On this page</p>
-        {toc.map((item) => <a href={`#${item.id}`}>{item.label}</a>)}
-      </nav>
-    </aside>
-    <article class="min-w-0">
-      <header class="prose">
-        <h1>{title}</h1>
-        <p class="lead !mt-3">{lead}</p>
-      </header>
-      <slot />
-    </article>
-  </div>
-</Base>
+<Fragment set:html={JSON.stringify(document)} />
