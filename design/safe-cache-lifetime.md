@@ -150,7 +150,7 @@ One shape for both kinds, so that a page prints the list in one loop. A key that
 | `lifetime_s` | The documented lifetime in seconds; 0 on the item that says the entry does not cache (5.2) | The oldest tested age through which every check of this client hit. 0 = none. |
 | `mode` | `implicit` or `explicit`: the way of caching the lifetime is documented for; null on the "does not cache" item | null |
 | `documented_as` | The lifetime as the source writes it, for example `5m`; null on the "does not cache" item | null |
-| `client`, `client_label` | null | The public client id and label, as on `evaluations[]` |
+| `client`, `client_label` | null | The public client id and label, as on `evaluations[]`. One public client id has one label: two clients of `data/authored/measurement-labels.yaml` with the same `id` and different `label` fail the build, and `other` keeps the label of an undescribed client |
 | `parameter`, `value` | null | The request field that asked for the lifetime and the value sent, as on `evaluations[]`; both null = no lifetime was asked for |
 | `evaluations` | 0 | How many evaluations the item is made from (≥ 1) |
 | `evaluation_ids` | `[]` | Their ids, sorted, as in `evaluations[].id` |
@@ -556,9 +556,11 @@ The profile of a documented item:
 - `short`: its `lifetime_s` is the shortest lifetime the entry documents, over both ways of caching.
 - `long`: every other.
 
-This is the rule that already puts an evaluation in a profile (`profileOf`: no lifetime asked, or the shortest
-documented one, is short; any other is long), so a documented lifetime and an evaluation of the same setting land in
-the same profile.
+The same rule puts an evaluation in a profile (`profileOf`), in seconds: one that asked for no lifetime is short; one
+that asked for a lifetime is short when that lifetime, converted as in 5.3, equals the shortest lifetime the entry
+documents (the `lifetime_s` of its short documented items), and long in every other case, a value that does not
+convert included. A profile declared on the entry's retention option comes first. So a documented lifetime and an
+evaluation of the same setting land in the same profile, however either is written and in whatever order.
 
 `documented_s` of a profile is the lowest `lifetime_s` of its documented items: for `short` the shortest lifetime
 documented, for `long` the shortest of the longer ones. Section 4 says when it is the safe value.
@@ -1088,6 +1090,8 @@ All on 2026-11-15. "The owner" decided; "the chief" is the project's chief, who 
 | 25 | 2026-11-15: the date of a documented lifetime on an added entry is the newest non-`listed` evidence of the entry as published, the declarations made for it by name included (5.4). | The chief, after review T-14 |
 | 26 | 2026-11-15: a run that does not count, whose control did not miss and to which groundtruth gives an `all_warm_through_s` above 0, is reported as `lifetime-differs`; it still counts for no lifetime (3.6). | The chief, after review T-14 |
 | 27 | 2026-11-15: `retention-lifetime-differs` has the target `provider/model#request_controls.cache.retention`, is reported also where the option's profile has no documented lifetime, and skips an option without a `profile` (6.3). The same lifetime text twice in one mode makes two items, as written (2.3). | The chief, after review T-14 |
+| 28 | 2026-11-15: the profile of an evaluation is decided in seconds: no lifetime asked is short; a lifetime asked is short when, converted as in 5.3, it equals the shortest documented lifetime in whole seconds, and long otherwise, a value that does not convert included. A declared profile comes first. Nothing depends on the order or the writing of the texts (5.1). | The chief, after review T-19 |
+| 29 | 2026-11-15: one public client id has one label. Two clients of the labels file with the same `id` and different `label` are an error that fails the build and names both (2.3). | The chief, after review T-19 |
 
 Open: 12 (the exact test, pending the owner's look at the borderline cases) and 20.
 
