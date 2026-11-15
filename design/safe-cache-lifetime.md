@@ -1,12 +1,16 @@
 # One cache record per entry: every lifetime, and the safe value
 
-Design, 2026-11-15, final after the owner's answers of that day (section 12). Not built yet. This file says what is
-to be built, in full: a worker implements from it. `AGENTS.md` and `README.md` stay the rules of the data and the
-contract, and section 11 lists what changes in them.
+Design, 2026-11-15, final after the owner's answers of that day (section 12). Built: tasks 1 to 6 of section 11 are
+in `main` up to `5401995`, and `documented_status` (decision 32) after the final review T-26. This file says what
+is built and why; sections 6 and 11 also keep the order in which it was built. `AGENTS.md` and `README.md` stay the
+rules of the data and the contract.
 
 Numbers and examples are from the dataset built on 2026-11-15 from commit `e6cd269`: `dataset_version`
 `c58159b6ef7f9dfa`, models.dev import of 2026-11-15 (commit `c18a3cf`), `observed.json` sha256 `956fa11a…`
-(groundtruth `60423f2`), 332 providers, 10,524 entries, 78 published cache evaluations on 46 entries.
+(groundtruth `60423f2`), 332 providers, 10,524 entries, 78 published cache evaluations on 46 entries. The final
+review T-26 rebuilt them on `4d6a1f5df03a858f` (groundtruth `798c409`, after the work): every count and safe value
+here is unchanged; only the notes of three published evaluations changed. With `documented_status` the dataset is
+`04b201d22bee0831`, the values again unchanged.
 
 ## 1. What is published
 
@@ -17,7 +21,8 @@ Every entry gets one record, `providers_dev.cache.lifetime`, and every summary t
   date. A documented item also has the text as documented and the way of caching it is documented for. A measured
   item is one client, with its hits and checks and its results at each age.
 - `short` and `long`: the safe value of each profile, `safe_s`, in seconds, with its `basis`, and beside it the
-  documented lifetime (`documented_s`) and the measured one (`measured_s`) it was chosen from.
+  documented lifetime (`documented_s`) and the measured one (`measured_s`) it was chosen from, and what the rule
+  found of the documentation (`documented_status`: `contradicted`, `not_contradicted` or null).
 
 The safe value, in one paragraph (section 4 has it exactly):
 
@@ -33,9 +38,9 @@ So `safe_s: 0` is either documented ("does not cache") or measured (no age at wh
 `basis` and `source`; `safe_s: null` is "not known". The safe value is never above the documented lifetime.
 
 The record is worked out once, in the data build, from the documented caching and the published evaluations. It
-replaces three views the API has today: the documented lifetimes (`documented.modes.*.ttl`, `cache_ttl_s`,
-`cache_ttl_by_mode_s`) and the results added up over all clients (`results`, `cache_results`). Those are deleted in
-this work, and the pages print the merged record (section 6, tasks 5 and 6).
+replaced three views the API had before this work: the documented lifetimes (`documented.modes.*.ttl`,
+`cache_ttl_s`, `cache_ttl_by_mode_s`) and the results added up over all clients (`results`, `cache_results`). Those
+were deleted in this work, and the pages print the merged record (section 6, tasks 5 and 6).
 
 The imported part of an entry is not touched: `capabilities.cache` keeps models.dev's shape, and `/api.json` stays a
 superset of their export.
@@ -73,6 +78,9 @@ export interface CacheLifetimeItem {
   results: CacheResult[] | null;
 }
 
+/** What the rule of 4.1 found of a profile's documented lifetime, where one above 0 is documented and one measured. */
+export type DocumentedStatus = "contradicted" | "not_contradicted";
+
 /** The safe lifetime of an entry for one retention profile, and what it was chosen from. */
 export interface SafeLifetime {
   safe_s: number | null;
@@ -81,6 +89,7 @@ export interface SafeLifetime {
   date: string | null;
   documented_s: number | null;
   measured_s: number | null;
+  documented_status: DocumentedStatus | null;
   clients: number;
   evaluations: number;
   checks: number;
@@ -99,7 +108,7 @@ export interface CacheLifetimeRecord {
 }
 ```
 
-`EntryCache` gets the key `lifetime: CacheLifetimeRecord`, after `retention`. `Summary` gets
+`EntryCache` has the key `lifetime: CacheLifetimeRecord`, after `retention`. `Summary` has
 `cache_lifetime: CacheLifetimeRecord`, after `cache_retention`. It is the same object in both places.
 
 ### 2.2 `SafeLifetime` (`lifetime.short`, `lifetime.long`), key by key
@@ -114,6 +123,7 @@ export interface CacheLifetimeRecord {
 | `date` | `YYYY-MM-DD` or null | `measured`: the newest evaluation counted. `documented`: the date of the documented item it is taken from. Null with `none`, and where the source has no date. |
 | `documented_s` | integer ≥ 0, or null | The documented lifetime of the profile: the lowest `lifetime_s` of its documented items. 0 = the provider documents that it does not cache. Null = none is documented. |
 | `measured_s` | integer ≥ 0, or null | The measured lifetime of the profile: the lowest `lifetime_s` of its measured items, which is the oldest age through which every check hit in every client. 0 = no such age. Null = not measured. |
+| `documented_status` | `contradicted` \| `not_contradicted` \| null | What the rule of 4.1 found of the documented lifetime, set where the rule is applied. `contradicted`: a lifetime above 0 is documented, one is measured, and an evaluation of the profile contradicts it; `safe_s` is `measured_s`. `not_contradicted`: the same, and no evaluation contradicts it; `safe_s` is `documented_s` (not contradicted is not confirmed). Null in every other case: nothing documented, nothing measured, or `documented_s` 0 (the provider documents that it does not cache: the rule never calls that contradicted, and "not contradicted" beside a measurement that found caching would mislead; `measured_s` is beside it). |
 | `clients` | integer ≥ 0 | How many clients were measured. 0 = not measured. |
 | `evaluations` | integer ≥ 0 | How many evaluations were counted. 0 = not measured. |
 | `checks` | integer ≥ 0 | Re-sends made in them, the control included. |
@@ -126,15 +136,17 @@ export interface CacheLifetimeRecord {
 The eight keys from `clients` to `first_miss_s` describe the measurement of the profile whatever the `basis`: a
 profile whose safe value is the documented one still shows what was measured.
 
-Which case applied is read from three keys:
+Which case applied is read from these keys; the two that compare the documentation with a measurement are
+published as `documented_status`, so that nobody, a page included, has to work them out:
 
-| Case | `basis` | `documented_s` | `measured_s` | Beside it |
-|---|---|---|---|---|
-| Documented, not measured | `documented` | a number | null | |
-| Documented, measured, not contradicted | `documented` | a number | a number | `hits_inside` of `checks_inside` agree |
-| Measured, because the documentation was contradicted | `measured` | a number | a number, = `safe_s` | `hits_inside` of `checks_inside` |
-| Measured, nothing documented | `measured` | null | a number, = `safe_s` | |
-| Nothing known | `none` | null | null | |
+| Case | `basis` | `documented_s` | `measured_s` | `documented_status` | Beside it |
+|---|---|---|---|---|---|
+| Documented, not measured | `documented` | a number | null | null | |
+| Documented, measured, not contradicted | `documented` | a number above 0 | a number | `not_contradicted` | `hits_inside` of `checks_inside` agree |
+| Measured, because the documentation was contradicted | `measured` | a number above 0 | a number, = `safe_s` | `contradicted` | `hits_inside` of `checks_inside` |
+| Documented as not caching, and measured | `documented` | 0 | a number | null | `hits_inside` of `checks_inside` |
+| Measured, nothing documented | `measured` | null | a number, = `safe_s` | null | |
+| Nothing known | `none` | null | null | null | |
 
 ### 2.3 `CacheLifetimeItem` (`lifetime.lifetimes[]`), key by key
 
@@ -157,7 +169,7 @@ One shape for both kinds, so that a page prints the list in one loop. A key that
 | `checks`, `hits` | 0, 0 | Re-sends made in them and how many were served from the cache, the control included |
 | `tested_from_s` | null | The youngest timed age any of them checked; null = none made a timed check |
 | `first_miss_s` | null | The youngest age at which any of them missed; null = no miss |
-| `results` | null | Their results added up by exact age, the control first: `CacheResult[]`, the type the API has today |
+| `results` | null | Their results added up by exact age, the control first: `CacheResult[]`, the type of `evaluations[].results` |
 
 What one item is:
 
@@ -189,11 +201,11 @@ not contradicted.
 ```json
 "lifetime": {
   "short": { "safe_s": 1800, "basis": "documented", "source": "models.dev", "date": "2026-11-15",
-             "documented_s": 1800, "measured_s": 1800,
+             "documented_s": 1800, "measured_s": 1800, "documented_status": "not_contradicted",
              "clients": 1, "evaluations": 1, "checks": 16, "hits": 10, "checks_inside": 10, "hits_inside": 10,
              "tested_from_s": 300, "first_miss_s": 2400 },
   "long":  { "safe_s": 43200, "basis": "documented", "source": "models.dev", "date": "2026-11-15",
-             "documented_s": 43200, "measured_s": null,
+             "documented_s": 43200, "measured_s": null, "documented_status": null,
              "clients": 0, "evaluations": 0, "checks": 0, "hits": 0, "checks_inside": null, "hits_inside": null,
              "tested_from_s": null, "first_miss_s": null },
   "lifetimes": [
@@ -229,25 +241,25 @@ The other cases, each as `lifetime.short` (the lines starting with `//` are note
 ```jsonc
 // measured, the documentation contradicted: openrouter/google/gemini-3.8-flash (example 8)
 { "safe_s": 0, "basis": "measured", "source": "providers.dev", "date": "2026-11-04",
-  "documented_s": 300, "measured_s": 0,
+  "documented_s": 300, "measured_s": 0, "documented_status": "contradicted",
   "clients": 1, "evaluations": 1, "checks": 7, "hits": 1, "checks_inside": 7, "hits_inside": 1,
   "tested_from_s": 150, "first_miss_s": 150 }
 
 // measured, nothing documented: openai-codex/gpt-6.1-sol (example 1)
 { "safe_s": 300, "basis": "measured", "source": "providers.dev", "date": "2026-11-07",
-  "documented_s": null, "measured_s": 300,
+  "documented_s": null, "measured_s": 300, "documented_status": null,
   "clients": 3, "evaluations": 3, "checks": 96, "hits": 63, "checks_inside": null, "hits_inside": null,
   "tested_from_s": 300, "first_miss_s": 900 }
 
 // documented as not caching: alibaba/qwen-mt-plus (example 13)
 { "safe_s": 0, "basis": "documented", "source": "models.dev", "date": "2026-11-15",
-  "documented_s": 0, "measured_s": null,
+  "documented_s": 0, "measured_s": null, "documented_status": null,
   "clients": 0, "evaluations": 0, "checks": 0, "hits": 0, "checks_inside": null, "hits_inside": null,
   "tested_from_s": null, "first_miss_s": null }
 
 // nothing known: 9,668 entries
 { "safe_s": null, "basis": "none", "source": null, "date": null,
-  "documented_s": null, "measured_s": null,
+  "documented_s": null, "measured_s": null, "documented_status": null,
   "clients": 0, "evaluations": 0, "checks": 0, "hits": 0, "checks_inside": null, "hits_inside": null,
   "tested_from_s": null, "first_miss_s": null }
 ```
@@ -262,8 +274,8 @@ The "does not cache" item, as on `alibaba/qwen-mt-plus` (one for `short`, the sa
   "tested_from_s": null, "first_miss_s": null, "results": null }
 ```
 
-Today the list would hold 1,403 documented items (1,133 lifetimes, and 270 on the 135 entries that do not cache)
-and 75 measured ones.
+The list holds 1,403 documented items (1,133 lifetimes, and 270 on the 135 entries that do not cache) and 75
+measured ones.
 
 ### 2.6 What always holds
 
@@ -292,6 +304,10 @@ A test checks these on every entry (task 2). P is a profile; "of P" means the it
 11. Every evaluation of the entry that counts (3.1) is named in exactly one item.
 12. A documented item with `lifetime_s` 0, `mode` null and `documented_as` null is there, once per profile, exactly
     when `documented.support` is `unsupported`.
+13. `documented_status` is not null ⇔ `documented_s` is above 0 and `measured_s` is not null. Then it is
+    `contradicted` ⇔ `basis` is `measured`, and `not_contradicted` ⇔ `basis` is `documented`; and it is what the
+    test of 4.1, redone from the counted evaluations, finds. (`lifetimeRuleBreaks` in `tests/helpers.ts`, on every
+    entry of the fixture and of the real snapshot.)
 
 ## 3. The derivation of a measured value
 
@@ -345,7 +361,7 @@ lifetime_s    = min(safe)
 first_miss_s  = min(first_miss that are not null), else null
 tested_from_s = min(tested_from that are not null), else null
 evaluations   = how many;  date = the newest;  evaluation_ids = sorted
-results       = their results added up by exact age (addResults, as today);  checks, hits = the sums over results
+results       = their results added up by exact age (addResults);  checks, hits = the sums over results
 ```
 
 - A measured item is the set of counted evaluations with one profile, one `parameter` and `value`, and one public
@@ -356,11 +372,12 @@ results       = their results added up by exact age (addResults, as today);  che
 
 ### 3.4 A measured item and the results by age
 
-The per-age results the API publishes today are of two kinds: each evaluation's own (`evaluations[].results`) and
-the sums over every client of a retention setting (`results`, `cache_results`). In the merged record:
+Before this work the API published per-age results of two kinds: each evaluation's own (`evaluations[].results`)
+and the sums over every client of a retention setting (`results`, `cache_results`, now deleted). In the merged
+record:
 
-- A measured item carries `results`: the sums over *its* evaluations, so one client and one setting. Same type,
-  same making (`addResults`), same exact ages; the ages listed in `/api/v1/meta` (`cache_ages_s`) still say which
+- A measured item carries `results`: the sums over *its* evaluations, so one client and one setting. The same
+  `CacheResult` type, made by `addResults`, at the exact ages; the ages listed in `/api/v1/meta` (`cache_ages_s`) still say which
   ones a table has columns for.
 - `lifetime_s` is read from the evaluations one by one (3.2) and the lowest is taken (3.3). On an item with one
   evaluation, which is 72 of the 75 items today, the walk over the item's `results` gives exactly `lifetime_s`. On
@@ -368,8 +385,8 @@ the sums over every client of a retention setting (`results`, `cache_results`). 
   the same.
 - `evaluation_ids` names the evaluations, and `evaluations[]` has each one's own results, route, date, request
   settings and raw file.
-- The sums over all clients of a setting are not made any more (section 6): adding the checks of different clients
-  is what decision 2 does not do.
+- The sums over all clients of a setting are not made (section 6): adding the checks of different clients is what
+  decision 2 does not do.
 
 ### 3.5 The cases of the first brief
 
@@ -448,7 +465,13 @@ else if measured_s is not null:
     safe_s = measured_s,    basis = "measured",    source = "providers.dev", date = the newest evaluation
 else:
     safe_s = null,          basis = "none",        source = null, date = null
+
+documented_status = "contradicted" or "not_contradicted" as the test below found,
+                    where documented_s is above 0 and measured_s is not null; else null
 ```
+
+`cacheLifetime` applies the test once per profile and sets `basis` and `documented_status` from that one result
+(decision 32); the status is not derived afterwards from the other keys.
 
 **Contradicted.** The documentation of a profile is contradicted when `documented_s` is above 0 and at least one
 counted evaluation of the profile (3.1) has a result for which both hold:
@@ -477,7 +500,7 @@ What follows from the rule:
 - Where the documentation is contradicted, `measured_s` is not null, so the second branch always applies.
 - A documented lifetime that no evaluation checked at any age inside it cannot be contradicted.
 - "Not contradicted" is not "confirmed". `hits_inside` of `checks_inside` and the items' `results` say how much
-  agrees and up to which age.
+  agrees and up to which age. `documented_status: "not_contradicted"` says no more than that.
 
 `checks_inside` and `hits_inside`, where the profile is both documented and measured: over all counted evaluations
 of the profile, the checks and the hits of the results with `age_s` ≤ `documented_s`, the control included.
@@ -503,7 +526,9 @@ of the profile, the checks and the hits of the results with `age_s` ≤ `documen
 ### 4.3 Every entry with a documented lifetime and a measurement for the same profile
 
 All thirteen, on the dataset of this document. "Inside" is `hits_inside` of `checks_inside`; the lowest rate is the
-result nearest to contradicting.
+result nearest to contradicting. These thirteen are exactly the profiles with a `documented_status`: twelve
+`not_contradicted` and one `contradicted` (`openrouter/google/gemini-3.8-flash` short). No profile has `documented_s`
+0 together with a measurement.
 
 | Entry | Profile | `documented_s` | `measured_s` | Inside | Lowest rate inside | `safe_s` |
 |---|---|---|---|---|---|---|
@@ -521,7 +546,8 @@ result nearest to contradicting.
 | `openrouter/openai/gpt-6.1-sol` | short | 1,800 | 1,800 | 25 of 25 | all hit | **1,800** documented |
 | `openrouter/openai/gpt-6.1-terra` | short | 1,800 | 1,800 | 25 of 25 | all hit | **1,800** documented |
 
-The evaluations behind the four rows where the two values differ:
+The evaluations behind the five rows where the two values differ (the two OpenRouter Anthropic long rows share a
+bullet):
 
 - `anthropic/claude-opus-5-5` long, `cliproxyapi`, 2026-11-04: `K1-beta` c 1/1 · 600: 3/3 · 1800: 2/3 · 3900: 0/3;
   `K1-nobeta` c 1/1 · 600: 3/3 · 1800: 3/3 · 3900: 0/3. 2 of 3 is not below half; 3,900 is outside.
@@ -552,7 +578,9 @@ The borderline cases and which way the rule takes them:
 ### 5.1 The source fields and the profiles
 
 The documented caching of an entry: models.dev's `capabilities.cache` after providers.dev's corrections, as
-`documentedCache` in `src/core/cache.ts` reads it. For each way of caching that is supported, each text of its `ttl`
+`documentedCaching` in `src/core/cache.ts` reads it into the build-only `DocumentedCaching`: `documented`, the
+published support and details of each way of caching (`documentedCache`), and beside it `ttl`, the lifetime texts of
+each way, which are published only as the documented items and, as imported, in `capabilities.cache`. For each way of caching that is supported, each text of its `ttl`
 list that is a duration (5.3) is one documented item, with `mode`, `documented_as` and `lifetime_s`.
 
 The profile of a documented item:
@@ -587,15 +615,16 @@ caching is unsupported and the other is not stated has `support: unknown` and ge
 
 ### 5.3 Text to seconds
 
-Only `durationSeconds` (`src/core/cache.ts`): a whole number and one unit of `ms`, `s`, `m`, `h`, `d` (`"5m"` → 300,
-`"1h"` → 3600), and only where it comes to a whole number of seconds above 0: the record holds whole seconds, and a
+Only `lifetimeSeconds` (`src/core/cache.ts`), which reads the text with `durationSeconds`: a whole number and one
+unit of `ms`, `s`, `m`, `h`, `d` (`"5m"` → 300, `"1h"` → 3600), and keeps it only where it comes to a whole number
+of seconds above 0: the record holds whole seconds, and a
 text of 0 seconds has no meaning (0 is only the "does not cache" item of 5.2). `"500ms"` or `"0s"` is treated as any
 other text that cannot be converted, below; nothing is rounded. Every lifetime in today's catalog has that form (`5m`, `30m`, `1h`, `2h`, `12h`, `24h`).
 
 Anything else (a range such as `5m-10m`, words) is not converted and is no item: a number is not made up from it.
-Today such a string is dropped silently by `cacheFacts`; from task 2 the build reports it (`unparsed-lifetime`, a
-notice, target `provider/model#capabilities.cache.<mode>.ttl`), so that the format is seen the day models.dev uses
-it. The text itself stays readable in `capabilities.cache`, which is published as imported. If ranges appear, the
+The build reports it (`unparsed-lifetime`, a notice, target `provider/model#capabilities.cache.<mode>.ttl`, made in
+`resolve.ts`), so that the format is seen the day models.dev uses it; before this work such a string was dropped
+silently. `CacheFacts` holds no lifetime. The text itself stays readable in `capabilities.cache`, which is published as imported. If ranges appear, the
 rule to add is "the lower bound", as a change to this design.
 
 ### 5.4 The source and date of a documented item
@@ -630,37 +659,38 @@ An entry providers.dev added takes no cache behaviour from the entry it names, s
 its own file states one. The `meta-subscription/*` entries are of that kind: their values are measured, and nothing
 is documented beside them.
 
-## 6. What becomes of today's fields
+## 6. What became of the fields of before
 
 "Merged, not distinct": a lifetime is published in one place, the list. A field stays only where it says something
 the list does not. The owner: "delete them and make it nice and change the website". Nothing is kept for old
-readers; the API is not public.
+readers; the API is not public. The tables below are the record of the change: "Before" is the API before this work,
+"After" is what it publishes now. No field marked deleted is published any more.
 
 ### 6.1 In `providers_dev.cache`
 
-| Today | After | Why |
+| Before | After | Why |
 |---|---|---|
 | `documented.support`, `documented.modes.<mode>.support` | **Stay** | Whether and how the entry caches (supported, unsupported, unknown). Not a lifetime. The filters `cache` and `cache_mode` and the rule "cache mode support comes from `providers_dev.cache.documented`" rest on it. |
 | `documented.modes.<mode>.min_tokens`, `max_breakpoints`, `targets` | **Stay** | Documented facts about a way of caching that are not lifetimes. |
-| `documented.modes.<mode>.ttl` | **Folded, then deleted** | Each text is the `documented_as` of a documented item, with its `mode`, seconds, profile, source and date. |
+| `documented.modes.<mode>.ttl` | **Folded in, deleted** | Each text is the `documented_as` of a documented item, with its `mode`, seconds, profile, source and date. |
 | `retention` | **Stays** | What a request can send: the field, the accepted values, the default, which value gives which profile, the conditions, the evidence. The list says how long a cache lasts, not how to ask for it. |
-| `results` | **Folded, then deleted** | Its lines per retention setting become the measured items: `retention_profile`, `parameter`, `value`, `evaluations`, `evaluation_ids`, the newest date and the results by age, now per client. The sums over all clients are not made any more. |
+| `results` | **Folded in, deleted** | Its lines per retention setting become the measured items: `retention_profile`, `parameter`, `value`, `evaluations`, `evaluation_ids`, the newest date and the results by age, now per client. The sums over all clients are not made any more. |
 | `evaluations` | **Stay**, unchanged | The raw record: route, client, date, request settings, each evaluation's own results, `late_excluded`, note, the raw file. The items point to them by id. |
 | `lifetime` | **New** | The merged record. |
 
-After the work `providers_dev.cache` has four keys: `documented` (whether and how), `retention` (how to ask),
+`providers_dev.cache` has four keys: `documented` (whether and how), `retention` (how to ask),
 `lifetime` (how long, by every source, and the safe value), `evaluations` (the raw measurements).
 
 ### 6.2 In the summary
 
-| Today | After | Why |
+| Before | After | Why |
 |---|---|---|
 | `cache`, `cache_modes`, `cache_mode_support` | **Stay** | Support, not lifetimes; the filters use them. |
 | `cache_retention` | **Stays** | `retention.support`. |
 | `evaluation_count` | **Stays** | The filter `evaluated` uses it; it also counts evaluations that are in no item (3.1). |
-| `cache_ttl_s` | **Folded, then deleted** | The `lifetime_s` of the documented items. |
-| `cache_ttl_by_mode_s` | **Folded, then deleted** | The same, by their `mode`. |
-| `cache_results` | **Folded, then deleted** | As `results` above. |
+| `cache_ttl_s` | **Folded in, deleted** | The `lifetime_s` of the documented items. |
+| `cache_ttl_by_mode_s` | **Folded in, deleted** | The same, by their `mode`. |
+| `cache_results` | **Folded in, deleted** | As `results` above. |
 | `cache_lifetime` | **New** | The merged record, the same object as on the entry. |
 
 ### 6.3 What is left alone, and why it is not a second view
@@ -682,9 +712,9 @@ After the work `providers_dev.cache` has four keys: `documented` (whether and ho
 
 ### 6.4 Nothing is lost
 
-Where each fact published today is read after the old fields are gone:
+Where each fact published before this work is read now that the old fields are gone:
 
-| Fact today | Where it is afterwards |
+| Fact before | Where it is now |
 |---|---|
 | A documented lifetime, as text and by way of caching (`documented.modes.<mode>.ttl`) | `lifetime.lifetimes[]`, documented items: `documented_as`, `mode`; also `capabilities.cache.<mode>.ttl`, as imported |
 | The same in seconds (`cache_ttl_s`, `cache_ttl_by_mode_s`) | `lifetime_s` of those items, by `mode` |
@@ -696,19 +726,21 @@ Where each fact published today is read after the old fields are gone:
 | "This setting was not evaluated" (`results: null`, `evaluations: 0`) | `lifetime.<profile>.evaluations` is 0 and the profile has no measured item |
 | Every evaluation with its own results (`evaluations[]`, `/api/v1/evaluations/cache`) | Unchanged |
 
-Three things change in what can be read, all small:
+Three things changed in what can be read, all small:
 
 1. The sums over all clients of a setting are no longer published.
-2. `documented.modes.<mode>.ttl` tells "no list" (`null`) from "an empty list" (`[]`); both are "no documented
-   item" afterwards. The imported `capabilities.cache` still shows which it was. No entry has an empty list today.
-3. An evaluation that does not count (no result, or only a control that hit) is in a summary line today and in no
-   item afterwards. It stays in `evaluations`. No published evaluation is of that kind today.
+2. `documented.modes.<mode>.ttl` told "no list" (`null`) from "an empty list" (`[]`); both are "no documented
+   item" now. The imported `capabilities.cache` still shows which it was. No entry has an empty list today.
+3. An evaluation that does not count (no result, or only a control that hit) was in a summary line before and is in
+   no item now. It stays in `evaluations`. No published evaluation is of that kind today. So a profile with no
+   measured item has no lifetime measured; it is not always "not evaluated".
 
 ### 6.5 The order of the change
 
-The old fields are read by the pages (`src/core/render.ts`, `format.ts`). So tasks 1 to 4 add the merged record,
-task 5 moves the pages to it, and task 6 deletes the old fields, one straight after the other. Between task 2 and
-task 6 the API carries both, with the old ones unchanged in value; that state is not published.
+The old fields were read by the pages (`src/core/render.ts`, `format.ts`). So tasks 1 to 4 added the merged record,
+task 5 moved the pages to it (`c0b5d20`, `ccc86f2`), and task 6 deleted the old fields (`f489197`), one straight
+after the other. Between task 2 and task 6 the API carried both, with the old ones unchanged in value; that state was
+never published. The change is finished: no renderer reads an old field, and none is in the API.
 
 ## 7. The `known` lifetimes of groundtruth
 
@@ -738,28 +770,28 @@ and groundtruth's `source`, never entering `safe_s`. That adds a third value to 
 ```
 data/sources/observed.json ─┐
 data/upstream/, authored/  ─┴─▶ resolve() step 6, per entry
-                                  documented  = documentedCache(model)             (as today)
-                                  evaluations = the entry's CacheEvaluation[]      (as today)
-                                  lifetime    = cacheLifetime(documented, evaluations, sourceOf)   ◀── new
-                                  providers_dev.cache = { documented, retention, lifetime, evaluations }
+                                  caching     = documentedCaching(model)    (build only: documented + ttl texts)
+                                  evaluations = the entry's CacheEvaluation[]
+                                  lifetime    = cacheLifetime(caching, evaluations, sourceOf)
+                                  providers_dev.cache = { documented: caching.documented, retention, lifetime, evaluations }
                                         │
-        buildIndex() / summarize() ─────┤  summary.cache_lifetime = providers_dev.cache.lifetime   ◀── new
+        buildIndex() / summarize() ─────┤  summary.cache_lifetime = providers_dev.cache.lifetime
                                         ▼
         data/published/  (catalog.json, api.json, entries/, index.json)  ──▶  every API answer, every page
 ```
 
-Four pure functions in `src/core/cache.ts`, beside `summarizeCache`. No file, no network, no clock; the file still
-runs in the browser.
+Four pure functions in `src/core/cache.ts`. No file, no network, no clock; the file also runs in the browser.
 
 - `evaluationLifetime(evaluation: CacheEvaluation): { safe_s: number; first_miss_s: number | null; tested_from_s: number | null } | null`
   is section 3.2; null = the evaluation does not count (3.1).
 - `contradicts(evaluation: CacheEvaluation, documentedS: number): boolean` is the test of 4.1 for one evaluation:
   false where `documentedS` is 0.
-- `documentedItems(documented: CacheDocumentation, sourceOf: (mode: CacheMode | null) => { source: LifetimeSource; date: string | null }): CacheLifetimeItem[]`
-  is section 5. `sourceOf` is 5.4 (`null` = the "does not cache" item); `resolve` passes it, because only `resolve`
+- `documentedItems(caching: DocumentedCaching, sourceOf: (mode: CacheMode | null) => { source: LifetimeSource; date: string | null }): CacheLifetimeItem[]`
+  is section 5. `DocumentedCaching` (`{ documented, ttl }`) is build-only and never published. `sourceOf` is 5.4 (`null` = the "does not cache" item); `resolve` passes it, because only `resolve`
   knows the corrections and the import date.
-- `cacheLifetime(documented, evaluations: readonly CacheEvaluation[], sourceOf): CacheLifetimeRecord` makes the
-  measured items (3.3), puts the list in order (2.4) and works out the two profiles (4.1, 2.2).
+- `cacheLifetime(caching: DocumentedCaching, evaluations: readonly CacheEvaluation[], sourceOf): CacheLifetimeRecord`
+  makes the measured items (3.3), puts the list in order (2.4) and works out the two profiles (4.1, 2.2): the safe
+  value, and `documented_status` from the same application of the test.
 
 How it reaches each answer:
 
@@ -769,28 +801,32 @@ How it reaches each answer:
 | `cache_lifetime` of a summary | `summarize` in `src/core/entries.ts` copies it from the entry | `entries.ts` |
 | `/api/v1/entries`, `/entries/{provider}/{model}`, `/providers/{id}`, `/models/{lab}/{model}`, `/catalog` | They pass summaries and entries on as published | none in `api.ts` |
 | `/api.json` | The catalog as published; the key is under `providers_dev.cache` of every model, and the models.dev fields are as imported | none |
-| `/api/v1/openapi.json`, the tables of `/docs/api/` | Generated from `src/core/contract.ts` | `contract.ts`: three schemas, two keys, three components |
+| `/api/v1/openapi.json`, the tables of `/docs/api/` | Generated from `src/core/contract.ts`; the guide text is in `src/core/openapi.ts` | `contract.ts`: three schemas, two keys, three components |
 
 In `contract.ts`: `CacheLifetimeItemSchema`, `SafeLifetimeSchema` and `CacheLifetimeRecordSchema` (strict objects,
 each `satisfies` its type, described with the meanings of 2.2 and 2.3), `lifetime` in `EntryCacheSchema`,
 `cache_lifetime` in `EntrySummarySchema`, and the components `CacheLifetime`, `SafeLifetime` and
 `CacheLifetimeItem` in `COMPONENTS`.
 
-Versions: `dataset_version` changes with each task that changes the data, because it is a hash of the catalog and
-the summaries, and with it every ETag. `schema_version` stays 1 and `api_version` stays `v1`: the API is not public
-yet. The `version` of the OpenAPI document goes to 1.3.0 with task 4 and to 2.0.0 with task 6, which removes fields.
+Versions: `dataset_version` changes with each change of the data, because it is a hash of the catalog and the
+summaries, and with it every ETag. `schema_version` stays 1 and `api_version` stays `v1`: the API is not public yet.
+The `version` of the OpenAPI document went to 1.3.0 with task 4 and to 2.0.0 with task 6, which removed fields; it
+stays 2.0.0 with `documented_status`, as the API has never been public.
 
-Size: `index.json` is 26 MB and the catalog 36 MB before gzip today. The record of an entry nothing is known about
-is about 500 bytes, some 5 MB in each file; today's 1,478 items add about half a megabyte, and task 6 removes the
-old fields. The assets served are the gzip files (0.7 MB and 1.4 MB today, against a limit of 25 MiB); the new
-records are nearly all the same and compress to very little.
+Size, before gzip: `index.json` was 26 MB and the catalog 36 MB before this work. The record of an entry nothing is
+known about is about 500 bytes; with the old fields gone and `documented_status` on every profile, `index.json` is
+31,236,239 bytes and the catalog 42,031,457 (on `04b201d22bee0831`). The assets served are the gzip files: 790,442
+and 1,500,190 bytes, against a limit of 25 MiB; the records are nearly all the same and compress to very little.
 
 ## 9. What a page prints
 
 The merged record is the API's shape, and a page prints it as it is:
 
 - per profile, `lifetime.<profile>`: `safe_s` with `basis`, `source` and `date`; beside it `documented_s` and
-  `measured_s`, each where it is not null, and `hits_inside` of `checks_inside` where they are not null;
+  `measured_s`, each where it is not null, and `hits_inside` of `checks_inside` where they are not null; and
+  `documented_status` where it is not null, as "Documentation contradicted" or "Documentation not contradicted"
+  (decision 32). The label comes from this key and from nothing else: a page does not read it off `basis`,
+  `documented_s` and `measured_s`;
 - the list, one item under another, each with the same fields: `retention_profile`, `lifetime_s`, `basis`,
   `source`, `date`; on a documented item `mode` and `documented_as`; on a measured item `client_label`, the setting
   (`parameter`, `value`), `hits` of `checks`, and `results` where the page shows the ages.
@@ -800,17 +836,24 @@ of one list, so a page has one loop and no second block. Which value is the safe
 page compares nothing, takes no minimum and applies no rule. Each item names `models.dev` or `providers.dev` and has
 its own date, as `AGENTS.md` and the licence notes require. A profile with no item prints "Unknown". 0 prints by its
 basis: a documented 0 as "None" (the provider documents that it does not cache), a measured 0 as "0 s" (no age at
-which every check hit) (decision 31).
+which every check hit) (decision 31). Where `measured_s` is null the page says "Not measured", not "Not evaluated":
+an evaluation that counts for no lifetime (3.1) is still an evaluation.
 
 A cell of the results by age shows the hit percentage rounded to a whole number; the exact `hit_rate_pct`, the hits
 and the checks are in the API and in the hover text (decided separately, section 12).
 
-How the items are laid out (the two profiles as columns, the clients as rows, the ages as today's cells) is the
-designer's.
+The layout, as built (task 5, the designer's): at the top of an entry's page a tile per profile with the safe value,
+its basis, source and date, and the other of the two lifetimes; then the *Lifetimes* table, a section per profile
+(short, then long) with a row of the profile's facts (safe lifetime and its label, documented, measured with its
+clients, the checks inside the documented lifetime) and under it a row per lifetime of the list, a measured one with
+its results by age and its evaluations, collapsed. In the catalog, a provider's and a model's page, one *Cache
+lifetime* column: short and long, each on its line, with the other lifetime beside the safe one, in orange where
+`documented_status` is `contradicted`. On a phone the table rows stack.
 
 ## 10. Worked examples
 
-Each from the published evaluations of the dataset `c58159b6ef7f9dfa`; `c` is the control, then `age: hits/checks`.
+Each from the published evaluations of the dataset `c58159b6ef7f9dfa` (the same on `4d6a1f5df03a858f` and
+`04b201d22bee0831`); `c` is the control, then `age: hits/checks`.
 To see an evaluation: `/api/v1/entries/<ref>`, `data.entry.providers_dev.cache.evaluations`.
 
 **1. `openai-codex/gpt-6.1-sol`, short: three clients, nothing documented → 300 measured.**
@@ -926,7 +969,7 @@ Over all 10,524 entries, by `basis`:
 
 By case:
 
-| Profile | Documented, not measured | Documented, measured, not contradicted | Measured, documentation contradicted | Measured, nothing documented | Nothing known |
+| Profile | Documented, not measured | Documented, measured, not contradicted (`documented_status` `not_contradicted`) | Measured, documentation contradicted (`contradicted`) | Measured, nothing documented | Nothing known |
 |---|---|---|---|---|---|
 | short | 812 | 9 | 1 | 34 | 9,668 |
 | long | 576 | 3 | 0 | 3 | 9,942 |
@@ -952,14 +995,23 @@ jq '[.entries[] | .cache_lifetime.lifetimes[] | .basis] | group_by(.) | map({(.[
 jq -r '.entries[] | . as $e | ("short","long") | . as $p | $e.cache_lifetime[$p] | select(.documented_s != null and .measured_s != null) | [$e.ref, $p, .documented_s, .measured_s, .hits_inside, .checks_inside, .safe_s, .basis] | @tsv' data/published/site/data/index.json
 ```
 
+```
+jq -r '.entries[] | . as $e | ("short","long") | . as $p | $e.cache_lifetime[$p] | select(.documented_status != null) | [$e.ref, $p, .documented_status, .basis] | @tsv' data/published/site/data/index.json
+```
+
 On the dataset of this document the third gives `{"documented": 821, "measured": 35, "none": 9668}` (with `long`:
-`{"documented": 579, "measured": 3, "none": 9942}`), the fourth `{"documented": 1403, "measured": 75}`, and the
-fifth the thirteen rows of 4.3.
+`{"documented": 579, "measured": 3, "none": 9942}`), the fourth `{"documented": 1403, "measured": 75}`, the
+fifth the thirteen rows of 4.3, and the sixth the same thirteen: twelve `not_contradicted` and one `contradicted`.
 
 ## 11. The work, as tasks
 
-Six tasks, one straight after the other. Each leaves `npm run build && npm run check` passing. Tasks 1 to 4 add the
-merged record and change no existing value. Task 5 moves the pages to it. Task 6 deletes what was folded in.
+Six tasks, one straight after the other, all done; this section is the plan they were built from, kept as the
+record of the change. Each left `npm run build && npm run check` passing. Tasks 1 to 4 added the merged record and
+changed no existing value (`08d140a`, `731064b`, `b34026a`, `8c80de2`, with the corrections after the reviews in
+`8168dfb`, `97970e1`, `941db6e`). Task 5 moved the pages to it (`c0b5d20`, `ccc86f2`). Task 6 deleted what was
+folded in (`f489197`). What is said below in the future tense or about "today's" fields describes the state before
+each task; sections 1 to 10 describe what is built. After them, `documented_status` (decision 32) was added on
+2026-11-15, after the final review T-26.
 
 **Task 1. The derivation, as pure functions.** Nothing calls them yet.
 
@@ -1080,7 +1132,7 @@ All on 2026-11-15. "The owner" decided; "the chief" is the project's chief, who 
 | 9 | Documented and measured values are shown together, in the same manner, each naming its source and date. | The owner |
 | 10 | The API itself publishes one merged cache record per entry: one list, and the safe value with it. | The owner, against the chief's recommendation of three separate records |
 | 11 | Where the provider documents a lifetime, that is the safe value, unless a measurement clearly contradicts it; then the measured one. Where nothing is documented, the measured one. The safe value is never above the documented lifetime. | The chief, on the owner's answer. The owner first said "strict", then "maybe should be B"; B was the chief's recommendation and is taken as decided. |
-| 12 | "Clearly contradicts": at a tested age inside the documented lifetime, fewer than half the checks hit. | The chief, as put to the owner. The exact test of 4.1 (per evaluation, the control and single checks included, exactly half not contradicting, the documented age itself inside) is this design's and **open until the owner has seen 4.3**. |
+| 12 | "Clearly contradicts": at a tested age inside the documented lifetime, fewer than half the checks hit. The safe value is the documented one unless clearly contradicted. The exact test is that of 4.1: per evaluation, the control and single checks included, exactly half not contradicting, the documented age itself inside. | The owner. First put by the chief; the owner decided it after seeing the borderline cases of 4.3. |
 | 13 | An entry documented as not caching has a safe value of 0, with basis `documented`. | The owner ("does not cache should not show like not measured; maybe 0"), as recommended |
 | 14 | The results added up over all clients are gone; results by age are per client. | The owner |
 | 15 | The old fields are deleted and the website changed, in this work: tasks 5 and 6. | The owner ("delete them and make it nice and change the website") |
@@ -1100,8 +1152,9 @@ All on 2026-11-15. "The owner" decided; "the chief" is the project's chief, who 
 | 29 | 2026-11-15: one public client id has one label. Two clients of the labels file with the same `id` and different `label` are an error that fails the build and names both (2.3). | The chief, after review T-19 |
 | 30 | 2026-11-15: a run has one check result per age. A measurements file in which a run holds the same `age_s` twice is refused when read, by the sync and by the build, naming the run and the age; the checks are not added together (3.2). | The chief, after review T-21 |
 | 31 | 2026-11-15: a documented 0 prints "None" (the provider documents that it does not cache), a measured 0 prints "0 s" (no age at which every check hit), and not known prints "Unknown" (9). | The chief, with the page design (T-23) |
+| 32 | 2026-11-15: what the rule found of the documentation is published, as `documented_status` on each profile (`contradicted`, `not_contradicted`, or null where nothing above 0 is documented, nothing is measured, or the provider documents that it does not cache), set by `cacheLifetime` where the rule is applied (2.2, 2.6, 4.1). The pages print "Documentation contradicted" and "Documentation not contradicted" from this key and from nothing else (9); the OpenAPI version stays 2.0.0. Where `measured_s` is null a page says "Not measured" (9). | The chief, after the final review T-26 |
 
-Open: 12 (the exact test, pending the owner's look at the borderline cases) and 20.
+Open: 20.
 
 ## 13. What the data or the contract makes awkward
 
@@ -1164,13 +1217,14 @@ Open: 12 (the exact test, pending the owner's look at the borderline cases) and 
     decisions.
 14. **"A measurement never replaces a documented value"** (`AGENTS.md`, the methodology) holds for the data: the
     documented item and `capabilities.cache` stay. But on one profile today a measured value is the safe value
-    where a documented one exists (`openrouter/google/gemini-3.8-flash`), so the methodology's sentence needs the
-    wording of task 5.
+    where a documented one exists (`openrouter/google/gemini-3.8-flash`). The methodology says so since task 5
+    (`ccc86f2`): the documented lifetime stays listed beside the measured one.
 
 **The data, as before**
 
 15. **The strict measured value on routes that miss now and then.** "Every check hit" is all or nothing, and more
-    checks can only lower it. It now decides `safe_s` only where nothing is documented (item 1).
+    checks can only lower it. It decides `safe_s` where nothing is documented (item 1), and where the documentation
+    is contradicted (`openrouter/google/gemini-3.8-flash` short today).
 16. **A measured value is always an age that was tested.** `first_miss_s` shows the gap to the next age.
 17. **A client that cannot cache by design counts.** Muse Code "caches its own system prompt but never the
     conversation", and that makes `meta-subscription/muse-wonder-1.0` 0 while a coding agent held 2 hours. It is
