@@ -276,7 +276,8 @@ per client and retention setting, each item with its source and date; and for th
 safe value, `safe_s` in seconds, with its `basis`. The documented lifetime is the safe value unless an evaluation
 contradicts it (at an age up to it, fewer than half of that evaluation's checks hit), and then the measured one is;
 where nothing is documented, the measured one, the oldest age through which every check hit, lowest across clients.
-`documented_s` and `measured_s` are published beside it. `0` is a value (documented as not caching, or no age at
+`documented_s` and `measured_s` are published beside it, and `documented_status` says what the rule found where a
+lifetime above 0 is documented and one is measured: `contradicted` or `not_contradicted` (else `null`). `0` is a value (documented as not caching, or no age at
 which every check hit); `null` is not known. `cacheLifetime` in `src/core/cache.ts` works it out once, when the data
 is built; the rule in full is in `design/safe-cache-lifetime.md` and in the guide of the OpenAPI document.
 

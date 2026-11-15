@@ -97,7 +97,7 @@ const documentedOf = (profile: RetentionProfile, lifetime: number, mode: CacheMo
 const measuredOf = (more: Pick<CacheLifetimeItem, "date" | "lifetime_s" | "client" | "evaluation_ids" | "checks" | "hits" | "tested_from_s" | "first_miss_s" | "results"> & Partial<CacheLifetimeItem>): CacheLifetimeItem => ({
   retention_profile: "short", basis: "measured", source: "providers.dev", mode: null, documented_as: null, client_label: LABELS[more.client!]!, parameter: null, value: null, evaluations: more.evaluation_ids.length, ...more,
 });
-const NOTHING: SafeLifetime = { safe_s: null, basis: "none", source: null, date: null, documented_s: null, measured_s: null, clients: 0, evaluations: 0, checks: 0, hits: 0, checks_inside: null, hits_inside: null, tested_from_s: null, first_miss_s: null };
+const NOTHING: SafeLifetime = { safe_s: null, basis: "none", source: null, date: null, documented_s: null, measured_s: null, documented_status: null, clients: 0, evaluations: 0, checks: 0, hits: 0, checks_inside: null, hits_inside: null, tested_from_s: null, first_miss_s: null };
 const profileOf = (more: Partial<SafeLifetime>): SafeLifetime => ({ ...NOTHING, ...more });
 
 describe("evaluationLifetime (3.2)", () => {
@@ -291,8 +291,8 @@ describe("cacheLifetime: the worked examples of section 10", () => {
   it("3. openai/gpt-6.1-sol: documented and measured agree (the record of 2.5)", () => {
     const record = check(docs({ implicit: { min_tokens: 1024 }, explicit: { ttl: ["30m", "12h"], min_tokens: 1024, max_breakpoints: 4 } }), [G5]);
     expect(record).toEqual({
-      short: { safe_s: 1800, basis: "documented", source: "models.dev", date: "2026-11-15", documented_s: 1800, measured_s: 1800, clients: 1, evaluations: 1, checks: 16, hits: 10, checks_inside: 10, hits_inside: 10, tested_from_s: 300, first_miss_s: 2400 },
-      long: { safe_s: 43200, basis: "documented", source: "models.dev", date: "2026-11-15", documented_s: 43200, measured_s: null, clients: 0, evaluations: 0, checks: 0, hits: 0, checks_inside: null, hits_inside: null, tested_from_s: null, first_miss_s: null },
+      short: { safe_s: 1800, basis: "documented", source: "models.dev", date: "2026-11-15", documented_s: 1800, measured_s: 1800, documented_status: "not_contradicted", clients: 1, evaluations: 1, checks: 16, hits: 10, checks_inside: 10, hits_inside: 10, tested_from_s: 300, first_miss_s: 2400 },
+      long: { safe_s: 43200, basis: "documented", source: "models.dev", date: "2026-11-15", documented_s: 43200, measured_s: null, documented_status: null, clients: 0, evaluations: 0, checks: 0, hits: 0, checks_inside: null, hits_inside: null, tested_from_s: null, first_miss_s: null },
       lifetimes: [
         documentedOf("short", 1800, "explicit", "30m"),
         {
@@ -325,7 +325,7 @@ describe("cacheLifetime: the worked examples of section 10", () => {
     const record = check(docs({ explicit: { ttl: ["5m", "1h"], min_tokens: 512, max_breakpoints: 4, targets: ["tools", "system", "messages"] } }), [K1beta, K1nobeta]);
     expect(record).toEqual({
       short: profileOf({ safe_s: 300, basis: "documented", source: "models.dev", date: "2026-11-15", documented_s: 300 }),
-      long: { safe_s: 3600, basis: "documented", source: "models.dev", date: "2026-11-15", documented_s: 3600, measured_s: 600, clients: 1, evaluations: 2, checks: 20, hits: 13, checks_inside: 14, hits_inside: 13, tested_from_s: 600, first_miss_s: 1800 },
+      long: { safe_s: 3600, basis: "documented", source: "models.dev", date: "2026-11-15", documented_s: 3600, measured_s: 600, documented_status: "not_contradicted", clients: 1, evaluations: 2, checks: 20, hits: 13, checks_inside: 14, hits_inside: 13, tested_from_s: 600, first_miss_s: 1800 },
       lifetimes: [
         documentedOf("short", 300, "explicit", "5m"),
         documentedOf("long", 3600, "explicit", "1h"),
@@ -356,7 +356,7 @@ describe("cacheLifetime: the worked examples of section 10", () => {
   it("8. openrouter/google/gemini-3.8-flash: the documentation contradicted", () => {
     const record = check(docs({ implicit: true, explicit: { ttl: ["5m"], max_breakpoints: 1 } }), [R5]);
     expect(record).toEqual({
-      short: { safe_s: 0, basis: "measured", source: "providers.dev", date: "2026-11-04", documented_s: 300, measured_s: 0, clients: 1, evaluations: 1, checks: 7, hits: 1, checks_inside: 7, hits_inside: 1, tested_from_s: 150, first_miss_s: 150 },
+      short: { safe_s: 0, basis: "measured", source: "providers.dev", date: "2026-11-04", documented_s: 300, measured_s: 0, documented_status: "contradicted", clients: 1, evaluations: 1, checks: 7, hits: 1, checks_inside: 7, hits_inside: 1, tested_from_s: 150, first_miss_s: 150 },
       long: NOTHING,
       lifetimes: [
         documentedOf("short", 300, "explicit", "5m"),
@@ -368,7 +368,7 @@ describe("cacheLifetime: the worked examples of section 10", () => {
   it("9. openrouter/google/gemini-4-argon: exactly half does not contradict", () => {
     const record = check(docs({ implicit: true, explicit: { ttl: ["5m"], max_breakpoints: 1 } }), [L1b, R4]);
     expect(record).toEqual({
-      short: { safe_s: 300, basis: "documented", source: "models.dev", date: "2026-11-15", documented_s: 300, measured_s: 150, clients: 2, evaluations: 2, checks: 22, hits: 11, checks_inside: 12, hits_inside: 11, tested_from_s: 150, first_miss_s: 300 },
+      short: { safe_s: 300, basis: "documented", source: "models.dev", date: "2026-11-15", documented_s: 300, measured_s: 150, documented_status: "not_contradicted", clients: 2, evaluations: 2, checks: 22, hits: 11, checks_inside: 12, hits_inside: 11, tested_from_s: 150, first_miss_s: 300 },
       long: NOTHING,
       lifetimes: [
         documentedOf("short", 300, "explicit", "5m"),
@@ -402,6 +402,54 @@ describe("cacheLifetime: the worked examples of section 10", () => {
       long: profileOf({ safe_s: 0, basis: "documented", source: "models.dev", date: "2026-11-15", documented_s: 0 }),
       lifetimes: [documentedOf("short", 0, null, null), documentedOf("long", 0, null, null)],
     });
+  });
+});
+
+describe("cacheLifetime: documented_status, set where the rule is applied", () => {
+  const fiveMinutes = docs({ implicit: true, explicit: { ttl: ["5m"], max_breakpoints: 1 } });
+  const status = (documented: ReturnType<typeof docs>, runs: CacheEvaluation[]) => {
+    const record = cacheLifetime(documented, runs, fromImport);
+    expect(lifetimeRuleBreaks(record, runs, documented.documented)).toEqual([]);
+    return { short: record.short.documented_status, long: record.long.documented_status, basis: [record.short.basis, record.long.basis] };
+  };
+
+  it("contradicted: documented above 0, measured, an evaluation contradicts it; the safe value is the measured one", () => {
+    expect(status(fiveMinutes, [R5])).toEqual({ short: "contradicted", long: null, basis: ["measured", "none"] });
+    // One evaluation of several is enough, though another client confirms the documentation.
+    expect(status(fiveMinutes, [R5, R4]).short).toBe("contradicted");
+  });
+
+  it("not_contradicted: documented above 0, measured, no evaluation contradicts it; the safe value is the documented one", () => {
+    expect(status(fiveMinutes, [L1b, R4])).toEqual({ short: "not_contradicted", long: null, basis: ["documented", "none"] });
+    // A measured lifetime below the documented one, by misses that are not below half: the long profile of Opus.
+    expect(status(docs({ explicit: { ttl: ["5m", "1h"] } }), [K1beta, K1nobeta])).toEqual({ short: null, long: "not_contradicted", basis: ["documented", "documented"] });
+  });
+
+  it("null: nothing documented and nothing measured", () => {
+    expect(status(documentedCaching({}), [])).toEqual({ short: null, long: null, basis: ["none", "none"] });
+    expect(emptyCacheLifetime().short.documented_status).toBeNull();
+  });
+
+  it("null: measured with nothing documented, whatever the measurement", () => {
+    expect(status(documentedCaching({}), [H1, H2, X1]).short).toBeNull();
+    expect(status(docs({ implicit: true }), [D6]).short).toBeNull();
+  });
+
+  it("null: documented and not measured, also where the only evaluation counts for no lifetime", () => {
+    expect(status(fiveMinutes, [])).toEqual({ short: null, long: null, basis: ["documented", "none"] });
+    const controlOnly = evaluation("control-only", "direct", "2026-11-01", "c 1/1");
+    expect(status(fiveMinutes, [controlOnly]).short).toBeNull();
+  });
+
+  it("null: documented as not caching (documented_s 0), with a measurement that found caching or one that did not", () => {
+    const caches = evaluation("caches-after-all", "direct", "2026-11-01", "c 1/1 · 300: 3/3 · 600: 3/3");
+    const cold = evaluation("cold", "direct", "2026-11-01", "c 0/1 · 300: 0/3");
+    for (const run of [caches, cold]) {
+      const record = cacheLifetime(docs(false), [run], fromImport);
+      expect(record.short).toMatchObject({ safe_s: 0, basis: "documented", documented_s: 0, documented_status: null });
+      expect(record.short.measured_s).not.toBeNull();
+      expect(lifetimeRuleBreaks(record, [run], docs(false).documented)).toEqual([]);
+    }
   });
 });
 
@@ -471,7 +519,7 @@ describe("cacheLifetime: the rules", () => {
     const documented = docs({ explicit: { ttl: ["5m"] } });
     const record = cacheLifetime(documented, [hits, misses], fromImport);
     expect(record.lifetimes[1]!.results).toEqual(results("c 2/2 · 150: 3/6 · 300: 3/6"));
-    expect(record.short).toEqual({ safe_s: 0, basis: "measured", source: "providers.dev", date: "2026-11-01", documented_s: 300, measured_s: 0, clients: 1, evaluations: 2, checks: 14, hits: 8, checks_inside: 14, hits_inside: 8, tested_from_s: 150, first_miss_s: 150 });
+    expect(record.short).toEqual({ safe_s: 0, basis: "measured", source: "providers.dev", date: "2026-11-01", documented_s: 300, measured_s: 0, documented_status: "contradicted", clients: 1, evaluations: 2, checks: 14, hits: 8, checks_inside: 14, hits_inside: 8, tested_from_s: 150, first_miss_s: 150 });
     expect(lifetimeRuleBreaks(record, [hits, misses], documented.documented)).toEqual([]);
   });
 
@@ -487,7 +535,7 @@ describe("cacheLifetime: the rules", () => {
     const run = twoMinutes("caches-after-all", "direct", "c 1/1 · 300: 3/3 · 600: 3/3");
     const documented = docs(false);
     const record = cacheLifetime(documented, [run], fromImport);
-    expect(record.short).toEqual({ safe_s: 0, basis: "documented", source: "models.dev", date: "2026-11-15", documented_s: 0, measured_s: 600, clients: 1, evaluations: 1, checks: 7, hits: 7, checks_inside: 1, hits_inside: 1, tested_from_s: 300, first_miss_s: null });
+    expect(record.short).toEqual({ safe_s: 0, basis: "documented", source: "models.dev", date: "2026-11-15", documented_s: 0, measured_s: 600, documented_status: null, clients: 1, evaluations: 1, checks: 7, hits: 7, checks_inside: 1, hits_inside: 1, tested_from_s: 300, first_miss_s: null });
     expect(record.long).toEqual(profileOf({ safe_s: 0, basis: "documented", source: "models.dev", date: "2026-11-15", documented_s: 0 }));
     expect(record.lifetimes.map((item) => [item.retention_profile, item.basis, item.lifetime_s])).toEqual([["short", "documented", 0], ["short", "measured", 600], ["long", "documented", 0]]);
     expect(lifetimeRuleBreaks(record, [run], documented.documented)).toEqual([]);
@@ -564,6 +612,10 @@ describe("cacheLifetime: the rules", () => {
     const record = cacheLifetime(docs({ explicit: { ttl: ["5m"] } }), [R5], fromImport);
     const wrong = { ...record, short: { ...record.short, safe_s: 300, basis: "documented" as const, source: "models.dev" as const, date: "2026-11-15" } };
     expect(lifetimeRuleBreaks(wrong, [R5], docs({ explicit: { ttl: ["5m"] } }).documented)).toContain("short 4.1 rule");
+    for (const status of ["not_contradicted", null] as const) {
+      const mislabelled = { ...record, short: { ...record.short, documented_status: status } };
+      expect(lifetimeRuleBreaks(mislabelled, [R5], docs({ explicit: { ttl: ["5m"] } }).documented)).toEqual(["short 4.1 status", "short 4.1 status and basis"]);
+    }
     expect(lifetimeRuleBreaks(record, [R5, D6], docs({ explicit: { ttl: ["5m"] } }).documented)).toContain("11 cpa-8.0.53/D6");
   });
 });

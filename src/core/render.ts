@@ -148,7 +148,8 @@ function safeSaid(profile: RetentionProfile, p: SafeLifetime): string {
 
 /**
  * One line of the list cell: the profile, the safe value and its basis, and beside it the other of the two lifetimes
- * it was chosen from where there is one. Which is the other is read from `basis`; nothing is compared.
+ * it was chosen from where there is one. Which is the other is read from `basis`, and its emphasis from
+ * `documented_status`; nothing is compared.
  */
 function lifetimeLine(profile: RetentionProfile, p: SafeLifetime): string {
   const name = `<span class="life-profile">${PROFILE_WORD[profile]}</span>`;
@@ -156,7 +157,7 @@ function lifetimeLine(profile: RetentionProfile, p: SafeLifetime): string {
   const other =
     p.basis === "documented"
       ? p.measured_s === null ? "" : `<span class="life-other">measured ${span(p.measured_s)}</span>`
-      : p.documented_s === null ? "" : `<span class="life-other contradicted">documented ${p.documented_s === 0 ? "None" : span(p.documented_s)}</span>`;
+      : p.documented_s === null ? "" : `<span class="life-other${p.documented_status === "contradicted" ? " contradicted" : ""}">documented ${p.documented_s === 0 ? "None" : span(p.documented_s)}</span>`;
   const value = p.safe_s === 0 ? (p.basis === "documented" ? "None" : "0 s") : span(p.safe_s);
   return `${name}<span class="life-value" title="${e(safeSaid(profile, p))}">${value}</span><span class="life-basis">${basisTag(p.basis)}${other}</span>`;
 }
@@ -451,12 +452,11 @@ function profileRow(profile: RetentionProfile, p: SafeLifetime, now: Date): stri
     p.safe_s === null || p.basis === "none" || p.source === null
       ? UNKNOWN
       : `<span class="life-value">${lifetimeText(p.safe_s, p.basis)}</span>${basisTag(p.basis)}${lifetimeSource(p.source, p.date, p.basis, now)}`;
-  // The case, read from the three keys the API names for it: a measured safe value beside a documented lifetime replaced
-  // a contradicted one; a documented safe value beside a measured lifetime was not contradicted.
+  // The case, as the API publishes it in `documented_status`, and from nothing else.
   const verdict =
-    p.basis === "measured" && p.documented_s !== null
+    p.documented_status === "contradicted"
       ? '<span class="case contradicted" title="An evaluation contradicts the documented lifetime: the safe value is the measured one. The documented lifetime stays in the list.">Documentation contradicted</span>'
-      : p.basis === "documented" && p.measured_s !== null
+      : p.documented_status === "not_contradicted"
         ? '<span class="case" title="No evaluation contradicts the documented lifetime: the safe value is the documented one. Not contradicted is not confirmed.">Documentation not contradicted</span>'
         : "";
   const fact = (label: string, value: string): string => `<div><dt>${label}</dt><dd>${value}</dd></div>`;
@@ -623,11 +623,16 @@ export function entryHtml(view: EntryView): string {
     const p = cache.lifetime[profile];
     const label = `Cache lifetime, ${profile}`;
     if (p.safe_s === null || p.basis === "none" || p.source === null) return tile(label, '<span class="muted">Unknown</span>', "Not documented or evaluated");
-    // The other of the two lifetimes it was chosen from, where there is one, read from `basis` as in the list.
+    // The other of the two lifetimes it was chosen from, where there is one, read from `basis` as in the list; whether
+    // the documented one is contradicted is `documented_status`.
     const other =
       p.basis === "documented"
         ? p.measured_s === null ? "" : `<div>Measured ${p.measured_s === 0 ? "0 s" : span(p.measured_s)}</div>`
-        : p.documented_s === null ? "" : `<div class="contradicted">Documented ${p.documented_s === 0 ? "None" : span(p.documented_s)}, contradicted</div>`;
+        : p.documented_s === null
+          ? ""
+          : p.documented_status === "contradicted"
+            ? `<div class="contradicted">Documented ${p.documented_s === 0 ? "None" : span(p.documented_s)}, contradicted</div>`
+            : `<div>Documented ${p.documented_s === 0 ? "None" : span(p.documented_s)}</div>`;
     return tile(label, `<span title="${e(safeSaid(profile, p))}">${lifetimeText(p.safe_s, p.basis)}</span>${basisTag(p.basis)}`, `${e(p.source)}${p.date ? ` · ${e(p.date)}` : ""}${other}`);
   };
 

@@ -140,6 +140,12 @@ export interface CacheLifetimeItem {
   results: CacheResult[] | null;
 }
 
+/**
+ * What the rule found of a profile's documented lifetime: contradicted (the safe value is the measured one) or not
+ * contradicted (the safe value is the documented one). Set only where a lifetime above 0 is documented and measured.
+ */
+export type DocumentedStatus = "contradicted" | "not_contradicted";
+
 /** The safe lifetime of an entry for one retention profile, and what it was chosen from. */
 export interface SafeLifetime {
   /** Seconds a cached prompt can be relied on: `documented_s` unless an evaluation contradicts it, else `measured_s`. Null = not known. */
@@ -149,6 +155,8 @@ export interface SafeLifetime {
   date: string | null;
   documented_s: number | null;
   measured_s: number | null;
+  /** Null where nothing above 0 is documented or nothing is measured. */
+  documented_status: DocumentedStatus | null;
   clients: number;
   evaluations: number;
   checks: number;
@@ -409,6 +417,7 @@ const emptySafeLifetime = (): SafeLifetime => ({
   date: null,
   documented_s: null,
   measured_s: null,
+  documented_status: null,
   clients: 0,
   evaluations: 0,
   checks: 0,
@@ -506,7 +515,11 @@ export function cacheLifetime(
       record.checks_inside = inside.reduce((sum, result) => sum + result.checks, 0);
       record.hits_inside = inside.reduce((sum, result) => sum + result.hits, 0);
     }
-    if (documentedS !== null && !runs.some((run) => contradicts(run, documentedS))) {
+    // The rule of design 4.1, applied once; its finding is published where there is something to find: a lifetime
+    // above 0 documented, and one measured. A documented 0 is never contradicted, and is left without a status.
+    const contradicted = documentedS !== null && runs.some((run) => contradicts(run, documentedS));
+    if (documentedS !== null && documentedS > 0 && measuredS !== null) record.documented_status = contradicted ? "contradicted" : "not_contradicted";
+    if (documentedS !== null && !contradicted) {
       const chosen = own.find((item) => item.lifetime_s === documentedS)!;
       Object.assign(record, { safe_s: documentedS, basis: "documented", source: chosen.source, date: chosen.date });
     } else if (measuredS !== null) {

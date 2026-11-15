@@ -386,7 +386,7 @@ describe("HTTP behaviour", () => {
     expect(document.info.version).toBe("2.0.0");
     const schemas = document.components.schemas;
     expect(Object.keys(schemas.CacheLifetime!.properties!)).toEqual(["short", "long", "lifetimes"]);
-    expect(Object.keys(schemas.SafeLifetime!.properties!)).toEqual(["safe_s", "basis", "source", "date", "documented_s", "measured_s", "clients", "evaluations", "checks", "hits", "checks_inside", "hits_inside", "tested_from_s", "first_miss_s"]);
+    expect(Object.keys(schemas.SafeLifetime!.properties!)).toEqual(["safe_s", "basis", "source", "date", "documented_s", "measured_s", "documented_status", "clients", "evaluations", "checks", "hits", "checks_inside", "hits_inside", "tested_from_s", "first_miss_s"]);
     expect(Object.keys(schemas.CacheLifetimeItem!.properties!)).toEqual([
       "retention_profile", "basis", "source", "date", "lifetime_s", "mode", "documented_as", "client", "client_label", "parameter", "value", "evaluations", "evaluation_ids", "checks", "hits", "tested_from_s", "first_miss_s", "results",
     ]);
@@ -400,7 +400,12 @@ describe("HTTP behaviour", () => {
     const section = document["x-guide"].find((item) => item.id === "cache-lifetimes");
     expect(section?.title).toBe("Cache lifetimes");
     const text = section!.paragraphs.join(" ");
-    for (const words of ["lifetimes", "safe_s", "documented_s", "measured_s", "fewer than half", "hits_inside of checks_inside", "lowest over the clients", "null", "not a guarantee"]) expect(text).toContain(words);
+    for (const words of ["lifetimes", "safe_s", "documented_s", "measured_s", "fewer than half", "hits_inside of checks_inside", "lowest over the clients", "null", "not a guarantee", "documented_status", "not_contradicted"]) expect(text).toContain(words);
+    // documented_status is required and nullable: the two values of the rule, or null.
+    const status = schemas.SafeLifetime as unknown as { required: string[]; properties: { documented_status: unknown } };
+    expect(status.required).toContain("documented_status");
+    expect(JSON.stringify(status.properties.documented_status)).toMatch(/"contradicted","not_contradicted"/);
+    expect(JSON.stringify(status.properties.documented_status)).toMatch(/null/);
   });
 });
 

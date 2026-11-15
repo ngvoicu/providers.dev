@@ -502,7 +502,7 @@ describe("resolve: measurements", () => {
           tested_from_s: 300, first_miss_s: null, results: [{ kind: "timed", age_s: 300, hits: 3, checks: 3, hit_rate_pct: 100 }],
         },
       ]);
-      expect(lifetime.short).toEqual({ safe_s: 300, basis: "measured", source: "providers.dev", date: "2026-11-05", documented_s: null, measured_s: 300, clients: 1, evaluations: 1, checks: 3, hits: 3, checks_inside: null, hits_inside: null, tested_from_s: 300, first_miss_s: null });
+      expect(lifetime.short).toEqual({ safe_s: 300, basis: "measured", source: "providers.dev", date: "2026-11-05", documented_s: null, measured_s: 300, documented_status: null, clients: 1, evaluations: 1, checks: 3, hits: 3, checks_inside: null, hits_inside: null, tested_from_s: 300, first_miss_s: null });
       expect(lifetime.long).toEqual(emptyCacheLifetime().long);
       // Nobody evaluated it and nothing is documented: the record of an entry nothing is known about.
       expect(ext(catalog.lab!.models["model-b"]!).cache.lifetime).toEqual(emptyCacheLifetime());
@@ -702,7 +702,7 @@ describe("resolve: measurements", () => {
       expect(cache.evaluations.map((item) => [item.id, item.retention_profile])).toEqual([["asks-500ms", "long"], ["asks-5m", "short"]]);
       // Its miss at 150 s, inside 300 s, contradicts the documented lifetime.
       expect(cache.lifetime.short).toEqual({
-        safe_s: 0, basis: "measured", source: "providers.dev", date: "2026-11-07", documented_s: 300, measured_s: 0,
+        safe_s: 0, basis: "measured", source: "providers.dev", date: "2026-11-07", documented_s: 300, measured_s: 0, documented_status: "contradicted",
         clients: 1, evaluations: 1, checks: 2, hits: 1, checks_inside: 2, hits_inside: 1, tested_from_s: 150, first_miss_s: 150,
       });
       expect(cache.lifetime.long).toMatchObject({ safe_s: 150, basis: "measured", documented_s: null, measured_s: 150, evaluations: 1 });

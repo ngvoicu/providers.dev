@@ -269,6 +269,40 @@ describe("the cache lifetimes on an entry page", () => {
     expect(section(page(CASES.wonder))).not.toContain('class="case');
   });
 
+  it("prints the documentation label from documented_status and from nothing else", () => {
+    /** The record with the key of one profile changed by hand, every other key as the build made it. */
+    const withStatus = (cache: EntryCache, profile: RetentionProfile, status: "contradicted" | "not_contradicted" | null): EntryCache => {
+      const changed = structuredClone(cache);
+      changed.lifetime[profile].documented_status = status;
+      return changed;
+    };
+    const label = (html: string): string[] => [...section(html).matchAll(/<span class="case[^"]*"[^>]*>([^<]+)<\/span>/g)].map((match) => match[1]!);
+    const cellOf = (cache: EntryCache): string => row({ cache_lifetime: cache.lifetime });
+    // As built.
+    expect(CASES.flash.lifetime.short.documented_status).toBe("contradicted");
+    expect(CASES.opus.lifetime.long.documented_status).toBe("not_contradicted");
+    expect(label(page(CASES.flash))).toEqual(["Documentation contradicted"]);
+    expect(label(page(CASES.opus))).toEqual(["Documentation not contradicted"]);
+    // Changed by hand: the other label, or none, whatever basis, documented_s and measured_s say.
+    const flashNot = withStatus(CASES.flash, "short", "not_contradicted");
+    expect(label(page(flashNot))).toEqual(["Documentation not contradicted"]);
+    expect(text(tiles(page(flashNot)))).toContain("Documented 5 min Cache lifetime, long");
+    expect(tiles(page(flashNot))).not.toContain("contradicted");
+    expect(cellOf(flashNot)).toContain('<span class="life-other">documented 5 min</span>');
+    const flashNone = withStatus(CASES.flash, "short", null);
+    expect(label(page(flashNone))).toEqual([]);
+    expect(tiles(page(flashNone))).not.toContain("contradicted");
+    expect(cellOf(flashNone)).not.toContain("contradicted");
+    expect(label(page(withStatus(CASES.opus, "long", "contradicted")))).toEqual(["Documentation contradicted"]);
+    expect(label(page(withStatus(CASES.opus, "long", null)))).toEqual([]);
+    // A label on a profile with nothing documented or measured, had the API one, is printed too: the page checks nothing.
+    expect(label(page(withStatus(CASES.wonder, "short", "not_contradicted")))).toEqual(["Documentation not contradicted"]);
+    // Documented as not caching, with a measurement that found caching: no label.
+    const none = cacheOf(false, [run("caches", "direct", "short", [[0, 1, 1], [300, 3, 3]])]);
+    expect(none.lifetime.short).toMatchObject({ documented_s: 0, measured_s: 300, documented_status: null });
+    expect(label(page(none))).toEqual([]);
+  });
+
   it("gives each client its own measured lifetime and keeps an evaluation's note in sight with it", () => {
     const rows = bodies(page(CASES.wonder));
     expect(rows.map((body) => body.split(":")[0])).toEqual(["profile", "item measured", "item measured", "item measured", "profile", "item measured"]);

@@ -104,6 +104,11 @@ export function lifetimeRuleBreaks(record: CacheLifetimeRecord, evaluations: rea
     const documentedS = p.documented_s;
     const contradicted = documentedS !== null && documentedS > 0 && runs.some((run) => run.results.some((result) => result.age_s <= documentedS && result.hits * 2 < result.checks));
     fail(`${profile} 4.1 rule`, p.basis === (documentedS !== null && !contradicted ? "documented" : p.measured_s !== null ? "measured" : "none"));
+    // documented_status: set exactly where a lifetime above 0 is documented and one is measured; contradicted exactly
+    // where the safe value is the measured one, not_contradicted where it is the documented one. Null everywhere else.
+    const judged = documentedS !== null && documentedS > 0 && p.measured_s !== null;
+    fail(`${profile} 4.1 status`, p.documented_status === (judged ? (contradicted ? "contradicted" : "not_contradicted") : null));
+    fail(`${profile} 4.1 status and basis`, p.documented_status === (judged ? (p.basis === "measured" ? "contradicted" : "not_contradicted") : null));
   }
   for (const item of record.lifetimes.filter((entry) => entry.basis === "measured")) {
     const members = item.evaluation_ids.map((id) => byId.get(id));
