@@ -773,8 +773,13 @@ describe("resolve: measurements", () => {
       } finally {
         String.prototype.localeCompare = original;
       }
-      // The inputs did reach the record in another order: the evaluations as published are ordered with the locale.
-      expect(ext(otherLocale.catalog.lab!.models["model-a"]!).cache.evaluations.map((item) => item.id)).not.toEqual(ext(forward.catalog.lab!.models["model-a"]!).cache.evaluations.map((item) => item.id));
+      // The evaluations as published are newest first, then by id in plain character order ("z" before "ä"), whatever the locale.
+      const published = (result: ReturnType<typeof resolve>) => ext(result.catalog.lab!.models["model-a"]!).cache.evaluations;
+      const order = published(forward).map((item) => [item.date, item.id] as const);
+      expect(order).toEqual([...order].sort((x, y) => (x[0] === y[0] ? (x[1] < y[1] ? -1 : 1) : x[0] > y[0] ? -1 : 1)));
+      expect(order.map(([, id]) => id).filter((id) => id === "z" || id === "ä")).toEqual(["z", "ä"]);
+      expect(published(otherLocale).map((item) => item.id)).toEqual(published(forward).map((item) => item.id));
+      expect(published(backward).map((item) => item.id)).toEqual(published(forward).map((item) => item.id));
       const a = records(forward)["lab/model-a"]!;
       expect(a.lifetimes.map((item) => [item.retention_profile, item.basis, item.documented_as ?? item.value, item.client, item.parameter])).toEqual([
         ["short", "documented", "5m", null, null],

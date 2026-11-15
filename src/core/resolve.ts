@@ -3,6 +3,7 @@
 import {
   cacheLifetime,
   cacheResult,
+  byCharacters,
   documentedCaching,
   evaluationLifetime,
   lifetimeAsked,
@@ -571,8 +572,9 @@ export function resolve(input: ResolveInput): ResolveResult {
     for (const model of Object.values(provider.models)) {
       const extension = modelExt(model);
       // Every entry gets the same cache record: what a request can ask for, the lifetime record, and the evaluations
-      // under it. The sums and percentages are made here, once; pages and API answers only pass them on.
-      const own = (evaluations.get(model) ?? []).sort((a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id));
+      // under it. The sums and percentages are made here, once; pages and API answers only pass them on. The
+      // evaluations are listed newest first, then by id, in plain character order (never the locale's).
+      const own = (evaluations.get(model) ?? []).sort((a, b) => byCharacters(b.date, a.date) || byCharacters(a.id, b.id));
       const declaration = retentionDeclarations.get(model);
       const caching = documentedCaching(model);
       const documented = caching.documented;

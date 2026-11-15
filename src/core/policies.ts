@@ -1,5 +1,5 @@
 // Normalize once at publication. Pages and API responses use these objects without interpreting source rules again.
-import { durationSeconds, type CacheRetention } from "./cache.ts";
+import { byCharacters, durationSeconds, type CacheRetention } from "./cache.ts";
 import { isObject, type Json, type JsonObject } from "./merge.ts";
 import type { Condition, PolicyEvidence, Pricing, PricingInput, PricingRule, PricingRuleInput, RequestControl, RequestControls, ResultingRate } from "./policy-contract.ts";
 
@@ -283,7 +283,8 @@ export function controlsOf(model: JsonObject, retention: CacheRetention, evidenc
   }
   const byId = new Map([cache, service].map((control) => [control.id, control]));
   for (const control of declarations) byId.set(control.id, structuredClone(control));
-  const items = [...byId.values()].sort((a, b) => a.id.localeCompare(b.id));
+  // By id in plain character order, the same on every machine whatever its locale.
+  const items = [...byId.values()].sort((a, b) => byCharacters(a.id, b.id));
   return { coverage: items.some((item) => item.support !== "unknown") ? "partial" : "unknown", items };
 }
 
