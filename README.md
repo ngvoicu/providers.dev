@@ -197,6 +197,8 @@ reviewed; the site marks the rest "by default" or "by name".
 What the sync checks before it replaces the snapshot: the answer is JSON in the expected v2 structure; every
 provider and model id matches its key; the import is not empty and has not lost more than 40% of its providers or
 entries since the last one. It sends the stored ETag, so an unchanged upstream costs one small request.
+The models of each provider are written sorted by id, so models.dev sending them in another order is not a change
+in `data/upstream/`; everything else (the keys inside a model, every array) keeps the order models.dev sends.
 
 If any check fails or models.dev is down, `data/upstream/` is left exactly as it was, the command exits with an
 error, and the next build publishes the last good snapshot with a note that the last sync failed. A lock file

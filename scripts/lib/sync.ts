@@ -77,6 +77,16 @@ export function loadUpstream(dataDir: string): { catalog: UpstreamCatalog; meta:
   return { catalog, meta };
 }
 
+/**
+ * The file a provider is stored in. models.dev sends the models of a provider in no fixed order, so they are written
+ * sorted by id: the same content gives the same file. Nothing else is reordered: inside a model the key order can
+ * carry meaning (the pricing rules follow the keys of `cost`), and arrays keep their order.
+ */
+export function providerFile(provider: UpstreamCatalog[string]): string {
+  const models = Object.fromEntries(Object.keys(provider.models).sort().map((id) => [id, provider.models[id]]));
+  return pretty({ ...provider, models });
+}
+
 function countModels(catalog: UpstreamCatalog): number {
   return Object.values(catalog).reduce((sum, provider) => sum + Object.keys(provider.models).length, 0);
 }
@@ -184,7 +194,7 @@ async function syncUpstream(options: Required<Pick<SyncOptions, "dataDir" | "fet
   const next = `${dir}.tmp-${process.pid}`;
   rmSync(next, { recursive: true, force: true });
   mkdirSync(join(next, "providers"), { recursive: true });
-  for (const [id, provider] of Object.entries(catalog)) writeFileSync(join(next, "providers", `${id}.json`), pretty(provider));
+  for (const [id, provider] of Object.entries(catalog)) writeFileSync(join(next, "providers", `${id}.json`), providerFile(provider));
   writeFileSync(join(next, "meta.json"), pretty(meta));
   swapDir(next, dir);
 

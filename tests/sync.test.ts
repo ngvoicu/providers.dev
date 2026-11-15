@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { publish } from "../scripts/lib/publish.ts";
@@ -66,6 +66,33 @@ describe("sync", () => {
     changed["provider-02"]!.models.fresh = { id: "fresh", name: "Fresh" };
     const report = await sync({ dataDir, fetch: fetchReturning(JSON.stringify(changed), { status: 200, headers: { etag: '"v2"' } }) });
     expect(report.upstream.summary).toEqual(["models: +1 added, -1 removed, 1 changed"]);
+  });
+
+  it("writes the same files for the same catalog sent in another order, and keeps the order inside a model", async () => {
+    const sent = fixtureUpstream();
+    // Key order inside a model and the order of an array are left as models.dev sends them.
+    sent["provider-03"]!.models["model-5"]!.cost = { output: 2, input: 1, cache_read: 0.1 };
+    sent["provider-03"]!.models["model-5"]!.modalities = { input: ["text", "image"], output: ["text"] };
+    // The same content: providers and the models of each provider in reverse order.
+    const reordered = Object.fromEntries(
+      Object.entries(sent).reverse().map(([id, provider]) => [id, { ...provider, models: Object.fromEntries(Object.entries(provider.models).reverse()) }]),
+    );
+    const files = (dataDir: string): Record<string, string> => {
+      const dir = join(dataDir, "upstream", "providers");
+      return Object.fromEntries(readdirSync(dir).sort().map((file) => [file, readFileSync(join(dir, file), "utf8")]));
+    };
+    const first = tempDataDir();
+    const second = tempDataDir();
+    expect((await sync({ dataDir: first, fetch: fetchReturning(JSON.stringify(sent)) })).upstream.status).toBe("updated");
+    expect((await sync({ dataDir: second, fetch: fetchReturning(JSON.stringify(reordered)) })).upstream.status).toBe("updated");
+    expect(JSON.stringify(sent)).not.toBe(JSON.stringify(reordered));
+    expect(files(second)).toEqual(files(first));
+
+    const stored = loadUpstream(first)!.catalog["provider-03"]!;
+    expect(Object.keys(stored.models)).toEqual(Object.keys(sent["provider-03"]!.models).sort());
+    expect(Object.keys(stored)).toEqual(["id", "name", "doc", "models"]);
+    expect(Object.keys(stored.models["model-5"]!.cost as object)).toEqual(["output", "input", "cache_read"]);
+    expect(stored.models["model-5"]!.modalities).toEqual({ input: ["text", "image"], output: ["text"] });
   });
 
   it("refuses to run while another sync holds the lock", async () => {
