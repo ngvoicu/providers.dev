@@ -81,7 +81,7 @@ export const CacheLifetimeItemSchema = z
     basis: z.enum(["measured", "documented"]).describe("documented = a lifetime the source documents. measured = what the evaluations of one client with one retention setting showed. Says which of the keys below apply."),
     source: lifetimeSource.describe("Documented: models.dev, or providers.dev where the lifetime is a providers.dev correction or the entry is one providers.dev added. Measured: always providers.dev."),
     date: date.nullable().describe("Documented: the import date for models.dev, the newest evidence date for providers.dev. Measured: the newest of its evaluations. Null = the source has no date."),
-    lifetime_s: z.int().min(0).describe("Documented: the lifetime in seconds; 0 on the item that says the entry does not cache. Measured: the oldest tested age through which every check of every one of its evaluations hit; 0 = no such age."),
+    lifetime_s: z.int().min(0).describe("Documented: the lifetime in whole seconds; 0 only on the item that says the entry does not cache. A documented text that is not a whole number of seconds above 0 is no item. Measured: the oldest tested age through which every check of every one of its evaluations hit; 0 = no such age."),
     mode: z.enum(["implicit", "explicit"]).nullable().describe("Documented: the way of caching the lifetime is documented for. Null on the item that says the entry does not cache, and on a measured item."),
     documented_as: z.string().nullable().describe("Documented: the lifetime as the source writes it, for example 5m. Null on the item that says the entry does not cache, and on a measured item."),
     client: z.string().nullable().describe("Measured: the public id of the client the requests went through, as on the evaluations. Null on a documented item."),
@@ -121,7 +121,7 @@ export const CacheLifetimeRecordSchema = z
   .strictObject({
     short: SafeLifetimeSchema.describe("The short profile: no lifetime asked for, or the shortest documented one."),
     long: SafeLifetimeSchema.describe("The long profile: a longer lifetime asked for."),
-    lifetimes: z.array(CacheLifetimeItemSchema).describe("Every lifetime known for the entry: short, then long; in each, the documented items by seconds, implicit before explicit, then the measured ones, the setting that asked for no lifetime first, then by seconds and value, then by client. Empty = none is known."),
+    lifetimes: z.array(CacheLifetimeItemSchema).describe("Every lifetime known for the entry: short, then long; in each, the documented items by seconds, implicit before explicit, then by text; then the measured ones, the setting that asked for no lifetime first, then by seconds and value, then by client, then by parameter. Text is compared in plain character order. Empty = none is known."),
   })
   .describe("Every cache lifetime of an entry in one list, and the safe value of each retention profile. Worked out once when the data is built. What the documentation says and what evaluations found on their dates, not a guarantee.") satisfies z.ZodType<CacheLifetimeRecord>;
 

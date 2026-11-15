@@ -4,9 +4,9 @@ import {
   cacheLifetime,
   cacheResult,
   documentedCache,
-  durationSeconds,
   evaluationLifetime,
   lifetimeAsked,
+  lifetimeSeconds,
   profileOf,
   retentionOf,
   summarizeCache,
@@ -475,15 +475,19 @@ export function resolve(input: ResolveInput): ResolveResult {
       };
       (evaluations.get(model) ?? evaluations.set(model, []).get(model)!).push(evaluation);
       // The lifetime is derived from the published checks. Where groundtruth gives its own reading of the same run,
-      // and the control did not miss (groundtruth's reading ignores the control), the two must agree.
+      // and the control did not miss (groundtruth's reading ignores the control), the two must agree, null read as 0.
+      // A run that does not count has no value of its own; groundtruth giving it a lifetime above 0 is a disagreement too.
       const derived = evaluationLifetime(evaluation);
       const controlMissed = run.control !== undefined && run.control.total > 0 && run.control.warm < run.control.total;
-      if (derived && !controlMissed && run.all_warm_through_s !== undefined && derived.safe_s !== (run.all_warm_through_s ?? 0)) {
+      const reading = run.all_warm_through_s;
+      if (!controlMissed && reading !== undefined && (derived ? derived.safe_s !== (reading ?? 0) : (reading ?? 0) !== 0)) {
         issues.push({
           level: "warning",
           code: "lifetime-differs",
           target: run.id,
-          message: `The checks of ${run.id} give a lifetime of ${derived.safe_s} s; groundtruth's all_warm_through_s is ${run.all_warm_through_s ?? "null"}. The value derived from the checks is published.`,
+          message: derived
+            ? `The checks of ${run.id} give a lifetime of ${derived.safe_s} s; groundtruth's all_warm_through_s is ${reading ?? "null"}. The value derived from the checks is published.`
+            : `${run.id} has no timed check and no control that missed, so its checks give no lifetime; groundtruth's all_warm_through_s is ${reading}. It counts for no lifetime.`,
         });
       }
     }
@@ -576,38 +580,7 @@ export function resolve(input: ResolveInput): ResolveResult {
       ];
       const cacheEvidence: RetentionEvidence[] = cacheSources.flatMap((source) => source.kind === "listed" ? [] : [{ ...source, kind: source.kind, note: source.note ?? "Source for this entry's cache capabilities." }]);
       if (extension.origin === "upstream") cacheEvidence.unshift({ kind: "documented", url: "https://models.dev", date: input.upstreamDate ?? null, note: "Cache capabilities imported from models.dev; any corrections are recorded in provenance." });
-      // Where a documented lifetime comes from: a providers.dev correction of the cache capabilities, an entry
-      // providers.dev added, or the models.dev import. Null = the "does not cache" item.
-      const lifetimeSource = (mode: CacheMode | null): { source: LifetimeSource; date: string | null } => {
-        const field = mode ? `capabilities.cache.${mode}.ttl` : null;
-        const corrections = (extension.provenance ?? []).filter((change) =>
-          field
-            ? change.path === field || change.path.startsWith(`${field}.`) || ["capabilities", "capabilities.cache", `capabilities.cache.${mode}`].includes(change.path)
-            : change.path === "capabilities" || change.path === "capabilities.cache" || change.path.startsWith("capabilities.cache."),
-        );
-        if (corrections.length > 0) return { source: "providers.dev", date: newestDate(corrections.flatMap((change) => change.evidence.map((source) => source.date))) ?? null };
-        if (extension.origin === "added") return { source: "providers.dev", date: newestDate((extension.evidence ?? []).filter((source) => source.kind !== "listed").map((source) => source.date)) ?? null };
-        return { source: "models.dev", date: input.upstreamDate ?? null };
-      };
-      const ref = `${id}/${model.id}`;
-      for (const mode of ["implicit", "explicit"] as const) {
-        for (const text of documented.modes[mode].ttl ?? []) {
-          if (durationSeconds(text) !== undefined) continue;
-          issues.push({
-            level: "notice",
-            code: "unparsed-lifetime",
-            target: `${ref}#capabilities.cache.${mode}.ttl`,
-            message: `"${text}" in capabilities.cache.${mode}.ttl of ${ref} is not a duration of one number and one unit. It is published as imported and is no documented lifetime.`,
-          });
-        }
-      }
-      const cache: EntryCache = {
-        documented,
-        retention: retentionOf(documented, cacheEvidence, declaration),
-        lifetime: cacheLifetime(documented, own, lifetimeSource),
-        results: summarizeCache(own),
-        evaluations: own,
-      };
+      const retention = retentionOf(documented, cacheEvidence, declaration);
       /** Where a field of `owner` comes from: the models.dev import, or providers.dev's own sources for it. */
       const sourcesOf = (owner: PublishedModel, field: string, imported: string): RetentionEvidence[] => {
         const ownerExtension = modelExt(owner);
@@ -632,7 +605,52 @@ export function resolve(input: ResolveInput): ResolveResult {
         ? `The cost models.dev records for ${reference}: the API list price this subscription entry refers to. Rules are in the order models.dev applies them.`
         : "The cost models.dev records for this entry. Rules are in the order models.dev applies them: base prices, overrides in their order, then multipliers.";
       const pricing = pricingOf(priced, extension.access, reference, sourcesOf(priced, "cost", priceNote), priceDeclaration);
-      const requestControls = controlsOf(model, cache.retention, sourcesOf(model, "capabilities", "Imported capabilities; corrections are recorded in providers_dev.provenance."), controlDeclarations.get(model));
+      const requestControls = controlsOf(model, retention, sourcesOf(model, "capabilities", "Imported capabilities; corrections are recorded in providers_dev.provenance."), controlDeclarations.get(model));
+      // A declaration made for this entry by name is evidence about the entry. One that reached it through a
+      // provider-wide selection is not: its source stays with the control.
+      const wide = providerWide.get(model);
+      const declared = [
+        ...(declaration && !wide?.has("cache.retention") ? declaration.evidence : []),
+        ...(pricingDeclarations.get(model)?.evidence ?? []),
+        ...(controlDeclarations.get(model) ?? []).filter((control) => !wide?.has(control.id)).flatMap((control) => control.evidence),
+      ].flatMap((source): Evidence[] => (source.date === null ? [] : [{ kind: source.kind, url: source.url, date: source.date, note: source.note }]));
+      const evidence: Evidence[] = [...(extension.evidence ?? [])];
+      for (const source of declared) {
+        if (!evidence.some((item) => item.kind === source.kind && item.url === source.url && item.date === source.date && (item.note ?? null) === (source.note ?? null))) evidence.push(source);
+      }
+      // Where a documented lifetime comes from: a providers.dev correction of the cache capabilities, an entry
+      // providers.dev added (its evidence, with that of the declarations made for it by name), or the models.dev
+      // import. Null = the "does not cache" item.
+      const lifetimeSource = (mode: CacheMode | null): { source: LifetimeSource; date: string | null } => {
+        const field = mode ? `capabilities.cache.${mode}.ttl` : null;
+        const corrections = (extension.provenance ?? []).filter((change) =>
+          field
+            ? change.path === field || change.path.startsWith(`${field}.`) || ["capabilities", "capabilities.cache", `capabilities.cache.${mode}`].includes(change.path)
+            : change.path === "capabilities" || change.path === "capabilities.cache" || change.path.startsWith("capabilities.cache."),
+        );
+        if (corrections.length > 0) return { source: "providers.dev", date: newestDate(corrections.flatMap((change) => change.evidence.map((source) => source.date))) ?? null };
+        if (extension.origin === "added") return { source: "providers.dev", date: newestDate(evidence.filter((source) => source.kind !== "listed").map((source) => source.date)) ?? null };
+        return { source: "models.dev", date: input.upstreamDate ?? null };
+      };
+      const ref = `${id}/${model.id}`;
+      for (const mode of ["implicit", "explicit"] as const) {
+        for (const text of documented.modes[mode].ttl ?? []) {
+          if (lifetimeSeconds(text) !== undefined) continue;
+          issues.push({
+            level: "notice",
+            code: "unparsed-lifetime",
+            target: `${ref}#capabilities.cache.${mode}.ttl`,
+            message: `"${text}" in capabilities.cache.${mode}.ttl of ${ref} is not a whole number of seconds above 0 written as one number and one unit. It is published as imported and is no documented lifetime.`,
+          });
+        }
+      }
+      const cache: EntryCache = {
+        documented,
+        retention,
+        lifetime: cacheLifetime(documented, own, lifetimeSource),
+        results: summarizeCache(own),
+        evaluations: own,
+      };
       // The lifetime an option of the retention control asks for is kept equal to the documented lifetime of its profile.
       for (const control of requestControls.items.filter((item) => item.id === "cache.retention")) {
         for (const option of control.options ?? []) {
@@ -648,18 +666,6 @@ export function resolve(input: ResolveInput): ResolveResult {
             message: `The ${profile} option ${JSON.stringify(option.value)} of the cache.retention control of ${ref} has retention_s ${asked}; the documented ${profile} lifetime is ${documentedS ?? "not documented"}. Correct one of the two with an override.`,
           });
         }
-      }
-      // A declaration made for this entry by name is evidence about the entry. One that reached it through a
-      // provider-wide selection is not: its source stays with the control.
-      const wide = providerWide.get(model);
-      const declared = [
-        ...(declaration && !wide?.has("cache.retention") ? declaration.evidence : []),
-        ...(pricingDeclarations.get(model)?.evidence ?? []),
-        ...(controlDeclarations.get(model) ?? []).filter((control) => !wide?.has(control.id)).flatMap((control) => control.evidence),
-      ].flatMap((source): Evidence[] => (source.date === null ? [] : [{ kind: source.kind, url: source.url, date: source.date, note: source.note }]));
-      const evidence: Evidence[] = [...(extension.evidence ?? [])];
-      for (const source of declared) {
-        if (!evidence.some((item) => item.kind === source.kind && item.url === source.url && item.date === source.date && (item.note ?? null) === (source.note ?? null))) evidence.push(source);
       }
       const verified = newestDate([
         ...evidence.map((e) => e.date),

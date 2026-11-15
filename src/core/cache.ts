@@ -413,7 +413,7 @@ const documentedItem = (profile: RetentionProfile, lifetime: number, mode: Cache
  * The documented items of an entry: one per text of a supported mode's `ttl` that is a duration, `short` for the
  * shortest lifetime documented over both modes and `long` for every other; or, where the entry is documented as not
  * caching, one item of 0 seconds per profile. `sourceOf` names the source and date of a mode's lifetimes (null = the
- * "does not cache" item). Ordered by profile, then seconds, implicit before explicit.
+ * "does not cache" item). Ordered by profile, then seconds, implicit before explicit, then the text in character order.
  */
 export function documentedItems(documented: CacheDocumentation, sourceOf: (mode: CacheMode | null) => { source: LifetimeSource; date: string | null }): CacheLifetimeItem[] {
   if (documented.support === "unsupported") {
@@ -425,7 +425,7 @@ export function documentedItems(documented: CacheDocumentation, sourceOf: (mode:
     const value = documented.modes[mode];
     if (value.support !== "supported" || !value.ttl) continue;
     for (const text of value.ttl) {
-      const seconds = durationSeconds(text);
+      const seconds = lifetimeSeconds(text);
       if (seconds !== undefined) found.push({ mode, text, seconds });
     }
   }
@@ -435,8 +435,21 @@ export function documentedItems(documented: CacheDocumentation, sourceOf: (mode:
   const from = (mode: CacheMode) => sources.get(mode) ?? sources.set(mode, sourceOf(mode)).get(mode)!;
   return found
     .map((item) => documentedItem(item.seconds === shortest ? "short" : "long", item.seconds, item.mode, item.text, from(item.mode)))
-    .sort((a, b) => profileRank(a.retention_profile) - profileRank(b.retention_profile) || a.lifetime_s - b.lifetime_s || modeRank(a.mode) - modeRank(b.mode));
+    .sort((a, b) => profileRank(a.retention_profile) - profileRank(b.retention_profile) || a.lifetime_s - b.lifetime_s || modeRank(a.mode) - modeRank(b.mode) || byCharacters(a.documented_as, b.documented_as));
 }
+
+/**
+ * A documented lifetime text in whole seconds: a duration (`durationSeconds`) of at least one whole second. Anything
+ * else (a range, words, a fraction of a second such as `500ms`, a lifetime of 0) is no documented lifetime: it makes no
+ * item and the build reports it. Nothing is rounded.
+ */
+export function lifetimeSeconds(text: string): number | undefined {
+  const seconds = durationSeconds(text);
+  return seconds !== undefined && Number.isInteger(seconds) && seconds > 0 ? seconds : undefined;
+}
+
+/** Plain character (UTF-16 code unit) order, null first: the same on every machine, whatever its locale. */
+const byCharacters = (a: string | null, b: string | null): number => (a === b ? 0 : a === null ? -1 : b === null ? 1 : a < b ? -1 : 1);
 
 const profileRank = (profile: RetentionProfile): number => (profile === "short" ? 0 : 1);
 const modeRank = (mode: CacheMode | null): number => (mode === "implicit" ? 0 : 1);
@@ -519,8 +532,9 @@ export function cacheLifetime(
       profileRank(a.retention_profile) - profileRank(b.retention_profile) ||
       (a.value === null ? 0 : 1) - (b.value === null ? 0 : 1) ||
       (durationSeconds(a.value) ?? 0) - (durationSeconds(b.value) ?? 0) ||
-      String(a.value).localeCompare(String(b.value)) ||
-      (a.client! < b.client! ? -1 : a.client! > b.client! ? 1 : 0),
+      byCharacters(a.value, b.value) ||
+      byCharacters(a.client, b.client) ||
+      byCharacters(a.parameter, b.parameter),
   );
   const docs = documentedItems(documented, sourceOf);
   const lifetimes = RETENTION_PROFILES.flatMap((profile) => [...docs, ...measured].filter((item) => item.retention_profile === profile));

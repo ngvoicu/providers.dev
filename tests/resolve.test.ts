@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { emptyCacheLifetime } from "../src/core/cache.ts";
+import { CacheLifetimeRecordSchema } from "../src/core/contract.ts";
 import { clone } from "../src/core/merge.ts";
 import { summarize } from "../src/core/entries.ts";
 import { resolve, type ResolveInput } from "../src/core/resolve.ts";
@@ -605,6 +606,52 @@ describe("resolve: measurements", () => {
       ]);
       // The value derived from the checks is published all the same.
       expect(ext(catalog.lab!.models["model-a"]!).cache.lifetime.lifetimes[0]!.evaluation_ids).toContain("differs");
+    });
+
+    it("reports a lifetime that is not a whole number of seconds, makes no item of it, and keeps the record valid", () => {
+      const catalog = documentedUpstream();
+      catalog.lab!.models["model-c"]!.capabilities = { cache: { explicit: { ttl: ["500ms"] } } };
+      const result = resolve(input([], { upstream: catalog }));
+      expect(result.issues).toEqual([expect.objectContaining({ level: "notice", code: "unparsed-lifetime", target: "lab/model-c#capabilities.cache.explicit.ttl" })]);
+      const lifetime = ext(result.catalog.lab!.models["model-c"]!).cache.lifetime;
+      expect(lifetime).toEqual(emptyCacheLifetime());
+      expect(CacheLifetimeRecordSchema.safeParse(lifetime).success).toBe(true);
+      // The text stays readable where models.dev wrote it.
+      expect(result.catalog.lab!.models["model-c"]!.capabilities).toEqual({ cache: { explicit: { ttl: ["500ms"] } } });
+    });
+
+    it("dates a documented lifetime of an added entry by its newest evidence, a declaration made for it included", () => {
+      const dated = (date: string) => ({ kind: "documented" as const, url: `https://example.com/docs/${date}`, date });
+      const declaration = {
+        support: "supported" as const, parameter: { name: "cache_control.ttl", location: "Cache marker" }, accepted_values: ["5m", "1h"], default: "5m",
+        profiles: [{ profile: "short" as const, value: "5m" }, { profile: "long" as const, value: "1h" }], conditions: [], evidence: [{ ...dated("2026-11-14"), note: "The documented request field." }],
+      };
+      const added: AuthoredProvider = {
+        id: "added", name: "Added", access: "api", access_basis: "fixture", evidence: [dated("2026-11-01")],
+        models: [{ id: "m", fields: { capabilities: { cache: { explicit: { ttl: ["5m", "1h"] } } } }, evidence: [dated("2026-11-01")], cache_retention: declaration }],
+      };
+      const { catalog } = resolve(input([], { additions: [added] }));
+      const extension = ext(catalog.added!.models.m!);
+      expect(extension.evidence.map((source) => source.date)).toEqual(["2026-11-01", "2026-11-14"]);
+      expect(extension.cache.lifetime.lifetimes.map((item) => [item.lifetime_s, item.source, item.date])).toEqual([[300, "providers.dev", "2026-11-14"], [3600, "providers.dev", "2026-11-14"]]);
+      expect([extension.cache.lifetime.short.date, extension.cache.lifetime.long.date]).toEqual(["2026-11-14", "2026-11-14"]);
+    });
+
+    it("reports groundtruth's lifetime for a run whose checks give none", () => {
+      const runs: ObservedFile = {
+        ...observed,
+        cache: [
+          run("warm-only", [], { all_warm_through_s: 300 }),
+          run("warm-only-null", [], { all_warm_through_s: null }),
+          run("warm-only-zero", [], { all_warm_through_s: 0 }),
+        ],
+      };
+      const { catalog, issues } = resolve(input([], { observed: runs, routes, labels: directLabel, additions: [login] }));
+      expect(issues.filter((issue) => issue.code === "lifetime-differs")).toEqual([expect.objectContaining({ level: "warning", target: "warm-only" })]);
+      // It stays an evaluation that counts for no lifetime.
+      const cache = ext(catalog.lab!.models["model-a"]!).cache;
+      expect(cache.evaluations.map((item) => item.id).sort()).toEqual(["warm-only", "warm-only-null", "warm-only-zero"]);
+      expect(cache.lifetime).toEqual(emptyCacheLifetime());
     });
 
     it("reports a documented lifetime that is not a duration, and does not make an item of it", () => {

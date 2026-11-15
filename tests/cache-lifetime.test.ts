@@ -1,6 +1,6 @@
 // The cache lifetime record (design/safe-cache-lifetime.md, sections 2 to 5 and the worked examples of section 10).
 // Every evaluation is written out here, as the published dataset of 2026-11-15 has it; nothing is read from data/.
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   cacheLifetime,
   cacheResult,
@@ -9,6 +9,7 @@ import {
   documentedItems,
   emptyCacheLifetime,
   evaluationLifetime,
+  lifetimeSeconds,
   type CacheEvaluation,
   type CacheLifetimeItem,
   type CacheMode,
@@ -216,6 +217,17 @@ describe("documentedItems (5)", () => {
     const none = [documentedOf("short", 0, null, null), documentedOf("long", 0, null, null)];
     expect(documentedItems(docs(false), fromImport)).toEqual(none);
     expect(documentedItems(docs({ implicit: false, explicit: false }), fromImport)).toEqual(none);
+  });
+
+  it("makes no item of a lifetime that is not a whole number of seconds above 0, and rounds nothing", () => {
+    expect(lifetimeSeconds("500ms")).toBeUndefined();
+    expect(lifetimeSeconds("1500ms")).toBeUndefined();
+    expect(lifetimeSeconds("0s")).toBeUndefined();
+    expect(lifetimeSeconds("2000ms")).toBe(2);
+    expect(lifetimeSeconds("5m")).toBe(300);
+    expect(documentedItems(docs({ explicit: { ttl: ["500ms"] } }), fromImport)).toEqual([]);
+    expect(documentedItems(docs({ explicit: { ttl: ["500ms", "0m", "5m"] } }), fromImport)).toEqual([documentedOf("short", 300, "explicit", "5m")]);
+    expect(cacheLifetime(docs({ explicit: { ttl: ["500ms"] } }), [], fromImport)).toEqual(emptyCacheLifetime());
   });
 
   it("makes no item of a text that is not a duration", () => {
@@ -487,6 +499,65 @@ describe("cacheLifetime: the rules", () => {
     const record = cacheLifetime(documented, [], sourceOf);
     expect(record.short).toMatchObject({ safe_s: 300, basis: "documented", source: "providers.dev", date: "2026-11-02" });
     expect(lifetimeRuleBreaks(record, [], documented)).toEqual([]);
+  });
+
+  it("counts a timed result with a single check like any other", () => {
+    const single = twoMinutes("single", "direct", "c 1/1 · 150: 1/1 · 300: 1/1 · 600: 0/1");
+    expect(evaluationLifetime(single)).toEqual({ safe_s: 300, first_miss_s: 600, tested_from_s: 150 });
+    const record = cacheLifetime(documentedCache({}), [single], fromImport);
+    expect(record.short).toMatchObject({ safe_s: 300, measured_s: 300, checks: 4, hits: 3, tested_from_s: 150, first_miss_s: 600 });
+    expect(record.lifetimes[0]!.results).toEqual(results("c 1/1 · 150: 1/1 · 300: 1/1 · 600: 0/1"));
+    // A single timed check that missed inside the documented lifetime contradicts it.
+    const cold = twoMinutes("cold-single", "direct", "c 1/1 · 150: 0/1");
+    expect(contradicts(cold, 300)).toBe(true);
+    expect(cacheLifetime(docs({ explicit: { ttl: ["5m"] } }), [cold], fromImport).short).toMatchObject({ safe_s: 0, basis: "measured", checks_inside: 2, hits_inside: 1 });
+  });
+
+  it("makes one item per parameter: the same client and value sent in two request fields are two items", () => {
+    const ttl = twoMinutes("by-ttl", "direct", "c 1/1 · 3600: 3/3", long1h);
+    const retention = twoMinutes("by-retention", "direct", "c 1/1 · 1800: 3/3 · 3600: 0/3", { retention_profile: "long", parameter: "prompt_cache_retention", value: "1h" });
+    const record = cacheLifetime(documentedCache({}), [ttl, retention], fromImport);
+    expect(record.lifetimes.map((item) => [item.parameter, item.value, item.client, item.evaluation_ids, item.lifetime_s])).toEqual([
+      ["cache_control.ttl", "1h", "direct", ["by-ttl"], 3600],
+      ["prompt_cache_retention", "1h", "direct", ["by-retention"], 1800],
+    ]);
+    expect(record.long).toMatchObject({ safe_s: 1800, clients: 1, evaluations: 2 });
+    expect(lifetimeRuleBreaks(record, [ttl, retention], documentedCache({}))).toEqual([]);
+  });
+
+  it("orders the list in plain character order, whatever the locale, and whatever the order of the input", () => {
+    // Ordered by character code: B (66) < a (97) < z (122) < ä (228). A locale orders them a, B, ä, z (en-US) or
+    // a, B, z, ä (sv-SE); neither is the order here, and localeCompare is made to fail if anything calls it.
+    const runs = [
+      twoMinutes("v-a", "direct", "c 1/1 · 600: 3/3", { retention_profile: "long", parameter: "p", value: "a" }),
+      twoMinutes("v-ae", "direct", "c 1/1 · 600: 3/3", { retention_profile: "long", parameter: "p", value: "ä" }),
+      twoMinutes("v-z", "direct", "c 1/1 · 600: 3/3", { retention_profile: "long", parameter: "p", value: "z" }),
+      twoMinutes("v-B", "direct", "c 1/1 · 600: 3/3", { retention_profile: "long", parameter: "p", value: "B" }),
+      // Clients in character order too: Zed before alpha.
+      twoMinutes("c-alpha", "alpha", "c 1/1 · 300: 3/3"),
+      twoMinutes("c-Zed", "Zed", "c 1/1 · 300: 3/3"),
+      // One client, one value, two request fields: by parameter.
+      twoMinutes("p-z", "direct", "c 1/1 · 600: 3/3", { retention_profile: "long", parameter: "z_field", value: "1h" }),
+      twoMinutes("p-a", "direct", "c 1/1 · 600: 3/3", { retention_profile: "long", parameter: "a_field", value: "1h" }),
+    ];
+    // Two texts of one lifetime in one mode: by the text.
+    const documented = docs({ explicit: { ttl: ["60s", "1m", "5m"] } });
+    const spy = vi.spyOn(String.prototype, "localeCompare").mockImplementation(() => {
+      throw new Error("the order of the lifetime record must not depend on the locale");
+    });
+    try {
+      const record = cacheLifetime(documented, runs, fromImport);
+      expect(record.lifetimes.map((item) => item.documented_as ?? `${item.client}:${item.parameter}:${item.value}`)).toEqual([
+        "1m", "60s", "Zed:null:null", "alpha:null:null",
+        // Values that are not durations count as 0 seconds and come before 1h; among themselves, by character.
+        "5m", "direct:p:B", "direct:p:a", "direct:p:z", "direct:p:ä", "direct:a_field:1h", "direct:z_field:1h",
+      ]);
+      for (const order of [[...runs].reverse(), [...runs.slice(3), ...runs.slice(0, 3)]]) {
+        expect(cacheLifetime(docs({ explicit: { ttl: ["5m", "1m", "60s"] } }), order, fromImport)).toEqual(record);
+      }
+    } finally {
+      spy.mockRestore();
+    }
   });
 
   it("finds a broken rule", () => {
