@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { stringify } from "yaml";
@@ -80,8 +80,18 @@ export function fixtureUpstream(providers = 30, modelsEach = 20): UpstreamCatalo
   return catalog;
 }
 
+/** Folders made by `tempDataDir`; `tests/setup.ts` removes them when each test file is over, passed or failed. */
+const tempDirs = new Set<string>();
+
 export function tempDataDir(): string {
-  return mkdtempSync(join(tmpdir(), "providers-dev-"));
+  const dir = mkdtempSync(join(tmpdir(), "providers-dev-"));
+  tempDirs.add(dir);
+  return dir;
+}
+
+export function removeTempDataDirs(): void {
+  for (const dir of tempDirs) rmSync(dir, { recursive: true, force: true });
+  tempDirs.clear();
 }
 
 export function writeAuthored(dataDir: string): void {
