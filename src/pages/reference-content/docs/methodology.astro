@@ -18,6 +18,7 @@ import { IDENTITY_FIELDS } from "../../../core/resolve.ts";
     { id: "sync", label: "Daily import" },
     { id: "caching", label: "Documented caching" },
     { id: "evaluations", label: "Cache evaluations" },
+    { id: "lifetimes", label: "Cache lifetimes" },
     { id: "stale", label: "Dates and staleness" },
   ]}
 >
@@ -30,8 +31,10 @@ import { IDENTITY_FIELDS } from "../../../core/resolve.ts";
       <li><strong>API price.</strong> The list price of the API entry of the same model, shown on a subscription entry and marked "API price". It is the only value an entry takes from another one (see <a href="#prices">Prices</a>).</li>
     </ul>
     <p>
-      A measured value never replaces a documented one: both are shown. A provider documenting a 30-minute cache and an evaluation that found the cache gone after 15 minutes are two
-      different facts. The one exception is an added entry, where no documented limit exists: there a measured limit is published as the limit and labelled as measured.
+      A documented value and a measured one are both shown, each with its source and date. A provider documenting a 30-minute cache and an evaluation that found the cache gone after
+      15 minutes are two different facts, and both stay published. A measured value takes the place of a documented one in one figure only, the safe cache lifetime, and only where a
+      measurement clearly contradicts the documentation (see <a href="#lifetimes">Cache lifetimes</a>); the documented lifetime stays listed beside it. The other exception is an added
+      entry, where no documented limit exists: there a measured limit is published as the limit and labelled as measured.
     </p>
 
     <h2 id="unknown">Unknown values</h2>
@@ -156,8 +159,9 @@ import { IDENTITY_FIELDS } from "../../../core/resolve.ts";
       <li><strong>Automatic</strong> (<code>implicit</code> in the data): the provider caches the start of a prompt by itself. The request does nothing for it.</li>
       <li><strong>Manual</strong> (<code>explicit</code>): nothing is cached unless the request marks what to cache. The mark also picks the lifetime, where there is a choice.</li>
       <li>
-        The box after the word holds the lifetimes the provider documents for that way of caching. "Manual <span class="cache-box">5 min, 1 h</span>" means a request must mark what to
-        cache, and the source lists those lifetimes. The request parameter and accepted values are recorded separately under Retention. A box that says <span class="cache-box none">Unknown</span> means the source gives no lifetime.
+        On an entry's page the <em>Cache modes</em> table has one row for each way of caching, supported or not, with its minimum prompt size, breakpoints and targets. The lifetimes the
+        provider documents are in the <em>Lifetimes</em> table (see <a href="#lifetimes">Cache lifetimes</a>), each naming its way of caching and the text as documented
+        (<code>5m</code>, say). The request parameter and accepted values are recorded separately under Retention.
       </li>
       <li>An entry can have both: it caches by itself, and a request can also mark parts. Then each has its own line.</li>
     </ul>
@@ -174,21 +178,22 @@ import { IDENTITY_FIELDS } from "../../../core/resolve.ts";
       route reports cache hits, so that a later miss means the cache is gone and not that nothing was cached. Older evaluations keep the ages they were made with, and some start at 5 minutes.
     </p>
     <p>
-      Results are shown the same way on every page: the catalog, a provider's page, a model's page and an entry's page all draw one summary table, with the same lines and the same
-      columns. The columns are the control and the ages above. A cell is the share of re-sends at exactly that age that were served from the cache, in percent, with the counts on hover
-      or under it. Nothing is rounded into a neighbouring age: 7.5 minutes and 10 minutes are two cells. A cell with no check stays empty; it is not a miss. A check made at an age that
-      has no column (an older evaluation at 3 hours, say) is in the data at its exact age and is listed in words on the entry's page.
+      Results are shown per client. On an entry's page each measured lifetime in the <em>Lifetimes</em> table is one client and one request setting, with its results by age, and
+      opens onto each of its evaluations with their own results. The columns are the control and the ages above. A cell is the share of re-sends at exactly that age that were served
+      from the cache, in percent rounded to a whole number, with the hits and checks under it; the hover text has the exact percentage. Nothing is rounded into a neighbouring age:
+      7.5 minutes and 10 minutes are two cells. A cell with no check shows a dot; it is not a miss. A check made at an age that has no column (an older evaluation at 3 hours, say) is in
+      the data at its exact age and is listed in words on the entry's page. The evidence page lists every evaluation, each with its percentages by age, rounded the same way.
     </p>
-    <p>There are two kinds of line, because a request can ask for the cache in two ways, and the two answer different questions:</p>
+    <p>There are two retention profiles, because a request can ask for the cache in two ways, and the two answer different questions:</p>
     <ul>
       <li><strong>Short:</strong> the request asks for no lifetime, or for the shortest one the provider documents. This is the cache you get without asking.</li>
       <li>
-        <strong>Long:</strong> the request asks for a longer lifetime, for example <code>cache_control.ttl=1h</code> or <code>prompt_cache_retention=24h</code>. The value is shown next to
-        the word, and the entry's page names the request field.
+        <strong>Long:</strong> the request asks for a longer lifetime, for example <code>cache_control.ttl=1h</code> or <code>prompt_cache_retention=24h</code>. Each measured lifetime
+        shows the field and value its requests sent.
       </li>
     </ul>
     <p>
-      Both lines are there on every evaluated entry. A line with no measurement says <em>Not evaluated</em>; that is not 0 %, and it says nothing about whether the provider accepts a
+      Both profiles are there on every entry. A profile with no measurement says <em>Not evaluated</em>; that is not 0 %, and it says nothing about whether the provider accepts a
       lifetime. What a request can ask for is a separate record, <em>Retention</em>, on every entry's page: whether a lifetime is accepted, the request field, the accepted values and which
       value gives which line. It is filled from the provider's own documentation, quoted with the record: the field as a request sends it (<code>cache_control.ttl</code>, say), its
       values, and the default. Where the short lifetime is what a request gets by leaving the field out, the record says so instead of naming a value. Sending a value, receiving a cache
@@ -196,18 +201,56 @@ import { IDENTITY_FIELDS } from "../../../core/resolve.ts";
       <em>Unknown</em> until its own page says it. Requested settings stay visible in evaluations even when support is unknown. The results show observed behavior, not a guaranteed lifetime.
     </p>
     <p>
-      A line adds up every evaluation of the entry with that retention setting, from every client. One evaluation has only a few re-sends per age, so a single miss moves it a lot, and the
-      sum is steadier. The entry's page lists every evaluation under the summary, with its client, request settings, counts and raw result. The pages state no verdict about a cache
-      lifetime: they show the counts, and the reader draws the line.
+      The evaluations of one client with one request setting are added up by exact age; the results of different clients are never added together. The entry's page lists every
+      evaluation, with its client, request settings, counts and raw result. An evaluation that checked no age and whose control hit shows that the prompt was cached and nothing about
+      how long: it is listed under <em>Other evaluations</em> and is in no lifetime.
     </p>
     <p>
-      Every number on these pages is in the API as published, counts and percentages alike; a page formats it and works out nothing of its own.
+      Every number on these pages is in the API as published, counts, percentages and lifetimes alike; a page formats it and works out nothing of its own.
       See <a href="/docs/api/#cache">cache evaluations in the API</a>.
     </p>
     <p>
       Each evaluation names the access method it was taken on and the client that sent the requests: straight to the provider, through{" "}
       <a href="https://github.com/router-for-me/CLIProxyAPI" rel="noopener">CLIProxyAPI</a> (an open-source proxy, and for a subscription login often the only way in besides the
       vendor's own tool), or through the vendor's own command-line tool. A result holds for that combination on that date. The evaluation source repository is listed in <a href="/api/v1/meta"><code>/api/v1/meta</code></a>, and every evaluation links to its raw result.
+    </p>
+
+    <h2 id="lifetimes">Cache lifetimes</h2>
+    <p>
+      Every entry has a safe cache lifetime for each retention profile, short and long: how long a cached prompt can be relied on. It is worked out once, when the data is built, from
+      the entry's documented lifetimes and its evaluations, and published in the API (<code>providers_dev.cache.lifetime</code>, and <code>cache_lifetime</code> of a summary). The
+      pages print it.
+    </p>
+    <ul>
+      <li><strong>Documented.</strong> Where the provider documents a lifetime for the profile, that is the safe lifetime, unless a measurement clearly contradicts it.</li>
+      <li>
+        <strong>Contradicted.</strong> A measurement contradicts the documentation when one evaluation has a result at an age up to the documented lifetime, the immediate re-send
+        included, in which fewer than half of the checks hit. Exactly half does not contradict. A miss after the documented lifetime is what the documentation says and is not looked at.
+        Then the measured lifetime is the safe one, and the documented lifetime stays in the list.
+      </li>
+      <li>
+        <strong>Measured.</strong> Where nothing is documented, the safe lifetime is the measured one: for each evaluation, the oldest age up to which every check hit, from the
+        immediate re-send on (one miss ends it, and an older age that hits again does not raise it); then the lowest of these across evaluations and clients.
+      </li>
+      <li>The safe lifetime is never above the documented lifetime: a cache that still hits after it changes nothing.</li>
+      <li>
+        A provider that documents that it does not cache has a safe lifetime of 0, documented, shown as <em>None</em>. A measured 0, shown as <em>0 s</em>, means no tested age at which
+        every check hit. Where nothing is documented or measured the lifetime is not known and is shown as <em>Unknown</em>, never as 0.
+      </li>
+      <li>A measured lifetime is per client and request setting. It does not expire, and shows the date of its newest evaluation.</li>
+    </ul>
+    <p>
+      On an entry's page the <em>Lifetimes</em> table gives, for each retention profile, the safe lifetime with its basis (documented or measured), source and date; then the documented
+      lifetime, the measured one with its number of clients, and how many checks hit inside the documented lifetime. Where the safe lifetime is measured and a documented lifetime
+      exists, the profile says <em>Documentation contradicted</em>. Where it is documented and a measurement exists, it says <em>Documentation not contradicted</em>: no evaluation
+      contradicts it, which is not the same as confirmed. Under the profile, every documented and every measured lifetime, one per line, each with its source and date. The catalog, a
+      provider's page and a model's page show the safe lifetime of both profiles in one <em>Cache lifetime</em> column, with the other of the two lifetimes beside it where there is one.
+      Lifetimes are shown in minutes and hours (<em>5 min</em>, <em>24 h</em>); the exact seconds are in the hover text and in the API.
+    </p>
+    <p>
+      The safe lifetime has limits. A measurement is a sample: a few requests from one account, on some days. An age between two tested ages is not known: a cache that hit at 30
+      minutes and missed at 1 h 5 min may have ended at any point between. And a provider can change its cache behaviour without notice. The safe lifetime is a published number made by
+      this rule, not a guarantee.
     </p>
 
     <h2 id="stale">Dates and staleness</h2>

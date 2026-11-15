@@ -62,8 +62,9 @@ The baseline is imported from models.dev; our additions, corrections and measure
   `description` of a model is in the API and not on the page.
 - Wording: the two sources are named `models.dev` and `providers.dev` (never "ours"). A cache run is an
   "evaluation". Pages use the full width of the home page (`.page`).
-- Cache summaries use the API's exact ages, hit percentages and counts, with separate short/long settings on every
-  page. Do not generate narrative lifetime verdicts. Individual evaluations are collapsed by default.
+- Cache summaries use the API's exact ages and counts, with separate short/long settings on every page. The hit
+  percentage is exact in the API and in the hover text; a cell of the results by age shows it rounded to a whole
+  number. Do not generate narrative lifetime verdicts. Individual evaluations are collapsed by default.
 - Cache lifetimes are worked out once, in `cacheLifetime` (`src/core/cache.ts`), into `providers_dev.cache.lifetime`
   (`cache_lifetime` of a summary). A lifetime providers.dev publishes of its own is an item of its `lifetimes` list and
   nowhere else. A page prints the profiles (`short`, `long`) and the items as they are: it converts no lifetime, takes
@@ -71,6 +72,9 @@ The baseline is imported from models.dev; our additions, corrections and measure
   at which every check hit), told apart by `basis`; `null` is unknown. A measured safe value replaces a contradicted
   documented one only in `safe_s`: the documented item stays in the list, and `capabilities.cache` stays as imported.
   The safe value is a published number made by a published rule, not a verdict a page writes.
+- The safe value, like every figure the site shows, is worked out once, when the data is built, and published in the
+  API. A page never works anything out: it prints fields of the API, formatted. The site never shows anything that is
+  not from the API.
 - Cache mode support comes from `providers_dev.cache.documented`; retention parameter support requires a sourced
   declaration. A requested setting or cache hit alone does not confirm parameter support.
 - A retention declaration is a `request_controls` item with id `cache.retention` in

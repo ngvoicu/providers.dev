@@ -276,6 +276,10 @@ where nothing is documented, the measured one, the oldest age through which ever
 which every check hit); `null` is not known. `cacheLifetime` in `src/core/cache.ts` works it out once, when the data
 is built; the rule in full is in `design/safe-cache-lifetime.md` and in the guide of the OpenAPI document.
 
+The safe value, like every figure the site shows, is worked out once, when the data is built, and published in the
+API. A page never works anything out: it prints fields of the API, formatted. The site never shows anything that is
+not from the API.
+
 `providers_dev.cache.documented` publishes a support state and details for each cache mode. Its compact support
 states are also in `cache_mode_support` on summaries. Pages render these states directly: an absent mode remains
 unknown. Known prices, capabilities and API endpoint fields are described in OpenAPI, while additional upstream

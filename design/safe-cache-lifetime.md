@@ -798,8 +798,9 @@ The merged record is the API's shape, and a page prints it as it is:
 Every lifetime is in seconds, so `"5m"` is converted once, in the build. Documented and measured lifetimes are items
 of one list, so a page has one loop and no second block. Which value is the safe one is `basis` and `safe_s`, so a
 page compares nothing, takes no minimum and applies no rule. Each item names `models.dev` or `providers.dev` and has
-its own date, as `AGENTS.md` and the licence notes require. A profile with no item prints "Unknown"; 0 prints as
-"None", with its basis.
+its own date, as `AGENTS.md` and the licence notes require. A profile with no item prints "Unknown". 0 prints by its
+basis: a documented 0 as "None" (the provider documents that it does not cache), a measured 0 as "0 s" (no age at
+which every check hit) (decision 31).
 
 A cell of the results by age shows the hit percentage rounded to a whole number; the exact `hit_rate_pct`, the hits
 and the checks are in the API and in the hover text (decided separately, section 12).
@@ -1098,6 +1099,7 @@ All on 2026-11-15. "The owner" decided; "the chief" is the project's chief, who 
 | 28 | 2026-11-15: the profile of an evaluation is decided in seconds: no lifetime asked is short; a lifetime asked is short when, converted as in 5.3, it equals the shortest documented lifetime in whole seconds, and long otherwise, a value that does not convert included. A declared profile comes first. Nothing depends on the order or the writing of the texts (5.1). | The chief, after review T-19 |
 | 29 | 2026-11-15: one public client id has one label. Two clients of the labels file with the same `id` and different `label` are an error that fails the build and names both (2.3). | The chief, after review T-19 |
 | 30 | 2026-11-15: a run has one check result per age. A measurements file in which a run holds the same `age_s` twice is refused when read, by the sync and by the build, naming the run and the age; the checks are not added together (3.2). | The chief, after review T-21 |
+| 31 | 2026-11-15: a documented 0 prints "None" (the provider documents that it does not cache), a measured 0 prints "0 s" (no age at which every check hit), and not known prints "Unknown" (9). | The chief, with the page design (T-23) |
 
 Open: 12 (the exact test, pending the owner's look at the borderline cases) and 20.
 
