@@ -148,10 +148,34 @@ export const RouteMap = z.record(z.string(), z.strictObject({ provider: z.string
 export type RouteMap = z.infer<typeof RouteMap>;
 
 // ---- authored: public names for the measurement file's clients (data/authored/measurement-labels.yaml)
-export const MeasurementLabels = z.strictObject({
-  clients: z.record(z.string(), z.strictObject({ id: z.string().min(1), label: z.string().min(1) })),
-  omit_note_parts_mentioning: z.array(z.string().min(1)).default([]),
-});
+/** What a client the labels file does not describe is published as. */
+export const OTHER_CLIENT = { id: "other", label: "Another client" } as const;
+
+// One public client id has one label: several raw clients may share an id only with the same label. So the label of
+// a published client is a function of its id, and nothing depends on which of its evaluations comes first. The id
+// `other` is taken by OTHER_CLIENT and keeps its label.
+export const MeasurementLabels = z
+  .strictObject({
+    clients: z.record(z.string(), z.strictObject({ id: z.string().min(1), label: z.string().min(1) })),
+    omit_note_parts_mentioning: z.array(z.string().min(1)).default([]),
+  })
+  .superRefine((file, ctx) => {
+    const seen = new Map<string, { raw: string | null; label: string }>([[OTHER_CLIENT.id, { raw: null, label: OTHER_CLIENT.label }]]);
+    for (const [raw, client] of Object.entries(file.clients)) {
+      const before = seen.get(client.id);
+      if (!before) {
+        seen.set(client.id, { raw, label: client.label });
+        continue;
+      }
+      if (before.label === client.label) continue;
+      const first = before.raw === null ? `a client the file does not describe ("${before.label}")` : `"${before.raw}" ("${before.label}")`;
+      ctx.addIssue({
+        code: "custom",
+        path: ["clients", raw, "label"],
+        message: `Public client id "${client.id}" has two labels: ${first} and "${raw}" ("${client.label}"). One public client id has one label.`,
+      });
+    }
+  });
 export type MeasurementLabels = z.infer<typeof MeasurementLabels>;
 
 // ---- measurements (observed.json from groundtruth)

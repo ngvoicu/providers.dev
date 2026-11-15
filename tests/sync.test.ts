@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { publish } from "../scripts/lib/publish.ts";
 import { loadUpstream, sync, SyncBusyError } from "../scripts/lib/sync.ts";
+import { stringify } from "yaml";
 import { fetchReturning, fixtureUpstream, ROOT, tempDataDir, writeAuthored } from "./helpers.ts";
 
 const good = JSON.stringify(fixtureUpstream());
@@ -128,6 +129,27 @@ describe("publish", () => {
     writeFileSync(join(dataDir, "authored", "overrides", "provider-01.yaml"), "provider: provider-01\n");
     const third = publish({ dataDir, rootDir: ROOT });
     expect(third.meta?.dataset_version).not.toBe(first.meta?.dataset_version);
+  });
+
+  it("fails the build where the measurement labels give one public client id two labels, and names both", async () => {
+    const dataDir = await firstImport();
+    writeAuthored(dataDir);
+    const labels = (clients: Record<string, { id: string; label: string }>) => writeFileSync(join(dataDir, "authored", "measurement-labels.yaml"), stringify({ clients }));
+    labels({ direct: { id: "direct", label: "Straight to the provider" }, "direct-2": { id: "direct", label: "Straight to the provider" }, "tool-x": { id: "gateway", label: "Through a gateway" } });
+    expect(publish({ dataDir, rootDir: ROOT }).errors).toEqual([]);
+    const before = readFileSync(join(dataDir, "published", "site", "data", "meta.json"), "utf8");
+
+    labels({ "cli-a": { id: "direct", label: "Label A" }, "cli-z": { id: "direct", label: "Label Z" } });
+    const report = publish({ dataDir, rootDir: ROOT });
+    expect(report.ok).toBe(false);
+    expect(report.errors).toEqual([expect.stringMatching(/measurement-labels\.yaml: clients\.cli-z\.label: Public client id "direct" has two labels: "cli-a" \("Label A"\) and "cli-z" \("Label Z"\)/)]);
+    expect(readFileSync(join(dataDir, "published", "site", "data", "meta.json"), "utf8")).toBe(before);
+
+    // `other` is what an undescribed client is published as, with its own label.
+    labels({ "cli-a": { id: "other", label: "Label A" } });
+    expect(publish({ dataDir, rootDir: ROOT }).errors).toEqual([expect.stringMatching(/Public client id "other" has two labels: a client the file does not describe \("Another client"\) and "cli-a" \("Label A"\)/)]);
+    labels({ "cli-a": { id: "other", label: "Another client" } });
+    expect(publish({ dataDir, rootDir: ROOT }).ok).toBe(true);
   });
 
   it("says so when there is no upstream snapshot yet", () => {

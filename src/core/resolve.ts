@@ -41,6 +41,7 @@ import {
   type PublishedProvider,
   type RouteMap,
   type UpstreamCatalog,
+  OTHER_CLIENT,
 } from "./schema.ts";
 
 export interface ResolveInput {
@@ -411,7 +412,7 @@ export function resolve(input: ResolveInput): ResolveResult {
           message: `Measurements name a client "${client}" that data/authored/measurement-labels.yaml does not describe. It is published as "other".`,
         });
       }
-      return { client: "other", client_label: "Another client" };
+      return { client: OTHER_CLIENT.id, client_label: OTHER_CLIENT.label };
     };
     const omit = (input.labels?.omit_note_parts_mentioning ?? []).map((word) => word.toLowerCase());
     const publicNote = (note: string | undefined): string | undefined => {
@@ -480,7 +481,7 @@ export function resolve(input: ResolveInput): ResolveResult {
       const derived = evaluationLifetime(evaluation);
       const controlMissed = run.control !== undefined && run.control.total > 0 && run.control.warm < run.control.total;
       const reading = run.all_warm_through_s;
-      if (!controlMissed && reading !== undefined && (derived ? derived.safe_s !== (reading ?? 0) : (reading ?? 0) !== 0)) {
+      if (!controlMissed && reading !== undefined && (derived ? derived.safe_s !== (reading ?? 0) : (reading ?? 0) > 0)) {
         issues.push({
           level: "warning",
           code: "lifetime-differs",

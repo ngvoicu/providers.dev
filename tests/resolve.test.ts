@@ -4,7 +4,7 @@ import { CacheLifetimeRecordSchema } from "../src/core/contract.ts";
 import { clone } from "../src/core/merge.ts";
 import { summarize } from "../src/core/entries.ts";
 import { resolve, type ResolveInput } from "../src/core/resolve.ts";
-import { OverrideFile as OverrideFileSchema, ext, providerExt, type AccessRules, type AuthoredProvider, type Evidence, type ObservedFile, type OverrideFile, type UpstreamCatalog } from "../src/core/schema.ts";
+import { MeasurementLabels, OverrideFile as OverrideFileSchema, ext, providerExt, type AccessRules, type AuthoredProvider, type Evidence, type ObservedFile, type OverrideFile, type UpstreamCatalog } from "../src/core/schema.ts";
 
 const evidence: Evidence[] = [{ kind: "documented", url: "https://example.com/docs", date: "2026-11-01" }];
 
@@ -644,13 +644,15 @@ describe("resolve: measurements", () => {
           run("warm-only", [], { all_warm_through_s: 300 }),
           run("warm-only-null", [], { all_warm_through_s: null }),
           run("warm-only-zero", [], { all_warm_through_s: 0 }),
+          // Only a reading above 0 claims a lifetime the checks do not give.
+          run("warm-only-negative", [], { all_warm_through_s: -1 }),
         ],
       };
       const { catalog, issues } = resolve(input([], { observed: runs, routes, labels: directLabel, additions: [login] }));
       expect(issues.filter((issue) => issue.code === "lifetime-differs")).toEqual([expect.objectContaining({ level: "warning", target: "warm-only" })]);
       // It stays an evaluation that counts for no lifetime.
       const cache = ext(catalog.lab!.models["model-a"]!).cache;
-      expect(cache.evaluations.map((item) => item.id).sort()).toEqual(["warm-only", "warm-only-null", "warm-only-zero"]);
+      expect(cache.evaluations.map((item) => item.id).sort()).toEqual(["warm-only", "warm-only-negative", "warm-only-null", "warm-only-zero"]);
       expect(cache.lifetime).toEqual(emptyCacheLifetime());
     });
 
@@ -681,6 +683,122 @@ describe("resolve: measurements", () => {
       expect(resolve(input([file(7200)], { upstream: documentedUpstream() })).issues).toEqual([
         expect.objectContaining({ level: "notice", code: "retention-lifetime-differs", target: "lab/model-a#request_controls.cache.retention" }),
       ]);
+    });
+
+    const documenting = (ttl: string[]): UpstreamCatalog => {
+      const catalog = upstream();
+      catalog.lab!.models["model-a"]!.capabilities = { cache: { explicit: { ttl } } };
+      return catalog;
+    };
+
+    it("puts an evaluation in short by the seconds of the shortest documented lifetime the record counts, not by its first text", () => {
+      // 500ms is no documented lifetime (whole seconds only): the shortest is 5m, and an evaluation that asked for 5m is short.
+      const runs: ObservedFile = {
+        ...observed,
+        cache: [
+          run("asks-5m", [{ age_s: 150, warm: 0, total: 1 }], { options: { ttl: "5m" } }),
+          run("asks-500ms", [{ age_s: 150, warm: 3, total: 3 }], { options: { ttl: "500ms" } }),
+        ],
+      };
+      const { catalog, issues } = resolve(input([], { upstream: documenting(["500ms", "5m"]), observed: runs, routes, labels: directLabel, additions: [login] }));
+      const cache = ext(catalog.lab!.models["model-a"]!).cache;
+      // A lifetime asked for that does not come to whole seconds is long.
+      expect(cache.evaluations.map((item) => [item.id, item.retention_profile])).toEqual([["asks-500ms", "long"], ["asks-5m", "short"]]);
+      // Its miss at 150 s, inside 300 s, contradicts the documented lifetime.
+      expect(cache.lifetime.short).toEqual({
+        safe_s: 0, basis: "measured", source: "providers.dev", date: "2026-11-07", documented_s: 300, measured_s: 0,
+        clients: 1, evaluations: 1, checks: 2, hits: 1, checks_inside: 2, hits_inside: 1, tested_from_s: 150, first_miss_s: 150,
+      });
+      expect(cache.lifetime.long).toMatchObject({ safe_s: 150, basis: "measured", documented_s: null, measured_s: 150, evaluations: 1 });
+      expect(issues.map((issue) => issue.code)).toEqual(["unparsed-lifetime"]);
+    });
+
+    it("puts an evaluation in short when its lifetime is the shortest one in seconds, however either is written and in whatever order", () => {
+      const runs: ObservedFile = { ...observed, cache: [run("asks-1m", [{ age_s: 30, warm: 0, total: 1 }], { options: { ttl: "1m" } })] };
+      const record = (ttl: string[], overrides: OverrideFile[] = []) => ext(resolve(input(overrides, { upstream: documenting(ttl), observed: runs, routes, labels: directLabel, additions: [login] })).catalog.lab!.models["model-a"]!).cache;
+      const first = record(["60s", "1m"]);
+      const reversed = record(["1m", "60s"]);
+      expect(first.evaluations[0]!.retention_profile).toBe("short");
+      expect(reversed.evaluations[0]!.retention_profile).toBe("short");
+      expect(first.lifetime.short).toMatchObject({ safe_s: 0, basis: "measured", documented_s: 60, measured_s: 0, checks_inside: 2, hits_inside: 1 });
+      expect(first.lifetime.lifetimes.map((item) => [item.retention_profile, item.basis, item.documented_as ?? item.value])).toEqual([["short", "documented", "1m"], ["short", "documented", "60s"], ["short", "measured", "1m"]]);
+      expect(reversed.lifetime).toEqual(first.lifetime);
+      // A profile declared on the entry's retention option still decides first.
+      const declaration = {
+        support: "supported", parameter: { name: "cache_control.ttl", location: "Cache marker" }, accepted_values: ["1m"], default: null,
+        profiles: [{ profile: "long", value: "1m" }], conditions: [], evidence: [{ kind: "documented", url: "https://example.com/retention", date: "2026-11-14", note: "The fixture documentation." }],
+      };
+      const declared = OverrideFileSchema.parse({ provider: "lab", rules: [{ models: ["model-a"], cache_retention: declaration, reason: "Declared", evidence }] });
+      expect(record(["60s", "1m"], [declared]).evaluations[0]!.retention_profile).toBe("long");
+    });
+
+    it("makes the same lifetime record of every entry from inputs in reverse order, and whatever the locale's order of text", () => {
+      const catalog = upstream();
+      catalog.lab!.models["model-a"]!.capabilities = { cache: { implicit: { ttl: ["1h", "5m"] }, explicit: { ttl: ["300s", "1h", "60m", "500ms"] } } };
+      catalog.lab!.models["model-b"]!.capabilities = { cache: false };
+      catalog.lab!.models["model-c"] = { id: "model-c", name: "Model C", capabilities: { cache: { explicit: { ttl: ["60s", "1m", "2h"] } } } };
+      // Two raw clients share a public id, with its one label.
+      const labels = MeasurementLabels.parse({
+        clients: { direct: { id: "direct", label: "Straight to the provider" }, "direct-2": { id: "direct", label: "Straight to the provider" }, "tool-x": { id: "gateway", label: "Through a gateway" } },
+      });
+      const at = (model: string) => ({ model, models_dev: `lab/${model}` });
+      const runs: ObservedFile = {
+        ...observed,
+        cache: [
+          run("z", [{ age_s: 300, warm: 3, total: 3 }, { age_s: 150, warm: 3, total: 3 }, { age_s: 600, warm: 1, total: 3 }]),
+          run("ä", [{ age_s: 150, warm: 3, total: 3 }, { age_s: 300, warm: 2, total: 3 }], { client: "direct-2" }),
+          run("Z2", [{ age_s: 1800, warm: 3, total: 3 }, { age_s: 600, warm: 3, total: 3 }], { client: "tool-x", date: "2026-11-06", options: { ttl: "1h" } }),
+          run("b", [{ age_s: 600, warm: 2, total: 3 }], { client: "tool-x", date: "2026-11-08", options: { ttl: "60m" } }),
+          run("f", [{ age_s: 900, warm: 3, total: 3 }], { client: "tool-x", options: { prompt_cache_retention: "1h" } }),
+          run("c", [{ age_s: 150, warm: 1, total: 3 }], { options: { ttl: "5m" } }),
+          run("d", [{ age_s: 300, warm: 3, total: 3 }], { date: "2026-11-05", options: { ttl: "300s" } }),
+          run("e", [{ age_s: 150, warm: 3, total: 3 }], { options: { ttl: "500ms" } }),
+          run("g", [{ age_s: 30, warm: 0, total: 3 }], { ...at("model-c"), options: { ttl: "1m" } }),
+          run("h", [{ age_s: 60, warm: 3, total: 3 }], { ...at("model-c"), client: "tool-x", options: { ttl: "60s" } }),
+          run("i", [{ age_s: 600, warm: 3, total: 3 }, { age_s: 7200, warm: 0, total: 3 }], { ...at("model-c"), client: "direct-2", options: { ttl: "2h" } }),
+          run("j", [{ age_s: 300, warm: 3, total: 3 }], { ...at("model-b") }),
+          run("k", [{ age_s: 300, warm: 3, total: 3 }], { client: "tool-x", date: "2026-11-04" }),
+        ],
+      };
+      const given = input([], { upstream: catalog, observed: runs, routes, labels, additions: [login], upstreamDate: "2026-11-15" });
+      /** Every list of the input in reverse order, and every object with its keys in reverse order. */
+      const reversed = <T>(value: T): T =>
+        (Array.isArray(value) ? value.map(reversed).reverse() : value !== null && typeof value === "object" ? Object.fromEntries(Object.entries(value).reverse().map(([key, item]) => [key, reversed(item)])) : value) as T;
+      const records = (result: ReturnType<typeof resolve>) =>
+        Object.fromEntries(Object.values(result.catalog).flatMap((provider) => Object.values(provider.models).map((model) => [`${provider.id}/${model.id}`, ext(model).cache.lifetime])));
+      const forward = resolve(given);
+      const backward = resolve(reversed(given));
+      const original = String.prototype.localeCompare;
+      let otherLocale: ReturnType<typeof resolve>;
+      try {
+        // Another collation: every comparison by the locale the other way round.
+        String.prototype.localeCompare = function (this: string, that: string) { return -original.call(this, that); } as typeof original;
+        otherLocale = resolve(given);
+      } finally {
+        String.prototype.localeCompare = original;
+      }
+      // The inputs did reach the record in another order: the evaluations as published are ordered with the locale.
+      expect(ext(otherLocale.catalog.lab!.models["model-a"]!).cache.evaluations.map((item) => item.id)).not.toEqual(ext(forward.catalog.lab!.models["model-a"]!).cache.evaluations.map((item) => item.id));
+      const a = records(forward)["lab/model-a"]!;
+      expect(a.lifetimes.map((item) => [item.retention_profile, item.basis, item.documented_as ?? item.value, item.client, item.parameter])).toEqual([
+        ["short", "documented", "5m", null, null],
+        ["short", "documented", "300s", null, null],
+        ["short", "measured", null, "direct", null],
+        ["short", "measured", null, "gateway", null],
+        ["short", "measured", "300s", "direct", "cache_control.ttl"],
+        ["short", "measured", "5m", "direct", "cache_control.ttl"],
+        ["long", "documented", "1h", null, null],
+        ["long", "documented", "1h", null, null],
+        ["long", "documented", "60m", null, null],
+        ["long", "measured", "500ms", "direct", "cache_control.ttl"],
+        ["long", "measured", "1h", "gateway", "cache_control.ttl"],
+        ["long", "measured", "1h", "gateway", "prompt_cache_retention"],
+        ["long", "measured", "60m", "gateway", "cache_control.ttl"],
+      ]);
+      expect(a.lifetimes[2]).toMatchObject({ client_label: "Straight to the provider", evaluation_ids: ["z", "ä"], lifetime_s: 150 });
+      expect(records(forward)["lab/model-c"]!.short).toMatchObject({ documented_s: 60, measured_s: 0, safe_s: 0, clients: 2 });
+      expect(records(backward)).toEqual(records(forward));
+      expect(records(otherLocale)).toEqual(records(forward));
     });
   });
 });

@@ -244,21 +244,27 @@ export function cacheFacts(documented: CacheDocumentation): CacheFacts {
   };
 }
 
-/** The documented lifetimes as written in the source ("5m", "1h"), shortest first. */
-function documentedLifetimes(model: JsonObject): string[] {
-  const capabilities = isObject(model.capabilities) ? model.capabilities : {};
-  const cache = capabilities.cache;
-  if (!isObject(cache)) return [];
-  const found = new Map<string, number>();
+/**
+ * The documented lifetimes of an entry in whole seconds (`lifetimeSeconds`), one per text of a supported mode's `ttl`
+ * that converts, with the mode and the text. The one place the record reads documented lifetimes from.
+ */
+function documentedSeconds(documented: CacheDocumentation): { mode: CacheMode; text: string; seconds: number }[] {
+  const found: { mode: CacheMode; text: string; seconds: number }[] = [];
   for (const mode of ["implicit", "explicit"] as const) {
-    const value = cache[mode];
-    if (!isObject(value) || !Array.isArray(value.ttl)) continue;
-    for (const item of value.ttl) {
-      const seconds = durationSeconds(item);
-      if (typeof item === "string" && seconds !== undefined) found.set(item, seconds);
+    const value = documented.modes[mode];
+    if (value.support !== "supported" || !value.ttl) continue;
+    for (const text of value.ttl) {
+      const seconds = lifetimeSeconds(text);
+      if (seconds !== undefined) found.push({ mode, text, seconds });
     }
   }
-  return [...found].sort((a, b) => a[1] - b[1]).map(([text]) => text);
+  return found;
+}
+
+/** The shortest documented lifetime of an entry in whole seconds: what its short documented items carry. Null = none. */
+function shortestDocumentedS(documented: CacheDocumentation): number | null {
+  const found = documentedSeconds(documented);
+  return found.length > 0 ? Math.min(...found.map((item) => item.seconds)) : null;
 }
 
 /**
@@ -279,10 +285,15 @@ export function lifetimeAsked(settings: JsonObject | undefined): { parameter: st
   return null;
 }
 
-/** No lifetime asked, or the shortest documented one: short. Any other lifetime asked: long. */
+/**
+ * No lifetime asked, or one that comes in whole seconds (`lifetimeSeconds`) to the shortest lifetime the entry
+ * documents: short. Any other lifetime asked, one that does not convert included: long. Decided in seconds, so the
+ * way a lifetime is written (`60s`, `1m`) and the order of the documented texts do not matter.
+ */
 export function profileOf(value: string | null, model: JsonObject): RetentionProfile {
   if (value === null) return "short";
-  return documentedLifetimes(model)[0] === value ? "short" : "long";
+  const asked = lifetimeSeconds(value);
+  return asked !== undefined && asked === shortestDocumentedS(documentedCache(model)) ? "short" : "long";
 }
 
 /** hits of checks as one result. The percentage is worked out here and nowhere else. */
@@ -420,17 +431,9 @@ export function documentedItems(documented: CacheDocumentation, sourceOf: (mode:
     const from = sourceOf(null);
     return RETENTION_PROFILES.map((profile) => documentedItem(profile, 0, null, null, from));
   }
-  const found: { mode: CacheMode; text: string; seconds: number }[] = [];
-  for (const mode of ["implicit", "explicit"] as const) {
-    const value = documented.modes[mode];
-    if (value.support !== "supported" || !value.ttl) continue;
-    for (const text of value.ttl) {
-      const seconds = lifetimeSeconds(text);
-      if (seconds !== undefined) found.push({ mode, text, seconds });
-    }
-  }
-  if (found.length === 0) return [];
-  const shortest = Math.min(...found.map((item) => item.seconds));
+  const found = documentedSeconds(documented);
+  const shortest = shortestDocumentedS(documented);
+  if (shortest === null) return [];
   const sources = new Map<CacheMode, { source: LifetimeSource; date: string | null }>();
   const from = (mode: CacheMode) => sources.get(mode) ?? sources.set(mode, sourceOf(mode)).get(mode)!;
   return found
@@ -481,7 +484,11 @@ export function emptyCacheLifetime(): CacheLifetimeRecord {
   return { short: emptySafeLifetime(), long: emptySafeLifetime(), lifetimes: [] };
 }
 
-/** One measured item: the counted evaluations of one profile, one setting and one client, combined by the minimum. */
+/**
+ * One measured item: the counted evaluations of one profile, one setting and one client, combined by the minimum.
+ * Every key taken from one member is part of the group's key, or a function of it: the label of a public client id is
+ * one (`MeasurementLabels`), so the item does not depend on which evaluation comes first.
+ */
 function measuredItem(members: readonly { evaluation: CacheEvaluation; lifetime: EvaluationLifetime }[]): CacheLifetimeItem {
   const first = members[0]!.evaluation;
   const results = addResults(members.map((member) => member.evaluation.results));
@@ -531,7 +538,7 @@ export function cacheLifetime(
     (a, b) =>
       profileRank(a.retention_profile) - profileRank(b.retention_profile) ||
       (a.value === null ? 0 : 1) - (b.value === null ? 0 : 1) ||
-      (durationSeconds(a.value) ?? 0) - (durationSeconds(b.value) ?? 0) ||
+      (a.value === null ? 0 : lifetimeSeconds(a.value) ?? 0) - (b.value === null ? 0 : lifetimeSeconds(b.value) ?? 0) ||
       byCharacters(a.value, b.value) ||
       byCharacters(a.client, b.client) ||
       byCharacters(a.parameter, b.parameter),
