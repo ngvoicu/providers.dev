@@ -6,6 +6,78 @@
   "UNRESTRICTED_API_KEY"
  ],
  "models": {
+  "glm-5.3-flash-uncensored": {
+   "id": "glm-5.3-flash-uncensored",
+   "name": "GLM-5.3 Flash Uncensored",
+   "description": "Uncensored GLM-5.3 Flash for coding and security research",
+   "type": "chat",
+   "family": "glm-flash",
+   "release_date": "2026-10-23",
+   "limit": {
+    "context": 1048576,
+    "output": 32768
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.2,
+      "cache": {
+       "read": 0.19
+      }
+     },
+     "output": {
+      "price": 0.6
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.unrestricted.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-10-23"
+  },
   "deepseek-v4.1-flash-uncensored": {
    "id": "deepseek-v4.1-flash-uncensored",
    "name": "DeepSeek V4.1 Flash 1017 Uncensored",
@@ -224,78 +296,6 @@
    },
    "open_weights": true,
    "last_updated": "2026-11-05"
-  },
-  "glm-5.3-flash-uncensored": {
-   "id": "glm-5.3-flash-uncensored",
-   "name": "GLM-5.3 Flash Uncensored",
-   "description": "Uncensored GLM-5.3 Flash for coding and security research",
-   "type": "chat",
-   "family": "glm-flash",
-   "release_date": "2026-10-23",
-   "limit": {
-    "context": 1048576,
-    "output": 32768
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.2,
-      "cache": {
-       "read": 0.19
-      }
-     },
-     "output": {
-      "price": 0.6
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.unrestricted.sh/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-10-23"
   }
  }
 }

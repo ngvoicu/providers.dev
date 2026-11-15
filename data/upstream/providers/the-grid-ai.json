@@ -6,17 +6,77 @@
   "THEGRID_API_KEY"
  ],
  "models": {
-  "agent-prime": {
-   "id": "agent-prime",
-   "name": "Agent Prime",
-   "description": "Reliable models for dependable agentic applications, multi-step tool use, and reasoning workflows. Any model that meets the contract spec can serve your request.",
+  "code-max": {
+   "id": "code-max",
+   "name": "Code Max",
+   "description": "Frontier models for complex research, architectural decisions, debugging, and multi-file development. Any model that meets the contract spec can serve your request.",
    "type": "chat",
    "status": "beta",
    "release_date": "2026-05-04",
    "limit": {
-    "context": 196608,
+    "context": 1000000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.thegrid.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-07-30"
+  },
+  "text-standard": {
+   "id": "text-standard",
+   "name": "Text Standard",
+   "description": "Price-optimized models with low-latency, high-throughput and shorter maximum outputs. Any model that meets the contract spec can serve your request.",
+   "type": "chat",
+   "release_date": "2026-02-26",
+   "limit": {
+    "context": 128000,
     "input": 120000,
-    "output": 131072
+    "output": 65536
    },
    "capabilities": {
     "temperature": true,
@@ -61,7 +121,64 @@
     }
    },
    "open_weights": false,
-   "last_updated": "2026-07-15"
+   "last_updated": "2026-10-06"
+  },
+  "kimi-latest": {
+   "id": "kimi-latest",
+   "name": "Kimi Latest",
+   "description": "Lab latest market for Kimi supply. You contract for the latest qualifying route, not a specific model.",
+   "type": "chat",
+   "release_date": "2026-07-06",
+   "limit": {
+    "context": 1048576,
+    "input": 922000,
+    "output": 943718
+   },
+   "capabilities": {
+    "temperature": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.thegrid.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-07-06"
   },
   "agent-max": {
    "id": "agent-max",
@@ -124,63 +241,6 @@
    "open_weights": false,
    "last_updated": "2026-07-30"
   },
-  "agent-standard": {
-   "id": "agent-standard",
-   "name": "Agent Standard",
-   "description": "Price-optimized models for fast tool calls, simple agent loops, high-throughput automation, and orchestration. Any model that meets the contract spec can serve your request.",
-   "type": "chat",
-   "status": "beta",
-   "release_date": "2026-05-04",
-   "limit": {
-    "context": 128000,
-    "input": 120000,
-    "output": 65536
-   },
-   "capabilities": {
-    "temperature": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.thegrid.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-10-06"
-  },
   "deepseek-pro-latest": {
    "id": "deepseek-pro-latest",
    "name": "DeepSeek Pro Latest",
@@ -236,289 +296,6 @@
    },
    "open_weights": false,
    "last_updated": "2026-07-06"
-  },
-  "bytedance-pro-latest": {
-   "id": "bytedance-pro-latest",
-   "name": "ByteDance Pro Latest",
-   "description": "Lab latest market for ByteDance Pro supply. You contract for the latest qualifying route, not a specific model.",
-   "type": "chat",
-   "release_date": "2026-07-06",
-   "limit": {
-    "context": 262144,
-    "input": 256000,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.thegrid.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-07-06"
-  },
-  "gpt-sol-latest": {
-   "id": "gpt-sol-latest",
-   "name": "GPT Sol Latest",
-   "description": "Lab latest market for GPT frontier supply. You contract for the latest qualifying route, not a specific model.",
-   "type": "chat",
-   "release_date": "2026-07-06",
-   "limit": {
-    "context": 1000000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.thegrid.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-07-06"
-  },
-  "code-prime": {
-   "id": "code-prime",
-   "name": "Code Prime",
-   "description": "Reliable models for everyday software tasks, code completion, review, and standard debugging. Any model that meets the contract spec can serve your request.",
-   "type": "chat",
-   "status": "beta",
-   "release_date": "2026-05-04",
-   "limit": {
-    "context": 196608,
-    "input": 120000,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.thegrid.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-07-15"
-  },
-  "kimi-latest": {
-   "id": "kimi-latest",
-   "name": "Kimi Latest",
-   "description": "Lab latest market for Kimi supply. You contract for the latest qualifying route, not a specific model.",
-   "type": "chat",
-   "release_date": "2026-07-06",
-   "limit": {
-    "context": 1048576,
-    "input": 922000,
-    "output": 943718
-   },
-   "capabilities": {
-    "temperature": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.thegrid.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-07-06"
-  },
-  "text-standard": {
-   "id": "text-standard",
-   "name": "Text Standard",
-   "description": "Price-optimized models with low-latency, high-throughput and shorter maximum outputs. Any model that meets the contract spec can serve your request.",
-   "type": "chat",
-   "release_date": "2026-02-26",
-   "limit": {
-    "context": 128000,
-    "input": 120000,
-    "output": 65536
-   },
-   "capabilities": {
-    "temperature": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.thegrid.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-10-06"
   },
   "text-max": {
    "id": "text-max",
@@ -580,6 +357,176 @@
    "open_weights": false,
    "last_updated": "2026-07-30"
   },
+  "code-prime": {
+   "id": "code-prime",
+   "name": "Code Prime",
+   "description": "Reliable models for everyday software tasks, code completion, review, and standard debugging. Any model that meets the contract spec can serve your request.",
+   "type": "chat",
+   "status": "beta",
+   "release_date": "2026-05-04",
+   "limit": {
+    "context": 196608,
+    "input": 120000,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.thegrid.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-07-15"
+  },
+  "bytedance-pro-latest": {
+   "id": "bytedance-pro-latest",
+   "name": "ByteDance Pro Latest",
+   "description": "Lab latest market for ByteDance Pro supply. You contract for the latest qualifying route, not a specific model.",
+   "type": "chat",
+   "release_date": "2026-07-06",
+   "limit": {
+    "context": 262144,
+    "input": 256000,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.thegrid.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-07-06"
+  },
+  "agent-prime": {
+   "id": "agent-prime",
+   "name": "Agent Prime",
+   "description": "Reliable models for dependable agentic applications, multi-step tool use, and reasoning workflows. Any model that meets the contract spec can serve your request.",
+   "type": "chat",
+   "status": "beta",
+   "release_date": "2026-05-04",
+   "limit": {
+    "context": 196608,
+    "input": 120000,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.thegrid.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-07-15"
+  },
   "code-standard": {
    "id": "code-standard",
    "name": "Code Standard",
@@ -637,179 +584,6 @@
    "open_weights": false,
    "last_updated": "2026-10-06"
   },
-  "code-max": {
-   "id": "code-max",
-   "name": "Code Max",
-   "description": "Frontier models for complex research, architectural decisions, debugging, and multi-file development. Any model that meets the contract spec can serve your request.",
-   "type": "chat",
-   "status": "beta",
-   "release_date": "2026-05-04",
-   "limit": {
-    "context": 1000000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.thegrid.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-07-30"
-  },
-  "minimax-latest": {
-   "id": "minimax-latest",
-   "name": "MiniMax Latest",
-   "description": "Lab latest market for MiniMax supply. You contract for the latest qualifying route, not a specific model.",
-   "type": "chat",
-   "release_date": "2026-07-06",
-   "limit": {
-    "context": 1000000,
-    "input": 922000,
-    "output": 512000
-   },
-   "capabilities": {
-    "temperature": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.thegrid.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-07-06"
-  },
-  "text-prime": {
-   "id": "text-prime",
-   "name": "Text Prime",
-   "description": "Reliable models for everyday text generation, editing, and analysis across diverse workflows. Any model that meets the contract spec can serve your request.",
-   "type": "chat",
-   "release_date": "2026-02-26",
-   "limit": {
-    "context": 196608,
-    "input": 120000,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.thegrid.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-07-15"
-  },
   "gemini-pro-latest": {
    "id": "gemini-pro-latest",
    "name": "Gemini Pro Latest",
@@ -866,6 +640,176 @@
    },
    "open_weights": false,
    "last_updated": "2026-07-06"
+  },
+  "agent-standard": {
+   "id": "agent-standard",
+   "name": "Agent Standard",
+   "description": "Price-optimized models for fast tool calls, simple agent loops, high-throughput automation, and orchestration. Any model that meets the contract spec can serve your request.",
+   "type": "chat",
+   "status": "beta",
+   "release_date": "2026-05-04",
+   "limit": {
+    "context": 128000,
+    "input": 120000,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.thegrid.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-10-06"
+  },
+  "gpt-sol-latest": {
+   "id": "gpt-sol-latest",
+   "name": "GPT Sol Latest",
+   "description": "Lab latest market for GPT frontier supply. You contract for the latest qualifying route, not a specific model.",
+   "type": "chat",
+   "release_date": "2026-07-06",
+   "limit": {
+    "context": 1000000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.thegrid.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-07-06"
+  },
+  "glm-latest": {
+   "id": "glm-latest",
+   "name": "GLM Latest",
+   "description": "Lab latest market for GLM supply. You contract for the latest qualifying route, not a specific model.",
+   "type": "chat",
+   "release_date": "2026-07-06",
+   "limit": {
+    "context": 1048576,
+    "input": 917504,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.thegrid.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-08-18"
   },
   "claude-opus-latest": {
    "id": "claude-opus-latest",
@@ -927,19 +871,19 @@
    "open_weights": false,
    "last_updated": "2026-07-30"
   },
-  "glm-latest": {
-   "id": "glm-latest",
-   "name": "GLM Latest",
-   "description": "Lab latest market for GLM supply. You contract for the latest qualifying route, not a specific model.",
+  "text-prime": {
+   "id": "text-prime",
+   "name": "Text Prime",
+   "description": "Reliable models for everyday text generation, editing, and analysis across diverse workflows. Any model that meets the contract spec can serve your request.",
    "type": "chat",
-   "release_date": "2026-07-06",
+   "release_date": "2026-02-26",
    "limit": {
-    "context": 1048576,
-    "input": 917504,
+    "context": 196608,
+    "input": 120000,
     "output": 131072
    },
    "capabilities": {
-    "temperature": false,
+    "temperature": true,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -950,8 +894,8 @@
      "supported": true,
      "effort": [
       "low",
-      "high",
-      "max"
+      "medium",
+      "high"
      ]
     }
    },
@@ -981,7 +925,63 @@
     }
    },
    "open_weights": false,
-   "last_updated": "2026-08-18"
+   "last_updated": "2026-07-15"
+  },
+  "minimax-latest": {
+   "id": "minimax-latest",
+   "name": "MiniMax Latest",
+   "description": "Lab latest market for MiniMax supply. You contract for the latest qualifying route, not a specific model.",
+   "type": "chat",
+   "release_date": "2026-07-06",
+   "limit": {
+    "context": 1000000,
+    "input": 922000,
+    "output": 512000
+   },
+   "capabilities": {
+    "temperature": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.thegrid.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-07-06"
   }
  }
 }

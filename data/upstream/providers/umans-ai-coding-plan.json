@@ -6,100 +6,21 @@
   "UMANS_AI_CODING_PLAN_API_KEY"
  ],
  "models": {
-  "umans-deepseek-v4.1-flash": {
-   "id": "umans-deepseek-v4.1-flash",
-   "name": "DeepSeek V4.1 Flash",
-   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
+  "umans-qwen3.6-35b-a3b": {
+   "id": "umans-qwen3.6-35b-a3b",
+   "name": "Qwen3.6 35B A3B",
+   "description": "Open multimodal Qwen MoE for local agents that need vision, audio, and code",
    "type": "chat",
-   "family": "deepseek-flash",
-   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
-   "release_date": "2026-10-17",
-   "limit": {
-    "context": 1048576,
-    "output": 393215
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.code.umans.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-10-17"
-  },
-  "umans-deepseek-v4-flash-0731": {
-   "id": "umans-deepseek-v4-flash-0731",
-   "name": "DeepSeek V4 Flash",
-   "description": "Official DeepSeek V4 Flash release with enhanced agentic capabilities and integrated DSpark speculative decoding",
-   "type": "chat",
-   "family": "deepseek-flash",
-   "canonical_id": "deepseek/deepseek-v4-flash-0731",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.6-35b-a3b",
    "status": "deprecated",
-   "release_date": "2026-07-31",
+   "release_date": "2026-04-17",
    "limit": {
-    "context": 1048576,
-    "output": 393215
+    "context": 262144,
+    "output": 262144
    },
    "capabilities": {
-    "temperature": true,
+    "temperature": false,
     "top_k": true,
     "top_p": true,
     "structured_output": true,
@@ -113,83 +34,8 @@
      "toggle": true,
      "effort": [
       "low",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.code.umans.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-07-31"
-  },
-  "umans-coder": {
-   "id": "umans-coder",
-   "name": "Umans Coder",
-   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
-   "type": "chat",
-   "family": "deepseek-flash",
-   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
-   "release_date": "2026-10-17",
-   "limit": {
-    "context": 1048576,
-    "output": 393215
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
+      "medium",
+      "high"
      ]
     }
    },
@@ -210,10 +56,12 @@
    "modalities": {
     "input": [
      "text",
+     "image/bmp",
      "image/jpeg",
      "image/png",
-     "image/gif",
-     "image/webp"
+     "image/tiff",
+     "image/webp",
+     "image/heic"
     ],
     "output": [
      "text"
@@ -237,8 +85,7 @@
     }
    },
    "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-10-17"
+   "last_updated": "2026-04-17"
   },
   "umans-kimi-k3": {
    "id": "umans-kimi-k3",
@@ -322,9 +169,9 @@
    "open_weights": true,
    "last_updated": "2026-10-23"
   },
-  "umans-deepseek-v4.1-flash-1017": {
-   "id": "umans-deepseek-v4.1-flash-1017",
-   "name": "DeepSeek V4.1 Flash 1017",
+  "umans-coder": {
+   "id": "umans-coder",
+   "name": "Umans Coder",
    "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
    "type": "chat",
    "family": "deepseek-flash",
@@ -333,6 +180,319 @@
    "limit": {
     "context": 1048576,
     "output": 393215
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.code.umans.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-10-17"
+  },
+  "umans-deepseek-v4.1-flash": {
+   "id": "umans-deepseek-v4.1-flash",
+   "name": "DeepSeek V4.1 Flash",
+   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
+   "type": "chat",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
+   "release_date": "2026-10-17",
+   "limit": {
+    "context": 1048576,
+    "output": 393215
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.code.umans.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-10-17"
+  },
+  "umans-glm-5.3-flash": {
+   "id": "umans-glm-5.3-flash",
+   "name": "GLM 5.3 Flash",
+   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
+   "type": "chat",
+   "family": "glm-flash",
+   "canonical_id": "zhipuai/glm-5.3-flash",
+   "status": "deprecated",
+   "release_date": "2026-08-26",
+   "limit": {
+    "context": 1048576,
+    "output": 131071
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "video/mp4",
+     "video/x-matroska",
+     "video/quicktime"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.code.umans.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-26"
+  },
+  "umans-deepseek-v4-flash-0731": {
+   "id": "umans-deepseek-v4-flash-0731",
+   "name": "DeepSeek V4 Flash",
+   "description": "Official DeepSeek V4 Flash release with enhanced agentic capabilities and integrated DSpark speculative decoding",
+   "type": "chat",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4-flash-0731",
+   "status": "deprecated",
+   "release_date": "2026-07-31",
+   "limit": {
+    "context": 1048576,
+    "output": 393215
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.code.umans.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-07-31"
+  },
+  "umans-flash": {
+   "id": "umans-flash",
+   "name": "Umans Flash",
+   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
+   "type": "chat",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
+   "release_date": "2026-10-17",
+   "limit": {
+    "context": 262144,
+    "output": 32768
    },
    "capabilities": {
     "temperature": true,
@@ -482,177 +642,17 @@
    "open_weights": true,
    "last_updated": "2026-10-23"
   },
-  "umans-qwen3.6-35b-a3b": {
-   "id": "umans-qwen3.6-35b-a3b",
-   "name": "Qwen3.6 35B A3B",
-   "description": "Open multimodal Qwen MoE for local agents that need vision, audio, and code",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3.6-35b-a3b",
-   "status": "deprecated",
-   "release_date": "2026-04-17",
-   "limit": {
-    "context": 262144,
-    "output": 262144
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.code.umans.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-04-17"
-  },
-  "umans-glm-5.3-flash": {
-   "id": "umans-glm-5.3-flash",
-   "name": "GLM 5.3 Flash",
-   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
-   "type": "chat",
-   "family": "glm-flash",
-   "canonical_id": "zhipuai/glm-5.3-flash",
-   "status": "deprecated",
-   "release_date": "2026-08-26",
-   "limit": {
-    "context": 1048576,
-    "output": 131071
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "video/mp4",
-     "video/x-matroska",
-     "video/quicktime"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.code.umans.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-08-26"
-  },
-  "umans-flash": {
-   "id": "umans-flash",
-   "name": "Umans Flash",
+  "umans-deepseek-v4.1-flash-1017": {
+   "id": "umans-deepseek-v4.1-flash-1017",
+   "name": "DeepSeek V4.1 Flash 1017",
    "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
    "type": "chat",
    "family": "deepseek-flash",
    "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
    "release_date": "2026-10-17",
    "limit": {
-    "context": 262144,
-    "output": 32768
+    "context": 1048576,
+    "output": 393215
    },
    "capabilities": {
     "temperature": true,

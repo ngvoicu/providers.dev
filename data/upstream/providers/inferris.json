@@ -6,17 +6,17 @@
   "INFERRIS_API_KEY"
  ],
  "models": {
-  "kimi-k3.1-pro": {
-   "id": "kimi-k3.1-pro",
-   "name": "Kimi K3.1 Pro",
-   "description": "Multimodal Kimi model with a 1M-token context window and always-on reasoning, for coding, 3D creation and financial research",
+  "kimi-k3": {
+   "id": "kimi-k3",
+   "name": "Kimi K3",
+   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
    "type": "chat",
    "family": "kimi-k3",
-   "canonical_id": "moonshotai/kimi-k3.1-pro",
-   "release_date": "2026-10-23",
+   "canonical_id": "moonshotai/kimi-k3",
+   "release_date": "2026-07-16",
    "limit": {
-    "context": 1048576,
-    "output": 1048576
+    "context": 262144,
+    "output": 262144
    },
    "capabilities": {
     "temperature": false,
@@ -39,13 +39,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 1.2,
+      "price": 1.8,
       "cache": {
-       "read": 0.12
+       "read": 0.18
       }
      },
      "output": {
-      "price": 6
+      "price": 9
      }
     }
    },
@@ -72,75 +72,7 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2026-10-23"
-  },
-  "glm-5.3": {
-   "id": "glm-5.3",
-   "name": "GLM-5.3",
-   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
-   "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-5.3",
-   "release_date": "2026-08-14",
-   "limit": {
-    "context": 131072,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.84,
-      "cache": {
-       "read": 0.156
-      }
-     },
-     "output": {
-      "price": 2.64
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.inferris.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-08-14"
+   "last_updated": "2026-07-16"
   },
   "glm-5.3-flash": {
    "id": "glm-5.3-flash",
@@ -210,22 +142,22 @@
    "open_weights": true,
    "last_updated": "2026-08-26"
   },
-  "kimi-k3": {
-   "id": "kimi-k3",
-   "name": "Kimi K3",
-   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
+  "glm-5.3": {
+   "id": "glm-5.3",
+   "name": "GLM-5.3",
+   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
    "type": "chat",
-   "family": "kimi-k3",
-   "canonical_id": "moonshotai/kimi-k3",
-   "release_date": "2026-07-16",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.3",
+   "release_date": "2026-08-14",
    "limit": {
-    "context": 262144,
-    "output": 262144
+    "context": 131072,
+    "output": 131072
    },
    "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -243,13 +175,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 1.8,
+      "price": 0.84,
       "cache": {
-       "read": 0.18
+       "read": 0.156
       }
      },
      "output": {
-      "price": 9
+      "price": 2.64
      }
     }
    },
@@ -276,7 +208,75 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2026-07-16"
+   "last_updated": "2026-08-14"
+  },
+  "kimi-k3.1-pro": {
+   "id": "kimi-k3.1-pro",
+   "name": "Kimi K3.1 Pro",
+   "description": "Multimodal Kimi model with a 1M-token context window and always-on reasoning, for coding, 3D creation and financial research",
+   "type": "chat",
+   "family": "kimi-k3",
+   "canonical_id": "moonshotai/kimi-k3.1-pro",
+   "release_date": "2026-10-23",
+   "limit": {
+    "context": 1048576,
+    "output": 1048576
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.2,
+      "cache": {
+       "read": 0.12
+      }
+     },
+     "output": {
+      "price": 6
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.inferris.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-10-23"
   }
  }
 }

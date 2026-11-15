@@ -6,6 +6,76 @@
   "SYNTHETIC_API_KEY"
  ],
  "models": {
+  "hf:openai/gpt-oss-120b": {
+   "id": "hf:openai/gpt-oss-120b",
+   "name": "GPT OSS 120B",
+   "description": "Open-weight GPT model for self-hosted reasoning and instruction-following workloads",
+   "type": "chat",
+   "family": "gpt-oss",
+   "canonical_id": "openai/gpt-oss-120b",
+   "release_date": "2025-08-05",
+   "limit": {
+    "context": 131072,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1,
+      "cache": {
+       "read": 0.02
+      }
+     },
+     "output": {
+      "price": 0.1
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.synthetic.new/openai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-06",
+   "last_updated": "2025-08-05"
+  },
   "hf:moonshotai/Kimi-K3.1-Pro": {
    "id": "hf:moonshotai/Kimi-K3.1-Pro",
    "name": "Kimi K3.1 Pro",
@@ -158,17 +228,17 @@
    "open_weights": true,
    "last_updated": "2026-07-16"
   },
-  "hf:deepseek-ai/DeepSeek-V4.1-Flash-1017": {
-   "id": "hf:deepseek-ai/DeepSeek-V4.1-Flash-1017",
-   "name": "DeepSeek V4.1 Flash 1017",
-   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
+  "hf:Qwen/Qwen3.8-27B": {
+   "id": "hf:Qwen/Qwen3.8-27B",
+   "name": "Qwen3.8 27B",
+   "description": "Dense 27B vision-language model for coding, agent tasks, and image and video understanding",
    "type": "chat",
-   "family": "deepseek-flash",
-   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
-   "release_date": "2026-10-17",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.8-27b",
+   "release_date": "2026-08-14",
    "limit": {
-    "context": 524288,
-    "output": 65536
+    "context": 262144,
+    "output": 32768
    },
    "capabilities": {
     "temperature": true,
@@ -185,32 +255,33 @@
      "effort": [
       "none",
       "low",
-      "high",
-      "xhigh",
-      "max"
+      "medium",
+      "high"
      ]
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.6,
+      "price": 0.45,
       "cache": {
-       "read": 0.03
+       "read": 0.45
       }
      },
      "output": {
-      "price": 1.2
+      "price": 3.6
      }
     }
    },
    "modalities": {
     "input": [
      "text",
+     "image/bmp",
      "image/jpeg",
      "image/png",
-     "image/gif",
-     "image/webp"
+     "image/tiff",
+     "image/webp",
+     "image/heic"
     ],
     "output": [
      "text"
@@ -231,8 +302,7 @@
     }
    },
    "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-10-17"
+   "last_updated": "2026-08-14"
   },
   "hf:zai-org/GLM-5.3": {
    "id": "hf:zai-org/GLM-5.3",
@@ -444,17 +514,17 @@
    "open_weights": true,
    "last_updated": "2026-08-26"
   },
-  "hf:Qwen/Qwen3.8-27B": {
-   "id": "hf:Qwen/Qwen3.8-27B",
-   "name": "Qwen3.8 27B",
-   "description": "Dense 27B vision-language model for coding, agent tasks, and image and video understanding",
+  "hf:deepseek-ai/DeepSeek-V4.1-Flash-1017": {
+   "id": "hf:deepseek-ai/DeepSeek-V4.1-Flash-1017",
+   "name": "DeepSeek V4.1 Flash 1017",
+   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
    "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3.8-27b",
-   "release_date": "2026-08-14",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
+   "release_date": "2026-10-17",
    "limit": {
-    "context": 262144,
-    "output": 32768
+    "context": 524288,
+    "output": 65536
    },
    "capabilities": {
     "temperature": true,
@@ -471,33 +541,32 @@
      "effort": [
       "none",
       "low",
-      "medium",
-      "high"
+      "high",
+      "xhigh",
+      "max"
      ]
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.45,
+      "price": 0.6,
       "cache": {
-       "read": 0.45
+       "read": 0.03
       }
      },
      "output": {
-      "price": 3.6
+      "price": 1.2
      }
     }
    },
    "modalities": {
     "input": [
      "text",
-     "image/bmp",
      "image/jpeg",
      "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic"
+     "image/gif",
+     "image/webp"
     ],
     "output": [
      "text"
@@ -518,77 +587,8 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2026-08-14"
-  },
-  "hf:openai/gpt-oss-120b": {
-   "id": "hf:openai/gpt-oss-120b",
-   "name": "GPT OSS 120B",
-   "description": "Open-weight GPT model for self-hosted reasoning and instruction-following workloads",
-   "type": "chat",
-   "family": "gpt-oss",
-   "canonical_id": "openai/gpt-oss-120b",
-   "release_date": "2025-08-05",
-   "limit": {
-    "context": 131072,
-    "output": 65536
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.1,
-      "cache": {
-       "read": 0.02
-      }
-     },
-     "output": {
-      "price": 0.1
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.synthetic.new/openai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2024-06",
-   "last_updated": "2025-08-05"
+   "knowledge": "2025-05",
+   "last_updated": "2026-10-17"
   }
  }
 }

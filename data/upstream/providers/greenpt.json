@@ -6,16 +6,16 @@
   "GREENPT_API_KEY"
  ],
  "models": {
-  "gpt-oss-120b": {
-   "id": "gpt-oss-120b",
-   "name": "GPT OSS 120B",
-   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
+  "glm-5.2-honey-lite": {
+   "id": "glm-5.2-honey-lite",
+   "name": "GLM-5.2 Honey Lite",
+   "description": "glm-5.2 carrying a built-in ruleset that compresses both generated code and prose. The gentlest tier: it cuts filler only and keeps the explanation intact. Same upstream model and price per token as glm-5.2, with fewer output tokens.",
    "type": "chat",
-   "family": "gpt-oss",
-   "canonical_id": "openai/gpt-oss-120b",
-   "release_date": "2025-08-05",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.2",
+   "release_date": "2026-06-13",
    "limit": {
-    "context": 131072,
+    "context": 1000000,
     "output": 131072
    },
    "capabilities": {
@@ -31,6 +31,8 @@
     "reasoning": {
      "supported": true,
      "effort": [
+      "none",
+      "minimal",
       "low",
       "medium",
       "high"
@@ -40,17 +42,19 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.228
+      "price": 1.738325,
+      "cache": {
+       "read": 0.4486
+      }
      },
      "output": {
-      "price": 0.798
+      "price": 5.1589
      }
     }
    },
    "modalities": {
     "input": [
-     "text",
-     "image"
+     "text"
     ],
     "output": [
      "text"
@@ -71,8 +75,680 @@
     }
    },
    "open_weights": true,
-   "knowledge": "2024-06",
-   "last_updated": "2025-08-05"
+   "last_updated": "2026-06-13"
+  },
+  "qwen3-coder-30b-a3b-instruct": {
+   "id": "qwen3-coder-30b-a3b-instruct",
+   "name": "Qwen3-Coder 30B-A3B Instruct",
+   "description": "Smaller Qwen coder for efficient local agents and repo-level fixes",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3-coder-30b-a3b-instruct",
+   "status": "deprecated",
+   "release_date": "2025-07-31",
+   "limit": {
+    "context": 128000,
+    "output": 32768
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.285
+     },
+     "output": {
+      "price": 1.083
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.greenpt.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-04",
+   "last_updated": "2025-07-31"
+  },
+  "glm-5.2-caveman-ultra": {
+   "id": "glm-5.2-caveman-ultra",
+   "name": "GLM-5.2 Caveman Ultra",
+   "description": "glm-5.2 carrying a built-in ruleset that compresses prose, keeping code and technical detail verbatim. The most aggressive tier, close to answer-only. Same upstream model and price per token as glm-5.2, with fewer output tokens.",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.2",
+   "release_date": "2026-06-13",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.738325,
+      "cache": {
+       "read": 0.4486
+      }
+     },
+     "output": {
+      "price": 5.1589
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.greenpt.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-06-13"
+  },
+  "minimax-m2.5": {
+   "id": "minimax-m2.5",
+   "name": "MiniMax-M2.5",
+   "description": "Prior MiniMax coding model for agent workflows, office edits, and automation",
+   "type": "chat",
+   "family": "minimax",
+   "canonical_id": "minimax/MiniMax-M2.5",
+   "release_date": "2026-02-12",
+   "limit": {
+    "context": 204800,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.49346,
+      "cache": {
+       "read": 0.123365
+      }
+     },
+     "output": {
+      "price": 2.4673
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.greenpt.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-02-12"
+  },
+  "devstral-2-123b-instruct-2512": {
+   "id": "devstral-2-123b-instruct-2512",
+   "name": "Devstral 2",
+   "description": "Mistral's coding-agent model for repository work, terminal tasks, and software fixes",
+   "type": "chat",
+   "family": "devstral",
+   "canonical_id": "mistral/devstral-2512",
+   "status": "deprecated",
+   "release_date": "2025-12-09",
+   "limit": {
+    "context": 200000,
+    "output": 16384
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.57
+     },
+     "output": {
+      "price": 2.736
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.greenpt.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-12",
+   "last_updated": "2025-12-09"
+  },
+  "glm-5.2-ponytail-lite": {
+   "id": "glm-5.2-ponytail-lite",
+   "name": "GLM-5.2 Ponytail Lite",
+   "description": "glm-5.2 carrying a built-in ruleset that compresses generated code, preferring platform features over custom code. The gentlest tier: it cuts filler only and keeps the explanation intact. Same upstream model and price per token as glm-5.2, with fewer output tokens.",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.2",
+   "release_date": "2026-06-13",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.738325,
+      "cache": {
+       "read": 0.4486
+      }
+     },
+     "output": {
+      "price": 5.1589
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.greenpt.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-06-13"
+  },
+  "gemma4": {
+   "id": "gemma4",
+   "name": "gemma4",
+   "description": "Open Gemma instruction model for efficient chat and self-hosted deployments",
+   "type": "chat",
+   "family": "gemma",
+   "canonical_id": "google/gemma-4-26b-a4b-it",
+   "release_date": "2026-04-02",
+   "limit": {
+    "context": 262144,
+    "output": 32768
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.57
+     },
+     "output": {
+      "price": 1.71
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.greenpt.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-04-02"
+  },
+  "llama-3.3-70b-instruct": {
+   "id": "llama-3.3-70b-instruct",
+   "name": "Llama-3.3-70B-Instruct",
+   "description": "Popular open Llama workhorse for multilingual chat, coding, and self-hosting",
+   "type": "chat",
+   "family": "llama",
+   "canonical_id": "meta/llama-3.3-70b-instruct",
+   "release_date": "2024-12-06",
+   "limit": {
+    "context": 100000,
+    "output": 16384
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.254
+     },
+     "output": {
+      "price": 1.254
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.greenpt.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2023-12",
+   "last_updated": "2024-12-06"
+  },
+  "pixtral-12b-2409": {
+   "id": "pixtral-12b-2409",
+   "name": "Pixtral 12B",
+   "description": "Mistral vision-language model for image understanding and multimodal chat",
+   "type": "chat",
+   "family": "pixtral",
+   "canonical_id": "mistral/pixtral-12b",
+   "status": "deprecated",
+   "release_date": "2024-09-11",
+   "limit": {
+    "context": 128000,
+    "output": 4096
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.285
+     },
+     "output": {
+      "price": 0.285
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/gif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.greenpt.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-09",
+   "last_updated": "2024-09-11"
+  },
+  "deepseek-v4-flash-0731": {
+   "id": "deepseek-v4-flash-0731",
+   "name": "DeepSeek V4 Flash 0731",
+   "description": "Official DeepSeek V4 Flash release with enhanced agentic capabilities and integrated DSpark speculative decoding",
+   "type": "chat",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4-flash-0731",
+   "release_date": "2026-07-31",
+   "limit": {
+    "context": 1000000,
+    "output": 384000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1596,
+      "cache": {
+       "read": 0.0456
+      }
+     },
+     "output": {
+      "price": 0.399
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.greenpt.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-07-31"
+  },
+  "green-l": {
+   "id": "green-l",
+   "name": "Green L",
+   "description": "Efficient Mistral model for fast chat, extraction, and production assistants",
+   "type": "chat",
+   "family": "mistral-small",
+   "canonical_id": "mistral/mistral-small-2506",
+   "release_date": "2025-06-20",
+   "limit": {
+    "context": 128000,
+    "output": 32768
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.285
+     },
+     "output": {
+      "price": 0.912
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/gif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.greenpt.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-03",
+   "last_updated": "2025-06-20"
   },
   "glm-5.2-honey": {
    "id": "glm-5.2-honey",
@@ -145,22 +821,22 @@
    "open_weights": true,
    "last_updated": "2026-06-13"
   },
-  "glm-5.2-honey-lite": {
-   "id": "glm-5.2-honey-lite",
-   "name": "GLM-5.2 Honey Lite",
-   "description": "glm-5.2 carrying a built-in ruleset that compresses both generated code and prose. The gentlest tier: it cuts filler only and keeps the explanation intact. Same upstream model and price per token as glm-5.2, with fewer output tokens.",
+  "kimi-k3": {
+   "id": "kimi-k3",
+   "name": "Kimi K3",
+   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
    "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-5.2",
-   "release_date": "2026-06-13",
+   "family": "kimi-k3",
+   "canonical_id": "moonshotai/kimi-k3",
+   "release_date": "2026-07-16",
    "limit": {
-    "context": 1000000,
-    "output": 131072
+    "context": 1048576,
+    "output": 1048576
    },
    "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -181,136 +857,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 1.738325,
+      "price": 3.762,
       "cache": {
-       "read": 0.4486
+       "read": 0.9405
       }
      },
      "output": {
-      "price": 5.1589
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.greenpt.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-06-13"
-  },
-  "llama-3.3-70b-instruct": {
-   "id": "llama-3.3-70b-instruct",
-   "name": "Llama-3.3-70B-Instruct",
-   "description": "Popular open Llama workhorse for multilingual chat, coding, and self-hosting",
-   "type": "chat",
-   "family": "llama",
-   "canonical_id": "meta/llama-3.3-70b-instruct",
-   "release_date": "2024-12-06",
-   "limit": {
-    "context": 100000,
-    "output": 16384
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.254
-     },
-     "output": {
-      "price": 1.254
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.greenpt.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2023-12",
-   "last_updated": "2024-12-06"
-  },
-  "kimi-k2.6-fast": {
-   "id": "kimi-k2.6-fast",
-   "name": "Kimi K2.6 Fast",
-   "description": "Multimodal Kimi workhorse for agent loops, coding tasks, and visual context",
-   "type": "chat",
-   "family": "kimi-k2",
-   "canonical_id": "moonshotai/kimi-k2.6",
-   "status": "deprecated",
-   "release_date": "2026-04-20",
-   "limit": {
-    "context": 262144,
-    "output": 262144
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.655
-     },
-     "output": {
-      "price": 8.778
+      "price": 18.81
      }
     }
    },
@@ -344,8 +897,75 @@
     }
    },
    "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-04-20"
+   "last_updated": "2026-07-16"
+  },
+  "green-r": {
+   "id": "green-r",
+   "name": "Green R",
+   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
+   "type": "chat",
+   "family": "gpt-oss",
+   "canonical_id": "openai/gpt-oss-120b",
+   "release_date": "2025-08-05",
+   "limit": {
+    "context": 131072,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.399
+     },
+     "output": {
+      "price": 1.083
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.greenpt.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-06",
+   "last_updated": "2025-08-05"
   },
   "mistral-medium-3.5-128b": {
    "id": "mistral-medium-3.5-128b",
@@ -416,212 +1036,6 @@
    "open_weights": true,
    "last_updated": "2026-04-29"
   },
-  "green-l": {
-   "id": "green-l",
-   "name": "Green L",
-   "description": "Efficient Mistral model for fast chat, extraction, and production assistants",
-   "type": "chat",
-   "family": "mistral-small",
-   "canonical_id": "mistral/mistral-small-2506",
-   "release_date": "2025-06-20",
-   "limit": {
-    "context": 128000,
-    "output": 32768
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.285
-     },
-     "output": {
-      "price": 0.912
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/gif"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.greenpt.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-03",
-   "last_updated": "2025-06-20"
-  },
-  "qwen3-coder-30b-a3b-instruct": {
-   "id": "qwen3-coder-30b-a3b-instruct",
-   "name": "Qwen3-Coder 30B-A3B Instruct",
-   "description": "Smaller Qwen coder for efficient local agents and repo-level fixes",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3-coder-30b-a3b-instruct",
-   "status": "deprecated",
-   "release_date": "2025-07-31",
-   "limit": {
-    "context": 128000,
-    "output": 32768
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.285
-     },
-     "output": {
-      "price": 1.083
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.greenpt.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-07-31"
-  },
-  "kimi-k2.6": {
-   "id": "kimi-k2.6",
-   "name": "Kimi K2.6",
-   "description": "Multimodal Kimi workhorse for agent loops, coding tasks, and visual context",
-   "type": "chat",
-   "family": "kimi-k2",
-   "canonical_id": "moonshotai/kimi-k2.6",
-   "release_date": "2026-04-20",
-   "limit": {
-    "context": 262144,
-    "output": 262144
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.7524,
-      "cache": {
-       "read": 0.2508
-      }
-     },
-     "output": {
-      "price": 4.275
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/heic",
-     "image/heif"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.greenpt.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-04-20"
-  },
   "green-l-raw": {
    "id": "green-l-raw",
    "name": "Green L Raw",
@@ -687,22 +1101,91 @@
    "knowledge": "2025-03",
    "last_updated": "2025-06-20"
   },
-  "minimax-m2.5": {
-   "id": "minimax-m2.5",
-   "name": "MiniMax-M2.5",
-   "description": "Prior MiniMax coding model for agent workflows, office edits, and automation",
+  "gpt-oss-120b": {
+   "id": "gpt-oss-120b",
+   "name": "GPT OSS 120B",
+   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
    "type": "chat",
-   "family": "minimax",
-   "canonical_id": "minimax/MiniMax-M2.5",
-   "release_date": "2026-02-12",
+   "family": "gpt-oss",
+   "canonical_id": "openai/gpt-oss-120b",
+   "release_date": "2025-08-05",
    "limit": {
-    "context": 204800,
+    "context": 131072,
     "output": 131072
    },
    "capabilities": {
     "temperature": true,
-    "top_k": false,
+    "top_k": true,
     "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.228
+     },
+     "output": {
+      "price": 0.798
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.greenpt.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-06",
+   "last_updated": "2025-08-05"
+  },
+  "glm-5.2-caveman": {
+   "id": "glm-5.2-caveman",
+   "name": "GLM-5.2 Caveman",
+   "description": "glm-5.2 carrying a built-in ruleset that compresses prose, keeping code and technical detail verbatim. The middle tier, and the ruleset as its authors wrote it. Same upstream model and price per token as glm-5.2, with fewer output tokens.",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.2",
+   "release_date": "2026-06-13",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -722,13 +1205,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.49346,
+      "price": 1.738325,
       "cache": {
-       "read": 0.123365
+       "read": 0.4486
       }
      },
      "output": {
-      "price": 2.4673
+      "price": 5.1589
      }
     }
    },
@@ -755,7 +1238,69 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2026-02-12"
+   "last_updated": "2026-06-13"
+  },
+  "glm-5.1": {
+   "id": "glm-5.1",
+   "name": "GLM-5.1",
+   "description": "Strong GLM coding model for agentic engineering, terminals, and repository generation",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.1",
+   "status": "deprecated",
+   "release_date": "2026-04-07",
+   "limit": {
+    "context": 200000,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.756
+     },
+     "output": {
+      "price": 5.518
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.greenpt.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-04-07"
   },
   "green-r-raw": {
    "id": "green-r-raw",
@@ -825,14 +1370,14 @@
    "knowledge": "2024-06",
    "last_updated": "2025-08-05"
   },
-  "glm-5.2": {
-   "id": "glm-5.2",
-   "name": "GLM-5.2",
-   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
+  "glm-5.3-flash": {
+   "id": "glm-5.3-flash",
+   "name": "GLM-5.3-Flash",
+   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
    "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-5.2",
-   "release_date": "2026-06-13",
+   "family": "glm-flash",
+   "canonical_id": "zhipuai/glm-5.3-flash",
+   "release_date": "2026-08-26",
    "limit": {
     "context": 1000000,
     "output": 131072
@@ -861,13 +1406,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 1.738325,
+      "price": 0.127754,
       "cache": {
-       "read": 0.4486
+       "read": 0.0255508
       }
      },
      "output": {
-      "price": 5.1589
+      "price": 0.511016
      }
     }
    },
@@ -894,536 +1439,84 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2026-06-13"
+   "last_updated": "2026-08-26"
   },
-  "glm-5.2-ponytail-ultra": {
-   "id": "glm-5.2-ponytail-ultra",
-   "name": "GLM-5.2 Ponytail Ultra",
-   "description": "glm-5.2 carrying a built-in ruleset that compresses generated code, preferring platform features over custom code. The most aggressive tier, close to answer-only. Same upstream model and price per token as glm-5.2, with fewer output tokens.",
+  "kimi-k2.7-code": {
+   "id": "kimi-k2.7-code",
+   "name": "Kimi K2.7 Code",
+   "description": "Coding-focused Kimi model, stronger on long-horizon repo work with less overthinking",
    "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-5.2",
-   "release_date": "2026-06-13",
-   "limit": {
-    "context": 1000000,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.738325,
-      "cache": {
-       "read": 0.4486
-      }
-     },
-     "output": {
-      "price": 5.1589
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.greenpt.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-06-13"
-  },
-  "qwen3-235b-a22b-instruct-2507": {
-   "id": "qwen3-235b-a22b-instruct-2507",
-   "name": "Qwen3 235B A22B Instruct 2507",
-   "description": "Qwen3 235B MoE instruct model for long-context multilingual chat and reasoning",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3-235b-a22b-instruct-2507",
-   "release_date": "2025-07-21",
+   "family": "kimi-k2",
+   "canonical_id": "moonshotai/kimi-k2.7-code",
+   "release_date": "2026-06-12",
    "limit": {
     "context": 262144,
-    "output": 16384
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.026
-     },
-     "output": {
-      "price": 3.078
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.greenpt.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-07-21"
-  },
-  "qwen3.6-35b-a3b": {
-   "id": "qwen3.6-35b-a3b",
-   "name": "Qwen3.6 35B-A3B",
-   "description": "Open multimodal Qwen MoE for local agents that need vision, audio, and code",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3.6-35b-a3b",
-   "release_date": "2026-04-17",
-   "limit": {
-    "context": 262144,
-    "output": 32768
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.342
-     },
-     "output": {
-      "price": 2.052
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.greenpt.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-04-17"
-  },
-  "pixtral-12b-2409": {
-   "id": "pixtral-12b-2409",
-   "name": "Pixtral 12B",
-   "description": "Mistral vision-language model for image understanding and multimodal chat",
-   "type": "chat",
-   "family": "pixtral",
-   "canonical_id": "mistral/pixtral-12b",
-   "status": "deprecated",
-   "release_date": "2024-09-11",
-   "limit": {
-    "context": 128000,
-    "output": 4096
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.285
-     },
-     "output": {
-      "price": 0.285
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/gif"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.greenpt.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2024-09",
-   "last_updated": "2024-09-11"
-  },
-  "devstral-2-123b-instruct-2512": {
-   "id": "devstral-2-123b-instruct-2512",
-   "name": "Devstral 2",
-   "description": "Mistral's coding-agent model for repository work, terminal tasks, and software fixes",
-   "type": "chat",
-   "family": "devstral",
-   "canonical_id": "mistral/devstral-2512",
-   "status": "deprecated",
-   "release_date": "2025-12-09",
-   "limit": {
-    "context": 200000,
-    "output": 16384
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.57
-     },
-     "output": {
-      "price": 2.736
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.greenpt.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-12",
-   "last_updated": "2025-12-09"
-  },
-  "mistral-small-3.2-24b-instruct-2506": {
-   "id": "mistral-small-3.2-24b-instruct-2506",
-   "name": "Mistral Small 3.2",
-   "description": "Efficient Mistral model for fast chat, extraction, and production assistants",
-   "type": "chat",
-   "family": "mistral-small",
-   "canonical_id": "mistral/mistral-small-2506",
-   "release_date": "2025-06-20",
-   "limit": {
-    "context": 128000,
-    "output": 32768
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.228
-     },
-     "output": {
-      "price": 0.456
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/gif"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.greenpt.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-03",
-   "last_updated": "2025-06-20"
-  },
-  "deepseek-v4.1-flash-1017": {
-   "id": "deepseek-v4.1-flash-1017",
-   "name": "DeepSeek V4.1 Flash 1017",
-   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
-   "type": "chat",
-   "family": "deepseek-flash",
-   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
-   "release_date": "2026-10-17",
-   "limit": {
-    "context": 1000000,
-    "output": 384000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.402192,
-      "cache": {
-       "read": 0.044688
-      }
-     },
-     "output": {
-      "price": 1.61994
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.greenpt.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-10-17"
-  },
-  "green-s": {
-   "id": "green-s",
-   "name": "Green S",
-   "description": "GreenPT speech-to-text model for pre-recorded and live transcription",
-   "type": "transcription",
-   "release_date": "2025-01",
-   "limit": {
-    "context": 0,
-    "output": 8192
+    "output": 262144
    },
    "capabilities": {
     "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
-     "supported": false
+     "supported": true
     },
     "reasoning": {
-     "supported": false
+     "supported": true,
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
     }
    },
    "cost": {
-    "audio": {
+    "text": {
      "input": {
-      "unit": "minute",
-      "price": 0.00437
+      "price": 0.863555,
+      "cache": {
+       "read": 0.222057
+      }
+     },
+     "output": {
+      "price": 4.317775
      }
     }
    },
    "modalities": {
     "input": [
-     "audio"
+     "text"
     ],
     "output": [
      "text"
     ]
    },
    "api": {
-    "transcriptions": {
-     "base_url": "https://api.greenpt.ai",
+    "chat-completions": {
+     "base_url": "https://api.greenpt.ai/v1",
      "sdk": {
-      "opencodeai": "@opencode/ai/protocols/deepgram-transcription"
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
      }
     }
    },
-   "open_weights": false,
-   "last_updated": "2025-01"
+   "open_weights": true,
+   "knowledge": "2025-01",
+   "last_updated": "2026-06-12"
   },
-  "glm-5.2-ponytail": {
-   "id": "glm-5.2-ponytail",
-   "name": "GLM-5.2 Ponytail",
-   "description": "glm-5.2 carrying a built-in ruleset that compresses generated code, preferring platform features over custom code. The middle tier, and the ruleset as its authors wrote it. Same upstream model and price per token as glm-5.2, with fewer output tokens.",
+  "glm-5.2-caveman-lite": {
+   "id": "glm-5.2-caveman-lite",
+   "name": "GLM-5.2 Caveman Lite",
+   "description": "glm-5.2 carrying a built-in ruleset that compresses prose, keeping code and technical detail verbatim. The gentlest tier: it cuts filler only and keeps the explanation intact. Same upstream model and price per token as glm-5.2, with fewer output tokens.",
    "type": "chat",
    "family": "glm",
    "canonical_id": "zhipuai/glm-5.2",
@@ -1562,74 +1655,6 @@
    "open_weights": true,
    "last_updated": "2026-08-14"
   },
-  "qwen3.5-397b-a17b": {
-   "id": "qwen3.5-397b-a17b",
-   "name": "Qwen3.5 397B-A17B",
-   "description": "Large open Qwen multimodal MoE for visual agents and long technical tasks",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3.5-397b-a17b",
-   "release_date": "2026-02-15",
-   "limit": {
-    "context": 262144,
-    "output": 16384
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.798
-     },
-     "output": {
-      "price": 4.959
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.greenpt.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-02-15"
-  },
   "glm-5.2-honey-ultra": {
    "id": "glm-5.2-honey-ultra",
    "name": "GLM-5.2 Honey Ultra",
@@ -1701,6 +1726,322 @@
    "open_weights": true,
    "last_updated": "2026-06-13"
   },
+  "green-s-pro": {
+   "id": "green-s-pro",
+   "name": "Green S Pro",
+   "description": "GreenPT advanced speech-to-text model with multilingual transcription support",
+   "type": "transcription",
+   "release_date": "2025-02",
+   "limit": {
+    "context": 0,
+    "output": 8192
+   },
+   "capabilities": {
+    "temperature": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "audio": {
+     "input": {
+      "unit": "minute",
+      "price": 0.00437
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "audio"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "transcriptions": {
+     "base_url": "https://api.greenpt.ai",
+     "sdk": {
+      "opencodeai": "@opencode/ai/protocols/deepgram-transcription"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-02"
+  },
+  "glm-5.2-ponytail": {
+   "id": "glm-5.2-ponytail",
+   "name": "GLM-5.2 Ponytail",
+   "description": "glm-5.2 carrying a built-in ruleset that compresses generated code, preferring platform features over custom code. The middle tier, and the ruleset as its authors wrote it. Same upstream model and price per token as glm-5.2, with fewer output tokens.",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.2",
+   "release_date": "2026-06-13",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.738325,
+      "cache": {
+       "read": 0.4486
+      }
+     },
+     "output": {
+      "price": 5.1589
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.greenpt.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-06-13"
+  },
+  "mistral-small-3.2-24b-instruct-2506": {
+   "id": "mistral-small-3.2-24b-instruct-2506",
+   "name": "Mistral Small 3.2",
+   "description": "Efficient Mistral model for fast chat, extraction, and production assistants",
+   "type": "chat",
+   "family": "mistral-small",
+   "canonical_id": "mistral/mistral-small-2506",
+   "release_date": "2025-06-20",
+   "limit": {
+    "context": 128000,
+    "output": 32768
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.228
+     },
+     "output": {
+      "price": 0.456
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/gif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.greenpt.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-03",
+   "last_updated": "2025-06-20"
+  },
+  "qwen3-235b-a22b-instruct-2507": {
+   "id": "qwen3-235b-a22b-instruct-2507",
+   "name": "Qwen3 235B A22B Instruct 2507",
+   "description": "Qwen3 235B MoE instruct model for long-context multilingual chat and reasoning",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3-235b-a22b-instruct-2507",
+   "release_date": "2025-07-21",
+   "limit": {
+    "context": 262144,
+    "output": 16384
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.026
+     },
+     "output": {
+      "price": 3.078
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.greenpt.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-04",
+   "last_updated": "2025-07-21"
+  },
+  "kimi-k2.6-fast": {
+   "id": "kimi-k2.6-fast",
+   "name": "Kimi K2.6 Fast",
+   "description": "Multimodal Kimi workhorse for agent loops, coding tasks, and visual context",
+   "type": "chat",
+   "family": "kimi-k2",
+   "canonical_id": "moonshotai/kimi-k2.6",
+   "status": "deprecated",
+   "release_date": "2026-04-20",
+   "limit": {
+    "context": 262144,
+    "output": 262144
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.655
+     },
+     "output": {
+      "price": 8.778
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/heic",
+     "image/heif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.greenpt.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-01",
+   "last_updated": "2026-04-20"
+  },
   "voxtral-small-24b-2507": {
    "id": "voxtral-small-24b-2507",
    "name": "Voxtral Small 24B",
@@ -1766,10 +2107,10 @@
    "knowledge": "2025-07",
    "last_updated": "2025-07-15"
   },
-  "glm-5.2-caveman-lite": {
-   "id": "glm-5.2-caveman-lite",
-   "name": "GLM-5.2 Caveman Lite",
-   "description": "glm-5.2 carrying a built-in ruleset that compresses prose, keeping code and technical detail verbatim. The gentlest tier: it cuts filler only and keeps the explanation intact. Same upstream model and price per token as glm-5.2, with fewer output tokens.",
+  "glm-5.2": {
+   "id": "glm-5.2",
+   "name": "GLM-5.2",
+   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
    "type": "chat",
    "family": "glm",
    "canonical_id": "zhipuai/glm-5.2",
@@ -1836,197 +2177,6 @@
    },
    "open_weights": true,
    "last_updated": "2026-06-13"
-  },
-  "glm-5.3-flash": {
-   "id": "glm-5.3-flash",
-   "name": "GLM-5.3-Flash",
-   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
-   "type": "chat",
-   "family": "glm-flash",
-   "canonical_id": "zhipuai/glm-5.3-flash",
-   "release_date": "2026-08-26",
-   "limit": {
-    "context": 1000000,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.127754,
-      "cache": {
-       "read": 0.0255508
-      }
-     },
-     "output": {
-      "price": 0.511016
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.greenpt.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-08-26"
-  },
-  "deepseek-v4-flash-0731": {
-   "id": "deepseek-v4-flash-0731",
-   "name": "DeepSeek V4 Flash 0731",
-   "description": "Official DeepSeek V4 Flash release with enhanced agentic capabilities and integrated DSpark speculative decoding",
-   "type": "chat",
-   "family": "deepseek-flash",
-   "canonical_id": "deepseek/deepseek-v4-flash-0731",
-   "release_date": "2026-07-31",
-   "limit": {
-    "context": 1000000,
-    "output": 384000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.1596,
-      "cache": {
-       "read": 0.0456
-      }
-     },
-     "output": {
-      "price": 0.399
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.greenpt.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-07-31"
-  },
-  "green-s-pro": {
-   "id": "green-s-pro",
-   "name": "Green S Pro",
-   "description": "GreenPT advanced speech-to-text model with multilingual transcription support",
-   "type": "transcription",
-   "release_date": "2025-02",
-   "limit": {
-    "context": 0,
-    "output": 8192
-   },
-   "capabilities": {
-    "temperature": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "audio": {
-     "input": {
-      "unit": "minute",
-      "price": 0.00437
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "audio"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "transcriptions": {
-     "base_url": "https://api.greenpt.ai",
-     "sdk": {
-      "opencodeai": "@opencode/ai/protocols/deepgram-transcription"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2025-02"
   },
   "holo2-30b-a3b": {
    "id": "holo2-30b-a3b",
@@ -2091,406 +2241,6 @@
    },
    "open_weights": true,
    "last_updated": "2025-11"
-  },
-  "gemma4": {
-   "id": "gemma4",
-   "name": "gemma4",
-   "description": "Open Gemma instruction model for efficient chat and self-hosted deployments",
-   "type": "chat",
-   "family": "gemma",
-   "canonical_id": "google/gemma-4-26b-a4b-it",
-   "release_date": "2026-04-02",
-   "limit": {
-    "context": 262144,
-    "output": 32768
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.57
-     },
-     "output": {
-      "price": 1.71
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.greenpt.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-04-02"
-  },
-  "metis": {
-   "id": "metis",
-   "name": "Metis",
-   "description": "GreenPT decision model: probabilities for yes/no, choice and score questions about a case",
-   "type": "decision",
-   "release_date": "2026-10-06",
-   "limit": {
-    "context": 32768
-   },
-   "capabilities": {
-    "temperature": false,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.137
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "systemone": {
-     "base_url": "https://api.greenpt.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/typesafe-ai",
-      "opencodeai": "@opencode/ai/providers/typesafe-ai/decisions"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-10-06"
-  },
-  "glm-5.1": {
-   "id": "glm-5.1",
-   "name": "GLM-5.1",
-   "description": "Strong GLM coding model for agentic engineering, terminals, and repository generation",
-   "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-5.1",
-   "status": "deprecated",
-   "release_date": "2026-04-07",
-   "limit": {
-    "context": 200000,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.756
-     },
-     "output": {
-      "price": 5.518
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.greenpt.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-04-07"
-  },
-  "glm-5.2-caveman-ultra": {
-   "id": "glm-5.2-caveman-ultra",
-   "name": "GLM-5.2 Caveman Ultra",
-   "description": "glm-5.2 carrying a built-in ruleset that compresses prose, keeping code and technical detail verbatim. The most aggressive tier, close to answer-only. Same upstream model and price per token as glm-5.2, with fewer output tokens.",
-   "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-5.2",
-   "release_date": "2026-06-13",
-   "limit": {
-    "context": 1000000,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.738325,
-      "cache": {
-       "read": 0.4486
-      }
-     },
-     "output": {
-      "price": 5.1589
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.greenpt.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-06-13"
-  },
-  "glm-5.2-caveman": {
-   "id": "glm-5.2-caveman",
-   "name": "GLM-5.2 Caveman",
-   "description": "glm-5.2 carrying a built-in ruleset that compresses prose, keeping code and technical detail verbatim. The middle tier, and the ruleset as its authors wrote it. Same upstream model and price per token as glm-5.2, with fewer output tokens.",
-   "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-5.2",
-   "release_date": "2026-06-13",
-   "limit": {
-    "context": 1000000,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.738325,
-      "cache": {
-       "read": 0.4486
-      }
-     },
-     "output": {
-      "price": 5.1589
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.greenpt.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-06-13"
-  },
-  "kimi-k2.7-code": {
-   "id": "kimi-k2.7-code",
-   "name": "Kimi K2.7 Code",
-   "description": "Coding-focused Kimi model, stronger on long-horizon repo work with less overthinking",
-   "type": "chat",
-   "family": "kimi-k2",
-   "canonical_id": "moonshotai/kimi-k2.7-code",
-   "release_date": "2026-06-12",
-   "limit": {
-    "context": 262144,
-    "output": 262144
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.863555,
-      "cache": {
-       "read": 0.222057
-      }
-     },
-     "output": {
-      "price": 4.317775
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.greenpt.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-06-12"
   },
   "deepseek-v4.1-flash": {
    "id": "deepseek-v4.1-flash",
@@ -2568,84 +2318,6 @@
    "knowledge": "2025-05",
    "last_updated": "2026-09-10"
   },
-  "kimi-k3": {
-   "id": "kimi-k3",
-   "name": "Kimi K3",
-   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
-   "type": "chat",
-   "family": "kimi-k3",
-   "canonical_id": "moonshotai/kimi-k3",
-   "release_date": "2026-07-16",
-   "limit": {
-    "context": 1048576,
-    "output": 1048576
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 3.762,
-      "cache": {
-       "read": 0.9405
-      }
-     },
-     "output": {
-      "price": 18.81
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/heic",
-     "image/heif"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.greenpt.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-07-16"
-  },
   "gemma-3-27b-it": {
    "id": "gemma-3-27b-it",
    "name": "Gemma 3 27B",
@@ -2714,10 +2386,330 @@
    "knowledge": "2024-08",
    "last_updated": "2025-03-12"
   },
-  "glm-5.2-ponytail-lite": {
-   "id": "glm-5.2-ponytail-lite",
-   "name": "GLM-5.2 Ponytail Lite",
-   "description": "glm-5.2 carrying a built-in ruleset that compresses generated code, preferring platform features over custom code. The gentlest tier: it cuts filler only and keeps the explanation intact. Same upstream model and price per token as glm-5.2, with fewer output tokens.",
+  "kimi-k2.6": {
+   "id": "kimi-k2.6",
+   "name": "Kimi K2.6",
+   "description": "Multimodal Kimi workhorse for agent loops, coding tasks, and visual context",
+   "type": "chat",
+   "family": "kimi-k2",
+   "canonical_id": "moonshotai/kimi-k2.6",
+   "release_date": "2026-04-20",
+   "limit": {
+    "context": 262144,
+    "output": 262144
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.7524,
+      "cache": {
+       "read": 0.2508
+      }
+     },
+     "output": {
+      "price": 4.275
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/heic",
+     "image/heif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.greenpt.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-01",
+   "last_updated": "2026-04-20"
+  },
+  "qwen3.5-397b-a17b": {
+   "id": "qwen3.5-397b-a17b",
+   "name": "Qwen3.5 397B-A17B",
+   "description": "Large open Qwen multimodal MoE for visual agents and long technical tasks",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.5-397b-a17b",
+   "release_date": "2026-02-15",
+   "limit": {
+    "context": 262144,
+    "output": 16384
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.798
+     },
+     "output": {
+      "price": 4.959
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.greenpt.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-02-15"
+  },
+  "metis": {
+   "id": "metis",
+   "name": "Metis",
+   "description": "GreenPT decision model: probabilities for yes/no, choice and score questions about a case",
+   "type": "decision",
+   "release_date": "2026-10-06",
+   "limit": {
+    "context": 32768
+   },
+   "capabilities": {
+    "temperature": false,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.137
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "systemone": {
+     "base_url": "https://api.greenpt.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/typesafe-ai",
+      "opencodeai": "@opencode/ai/providers/typesafe-ai/decisions"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-10-06"
+  },
+  "green-s": {
+   "id": "green-s",
+   "name": "Green S",
+   "description": "GreenPT speech-to-text model for pre-recorded and live transcription",
+   "type": "transcription",
+   "release_date": "2025-01",
+   "limit": {
+    "context": 0,
+    "output": 8192
+   },
+   "capabilities": {
+    "temperature": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "audio": {
+     "input": {
+      "unit": "minute",
+      "price": 0.00437
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "audio"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "transcriptions": {
+     "base_url": "https://api.greenpt.ai",
+     "sdk": {
+      "opencodeai": "@opencode/ai/protocols/deepgram-transcription"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-01"
+  },
+  "qwen3.6-35b-a3b": {
+   "id": "qwen3.6-35b-a3b",
+   "name": "Qwen3.6 35B-A3B",
+   "description": "Open multimodal Qwen MoE for local agents that need vision, audio, and code",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.6-35b-a3b",
+   "release_date": "2026-04-17",
+   "limit": {
+    "context": 262144,
+    "output": 32768
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.342
+     },
+     "output": {
+      "price": 2.052
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.greenpt.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-04-17"
+  },
+  "glm-5.2-ponytail-ultra": {
+   "id": "glm-5.2-ponytail-ultra",
+   "name": "GLM-5.2 Ponytail Ultra",
+   "description": "glm-5.2 carrying a built-in ruleset that compresses generated code, preferring platform features over custom code. The most aggressive tier, close to answer-only. Same upstream model and price per token as glm-5.2, with fewer output tokens.",
    "type": "chat",
    "family": "glm",
    "canonical_id": "zhipuai/glm-5.2",
@@ -2785,23 +2777,23 @@
    "open_weights": true,
    "last_updated": "2026-06-13"
   },
-  "green-r": {
-   "id": "green-r",
-   "name": "Green R",
-   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
+  "deepseek-v4.1-flash-1017": {
+   "id": "deepseek-v4.1-flash-1017",
+   "name": "DeepSeek V4.1 Flash 1017",
+   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
    "type": "chat",
-   "family": "gpt-oss",
-   "canonical_id": "openai/gpt-oss-120b",
-   "release_date": "2025-08-05",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
+   "release_date": "2026-10-17",
    "limit": {
-    "context": 131072,
-    "output": 131072
+    "context": 1000000,
+    "output": 384000
    },
    "capabilities": {
     "temperature": true,
     "top_k": true,
     "top_p": true,
-    "structured_output": true,
+    "structured_output": false,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -2810,6 +2802,8 @@
     "reasoning": {
      "supported": true,
      "effort": [
+      "none",
+      "minimal",
       "low",
       "medium",
       "high"
@@ -2819,17 +2813,23 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.399
+      "price": 0.402192,
+      "cache": {
+       "read": 0.044688
+      }
      },
      "output": {
-      "price": 1.083
+      "price": 1.61994
      }
     }
    },
    "modalities": {
     "input": [
      "text",
-     "image"
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
     ],
     "output": [
      "text"
@@ -2850,8 +2850,8 @@
     }
    },
    "open_weights": true,
-   "knowledge": "2024-06",
-   "last_updated": "2025-08-05"
+   "knowledge": "2025-05",
+   "last_updated": "2026-10-17"
   }
  }
 }

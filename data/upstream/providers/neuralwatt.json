@@ -6,9 +6,312 @@
   "NEURALWATT_API_KEY"
  ],
  "models": {
-  "nw-small-flex": {
-   "id": "nw-small-flex",
-   "name": "Neuralwatt Small (flex)",
+  "qwen3.6-35b-fast": {
+   "id": "qwen3.6-35b-fast",
+   "name": "Qwen3.6 35B Fast",
+   "description": "Efficient model for low-latency assistance, extraction, and routine automation",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.6-35b-a3b",
+   "release_date": "2026-04-17",
+   "limit": {
+    "context": 262128,
+    "output": 131056
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.29,
+      "cache": {
+       "read": 0.029
+      }
+     },
+     "output": {
+      "price": 1.15
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.neuralwatt.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-04-17"
+  },
+  "nw-large-flex": {
+   "id": "nw-large-flex",
+   "name": "Neuralwatt Large (flex)",
+   "description": "Multimodal Kimi model with a 1M-token context window and always-on reasoning, for coding, 3D creation and financial research",
+   "type": "chat",
+   "family": "kimi-k3",
+   "canonical_id": "moonshotai/kimi-k3.1-pro",
+   "release_date": "2026-10-23",
+   "limit": {
+    "context": 1048560,
+    "output": 1048560
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "max"
+     ],
+     "budget": {}
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.3,
+      "cache": {
+       "read": 0.13
+      }
+     },
+     "output": {
+      "price": 6.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/heic",
+     "image/heif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.neuralwatt.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-10-23"
+  },
+  "qwen3.6-35b": {
+   "id": "qwen3.6-35b",
+   "name": "Qwen3.6 35B",
+   "description": "Open multimodal Qwen MoE for local agents that need vision, audio, and code",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.6-35b-a3b",
+   "release_date": "2026-04-17",
+   "limit": {
+    "context": 262128,
+    "output": 131056
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "high"
+     ],
+     "budget": {}
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.29,
+      "cache": {
+       "read": 0.029
+      }
+     },
+     "output": {
+      "price": 1.15
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.neuralwatt.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-04-17"
+  },
+  "nw-large": {
+   "id": "nw-large",
+   "name": "Neuralwatt Large",
+   "description": "Multimodal Kimi model with a 1M-token context window and always-on reasoning, for coding, 3D creation and financial research",
+   "type": "chat",
+   "family": "kimi-k3",
+   "canonical_id": "moonshotai/kimi-k3.1-pro",
+   "release_date": "2026-10-23",
+   "limit": {
+    "context": 1048560,
+    "output": 1048560
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "max"
+     ],
+     "budget": {}
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.2
+      }
+     },
+     "output": {
+      "price": 10
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/heic",
+     "image/heif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.neuralwatt.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-10-23"
+  },
+  "qwen-3.8-27b-flex": {
+   "id": "qwen-3.8-27b-flex",
+   "name": "Qwen3.8 27B Flex",
    "description": "Dense 27B vision-language model for coding, agent tasks, and image and video understanding",
    "type": "chat",
    "family": "qwen",
@@ -49,6 +352,235 @@
      },
      "output": {
       "price": 2.08
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.neuralwatt.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-14"
+  },
+  "qwen3.6-35b-flex": {
+   "id": "qwen3.6-35b-flex",
+   "name": "Qwen3.6 35B Flex",
+   "description": "Open multimodal Qwen MoE for local agents that need vision, audio, and code",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.6-35b-a3b",
+   "release_date": "2026-04-17",
+   "limit": {
+    "context": 262128,
+    "output": 131056
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "high"
+     ],
+     "budget": {}
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1885,
+      "cache": {
+       "read": 0.01885
+      }
+     },
+     "output": {
+      "price": 0.7475
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.neuralwatt.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-04-17"
+  },
+  "nw-flash-flex": {
+   "id": "nw-flash-flex",
+   "name": "Neuralwatt Flash (flex)",
+   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
+   "type": "chat",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
+   "release_date": "2026-10-17",
+   "limit": {
+    "context": 1048560,
+    "output": 393216
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "high",
+      "xhigh",
+      "max"
+     ],
+     "budget": {}
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.0975,
+      "cache": {
+       "read": 0.00975
+      }
+     },
+     "output": {
+      "price": 0.39
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.neuralwatt.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-10-17"
+  },
+  "nw-small": {
+   "id": "nw-small",
+   "name": "Neuralwatt Small",
+   "description": "Dense 27B vision-language model for coding, agent tasks, and image and video understanding",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.8-27b",
+   "release_date": "2026-08-14",
+   "limit": {
+    "context": 262128,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "xhigh"
+     ],
+     "budget": {}
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.45,
+      "cache": {
+       "read": 0.25
+      }
+     },
+     "output": {
+      "price": 3.2
      }
     }
    },
@@ -162,9 +694,463 @@
    "open_weights": true,
    "last_updated": "2026-09-22"
   },
-  "nw-flash-flex": {
-   "id": "nw-flash-flex",
-   "name": "Neuralwatt Flash (flex)",
+  "nw-small-flex": {
+   "id": "nw-small-flex",
+   "name": "Neuralwatt Small (flex)",
+   "description": "Dense 27B vision-language model for coding, agent tasks, and image and video understanding",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.8-27b",
+   "release_date": "2026-08-14",
+   "limit": {
+    "context": 262128,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "xhigh"
+     ],
+     "budget": {}
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.2925,
+      "cache": {
+       "read": 0.1625
+      }
+     },
+     "output": {
+      "price": 2.08
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.neuralwatt.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-14"
+  },
+  "qwen-3.8-27b": {
+   "id": "qwen-3.8-27b",
+   "name": "Qwen3.8 27B",
+   "description": "Dense 27B vision-language model for coding, agent tasks, and image and video understanding",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.8-27b",
+   "release_date": "2026-08-14",
+   "limit": {
+    "context": 262128,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "xhigh"
+     ],
+     "budget": {}
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.45,
+      "cache": {
+       "read": 0.25
+      }
+     },
+     "output": {
+      "price": 3.2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.neuralwatt.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-14"
+  },
+  "kimi-k3.1-pro-flex": {
+   "id": "kimi-k3.1-pro-flex",
+   "name": "Kimi K3.1 Pro (flex)",
+   "description": "Multimodal Kimi model with a 1M-token context window and always-on reasoning, for coding, 3D creation and financial research",
+   "type": "chat",
+   "family": "kimi-k3",
+   "canonical_id": "moonshotai/kimi-k3.1-pro",
+   "release_date": "2026-10-23",
+   "limit": {
+    "context": 1048560,
+    "output": 1048560
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "max"
+     ],
+     "budget": {}
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.3,
+      "cache": {
+       "read": 0.13
+      }
+     },
+     "output": {
+      "price": 6.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/heic",
+     "image/heif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.neuralwatt.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-10-23"
+  },
+  "mimo-v2.6-pro": {
+   "id": "mimo-v2.6-pro",
+   "name": "MiMo-V2.6-Pro",
+   "description": "Stronger MiMo Pro tier for multimodal reasoning and coding-agent execution",
+   "type": "chat",
+   "family": "mimo",
+   "canonical_id": "xiaomi/mimo-v2.6-pro",
+   "release_date": "2026-09-22",
+   "limit": {
+    "context": 1048560,
+    "output": 393216
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "high"
+     ],
+     "budget": {}
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.435,
+      "cache": {
+       "read": 0.0036
+      }
+     },
+     "output": {
+      "price": 0.87
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "audio/mpeg",
+     "audio/wav",
+     "audio/flac",
+     "audio/mp4",
+     "audio/ogg"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.neuralwatt.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-09-22"
+  },
+  "glm-5.3-flex": {
+   "id": "glm-5.3-flex",
+   "name": "GLM 5.3 Flex",
+   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.3",
+   "release_date": "2026-08-14",
+   "limit": {
+    "context": 1048560,
+    "output": 1048560
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ],
+     "budget": {}
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.9425,
+      "cache": {
+       "read": 0.09425
+      }
+     },
+     "output": {
+      "price": 2.925
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.neuralwatt.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-14"
+  },
+  "glm-5.3-flash": {
+   "id": "glm-5.3-flash",
+   "name": "GLM-5.3 Flash",
+   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
+   "type": "chat",
+   "family": "glm-flash",
+   "canonical_id": "zhipuai/glm-5.3-flash",
+   "release_date": "2026-08-26",
+   "limit": {
+    "context": 1048560,
+    "output": 1048560
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ],
+     "budget": {}
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.15,
+      "cache": {
+       "read": 0.03
+      }
+     },
+     "output": {
+      "price": 0.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.neuralwatt.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-26"
+  },
+  "deepseek-v4.1-flash-flex": {
+   "id": "deepseek-v4.1-flash-flex",
+   "name": "DeepSeek V4.1 Flash Flex",
    "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
    "type": "chat",
    "family": "deepseek-flash",
@@ -239,9 +1225,228 @@
    "knowledge": "2025-05",
    "last_updated": "2026-10-17"
   },
+  "glm-5.3": {
+   "id": "glm-5.3",
+   "name": "GLM 5.3",
+   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.3",
+   "release_date": "2026-08-14",
+   "limit": {
+    "context": 1048560,
+    "output": 1048560
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ],
+     "budget": {}
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.45,
+      "cache": {
+       "read": 0.145
+      }
+     },
+     "output": {
+      "price": 4.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.neuralwatt.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-14"
+  },
+  "glm-5.3-flash-flex": {
+   "id": "glm-5.3-flash-flex",
+   "name": "GLM-5.3 Flash Flex",
+   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
+   "type": "chat",
+   "family": "glm-flash",
+   "canonical_id": "zhipuai/glm-5.3-flash",
+   "release_date": "2026-08-26",
+   "limit": {
+    "context": 1048560,
+    "output": 1048560
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ],
+     "budget": {}
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.0975,
+      "cache": {
+       "read": 0.0195
+      }
+     },
+     "output": {
+      "price": 0.325
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.neuralwatt.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-26"
+  },
   "deepseek-v4.1-flash-speed": {
    "id": "deepseek-v4.1-flash-speed",
    "name": "DeepSeek V4.1 Flash (Speed)",
+   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
+   "type": "chat",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
+   "release_date": "2026-10-17",
+   "limit": {
+    "context": 1048560,
+    "output": 393216
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "high",
+      "xhigh",
+      "max"
+     ],
+     "budget": {}
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.15,
+      "cache": {
+       "read": 0.015
+      }
+     },
+     "output": {
+      "price": 0.6
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.neuralwatt.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-10-17"
+  },
+  "deepseek-v4.1-flash": {
+   "id": "deepseek-v4.1-flash",
+   "name": "DeepSeek V4.1 Flash",
    "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
    "type": "chat",
    "family": "deepseek-flash",
@@ -395,602 +1600,6 @@
    "open_weights": true,
    "last_updated": "2026-10-23"
   },
-  "mimo-v2.6-pro": {
-   "id": "mimo-v2.6-pro",
-   "name": "MiMo-V2.6-Pro",
-   "description": "Stronger MiMo Pro tier for multimodal reasoning and coding-agent execution",
-   "type": "chat",
-   "family": "mimo",
-   "canonical_id": "xiaomi/mimo-v2.6-pro",
-   "release_date": "2026-09-22",
-   "limit": {
-    "context": 1048560,
-    "output": 393216
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "high"
-     ],
-     "budget": {}
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.435,
-      "cache": {
-       "read": 0.0036
-      }
-     },
-     "output": {
-      "price": 0.87
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "audio/mpeg",
-     "audio/wav",
-     "audio/flac",
-     "audio/mp4",
-     "audio/ogg"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.neuralwatt.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-09-22"
-  },
-  "qwen3.6-35b-fast": {
-   "id": "qwen3.6-35b-fast",
-   "name": "Qwen3.6 35B Fast",
-   "description": "Efficient model for low-latency assistance, extraction, and routine automation",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3.6-35b-a3b",
-   "release_date": "2026-04-17",
-   "limit": {
-    "context": 262128,
-    "output": 131056
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.29,
-      "cache": {
-       "read": 0.029
-      }
-     },
-     "output": {
-      "price": 1.15
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.neuralwatt.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-04-17"
-  },
-  "nw-small": {
-   "id": "nw-small",
-   "name": "Neuralwatt Small",
-   "description": "Dense 27B vision-language model for coding, agent tasks, and image and video understanding",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3.8-27b",
-   "release_date": "2026-08-14",
-   "limit": {
-    "context": 262128,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "xhigh"
-     ],
-     "budget": {}
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.45,
-      "cache": {
-       "read": 0.25
-      }
-     },
-     "output": {
-      "price": 3.2
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.neuralwatt.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-08-14"
-  },
-  "nw-large": {
-   "id": "nw-large",
-   "name": "Neuralwatt Large",
-   "description": "Multimodal Kimi model with a 1M-token context window and always-on reasoning, for coding, 3D creation and financial research",
-   "type": "chat",
-   "family": "kimi-k3",
-   "canonical_id": "moonshotai/kimi-k3.1-pro",
-   "release_date": "2026-10-23",
-   "limit": {
-    "context": 1048560,
-    "output": 1048560
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "max"
-     ],
-     "budget": {}
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2,
-      "cache": {
-       "read": 0.2
-      }
-     },
-     "output": {
-      "price": 10
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/heic",
-     "image/heif"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.neuralwatt.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-10-23"
-  },
-  "glm-5.3": {
-   "id": "glm-5.3",
-   "name": "GLM 5.3",
-   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
-   "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-5.3",
-   "release_date": "2026-08-14",
-   "limit": {
-    "context": 1048560,
-    "output": 1048560
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ],
-     "budget": {}
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.45,
-      "cache": {
-       "read": 0.145
-      }
-     },
-     "output": {
-      "price": 4.5
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.neuralwatt.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-08-14"
-  },
-  "nw-large-flex": {
-   "id": "nw-large-flex",
-   "name": "Neuralwatt Large (flex)",
-   "description": "Multimodal Kimi model with a 1M-token context window and always-on reasoning, for coding, 3D creation and financial research",
-   "type": "chat",
-   "family": "kimi-k3",
-   "canonical_id": "moonshotai/kimi-k3.1-pro",
-   "release_date": "2026-10-23",
-   "limit": {
-    "context": 1048560,
-    "output": 1048560
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "max"
-     ],
-     "budget": {}
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.3,
-      "cache": {
-       "read": 0.13
-      }
-     },
-     "output": {
-      "price": 6.5
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/heic",
-     "image/heif"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.neuralwatt.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-10-23"
-  },
-  "glm-5.3-flash": {
-   "id": "glm-5.3-flash",
-   "name": "GLM-5.3 Flash",
-   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
-   "type": "chat",
-   "family": "glm-flash",
-   "canonical_id": "zhipuai/glm-5.3-flash",
-   "release_date": "2026-08-26",
-   "limit": {
-    "context": 1048560,
-    "output": 1048560
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ],
-     "budget": {}
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.15,
-      "cache": {
-       "read": 0.03
-      }
-     },
-     "output": {
-      "price": 0.5
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.neuralwatt.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-08-26"
-  },
-  "glm-5.3-flex": {
-   "id": "glm-5.3-flex",
-   "name": "GLM 5.3 Flex",
-   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
-   "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-5.3",
-   "release_date": "2026-08-14",
-   "limit": {
-    "context": 1048560,
-    "output": 1048560
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ],
-     "budget": {}
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.9425,
-      "cache": {
-       "read": 0.09425
-      }
-     },
-     "output": {
-      "price": 2.925
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.neuralwatt.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-08-14"
-  },
   "gemma-4-31b": {
    "id": "gemma-4-31b",
    "name": "Gemma 4 31B",
@@ -1141,615 +1750,6 @@
    "open_weights": true,
    "knowledge": "2025-05",
    "last_updated": "2026-10-17"
-  },
-  "qwen-3.8-27b": {
-   "id": "qwen-3.8-27b",
-   "name": "Qwen3.8 27B",
-   "description": "Dense 27B vision-language model for coding, agent tasks, and image and video understanding",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3.8-27b",
-   "release_date": "2026-08-14",
-   "limit": {
-    "context": 262128,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "xhigh"
-     ],
-     "budget": {}
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.45,
-      "cache": {
-       "read": 0.25
-      }
-     },
-     "output": {
-      "price": 3.2
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.neuralwatt.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-08-14"
-  },
-  "qwen-3.8-27b-flex": {
-   "id": "qwen-3.8-27b-flex",
-   "name": "Qwen3.8 27B Flex",
-   "description": "Dense 27B vision-language model for coding, agent tasks, and image and video understanding",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3.8-27b",
-   "release_date": "2026-08-14",
-   "limit": {
-    "context": 262128,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "xhigh"
-     ],
-     "budget": {}
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.2925,
-      "cache": {
-       "read": 0.1625
-      }
-     },
-     "output": {
-      "price": 2.08
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.neuralwatt.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-08-14"
-  },
-  "qwen3.6-35b": {
-   "id": "qwen3.6-35b",
-   "name": "Qwen3.6 35B",
-   "description": "Open multimodal Qwen MoE for local agents that need vision, audio, and code",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3.6-35b-a3b",
-   "release_date": "2026-04-17",
-   "limit": {
-    "context": 262128,
-    "output": 131056
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "high"
-     ],
-     "budget": {}
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.29,
-      "cache": {
-       "read": 0.029
-      }
-     },
-     "output": {
-      "price": 1.15
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.neuralwatt.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-04-17"
-  },
-  "qwen3.6-35b-flex": {
-   "id": "qwen3.6-35b-flex",
-   "name": "Qwen3.6 35B Flex",
-   "description": "Open multimodal Qwen MoE for local agents that need vision, audio, and code",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3.6-35b-a3b",
-   "release_date": "2026-04-17",
-   "limit": {
-    "context": 262128,
-    "output": 131056
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "high"
-     ],
-     "budget": {}
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.1885,
-      "cache": {
-       "read": 0.01885
-      }
-     },
-     "output": {
-      "price": 0.7475
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.neuralwatt.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-04-17"
-  },
-  "deepseek-v4.1-flash": {
-   "id": "deepseek-v4.1-flash",
-   "name": "DeepSeek V4.1 Flash",
-   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
-   "type": "chat",
-   "family": "deepseek-flash",
-   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
-   "release_date": "2026-10-17",
-   "limit": {
-    "context": 1048560,
-    "output": 393216
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "high",
-      "xhigh",
-      "max"
-     ],
-     "budget": {}
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.15,
-      "cache": {
-       "read": 0.015
-      }
-     },
-     "output": {
-      "price": 0.6
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.neuralwatt.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-10-17"
-  },
-  "kimi-k3.1-pro-flex": {
-   "id": "kimi-k3.1-pro-flex",
-   "name": "Kimi K3.1 Pro (flex)",
-   "description": "Multimodal Kimi model with a 1M-token context window and always-on reasoning, for coding, 3D creation and financial research",
-   "type": "chat",
-   "family": "kimi-k3",
-   "canonical_id": "moonshotai/kimi-k3.1-pro",
-   "release_date": "2026-10-23",
-   "limit": {
-    "context": 1048560,
-    "output": 1048560
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "max"
-     ],
-     "budget": {}
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.3,
-      "cache": {
-       "read": 0.13
-      }
-     },
-     "output": {
-      "price": 6.5
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/heic",
-     "image/heif"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.neuralwatt.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-10-23"
-  },
-  "deepseek-v4.1-flash-flex": {
-   "id": "deepseek-v4.1-flash-flex",
-   "name": "DeepSeek V4.1 Flash Flex",
-   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
-   "type": "chat",
-   "family": "deepseek-flash",
-   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
-   "release_date": "2026-10-17",
-   "limit": {
-    "context": 1048560,
-    "output": 393216
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "high",
-      "xhigh",
-      "max"
-     ],
-     "budget": {}
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.0975,
-      "cache": {
-       "read": 0.00975
-      }
-     },
-     "output": {
-      "price": 0.39
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.neuralwatt.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-10-17"
-  },
-  "glm-5.3-flash-flex": {
-   "id": "glm-5.3-flash-flex",
-   "name": "GLM-5.3 Flash Flex",
-   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
-   "type": "chat",
-   "family": "glm-flash",
-   "canonical_id": "zhipuai/glm-5.3-flash",
-   "release_date": "2026-08-26",
-   "limit": {
-    "context": 1048560,
-    "output": 1048560
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ],
-     "budget": {}
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.0975,
-      "cache": {
-       "read": 0.0195
-      }
-     },
-     "output": {
-      "price": 0.325
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.neuralwatt.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-08-26"
   }
  }
 }

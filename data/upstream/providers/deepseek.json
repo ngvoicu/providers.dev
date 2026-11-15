@@ -6,6 +6,164 @@
   "DEEPSEEK_API_KEY"
  ],
  "models": {
+  "deepseek-v4-pro": {
+   "id": "deepseek-v4-pro",
+   "name": "DeepSeek V4 Pro",
+   "description": "DeepSeek V4 Pro snapshot with million-token context and support for thinking and non-thinking modes",
+   "type": "chat",
+   "family": "deepseek-thinking",
+   "canonical_id": "deepseek/deepseek-v4-pro-0813",
+   "release_date": "2026-08-13",
+   "limit": {
+    "context": 1048576,
+    "output": 393216
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "stream_usage": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ],
+     "default": {
+      "type": "effort",
+      "value": "high"
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.66,
+      "cache": {
+       "read": 0.022
+      }
+     },
+     "output": {
+      "price": 1.98,
+      "reasoning": 1.98
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "utc_days": {
+        "in": [
+         "mon",
+         "tue",
+         "wed",
+         "thu",
+         "fri"
+        ]
+       },
+       "any": [
+        {
+         "all": [
+          {
+           "utc_hours": {
+            "gte": "01:00"
+           }
+          },
+          {
+           "utc_hours": {
+            "lt": "04:00"
+           }
+          }
+         ]
+        },
+        {
+         "all": [
+          {
+           "utc_hours": {
+            "gte": "06:00"
+           }
+          },
+          {
+           "utc_hours": {
+            "lt": "10:00"
+           }
+          }
+         ]
+        }
+       ],
+       "not": {
+        "holiday": {
+         "equals": "CN"
+        }
+       }
+      },
+      "factor": 2
+     }
+    ]
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.deepseek.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/deepseek"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "messages": {
+     "base_url": "https://api.deepseek.com/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-22"
+  },
   "deepseek-v4-flash": {
    "id": "deepseek-v4-flash",
    "name": "DeepSeek V4 Flash",
@@ -335,164 +493,6 @@
    "open_weights": true,
    "knowledge": "2025-05",
    "last_updated": "2026-10-17"
-  },
-  "deepseek-v4-pro": {
-   "id": "deepseek-v4-pro",
-   "name": "DeepSeek V4 Pro",
-   "description": "DeepSeek V4 Pro snapshot with million-token context and support for thinking and non-thinking modes",
-   "type": "chat",
-   "family": "deepseek-thinking",
-   "canonical_id": "deepseek/deepseek-v4-pro-0813",
-   "release_date": "2026-08-13",
-   "limit": {
-    "context": 1048576,
-    "output": 393216
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": true,
-    "stream_usage": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ],
-     "default": {
-      "type": "effort",
-      "value": "high"
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.66,
-      "cache": {
-       "read": 0.022
-      }
-     },
-     "output": {
-      "price": 1.98,
-      "reasoning": 1.98
-     }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "utc_days": {
-        "in": [
-         "mon",
-         "tue",
-         "wed",
-         "thu",
-         "fri"
-        ]
-       },
-       "any": [
-        {
-         "all": [
-          {
-           "utc_hours": {
-            "gte": "01:00"
-           }
-          },
-          {
-           "utc_hours": {
-            "lt": "04:00"
-           }
-          }
-         ]
-        },
-        {
-         "all": [
-          {
-           "utc_hours": {
-            "gte": "06:00"
-           }
-          },
-          {
-           "utc_hours": {
-            "lt": "10:00"
-           }
-          }
-         ]
-        }
-       ],
-       "not": {
-        "holiday": {
-         "equals": "CN"
-        }
-       }
-      },
-      "factor": 2
-     }
-    ]
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.deepseek.com",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/deepseek"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens",
-      "reasoning_field": "reasoning_content"
-     }
-    },
-    "messages": {
-     "base_url": "https://api.deepseek.com/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-08-22"
   },
   "deepseek-flash": {
    "id": "deepseek-flash",

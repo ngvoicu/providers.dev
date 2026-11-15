@@ -6,23 +6,22 @@
   "FASTROUTER_API_KEY"
  ],
  "models": {
-  "google/gemma-4-31b-it": {
-   "id": "google/gemma-4-31b-it",
-   "name": "Gemma 4 31B IT",
-   "description": "Largest Gemma 4 instruction model for open, self-hosted chat and reasoning",
+  "minimax/minimax-m2.7-highspeed": {
+   "id": "minimax/minimax-m2.7-highspeed",
+   "name": "MiniMax-M2.7-highspeed",
+   "description": "Low-latency M2.7 variant for interactive coding plans and agent loops",
    "type": "chat",
-   "family": "gemma",
-   "canonical_id": "google/gemma-4-31b-it",
-   "release_date": "2026-04-02",
+   "family": "minimax",
+   "canonical_id": "minimax/MiniMax-M2.7-highspeed",
+   "release_date": "2026-03-18",
    "limit": {
-    "context": 262144,
-    "output": 32768
+    "context": 204800,
+    "output": 131072
    },
    "capabilities": {
     "temperature": true,
-    "top_k": true,
+    "top_k": false,
     "top_p": true,
-    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -35,21 +34,724 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.1
+      "price": 0.6,
+      "cache": {
+       "read": 0.06,
+       "write": 0.375
+      }
      },
      "output": {
-      "price": 0.3
+      "price": 2.4
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://go.fastrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-03-18"
+  },
+  "minimax/minimax-m2.7": {
+   "id": "minimax/minimax-m2.7",
+   "name": "MiniMax-M2.7",
+   "description": "Open MiniMax flagship for coding agents, office automation, and complex environments",
+   "type": "chat",
+   "family": "minimax",
+   "canonical_id": "minimax/MiniMax-M2.7",
+   "release_date": "2026-03-18",
+   "limit": {
+    "context": 204800,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.3,
+      "cache": {
+       "read": 0.06,
+       "write": 0.375
+      }
+     },
+     "output": {
+      "price": 1.2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://go.fastrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-03-18"
+  },
+  "leonardo-ai/lucid-origin": {
+   "id": "leonardo-ai/lucid-origin",
+   "name": "Lucid Origin",
+   "description": "Image model for prompt-driven generation, editing, and visual design workflows",
+   "type": "image",
+   "family": "lucid",
+   "release_date": "2025-06-01",
+   "limit": {
+    "context": 4096,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "image"
+    ]
+   },
+   "api": {
+    "images": {
+     "base_url": "https://go.fastrouter.ai/api/v1",
+     "sdk": {}
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-06-01"
+  },
+  "leonardo-ai/lucid-realism": {
+   "id": "leonardo-ai/lucid-realism",
+   "name": "Lucid Realism",
+   "description": "Image model for prompt-driven generation, editing, and visual design workflows",
+   "type": "image",
+   "family": "lucid",
+   "release_date": "2025-06-01",
+   "limit": {
+    "context": 4096,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "image"
+    ]
+   },
+   "api": {
+    "images": {
+     "base_url": "https://go.fastrouter.ai/api/v1",
+     "sdk": {}
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-06-01"
+  },
+  "anthropic/claude-opus-5": {
+   "id": "anthropic/claude-opus-5",
+   "name": "Claude Opus 5",
+   "description": "Strongest Claude Opus model for coding, agents, and professional work",
+   "type": "chat",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-5",
+   "release_date": "2026-07-24",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5,
+       "write": {
+        "5m": 6.25,
+        "1h": 10
+       }
+      }
+     },
+     "output": {
+      "price": 25
      }
     }
    },
    "modalities": {
     "input": [
      "text",
-     "image/png",
      "image/jpeg",
+     "image/png",
+     "image/gif",
      "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://go.fastrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-05",
+   "last_updated": "2026-07-24"
+  },
+  "anthropic/claude-opus-5.5": {
+   "id": "anthropic/claude-opus-5.5",
+   "name": "Claude Opus 5.5",
+   "description": "Claude model for long-running agentic coding and knowledge work",
+   "type": "chat",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-5-5",
+   "release_date": "2026-09-22",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 4,
+      "cache": {
+       "read": 0.2,
+       "write": {
+        "5m": 5,
+        "1h": 8
+       }
+      }
+     },
+     "output": {
+      "price": 20
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://go.fastrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-06",
+   "last_updated": "2026-09-22"
+  },
+  "anthropic/claude-opus-4.1": {
+   "id": "anthropic/claude-opus-4.1",
+   "name": "Claude Opus 4.1",
+   "description": "Flagship Claude model for deep reasoning, coding, and long-horizon agents",
+   "type": "chat",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-4-1-20250805",
+   "release_date": "2025-08-05",
+   "limit": {
+    "context": 200000,
+    "output": 32000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "budget": {
+      "min": 1024,
+      "max": 32000
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 15,
+      "cache": {
+       "read": 1.5,
+       "write": {
+        "5m": 18.75,
+        "1h": 30
+       }
+      }
+     },
+     "output": {
+      "price": 75
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://go.fastrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-03-31",
+   "last_updated": "2025-08-05"
+  },
+  "anthropic/claude-opus-4.8": {
+   "id": "anthropic/claude-opus-4.8",
+   "name": "Claude Opus 4.8",
+   "description": "Top Claude Opus tier for the hardest reasoning, coding, and long-horizon agents",
+   "type": "chat",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-4-8",
+   "release_date": "2026-05-28",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5,
+       "write": {
+        "5m": 6.25,
+        "1h": 10
+       }
+      }
+     },
+     "output": {
+      "price": 25
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://go.fastrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-01",
+   "last_updated": "2026-05-28"
+  },
+  "anthropic/claude-sonnet-4.6": {
+   "id": "anthropic/claude-sonnet-4.6",
+   "name": "Claude Sonnet 4.6",
+   "description": "Claude workhorse for coding agents, careful analysis, and production cost control",
+   "type": "chat",
+   "family": "claude-sonnet",
+   "canonical_id": "anthropic/claude-sonnet-4-6",
+   "release_date": "2026-02-17",
+   "limit": {
+    "context": 1000000,
+    "output": 64000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "budget": {
+      "min": 1024,
+      "max": 32000
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 3,
+      "cache": {
+       "read": 0.3,
+       "write": {
+        "5m": 3.75,
+        "1h": 6
+       }
+      }
+     },
+     "output": {
+      "price": 15
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://go.fastrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-03-13"
+  },
+  "anthropic/claude-fable-5": {
+   "id": "anthropic/claude-fable-5",
+   "name": "Claude Fable 5",
+   "description": "Claude model for creative writing, analysis, and controlled agent workflows",
+   "type": "chat",
+   "family": "claude-fable",
+   "canonical_id": "anthropic/claude-fable-5",
+   "release_date": "2026-06-09",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 10,
+      "cache": {
+       "read": 1,
+       "write": {
+        "5m": 12.5,
+        "1h": 20
+       }
+      }
+     },
+     "output": {
+      "price": 50
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://go.fastrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-01-31",
+   "last_updated": "2026-06-09"
+  },
+  "moonshotai/kimi-k2.6": {
+   "id": "moonshotai/kimi-k2.6",
+   "name": "Kimi K2.6",
+   "description": "Multimodal Kimi workhorse for agent loops, coding tasks, and visual context",
+   "type": "chat",
+   "family": "kimi-k2",
+   "canonical_id": "moonshotai/kimi-k2.6",
+   "release_date": "2026-04-20",
+   "limit": {
+    "context": 262144,
+    "output": 262144
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.75,
+      "cache": {
+       "read": 0.15
+      }
+     },
+     "output": {
+      "price": 3.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
      "image/heic",
-     "image/heif"
+     "image/heif",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp"
     ],
     "output": [
      "text"
@@ -71,16 +773,15 @@
    },
    "open_weights": true,
    "knowledge": "2025-01",
-   "last_updated": "2026-04-02"
+   "last_updated": "2026-04-20"
   },
-  "google/veo3.1-fast": {
-   "id": "google/veo3.1-fast",
-   "name": "Veo 3.1 Fast",
-   "description": "Video model for prompt-guided generation, editing, and motion workflows",
+  "wanx/wan-v2-6": {
+   "id": "wanx/wan-v2-6",
+   "name": "Wan 2.6",
+   "description": "Video model for text- and image-to-video with audio input and synchronized sound",
    "type": "video",
-   "family": "veo",
-   "canonical_id": "google/veo-3.1-fast-generate-preview",
-   "release_date": "2025-10-15",
+   "canonical_id": "alibaba/wan2.6",
+   "release_date": "2025-12-03",
    "limit": {
     "context": 400000,
     "output": 0
@@ -102,40 +803,15 @@
     "video": {
      "output": {
       "unit": "second",
-      "price": 0.1,
+      "price": 0.15,
       "overrides": [
        {
         "when": {
          "resolution": {
-          "equals": "4k"
+          "equals": "720p"
          }
         },
-        "price": 0.3
-       },
-       {
-        "when": {
-         "generate_audio": {
-          "equals": true
-         }
-        },
-        "price": 0.15
-       },
-       {
-        "when": {
-         "all": [
-          {
-           "resolution": {
-            "equals": "4k"
-           }
-          },
-          {
-           "generate_audio": {
-            "equals": true
-           }
-          }
-         ]
-        },
-        "price": 0.35
+        "price": 0.1
        }
       ]
      }
@@ -145,7 +821,9 @@
     "input": [
      "text",
      "image/jpeg",
-     "image/png"
+     "image/png",
+     "image/bmp",
+     "image/webp"
     ],
     "output": [
      "video/mp4"
@@ -158,7 +836,7 @@
     }
    },
    "open_weights": false,
-   "last_updated": "2026-01-01"
+   "last_updated": "2025-12-03"
   },
   "google/gemini-2.5-pro": {
    "id": "google/gemini-2.5-pro",
@@ -285,6 +963,135 @@
    "open_weights": false,
    "knowledge": "2025-01",
    "last_updated": "2025-06-17"
+  },
+  "google/gemma-4-31b-it": {
+   "id": "google/gemma-4-31b-it",
+   "name": "Gemma 4 31B IT",
+   "description": "Largest Gemma 4 instruction model for open, self-hosted chat and reasoning",
+   "type": "chat",
+   "family": "gemma",
+   "canonical_id": "google/gemma-4-31b-it",
+   "release_date": "2026-04-02",
+   "limit": {
+    "context": 262144,
+    "output": 32768
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1
+     },
+     "output": {
+      "price": 0.3
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://go.fastrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-01",
+   "last_updated": "2026-04-02"
+  },
+  "google/veo3.1-lite": {
+   "id": "google/veo3.1-lite",
+   "name": "Veo 3.1 Lite",
+   "description": "Video model for prompt-guided generation, editing, and motion workflows",
+   "type": "video",
+   "family": "veo",
+   "canonical_id": "google/veo-3.1-lite-generate-preview",
+   "release_date": "2026-03-31",
+   "limit": {
+    "context": 400000,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "video": {
+     "output": {
+      "unit": "second",
+      "price": 0.05,
+      "overrides": [
+       {
+        "when": {
+         "resolution": {
+          "equals": "1080p"
+         }
+        },
+        "price": 0.08
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png"
+    ],
+    "output": [
+     "video/mp4"
+    ]
+   },
+   "api": {
+    "videos": {
+     "base_url": "https://go.fastrouter.ai/api/v1",
+     "sdk": {}
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-03-31"
   },
   "google/gemini-3-pro-image-preview": {
    "id": "google/gemini-3-pro-image-preview",
@@ -506,82 +1313,6 @@
    "knowledge": "2025-01",
    "last_updated": "2026-02-19"
   },
-  "google/gemini-3.1-flash-image-preview": {
-   "id": "google/gemini-3.1-flash-image-preview",
-   "name": "Nano Banana 2 Preview",
-   "description": "Image model for prompt-driven generation, editing, and visual design workflows",
-   "type": "image",
-   "family": "gemini-flash",
-   "canonical_id": "google/gemini-3.1-flash-image-preview",
-   "release_date": "2026-02-26",
-   "limit": {
-    "context": 65536,
-    "output": 65536
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.5
-     },
-     "output": {
-      "price": 3
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "application/pdf"
-    ],
-    "output": [
-     "text",
-     "image/png",
-     "image/jpeg"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://go.fastrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     }
-    },
-    "images": {
-     "base_url": "https://go.fastrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/images"
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-01",
-   "last_updated": "2026-02-26"
-  },
   "google/gemini-2.5-flash": {
    "id": "google/gemini-2.5-flash",
    "name": "Gemini 2.5 Flash",
@@ -712,6 +1443,256 @@
    "knowledge": "2025-01",
    "last_updated": "2025-06-17"
   },
+  "google/veo3.1-fast": {
+   "id": "google/veo3.1-fast",
+   "name": "Veo 3.1 Fast",
+   "description": "Video model for prompt-guided generation, editing, and motion workflows",
+   "type": "video",
+   "family": "veo",
+   "canonical_id": "google/veo-3.1-fast-generate-preview",
+   "release_date": "2025-10-15",
+   "limit": {
+    "context": 400000,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "video": {
+     "output": {
+      "unit": "second",
+      "price": 0.1,
+      "overrides": [
+       {
+        "when": {
+         "resolution": {
+          "equals": "4k"
+         }
+        },
+        "price": 0.3
+       },
+       {
+        "when": {
+         "generate_audio": {
+          "equals": true
+         }
+        },
+        "price": 0.15
+       },
+       {
+        "when": {
+         "all": [
+          {
+           "resolution": {
+            "equals": "4k"
+           }
+          },
+          {
+           "generate_audio": {
+            "equals": true
+           }
+          }
+         ]
+        },
+        "price": 0.35
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png"
+    ],
+    "output": [
+     "video/mp4"
+    ]
+   },
+   "api": {
+    "videos": {
+     "base_url": "https://go.fastrouter.ai/api/v1",
+     "sdk": {}
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-01-01"
+  },
+  "google/gemini-3.1-flash-image-preview": {
+   "id": "google/gemini-3.1-flash-image-preview",
+   "name": "Nano Banana 2 Preview",
+   "description": "Image model for prompt-driven generation, editing, and visual design workflows",
+   "type": "image",
+   "family": "gemini-flash",
+   "canonical_id": "google/gemini-3.1-flash-image-preview",
+   "release_date": "2026-02-26",
+   "limit": {
+    "context": 65536,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.5
+     },
+     "output": {
+      "price": 3
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "application/pdf"
+    ],
+    "output": [
+     "text",
+     "image/png",
+     "image/jpeg"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://go.fastrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     }
+    },
+    "images": {
+     "base_url": "https://go.fastrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/images"
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2026-02-26"
+  },
+  "google/veo3.1": {
+   "id": "google/veo3.1",
+   "name": "Veo 3.1",
+   "description": "Video model for prompt-guided generation, editing, and motion workflows",
+   "type": "video",
+   "family": "veo",
+   "canonical_id": "google/veo-3.1-generate-preview",
+   "release_date": "2025-10-15",
+   "limit": {
+    "context": 400000,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "video": {
+     "output": {
+      "unit": "second",
+      "price": 0.2,
+      "overrides": [
+       {
+        "when": {
+         "resolution": {
+          "equals": "4k"
+         }
+        },
+        "price": 0.4
+       },
+       {
+        "when": {
+         "generate_audio": {
+          "equals": true
+         }
+        },
+        "price": 0.4
+       },
+       {
+        "when": {
+         "all": [
+          {
+           "resolution": {
+            "equals": "4k"
+           }
+          },
+          {
+           "generate_audio": {
+            "equals": true
+           }
+          }
+         ]
+        },
+        "price": 0.6
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png"
+    ],
+    "output": [
+     "video/mp4"
+    ]
+   },
+   "api": {
+    "videos": {
+     "base_url": "https://go.fastrouter.ai/api/v1",
+     "sdk": {}
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-01"
+  },
   "google/gemini-3.5-flash": {
    "id": "google/gemini-3.5-flash",
    "name": "Gemini 3.5 Flash",
@@ -823,386 +1804,6 @@
    "knowledge": "2025-01",
    "last_updated": "2026-05-19"
   },
-  "google/veo3.1": {
-   "id": "google/veo3.1",
-   "name": "Veo 3.1",
-   "description": "Video model for prompt-guided generation, editing, and motion workflows",
-   "type": "video",
-   "family": "veo",
-   "canonical_id": "google/veo-3.1-generate-preview",
-   "release_date": "2025-10-15",
-   "limit": {
-    "context": 400000,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "video": {
-     "output": {
-      "unit": "second",
-      "price": 0.2,
-      "overrides": [
-       {
-        "when": {
-         "resolution": {
-          "equals": "4k"
-         }
-        },
-        "price": 0.4
-       },
-       {
-        "when": {
-         "generate_audio": {
-          "equals": true
-         }
-        },
-        "price": 0.4
-       },
-       {
-        "when": {
-         "all": [
-          {
-           "resolution": {
-            "equals": "4k"
-           }
-          },
-          {
-           "generate_audio": {
-            "equals": true
-           }
-          }
-         ]
-        },
-        "price": 0.6
-       }
-      ]
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png"
-    ],
-    "output": [
-     "video/mp4"
-    ]
-   },
-   "api": {
-    "videos": {
-     "base_url": "https://go.fastrouter.ai/api/v1",
-     "sdk": {}
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-01"
-  },
-  "google/veo3.1-lite": {
-   "id": "google/veo3.1-lite",
-   "name": "Veo 3.1 Lite",
-   "description": "Video model for prompt-guided generation, editing, and motion workflows",
-   "type": "video",
-   "family": "veo",
-   "canonical_id": "google/veo-3.1-lite-generate-preview",
-   "release_date": "2026-03-31",
-   "limit": {
-    "context": 400000,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "video": {
-     "output": {
-      "unit": "second",
-      "price": 0.05,
-      "overrides": [
-       {
-        "when": {
-         "resolution": {
-          "equals": "1080p"
-         }
-        },
-        "price": 0.08
-       }
-      ]
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png"
-    ],
-    "output": [
-     "video/mp4"
-    ]
-   },
-   "api": {
-    "videos": {
-     "base_url": "https://go.fastrouter.ai/api/v1",
-     "sdk": {}
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-03-31"
-  },
-  "moonshotai/kimi-k2.6": {
-   "id": "moonshotai/kimi-k2.6",
-   "name": "Kimi K2.6",
-   "description": "Multimodal Kimi workhorse for agent loops, coding tasks, and visual context",
-   "type": "chat",
-   "family": "kimi-k2",
-   "canonical_id": "moonshotai/kimi-k2.6",
-   "release_date": "2026-04-20",
-   "limit": {
-    "context": 262144,
-    "output": 262144
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.75,
-      "cache": {
-       "read": 0.15
-      }
-     },
-     "output": {
-      "price": 3.5
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/heic",
-     "image/heif",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://go.fastrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-04-20"
-  },
-  "deepseek/deepseek-v4-pro": {
-   "id": "deepseek/deepseek-v4-pro",
-   "name": "DeepSeek V4 Pro",
-   "description": "Open MoE flagship with million-token context for coding and long agent runs",
-   "type": "chat",
-   "family": "deepseek-thinking",
-   "canonical_id": "deepseek/deepseek-v4-pro",
-   "release_date": "2026-04-24",
-   "limit": {
-    "context": 1000000,
-    "output": 384000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.74,
-      "cache": {
-       "read": 0.145
-      }
-     },
-     "output": {
-      "price": 3.48
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://go.fastrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-04-24"
-  },
-  "leonardo-ai/lucid-realism": {
-   "id": "leonardo-ai/lucid-realism",
-   "name": "Lucid Realism",
-   "description": "Image model for prompt-driven generation, editing, and visual design workflows",
-   "type": "image",
-   "family": "lucid",
-   "release_date": "2025-06-01",
-   "limit": {
-    "context": 4096,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "image"
-    ]
-   },
-   "api": {
-    "images": {
-     "base_url": "https://go.fastrouter.ai/api/v1",
-     "sdk": {}
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2025-06-01"
-  },
-  "leonardo-ai/lucid-origin": {
-   "id": "leonardo-ai/lucid-origin",
-   "name": "Lucid Origin",
-   "description": "Image model for prompt-driven generation, editing, and visual design workflows",
-   "type": "image",
-   "family": "lucid",
-   "release_date": "2025-06-01",
-   "limit": {
-    "context": 4096,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "image"
-    ]
-   },
-   "api": {
-    "images": {
-     "base_url": "https://go.fastrouter.ai/api/v1",
-     "sdk": {}
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2025-06-01"
-  },
   "x-ai/grok-4.3": {
    "id": "x-ai/grok-4.3",
    "name": "Grok 4.3",
@@ -1295,46 +1896,80 @@
    "open_weights": false,
    "last_updated": "2026-04-17"
   },
-  "x-ai/grok-4": {
-   "id": "x-ai/grok-4",
-   "name": "Grok 4",
-   "description": "Grok model for agentic tool use, reasoning, coding, and live assistance",
+  "x-ai/grok-4.7": {
+   "id": "x-ai/grok-4.7",
+   "name": "Grok 4.7",
+   "description": "xAI's frontier model for long-running agents, coding, knowledge work, and visual projects",
    "type": "chat",
    "family": "grok",
-   "status": "deprecated",
-   "release_date": "2025-07-09",
+   "canonical_id": "xai/grok-4.7",
+   "release_date": "2026-09-21",
    "limit": {
-    "context": 256000,
-    "output": 64000
+    "context": 500000,
+    "output": 500000
    },
    "capabilities": {
     "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": true
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 3,
+      "price": 2,
       "cache": {
-       "read": 0.75,
-       "write": 15
-      }
+       "read": 0.5
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gte": 200000
+         }
+        },
+        "price": 4,
+        "cache": {
+         "read": 1
+        }
+       }
+      ]
      },
      "output": {
-      "price": 15
+      "price": 6,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gte": 200000
+         }
+        },
+        "price": 12
+       }
+      ]
      }
     }
    },
    "modalities": {
     "input": [
-     "text"
+     "text",
+     "image/jpeg",
+     "image/png",
+     "application/pdf"
     ],
     "output": [
      "text"
@@ -1355,8 +1990,8 @@
     }
    },
    "open_weights": false,
-   "knowledge": "2025-07",
-   "last_updated": "2025-07-09"
+   "knowledge": "2026-05",
+   "last_updated": "2026-09-21"
   },
   "x-ai/grok-4.6": {
    "id": "x-ai/grok-4.6",
@@ -1549,25 +2184,91 @@
    "open_weights": false,
    "last_updated": "2026-04-16"
   },
-  "x-ai/grok-4.7": {
-   "id": "x-ai/grok-4.7",
-   "name": "Grok 4.7",
-   "description": "xAI's frontier model for long-running agents, coding, knowledge work, and visual projects",
+  "x-ai/grok-4": {
+   "id": "x-ai/grok-4",
+   "name": "Grok 4",
+   "description": "Grok model for agentic tool use, reasoning, coding, and live assistance",
    "type": "chat",
    "family": "grok",
-   "canonical_id": "xai/grok-4.7",
-   "release_date": "2026-09-21",
+   "status": "deprecated",
+   "release_date": "2025-07-09",
    "limit": {
-    "context": 500000,
-    "output": 500000
+    "context": 256000,
+    "output": 64000
    },
    "capabilities": {
     "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 3,
+      "cache": {
+       "read": 0.75,
+       "write": 15
+      }
+     },
+     "output": {
+      "price": 15
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://go.fastrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-07",
+   "last_updated": "2025-07-09"
+  },
+  "openai/gpt-5-nano": {
+   "id": "openai/gpt-5-nano",
+   "name": "GPT-5 Nano",
+   "description": "Tiny GPT-5 lane for routing, extraction, classification, and bulk jobs",
+   "type": "chat",
+   "family": "gpt-nano",
+   "canonical_id": "openai/gpt-5-nano",
+   "release_date": "2025-08-07",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "service_tier": [
+     "flex"
+    ],
     "tools": {
      "supported": true
     },
@@ -1576,53 +2277,40 @@
      "effort": [
       "low",
       "medium",
-      "high",
-      "xhigh"
+      "high"
      ]
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 2,
+      "price": 0.05,
       "cache": {
-       "read": 0.5
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gte": 200000
-         }
-        },
-        "price": 4,
-        "cache": {
-         "read": 1
-        }
-       }
-      ]
+       "read": 0.005
+      }
      },
      "output": {
-      "price": 6,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gte": 200000
-         }
-        },
-        "price": 12
-       }
-      ]
+      "price": 0.4
      }
-    }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": 0.5
+     }
+    ]
    },
    "modalities": {
     "input": [
      "text",
      "image/jpeg",
      "image/png",
-     "application/pdf"
+     "image/gif",
+     "image/webp"
     ],
     "output": [
      "text"
@@ -1643,20 +2331,21 @@
     }
    },
    "open_weights": false,
-   "knowledge": "2026-05",
-   "last_updated": "2026-09-21"
+   "knowledge": "2024-10-01",
+   "last_updated": "2025-08-07"
   },
-  "bytedance/seedance-2": {
-   "id": "bytedance/seedance-2",
-   "name": "Seedance 2",
-   "description": "ByteDance unified multimodal audio-video model supporting text, image, video and audio references, editing, extension and synchronized stereo sound.",
-   "type": "video",
-   "family": "seed",
-   "canonical_id": "bytedance-seed/seedance-2.0",
-   "release_date": "2026-02-12",
+  "openai/gpt-5-mini": {
+   "id": "openai/gpt-5-mini",
+   "name": "GPT-5 Mini",
+   "description": "Small GPT-5 for responsive agents, coding help, and everyday automation",
+   "type": "chat",
+   "family": "gpt-mini",
+   "canonical_id": "openai/gpt-5-mini",
+   "release_date": "2025-08-07",
    "limit": {
-    "context": 4096,
-    "output": 0
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
    },
    "capabilities": {
     "temperature": false,
@@ -1664,105 +2353,60 @@
     "top_p": false,
     "system_updates": false,
     "effort_updates": false,
+    "service_tier": [
+     "flex",
+     "priority"
+    ],
     "tools": {
-     "supported": false
+     "supported": true
     },
     "reasoning": {
-     "supported": false
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
     }
    },
    "cost": {
-    "video": {
+    "text": {
+     "input": {
+      "price": 0.25,
+      "cache": {
+       "read": 0.025
+      }
+     },
      "output": {
-      "unit": "second",
-      "price": 0.18,
-      "overrides": [
-       {
-        "when": {
-         "resolution": {
-          "equals": "480p"
-         }
-        },
-        "price": 0.084
-       },
-       {
-        "when": {
-         "resolution": {
-          "equals": "1080p"
-         }
-        },
-        "price": 0.438
-       }
-      ]
+      "price": 2
      }
-    }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": 0.5
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": 1.8
+     }
+    ]
    },
    "modalities": {
     "input": [
      "text",
      "image/jpeg",
      "image/png",
-     "image/webp",
-     "image/bmp",
-     "image/tiff",
      "image/gif",
-     "image/heic",
-     "image/heif"
-    ],
-    "output": [
-     "video/mp4"
-    ]
-   },
-   "api": {
-    "videos": {
-     "base_url": "https://go.fastrouter.ai/api/v1",
-     "sdk": {}
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-10-04"
-  },
-  "sarvam/sarvam-105b": {
-   "id": "sarvam/sarvam-105b",
-   "name": "Sarvam 105B",
-   "description": "Flagship Indian-language reasoning model for enterprise multilingual applications",
-   "type": "chat",
-   "family": "sarvam",
-   "canonical_id": "sarvam/sarvam-105b",
-   "release_date": "2026-02-18",
-   "limit": {
-    "context": 131072,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.04,
-      "cache": {
-       "read": 0.025
-      }
-     },
-     "output": {
-      "price": 0.16
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
+     "image/webp"
     ],
     "output": [
      "text"
@@ -1782,8 +2426,9 @@
      }
     }
    },
-   "open_weights": true,
-   "last_updated": "2026-02-18"
+   "open_weights": false,
+   "knowledge": "2024-10-01",
+   "last_updated": "2025-08-07"
   },
   "openai/gpt-realtime-1.5": {
    "id": "openai/gpt-realtime-1.5",
@@ -1872,142 +2517,13 @@
    "knowledge": "2024-09-30",
    "last_updated": "2026-02-23"
   },
-  "openai/gpt-oss-120b": {
-   "id": "openai/gpt-oss-120b",
-   "name": "GPT OSS 120B",
-   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
+  "openai/gpt-5.5": {
+   "id": "openai/gpt-5.5",
+   "name": "GPT-5.5",
+   "description": "Default frontier GPT for coding, computer use, research, and knowledge work",
    "type": "chat",
-   "family": "gpt-oss",
-   "canonical_id": "openai/gpt-oss-120b",
-   "release_date": "2025-08-05",
-   "limit": {
-    "context": 131072,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.09
-     },
-     "output": {
-      "price": 0.36
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://go.fastrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2024-06",
-   "last_updated": "2025-08-05"
-  },
-  "openai/gpt-image-2": {
-   "id": "openai/gpt-image-2",
-   "name": "GPT Image 2",
-   "description": "Image model for prompt-driven generation, editing, and visual design workflows",
-   "type": "image",
-   "family": "gpt-image",
-   "canonical_id": "openai/gpt-image-2",
-   "release_date": "2026-04-21",
-   "limit": {
-    "context": 128000,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "image": {
-     "input": {
-      "price": 8,
-      "cache": {
-       "read": 2
-      }
-     },
-     "output": {
-      "price": 30
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/webp"
-    ],
-    "output": [
-     "image/png",
-     "image/jpeg",
-     "image/webp"
-    ]
-   },
-   "api": {
-    "images": {
-     "base_url": "https://go.fastrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/images"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-04-21"
-  },
-  "openai/gpt-5.5-pro": {
-   "id": "openai/gpt-5.5-pro",
-   "name": "GPT-5.5 Pro",
-   "description": "Highest-accuracy GPT-5.5 tier for slower, precision-heavy reasoning and coding",
-   "type": "chat",
-   "family": "gpt-pro",
-   "canonical_id": "openai/gpt-5.5-pro",
+   "family": "gpt",
+   "canonical_id": "openai/gpt-5.5",
    "release_date": "2026-04-23",
    "limit": {
     "context": 1050000,
@@ -2015,14 +2531,15 @@
     "output": 128000
    },
    "capabilities": {
-    "temperature": false,
+    "temperature": true,
     "top_k": false,
-    "top_p": false,
+    "top_p": true,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "service_tier": [
-     "flex"
+     "flex",
+     "fast"
     ],
     "tools": {
      "supported": true
@@ -2039,6 +2556,25 @@
    "cost": {
     "text": {
      "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 10,
+        "cache": {
+         "read": 1
+        }
+       }
+      ]
+     },
+     "output": {
       "price": 30,
       "overrides": [
        {
@@ -2047,20 +2583,7 @@
           "gt": 272000
          }
         },
-        "price": 60
-       }
-      ]
-     },
-     "output": {
-      "price": 180,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 270
+        "price": 45
        }
       ]
      }
@@ -2073,6 +2596,14 @@
        }
       },
       "factor": 0.5
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "fast"
+       }
+      },
+      "factor": 2.5
      }
     ]
    },
@@ -2206,18 +2737,142 @@
    "knowledge": "2025-08-31",
    "last_updated": "2025-12-11"
   },
-  "openai/gpt-5-nano": {
-   "id": "openai/gpt-5-nano",
-   "name": "GPT-5 Nano",
-   "description": "Tiny GPT-5 lane for routing, extraction, classification, and bulk jobs",
+  "openai/gpt-6-luna": {
+   "id": "openai/gpt-6-luna",
+   "name": "GPT-6 Luna",
+   "description": "OpenAI's most efficient model for focused, high-volume tasks",
    "type": "chat",
-   "family": "gpt-nano",
-   "canonical_id": "openai/gpt-5-nano",
-   "release_date": "2025-08-07",
+   "family": "gpt-luna",
+   "canonical_id": "openai/gpt-6-luna",
+   "release_date": "2026-09-22",
    "limit": {
     "context": 400000,
-    "input": 272000,
     "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "service_tier": [
+     "flex",
+     "fast"
+    ],
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1,
+      "cache": {
+       "read": 0.01,
+       "write": 0.125
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 0.2,
+        "cache": {
+         "read": 0.02,
+         "write": 0.25
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 0.5,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 0.75
+       }
+      ]
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": 0.5
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "fast"
+       }
+      },
+      "factor": 2
+     }
+    ]
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://go.fastrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-05-18",
+   "last_updated": "2026-09-22"
+  },
+  "openai/gpt-image-2": {
+   "id": "openai/gpt-image-2",
+   "name": "GPT Image 2",
+   "description": "Image model for prompt-driven generation, editing, and visual design workflows",
+   "type": "image",
+   "family": "gpt-image",
+   "canonical_id": "openai/gpt-image-2",
+   "release_date": "2026-04-21",
+   "limit": {
+    "context": 128000,
+    "output": 0
    },
    "capabilities": {
     "temperature": false,
@@ -2225,8 +2880,74 @@
     "top_p": false,
     "system_updates": false,
     "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "image": {
+     "input": {
+      "price": 8,
+      "cache": {
+       "read": 2
+      }
+     },
+     "output": {
+      "price": 30
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp"
+    ],
+    "output": [
+     "image/png",
+     "image/jpeg",
+     "image/webp"
+    ]
+   },
+   "api": {
+    "images": {
+     "base_url": "https://go.fastrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/images"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-04-21"
+  },
+  "openai/gpt-5.4-mini": {
+   "id": "openai/gpt-5.4-mini",
+   "name": "GPT-5.4 mini",
+   "description": "Strong small GPT for coding subagents, quick tool use, and high-volume work",
+   "type": "chat",
+   "family": "gpt-mini",
+   "canonical_id": "openai/gpt-5.4-mini",
+   "release_date": "2026-03-17",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "service_tier": [
-     "flex"
+     "flex",
+     "priority"
     ],
     "tools": {
      "supported": true
@@ -2243,13 +2964,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.05,
+      "price": 0.75,
       "cache": {
-       "read": 0.005
+       "read": 0.075
       }
      },
      "output": {
-      "price": 0.4
+      "price": 4.5
      }
     },
     "multipliers": [
@@ -2260,6 +2981,14 @@
        }
       },
       "factor": 0.5
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": 2
      }
     ]
    },
@@ -2290,24 +3019,113 @@
     }
    },
    "open_weights": false,
-   "knowledge": "2024-10-01",
-   "last_updated": "2025-08-07"
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-03-17"
   },
-  "openai/gpt-4.1": {
-   "id": "openai/gpt-4.1",
-   "name": "GPT-4.1",
-   "description": "Long-lived GPT workhorse for coding, instruction following, and production apps",
+  "openai/gpt-5.3-codex": {
+   "id": "openai/gpt-5.3-codex",
+   "name": "GPT-5.3 Codex",
+   "description": "Coding-optimized GPT model for repository edits, reviews, and agentic software work",
    "type": "chat",
-   "family": "gpt",
-   "canonical_id": "openai/gpt-4.1",
-   "release_date": "2025-04-14",
+   "family": "gpt-codex",
+   "canonical_id": "openai/gpt-5.3-codex",
+   "release_date": "2026-02-05",
    "limit": {
-    "context": 1047576,
-    "output": 32768
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
    },
    "capabilities": {
     "temperature": true,
     "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "service_tier": [
+     "fast"
+    ],
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.75,
+      "cache": {
+       "read": 0.175
+      }
+     },
+     "output": {
+      "price": 14
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "fast"
+       }
+      },
+      "factor": 2
+     }
+    ]
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://go.fastrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-02-05"
+  },
+  "openai/gpt-oss-120b": {
+   "id": "openai/gpt-oss-120b",
+   "name": "GPT OSS 120B",
+   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
+   "type": "chat",
+   "family": "gpt-oss",
+   "canonical_id": "openai/gpt-oss-120b",
+   "release_date": "2025-08-05",
+   "limit": {
+    "context": 131072,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
     "top_p": true,
     "system_updates": false,
     "effort_updates": false,
@@ -2315,29 +3133,27 @@
      "supported": true
     },
     "reasoning": {
-     "supported": false
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 2,
-      "cache": {
-       "read": 0.5
-      }
+      "price": 0.09
      },
      "output": {
-      "price": 8
+      "price": 0.36
      }
     }
    },
    "modalities": {
     "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
+     "text"
     ],
     "output": [
      "text"
@@ -2357,9 +3173,9 @@
      }
     }
    },
-   "open_weights": false,
-   "knowledge": "2024-04",
-   "last_updated": "2025-04-14"
+   "open_weights": true,
+   "knowledge": "2024-06",
+   "last_updated": "2025-08-05"
   },
   "openai/gpt-5.4-nano": {
    "id": "openai/gpt-5.4-nano",
@@ -2574,13 +3390,13 @@
    "knowledge": "2026-04-20",
    "last_updated": "2026-09-22"
   },
-  "openai/gpt-5-mini": {
-   "id": "openai/gpt-5-mini",
-   "name": "GPT-5 Mini",
-   "description": "Small GPT-5 for responsive agents, coding help, and everyday automation",
+  "openai/gpt-5": {
+   "id": "openai/gpt-5",
+   "name": "GPT-5",
+   "description": "Original GPT-5 workhorse for reasoning, coding, writing, and tool workflows",
    "type": "chat",
-   "family": "gpt-mini",
-   "canonical_id": "openai/gpt-5-mini",
+   "family": "gpt",
+   "canonical_id": "openai/gpt-5",
    "release_date": "2025-08-07",
    "limit": {
     "context": 400000,
@@ -2593,52 +3409,25 @@
     "top_p": false,
     "system_updates": false,
     "effort_updates": false,
-    "service_tier": [
-     "flex",
-     "priority"
-    ],
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
+     "supported": true
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.25,
+      "price": 1.25,
       "cache": {
-       "read": 0.025
+       "read": 0.125
       }
      },
      "output": {
-      "price": 2
+      "price": 10
      }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "service_tier": {
-        "equals": "flex"
-       }
-      },
-      "factor": 0.5
-     },
-     {
-      "when": {
-       "service_tier": {
-        "equals": "priority"
-       }
-      },
-      "factor": 1.8
-     }
-    ]
+    }
    },
    "modalities": {
     "input": [
@@ -2670,161 +3459,43 @@
    "knowledge": "2024-10-01",
    "last_updated": "2025-08-07"
   },
-  "openai/gpt-5.3-codex": {
-   "id": "openai/gpt-5.3-codex",
-   "name": "GPT-5.3 Codex",
-   "description": "Coding-optimized GPT model for repository edits, reviews, and agentic software work",
+  "openai/gpt-4.1": {
+   "id": "openai/gpt-4.1",
+   "name": "GPT-4.1",
+   "description": "Long-lived GPT workhorse for coding, instruction following, and production apps",
    "type": "chat",
-   "family": "gpt-codex",
-   "canonical_id": "openai/gpt-5.3-codex",
-   "release_date": "2026-02-05",
+   "family": "gpt",
+   "canonical_id": "openai/gpt-4.1",
+   "release_date": "2025-04-14",
    "limit": {
-    "context": 400000,
-    "input": 272000,
-    "output": 128000
+    "context": 1047576,
+    "output": 32768
    },
    "capabilities": {
     "temperature": true,
     "top_k": false,
     "top_p": true,
-    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
-    "service_tier": [
-     "fast"
-    ],
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
+     "supported": false
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 1.75,
+      "price": 2,
       "cache": {
-       "read": 0.175
+       "read": 0.5
       }
      },
      "output": {
-      "price": 14
-     }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "service_tier": {
-        "equals": "fast"
-       }
-      },
-      "factor": 2
-     }
-    ]
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://go.fastrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
+      "price": 8
      }
     }
-   },
-   "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2026-02-05"
-  },
-  "openai/gpt-5.4-mini": {
-   "id": "openai/gpt-5.4-mini",
-   "name": "GPT-5.4 mini",
-   "description": "Strong small GPT for coding subagents, quick tool use, and high-volume work",
-   "type": "chat",
-   "family": "gpt-mini",
-   "canonical_id": "openai/gpt-5.4-mini",
-   "release_date": "2026-03-17",
-   "limit": {
-    "context": 400000,
-    "input": 272000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "service_tier": [
-     "flex",
-     "priority"
-    ],
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.75,
-      "cache": {
-       "read": 0.075
-      }
-     },
-     "output": {
-      "price": 4.5
-     }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "service_tier": {
-        "equals": "flex"
-       }
-      },
-      "factor": 0.5
-     },
-     {
-      "when": {
-       "service_tier": {
-        "equals": "priority"
-       }
-      },
-      "factor": 2
-     }
-    ]
    },
    "modalities": {
     "input": [
@@ -2853,16 +3524,16 @@
     }
    },
    "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2026-03-17"
+   "knowledge": "2024-04",
+   "last_updated": "2025-04-14"
   },
-  "openai/gpt-5.5": {
-   "id": "openai/gpt-5.5",
-   "name": "GPT-5.5",
-   "description": "Default frontier GPT for coding, computer use, research, and knowledge work",
+  "openai/gpt-5.5-pro": {
+   "id": "openai/gpt-5.5-pro",
+   "name": "GPT-5.5 Pro",
+   "description": "Highest-accuracy GPT-5.5 tier for slower, precision-heavy reasoning and coding",
    "type": "chat",
-   "family": "gpt",
-   "canonical_id": "openai/gpt-5.5",
+   "family": "gpt-pro",
+   "canonical_id": "openai/gpt-5.5-pro",
    "release_date": "2026-04-23",
    "limit": {
     "context": 1050000,
@@ -2870,15 +3541,14 @@
     "output": 128000
    },
    "capabilities": {
-    "temperature": true,
+    "temperature": false,
     "top_k": false,
-    "top_p": true,
+    "top_p": false,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "service_tier": [
-     "flex",
-     "fast"
+     "flex"
     ],
     "tools": {
      "supported": true
@@ -2895,25 +3565,6 @@
    "cost": {
     "text": {
      "input": {
-      "price": 5,
-      "cache": {
-       "read": 0.5
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 10,
-        "cache": {
-         "read": 1
-        }
-       }
-      ]
-     },
-     "output": {
       "price": 30,
       "overrides": [
        {
@@ -2922,7 +3573,20 @@
           "gt": 272000
          }
         },
-        "price": 45
+        "price": 60
+       }
+      ]
+     },
+     "output": {
+      "price": 180,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 270
        }
       ]
      }
@@ -2935,14 +3599,6 @@
        }
       },
       "factor": 0.5
-     },
-     {
-      "when": {
-       "service_tier": {
-        "equals": "fast"
-       }
-      },
-      "factor": 2.5
      }
     ]
    },
@@ -2976,131 +3632,6 @@
    "open_weights": false,
    "knowledge": "2025-12-01",
    "last_updated": "2026-04-23"
-  },
-  "openai/gpt-6-luna": {
-   "id": "openai/gpt-6-luna",
-   "name": "GPT-6 Luna",
-   "description": "OpenAI's most efficient model for focused, high-volume tasks",
-   "type": "chat",
-   "family": "gpt-luna",
-   "canonical_id": "openai/gpt-6-luna",
-   "release_date": "2026-09-22",
-   "limit": {
-    "context": 400000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "service_tier": [
-     "flex",
-     "fast"
-    ],
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.1,
-      "cache": {
-       "read": 0.01,
-       "write": 0.125
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 0.2,
-        "cache": {
-         "read": 0.02,
-         "write": 0.25
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 0.5,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 0.75
-       }
-      ]
-     }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "service_tier": {
-        "equals": "flex"
-       }
-      },
-      "factor": 0.5
-     },
-     {
-      "when": {
-       "service_tier": {
-        "equals": "fast"
-       }
-      },
-      "factor": 2
-     }
-    ]
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://go.fastrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-05-18",
-   "last_updated": "2026-09-22"
   },
   "openai/gpt-oss-20b": {
    "id": "openai/gpt-oss-20b",
@@ -3171,111 +3702,48 @@
    "knowledge": "2024-06",
    "last_updated": "2025-08-05"
   },
-  "openai/gpt-5": {
-   "id": "openai/gpt-5",
-   "name": "GPT-5",
-   "description": "Original GPT-5 workhorse for reasoning, coding, writing, and tool workflows",
+  "deepseek/deepseek-v4-pro": {
+   "id": "deepseek/deepseek-v4-pro",
+   "name": "DeepSeek V4 Pro",
+   "description": "Open MoE flagship with million-token context for coding and long agent runs",
    "type": "chat",
-   "family": "gpt",
-   "canonical_id": "openai/gpt-5",
-   "release_date": "2025-08-07",
+   "family": "deepseek-thinking",
+   "canonical_id": "deepseek/deepseek-v4-pro",
+   "release_date": "2026-04-24",
    "limit": {
-    "context": 400000,
-    "input": 272000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.25,
-      "cache": {
-       "read": 0.125
-      }
-     },
-     "output": {
-      "price": 10
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://go.fastrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2024-10-01",
-   "last_updated": "2025-08-07"
-  },
-  "minimax/minimax-m2.7": {
-   "id": "minimax/minimax-m2.7",
-   "name": "MiniMax-M2.7",
-   "description": "Open MiniMax flagship for coding agents, office automation, and complex environments",
-   "type": "chat",
-   "family": "minimax",
-   "canonical_id": "minimax/MiniMax-M2.7",
-   "release_date": "2026-03-18",
-   "limit": {
-    "context": 204800,
-    "output": 131072
+    "context": 1000000,
+    "output": 384000
    },
    "capabilities": {
     "temperature": true,
-    "top_k": false,
+    "top_k": true,
     "top_p": true,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": true
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.3,
+      "price": 1.74,
       "cache": {
-       "read": 0.06,
-       "write": 0.375
+       "read": 0.145
       }
      },
      "output": {
-      "price": 1.2
+      "price": 3.48
      }
     }
    },
@@ -3302,23 +3770,24 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2026-03-18"
+   "knowledge": "2025-05",
+   "last_updated": "2026-04-24"
   },
-  "minimax/minimax-m2.7-highspeed": {
-   "id": "minimax/minimax-m2.7-highspeed",
-   "name": "MiniMax-M2.7-highspeed",
-   "description": "Low-latency M2.7 variant for interactive coding plans and agent loops",
+  "sarvam/sarvam-105b": {
+   "id": "sarvam/sarvam-105b",
+   "name": "Sarvam 105B",
+   "description": "Flagship Indian-language reasoning model for enterprise multilingual applications",
    "type": "chat",
-   "family": "minimax",
-   "canonical_id": "minimax/MiniMax-M2.7-highspeed",
-   "release_date": "2026-03-18",
+   "family": "sarvam",
+   "canonical_id": "sarvam/sarvam-105b",
+   "release_date": "2026-02-18",
    "limit": {
-    "context": 204800,
+    "context": 131072,
     "output": 131072
    },
    "capabilities": {
     "temperature": true,
-    "top_k": false,
+    "top_k": true,
     "top_p": true,
     "system_updates": false,
     "effort_updates": false,
@@ -3332,14 +3801,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.6,
+      "price": 0.04,
       "cache": {
-       "read": 0.06,
-       "write": 0.375
+       "read": 0.025
       }
      },
      "output": {
-      "price": 2.4
+      "price": 0.16
      }
     }
    },
@@ -3366,17 +3834,18 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2026-03-18"
+   "last_updated": "2026-02-18"
   },
-  "wanx/wan-v2-6": {
-   "id": "wanx/wan-v2-6",
-   "name": "Wan 2.6",
-   "description": "Video model for text- and image-to-video with audio input and synchronized sound",
+  "bytedance/seedance-2": {
+   "id": "bytedance/seedance-2",
+   "name": "Seedance 2",
+   "description": "ByteDance unified multimodal audio-video model supporting text, image, video and audio references, editing, extension and synchronized stereo sound.",
    "type": "video",
-   "canonical_id": "alibaba/wan2.6",
-   "release_date": "2025-12-03",
+   "family": "seed",
+   "canonical_id": "bytedance-seed/seedance-2.0",
+   "release_date": "2026-02-12",
    "limit": {
-    "context": 400000,
+    "context": 4096,
     "output": 0
    },
    "capabilities": {
@@ -3396,15 +3865,23 @@
     "video": {
      "output": {
       "unit": "second",
-      "price": 0.15,
+      "price": 0.18,
       "overrides": [
        {
         "when": {
          "resolution": {
-          "equals": "720p"
+          "equals": "480p"
          }
         },
-        "price": 0.1
+        "price": 0.084
+       },
+       {
+        "when": {
+         "resolution": {
+          "equals": "1080p"
+         }
+        },
+        "price": 0.438
        }
       ]
      }
@@ -3415,8 +3892,12 @@
      "text",
      "image/jpeg",
      "image/png",
+     "image/webp",
      "image/bmp",
-     "image/webp"
+     "image/tiff",
+     "image/gif",
+     "image/heic",
+     "image/heif"
     ],
     "output": [
      "video/mp4"
@@ -3429,563 +3910,7 @@
     }
    },
    "open_weights": false,
-   "last_updated": "2025-12-03"
-  },
-  "anthropic/claude-sonnet-4.6": {
-   "id": "anthropic/claude-sonnet-4.6",
-   "name": "Claude Sonnet 4.6",
-   "description": "Claude workhorse for coding agents, careful analysis, and production cost control",
-   "type": "chat",
-   "family": "claude-sonnet",
-   "canonical_id": "anthropic/claude-sonnet-4-6",
-   "release_date": "2026-02-17",
-   "limit": {
-    "context": 1000000,
-    "output": 64000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "budget": {
-      "min": 1024,
-      "max": 32000
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 3,
-      "cache": {
-       "read": 0.3,
-       "write": {
-        "5m": 3.75,
-        "1h": 6
-       }
-      }
-     },
-     "output": {
-      "price": 15
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://go.fastrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2026-03-13"
-  },
-  "anthropic/claude-opus-4.8": {
-   "id": "anthropic/claude-opus-4.8",
-   "name": "Claude Opus 4.8",
-   "description": "Top Claude Opus tier for the hardest reasoning, coding, and long-horizon agents",
-   "type": "chat",
-   "family": "claude-opus",
-   "canonical_id": "anthropic/claude-opus-4-8",
-   "release_date": "2026-05-28",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 5,
-      "cache": {
-       "read": 0.5,
-       "write": {
-        "5m": 6.25,
-        "1h": 10
-       }
-      }
-     },
-     "output": {
-      "price": 25
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://go.fastrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-01",
-   "last_updated": "2026-05-28"
-  },
-  "anthropic/claude-fable-5": {
-   "id": "anthropic/claude-fable-5",
-   "name": "Claude Fable 5",
-   "description": "Claude model for creative writing, analysis, and controlled agent workflows",
-   "type": "chat",
-   "family": "claude-fable",
-   "canonical_id": "anthropic/claude-fable-5",
-   "release_date": "2026-06-09",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 10,
-      "cache": {
-       "read": 1,
-       "write": {
-        "5m": 12.5,
-        "1h": 20
-       }
-      }
-     },
-     "output": {
-      "price": 50
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://go.fastrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-01-31",
-   "last_updated": "2026-06-09"
-  },
-  "anthropic/claude-opus-4.1": {
-   "id": "anthropic/claude-opus-4.1",
-   "name": "Claude Opus 4.1",
-   "description": "Flagship Claude model for deep reasoning, coding, and long-horizon agents",
-   "type": "chat",
-   "family": "claude-opus",
-   "canonical_id": "anthropic/claude-opus-4-1-20250805",
-   "release_date": "2025-08-05",
-   "limit": {
-    "context": 200000,
-    "output": 32000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "budget": {
-      "min": 1024,
-      "max": 32000
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 15,
-      "cache": {
-       "read": 1.5,
-       "write": {
-        "5m": 18.75,
-        "1h": 30
-       }
-      }
-     },
-     "output": {
-      "price": 75
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://go.fastrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-03-31",
-   "last_updated": "2025-08-05"
-  },
-  "anthropic/claude-opus-5.5": {
-   "id": "anthropic/claude-opus-5.5",
-   "name": "Claude Opus 5.5",
-   "description": "Claude model for long-running agentic coding and knowledge work",
-   "type": "chat",
-   "family": "claude-opus",
-   "canonical_id": "anthropic/claude-opus-5-5",
-   "release_date": "2026-09-22",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 4,
-      "cache": {
-       "read": 0.2,
-       "write": {
-        "5m": 5,
-        "1h": 8
-       }
-      }
-     },
-     "output": {
-      "price": 20
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://go.fastrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-06",
-   "last_updated": "2026-09-22"
-  },
-  "anthropic/claude-opus-5": {
-   "id": "anthropic/claude-opus-5",
-   "name": "Claude Opus 5",
-   "description": "Strongest Claude Opus model for coding, agents, and professional work",
-   "type": "chat",
-   "family": "claude-opus",
-   "canonical_id": "anthropic/claude-opus-5",
-   "release_date": "2026-07-24",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 5,
-      "cache": {
-       "read": 0.5,
-       "write": {
-        "5m": 6.25,
-        "1h": 10
-       }
-      }
-     },
-     "output": {
-      "price": 25
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://go.fastrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-05",
-   "last_updated": "2026-07-24"
-  },
-  "z-ai/glm-5.3-flash": {
-   "id": "z-ai/glm-5.3-flash",
-   "name": "GLM-5.3-Flash",
-   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
-   "type": "chat",
-   "family": "glm-flash",
-   "canonical_id": "zhipuai/glm-5.3-flash",
-   "release_date": "2026-08-26",
-   "limit": {
-    "context": 1000000,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.075,
-      "cache": {
-       "read": 0.015
-      }
-     },
-     "output": {
-      "price": 0.25
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "video/mp4",
-     "video/x-matroska",
-     "video/quicktime",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://go.fastrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-08-26"
+   "last_updated": "2026-10-04"
   },
   "z-ai/glm-5": {
    "id": "z-ai/glm-5",
@@ -4118,6 +4043,81 @@
    },
    "open_weights": true,
    "last_updated": "2026-04-07"
+  },
+  "z-ai/glm-5.3-flash": {
+   "id": "z-ai/glm-5.3-flash",
+   "name": "GLM-5.3-Flash",
+   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
+   "type": "chat",
+   "family": "glm-flash",
+   "canonical_id": "zhipuai/glm-5.3-flash",
+   "release_date": "2026-08-26",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.075,
+      "cache": {
+       "read": 0.015
+      }
+     },
+     "output": {
+      "price": 0.25
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "video/mp4",
+     "video/x-matroska",
+     "video/quicktime",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://go.fastrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-26"
   }
  }
 }

@@ -121,17 +121,18 @@
    "open_weights": true,
    "last_updated": "2026-08-14"
   },
-  "glm-5.3": {
-   "id": "glm-5.3",
-   "name": "GLM-5.3",
-   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
+  "glm-4.6v": {
+   "id": "glm-4.6v",
+   "name": "GLM-4.6V",
+   "description": "GLM vision model for visual reasoning, documents, and multimodal agents",
    "type": "chat",
    "family": "glm",
-   "canonical_id": "zhipuai/glm-5.3",
-   "release_date": "2026-08-14",
+   "canonical_id": "zhipuai/glm-4.6v",
+   "status": "deprecated",
+   "release_date": "2025-12-08",
    "limit": {
-    "context": 1000000,
-    "output": 131072
+    "context": 128000,
+    "output": 32768
    },
    "capabilities": {
     "cache": {
@@ -140,7 +141,6 @@
     "temperature": true,
     "top_k": false,
     "top_p": true,
-    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -148,14 +148,10 @@
     },
     "reasoning": {
      "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ],
+     "toggle": true,
      "default": {
-      "type": "effort",
-      "value": "max"
+      "type": "toggle",
+      "value": true
      }
     }
    },
@@ -175,7 +171,12 @@
    },
    "modalities": {
     "input": [
-     "text"
+     "text",
+     "image/jpeg",
+     "image/png",
+     "video/mp4",
+     "video/x-matroska",
+     "video/quicktime"
     ],
     "output": [
      "text"
@@ -200,41 +201,11 @@
       "max_tokens_field": "max_tokens",
       "reasoning_field": "reasoning_content"
      }
-    },
-    "messages": {
-     "base_url": "https://open.bigmodel.cn/api/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://open.bigmodel.cn/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
     }
    },
    "open_weights": true,
-   "last_updated": "2026-08-14"
+   "knowledge": "2025-04",
+   "last_updated": "2025-12-08"
   },
   "glm-5.3-flash": {
    "id": "glm-5.3-flash",
@@ -357,18 +328,17 @@
    "open_weights": true,
    "last_updated": "2026-08-26"
   },
-  "glm-4.6v": {
-   "id": "glm-4.6v",
-   "name": "GLM-4.6V",
-   "description": "GLM vision model for visual reasoning, documents, and multimodal agents",
+  "glm-5.3": {
+   "id": "glm-5.3",
+   "name": "GLM-5.3",
+   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
    "type": "chat",
    "family": "glm",
-   "canonical_id": "zhipuai/glm-4.6v",
-   "status": "deprecated",
-   "release_date": "2025-12-08",
+   "canonical_id": "zhipuai/glm-5.3",
+   "release_date": "2026-08-14",
    "limit": {
-    "context": 128000,
-    "output": 32768
+    "context": 1000000,
+    "output": 131072
    },
    "capabilities": {
     "cache": {
@@ -377,6 +347,7 @@
     "temperature": true,
     "top_k": false,
     "top_p": true,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -384,10 +355,14 @@
     },
     "reasoning": {
      "supported": true,
-     "toggle": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ],
      "default": {
-      "type": "toggle",
-      "value": true
+      "type": "effort",
+      "value": "max"
      }
     }
    },
@@ -407,12 +382,7 @@
    },
    "modalities": {
     "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "video/mp4",
-     "video/x-matroska",
-     "video/quicktime"
+     "text"
     ],
     "output": [
      "text"
@@ -437,11 +407,41 @@
       "max_tokens_field": "max_tokens",
       "reasoning_field": "reasoning_content"
      }
+    },
+    "messages": {
+     "base_url": "https://open.bigmodel.cn/api/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://open.bigmodel.cn/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
     }
    },
    "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-12-08"
+   "last_updated": "2026-08-14"
   }
  }
 }

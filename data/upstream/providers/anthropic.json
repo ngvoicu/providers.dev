@@ -6,138 +6,16 @@
   "ANTHROPIC_API_KEY"
  ],
  "models": {
-  "claude-haiku-4-5": {
-   "id": "claude-haiku-4-5",
-   "name": "Claude Haiku 4.5 (latest)",
-   "description": "Fast Claude lane for lightweight agents, office tasks, and responsive chat",
-   "type": "chat",
-   "family": "claude-haiku",
-   "canonical_id": "anthropic/claude-haiku-4-5",
-   "release_date": "2025-10-15",
-   "limit": {
-    "context": 200000,
-    "output": 64000
-   },
-   "capabilities": {
-    "cache": {
-     "explicit": {
-      "ttl": [
-       "5m",
-       "1h"
-      ],
-      "min_tokens": 4096,
-      "max_breakpoints": 4,
-      "targets": [
-       "tools",
-       "system",
-       "messages"
-      ]
-     }
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "budget": {
-      "min": 1024
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1,
-      "cache": {
-       "read": 0.1,
-       "write": {
-        "5m": 1.25,
-        "1h": 2
-       }
-      }
-     },
-     "output": {
-      "price": 5
-     }
-    },
-    "web_search": {
-     "price": 10
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "messages": {
-     "base_url": "https://api.anthropic.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "strict": true,
-       "updates": false,
-       "search": true
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "https://api.anthropic.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-02-28",
-   "last_updated": "2025-10-15"
-  },
-  "claude-opus-4-5": {
-   "id": "claude-opus-4-5",
-   "name": "Claude Opus 4.5 (latest)",
-   "description": "Flagship Claude model for deep reasoning, coding, and long-horizon agents",
+  "claude-opus-4-7": {
+   "id": "claude-opus-4-7",
+   "name": "Claude Opus 4.7",
+   "description": "Stronger Opus tier for advanced software work and high-stakes reasoning",
    "type": "chat",
    "family": "claude-opus",
-   "canonical_id": "anthropic/claude-opus-4-5",
-   "release_date": "2025-11-24",
+   "release_date": "2026-04-14",
    "limit": {
-    "context": 200000,
-    "output": 64000
+    "context": 1000000,
+    "output": 128000
    },
    "capabilities": {
     "cache": {
@@ -146,7 +24,7 @@
        "5m",
        "1h"
       ],
-      "min_tokens": 4096,
+      "min_tokens": 2048,
       "max_breakpoints": 4,
       "targets": [
        "tools",
@@ -155,9 +33,7 @@
       ]
      }
     },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
+    "temperature": false,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -169,11 +45,10 @@
      "effort": [
       "low",
       "medium",
-      "high"
-     ],
-     "budget": {
-      "min": 1024
-     }
+      "high",
+      "xhigh",
+      "max"
+     ]
     }
    },
    "cost": {
@@ -192,6 +67,18 @@
       "price": 25
      }
     },
+    "multipliers": [
+     {
+      "when": {
+       "region": {
+        "equals": "us"
+       }
+      },
+      "factor": {
+       "text": 1.1
+      }
+     }
+    ],
     "web_search": {
      "price": 10
     }
@@ -250,16 +137,314 @@
     }
    },
    "open_weights": false,
-   "knowledge": "2025-05",
-   "last_updated": "2025-11-24"
+   "knowledge": "2026-01-31",
+   "last_updated": "2026-04-16"
   },
-  "claude-sonnet-4-5": {
-   "id": "claude-sonnet-4-5",
-   "name": "Claude Sonnet 4.5 (latest)",
+  "claude-fable-5-1": {
+   "id": "claude-fable-5-1",
+   "name": "Claude Fable 5.1",
+   "description": "Claude model for demanding reasoning and long-horizon agentic work",
+   "type": "chat",
+   "family": "claude-fable",
+   "canonical_id": "anthropic/claude-fable-5-1",
+   "release_date": "2026-09-01",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "explicit": {
+      "ttl": [
+       "5m",
+       "1h"
+      ],
+      "min_tokens": 512,
+      "max_breakpoints": 4,
+      "targets": [
+       "tools",
+       "system",
+       "messages"
+      ]
+     }
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 10,
+      "cache": {
+       "read": 0.25,
+       "write": {
+        "5m": 12.5,
+        "1h": 20
+       }
+      }
+     },
+     "output": {
+      "price": 50
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "region": {
+        "equals": "us"
+       }
+      },
+      "factor": {
+       "text": 1.1
+      }
+     }
+    ],
+    "web_search": {
+     "price": 10
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://api.anthropic.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic"
+     },
+     "capabilities": {
+      "system_updates": true,
+      "effort_updates": true,
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "strict": true,
+       "updates": true,
+       "search": true
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "https://api.anthropic.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-06",
+   "last_updated": "2026-09-01"
+  },
+  "claude-opus-5": {
+   "id": "claude-opus-5",
+   "name": "Claude Opus 5",
+   "description": "Strongest Claude Opus model for coding, agents, and professional work",
+   "type": "chat",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-5",
+   "release_date": "2026-07-24",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "explicit": {
+      "ttl": [
+       "5m",
+       "1h"
+      ],
+      "min_tokens": 512,
+      "max_breakpoints": 4,
+      "targets": [
+       "tools",
+       "system",
+       "messages"
+      ]
+     }
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "service_tier": [
+     "fast"
+    ],
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5,
+       "write": {
+        "5m": 6.25,
+        "1h": 10
+       }
+      }
+     },
+     "output": {
+      "price": 25
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "fast"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     },
+     {
+      "when": {
+       "region": {
+        "equals": "us"
+       }
+      },
+      "factor": {
+       "text": 1.1
+      }
+     }
+    ],
+    "web_search": {
+     "price": 10
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://api.anthropic.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic"
+     },
+     "capabilities": {
+      "system_updates": true,
+      "effort_updates": true,
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "strict": true,
+       "updates": true,
+       "search": true
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "https://api.anthropic.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-05",
+   "last_updated": "2026-07-24",
+   "experimental": {
+    "modes": {
+     "fast": {
+      "body": {
+       "speed": "fast"
+      },
+      "headers": {
+       "anthropic-beta": "fast-mode-2026-02-01"
+      }
+     }
+    }
+   }
+  },
+  "claude-sonnet-4-5-20250929": {
+   "id": "claude-sonnet-4-5-20250929",
+   "name": "Claude Sonnet 4.5",
    "description": "Balanced Claude model for coding, analysis, agent workflows, and cost control",
    "type": "chat",
    "family": "claude-sonnet",
-   "canonical_id": "anthropic/claude-sonnet-4-5",
    "status": "deprecated",
    "release_date": "2025-09-29",
    "limit": {
@@ -283,8 +468,6 @@
      }
     },
     "temperature": true,
-    "top_k": true,
-    "top_p": true,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -532,6 +715,264 @@
     }
    }
   },
+  "claude-sonnet-4-6": {
+   "id": "claude-sonnet-4-6",
+   "name": "Claude Sonnet 4.6",
+   "description": "Claude workhorse for coding agents, careful analysis, and production cost control",
+   "type": "chat",
+   "family": "claude-sonnet",
+   "release_date": "2026-02-17",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "explicit": {
+      "ttl": [
+       "5m",
+       "1h"
+      ],
+      "min_tokens": 1024,
+      "max_breakpoints": 4,
+      "targets": [
+       "tools",
+       "system",
+       "messages"
+      ]
+     }
+    },
+    "temperature": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "max"
+     ],
+     "budget": {
+      "min": 1024
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 3,
+      "cache": {
+       "read": 0.3,
+       "write": {
+        "5m": 3.75,
+        "1h": 6
+       }
+      }
+     },
+     "output": {
+      "price": 15
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "region": {
+        "equals": "us"
+       }
+      },
+      "factor": {
+       "text": 1.1
+      }
+     }
+    ],
+    "web_search": {
+     "price": 10
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://api.anthropic.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "strict": true,
+       "updates": false,
+       "search": true
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "https://api.anthropic.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-03-13"
+  },
+  "claude-sonnet-4-5": {
+   "id": "claude-sonnet-4-5",
+   "name": "Claude Sonnet 4.5 (latest)",
+   "description": "Balanced Claude model for coding, analysis, agent workflows, and cost control",
+   "type": "chat",
+   "family": "claude-sonnet",
+   "canonical_id": "anthropic/claude-sonnet-4-5",
+   "status": "deprecated",
+   "release_date": "2025-09-29",
+   "limit": {
+    "context": 200000,
+    "output": 64000
+   },
+   "capabilities": {
+    "cache": {
+     "explicit": {
+      "ttl": [
+       "5m",
+       "1h"
+      ],
+      "min_tokens": 1024,
+      "max_breakpoints": 4,
+      "targets": [
+       "tools",
+       "system",
+       "messages"
+      ]
+     }
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "budget": {
+      "min": 1024
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 3,
+      "cache": {
+       "read": 0.3,
+       "write": {
+        "5m": 3.75,
+        "1h": 6
+       }
+      }
+     },
+     "output": {
+      "price": 15
+     }
+    },
+    "web_search": {
+     "price": 10
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://api.anthropic.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "strict": true,
+       "updates": false,
+       "search": true
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "https://api.anthropic.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-07-31",
+   "last_updated": "2025-09-29"
+  },
   "claude-haiku-5-5": {
    "id": "claude-haiku-5-5",
    "name": "Claude Haiku 5.5",
@@ -699,12 +1140,274 @@
    "knowledge": "2026-06",
    "last_updated": "2026-10-07"
   },
-  "claude-haiku-4-5-20251001": {
-   "id": "claude-haiku-4-5-20251001",
-   "name": "Claude Haiku 4.5",
-   "description": "Fast Claude model for responsive assistance, classification, and lightweight agents",
+  "claude-opus-4-5": {
+   "id": "claude-opus-4-5",
+   "name": "Claude Opus 4.5 (latest)",
+   "description": "Flagship Claude model for deep reasoning, coding, and long-horizon agents",
+   "type": "chat",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-4-5",
+   "release_date": "2025-11-24",
+   "limit": {
+    "context": 200000,
+    "output": 64000
+   },
+   "capabilities": {
+    "cache": {
+     "explicit": {
+      "ttl": [
+       "5m",
+       "1h"
+      ],
+      "min_tokens": 4096,
+      "max_breakpoints": 4,
+      "targets": [
+       "tools",
+       "system",
+       "messages"
+      ]
+     }
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ],
+     "budget": {
+      "min": 1024
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5,
+       "write": {
+        "5m": 6.25,
+        "1h": 10
+       }
+      }
+     },
+     "output": {
+      "price": 25
+     }
+    },
+    "web_search": {
+     "price": 10
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://api.anthropic.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "strict": true,
+       "updates": false,
+       "search": true
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "https://api.anthropic.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-05",
+   "last_updated": "2025-11-24"
+  },
+  "claude-sonnet-5-5": {
+   "id": "claude-sonnet-5-5",
+   "name": "Claude Sonnet 5.5",
+   "description": "Fast Claude model for everyday coding, agents, and knowledge work",
+   "type": "chat",
+   "family": "claude-sonnet",
+   "canonical_id": "anthropic/claude-sonnet-5-5",
+   "release_date": "2026-09-28",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "explicit": {
+      "ttl": [
+       "5m",
+       "1h"
+      ],
+      "min_tokens": 512,
+      "max_breakpoints": 4,
+      "targets": [
+       "tools",
+       "system",
+       "messages"
+      ]
+     }
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.1,
+       "write": {
+        "5m": 2.5,
+        "1h": 4
+       }
+      }
+     },
+     "output": {
+      "price": 10
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "region": {
+        "equals": "us"
+       }
+      },
+      "factor": {
+       "text": 1.1
+      }
+     }
+    ],
+    "web_search": {
+     "price": 10
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://api.anthropic.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic"
+     },
+     "capabilities": {
+      "system_updates": true,
+      "effort_updates": true,
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "strict": true,
+       "updates": true,
+       "search": true
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "https://api.anthropic.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-06",
+   "last_updated": "2026-09-28"
+  },
+  "claude-haiku-4-5": {
+   "id": "claude-haiku-4-5",
+   "name": "Claude Haiku 4.5 (latest)",
+   "description": "Fast Claude lane for lightweight agents, office tasks, and responsive chat",
    "type": "chat",
    "family": "claude-haiku",
+   "canonical_id": "anthropic/claude-haiku-4-5",
    "release_date": "2025-10-15",
    "limit": {
     "context": 200000,
@@ -727,6 +1430,8 @@
      }
     },
     "temperature": true,
+    "top_k": true,
+    "top_p": true,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -816,531 +1521,6 @@
    "open_weights": false,
    "knowledge": "2025-02-28",
    "last_updated": "2025-10-15"
-  },
-  "claude-fable-5": {
-   "id": "claude-fable-5",
-   "name": "Claude Fable 5",
-   "description": "Claude model for creative writing, analysis, and controlled agent workflows",
-   "type": "chat",
-   "family": "claude-fable",
-   "release_date": "2026-06-07",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "explicit": {
-      "ttl": [
-       "5m",
-       "1h"
-      ],
-      "min_tokens": 512,
-      "max_breakpoints": 4,
-      "targets": [
-       "tools",
-       "system",
-       "messages"
-      ]
-     }
-    },
-    "temperature": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 10,
-      "cache": {
-       "read": 1,
-       "write": {
-        "5m": 12.5,
-        "1h": 20
-       }
-      }
-     },
-     "output": {
-      "price": 50
-     }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "region": {
-        "equals": "us"
-       }
-      },
-      "factor": {
-       "text": 1.1
-      }
-     }
-    ],
-    "web_search": {
-     "price": 10
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "messages": {
-     "base_url": "https://api.anthropic.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic"
-     },
-     "capabilities": {
-      "system_updates": true,
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "strict": true,
-       "updates": true,
-       "search": true
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "https://api.anthropic.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-06-09"
-  },
-  "claude-sonnet-4-5-20250929": {
-   "id": "claude-sonnet-4-5-20250929",
-   "name": "Claude Sonnet 4.5",
-   "description": "Balanced Claude model for coding, analysis, agent workflows, and cost control",
-   "type": "chat",
-   "family": "claude-sonnet",
-   "status": "deprecated",
-   "release_date": "2025-09-29",
-   "limit": {
-    "context": 200000,
-    "output": 64000
-   },
-   "capabilities": {
-    "cache": {
-     "explicit": {
-      "ttl": [
-       "5m",
-       "1h"
-      ],
-      "min_tokens": 1024,
-      "max_breakpoints": 4,
-      "targets": [
-       "tools",
-       "system",
-       "messages"
-      ]
-     }
-    },
-    "temperature": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "budget": {
-      "min": 1024
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 3,
-      "cache": {
-       "read": 0.3,
-       "write": {
-        "5m": 3.75,
-        "1h": 6
-       }
-      }
-     },
-     "output": {
-      "price": 15
-     }
-    },
-    "web_search": {
-     "price": 10
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "messages": {
-     "base_url": "https://api.anthropic.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "strict": true,
-       "updates": false,
-       "search": true
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "https://api.anthropic.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-07-31",
-   "last_updated": "2025-09-29"
-  },
-  "claude-sonnet-5": {
-   "id": "claude-sonnet-5",
-   "name": "Claude Sonnet 5",
-   "description": "Everyday Claude agent model for coding, planning, browsing, and general work",
-   "type": "chat",
-   "family": "claude-sonnet",
-   "release_date": "2026-06-29",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "explicit": {
-      "ttl": [
-       "5m",
-       "1h"
-      ],
-      "min_tokens": 1024,
-      "max_breakpoints": 4,
-      "targets": [
-       "tools",
-       "system",
-       "messages"
-      ]
-     }
-    },
-    "temperature": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2,
-      "cache": {
-       "read": 0.2,
-       "write": {
-        "5m": 2.5,
-        "1h": 4
-       }
-      }
-     },
-     "output": {
-      "price": 10
-     }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "region": {
-        "equals": "us"
-       }
-      },
-      "factor": {
-       "text": 1.1
-      }
-     }
-    ],
-    "web_search": {
-     "price": 10
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "messages": {
-     "base_url": "https://api.anthropic.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic"
-     },
-     "capabilities": {
-      "system_updates": true,
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "strict": true,
-       "updates": false,
-       "search": true
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "https://api.anthropic.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-01-31",
-   "last_updated": "2026-06-30"
-  },
-  "claude-sonnet-4-6": {
-   "id": "claude-sonnet-4-6",
-   "name": "Claude Sonnet 4.6",
-   "description": "Claude workhorse for coding agents, careful analysis, and production cost control",
-   "type": "chat",
-   "family": "claude-sonnet",
-   "release_date": "2026-02-17",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "explicit": {
-      "ttl": [
-       "5m",
-       "1h"
-      ],
-      "min_tokens": 1024,
-      "max_breakpoints": 4,
-      "targets": [
-       "tools",
-       "system",
-       "messages"
-      ]
-     }
-    },
-    "temperature": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "max"
-     ],
-     "budget": {
-      "min": 1024
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 3,
-      "cache": {
-       "read": 0.3,
-       "write": {
-        "5m": 3.75,
-        "1h": 6
-       }
-      }
-     },
-     "output": {
-      "price": 15
-     }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "region": {
-        "equals": "us"
-       }
-      },
-      "factor": {
-       "text": 1.1
-      }
-     }
-    ],
-    "web_search": {
-     "price": 10
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "messages": {
-     "base_url": "https://api.anthropic.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "strict": true,
-       "updates": false,
-       "search": true
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "https://api.anthropic.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2026-03-13"
   },
   "claude-opus-4-6": {
    "id": "claude-opus-4-6",
@@ -1477,6 +1657,302 @@
    "open_weights": false,
    "knowledge": "2025-05-31",
    "last_updated": "2026-03-13"
+  },
+  "claude-opus-5-5": {
+   "id": "claude-opus-5-5",
+   "name": "Claude Opus 5.5",
+   "description": "Claude model for long-running agentic coding and knowledge work",
+   "type": "chat",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-5-5",
+   "release_date": "2026-09-22",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "explicit": {
+      "ttl": [
+       "5m",
+       "1h"
+      ],
+      "min_tokens": 512,
+      "max_breakpoints": 4,
+      "targets": [
+       "tools",
+       "system",
+       "messages"
+      ]
+     }
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "service_tier": [
+     "fast"
+    ],
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 4,
+      "cache": {
+       "read": 0.2,
+       "write": {
+        "5m": 5,
+        "1h": 8
+       }
+      }
+     },
+     "output": {
+      "price": 20
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "fast"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     },
+     {
+      "when": {
+       "region": {
+        "equals": "us"
+       }
+      },
+      "factor": {
+       "text": 1.1
+      }
+     }
+    ],
+    "web_search": {
+     "price": 10
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://api.anthropic.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic"
+     },
+     "capabilities": {
+      "system_updates": true,
+      "effort_updates": true,
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "strict": true,
+       "updates": true,
+       "search": true
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "https://api.anthropic.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-06",
+   "last_updated": "2026-09-22",
+   "experimental": {
+    "modes": {
+     "fast": {
+      "body": {
+       "speed": "fast"
+      },
+      "headers": {
+       "anthropic-beta": "fast-mode-2026-02-01"
+      }
+     }
+    }
+   }
+  },
+  "claude-sonnet-5": {
+   "id": "claude-sonnet-5",
+   "name": "Claude Sonnet 5",
+   "description": "Everyday Claude agent model for coding, planning, browsing, and general work",
+   "type": "chat",
+   "family": "claude-sonnet",
+   "release_date": "2026-06-29",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "explicit": {
+      "ttl": [
+       "5m",
+       "1h"
+      ],
+      "min_tokens": 1024,
+      "max_breakpoints": 4,
+      "targets": [
+       "tools",
+       "system",
+       "messages"
+      ]
+     }
+    },
+    "temperature": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.2,
+       "write": {
+        "5m": 2.5,
+        "1h": 4
+       }
+      }
+     },
+     "output": {
+      "price": 10
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "region": {
+        "equals": "us"
+       }
+      },
+      "factor": {
+       "text": 1.1
+      }
+     }
+    ],
+    "web_search": {
+     "price": 10
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://api.anthropic.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic"
+     },
+     "capabilities": {
+      "system_updates": true,
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "strict": true,
+       "updates": false,
+       "search": true
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "https://api.anthropic.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-01-31",
+   "last_updated": "2026-06-30"
   },
   "claude-opus-4-8": {
    "id": "claude-opus-4-8",
@@ -1638,440 +2114,6 @@
     }
    }
   },
-  "claude-opus-5": {
-   "id": "claude-opus-5",
-   "name": "Claude Opus 5",
-   "description": "Strongest Claude Opus model for coding, agents, and professional work",
-   "type": "chat",
-   "family": "claude-opus",
-   "canonical_id": "anthropic/claude-opus-5",
-   "release_date": "2026-07-24",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "explicit": {
-      "ttl": [
-       "5m",
-       "1h"
-      ],
-      "min_tokens": 512,
-      "max_breakpoints": 4,
-      "targets": [
-       "tools",
-       "system",
-       "messages"
-      ]
-     }
-    },
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "service_tier": [
-     "fast"
-    ],
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 5,
-      "cache": {
-       "read": 0.5,
-       "write": {
-        "5m": 6.25,
-        "1h": 10
-       }
-      }
-     },
-     "output": {
-      "price": 25
-     }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "service_tier": {
-        "equals": "fast"
-       }
-      },
-      "factor": {
-       "text": 2
-      }
-     },
-     {
-      "when": {
-       "region": {
-        "equals": "us"
-       }
-      },
-      "factor": {
-       "text": 1.1
-      }
-     }
-    ],
-    "web_search": {
-     "price": 10
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "messages": {
-     "base_url": "https://api.anthropic.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic"
-     },
-     "capabilities": {
-      "system_updates": true,
-      "effort_updates": true,
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "strict": true,
-       "updates": true,
-       "search": true
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "https://api.anthropic.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-05",
-   "last_updated": "2026-07-24",
-   "experimental": {
-    "modes": {
-     "fast": {
-      "body": {
-       "speed": "fast"
-      },
-      "headers": {
-       "anthropic-beta": "fast-mode-2026-02-01"
-      }
-     }
-    }
-   }
-  },
-  "claude-sonnet-5-5": {
-   "id": "claude-sonnet-5-5",
-   "name": "Claude Sonnet 5.5",
-   "description": "Fast Claude model for everyday coding, agents, and knowledge work",
-   "type": "chat",
-   "family": "claude-sonnet",
-   "canonical_id": "anthropic/claude-sonnet-5-5",
-   "release_date": "2026-09-28",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "explicit": {
-      "ttl": [
-       "5m",
-       "1h"
-      ],
-      "min_tokens": 512,
-      "max_breakpoints": 4,
-      "targets": [
-       "tools",
-       "system",
-       "messages"
-      ]
-     }
-    },
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2,
-      "cache": {
-       "read": 0.1,
-       "write": {
-        "5m": 2.5,
-        "1h": 4
-       }
-      }
-     },
-     "output": {
-      "price": 10
-     }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "region": {
-        "equals": "us"
-       }
-      },
-      "factor": {
-       "text": 1.1
-      }
-     }
-    ],
-    "web_search": {
-     "price": 10
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "messages": {
-     "base_url": "https://api.anthropic.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic"
-     },
-     "capabilities": {
-      "system_updates": true,
-      "effort_updates": true,
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "strict": true,
-       "updates": true,
-       "search": true
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "https://api.anthropic.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-06",
-   "last_updated": "2026-09-28"
-  },
-  "claude-fable-5-1": {
-   "id": "claude-fable-5-1",
-   "name": "Claude Fable 5.1",
-   "description": "Claude model for demanding reasoning and long-horizon agentic work",
-   "type": "chat",
-   "family": "claude-fable",
-   "canonical_id": "anthropic/claude-fable-5-1",
-   "release_date": "2026-09-01",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "explicit": {
-      "ttl": [
-       "5m",
-       "1h"
-      ],
-      "min_tokens": 512,
-      "max_breakpoints": 4,
-      "targets": [
-       "tools",
-       "system",
-       "messages"
-      ]
-     }
-    },
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 10,
-      "cache": {
-       "read": 0.25,
-       "write": {
-        "5m": 12.5,
-        "1h": 20
-       }
-      }
-     },
-     "output": {
-      "price": 50
-     }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "region": {
-        "equals": "us"
-       }
-      },
-      "factor": {
-       "text": 1.1
-      }
-     }
-    ],
-    "web_search": {
-     "price": 10
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "messages": {
-     "base_url": "https://api.anthropic.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic"
-     },
-     "capabilities": {
-      "system_updates": true,
-      "effort_updates": true,
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "strict": true,
-       "updates": true,
-       "search": true
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "https://api.anthropic.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-06",
-   "last_updated": "2026-09-01"
-  },
   "claude-opus-4-5-20251101": {
    "id": "claude-opus-4-5-20251101",
    "name": "Claude Opus 4.5",
@@ -2195,13 +2237,13 @@
    "knowledge": "2025-05",
    "last_updated": "2025-11-01"
   },
-  "claude-opus-4-7": {
-   "id": "claude-opus-4-7",
-   "name": "Claude Opus 4.7",
-   "description": "Stronger Opus tier for advanced software work and high-stakes reasoning",
+  "claude-fable-5": {
+   "id": "claude-fable-5",
+   "name": "Claude Fable 5",
+   "description": "Claude model for creative writing, analysis, and controlled agent workflows",
    "type": "chat",
-   "family": "claude-opus",
-   "release_date": "2026-04-14",
+   "family": "claude-fable",
+   "release_date": "2026-06-07",
    "limit": {
     "context": 1000000,
     "output": 128000
@@ -2213,7 +2255,7 @@
        "5m",
        "1h"
       ],
-      "min_tokens": 2048,
+      "min_tokens": 512,
       "max_breakpoints": 4,
       "targets": [
        "tools",
@@ -2243,17 +2285,17 @@
    "cost": {
     "text": {
      "input": {
-      "price": 5,
+      "price": 10,
       "cache": {
-       "read": 0.5,
+       "read": 1,
        "write": {
-        "5m": 6.25,
-        "1h": 10
+        "5m": 12.5,
+        "1h": 20
        }
       }
      },
      "output": {
-      "price": 25
+      "price": 50
      }
     },
     "multipliers": [
@@ -2268,6 +2310,124 @@
       }
      }
     ],
+    "web_search": {
+     "price": 10
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://api.anthropic.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic"
+     },
+     "capabilities": {
+      "system_updates": true,
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "strict": true,
+       "updates": true,
+       "search": true
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "https://api.anthropic.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-06-09"
+  },
+  "claude-haiku-4-5-20251001": {
+   "id": "claude-haiku-4-5-20251001",
+   "name": "Claude Haiku 4.5",
+   "description": "Fast Claude model for responsive assistance, classification, and lightweight agents",
+   "type": "chat",
+   "family": "claude-haiku",
+   "release_date": "2025-10-15",
+   "limit": {
+    "context": 200000,
+    "output": 64000
+   },
+   "capabilities": {
+    "cache": {
+     "explicit": {
+      "ttl": [
+       "5m",
+       "1h"
+      ],
+      "min_tokens": 4096,
+      "max_breakpoints": 4,
+      "targets": [
+       "tools",
+       "system",
+       "messages"
+      ]
+     }
+    },
+    "temperature": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "budget": {
+      "min": 1024
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1,
+      "cache": {
+       "read": 0.1,
+       "write": {
+        "5m": 1.25,
+        "1h": 2
+       }
+      }
+     },
+     "output": {
+      "price": 5
+     }
+    },
     "web_search": {
      "price": 10
     }
@@ -2326,168 +2486,8 @@
     }
    },
    "open_weights": false,
-   "knowledge": "2026-01-31",
-   "last_updated": "2026-04-16"
-  },
-  "claude-opus-5-5": {
-   "id": "claude-opus-5-5",
-   "name": "Claude Opus 5.5",
-   "description": "Claude model for long-running agentic coding and knowledge work",
-   "type": "chat",
-   "family": "claude-opus",
-   "canonical_id": "anthropic/claude-opus-5-5",
-   "release_date": "2026-09-22",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "explicit": {
-      "ttl": [
-       "5m",
-       "1h"
-      ],
-      "min_tokens": 512,
-      "max_breakpoints": 4,
-      "targets": [
-       "tools",
-       "system",
-       "messages"
-      ]
-     }
-    },
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "service_tier": [
-     "fast"
-    ],
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 4,
-      "cache": {
-       "read": 0.2,
-       "write": {
-        "5m": 5,
-        "1h": 8
-       }
-      }
-     },
-     "output": {
-      "price": 20
-     }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "service_tier": {
-        "equals": "fast"
-       }
-      },
-      "factor": {
-       "text": 2
-      }
-     },
-     {
-      "when": {
-       "region": {
-        "equals": "us"
-       }
-      },
-      "factor": {
-       "text": 1.1
-      }
-     }
-    ],
-    "web_search": {
-     "price": 10
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "messages": {
-     "base_url": "https://api.anthropic.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic"
-     },
-     "capabilities": {
-      "system_updates": true,
-      "effort_updates": true,
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "strict": true,
-       "updates": true,
-       "search": true
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "https://api.anthropic.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-06",
-   "last_updated": "2026-09-22",
-   "experimental": {
-    "modes": {
-     "fast": {
-      "body": {
-       "speed": "fast"
-      },
-      "headers": {
-       "anthropic-beta": "fast-mode-2026-02-01"
-      }
-     }
-    }
-   }
+   "knowledge": "2025-02-28",
+   "last_updated": "2025-10-15"
   }
  }
 }

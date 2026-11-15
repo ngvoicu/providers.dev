@@ -6,17 +6,17 @@
   "DOUBLEWORD_API_KEY"
  ],
  "models": {
-  "google/gemma-4-31B-it": {
-   "id": "google/gemma-4-31B-it",
-   "name": "Gemma 4 31B IT",
-   "description": "Largest Gemma 4 instruction model for open, self-hosted chat and reasoning",
+  "nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-NVFP4": {
+   "id": "nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-NVFP4",
+   "name": "Nemotron 3 Ultra 550B A55B",
+   "description": "Largest Nemotron 3 model for maximum open-weight reasoning and agent accuracy",
    "type": "chat",
-   "family": "gemma",
-   "canonical_id": "google/gemma-4-31b-it",
-   "release_date": "2026-04-02",
+   "family": "nemotron",
+   "canonical_id": "nvidia/nemotron-3-ultra-550b-a55b",
+   "release_date": "2026-06-04",
    "limit": {
-    "context": 262144,
-    "output": 32768
+    "context": 1000000,
+    "output": 128000
    },
    "capabilities": {
     "cache": {
@@ -33,6 +33,79 @@
     "temperature": true,
     "top_k": true,
     "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.5,
+      "cache": {
+       "read": 0.125,
+       "write": {
+        "5m": 0.625,
+        "1h": 1
+       }
+      }
+     },
+     "output": {
+      "price": 2.2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.doubleword.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-09",
+   "last_updated": "2026-06-04"
+  },
+  "moonshotai/Kimi-K3.1-Pro": {
+   "id": "moonshotai/Kimi-K3.1-Pro",
+   "name": "Kimi K3.1 Pro",
+   "description": "Multimodal Kimi model with a 1M-token context window and always-on reasoning, for coding, 3D creation and financial research",
+   "type": "chat",
+   "family": "kimi-k3",
+   "canonical_id": "moonshotai/kimi-k3.1-pro",
+   "release_date": "2026-10-23",
+   "limit": {
+    "context": 1048576,
+    "output": 1048576
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -43,37 +116,30 @@
      "supported": true,
      "effort": [
       "none",
-      "high"
-     ],
-     "default": {
-      "type": "effort",
-      "value": "none"
-     }
+      "low",
+      "high",
+      "max"
+     ]
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.12,
-      "cache": {
-       "read": 0.12,
-       "write": {
-        "5m": 0.15,
-        "1h": 0.24
-       }
-      }
+      "price": 2
      },
      "output": {
-      "price": 0.35
+      "price": 10
      }
     }
    },
    "modalities": {
     "input": [
      "text",
-     "image/png",
      "image/jpeg",
+     "image/png",
+     "image/gif",
      "image/webp",
+     "image/bmp",
      "image/heic",
      "image/heif"
     ],
@@ -96,8 +162,7 @@
     }
    },
    "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-04-02"
+   "last_updated": "2026-10-23"
   },
   "moonshotai/kimi-k3": {
    "id": "moonshotai/kimi-k3",
@@ -191,22 +256,33 @@
    "open_weights": true,
    "last_updated": "2026-07-16"
   },
-  "moonshotai/Kimi-K3.1-Pro": {
-   "id": "moonshotai/Kimi-K3.1-Pro",
-   "name": "Kimi K3.1 Pro",
-   "description": "Multimodal Kimi model with a 1M-token context window and always-on reasoning, for coding, 3D creation and financial research",
+  "google/gemma-4-31B-it": {
+   "id": "google/gemma-4-31B-it",
+   "name": "Gemma 4 31B IT",
+   "description": "Largest Gemma 4 instruction model for open, self-hosted chat and reasoning",
    "type": "chat",
-   "family": "kimi-k3",
-   "canonical_id": "moonshotai/kimi-k3.1-pro",
-   "release_date": "2026-10-23",
+   "family": "gemma",
+   "canonical_id": "google/gemma-4-31b-it",
+   "release_date": "2026-04-02",
    "limit": {
-    "context": 1048576,
-    "output": 1048576
+    "context": 262144,
+    "output": 32768
    },
    "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
+    "cache": {
+     "implicit": true,
+     "explicit": {
+      "ttl": [
+       "5m",
+       "1h"
+      ],
+      "min_tokens": 1024,
+      "max_breakpoints": 4
+     }
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -217,30 +293,37 @@
      "supported": true,
      "effort": [
       "none",
-      "low",
-      "high",
-      "max"
-     ]
+      "high"
+     ],
+     "default": {
+      "type": "effort",
+      "value": "none"
+     }
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 2
+      "price": 0.12,
+      "cache": {
+       "read": 0.12,
+       "write": {
+        "5m": 0.15,
+        "1h": 0.24
+       }
+      }
      },
      "output": {
-      "price": 10
+      "price": 0.35
      }
     }
    },
    "modalities": {
     "input": [
      "text",
-     "image/jpeg",
      "image/png",
-     "image/gif",
+     "image/jpeg",
      "image/webp",
-     "image/bmp",
      "image/heic",
      "image/heif"
     ],
@@ -263,19 +346,20 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2026-10-23"
+   "knowledge": "2025-01",
+   "last_updated": "2026-04-02"
   },
-  "nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-NVFP4": {
-   "id": "nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-NVFP4",
-   "name": "Nemotron 3 Ultra 550B A55B",
-   "description": "Largest Nemotron 3 model for maximum open-weight reasoning and agent accuracy",
+  "meta-models/Muse-Glimmer-30B": {
+   "id": "meta-models/Muse-Glimmer-30B",
+   "name": "Muse Glimmer 30B",
+   "description": "Muse Glimmer is a 30-billion-parameter open-weight multimodal model from Meta Superintelligence Labs, distilled from Muse Spark for always-on local agents, tool use, coding, and image understanding.",
    "type": "chat",
-   "family": "nemotron",
-   "canonical_id": "nvidia/nemotron-3-ultra-550b-a55b",
-   "release_date": "2026-06-04",
+   "family": "muse",
+   "canonical_id": "meta/muse-glimmer-30b",
+   "release_date": "2026-08-10",
    "limit": {
-    "context": 1000000,
-    "output": 128000
+    "context": 131072,
+    "output": 131072
    },
    "capabilities": {
     "cache": {
@@ -292,6 +376,7 @@
     "temperature": true,
     "top_k": true,
     "top_p": true,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -300,26 +385,27 @@
     "reasoning": {
      "supported": true,
      "effort": [
-      "none",
+      "low",
       "medium",
-      "high"
+      "high",
+      "xhigh"
      ]
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.5,
+      "price": 0.11,
       "cache": {
-       "read": 0.125,
+       "read": 0.0132,
        "write": {
-        "5m": 0.625,
-        "1h": 1
+        "5m": 0.1375,
+        "1h": 0.22
        }
       }
      },
      "output": {
-      "price": 2.2
+      "price": 0.32
      }
     }
    },
@@ -346,8 +432,76 @@
     }
    },
    "open_weights": true,
-   "knowledge": "2025-09",
-   "last_updated": "2026-06-04"
+   "knowledge": "2026-01-04",
+   "last_updated": "2026-08-10"
+  },
+  "meta/muse-spark-open": {
+   "id": "meta/muse-spark-open",
+   "name": "Muse Spark Open",
+   "description": "Muse Spark Open is an 816B total / 42B active open-weight multimodal reasoning model from Meta for coding and long-horizon agentic work, with 1M-token context.",
+   "type": "chat",
+   "family": "muse",
+   "canonical_id": "meta/muse-spark-open",
+   "release_date": "2026-10-15",
+   "limit": {
+    "context": 1048576,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.25
+     },
+     "output": {
+      "price": 4.25
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.doubleword.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2026-01-04",
+   "last_updated": "2026-10-15"
   },
   "deepseek-ai/DeepSeek-V4.1-Flash": {
    "id": "deepseek-ai/DeepSeek-V4.1-Flash",
@@ -700,90 +854,6 @@
    "knowledge": "2025-05",
    "last_updated": "2026-10-17"
   },
-  "zai-org/GLM-5.2-FP8": {
-   "id": "zai-org/GLM-5.2-FP8",
-   "name": "GLM-5.2",
-   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
-   "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-5.2",
-   "release_date": "2026-06-13",
-   "limit": {
-    "context": 1000000,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true,
-     "explicit": {
-      "ttl": [
-       "5m",
-       "1h"
-      ],
-      "min_tokens": 1024,
-      "max_breakpoints": 4
-     }
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.93,
-      "cache": {
-       "read": 0.186,
-       "write": {
-        "5m": 1.1625,
-        "1h": 1.86
-       }
-      }
-     },
-     "output": {
-      "price": 3
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.doubleword.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-06-13"
-  },
   "zai-org/GLM-5.3": {
    "id": "zai-org/GLM-5.3",
    "name": "GLM-5.3",
@@ -868,6 +938,90 @@
    },
    "open_weights": true,
    "last_updated": "2026-08-14"
+  },
+  "zai-org/GLM-5.2-FP8": {
+   "id": "zai-org/GLM-5.2-FP8",
+   "name": "GLM-5.2",
+   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.2",
+   "release_date": "2026-06-13",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true,
+     "explicit": {
+      "ttl": [
+       "5m",
+       "1h"
+      ],
+      "min_tokens": 1024,
+      "max_breakpoints": 4
+     }
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.93,
+      "cache": {
+       "read": 0.186,
+       "write": {
+        "5m": 1.1625,
+        "1h": 1.86
+       }
+      }
+     },
+     "output": {
+      "price": 3
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.doubleword.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-06-13"
   },
   "zai-org/GLM-5.3-Flash": {
    "id": "zai-org/GLM-5.3-Flash",
@@ -955,475 +1109,6 @@
    },
    "open_weights": true,
    "last_updated": "2026-08-26"
-  },
-  "meta-models/Muse-Glimmer-30B": {
-   "id": "meta-models/Muse-Glimmer-30B",
-   "name": "Muse Glimmer 30B",
-   "description": "Muse Glimmer is a 30-billion-parameter open-weight multimodal model from Meta Superintelligence Labs, distilled from Muse Spark for always-on local agents, tool use, coding, and image understanding.",
-   "type": "chat",
-   "family": "muse",
-   "canonical_id": "meta/muse-glimmer-30b",
-   "release_date": "2026-08-10",
-   "limit": {
-    "context": 131072,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true,
-     "explicit": {
-      "ttl": [
-       "5m",
-       "1h"
-      ],
-      "min_tokens": 1024,
-      "max_breakpoints": 4
-     }
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.11,
-      "cache": {
-       "read": 0.0132,
-       "write": {
-        "5m": 0.1375,
-        "1h": 0.22
-       }
-      }
-     },
-     "output": {
-      "price": 0.32
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.doubleword.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2026-01-04",
-   "last_updated": "2026-08-10"
-  },
-  "meta/muse-spark-open": {
-   "id": "meta/muse-spark-open",
-   "name": "Muse Spark Open",
-   "description": "Muse Spark Open is an 816B total / 42B active open-weight multimodal reasoning model from Meta for coding and long-horizon agentic work, with 1M-token context.",
-   "type": "chat",
-   "family": "muse",
-   "canonical_id": "meta/muse-spark-open",
-   "release_date": "2026-10-15",
-   "limit": {
-    "context": 1048576,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.25
-     },
-     "output": {
-      "price": 4.25
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.doubleword.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2026-01-04",
-   "last_updated": "2026-10-15"
-  },
-  "Qwen/Qwen3.5-35B-A3B-FP8-dottxt": {
-   "id": "Qwen/Qwen3.5-35B-A3B-FP8-dottxt",
-   "name": "Qwen3.5 35B A3B dottxt",
-   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3.5-35b-a3b",
-   "release_date": "2026-02-23",
-   "limit": {
-    "context": 262144,
-    "output": 65536
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true,
-     "explicit": {
-      "ttl": [
-       "5m",
-       "1h"
-      ],
-      "min_tokens": 1024,
-      "max_breakpoints": 4
-     }
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.35,
-      "cache": {
-       "read": 0.2,
-       "write": {
-        "5m": 0.4375,
-        "1h": 0.7
-       }
-      }
-     },
-     "output": {
-      "price": 1.2
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.doubleword.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-02-23"
-  },
-  "Qwen/Qwen3-VL-235B-A22B-Instruct-FP8": {
-   "id": "Qwen/Qwen3-VL-235B-A22B-Instruct-FP8",
-   "name": "Qwen3 VL 235B A22B Instruct",
-   "description": "Qwen vision-language instruct model for visual reasoning, documents, and agent tasks",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3-vl-235b-a22b-instruct",
-   "release_date": "2025-09-23",
-   "limit": {
-    "context": 131072,
-    "output": 32768
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true,
-     "explicit": {
-      "ttl": [
-       "5m",
-       "1h"
-      ],
-      "min_tokens": 1024,
-      "max_breakpoints": 4
-     }
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.21,
-      "cache": {
-       "read": 0.1155,
-       "write": {
-        "5m": 0.2625,
-        "1h": 0.42
-       }
-      }
-     },
-     "output": {
-      "price": 1.9
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.doubleword.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-03-31",
-   "last_updated": "2025-09-23"
-  },
-  "Qwen/Qwen3-Embedding-8B": {
-   "id": "Qwen/Qwen3-Embedding-8B",
-   "name": "Qwen3 Embedding 8B",
-   "description": "Multilingual text embedding model for retrieval, code search, classification, and clustering",
-   "type": "embedding",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3-embedding-8b",
-   "release_date": "2025-06-05",
-   "limit": {
-    "context": 32768,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.04
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "embedding"
-    ]
-   },
-   "api": {
-    "embeddings": {
-     "base_url": "https://api.doubleword.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-06-05"
-  },
-  "Qwen/Qwen3.6-35B-A3B-FP8": {
-   "id": "Qwen/Qwen3.6-35B-A3B-FP8",
-   "name": "Qwen3.6 35B-A3B",
-   "description": "Open multimodal Qwen MoE for local agents that need vision, audio, and code",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3.6-35b-a3b",
-   "release_date": "2026-04-17",
-   "limit": {
-    "context": 262144,
-    "output": 65536
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true,
-     "explicit": {
-      "ttl": [
-       "5m",
-       "1h"
-      ],
-      "min_tokens": 1024,
-      "max_breakpoints": 4
-     }
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.14,
-      "cache": {
-       "read": 0.14,
-       "write": {
-        "5m": 0.175,
-        "1h": 0.28
-       }
-      }
-     },
-     "output": {
-      "price": 1
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.doubleword.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-04-17"
   },
   "Qwen/Qwen3.8-27B-FP8": {
    "id": "Qwen/Qwen3.8-27B-FP8",
@@ -1515,6 +1200,321 @@
    },
    "open_weights": true,
    "last_updated": "2026-08-14"
+  },
+  "Qwen/Qwen3-Embedding-8B": {
+   "id": "Qwen/Qwen3-Embedding-8B",
+   "name": "Qwen3 Embedding 8B",
+   "description": "Multilingual text embedding model for retrieval, code search, classification, and clustering",
+   "type": "embedding",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3-embedding-8b",
+   "release_date": "2025-06-05",
+   "limit": {
+    "context": 32768,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.04
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "api": {
+    "embeddings": {
+     "base_url": "https://api.doubleword.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-06-05"
+  },
+  "Qwen/Qwen3-VL-235B-A22B-Instruct-FP8": {
+   "id": "Qwen/Qwen3-VL-235B-A22B-Instruct-FP8",
+   "name": "Qwen3 VL 235B A22B Instruct",
+   "description": "Qwen vision-language instruct model for visual reasoning, documents, and agent tasks",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3-vl-235b-a22b-instruct",
+   "release_date": "2025-09-23",
+   "limit": {
+    "context": 131072,
+    "output": 32768
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true,
+     "explicit": {
+      "ttl": [
+       "5m",
+       "1h"
+      ],
+      "min_tokens": 1024,
+      "max_breakpoints": 4
+     }
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.21,
+      "cache": {
+       "read": 0.1155,
+       "write": {
+        "5m": 0.2625,
+        "1h": 0.42
+       }
+      }
+     },
+     "output": {
+      "price": 1.9
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.doubleword.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-03-31",
+   "last_updated": "2025-09-23"
+  },
+  "Qwen/Qwen3.5-35B-A3B-FP8-dottxt": {
+   "id": "Qwen/Qwen3.5-35B-A3B-FP8-dottxt",
+   "name": "Qwen3.5 35B A3B dottxt",
+   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.5-35b-a3b",
+   "release_date": "2026-02-23",
+   "limit": {
+    "context": 262144,
+    "output": 65536
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true,
+     "explicit": {
+      "ttl": [
+       "5m",
+       "1h"
+      ],
+      "min_tokens": 1024,
+      "max_breakpoints": 4
+     }
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.35,
+      "cache": {
+       "read": 0.2,
+       "write": {
+        "5m": 0.4375,
+        "1h": 0.7
+       }
+      }
+     },
+     "output": {
+      "price": 1.2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.doubleword.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-02-23"
+  },
+  "Qwen/Qwen3.6-35B-A3B-FP8": {
+   "id": "Qwen/Qwen3.6-35B-A3B-FP8",
+   "name": "Qwen3.6 35B-A3B",
+   "description": "Open multimodal Qwen MoE for local agents that need vision, audio, and code",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.6-35b-a3b",
+   "release_date": "2026-04-17",
+   "limit": {
+    "context": 262144,
+    "output": 65536
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true,
+     "explicit": {
+      "ttl": [
+       "5m",
+       "1h"
+      ],
+      "min_tokens": 1024,
+      "max_breakpoints": 4
+     }
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.14,
+      "cache": {
+       "read": 0.14,
+       "write": {
+        "5m": 0.175,
+        "1h": 0.28
+       }
+      }
+     },
+     "output": {
+      "price": 1
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.doubleword.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-04-17"
   }
  }
 }

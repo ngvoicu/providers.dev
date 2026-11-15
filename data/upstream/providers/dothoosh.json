@@ -6,17 +6,96 @@
   "DOTHOOSH_API_KEY"
  ],
  "models": {
-  "kimi-k2.6": {
-   "id": "kimi-k2.6",
-   "name": "Kimi K2.6",
-   "description": "Multimodal Kimi workhorse for agent loops, coding tasks, and visual context",
+  "claude-fable-5-1": {
+   "id": "claude-fable-5-1",
+   "name": "Claude Fable 5.1",
+   "description": "Claude model for demanding reasoning and long-horizon agentic work",
    "type": "chat",
-   "family": "kimi-k2",
-   "canonical_id": "moonshotai/kimi-k2.6",
-   "release_date": "2026-04-20",
+   "family": "claude-fable",
+   "canonical_id": "anthropic/claude-fable-5-1",
+   "release_date": "2026-09-01",
    "limit": {
-    "context": 262144,
-    "output": 262144
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 12.833336,
+      "cache": {
+       "read": 0.320837,
+       "write": {
+        "5m": 16.041669,
+        "1h": 25.666668
+       }
+      }
+     },
+     "output": {
+      "price": 64.166668
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://gateway.dothoosh.com/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-06",
+   "last_updated": "2026-09-01"
+  },
+  "gemini-3.5-flash-lite": {
+   "id": "gemini-3.5-flash-lite",
+   "name": "Gemini 3.5 Flash Lite",
+   "description": "Fast Gemini model balancing multimodal reasoning, tool use, and cost",
+   "type": "chat",
+   "family": "gemini-flash-lite",
+   "canonical_id": "google/gemini-3.5-flash-lite",
+   "release_date": "2026-07-21",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
    },
    "capabilities": {
     "temperature": true,
@@ -30,19 +109,95 @@
     },
     "reasoning": {
      "supported": true,
-     "toggle": true
+     "effort": [
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 1.219167,
+      "price": 0.385001,
       "cache": {
-       "read": 0.205333
+       "read": 0.038502
       }
      },
      "output": {
-      "price": 5.133334
+      "price": 3.208337
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://gateway.dothoosh.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-03",
+   "last_updated": "2026-07-21"
+  },
+  "deepseek-v4-pro": {
+   "id": "deepseek-v4-pro",
+   "name": "DeepSeek V4 Pro",
+   "description": "Open MoE flagship with million-token context for coding and long agent runs",
+   "type": "chat",
+   "family": "deepseek-thinking",
+   "canonical_id": "deepseek/deepseek-v4-pro",
+   "release_date": "2026-04-24",
+   "limit": {
+    "context": 1048576,
+    "output": 393216
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.694002,
+      "cache": {
+       "read": 0.056467
+      }
+     },
+     "output": {
+      "price": 5.082003
      }
     }
    },
@@ -72,25 +227,26 @@
     }
    },
    "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-04-20"
+   "knowledge": "2025-05",
+   "last_updated": "2026-04-24"
   },
-  "kimi-k3.1-pro": {
-   "id": "kimi-k3.1-pro",
-   "name": "Kimi K3.1 Pro",
-   "description": "Multimodal Kimi model with a 1M-token context window and always-on reasoning, for coding, 3D creation and financial research",
+  "gpt-6-luna": {
+   "id": "gpt-6-luna",
+   "name": "GPT-6 Luna",
+   "description": "OpenAI's most efficient model for focused, high-volume tasks",
    "type": "chat",
-   "family": "kimi-k3",
-   "canonical_id": "moonshotai/kimi-k3.1-pro",
-   "release_date": "2026-10-23",
+   "family": "gpt-luna",
+   "canonical_id": "openai/gpt-6-luna",
+   "release_date": "2026-09-22",
    "limit": {
-    "context": 1048576,
-    "output": 1048576
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
    },
    "capabilities": {
-    "temperature": false,
+    "temperature": true,
     "top_k": false,
-    "top_p": false,
+    "top_p": true,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -100,26 +256,50 @@
     "reasoning": {
      "supported": true,
      "effort": [
+      "none",
       "low",
+      "medium",
       "high",
+      "xhigh",
       "max"
-     ],
-     "default": {
-      "type": "effort",
-      "value": "max"
-     }
+     ]
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 2.566667,
+      "price": 0.128336,
       "cache": {
-       "read": 0.256667
-      }
+       "read": 0.012837,
+       "write": 0.16042
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 0.256669,
+        "cache": {
+         "read": 0.025669,
+         "write": 0.320837
+        }
+       }
+      ]
      },
      "output": {
-      "price": 12.833334
+      "price": 0.64167,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 0.962503
+       }
+      ]
      }
     }
    },
@@ -132,24 +312,22 @@
     ]
    },
    "api": {
-    "chat-completions": {
+    "responses": {
      "base_url": "https://gateway.dothoosh.com/v1",
      "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
      },
      "capabilities": {
       "tools": {
        "updates": false
       }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
      }
     }
    },
-   "open_weights": true,
-   "last_updated": "2026-10-23"
+   "open_weights": false,
+   "knowledge": "2026-05-18",
+   "last_updated": "2026-09-22"
   },
   "claude-haiku-5-5": {
    "id": "claude-haiku-5-5",
@@ -254,18 +432,17 @@
    "knowledge": "2026-06",
    "last_updated": "2026-10-07"
   },
-  "gpt-6.1-sol": {
-   "id": "gpt-6.1-sol",
-   "name": "GPT-6.1 Sol",
-   "description": "Near-Astra performance for complex coding, computer use, and professional work at a lower cost.",
+  "kimi-k3": {
+   "id": "kimi-k3",
+   "name": "Kimi K3",
+   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
    "type": "chat",
-   "family": "gpt-sol",
-   "canonical_id": "openai/gpt-6.1-sol",
-   "release_date": "2026-09-29",
+   "family": "kimi-k3",
+   "canonical_id": "moonshotai/kimi-k3",
+   "release_date": "2026-07-16",
    "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
+    "context": 1048576,
+    "output": 1048576
    },
    "capabilities": {
     "temperature": false,
@@ -281,9 +458,7 @@
      "supported": true,
      "effort": [
       "low",
-      "medium",
       "high",
-      "xhigh",
       "max"
      ]
     }
@@ -291,38 +466,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 2.566667,
+      "price": 3.850003,
       "cache": {
-       "read": 0.128336,
-       "write": 3.208337
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 5.133334,
-        "cache": {
-         "read": 0.256669,
-         "write": 6.41667
-        }
-       }
-      ]
+       "read": 0.385001
+      }
      },
      "output": {
-      "price": 12.833336,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 19.250002
-       }
-      ]
+      "price": 19.250002
      }
     }
    },
@@ -335,22 +485,24 @@
     ]
    },
    "api": {
-    "responses": {
+    "chat-completions": {
      "base_url": "https://gateway.dothoosh.com/v1",
      "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
      "capabilities": {
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
      }
     }
    },
-   "open_weights": false,
-   "knowledge": "2026-04-30",
-   "last_updated": "2026-09-29"
+   "open_weights": true,
+   "last_updated": "2026-07-16"
   },
   "gemini-3.8-flash": {
    "id": "gemini-3.8-flash",
@@ -421,97 +573,22 @@
    "open_weights": false,
    "last_updated": "2026-09-02"
   },
-  "deepseek-v4-pro": {
-   "id": "deepseek-v4-pro",
-   "name": "DeepSeek V4 Pro",
-   "description": "Open MoE flagship with million-token context for coding and long agent runs",
+  "claude-sonnet-5-5": {
+   "id": "claude-sonnet-5-5",
+   "name": "Claude Sonnet 5.5",
+   "description": "Fast Claude model for everyday coding, agents, and knowledge work",
    "type": "chat",
-   "family": "deepseek-thinking",
-   "canonical_id": "deepseek/deepseek-v4-pro",
-   "release_date": "2026-04-24",
+   "family": "claude-sonnet",
+   "canonical_id": "anthropic/claude-sonnet-5-5",
+   "release_date": "2026-09-28",
    "limit": {
-    "context": 1048576,
-    "output": 393216
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.694002,
-      "cache": {
-       "read": 0.056467
-      }
-     },
-     "output": {
-      "price": 5.082003
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://gateway.dothoosh.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-04-24"
-  },
-  "gemini-4-argon": {
-   "id": "gemini-4-argon",
-   "name": "Gemini 4 Argon",
-   "description": "Google's flagship reasoning model for complex software engineering, deep math and science, and long-horizon autonomous agents",
-   "type": "chat",
-   "family": "gemini",
-   "canonical_id": "google/gemini-4-argon",
-   "release_date": "2026-10-13",
-   "limit": {
-    "context": 1048576,
-    "output": 65536
+    "context": 1000000,
+    "output": 128000
    },
    "capabilities": {
     "temperature": false,
     "top_k": false,
     "top_p": false,
-    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -522,7 +599,9 @@
      "effort": [
       "low",
       "medium",
-      "high"
+      "high",
+      "xhigh",
+      "max"
      ]
     }
    },
@@ -531,7 +610,11 @@
      "input": {
       "price": 2.566667,
       "cache": {
-       "read": 0.128336
+       "read": 0.128336,
+       "write": {
+        "5m": 3.208337,
+        "1h": 5.133334
+       }
       }
      },
      "output": {
@@ -548,22 +631,26 @@
     ]
    },
    "api": {
-    "chat-completions": {
-     "base_url": "https://gateway.dothoosh.com/v1",
+    "messages": {
+     "base_url": "https://gateway.dothoosh.com/anthropic/v1",
      "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
      },
      "capabilities": {
       "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
        "updates": false
       }
      }
     }
    },
    "open_weights": false,
-   "knowledge": "2026-03",
-   "last_updated": "2026-10-13"
+   "knowledge": "2026-06",
+   "last_updated": "2026-09-28"
   },
   "gpt-6-astra": {
    "id": "gpt-6-astra",
@@ -663,235 +750,6 @@
    "knowledge": "2026-04-30",
    "last_updated": "2026-09-04"
   },
-  "gemini-3.5-flash-lite": {
-   "id": "gemini-3.5-flash-lite",
-   "name": "Gemini 3.5 Flash Lite",
-   "description": "Fast Gemini model balancing multimodal reasoning, tool use, and cost",
-   "type": "chat",
-   "family": "gemini-flash-lite",
-   "canonical_id": "google/gemini-3.5-flash-lite",
-   "release_date": "2026-07-21",
-   "limit": {
-    "context": 1048576,
-    "output": 65536
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.385001,
-      "cache": {
-       "read": 0.038502
-      }
-     },
-     "output": {
-      "price": 3.208337
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://gateway.dothoosh.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-03",
-   "last_updated": "2026-07-21"
-  },
-  "claude-sonnet-5-5": {
-   "id": "claude-sonnet-5-5",
-   "name": "Claude Sonnet 5.5",
-   "description": "Fast Claude model for everyday coding, agents, and knowledge work",
-   "type": "chat",
-   "family": "claude-sonnet",
-   "canonical_id": "anthropic/claude-sonnet-5-5",
-   "release_date": "2026-09-28",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2.566667,
-      "cache": {
-       "read": 0.128336,
-       "write": {
-        "5m": 3.208337,
-        "1h": 5.133334
-       }
-      }
-     },
-     "output": {
-      "price": 12.833336
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "messages": {
-     "base_url": "https://gateway.dothoosh.com/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-06",
-   "last_updated": "2026-09-28"
-  },
-  "claude-fable-5-1": {
-   "id": "claude-fable-5-1",
-   "name": "Claude Fable 5.1",
-   "description": "Claude model for demanding reasoning and long-horizon agentic work",
-   "type": "chat",
-   "family": "claude-fable",
-   "canonical_id": "anthropic/claude-fable-5-1",
-   "release_date": "2026-09-01",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 12.833336,
-      "cache": {
-       "read": 0.320837,
-       "write": {
-        "5m": 16.041669,
-        "1h": 25.666668
-       }
-      }
-     },
-     "output": {
-      "price": 64.166668
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "messages": {
-     "base_url": "https://gateway.dothoosh.com/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-06",
-   "last_updated": "2026-09-01"
-  },
   "kimi-k2.7-code": {
    "id": "kimi-k2.7-code",
    "name": "Kimi K2.7 Code",
@@ -960,91 +818,18 @@
    "knowledge": "2025-01",
    "last_updated": "2026-06-12"
   },
-  "deepseek-flash": {
-   "id": "deepseek-flash",
-   "name": "DeepSeek V4.1 Flash 1017",
-   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
+  "gpt-6.1-sol": {
+   "id": "gpt-6.1-sol",
+   "name": "GPT-6.1 Sol",
+   "description": "Near-Astra performance for complex coding, computer use, and professional work at a lower cost.",
    "type": "chat",
-   "family": "deepseek-flash",
-   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
-   "release_date": "2026-10-17",
+   "family": "gpt-sol",
+   "canonical_id": "openai/gpt-6.1-sol",
+   "release_date": "2026-09-29",
    "limit": {
-    "context": 1048576,
-    "output": 393216
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.385001,
-      "cache": {
-       "read": 0.007701
-      }
-     },
-     "output": {
-      "price": 1.54
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://gateway.dothoosh.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-10-17"
-  },
-  "kimi-k3": {
-   "id": "kimi-k3",
-   "name": "Kimi K3",
-   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
-   "type": "chat",
-   "family": "kimi-k3",
-   "canonical_id": "moonshotai/kimi-k3",
-   "release_date": "2026-07-16",
-   "limit": {
-    "context": 1048576,
-    "output": 1048576
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
    },
    "capabilities": {
     "temperature": false,
@@ -1060,80 +845,6 @@
      "supported": true,
      "effort": [
       "low",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 3.850003,
-      "cache": {
-       "read": 0.385001
-      }
-     },
-     "output": {
-      "price": 19.250002
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://gateway.dothoosh.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-07-16"
-  },
-  "gpt-6-luna": {
-   "id": "gpt-6-luna",
-   "name": "GPT-6 Luna",
-   "description": "OpenAI's most efficient model for focused, high-volume tasks",
-   "type": "chat",
-   "family": "gpt-luna",
-   "canonical_id": "openai/gpt-6-luna",
-   "release_date": "2026-09-22",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
       "medium",
       "high",
       "xhigh",
@@ -1144,10 +855,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.128336,
+      "price": 2.566667,
       "cache": {
-       "read": 0.012837,
-       "write": 0.16042
+       "read": 0.128336,
+       "write": 3.208337
       },
       "overrides": [
        {
@@ -1156,16 +867,16 @@
           "gt": 272000
          }
         },
-        "price": 0.256669,
+        "price": 5.133334,
         "cache": {
-         "read": 0.025669,
-         "write": 0.320837
+         "read": 0.256669,
+         "write": 6.41667
         }
        }
       ]
      },
      "output": {
-      "price": 0.64167,
+      "price": 12.833336,
       "overrides": [
        {
         "when": {
@@ -1173,7 +884,7 @@
           "gt": 272000
          }
         },
-        "price": 0.962503
+        "price": 19.250002
        }
       ]
      }
@@ -1202,8 +913,8 @@
     }
    },
    "open_weights": false,
-   "knowledge": "2026-05-18",
-   "last_updated": "2026-09-22"
+   "knowledge": "2026-04-30",
+   "last_updated": "2026-09-29"
   },
   "claude-opus-5-5": {
    "id": "claude-opus-5-5",
@@ -1283,6 +994,295 @@
    "open_weights": false,
    "knowledge": "2026-06",
    "last_updated": "2026-09-22"
+  },
+  "kimi-k2.6": {
+   "id": "kimi-k2.6",
+   "name": "Kimi K2.6",
+   "description": "Multimodal Kimi workhorse for agent loops, coding tasks, and visual context",
+   "type": "chat",
+   "family": "kimi-k2",
+   "canonical_id": "moonshotai/kimi-k2.6",
+   "release_date": "2026-04-20",
+   "limit": {
+    "context": 262144,
+    "output": 262144
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.219167,
+      "cache": {
+       "read": 0.205333
+      }
+     },
+     "output": {
+      "price": 5.133334
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://gateway.dothoosh.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-01",
+   "last_updated": "2026-04-20"
+  },
+  "gemini-4-argon": {
+   "id": "gemini-4-argon",
+   "name": "Gemini 4 Argon",
+   "description": "Google's flagship reasoning model for complex software engineering, deep math and science, and long-horizon autonomous agents",
+   "type": "chat",
+   "family": "gemini",
+   "canonical_id": "google/gemini-4-argon",
+   "release_date": "2026-10-13",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2.566667,
+      "cache": {
+       "read": 0.128336
+      }
+     },
+     "output": {
+      "price": 12.833336
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://gateway.dothoosh.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-03",
+   "last_updated": "2026-10-13"
+  },
+  "kimi-k3.1-pro": {
+   "id": "kimi-k3.1-pro",
+   "name": "Kimi K3.1 Pro",
+   "description": "Multimodal Kimi model with a 1M-token context window and always-on reasoning, for coding, 3D creation and financial research",
+   "type": "chat",
+   "family": "kimi-k3",
+   "canonical_id": "moonshotai/kimi-k3.1-pro",
+   "release_date": "2026-10-23",
+   "limit": {
+    "context": 1048576,
+    "output": 1048576
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ],
+     "default": {
+      "type": "effort",
+      "value": "max"
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2.566667,
+      "cache": {
+       "read": 0.256667
+      }
+     },
+     "output": {
+      "price": 12.833334
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://gateway.dothoosh.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-10-23"
+  },
+  "deepseek-flash": {
+   "id": "deepseek-flash",
+   "name": "DeepSeek V4.1 Flash 1017",
+   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
+   "type": "chat",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
+   "release_date": "2026-10-17",
+   "limit": {
+    "context": 1048576,
+    "output": 393216
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.385001,
+      "cache": {
+       "read": 0.007701
+      }
+     },
+     "output": {
+      "price": 1.54
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://gateway.dothoosh.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-10-17"
   }
  }
 }

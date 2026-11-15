@@ -6,14 +6,14 @@
   "OVHCLOUD_API_KEY"
  ],
  "models": {
-  "gpt-oss-120b": {
-   "id": "gpt-oss-120b",
-   "name": "gpt-oss-120b",
-   "description": "Open-weight GPT model for self-hosted reasoning and instruction-following workloads",
+  "meta-llama-3_3-70b-instruct": {
+   "id": "meta-llama-3_3-70b-instruct",
+   "name": "Meta-Llama-3_3-70B-Instruct",
+   "description": "Open Llama instruction model for multilingual chat, reasoning, and coding",
    "type": "chat",
-   "family": "gpt-oss",
-   "canonical_id": "openai/gpt-oss-120b",
-   "release_date": "2025-08-05",
+   "family": "llama",
+   "canonical_id": "meta/llama-3.3-70b-instruct",
+   "release_date": "2024-12-06",
    "limit": {
     "context": 131072,
     "output": 131072
@@ -29,21 +29,16 @@
      "supported": true
     },
     "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
+     "supported": false
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.09
+      "price": 0.74
      },
      "output": {
-      "price": 0.47
+      "price": 0.74
      }
     }
    },
@@ -70,59 +65,8 @@
     }
    },
    "open_weights": true,
-   "knowledge": "2024-06",
-   "last_updated": "2025-08-05"
-  },
-  "qwen3guard-gen-0.6b": {
-   "id": "qwen3guard-gen-0.6b",
-   "name": "Qwen3Guard-Gen-0.6B",
-   "description": "Open-weight instruction model for adaptable chat and self-hosted production workloads",
-   "type": "chat",
-   "release_date": "2026-01-22",
-   "limit": {
-    "context": 32768,
-    "output": 16384
-   },
-   "capabilities": {
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://oai.endpoints.kepler.ai.cloud.ovh.net/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-01-22"
+   "knowledge": "2023-12",
+   "last_updated": "2024-12-06"
   },
   "qwen3.8-27b": {
    "id": "qwen3.8-27b",
@@ -198,14 +142,65 @@
    "open_weights": true,
    "last_updated": "2026-08-14"
   },
-  "mistral-small-3.2-24b-instruct-2506": {
-   "id": "mistral-small-3.2-24b-instruct-2506",
-   "name": "Mistral-Small-3.2-24B-Instruct-2506",
-   "description": "Efficient Mistral model for fast chat, extraction, and production assistants",
+  "qwen3guard-gen-0.6b": {
+   "id": "qwen3guard-gen-0.6b",
+   "name": "Qwen3Guard-Gen-0.6B",
+   "description": "Open-weight instruction model for adaptable chat and self-hosted production workloads",
    "type": "chat",
-   "family": "mistral-small",
-   "canonical_id": "mistral/mistral-small-3.2-24b-instruct",
-   "release_date": "2025-06-20",
+   "release_date": "2026-01-22",
+   "limit": {
+    "context": 32768,
+    "output": 16384
+   },
+   "capabilities": {
+    "temperature": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://oai.endpoints.kepler.ai.cloud.ovh.net/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-01-22"
+  },
+  "gpt-oss-120b": {
+   "id": "gpt-oss-120b",
+   "name": "gpt-oss-120b",
+   "description": "Open-weight GPT model for self-hosted reasoning and instruction-following workloads",
+   "type": "chat",
+   "family": "gpt-oss",
+   "canonical_id": "openai/gpt-oss-120b",
+   "release_date": "2025-08-05",
    "limit": {
     "context": 131072,
     "output": 131072
@@ -221,25 +216,26 @@
      "supported": true
     },
     "reasoning": {
-     "supported": false
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.1
+      "price": 0.09
      },
      "output": {
-      "price": 0.31
+      "price": 0.47
      }
     }
    },
    "modalities": {
     "input": [
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/gif",
      "text"
     ],
     "output": [
@@ -261,8 +257,8 @@
     }
    },
    "open_weights": true,
-   "knowledge": "2023-10-31",
-   "last_updated": "2025-06-20"
+   "knowledge": "2024-06",
+   "last_updated": "2025-08-05"
   },
   "qwen3guard-gen-8b": {
    "id": "qwen3guard-gen-8b",
@@ -314,152 +310,6 @@
    },
    "open_weights": true,
    "last_updated": "2026-01-22"
-  },
-  "qwen3.5-397b-a17b": {
-   "id": "qwen3.5-397b-a17b",
-   "name": "Qwen3.5-397B-A17B",
-   "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3.5-397b-a17b",
-   "release_date": "2026-02-15",
-   "limit": {
-    "context": 262144,
-    "output": 262144
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.71
-     },
-     "output": {
-      "price": 4.25
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://oai.endpoints.kepler.ai.cloud.ovh.net/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-02-15"
-  },
-  "qwen3.5-9b": {
-   "id": "qwen3.5-9b",
-   "name": "Qwen3.5-9B",
-   "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3.5-9b",
-   "release_date": "2026-02-23",
-   "limit": {
-    "context": 262144,
-    "output": 262144
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.12
-     },
-     "output": {
-      "price": 0.18
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://oai.endpoints.kepler.ai.cloud.ovh.net/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-02-23"
   },
   "qwen2.5-vl-72b-instruct": {
    "id": "qwen2.5-vl-72b-instruct",
@@ -523,68 +373,6 @@
    "open_weights": true,
    "knowledge": "2024-04",
    "last_updated": "2025-01-26"
-  },
-  "meta-llama-3_3-70b-instruct": {
-   "id": "meta-llama-3_3-70b-instruct",
-   "name": "Meta-Llama-3_3-70B-Instruct",
-   "description": "Open Llama instruction model for multilingual chat, reasoning, and coding",
-   "type": "chat",
-   "family": "llama",
-   "canonical_id": "meta/llama-3.3-70b-instruct",
-   "release_date": "2024-12-06",
-   "limit": {
-    "context": 131072,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.74
-     },
-     "output": {
-      "price": 0.74
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://oai.endpoints.kepler.ai.cloud.ovh.net/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2023-12",
-   "last_updated": "2024-12-06"
   },
   "qwen3.6-27b": {
    "id": "qwen3.6-27b",
@@ -660,6 +448,145 @@
    "open_weights": true,
    "last_updated": "2026-04-22"
   },
+  "qwen3.5-9b": {
+   "id": "qwen3.5-9b",
+   "name": "Qwen3.5-9B",
+   "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.5-9b",
+   "release_date": "2026-02-23",
+   "limit": {
+    "context": 262144,
+    "output": 262144
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.12
+     },
+     "output": {
+      "price": 0.18
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://oai.endpoints.kepler.ai.cloud.ovh.net/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-02-23"
+  },
+  "mistral-small-3.2-24b-instruct-2506": {
+   "id": "mistral-small-3.2-24b-instruct-2506",
+   "name": "Mistral-Small-3.2-24B-Instruct-2506",
+   "description": "Efficient Mistral model for fast chat, extraction, and production assistants",
+   "type": "chat",
+   "family": "mistral-small",
+   "canonical_id": "mistral/mistral-small-3.2-24b-instruct",
+   "release_date": "2025-06-20",
+   "limit": {
+    "context": 131072,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1
+     },
+     "output": {
+      "price": 0.31
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/gif",
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://oai.endpoints.kepler.ai.cloud.ovh.net/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2023-10-31",
+   "last_updated": "2025-06-20"
+  },
   "gpt-oss-20b": {
    "id": "gpt-oss-20b",
    "name": "gpt-oss-20b",
@@ -726,6 +653,79 @@
    "open_weights": true,
    "knowledge": "2024-06",
    "last_updated": "2025-08-05"
+  },
+  "qwen3.5-397b-a17b": {
+   "id": "qwen3.5-397b-a17b",
+   "name": "Qwen3.5-397B-A17B",
+   "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.5-397b-a17b",
+   "release_date": "2026-02-15",
+   "limit": {
+    "context": 262144,
+    "output": 262144
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.71
+     },
+     "output": {
+      "price": 4.25
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://oai.endpoints.kepler.ai.cloud.ovh.net/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-02-15"
   }
  }
 }

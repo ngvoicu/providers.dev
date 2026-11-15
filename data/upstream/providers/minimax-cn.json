@@ -6,76 +6,10 @@
   "MINIMAX_API_KEY"
  ],
  "models": {
-  "MiniMax-H3-Image-Highspeed": {
-   "id": "MiniMax-H3-Image-Highspeed",
-   "name": "MiniMax H3 Image Highspeed",
-   "description": "Faster tier of MiniMax H3 Image for text-to-image and image editing",
-   "type": "image",
-   "family": "minimax",
-   "canonical_id": "minimax/MiniMax-H3-Image-Highspeed",
-   "release_date": "2026-11-10",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2.2436
-     }
-    },
-    "image": {
-     "input": {
-      "price": 2.9914
-     },
-     "output": {
-      "price": 7.4785
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/webp",
-     "image/heic",
-     "image/heif"
-    ],
-    "output": [
-     "image/jpeg",
-     "image/png",
-     "image/webp"
-    ]
-   },
-   "api": {
-    "images": {
-     "base_url": "https://api.minimax.cn/v1",
-     "sdk": {
-      "opencodeai": "@opencode/ai/providers/openai-compatible/images"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-11-10"
-  },
-  "MiniMax-M2.7": {
-   "id": "MiniMax-M2.7",
-   "name": "MiniMax-M2.7",
-   "description": "MiniMax model for chat, coding, office work, and agentic tasks",
+  "MiniMax-M2.7-highspeed": {
+   "id": "MiniMax-M2.7-highspeed",
+   "name": "MiniMax-M2.7-highspeed",
+   "description": "High-speed MiniMax model for low-latency coding and agent workflows",
    "type": "chat",
    "family": "minimax",
    "status": "deprecated",
@@ -106,14 +40,14 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.3137,
+      "price": 0.6275,
       "cache": {
        "read": 0.0627,
        "write": 0.3922
       }
      },
      "output": {
-      "price": 1.2549
+      "price": 2.5098
      }
     }
    },
@@ -177,6 +111,62 @@
    },
    "open_weights": true,
    "last_updated": "2026-03-18"
+  },
+  "speech-2.8-turbo": {
+   "id": "speech-2.8-turbo",
+   "name": "Speech 2.8 Turbo",
+   "description": "Fast text-to-speech model with sound tags and voice cloning",
+   "type": "speech",
+   "family": "minimax",
+   "canonical_id": "minimax/speech-2.8-turbo",
+   "release_date": "2026-01-23",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 29.9142,
+      "unit": "character"
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "audio/mpeg",
+     "audio/pcm",
+     "audio/flac",
+     "audio/wav",
+     "audio/basic",
+     "audio/opus"
+    ]
+   },
+   "api": {
+    "speech": {
+     "base_url": "https://api.minimax.cn/v1",
+     "path": "/t2a_v2",
+     "sdk": {}
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-01-23"
   },
   "MiniMax-H3-Max": {
    "id": "MiniMax-H3-Max",
@@ -270,250 +260,6 @@
    "open_weights": false,
    "last_updated": "2026-08-26"
   },
-  "MiniMax-Hailuo-02": {
-   "id": "MiniMax-Hailuo-02",
-   "name": "Hailuo 02",
-   "description": "Video model for 512P to 1080P clips of up to 10 seconds from text, a first-frame image or first and last frames",
-   "type": "video",
-   "family": "minimax",
-   "canonical_id": "minimax/MiniMax-Hailuo-02",
-   "release_date": "2025-06-18",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "video": {
-     "output": {
-      "unit": "second",
-      "price": 0.049857,
-      "overrides": [
-       {
-        "when": {
-         "all": [
-          {
-           "resolution": {
-            "equals": "768P"
-           }
-          },
-          {
-           "duration": {
-            "equals": 10
-           }
-          }
-         ]
-        },
-        "price": 0.059828
-       },
-       {
-        "when": {
-         "all": [
-          {
-           "resolution": {
-            "equals": "1080P"
-           }
-          },
-          {
-           "duration": {
-            "equals": 6
-           }
-          }
-         ]
-        },
-        "price": 0.08725
-       },
-       {
-        "when": {
-         "resolution": {
-          "equals": "512P"
-         }
-        },
-        "price": 0.014957
-       }
-      ]
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/webp"
-    ],
-    "output": [
-     "video/mp4"
-    ]
-   },
-   "api": {
-    "videos": {
-     "base_url": "https://api.minimax.cn",
-     "path": "/v1/video_generation",
-     "sdk": {
-      "opencodeai": "@opencode/ai/providers/minimax/videos"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2025-06-18"
-  },
-  "MiniMax-Hailuo-2.3": {
-   "id": "MiniMax-Hailuo-2.3",
-   "name": "Hailuo 2.3",
-   "description": "Video model for realistic human motion, cinematic effects and stylized scenes from text or a first-frame image",
-   "type": "video",
-   "family": "minimax",
-   "canonical_id": "minimax/MiniMax-Hailuo-2.3",
-   "release_date": "2025-10-28",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "video": {
-     "output": {
-      "unit": "second",
-      "price": 0.049857,
-      "overrides": [
-       {
-        "when": {
-         "all": [
-          {
-           "resolution": {
-            "equals": "768P"
-           }
-          },
-          {
-           "duration": {
-            "equals": 10
-           }
-          }
-         ]
-        },
-        "price": 0.059828
-       },
-       {
-        "when": {
-         "all": [
-          {
-           "resolution": {
-            "equals": "1080P"
-           }
-          },
-          {
-           "duration": {
-            "equals": 6
-           }
-          }
-         ]
-        },
-        "price": 0.08725
-       }
-      ]
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/webp"
-    ],
-    "output": [
-     "video/mp4"
-    ]
-   },
-   "api": {
-    "videos": {
-     "base_url": "https://api.minimax.cn",
-     "path": "/v1/video_generation",
-     "sdk": {
-      "opencodeai": "@opencode/ai/providers/minimax/videos"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2025-10-28"
-  },
-  "image-01": {
-   "id": "image-01",
-   "name": "MiniMax image-01",
-   "description": "MiniMax text-to-image generation model. The API also takes one character (portrait) reference to keep a person consistent, but it cannot edit an input image",
-   "type": "image",
-   "family": "minimax",
-   "canonical_id": "minimax/image-01",
-   "release_date": "2025-02-15",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "image": {
-     "output": {
-      "unit": "image",
-      "price": 0.003742
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "image/jpeg"
-    ]
-   },
-   "api": {
-    "images": {
-     "base_url": "https://api.minimax.cn/v1",
-     "sdk": {
-      "opencodeai": "@opencode/ai/providers/minimax/images"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-08-25"
-  },
   "MiniMax-H3-Lite": {
    "id": "MiniMax-H3-Lite",
    "name": "MiniMax H3 Lite",
@@ -606,13 +352,13 @@
    "open_weights": false,
    "last_updated": "2026-07-31"
   },
-  "speech-2.8-turbo": {
-   "id": "speech-2.8-turbo",
-   "name": "Speech 2.8 Turbo",
-   "description": "Fast text-to-speech model with sound tags and voice cloning",
+  "speech-2.8-hd": {
+   "id": "speech-2.8-hd",
+   "name": "Speech 2.8 HD",
+   "description": "High-fidelity text-to-speech model with sound tags and voice cloning",
    "type": "speech",
    "family": "minimax",
-   "canonical_id": "minimax/speech-2.8-turbo",
+   "canonical_id": "minimax/speech-2.8-hd",
    "release_date": "2026-01-23",
    "limit": {
     "context": 0,
@@ -634,7 +380,7 @@
    "cost": {
     "text": {
      "input": {
-      "price": 29.9142,
+      "price": 52.3498,
       "unit": "character"
      }
     }
@@ -815,6 +561,654 @@
    },
    "open_weights": true,
    "last_updated": "2026-06-25"
+  },
+  "image-01-live": {
+   "id": "image-01-live",
+   "name": "MiniMax image-01-live",
+   "description": "MiniMax image generation model with style presets. The API also takes one character (portrait) reference to keep a person consistent, but it cannot edit an input image",
+   "type": "image",
+   "family": "minimax",
+   "canonical_id": "minimax/image-01-live",
+   "release_date": "2025-02-15",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "image": {
+     "output": {
+      "unit": "image",
+      "price": 0.003742
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "image/jpeg"
+    ]
+   },
+   "api": {
+    "images": {
+     "base_url": "https://api.minimax.cn/v1",
+     "sdk": {
+      "opencodeai": "@opencode/ai/providers/minimax/images"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-02-15"
+  },
+  "MiniMax-M2.7": {
+   "id": "MiniMax-M2.7",
+   "name": "MiniMax-M2.7",
+   "description": "MiniMax model for chat, coding, office work, and agentic tasks",
+   "type": "chat",
+   "family": "minimax",
+   "status": "deprecated",
+   "release_date": "2026-03-18",
+   "limit": {
+    "context": 204800,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": {
+      "min_tokens": 512
+     },
+     "explicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.3137,
+      "cache": {
+       "read": 0.0627,
+       "write": 0.3922
+      }
+     },
+     "output": {
+      "price": 1.2549
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://api.minimax.cn/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/minimax/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "https://api.minimax.cn/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/minimax/chat"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "responses": {
+     "base_url": "https://api.minimax.cn/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/minimax/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-03-18"
+  },
+  "MiniMax-M2": {
+   "id": "MiniMax-M2",
+   "name": "MiniMax-M2",
+   "description": "MiniMax model for chat, coding, office work, and agentic tasks",
+   "type": "chat",
+   "family": "minimax",
+   "status": "deprecated",
+   "release_date": "2025-10-27",
+   "limit": {
+    "context": 204800,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "explicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.3137,
+      "cache": {
+       "read": 0.0314,
+       "write": 0.3922
+      }
+     },
+     "output": {
+      "price": 1.2549
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://api.minimax.cn/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/minimax/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "https://api.minimax.cn/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/minimax/chat"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "responses": {
+     "base_url": "https://api.minimax.cn/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/minimax/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-10-27"
+  },
+  "MiniMax-Hailuo-2.3-Fast": {
+   "id": "MiniMax-Hailuo-2.3-Fast",
+   "name": "Hailuo 2.3 Fast",
+   "description": "Faster, lower-cost Hailuo 2.3 variant that animates a first-frame image with a text prompt",
+   "type": "video",
+   "family": "minimax",
+   "canonical_id": "minimax/MiniMax-Hailuo-2.3-Fast",
+   "release_date": "2025-10-28",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "video": {
+     "output": {
+      "unit": "second",
+      "price": 0.033653,
+      "overrides": [
+       {
+        "when": {
+         "all": [
+          {
+           "resolution": {
+            "equals": "1080P"
+           }
+          },
+          {
+           "duration": {
+            "equals": 6
+           }
+          }
+         ]
+        },
+        "price": 0.057585
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp"
+    ],
+    "output": [
+     "video/mp4"
+    ]
+   },
+   "api": {
+    "videos": {
+     "base_url": "https://api.minimax.cn",
+     "path": "/v1/video_generation",
+     "sdk": {
+      "opencodeai": "@opencode/ai/providers/minimax/videos"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-10-28"
+  },
+  "MiniMax-M2.5": {
+   "id": "MiniMax-M2.5",
+   "name": "MiniMax-M2.5",
+   "description": "MiniMax model for chat, coding, office work, and agentic tasks",
+   "type": "chat",
+   "family": "minimax",
+   "status": "deprecated",
+   "release_date": "2026-02-12",
+   "limit": {
+    "context": 204800,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": {
+      "min_tokens": 512
+     },
+     "explicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.3137,
+      "cache": {
+       "read": 0.0314,
+       "write": 0.3922
+      }
+     },
+     "output": {
+      "price": 1.2549
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://api.minimax.cn/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/minimax/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "https://api.minimax.cn/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/minimax/chat"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "responses": {
+     "base_url": "https://api.minimax.cn/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/minimax/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-02-12"
+  },
+  "MiniMax-M2.5-highspeed": {
+   "id": "MiniMax-M2.5-highspeed",
+   "name": "MiniMax-M2.5-highspeed",
+   "description": "High-speed MiniMax model for low-latency coding and agent workflows",
+   "type": "chat",
+   "family": "minimax",
+   "status": "deprecated",
+   "release_date": "2026-02-13",
+   "limit": {
+    "context": 204800,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": {
+      "min_tokens": 512
+     },
+     "explicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.6275,
+      "cache": {
+       "read": 0.0314,
+       "write": 0.3922
+      }
+     },
+     "output": {
+      "price": 2.5098
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://api.minimax.cn/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/minimax/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "https://api.minimax.cn/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/minimax/chat"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "responses": {
+     "base_url": "https://api.minimax.cn/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/minimax/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-02-13"
+  },
+  "MiniMax-Hailuo-02": {
+   "id": "MiniMax-Hailuo-02",
+   "name": "Hailuo 02",
+   "description": "Video model for 512P to 1080P clips of up to 10 seconds from text, a first-frame image or first and last frames",
+   "type": "video",
+   "family": "minimax",
+   "canonical_id": "minimax/MiniMax-Hailuo-02",
+   "release_date": "2025-06-18",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "video": {
+     "output": {
+      "unit": "second",
+      "price": 0.049857,
+      "overrides": [
+       {
+        "when": {
+         "all": [
+          {
+           "resolution": {
+            "equals": "768P"
+           }
+          },
+          {
+           "duration": {
+            "equals": 10
+           }
+          }
+         ]
+        },
+        "price": 0.059828
+       },
+       {
+        "when": {
+         "all": [
+          {
+           "resolution": {
+            "equals": "1080P"
+           }
+          },
+          {
+           "duration": {
+            "equals": 6
+           }
+          }
+         ]
+        },
+        "price": 0.08725
+       },
+       {
+        "when": {
+         "resolution": {
+          "equals": "512P"
+         }
+        },
+        "price": 0.014957
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp"
+    ],
+    "output": [
+     "video/mp4"
+    ]
+   },
+   "api": {
+    "videos": {
+     "base_url": "https://api.minimax.cn",
+     "path": "/v1/video_generation",
+     "sdk": {
+      "opencodeai": "@opencode/ai/providers/minimax/videos"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-06-18"
   },
   "MiniMax-M3.1-Flash": {
    "id": "MiniMax-M3.1-Flash",
@@ -1007,541 +1401,6 @@
    "open_weights": true,
    "last_updated": "2026-11-10"
   },
-  "MiniMax-Hailuo-2.3-Fast": {
-   "id": "MiniMax-Hailuo-2.3-Fast",
-   "name": "Hailuo 2.3 Fast",
-   "description": "Faster, lower-cost Hailuo 2.3 variant that animates a first-frame image with a text prompt",
-   "type": "video",
-   "family": "minimax",
-   "canonical_id": "minimax/MiniMax-Hailuo-2.3-Fast",
-   "release_date": "2025-10-28",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "video": {
-     "output": {
-      "unit": "second",
-      "price": 0.033653,
-      "overrides": [
-       {
-        "when": {
-         "all": [
-          {
-           "resolution": {
-            "equals": "1080P"
-           }
-          },
-          {
-           "duration": {
-            "equals": 6
-           }
-          }
-         ]
-        },
-        "price": 0.057585
-       }
-      ]
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/webp"
-    ],
-    "output": [
-     "video/mp4"
-    ]
-   },
-   "api": {
-    "videos": {
-     "base_url": "https://api.minimax.cn",
-     "path": "/v1/video_generation",
-     "sdk": {
-      "opencodeai": "@opencode/ai/providers/minimax/videos"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2025-10-28"
-  },
-  "MiniMax-M2.7-highspeed": {
-   "id": "MiniMax-M2.7-highspeed",
-   "name": "MiniMax-M2.7-highspeed",
-   "description": "High-speed MiniMax model for low-latency coding and agent workflows",
-   "type": "chat",
-   "family": "minimax",
-   "status": "deprecated",
-   "release_date": "2026-03-18",
-   "limit": {
-    "context": 204800,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": {
-      "min_tokens": 512
-     },
-     "explicit": true
-    },
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.6275,
-      "cache": {
-       "read": 0.0627,
-       "write": 0.3922
-      }
-     },
-     "output": {
-      "price": 2.5098
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "messages": {
-     "base_url": "https://api.minimax.cn/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/minimax/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "https://api.minimax.cn/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/minimax/chat"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    },
-    "responses": {
-     "base_url": "https://api.minimax.cn/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/minimax/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-03-18"
-  },
-  "MiniMax-M2": {
-   "id": "MiniMax-M2",
-   "name": "MiniMax-M2",
-   "description": "MiniMax model for chat, coding, office work, and agentic tasks",
-   "type": "chat",
-   "family": "minimax",
-   "status": "deprecated",
-   "release_date": "2025-10-27",
-   "limit": {
-    "context": 204800,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": {
-     "explicit": true
-    },
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.3137,
-      "cache": {
-       "read": 0.0314,
-       "write": 0.3922
-      }
-     },
-     "output": {
-      "price": 1.2549
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "messages": {
-     "base_url": "https://api.minimax.cn/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/minimax/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "https://api.minimax.cn/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/minimax/chat"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    },
-    "responses": {
-     "base_url": "https://api.minimax.cn/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/minimax/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-10-27"
-  },
-  "MiniMax-H3": {
-   "id": "MiniMax-H3",
-   "name": "MiniMax H3",
-   "description": "MiniMax general-purpose video model with multimodal references and synchronized stereo audio. Open H3-Base checkpoints; Context-IR and 2K regeneration are not included in the initial weights release.",
-   "type": "video",
-   "family": "minimax",
-   "canonical_id": "minimax/MiniMax-H3",
-   "release_date": "2026-07-31",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "image": {
-     "input": {
-      "unit": "image",
-      "price": 0.0299
-     }
-    },
-    "video": {
-     "input": {
-      "unit": "second",
-      "price": 0.1197,
-      "overrides": [
-       {
-        "when": {
-         "resolution": {
-          "equals": "768P"
-         }
-        },
-        "price": 0.0748
-       }
-      ]
-     },
-     "output": {
-      "unit": "second",
-      "price": 0.1197,
-      "overrides": [
-       {
-        "when": {
-         "resolution": {
-          "equals": "768P"
-         }
-        },
-        "price": 0.0748
-       }
-      ]
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "video/mp4",
-     "video/quicktime",
-     "audio/wav",
-     "audio/mpeg"
-    ],
-    "output": [
-     "video/mp4",
-     "audio"
-    ]
-   },
-   "api": {
-    "videos": {
-     "base_url": "https://api.minimax.cn",
-     "path": "/v2/video_generation",
-     "sdk": {
-      "opencodeai": "@opencode/ai/providers/minimax/videos"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-10-04"
-  },
-  "image-01-live": {
-   "id": "image-01-live",
-   "name": "MiniMax image-01-live",
-   "description": "MiniMax image generation model with style presets. The API also takes one character (portrait) reference to keep a person consistent, but it cannot edit an input image",
-   "type": "image",
-   "family": "minimax",
-   "canonical_id": "minimax/image-01-live",
-   "release_date": "2025-02-15",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "image": {
-     "output": {
-      "unit": "image",
-      "price": 0.003742
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "image/jpeg"
-    ]
-   },
-   "api": {
-    "images": {
-     "base_url": "https://api.minimax.cn/v1",
-     "sdk": {
-      "opencodeai": "@opencode/ai/providers/minimax/images"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2025-02-15"
-  },
-  "MiniMax-M2.5": {
-   "id": "MiniMax-M2.5",
-   "name": "MiniMax-M2.5",
-   "description": "MiniMax model for chat, coding, office work, and agentic tasks",
-   "type": "chat",
-   "family": "minimax",
-   "status": "deprecated",
-   "release_date": "2026-02-12",
-   "limit": {
-    "context": 204800,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": {
-      "min_tokens": 512
-     },
-     "explicit": true
-    },
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.3137,
-      "cache": {
-       "read": 0.0314,
-       "write": 0.3922
-      }
-     },
-     "output": {
-      "price": 1.2549
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "messages": {
-     "base_url": "https://api.minimax.cn/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/minimax/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "https://api.minimax.cn/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/minimax/chat"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    },
-    "responses": {
-     "base_url": "https://api.minimax.cn/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/minimax/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-02-12"
-  },
   "MiniMax-H3-Highspeed": {
    "id": "MiniMax-H3-Highspeed",
    "name": "MiniMax H3 Highspeed",
@@ -1633,6 +1492,98 @@
    },
    "open_weights": false,
    "last_updated": "2026-07-31"
+  },
+  "MiniMax-Hailuo-2.3": {
+   "id": "MiniMax-Hailuo-2.3",
+   "name": "Hailuo 2.3",
+   "description": "Video model for realistic human motion, cinematic effects and stylized scenes from text or a first-frame image",
+   "type": "video",
+   "family": "minimax",
+   "canonical_id": "minimax/MiniMax-Hailuo-2.3",
+   "release_date": "2025-10-28",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "video": {
+     "output": {
+      "unit": "second",
+      "price": 0.049857,
+      "overrides": [
+       {
+        "when": {
+         "all": [
+          {
+           "resolution": {
+            "equals": "768P"
+           }
+          },
+          {
+           "duration": {
+            "equals": 10
+           }
+          }
+         ]
+        },
+        "price": 0.059828
+       },
+       {
+        "when": {
+         "all": [
+          {
+           "resolution": {
+            "equals": "1080P"
+           }
+          },
+          {
+           "duration": {
+            "equals": 6
+           }
+          }
+         ]
+        },
+        "price": 0.08725
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp"
+    ],
+    "output": [
+     "video/mp4"
+    ]
+   },
+   "api": {
+    "videos": {
+     "base_url": "https://api.minimax.cn",
+     "path": "/v1/video_generation",
+     "sdk": {
+      "opencodeai": "@opencode/ai/providers/minimax/videos"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-10-28"
   },
   "MiniMax-M2.1": {
    "id": "MiniMax-M2.1",
@@ -1740,48 +1691,129 @@
    "open_weights": true,
    "last_updated": "2025-12-23"
   },
-  "MiniMax-M2.5-highspeed": {
-   "id": "MiniMax-M2.5-highspeed",
-   "name": "MiniMax-M2.5-highspeed",
-   "description": "High-speed MiniMax model for low-latency coding and agent workflows",
-   "type": "chat",
+  "MiniMax-H3": {
+   "id": "MiniMax-H3",
+   "name": "MiniMax H3",
+   "description": "MiniMax general-purpose video model with multimodal references and synchronized stereo audio. Open H3-Base checkpoints; Context-IR and 2K regeneration are not included in the initial weights release.",
+   "type": "video",
    "family": "minimax",
-   "status": "deprecated",
-   "release_date": "2026-02-13",
+   "canonical_id": "minimax/MiniMax-H3",
+   "release_date": "2026-07-31",
    "limit": {
-    "context": 204800,
-    "output": 131072
+    "context": 0,
+    "output": 0
    },
    "capabilities": {
-    "cache": {
-     "implicit": {
-      "min_tokens": 512
-     },
-     "explicit": true
-    },
-    "temperature": true,
+    "temperature": false,
     "top_k": false,
-    "top_p": true,
+    "top_p": false,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
-     "supported": true
+     "supported": false
     },
     "reasoning": {
-     "supported": true
+     "supported": false
     }
    },
    "cost": {
-    "text": {
+    "image": {
      "input": {
-      "price": 0.6275,
-      "cache": {
-       "read": 0.0314,
-       "write": 0.3922
-      }
+      "unit": "image",
+      "price": 0.0299
+     }
+    },
+    "video": {
+     "input": {
+      "unit": "second",
+      "price": 0.1197,
+      "overrides": [
+       {
+        "when": {
+         "resolution": {
+          "equals": "768P"
+         }
+        },
+        "price": 0.0748
+       }
+      ]
      },
      "output": {
-      "price": 2.5098
+      "unit": "second",
+      "price": 0.1197,
+      "overrides": [
+       {
+        "when": {
+         "resolution": {
+          "equals": "768P"
+         }
+        },
+        "price": 0.0748
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/quicktime",
+     "audio/wav",
+     "audio/mpeg"
+    ],
+    "output": [
+     "video/mp4",
+     "audio"
+    ]
+   },
+   "api": {
+    "videos": {
+     "base_url": "https://api.minimax.cn",
+     "path": "/v2/video_generation",
+     "sdk": {
+      "opencodeai": "@opencode/ai/providers/minimax/videos"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-10-04"
+  },
+  "image-01": {
+   "id": "image-01",
+   "name": "MiniMax image-01",
+   "description": "MiniMax text-to-image generation model. The API also takes one character (portrait) reference to keep a person consistent, but it cannot edit an input image",
+   "type": "image",
+   "family": "minimax",
+   "canonical_id": "minimax/image-01",
+   "release_date": "2025-02-15",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "image": {
+     "output": {
+      "unit": "image",
+      "price": 0.003742
      }
     }
    },
@@ -1790,70 +1822,28 @@
      "text"
     ],
     "output": [
-     "text"
+     "image/jpeg"
     ]
    },
    "api": {
-    "messages": {
-     "base_url": "https://api.minimax.cn/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/minimax/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "chat-completions": {
+    "images": {
      "base_url": "https://api.minimax.cn/v1",
      "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/minimax/chat"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    },
-    "responses": {
-     "base_url": "https://api.minimax.cn/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/minimax/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
+      "opencodeai": "@opencode/ai/providers/minimax/images"
      }
     }
    },
-   "open_weights": true,
-   "last_updated": "2026-02-13"
+   "open_weights": false,
+   "last_updated": "2026-08-25"
   },
-  "speech-2.8-hd": {
-   "id": "speech-2.8-hd",
-   "name": "Speech 2.8 HD",
-   "description": "High-fidelity text-to-speech model with sound tags and voice cloning",
-   "type": "speech",
+  "MiniMax-H3-Image-Highspeed": {
+   "id": "MiniMax-H3-Image-Highspeed",
+   "name": "MiniMax H3 Image Highspeed",
+   "description": "Faster tier of MiniMax H3 Image for text-to-image and image editing",
+   "type": "image",
    "family": "minimax",
-   "canonical_id": "minimax/speech-2.8-hd",
-   "release_date": "2026-01-23",
+   "canonical_id": "minimax/MiniMax-H3-Image-Highspeed",
+   "release_date": "2026-11-10",
    "limit": {
     "context": 0,
     "output": 0
@@ -1874,33 +1864,43 @@
    "cost": {
     "text": {
      "input": {
-      "price": 52.3498,
-      "unit": "character"
+      "price": 2.2436
+     }
+    },
+    "image": {
+     "input": {
+      "price": 2.9914
+     },
+     "output": {
+      "price": 7.4785
      }
     }
    },
    "modalities": {
     "input": [
-     "text"
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp",
+     "image/heic",
+     "image/heif"
     ],
     "output": [
-     "audio/mpeg",
-     "audio/pcm",
-     "audio/flac",
-     "audio/wav",
-     "audio/basic",
-     "audio/opus"
+     "image/jpeg",
+     "image/png",
+     "image/webp"
     ]
    },
    "api": {
-    "speech": {
+    "images": {
      "base_url": "https://api.minimax.cn/v1",
-     "path": "/t2a_v2",
-     "sdk": {}
+     "sdk": {
+      "opencodeai": "@opencode/ai/providers/openai-compatible/images"
+     }
     }
    },
-   "open_weights": false,
-   "last_updated": "2026-01-23"
+   "open_weights": true,
+   "last_updated": "2026-11-10"
   }
  }
 }

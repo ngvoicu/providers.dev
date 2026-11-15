@@ -6,6 +6,85 @@
   "MODULAR_API_KEY"
  ],
  "models": {
+  "minimax/minimax-m3": {
+   "id": "minimax/minimax-m3",
+   "name": "MiniMax-M3",
+   "description": "MiniMax multimodal model for long-context coding, perception, and agent planning",
+   "type": "chat",
+   "family": "minimax",
+   "canonical_id": "minimax/MiniMax-M3",
+   "release_date": "2026-06-01",
+   "limit": {
+    "context": 1048576,
+    "output": 512000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "default": {
+      "type": "toggle",
+      "value": true
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.3,
+      "cache": {
+       "read": 0.06
+      }
+     },
+     "output": {
+      "price": 1.2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/quicktime",
+     "video/x-matroska"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.modular.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-06-01"
+  },
   "google/gemma-4-31b-it": {
    "id": "google/gemma-4-31b-it",
    "name": "Gemma 4 31B IT",
@@ -156,85 +235,6 @@
    "open_weights": true,
    "knowledge": "2025-05",
    "last_updated": "2026-10-17"
-  },
-  "minimax/minimax-m3": {
-   "id": "minimax/minimax-m3",
-   "name": "MiniMax-M3",
-   "description": "MiniMax multimodal model for long-context coding, perception, and agent planning",
-   "type": "chat",
-   "family": "minimax",
-   "canonical_id": "minimax/MiniMax-M3",
-   "release_date": "2026-06-01",
-   "limit": {
-    "context": 1048576,
-    "output": 512000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "default": {
-      "type": "toggle",
-      "value": true
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.3,
-      "cache": {
-       "read": 0.06
-      }
-     },
-     "output": {
-      "price": 1.2
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/quicktime",
-     "video/x-matroska"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.modular.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-06-01"
   },
   "MiniMaxAI/MiniMax-M3.1-Flash": {
    "id": "MiniMaxAI/MiniMax-M3.1-Flash",

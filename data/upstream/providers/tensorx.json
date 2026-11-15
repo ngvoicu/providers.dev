@@ -6,66 +6,57 @@
   "TENSORX_API_KEY"
  ],
  "models": {
-  "moonshotai/kimi-k2.6": {
-   "id": "moonshotai/kimi-k2.6",
-   "name": "Kimi K2.6",
-   "description": "Multimodal Kimi workhorse for agent loops, coding tasks, and visual context",
+  "minimax/minimax-m2.5": {
+   "id": "minimax/minimax-m2.5",
+   "name": "MiniMax-M2.5",
+   "description": "Prior MiniMax coding model for agent workflows, office edits, and automation",
    "type": "chat",
-   "family": "kimi-k2",
-   "canonical_id": "moonshotai/kimi-k2.6",
+   "family": "minimax",
+   "canonical_id": "minimax/MiniMax-M2.5",
    "status": "deprecated",
-   "release_date": "2026-04-20",
+   "release_date": "2026-02-12",
    "limit": {
-    "context": 262144,
-    "output": 262144
+    "context": 196608,
+    "output": 65536
    },
    "capabilities": {
     "temperature": true,
-    "top_k": true,
+    "top_k": false,
     "top_p": true,
-    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": true
+     "supported": true,
+     "effort": [
+      "minimal",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 1,
+      "price": 0.3,
       "cache": {
-       "read": 0.25,
-       "write": 1.25
+       "read": 0.075,
+       "write": 0.375
       }
      },
      "output": {
-      "price": 4
+      "price": 1.2
      }
     }
    },
    "modalities": {
     "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/heic",
-     "image/heif",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp"
+     "text"
     ],
     "output": [
      "text"
@@ -86,45 +77,44 @@
     }
    },
    "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-04-20"
+   "last_updated": "2026-02-12"
   },
-  "moonshotai/kimi-k2.7-code": {
-   "id": "moonshotai/kimi-k2.7-code",
-   "name": "Kimi K2.7 Code",
-   "description": "Coding-focused Kimi model, stronger on long-horizon repo work with less overthinking",
+  "minimax/minimax-m3": {
+   "id": "minimax/minimax-m3",
+   "name": "MiniMax-M3",
+   "description": "MiniMax multimodal model for long-context coding, perception, and agent planning",
    "type": "chat",
-   "family": "kimi-k2",
-   "canonical_id": "moonshotai/kimi-k2.7-code",
-   "release_date": "2026-06-12",
+   "family": "minimax",
+   "canonical_id": "minimax/MiniMax-M3",
+   "release_date": "2026-06-01",
    "limit": {
-    "context": 262144,
-    "output": 262144
+    "context": 1048576,
+    "output": 131072
    },
    "capabilities": {
-    "temperature": false,
+    "temperature": true,
     "top_k": false,
-    "top_p": false,
-    "structured_output": true,
+    "top_p": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": true
+     "supported": true,
+     "toggle": true
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 1.25,
+      "price": 0.4,
       "cache": {
-       "read": 0.3125
+       "read": 0.1
       }
      },
      "output": {
-      "price": 4.5
+      "price": 2
      }
     }
    },
@@ -135,18 +125,10 @@
      "image/png",
      "image/gif",
      "image/webp",
-     "image/bmp",
-     "image/heic",
-     "image/heif",
      "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp"
+     "video/x-msvideo",
+     "video/quicktime",
+     "video/x-matroska"
     ],
     "output": [
      "text"
@@ -167,8 +149,7 @@
     }
    },
    "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-06-12"
+   "last_updated": "2026-06-01"
   },
   "moonshotai/kimi-k3": {
    "id": "moonshotai/kimi-k3",
@@ -333,6 +314,641 @@
    "knowledge": "2025-01",
    "last_updated": "2026-01-27"
   },
+  "moonshotai/kimi-k2.7-code": {
+   "id": "moonshotai/kimi-k2.7-code",
+   "name": "Kimi K2.7 Code",
+   "description": "Coding-focused Kimi model, stronger on long-horizon repo work with less overthinking",
+   "type": "chat",
+   "family": "kimi-k2",
+   "canonical_id": "moonshotai/kimi-k2.7-code",
+   "release_date": "2026-06-12",
+   "limit": {
+    "context": 262144,
+    "output": 262144
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.25,
+      "cache": {
+       "read": 0.3125
+      }
+     },
+     "output": {
+      "price": 4.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.tensorx.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-01",
+   "last_updated": "2026-06-12"
+  },
+  "moonshotai/kimi-k2.6": {
+   "id": "moonshotai/kimi-k2.6",
+   "name": "Kimi K2.6",
+   "description": "Multimodal Kimi workhorse for agent loops, coding tasks, and visual context",
+   "type": "chat",
+   "family": "kimi-k2",
+   "canonical_id": "moonshotai/kimi-k2.6",
+   "status": "deprecated",
+   "release_date": "2026-04-20",
+   "limit": {
+    "context": 262144,
+    "output": 262144
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1,
+      "cache": {
+       "read": 0.25,
+       "write": 1.25
+      }
+     },
+     "output": {
+      "price": 4
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.tensorx.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-01",
+   "last_updated": "2026-04-20"
+  },
+  "qwen/qwen3.8-27b": {
+   "id": "qwen/qwen3.8-27b",
+   "name": "Qwen3.8 27B",
+   "description": "Dense 27B vision-language model for coding, agent tasks, and image and video understanding",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.8-27b",
+   "release_date": "2026-08-14",
+   "limit": {
+    "context": 262144,
+    "output": 32768
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.4,
+      "cache": {
+       "read": 0.1
+      }
+     },
+     "output": {
+      "price": 2.4
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/x-matroska",
+     "video/quicktime",
+     "video/x-flv",
+     "video/x-ms-wmv"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.tensorx.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-14"
+  },
+  "qwen/qwen3.5-122b-a10b": {
+   "id": "qwen/qwen3.5-122b-a10b",
+   "name": "Qwen3.5 122B-A10B",
+   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.5-122b-a10b",
+   "status": "deprecated",
+   "release_date": "2026-02-23",
+   "limit": {
+    "context": 262144,
+    "output": 262144
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.5,
+      "cache": {
+       "read": 0.125,
+       "write": 0.625
+      }
+     },
+     "output": {
+      "price": 3.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/x-matroska",
+     "video/quicktime",
+     "video/x-flv",
+     "video/x-ms-wmv"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.tensorx.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-02-23"
+  },
+  "qwen/qwen3-235b-a22b-2507": {
+   "id": "qwen/qwen3-235b-a22b-2507",
+   "name": "Qwen3 235B-A22B-2507",
+   "description": "Qwen instruction model for multilingual chat, reasoning, and tool use",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3-235b-a22b-instruct-2507",
+   "status": "deprecated",
+   "release_date": "2025-07-21",
+   "limit": {
+    "context": 131000,
+    "output": 131000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.072,
+      "cache": {
+       "read": 0.018,
+       "write": 0.09
+      }
+     },
+     "output": {
+      "price": 0.464
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.tensorx.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-06-30",
+   "last_updated": "2025-07-21"
+  },
+  "qwen/qwen3.5-9b": {
+   "id": "qwen/qwen3.5-9b",
+   "name": "Qwen3.5 9B",
+   "description": "Qwen instruction model for multilingual chat, reasoning, and tool use",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.5-9b",
+   "status": "deprecated",
+   "release_date": "2026-02-23",
+   "limit": {
+    "context": 262144,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.15,
+      "cache": {
+       "read": 0.0375,
+       "write": 0.1875
+      }
+     },
+     "output": {
+      "price": 0.2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/x-matroska",
+     "video/quicktime",
+     "video/x-flv",
+     "video/x-ms-wmv"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.tensorx.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-02-23"
+  },
+  "qwen/qwen3.8-flash-next": {
+   "id": "qwen/qwen3.8-flash-next",
+   "name": "Qwen3.8 Flash Next",
+   "description": "Open-weight experimental preview of the Qwen4 architecture: hybrid-attention MoE (125B total, 6B active) with vision encoder for coding, agent tasks, and image and video understanding",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.8-flash-next",
+   "release_date": "2026-08-27",
+   "limit": {
+    "context": 262144,
+    "output": 64000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.2,
+      "cache": {
+       "read": 0.05
+      }
+     },
+     "output": {
+      "price": 0.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/x-matroska",
+     "video/quicktime",
+     "video/x-flv",
+     "video/x-ms-wmv"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.tensorx.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-27"
+  },
+  "qwen/qwen3.8-2.4t-a95b": {
+   "id": "qwen/qwen3.8-2.4t-a95b",
+   "name": "Qwen3.8 2.4T A95B",
+   "description": "Open-weight sparse MoE (2.4T total, 95B active), the open-weight twin of Qwen3.8 Max for coding, research, complex reasoning, and agentic workflows",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.8-2.4t-a95b",
+   "release_date": "2026-08-12",
+   "limit": {
+    "context": 262144,
+    "output": 64000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2.5,
+      "cache": {
+       "read": 0.63
+      }
+     },
+     "output": {
+      "price": 6
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.tensorx.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-12"
+  },
   "deepseek/deepseek-v3.2": {
    "id": "deepseek/deepseek-v3.2",
    "name": "DeepSeek V3.2",
@@ -408,23 +1024,23 @@
    "knowledge": "2025-05",
    "last_updated": "2025-12-01"
   },
-  "deepseek/deepseek-v4-pro-0813": {
-   "id": "deepseek/deepseek-v4-pro-0813",
-   "name": "DeepSeek V4 Pro 0813",
-   "description": "DeepSeek V4 Pro snapshot with million-token context and support for thinking and non-thinking modes",
+  "deepseek/deepseek-r1-0528": {
+   "id": "deepseek/deepseek-r1-0528",
+   "name": "DeepSeek R1-0528",
+   "description": "May 2025 DeepSeek R1 update with improved mathematics, coding, and reasoning",
    "type": "chat",
    "family": "deepseek-thinking",
-   "canonical_id": "deepseek/deepseek-v4-pro-0813",
-   "release_date": "2026-08-13",
+   "canonical_id": "deepseek/deepseek-r1-0528",
+   "status": "deprecated",
+   "release_date": "2025-05-28",
    "limit": {
-    "context": 1048576,
-    "output": 64000
+    "context": 164000,
+    "output": 8192
    },
    "capabilities": {
     "temperature": true,
     "top_k": true,
     "top_p": true,
-    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -432,9 +1048,12 @@
     },
     "reasoning": {
      "supported": true,
-     "toggle": true,
      "effort": [
+      "minimal",
+      "low",
+      "medium",
       "high",
+      "xhigh",
       "max"
      ]
     }
@@ -442,13 +1061,14 @@
    "cost": {
     "text": {
      "input": {
-      "price": 2,
+      "price": 0.66,
       "cache": {
-       "read": 0.5
+       "read": 0.165,
+       "write": 0.825
       }
      },
      "output": {
-      "price": 4
+      "price": 2.6
      }
     }
    },
@@ -475,7 +1095,8 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2026-08-22"
+   "knowledge": "2024-07",
+   "last_updated": "2025-05-28"
   },
   "deepseek/deepseek-v4-pro": {
    "id": "deepseek/deepseek-v4-pro",
@@ -619,23 +1240,23 @@
    "knowledge": "2025-05",
    "last_updated": "2026-07-31"
   },
-  "deepseek/deepseek-r1-0528": {
-   "id": "deepseek/deepseek-r1-0528",
-   "name": "DeepSeek R1-0528",
-   "description": "May 2025 DeepSeek R1 update with improved mathematics, coding, and reasoning",
+  "deepseek/deepseek-v4-pro-0813": {
+   "id": "deepseek/deepseek-v4-pro-0813",
+   "name": "DeepSeek V4 Pro 0813",
+   "description": "DeepSeek V4 Pro snapshot with million-token context and support for thinking and non-thinking modes",
    "type": "chat",
    "family": "deepseek-thinking",
-   "canonical_id": "deepseek/deepseek-r1-0528",
-   "status": "deprecated",
-   "release_date": "2025-05-28",
+   "canonical_id": "deepseek/deepseek-v4-pro-0813",
+   "release_date": "2026-08-13",
    "limit": {
-    "context": 164000,
-    "output": 8192
+    "context": 1048576,
+    "output": 64000
    },
    "capabilities": {
     "temperature": true,
     "top_k": true,
     "top_p": true,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -643,12 +1264,9 @@
     },
     "reasoning": {
      "supported": true,
+     "toggle": true,
      "effort": [
-      "minimal",
-      "low",
-      "medium",
       "high",
-      "xhigh",
       "max"
      ]
     }
@@ -656,14 +1274,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.66,
+      "price": 2,
       "cache": {
-       "read": 0.165,
-       "write": 0.825
+       "read": 0.5
       }
      },
      "output": {
-      "price": 2.6
+      "price": 4
      }
     }
    },
@@ -690,8 +1307,7 @@
     }
    },
    "open_weights": true,
-   "knowledge": "2024-07",
-   "last_updated": "2025-05-28"
+   "last_updated": "2026-08-22"
   },
   "deepseek/deepseek-v4.1-flash": {
    "id": "deepseek/deepseek-v4.1-flash",
@@ -767,493 +1383,22 @@
    "knowledge": "2025-05",
    "last_updated": "2026-09-10"
   },
-  "qwen/qwen3.8-2.4t-a95b": {
-   "id": "qwen/qwen3.8-2.4t-a95b",
-   "name": "Qwen3.8 2.4T A95B",
-   "description": "Open-weight sparse MoE (2.4T total, 95B active), the open-weight twin of Qwen3.8 Max for coding, research, complex reasoning, and agentic workflows",
+  "z-ai/glm-5": {
+   "id": "z-ai/glm-5",
+   "name": "GLM-5",
+   "description": "General GLM flagship for coding, analysis, and tool-heavy engineering workflows",
    "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3.8-2.4t-a95b",
-   "release_date": "2026-08-12",
-   "limit": {
-    "context": 262144,
-    "output": 64000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "xhigh"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2.5,
-      "cache": {
-       "read": 0.63
-      }
-     },
-     "output": {
-      "price": 6
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.tensorx.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-08-12"
-  },
-  "qwen/qwen3.8-27b": {
-   "id": "qwen/qwen3.8-27b",
-   "name": "Qwen3.8 27B",
-   "description": "Dense 27B vision-language model for coding, agent tasks, and image and video understanding",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3.8-27b",
-   "release_date": "2026-08-14",
-   "limit": {
-    "context": 262144,
-    "output": 32768
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "xhigh"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.4,
-      "cache": {
-       "read": 0.1
-      }
-     },
-     "output": {
-      "price": 2.4
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/x-matroska",
-     "video/quicktime",
-     "video/x-flv",
-     "video/x-ms-wmv"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.tensorx.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-08-14"
-  },
-  "qwen/qwen3.8-flash-next": {
-   "id": "qwen/qwen3.8-flash-next",
-   "name": "Qwen3.8 Flash Next",
-   "description": "Open-weight experimental preview of the Qwen4 architecture: hybrid-attention MoE (125B total, 6B active) with vision encoder for coding, agent tasks, and image and video understanding",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3.8-flash-next",
-   "release_date": "2026-08-27",
-   "limit": {
-    "context": 262144,
-    "output": 64000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "xhigh"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.2,
-      "cache": {
-       "read": 0.05
-      }
-     },
-     "output": {
-      "price": 0.5
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/x-matroska",
-     "video/quicktime",
-     "video/x-flv",
-     "video/x-ms-wmv"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.tensorx.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-08-27"
-  },
-  "qwen/qwen3-235b-a22b-2507": {
-   "id": "qwen/qwen3-235b-a22b-2507",
-   "name": "Qwen3 235B-A22B-2507",
-   "description": "Qwen instruction model for multilingual chat, reasoning, and tool use",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3-235b-a22b-instruct-2507",
-   "status": "deprecated",
-   "release_date": "2025-07-21",
-   "limit": {
-    "context": 131000,
-    "output": 131000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.072,
-      "cache": {
-       "read": 0.018,
-       "write": 0.09
-      }
-     },
-     "output": {
-      "price": 0.464
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.tensorx.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-06-30",
-   "last_updated": "2025-07-21"
-  },
-  "qwen/qwen3.5-122b-a10b": {
-   "id": "qwen/qwen3.5-122b-a10b",
-   "name": "Qwen3.5 122B-A10B",
-   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3.5-122b-a10b",
-   "status": "deprecated",
-   "release_date": "2026-02-23",
-   "limit": {
-    "context": 262144,
-    "output": 262144
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "minimal",
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.5,
-      "cache": {
-       "read": 0.125,
-       "write": 0.625
-      }
-     },
-     "output": {
-      "price": 3.5
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/x-matroska",
-     "video/quicktime",
-     "video/x-flv",
-     "video/x-ms-wmv"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.tensorx.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-02-23"
-  },
-  "qwen/qwen3.5-9b": {
-   "id": "qwen/qwen3.5-9b",
-   "name": "Qwen3.5 9B",
-   "description": "Qwen instruction model for multilingual chat, reasoning, and tool use",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3.5-9b",
-   "status": "deprecated",
-   "release_date": "2026-02-23",
-   "limit": {
-    "context": 262144,
-    "output": 65536
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "minimal",
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.15,
-      "cache": {
-       "read": 0.0375,
-       "write": 0.1875
-      }
-     },
-     "output": {
-      "price": 0.2
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/x-matroska",
-     "video/quicktime",
-     "video/x-flv",
-     "video/x-ms-wmv"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.tensorx.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-02-23"
-  },
-  "minimax/minimax-m2.5": {
-   "id": "minimax/minimax-m2.5",
-   "name": "MiniMax-M2.5",
-   "description": "Prior MiniMax coding model for agent workflows, office edits, and automation",
-   "type": "chat",
-   "family": "minimax",
-   "canonical_id": "minimax/MiniMax-M2.5",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5",
    "status": "deprecated",
    "release_date": "2026-02-12",
    "limit": {
-    "context": 196608,
-    "output": 65536
+    "context": 202752,
+    "output": 202752
    },
    "capabilities": {
     "temperature": true,
-    "top_k": false,
+    "top_k": true,
     "top_p": true,
     "system_updates": false,
     "effort_updates": false,
@@ -1263,6 +1408,7 @@
     "reasoning": {
      "supported": true,
      "effort": [
+      "none",
       "minimal",
       "low",
       "medium",
@@ -1275,14 +1421,14 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.3,
+      "price": 1,
       "cache": {
-       "read": 0.075,
-       "write": 0.375
+       "read": 0.25,
+       "write": 1.25
       }
      },
      "output": {
-      "price": 1.2
+      "price": 3.2
      }
     }
    },
@@ -1310,360 +1456,6 @@
    },
    "open_weights": true,
    "last_updated": "2026-02-12"
-  },
-  "minimax/minimax-m3": {
-   "id": "minimax/minimax-m3",
-   "name": "MiniMax-M3",
-   "description": "MiniMax multimodal model for long-context coding, perception, and agent planning",
-   "type": "chat",
-   "family": "minimax",
-   "canonical_id": "minimax/MiniMax-M3",
-   "release_date": "2026-06-01",
-   "limit": {
-    "context": 1048576,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.4,
-      "cache": {
-       "read": 0.1
-      }
-     },
-     "output": {
-      "price": 2
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/quicktime",
-     "video/x-matroska"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.tensorx.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-06-01"
-  },
-  "z-ai/glm-5.2": {
-   "id": "z-ai/glm-5.2",
-   "name": "GLM-5.2",
-   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
-   "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-5.2",
-   "release_date": "2026-06-13",
-   "limit": {
-    "context": 1048576,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.5,
-      "cache": {
-       "read": 0.375
-      }
-     },
-     "output": {
-      "price": 4.5
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.tensorx.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-06-13"
-  },
-  "z-ai/glm-5.3": {
-   "id": "z-ai/glm-5.3",
-   "name": "GLM-5.3",
-   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
-   "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-5.3",
-   "release_date": "2026-08-14",
-   "limit": {
-    "context": 1048576,
-    "output": 64000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.75,
-      "cache": {
-       "read": 0.44
-      }
-     },
-     "output": {
-      "price": 4.5
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.tensorx.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-08-14"
-  },
-  "z-ai/glm-5.3-flash": {
-   "id": "z-ai/glm-5.3-flash",
-   "name": "GLM-5.3-Flash",
-   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
-   "type": "chat",
-   "family": "glm-flash",
-   "canonical_id": "zhipuai/glm-5.3-flash",
-   "release_date": "2026-08-26",
-   "limit": {
-    "context": 1048576,
-    "output": 64000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.2,
-      "cache": {
-       "read": 0.05
-      }
-     },
-     "output": {
-      "price": 0.5
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "video/mp4",
-     "video/x-matroska",
-     "video/quicktime",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.tensorx.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-08-26"
-  },
-  "z-ai/glm-5-turbo": {
-   "id": "z-ai/glm-5-turbo",
-   "name": "GLM-5-Turbo",
-   "description": "Faster GLM-5 lane for coding agents that need lower latency",
-   "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-5-turbo",
-   "status": "deprecated",
-   "release_date": "2026-03-16",
-   "limit": {
-    "context": 202752,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.2,
-      "cache": {
-       "read": 0.3,
-       "write": 1.5
-      }
-     },
-     "output": {
-      "price": 4
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.tensorx.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-03-16"
   },
   "z-ai/glm-5v-turbo": {
    "id": "z-ai/glm-5v-turbo",
@@ -1746,23 +1538,24 @@
    "open_weights": false,
    "last_updated": "2026-04-01"
   },
-  "z-ai/glm-5": {
-   "id": "z-ai/glm-5",
-   "name": "GLM-5",
-   "description": "General GLM flagship for coding, analysis, and tool-heavy engineering workflows",
+  "z-ai/glm-5-turbo": {
+   "id": "z-ai/glm-5-turbo",
+   "name": "GLM-5-Turbo",
+   "description": "Faster GLM-5 lane for coding agents that need lower latency",
    "type": "chat",
    "family": "glm",
-   "canonical_id": "zhipuai/glm-5",
+   "canonical_id": "zhipuai/glm-5-turbo",
    "status": "deprecated",
-   "release_date": "2026-02-12",
+   "release_date": "2026-03-16",
    "limit": {
     "context": 202752,
-    "output": 202752
+    "output": 131072
    },
    "capabilities": {
     "temperature": true,
-    "top_k": true,
+    "top_k": false,
     "top_p": true,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -1770,28 +1563,20 @@
     },
     "reasoning": {
      "supported": true,
-     "effort": [
-      "none",
-      "minimal",
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
+     "toggle": true
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 1,
+      "price": 1.2,
       "cache": {
-       "read": 0.25,
-       "write": 1.25
+       "read": 0.3,
+       "write": 1.5
       }
      },
      "output": {
-      "price": 3.2
+      "price": 4
      }
     }
    },
@@ -1817,8 +1602,8 @@
      }
     }
    },
-   "open_weights": true,
-   "last_updated": "2026-02-12"
+   "open_weights": false,
+   "last_updated": "2026-03-16"
   },
   "z-ai/glm-5.1": {
    "id": "z-ai/glm-5.1",
@@ -1886,6 +1671,221 @@
    },
    "open_weights": true,
    "last_updated": "2026-04-07"
+  },
+  "z-ai/glm-5.3-flash": {
+   "id": "z-ai/glm-5.3-flash",
+   "name": "GLM-5.3-Flash",
+   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
+   "type": "chat",
+   "family": "glm-flash",
+   "canonical_id": "zhipuai/glm-5.3-flash",
+   "release_date": "2026-08-26",
+   "limit": {
+    "context": 1048576,
+    "output": 64000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.2,
+      "cache": {
+       "read": 0.05
+      }
+     },
+     "output": {
+      "price": 0.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "video/mp4",
+     "video/x-matroska",
+     "video/quicktime",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.tensorx.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-26"
+  },
+  "z-ai/glm-5.3": {
+   "id": "z-ai/glm-5.3",
+   "name": "GLM-5.3",
+   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.3",
+   "release_date": "2026-08-14",
+   "limit": {
+    "context": 1048576,
+    "output": 64000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.75,
+      "cache": {
+       "read": 0.44
+      }
+     },
+     "output": {
+      "price": 4.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.tensorx.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-14"
+  },
+  "z-ai/glm-5.2": {
+   "id": "z-ai/glm-5.2",
+   "name": "GLM-5.2",
+   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.2",
+   "release_date": "2026-06-13",
+   "limit": {
+    "context": 1048576,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.5,
+      "cache": {
+       "read": 0.375
+      }
+     },
+     "output": {
+      "price": 4.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.tensorx.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-06-13"
   }
  }
 }

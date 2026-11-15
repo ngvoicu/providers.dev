@@ -6,6 +6,439 @@
   "SYNTHORAI_API_KEY"
  ],
  "models": {
+  "claude-opus-5": {
+   "id": "claude-opus-5",
+   "name": "Claude Opus 5",
+   "description": "Strongest Claude Opus model for coding, agents, and professional work",
+   "type": "chat",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-5",
+   "release_date": "2026-07-24",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5,
+       "write": {
+        "5m": 6.25,
+        "1h": 10
+       }
+      }
+     },
+     "output": {
+      "price": 25
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://synthorai.io/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-05",
+   "last_updated": "2026-07-24"
+  },
+  "deepseek-v4-pro": {
+   "id": "deepseek-v4-pro",
+   "name": "DeepSeek V4 Pro 0813",
+   "description": "DeepSeek V4 Pro snapshot with million-token context and support for thinking and non-thinking modes",
+   "type": "chat",
+   "family": "deepseek-thinking",
+   "canonical_id": "deepseek/deepseek-v4-pro-0813",
+   "release_date": "2026-08-13",
+   "limit": {
+    "context": 1000000,
+    "output": 393216
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.32,
+      "cache": {
+       "read": 0.132
+      }
+     },
+     "output": {
+      "price": 3.96
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://synthorai.io/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-22"
+  },
+  "gpt-6-luna": {
+   "id": "gpt-6-luna",
+   "name": "GPT-6 Luna",
+   "description": "OpenAI's most efficient model for focused, high-volume tasks",
+   "type": "chat",
+   "family": "gpt-luna",
+   "canonical_id": "openai/gpt-6-luna",
+   "release_date": "2026-09-22",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1,
+      "cache": {
+       "read": 0.01
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 0.2,
+        "cache": {
+         "read": 0.02
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 0.5,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 0.75
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://synthorai.io/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-05-18",
+   "last_updated": "2026-09-22"
+  },
+  "claude-haiku-5-5": {
+   "id": "claude-haiku-5-5",
+   "name": "Claude Haiku 5.5",
+   "description": "Fast Claude model for responsive assistance, classification, and lightweight agents",
+   "type": "chat",
+   "family": "claude-haiku",
+   "canonical_id": "anthropic/claude-haiku-5-5",
+   "release_date": "2026-10-07",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1,
+      "cache": {
+       "read": 0.01,
+       "write": {
+        "5m": 0.125,
+        "1h": 0.2
+       }
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 100000
+         }
+        },
+        "price": 0.5,
+        "cache": {
+         "read": 0.05,
+         "write": {
+          "5m": 0.625,
+          "1h": 1
+         }
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 0.5,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 100000
+         }
+        },
+        "price": 2.5
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://synthorai.io/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-06",
+   "last_updated": "2026-10-07"
+  },
+  "kimi-k3": {
+   "id": "kimi-k3",
+   "name": "Kimi K3",
+   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
+   "type": "chat",
+   "family": "kimi-k3",
+   "canonical_id": "moonshotai/kimi-k3",
+   "release_date": "2026-07-16",
+   "limit": {
+    "context": 1048576,
+    "output": 1048576
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 3,
+      "cache": {
+       "read": 0.3
+      }
+     },
+     "output": {
+      "price": 15
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://synthorai.io/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-07-16"
+  },
   "gemini-3.1-pro-preview": {
    "id": "gemini-3.1-pro-preview",
    "name": "Gemini 3.1 Pro Preview",
@@ -127,126 +560,16 @@
    "knowledge": "2025-01",
    "last_updated": "2026-02-19"
   },
-  "claude-haiku-5-5": {
-   "id": "claude-haiku-5-5",
-   "name": "Claude Haiku 5.5",
-   "description": "Fast Claude model for responsive assistance, classification, and lightweight agents",
+  "claude-sonnet-5-5": {
+   "id": "claude-sonnet-5-5",
+   "name": "Claude Sonnet 5.5",
+   "description": "Fast Claude model for everyday coding, agents, and knowledge work",
    "type": "chat",
-   "family": "claude-haiku",
-   "canonical_id": "anthropic/claude-haiku-5-5",
-   "release_date": "2026-10-07",
+   "family": "claude-sonnet",
+   "canonical_id": "anthropic/claude-sonnet-5-5",
+   "release_date": "2026-09-28",
    "limit": {
     "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.1,
-      "cache": {
-       "read": 0.01,
-       "write": {
-        "5m": 0.125,
-        "1h": 0.2
-       }
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 100000
-         }
-        },
-        "price": 0.5,
-        "cache": {
-         "read": 0.05,
-         "write": {
-          "5m": 0.625,
-          "1h": 1
-         }
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 0.5,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 100000
-         }
-        },
-        "price": 2.5
-       }
-      ]
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://synthorai.io/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-06",
-   "last_updated": "2026-10-07"
-  },
-  "gpt-6.1-sol": {
-   "id": "gpt-6.1-sol",
-   "name": "GPT-6.1 Sol",
-   "description": "Near-Astra performance for complex coding, computer use, and professional work at a lower cost.",
-   "type": "chat",
-   "family": "gpt-sol",
-   "canonical_id": "openai/gpt-6.1-sol",
-   "release_date": "2026-09-29",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
     "output": 128000
    },
    "capabilities": {
@@ -275,34 +598,15 @@
      "input": {
       "price": 2,
       "cache": {
-       "read": 0.1
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 4,
-        "cache": {
-         "read": 0.2
-        }
+       "read": 0.1,
+       "write": {
+        "5m": 2.5,
+        "1h": 4
        }
-      ]
+      }
      },
      "output": {
-      "price": 10,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 15
-       }
-      ]
+      "price": 10
      }
     }
    },
@@ -328,153 +632,18 @@
      },
      "capabilities": {
       "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
        "updates": false
       }
      }
     }
    },
    "open_weights": false,
-   "knowledge": "2026-04-30",
-   "last_updated": "2026-09-29"
-  },
-  "glm-5.3": {
-   "id": "glm-5.3",
-   "name": "GLM-5.3",
-   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
-   "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-5.3",
-   "release_date": "2026-08-14",
-   "limit": {
-    "context": 1000000,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.4,
-      "cache": {
-       "read": 0.28
-      }
-     },
-     "output": {
-      "price": 4.4
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://synthorai.io/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-08-14"
-  },
-  "deepseek-v4-pro": {
-   "id": "deepseek-v4-pro",
-   "name": "DeepSeek V4 Pro 0813",
-   "description": "DeepSeek V4 Pro snapshot with million-token context and support for thinking and non-thinking modes",
-   "type": "chat",
-   "family": "deepseek-thinking",
-   "canonical_id": "deepseek/deepseek-v4-pro-0813",
-   "release_date": "2026-08-13",
-   "limit": {
-    "context": 1000000,
-    "output": 393216
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.32,
-      "cache": {
-       "read": 0.132
-      }
-     },
-     "output": {
-      "price": 3.96
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://synthorai.io/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-08-22"
+   "knowledge": "2026-06",
+   "last_updated": "2026-09-28"
   },
   "gpt-6-sol": {
    "id": "gpt-6-sol",
@@ -578,97 +747,17 @@
    "knowledge": "2026-04-20",
    "last_updated": "2026-09-22"
   },
-  "claude-opus-5": {
-   "id": "claude-opus-5",
-   "name": "Claude Opus 5",
-   "description": "Strongest Claude Opus model for coding, agents, and professional work",
+  "gpt-6.1-sol": {
+   "id": "gpt-6.1-sol",
+   "name": "GPT-6.1 Sol",
+   "description": "Near-Astra performance for complex coding, computer use, and professional work at a lower cost.",
    "type": "chat",
-   "family": "claude-opus",
-   "canonical_id": "anthropic/claude-opus-5",
-   "release_date": "2026-07-24",
+   "family": "gpt-sol",
+   "canonical_id": "openai/gpt-6.1-sol",
+   "release_date": "2026-09-29",
    "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 5,
-      "cache": {
-       "read": 0.5,
-       "write": {
-        "5m": 6.25,
-        "1h": 10
-       }
-      }
-     },
-     "output": {
-      "price": 25
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://synthorai.io/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-05",
-   "last_updated": "2026-07-24"
-  },
-  "claude-sonnet-5-5": {
-   "id": "claude-sonnet-5-5",
-   "name": "Claude Sonnet 5.5",
-   "description": "Fast Claude model for everyday coding, agents, and knowledge work",
-   "type": "chat",
-   "family": "claude-sonnet",
-   "canonical_id": "anthropic/claude-sonnet-5-5",
-   "release_date": "2026-09-28",
-   "limit": {
-    "context": 1000000,
+    "context": 1050000,
+    "input": 922000,
     "output": 128000
    },
    "capabilities": {
@@ -697,240 +786,7 @@
      "input": {
       "price": 2,
       "cache": {
-       "read": 0.1,
-       "write": {
-        "5m": 2.5,
-        "1h": 4
-       }
-      }
-     },
-     "output": {
-      "price": 10
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://synthorai.io/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-06",
-   "last_updated": "2026-09-28"
-  },
-  "deepseek-v4.1-flash": {
-   "id": "deepseek-v4.1-flash",
-   "name": "DeepSeek V4.1 Flash",
-   "description": "DeepSeek V4.1 Flash model for reasoning and agentic coding",
-   "type": "chat",
-   "family": "deepseek-flash",
-   "canonical_id": "deepseek/deepseek-v4.1-flash",
-   "release_date": "2026-09-10",
-   "limit": {
-    "context": 1000000,
-    "output": 393216
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.3,
-      "cache": {
-       "read": 0.006
-      }
-     },
-     "output": {
-      "price": 1.2
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://synthorai.io/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-09-10"
-  },
-  "kimi-k3": {
-   "id": "kimi-k3",
-   "name": "Kimi K3",
-   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
-   "type": "chat",
-   "family": "kimi-k3",
-   "canonical_id": "moonshotai/kimi-k3",
-   "release_date": "2026-07-16",
-   "limit": {
-    "context": 1048576,
-    "output": 1048576
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 3,
-      "cache": {
-       "read": 0.3
-      }
-     },
-     "output": {
-      "price": 15
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://synthorai.io/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-07-16"
-  },
-  "gpt-6-luna": {
-   "id": "gpt-6-luna",
-   "name": "GPT-6 Luna",
-   "description": "OpenAI's most efficient model for focused, high-volume tasks",
-   "type": "chat",
-   "family": "gpt-luna",
-   "canonical_id": "openai/gpt-6-luna",
-   "release_date": "2026-09-22",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.1,
-      "cache": {
-       "read": 0.01
+       "read": 0.1
       },
       "overrides": [
        {
@@ -939,15 +795,15 @@
           "gt": 272000
          }
         },
-        "price": 0.2,
+        "price": 4,
         "cache": {
-         "read": 0.02
+         "read": 0.2
         }
        }
       ]
      },
      "output": {
-      "price": 0.5,
+      "price": 10,
       "overrides": [
        {
         "when": {
@@ -955,7 +811,7 @@
           "gt": 272000
          }
         },
-        "price": 0.75
+        "price": 15
        }
       ]
      }
@@ -989,8 +845,8 @@
     }
    },
    "open_weights": false,
-   "knowledge": "2026-05-18",
-   "last_updated": "2026-09-22"
+   "knowledge": "2026-04-30",
+   "last_updated": "2026-09-29"
   },
   "claude-opus-5-5": {
    "id": "claude-opus-5-5",
@@ -1076,6 +932,150 @@
    "open_weights": false,
    "knowledge": "2026-06",
    "last_updated": "2026-09-22"
+  },
+  "glm-5.3": {
+   "id": "glm-5.3",
+   "name": "GLM-5.3",
+   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.3",
+   "release_date": "2026-08-14",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.4,
+      "cache": {
+       "read": 0.28
+      }
+     },
+     "output": {
+      "price": 4.4
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://synthorai.io/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-14"
+  },
+  "deepseek-v4.1-flash": {
+   "id": "deepseek-v4.1-flash",
+   "name": "DeepSeek V4.1 Flash",
+   "description": "DeepSeek V4.1 Flash model for reasoning and agentic coding",
+   "type": "chat",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4.1-flash",
+   "release_date": "2026-09-10",
+   "limit": {
+    "context": 1000000,
+    "output": 393216
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.3,
+      "cache": {
+       "read": 0.006
+      }
+     },
+     "output": {
+      "price": 1.2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://synthorai.io/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-09-10"
   }
  }
 }

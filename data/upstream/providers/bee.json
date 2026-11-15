@@ -6,6 +6,81 @@
   "BEE_API_KEY"
  ],
  "models": {
+  "bee-buzz": {
+   "id": "bee-buzz",
+   "name": "Bee Buzz 1.0",
+   "description": "Mid-tier production model for tool-using agents, multi-step workflows, and builder/integration work. Bigger context than Comb, deeper planning, faster than Hive on routine tasks.",
+   "type": "chat",
+   "release_date": "2026-07-10",
+   "limit": {
+    "context": 262144,
+    "output": 24576
+   },
+   "capabilities": {
+    "temperature": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2.5,
+      "cache": {
+       "read": 0.25,
+       "write": 3
+      }
+     },
+     "output": {
+      "price": 10
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "video/mp4",
+     "video/webm",
+     "audio/wav",
+     "audio/mpeg"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.bee.heossi.com/bee",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-09-28"
+  },
   "bee-hive": {
    "id": "bee-hive",
    "name": "Bee Hive 1.0",
@@ -222,23 +297,22 @@
    "open_weights": false,
    "last_updated": "2026-09-28"
   },
-  "bee-buzz": {
-   "id": "bee-buzz",
-   "name": "Bee Buzz 1.0",
-   "description": "Mid-tier production model for tool-using agents, multi-step workflows, and builder/integration work. Bigger context than Comb, deeper planning, faster than Hive on routine tasks.",
+  "bee-swarm": {
+   "id": "bee-swarm",
+   "name": "Bee Swarm 1.0",
+   "description": "Premium reasoning, multi-model cloud execution, large-document analysis, and high-value technical work. Includes the evolution engine and stronger eval gates by default.",
    "type": "chat",
    "release_date": "2026-07-10",
    "limit": {
-    "context": 262144,
-    "output": 24576
+    "context": 1000000,
+    "output": 64000
    },
    "capabilities": {
-    "temperature": true,
-    "structured_output": true,
+    "structured_output": false,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
-     "supported": true
+     "supported": false
     },
     "reasoning": {
      "supported": true,
@@ -254,25 +328,21 @@
    "cost": {
     "text": {
      "input": {
-      "price": 2.5,
+      "price": 25,
       "cache": {
-       "read": 0.25,
-       "write": 3
+       "read": 2.5,
+       "write": 30
       }
      },
      "output": {
-      "price": 10
+      "price": 150
      }
     }
    },
    "modalities": {
     "input": [
      "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "video/mp4",
-     "video/webm",
+     "image",
      "audio/wav",
      "audio/mpeg"
     ],
@@ -286,11 +356,6 @@
      "sdk": {
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
      }
     }
    },
@@ -366,71 +431,6 @@
       "tools": {
        "updates": false
       }
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-09-28"
-  },
-  "bee-swarm": {
-   "id": "bee-swarm",
-   "name": "Bee Swarm 1.0",
-   "description": "Premium reasoning, multi-model cloud execution, large-document analysis, and high-value technical work. Includes the evolution engine and stronger eval gates by default.",
-   "type": "chat",
-   "release_date": "2026-07-10",
-   "limit": {
-    "context": 1000000,
-    "output": 64000
-   },
-   "capabilities": {
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 25,
-      "cache": {
-       "read": 2.5,
-       "write": 30
-      }
-     },
-     "output": {
-      "price": 150
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image",
-     "audio/wav",
-     "audio/mpeg"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.bee.heossi.com/bee",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
      }
     }
    },

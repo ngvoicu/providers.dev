@@ -6,68 +6,6 @@
   "RUNCRATE_API_KEY"
  ],
  "models": {
-  "meta-llama/Llama-3.3-70B-Instruct-Turbo": {
-   "id": "meta-llama/Llama-3.3-70B-Instruct-Turbo",
-   "name": "Llama 3.3 70B Instruct Turbo",
-   "description": "Popular open Llama workhorse for multilingual chat, coding, and self-hosting",
-   "type": "chat",
-   "family": "llama",
-   "canonical_id": "meta/llama-3.3-70b-instruct",
-   "release_date": "2024-12-06",
-   "limit": {
-    "context": 131072,
-    "output": 16384
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.105
-     },
-     "output": {
-      "price": 0.336
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.runcrate.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2023-12",
-   "last_updated": "2024-12-06"
-  },
   "moonshotai/Kimi-K2.6": {
    "id": "moonshotai/Kimi-K2.6",
    "name": "Kimi K2.6",
@@ -141,6 +79,149 @@
    "open_weights": true,
    "knowledge": "2025-01",
    "last_updated": "2026-04-20"
+  },
+  "openai/gpt-oss-120b": {
+   "id": "openai/gpt-oss-120b",
+   "name": "GPT OSS 120B",
+   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
+   "type": "chat",
+   "family": "gpt-oss",
+   "canonical_id": "openai/gpt-oss-120b",
+   "release_date": "2025-08-05",
+   "limit": {
+    "context": 131072,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.03885,
+      "cache": {
+       "read": 0.0058275
+      }
+     },
+     "output": {
+      "price": 0.1785
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.runcrate.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-06",
+   "last_updated": "2025-08-05"
+  },
+  "deepseek-ai/DeepSeek-V3.2": {
+   "id": "deepseek-ai/DeepSeek-V3.2",
+   "name": "DeepSeek V3.2",
+   "description": "Hybrid-reasoning DeepSeek model with thinking and non-thinking modes, sparse attention, and tool-use",
+   "type": "chat",
+   "family": "deepseek",
+   "canonical_id": "deepseek/deepseek-v3.2",
+   "release_date": "2025-12-01",
+   "limit": {
+    "context": 163840,
+    "output": 16384
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.273,
+      "cache": {
+       "read": 0.1365
+      }
+     },
+     "output": {
+      "price": 0.399
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.runcrate.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-07",
+   "last_updated": "2025-12-01"
   },
   "deepseek-ai/DeepSeek-V4.1-Flash": {
    "id": "deepseek-ai/DeepSeek-V4.1-Flash",
@@ -222,78 +303,6 @@
    "open_weights": true,
    "knowledge": "2025-05",
    "last_updated": "2026-09-10"
-  },
-  "deepseek-ai/DeepSeek-V3.2": {
-   "id": "deepseek-ai/DeepSeek-V3.2",
-   "name": "DeepSeek V3.2",
-   "description": "Hybrid-reasoning DeepSeek model with thinking and non-thinking modes, sparse attention, and tool-use",
-   "type": "chat",
-   "family": "deepseek",
-   "canonical_id": "deepseek/deepseek-v3.2",
-   "release_date": "2025-12-01",
-   "limit": {
-    "context": 163840,
-    "output": 16384
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.273,
-      "cache": {
-       "read": 0.1365
-      }
-     },
-     "output": {
-      "price": 0.399
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.runcrate.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2024-07",
-   "last_updated": "2025-12-01"
   },
   "deepseek-ai/DeepSeek-V4.1-Flash-1017": {
    "id": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
@@ -528,148 +537,6 @@
    "open_weights": true,
    "last_updated": "2026-08-26"
   },
-  "openai/gpt-oss-120b": {
-   "id": "openai/gpt-oss-120b",
-   "name": "GPT OSS 120B",
-   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
-   "type": "chat",
-   "family": "gpt-oss",
-   "canonical_id": "openai/gpt-oss-120b",
-   "release_date": "2025-08-05",
-   "limit": {
-    "context": 131072,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.03885,
-      "cache": {
-       "read": 0.0058275
-      }
-     },
-     "output": {
-      "price": 0.1785
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.runcrate.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2024-06",
-   "last_updated": "2025-08-05"
-  },
-  "Qwen/Qwen3.8-Flash": {
-   "id": "Qwen/Qwen3.8-Flash",
-   "name": "Qwen3.8 Flash",
-   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3.8-flash",
-   "release_date": "2026-08-26",
-   "limit": {
-    "context": 1000000,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.11865,
-      "cache": {
-       "read": 0.014805
-      }
-     },
-     "output": {
-      "price": 0.4011
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.runcrate.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-08-26"
-  },
   "Qwen/Qwen3-Coder-480B-A35B-Instruct-Turbo": {
    "id": "Qwen/Qwen3-Coder-480B-A35B-Instruct-Turbo",
    "name": "Qwen3-Coder 480B-A35B Instruct",
@@ -798,6 +665,139 @@
    },
    "open_weights": true,
    "last_updated": "2025-07-21"
+  },
+  "Qwen/Qwen3.8-Flash": {
+   "id": "Qwen/Qwen3.8-Flash",
+   "name": "Qwen3.8 Flash",
+   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.8-flash",
+   "release_date": "2026-08-26",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.11865,
+      "cache": {
+       "read": 0.014805
+      }
+     },
+     "output": {
+      "price": 0.4011
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.runcrate.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-08-26"
+  },
+  "meta-llama/Llama-3.3-70B-Instruct-Turbo": {
+   "id": "meta-llama/Llama-3.3-70B-Instruct-Turbo",
+   "name": "Llama 3.3 70B Instruct Turbo",
+   "description": "Popular open Llama workhorse for multilingual chat, coding, and self-hosting",
+   "type": "chat",
+   "family": "llama",
+   "canonical_id": "meta/llama-3.3-70b-instruct",
+   "release_date": "2024-12-06",
+   "limit": {
+    "context": 131072,
+    "output": 16384
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.105
+     },
+     "output": {
+      "price": 0.336
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.runcrate.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2023-12",
+   "last_updated": "2024-12-06"
   }
  }
 }

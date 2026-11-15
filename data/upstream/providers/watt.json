@@ -83,22 +83,22 @@
    "open_weights": true,
    "last_updated": "2026-02-15"
   },
-  "DeepSeek-V4.1-Flash": {
-   "id": "DeepSeek-V4.1-Flash",
-   "name": "DeepSeek V4.1 Flash",
-   "description": "DeepSeek V4.1 Flash model for reasoning and agentic coding",
+  "Kimi-K2.7-Code": {
+   "id": "Kimi-K2.7-Code",
+   "name": "Kimi K2.7 Code",
+   "description": "Coding-focused Kimi model, stronger on long-horizon repo work with less overthinking",
    "type": "chat",
-   "family": "deepseek-flash",
-   "canonical_id": "deepseek/deepseek-v4.1-flash",
-   "release_date": "2026-09-10",
+   "family": "kimi-k2",
+   "canonical_id": "moonshotai/kimi-k2.7-code",
+   "release_date": "2026-06-12",
    "limit": {
-    "context": 1048576,
-    "output": 384000
+    "context": 271360,
+    "output": 262144
    },
    "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -106,17 +106,16 @@
      "supported": true
     },
     "reasoning": {
-     "supported": true,
-     "toggle": true
+     "supported": true
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.29
+      "price": 0.95
      },
      "output": {
-      "price": 1.14
+      "price": 4
      }
     }
    },
@@ -126,7 +125,19 @@
      "image/jpeg",
      "image/png",
      "image/gif",
-     "image/webp"
+     "image/webp",
+     "image/bmp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp"
     ],
     "output": [
      "text"
@@ -150,8 +161,77 @@
     }
    },
    "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-09-10"
+   "knowledge": "2025-01",
+   "last_updated": "2026-06-12"
+  },
+  "GLM-5.3": {
+   "id": "GLM-5.3",
+   "name": "GLM-5.3",
+   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.3",
+   "release_date": "2026-08-14",
+   "limit": {
+    "context": 1048576,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.4
+     },
+     "output": {
+      "price": 4.4
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.watt-cloud.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-14"
   },
   "GLM-5.2": {
    "id": "GLM-5.2",
@@ -284,17 +364,17 @@
    "knowledge": "2025-05",
    "last_updated": "2026-04-24"
   },
-  "Qwen3.5-27B": {
-   "id": "Qwen3.5-27B",
-   "name": "Qwen3.5 27B",
-   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
+  "GLM-5.1": {
+   "id": "GLM-5.1",
+   "name": "GLM-5.1",
+   "description": "Strong GLM coding model for agentic engineering, terminals, and repository generation",
    "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3.5-27b",
-   "release_date": "2026-02-23",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.1",
+   "release_date": "2026-04-07",
    "limit": {
-    "context": 262144,
-    "output": 65536
+    "context": 202752,
+    "output": 131072
    },
    "capabilities": {
     "temperature": true,
@@ -314,28 +394,16 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.3
+      "price": 1.38
      },
      "output": {
-      "price": 2.4
+      "price": 4.4
      }
     }
    },
    "modalities": {
     "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/x-matroska",
-     "video/quicktime",
-     "video/x-flv",
-     "video/x-ms-wmv"
+     "text"
     ],
     "output": [
      "text"
@@ -359,7 +427,7 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2026-02-23"
+   "last_updated": "2026-04-07"
   },
   "MiniMax-M3": {
    "id": "MiniMax-M3",
@@ -433,6 +501,76 @@
    },
    "open_weights": true,
    "last_updated": "2026-06-01"
+  },
+  "DeepSeek-V4.1-Flash": {
+   "id": "DeepSeek-V4.1-Flash",
+   "name": "DeepSeek V4.1 Flash",
+   "description": "DeepSeek V4.1 Flash model for reasoning and agentic coding",
+   "type": "chat",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4.1-flash",
+   "release_date": "2026-09-10",
+   "limit": {
+    "context": 1048576,
+    "output": 384000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.29
+     },
+     "output": {
+      "price": 1.14
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.watt-cloud.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-09-10"
   },
   "Kimi-K2.5": {
    "id": "Kimi-K2.5",
@@ -516,6 +654,138 @@
    "knowledge": "2025-01",
    "last_updated": "2026-01-27"
   },
+  "DeepSeek-V4-Flash-0731": {
+   "id": "DeepSeek-V4-Flash-0731",
+   "name": "DeepSeek V4 Flash 0731",
+   "description": "Official DeepSeek V4 Flash release with enhanced agentic capabilities and integrated DSpark speculative decoding",
+   "type": "chat",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4-flash-0731",
+   "release_date": "2026-07-31",
+   "limit": {
+    "context": 1048576,
+    "output": 384000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.44
+     },
+     "output": {
+      "price": 1.32
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.watt-cloud.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-07-31"
+  },
+  "DeepSeek-V4-Pro": {
+   "id": "DeepSeek-V4-Pro",
+   "name": "DeepSeek V4 Pro",
+   "description": "Open MoE flagship with million-token context for coding and long agent runs",
+   "type": "chat",
+   "family": "deepseek-thinking",
+   "canonical_id": "deepseek/deepseek-v4-pro",
+   "release_date": "2026-04-24",
+   "limit": {
+    "context": 1048576,
+    "output": 384000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.6
+     },
+     "output": {
+      "price": 3.38
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.watt-cloud.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-04-24"
+  },
   "Hy4-preview": {
    "id": "Hy4-preview",
    "name": "Hy4 preview",
@@ -584,213 +854,13 @@
    "open_weights": true,
    "last_updated": "2026-08-28"
   },
-  "DeepSeek-V4-Pro": {
-   "id": "DeepSeek-V4-Pro",
-   "name": "DeepSeek V4 Pro",
-   "description": "Open MoE flagship with million-token context for coding and long agent runs",
-   "type": "chat",
-   "family": "deepseek-thinking",
-   "canonical_id": "deepseek/deepseek-v4-pro",
-   "release_date": "2026-04-24",
-   "limit": {
-    "context": 1048576,
-    "output": 384000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.6
-     },
-     "output": {
-      "price": 3.38
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.watt-cloud.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-04-24"
-  },
-  "GLM-5.3": {
-   "id": "GLM-5.3",
-   "name": "GLM-5.3",
-   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
-   "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-5.3",
-   "release_date": "2026-08-14",
-   "limit": {
-    "context": 1048576,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.4
-     },
-     "output": {
-      "price": 4.4
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.watt-cloud.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-08-14"
-  },
-  "GLM-5.1": {
-   "id": "GLM-5.1",
-   "name": "GLM-5.1",
-   "description": "Strong GLM coding model for agentic engineering, terminals, and repository generation",
-   "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-5.1",
-   "release_date": "2026-04-07",
-   "limit": {
-    "context": 202752,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.38
-     },
-     "output": {
-      "price": 4.4
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.watt-cloud.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-04-07"
-  },
-  "Qwen3.5-122B-A10B": {
-   "id": "Qwen3.5-122B-A10B",
-   "name": "Qwen3.5 122B-A10B",
+  "Qwen3.5-27B": {
+   "id": "Qwen3.5-27B",
+   "name": "Qwen3.5 27B",
    "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
    "type": "chat",
    "family": "qwen",
-   "canonical_id": "alibaba/qwen3.5-122b-a10b",
+   "canonical_id": "alibaba/qwen3.5-27b",
    "release_date": "2026-02-23",
    "limit": {
     "context": 262144,
@@ -814,10 +884,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.4
+      "price": 0.3
      },
      "output": {
-      "price": 3.2
+      "price": 2.4
      }
     }
    },
@@ -860,153 +930,6 @@
    },
    "open_weights": true,
    "last_updated": "2026-02-23"
-  },
-  "DeepSeek-V4-Flash-0731": {
-   "id": "DeepSeek-V4-Flash-0731",
-   "name": "DeepSeek V4 Flash 0731",
-   "description": "Official DeepSeek V4 Flash release with enhanced agentic capabilities and integrated DSpark speculative decoding",
-   "type": "chat",
-   "family": "deepseek-flash",
-   "canonical_id": "deepseek/deepseek-v4-flash-0731",
-   "release_date": "2026-07-31",
-   "limit": {
-    "context": 1048576,
-    "output": 384000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.44
-     },
-     "output": {
-      "price": 1.32
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.watt-cloud.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-07-31"
-  },
-  "Kimi-K2.7-Code": {
-   "id": "Kimi-K2.7-Code",
-   "name": "Kimi K2.7 Code",
-   "description": "Coding-focused Kimi model, stronger on long-horizon repo work with less overthinking",
-   "type": "chat",
-   "family": "kimi-k2",
-   "canonical_id": "moonshotai/kimi-k2.7-code",
-   "release_date": "2026-06-12",
-   "limit": {
-    "context": 271360,
-    "output": 262144
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.95
-     },
-     "output": {
-      "price": 4
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/heic",
-     "image/heif",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.watt-cloud.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-06-12"
   },
   "Qwen3.5-35B-A3B": {
    "id": "Qwen3.5-35B-A3B",
@@ -1085,81 +1008,6 @@
    "open_weights": true,
    "last_updated": "2026-02-23"
   },
-  "GLM-5.3-Flash": {
-   "id": "GLM-5.3-Flash",
-   "name": "GLM-5.3-Flash",
-   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
-   "type": "chat",
-   "family": "glm-flash",
-   "canonical_id": "zhipuai/glm-5.3-flash",
-   "release_date": "2026-08-26",
-   "limit": {
-    "context": 1048576,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.15
-     },
-     "output": {
-      "price": 0.5
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "video/mp4",
-     "video/x-matroska",
-     "video/quicktime",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.watt-cloud.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-08-26"
-  },
   "DeepSeek-V4.1-Flash-1017": {
    "id": "DeepSeek-V4.1-Flash-1017",
    "name": "DeepSeek V4.1 Flash 1017",
@@ -1229,6 +1077,83 @@
    "open_weights": true,
    "knowledge": "2025-05",
    "last_updated": "2026-10-17"
+  },
+  "Qwen3.5-122B-A10B": {
+   "id": "Qwen3.5-122B-A10B",
+   "name": "Qwen3.5 122B-A10B",
+   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.5-122b-a10b",
+   "release_date": "2026-02-23",
+   "limit": {
+    "context": 262144,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.4
+     },
+     "output": {
+      "price": 3.2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/x-matroska",
+     "video/quicktime",
+     "video/x-flv",
+     "video/x-ms-wmv"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.watt-cloud.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-02-23"
   },
   "Kimi-K3": {
    "id": "Kimi-K3",
@@ -1310,6 +1235,81 @@
    },
    "open_weights": true,
    "last_updated": "2026-07-16"
+  },
+  "GLM-5.3-Flash": {
+   "id": "GLM-5.3-Flash",
+   "name": "GLM-5.3-Flash",
+   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
+   "type": "chat",
+   "family": "glm-flash",
+   "canonical_id": "zhipuai/glm-5.3-flash",
+   "release_date": "2026-08-26",
+   "limit": {
+    "context": 1048576,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.15
+     },
+     "output": {
+      "price": 0.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "video/mp4",
+     "video/x-matroska",
+     "video/quicktime",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.watt-cloud.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-26"
   }
  }
 }

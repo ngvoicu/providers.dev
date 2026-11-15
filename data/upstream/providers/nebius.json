@@ -6,54 +6,51 @@
   "NEBIUS_API_KEY"
  ],
  "models": {
-  "google/gemma-3-27b-it": {
-   "id": "google/gemma-3-27b-it",
-   "name": "Gemma-3-27b-it",
-   "description": "Open Gemma instruction model for efficient chat and self-hosted deployments",
+  "nvidia/Nemotron-3-Ultra-550b-a55b": {
+   "id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+   "name": "Nemotron 3 Ultra 550B A55B",
+   "description": "Largest Nemotron 3 model for maximum open-weight reasoning and agent accuracy",
    "type": "chat",
-   "family": "gemma",
-   "canonical_id": "google/gemma-3-27b-it",
-   "release_date": "2025-03-12",
+   "family": "nemotron",
+   "canonical_id": "nvidia/nemotron-3-ultra-550b-a55b",
+   "release_date": "2026-06-04",
    "limit": {
-    "context": 110000,
-    "input": 100000,
-    "output": 8192
+    "context": 1048576,
+    "output": 1048576
    },
    "capabilities": {
     "temperature": true,
     "top_k": true,
     "top_p": true,
-    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": false
+     "supported": true,
+     "effort": [
+      "none",
+      "high"
+     ]
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.1,
+      "price": 1,
       "cache": {
-       "read": 0.1
+       "read": 0.12
       }
      },
      "output": {
-      "price": 0.3
+      "price": 3
      }
     }
    },
    "modalities": {
     "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif"
+     "text"
     ],
     "output": [
      "text"
@@ -71,11 +68,268 @@
        "updates": false
       }
      }
+    },
+    "responses": {
+     "base_url": "https://api.tokenfactory.nebius.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
     }
    },
    "open_weights": true,
-   "knowledge": "2024-08",
-   "last_updated": "2025-03-12"
+   "knowledge": "2025-09",
+   "last_updated": "2026-06-04"
+  },
+  "nvidia/Nemotron-3.5-Super-VL": {
+   "id": "nvidia/Nemotron-3.5-Super-VL",
+   "name": "Nemotron 3.5 Super VL 120B A12B",
+   "description": "NVIDIA vision-language reasoning model for coding, visual understanding, and agentic tool use",
+   "type": "chat",
+   "family": "nemotron",
+   "canonical_id": "nvidia/nemotron-3.5-super-vl-120b-a12b",
+   "release_date": "2026-10-15",
+   "limit": {
+    "context": 1048576,
+    "output": 1048576
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.3,
+      "cache": {
+       "read": 0.06
+      }
+     },
+     "output": {
+      "price": 0.9
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "video/mp4"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.tokenfactory.nebius.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "responses": {
+     "base_url": "https://api.tokenfactory.nebius.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-10-15"
+  },
+  "nvidia/nemotron-3-super-120b-a12b": {
+   "id": "nvidia/nemotron-3-super-120b-a12b",
+   "name": "Nemotron-3-Super-120B-A12B",
+   "description": "Nemotron middle tier for collaborative agents and high-volume reasoning workloads",
+   "type": "chat",
+   "family": "nemotron",
+   "canonical_id": "nvidia/nemotron-3-super-120b-a12b",
+   "release_date": "2026-03-11",
+   "limit": {
+    "context": 262144,
+    "input": 262144,
+    "output": 32768
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.3,
+      "cache": {
+       "read": 0.06
+      }
+     },
+     "output": {
+      "price": 0.9
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.tokenfactory.nebius.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://api.tokenfactory.nebius.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-06",
+   "last_updated": "2026-03-11"
+  },
+  "nvidia/Nemotron-3_5-Lightning": {
+   "id": "nvidia/Nemotron-3_5-Lightning",
+   "name": "Nemotron 3.5 Lightning 30B A3B",
+   "description": "Fast NVIDIA Nemotron MoE for reliable agentic tasks across enterprise workloads",
+   "type": "chat",
+   "family": "nemotron",
+   "canonical_id": "nvidia/nemotron-3.5-lightning",
+   "release_date": "2026-08-11",
+   "limit": {
+    "context": 1048576,
+    "output": 1048576
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.06,
+      "cache": {
+       "read": 0.06
+      }
+     },
+     "output": {
+      "price": 0.24
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.tokenfactory.nebius.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://api.tokenfactory.nebius.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-09",
+   "last_updated": "2026-08-11"
   },
   "moonshotai/Kimi-K3.1-Pro": {
    "id": "moonshotai/Kimi-K3.1-Pro",
@@ -270,18 +524,122 @@
    "open_weights": true,
    "last_updated": "2026-07-16"
   },
-  "nvidia/nemotron-3-super-120b-a12b": {
-   "id": "nvidia/nemotron-3-super-120b-a12b",
-   "name": "Nemotron-3-Super-120B-A12B",
-   "description": "Nemotron middle tier for collaborative agents and high-volume reasoning workloads",
+  "thinkingmachines/Inkling-2-Small": {
+   "id": "thinkingmachines/Inkling-2-Small",
+   "name": "Inkling 2 Small",
+   "description": "Multimodal MoE reasoning model (594B total, 17B active) for agentic coding, vision, and knowledge work",
    "type": "chat",
-   "family": "nemotron",
-   "canonical_id": "nvidia/nemotron-3-super-120b-a12b",
-   "release_date": "2026-03-11",
+   "family": "ling",
+   "canonical_id": "thinkingmachines/inkling-2-small",
+   "release_date": "2026-11-05",
    "limit": {
-    "context": 262144,
-    "input": 262144,
-    "output": 32768
+    "context": 1048576,
+    "output": 1048576
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.3,
+      "cache": {
+       "read": 0.06
+      }
+     },
+     "output": {
+      "price": 1
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.tokenfactory.nebius.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "responses": {
+     "base_url": "https://api.tokenfactory.nebius.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-11-12"
+  },
+  "google/gemma-3-27b-it": {
+   "id": "google/gemma-3-27b-it",
+   "name": "Gemma-3-27b-it",
+   "description": "Open Gemma instruction model for efficient chat and self-hosted deployments",
+   "type": "chat",
+   "family": "gemma",
+   "canonical_id": "google/gemma-3-27b-it",
+   "release_date": "2025-03-12",
+   "limit": {
+    "context": 110000,
+    "input": 100000,
+    "output": 8192
    },
    "capabilities": {
     "temperature": true,
@@ -294,25 +652,30 @@
      "supported": true
     },
     "reasoning": {
-     "supported": true
+     "supported": false
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.3,
+      "price": 0.1,
       "cache": {
-       "read": 0.06
+       "read": 0.1
       }
      },
      "output": {
-      "price": 0.9
+      "price": 0.3
      }
     }
    },
    "modalities": {
     "input": [
-     "text"
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif"
     ],
     "output": [
      "text"
@@ -330,31 +693,19 @@
        "updates": false
       }
      }
-    },
-    "responses": {
-     "base_url": "https://api.tokenfactory.nebius.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
     }
    },
    "open_weights": true,
-   "knowledge": "2025-06",
-   "last_updated": "2026-03-11"
+   "knowledge": "2024-08",
+   "last_updated": "2025-03-12"
   },
-  "nvidia/Nemotron-3.5-Super-VL": {
-   "id": "nvidia/Nemotron-3.5-Super-VL",
-   "name": "Nemotron 3.5 Super VL 120B A12B",
-   "description": "NVIDIA vision-language reasoning model for coding, visual understanding, and agentic tool use",
+  "meta-models/muse-spark-open": {
+   "id": "meta-models/muse-spark-open",
+   "name": "Muse Spark Open",
+   "description": "Muse Spark Open is an 816B total / 42B active open-weight multimodal reasoning model from Meta for coding and long-horizon agentic work, with 1M-token context.",
    "type": "chat",
-   "family": "nemotron",
-   "canonical_id": "nvidia/nemotron-3.5-super-vl-120b-a12b",
+   "family": "muse",
+   "canonical_id": "meta/muse-spark-open",
    "release_date": "2026-10-15",
    "limit": {
     "context": 1048576,
@@ -373,30 +724,31 @@
     "reasoning": {
      "supported": true,
      "effort": [
-      "none",
-      "high"
+      "low",
+      "medium",
+      "high",
+      "xhigh"
      ]
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.3,
+      "price": 1.25,
       "cache": {
-       "read": 0.06
+       "read": 0.15
       }
      },
      "output": {
-      "price": 0.9
+      "price": 4.25
      }
     }
    },
    "modalities": {
     "input": [
      "text",
-     "image/jpeg",
-     "image/png",
-     "video/mp4"
+     "image",
+     "video"
     ],
     "output": [
      "text"
@@ -432,35 +784,34 @@
     }
    },
    "open_weights": true,
+   "knowledge": "2026-01-04",
    "last_updated": "2026-10-15"
   },
-  "nvidia/Nemotron-3-Ultra-550b-a55b": {
-   "id": "nvidia/Nemotron-3-Ultra-550b-a55b",
-   "name": "Nemotron 3 Ultra 550B A55B",
-   "description": "Largest Nemotron 3 model for maximum open-weight reasoning and agent accuracy",
+  "NousResearch/Hermes-4-405B": {
+   "id": "NousResearch/Hermes-4-405B",
+   "name": "Hermes-4-405B",
+   "description": "Reasoning model for deliberate analysis, multi-step problem solving, and tool use",
    "type": "chat",
-   "family": "nemotron",
-   "canonical_id": "nvidia/nemotron-3-ultra-550b-a55b",
-   "release_date": "2026-06-04",
+   "family": "hermes",
+   "canonical_id": "nousresearch/hermes-4-405b",
+   "release_date": "2025-08-26",
    "limit": {
-    "context": 1048576,
-    "output": 1048576
+    "context": 131072,
+    "input": 120000,
+    "output": 8192
    },
    "capabilities": {
     "temperature": true,
     "top_k": true,
     "top_p": true,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "high"
-     ]
+     "supported": true
     }
    },
    "cost": {
@@ -468,11 +819,12 @@
      "input": {
       "price": 1,
       "cache": {
-       "read": 0.12
+       "read": 1
       }
      },
      "output": {
-      "price": 3
+      "price": 3,
+      "reasoning": 3
      }
     }
    },
@@ -495,6 +847,9 @@
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
      }
     },
     "responses": {
@@ -511,20 +866,21 @@
     }
    },
    "open_weights": true,
-   "knowledge": "2025-09",
-   "last_updated": "2026-06-04"
+   "knowledge": "2024-08-31",
+   "last_updated": "2025-08-26"
   },
-  "nvidia/Nemotron-3_5-Lightning": {
-   "id": "nvidia/Nemotron-3_5-Lightning",
-   "name": "Nemotron 3.5 Lightning 30B A3B",
-   "description": "Fast NVIDIA Nemotron MoE for reliable agentic tasks across enterprise workloads",
+  "openai/gpt-oss-120b": {
+   "id": "openai/gpt-oss-120b",
+   "name": "gpt-oss-120b",
+   "description": "Open-weight GPT model for self-hosted reasoning and instruction-following workloads",
    "type": "chat",
-   "family": "nemotron",
-   "canonical_id": "nvidia/nemotron-3.5-lightning",
-   "release_date": "2026-08-11",
+   "family": "gpt-oss",
+   "canonical_id": "openai/gpt-oss-120b",
+   "release_date": "2025-08-05",
    "limit": {
-    "context": 1048576,
-    "output": 1048576
+    "context": 131072,
+    "input": 124000,
+    "output": 8192
    },
    "capabilities": {
     "temperature": true,
@@ -539,7 +895,8 @@
     "reasoning": {
      "supported": true,
      "effort": [
-      "none",
+      "low",
+      "medium",
       "high"
      ]
     }
@@ -547,13 +904,14 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.06,
+      "price": 0.15,
       "cache": {
-       "read": 0.06
+       "read": 0.15
       }
      },
      "output": {
-      "price": 0.24
+      "price": 0.6,
+      "reasoning": 0.6
      }
     }
    },
@@ -576,6 +934,85 @@
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-06",
+   "last_updated": "2025-08-05"
+  },
+  "reflection/beam": {
+   "id": "reflection/beam",
+   "name": "Beam 1.0 501B A23B",
+   "description": "Sparse mixture-of-experts reasoning model with 23B active parameters for coding and agentic workflows",
+   "type": "chat",
+   "family": "beam",
+   "canonical_id": "reflection/beam-1.0-501b-a23b",
+   "release_date": "2026-10-05",
+   "limit": {
+    "context": 1048576,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "minimal",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.25,
+      "cache": {
+       "read": 0.05
+      }
+     },
+     "output": {
+      "price": 1
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.tokenfactory.nebius.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
      }
     },
     "responses": {
@@ -592,8 +1029,8 @@
     }
    },
    "open_weights": true,
-   "knowledge": "2025-09",
-   "last_updated": "2026-08-11"
+   "knowledge": "2026-06-30",
+   "last_updated": "2026-10-16"
   },
   "deepseek-ai/DeepSeek-V4-Pro-0813": {
    "id": "deepseek-ai/DeepSeek-V4-Pro-0813",
@@ -770,78 +1207,6 @@
    "knowledge": "2025-05",
    "last_updated": "2026-10-17"
   },
-  "zai-org/GLM-5.2": {
-   "id": "zai-org/GLM-5.2",
-   "name": "GLM-5.2",
-   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
-   "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-5.2",
-   "release_date": "2026-06-13",
-   "limit": {
-    "context": 1048576,
-    "output": 1048576
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.4,
-      "cache": {
-       "read": 0.14
-      }
-     },
-     "output": {
-      "price": 4.4
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.tokenfactory.nebius.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-06-13"
-  },
   "zai-org/GLM-5.3": {
    "id": "zai-org/GLM-5.3",
    "name": "GLM-5.3",
@@ -925,6 +1290,78 @@
    },
    "open_weights": true,
    "last_updated": "2026-08-14"
+  },
+  "zai-org/GLM-5.2": {
+   "id": "zai-org/GLM-5.2",
+   "name": "GLM-5.2",
+   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.2",
+   "release_date": "2026-06-13",
+   "limit": {
+    "context": 1048576,
+    "output": 1048576
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.4,
+      "cache": {
+       "read": 0.14
+      }
+     },
+     "output": {
+      "price": 4.4
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.tokenfactory.nebius.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-06-13"
   },
   "zai-org/GLM-5.3-Flash": {
    "id": "zai-org/GLM-5.3-Flash",
@@ -1011,443 +1448,6 @@
    },
    "open_weights": true,
    "last_updated": "2026-08-26"
-  },
-  "thinkingmachines/Inkling-2-Small": {
-   "id": "thinkingmachines/Inkling-2-Small",
-   "name": "Inkling 2 Small",
-   "description": "Multimodal MoE reasoning model (594B total, 17B active) for agentic coding, vision, and knowledge work",
-   "type": "chat",
-   "family": "ling",
-   "canonical_id": "thinkingmachines/inkling-2-small",
-   "release_date": "2026-11-05",
-   "limit": {
-    "context": 1048576,
-    "output": 1048576
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "minimal",
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.3,
-      "cache": {
-       "read": 0.06
-      }
-     },
-     "output": {
-      "price": 1
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.tokenfactory.nebius.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    },
-    "responses": {
-     "base_url": "https://api.tokenfactory.nebius.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-11-12"
-  },
-  "meta-models/muse-spark-open": {
-   "id": "meta-models/muse-spark-open",
-   "name": "Muse Spark Open",
-   "description": "Muse Spark Open is an 816B total / 42B active open-weight multimodal reasoning model from Meta for coding and long-horizon agentic work, with 1M-token context.",
-   "type": "chat",
-   "family": "muse",
-   "canonical_id": "meta/muse-spark-open",
-   "release_date": "2026-10-15",
-   "limit": {
-    "context": 1048576,
-    "output": 1048576
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.25,
-      "cache": {
-       "read": 0.15
-      }
-     },
-     "output": {
-      "price": 4.25
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image",
-     "video"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.tokenfactory.nebius.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    },
-    "responses": {
-     "base_url": "https://api.tokenfactory.nebius.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2026-01-04",
-   "last_updated": "2026-10-15"
-  },
-  "NousResearch/Hermes-4-405B": {
-   "id": "NousResearch/Hermes-4-405B",
-   "name": "Hermes-4-405B",
-   "description": "Reasoning model for deliberate analysis, multi-step problem solving, and tool use",
-   "type": "chat",
-   "family": "hermes",
-   "canonical_id": "nousresearch/hermes-4-405b",
-   "release_date": "2025-08-26",
-   "limit": {
-    "context": 131072,
-    "input": 120000,
-    "output": 8192
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1,
-      "cache": {
-       "read": 1
-      }
-     },
-     "output": {
-      "price": 3,
-      "reasoning": 3
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.tokenfactory.nebius.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    },
-    "responses": {
-     "base_url": "https://api.tokenfactory.nebius.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2024-08-31",
-   "last_updated": "2025-08-26"
-  },
-  "reflection/beam": {
-   "id": "reflection/beam",
-   "name": "Beam 1.0 501B A23B",
-   "description": "Sparse mixture-of-experts reasoning model with 23B active parameters for coding and agentic workflows",
-   "type": "chat",
-   "family": "beam",
-   "canonical_id": "reflection/beam-1.0-501b-a23b",
-   "release_date": "2026-10-05",
-   "limit": {
-    "context": 1048576,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "minimal",
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.25,
-      "cache": {
-       "read": 0.05
-      }
-     },
-     "output": {
-      "price": 1
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.tokenfactory.nebius.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    },
-    "responses": {
-     "base_url": "https://api.tokenfactory.nebius.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2026-06-30",
-   "last_updated": "2026-10-16"
-  },
-  "openai/gpt-oss-120b": {
-   "id": "openai/gpt-oss-120b",
-   "name": "gpt-oss-120b",
-   "description": "Open-weight GPT model for self-hosted reasoning and instruction-following workloads",
-   "type": "chat",
-   "family": "gpt-oss",
-   "canonical_id": "openai/gpt-oss-120b",
-   "release_date": "2025-08-05",
-   "limit": {
-    "context": 131072,
-    "input": 124000,
-    "output": 8192
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.15,
-      "cache": {
-       "read": 0.15
-      }
-     },
-     "output": {
-      "price": 0.6,
-      "reasoning": 0.6
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.tokenfactory.nebius.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2024-06",
-   "last_updated": "2025-08-05"
   },
   "MiniMaxAI/MiniMax-M3": {
    "id": "MiniMaxAI/MiniMax-M3",
@@ -1618,97 +1618,6 @@
    "open_weights": true,
    "last_updated": "2026-10-19"
   },
-  "Qwen/Qwen3.8-27B": {
-   "id": "Qwen/Qwen3.8-27B",
-   "name": "Qwen3.8 27B",
-   "description": "Dense 27B vision-language model for coding, agent tasks, and image and video understanding",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3.8-27b",
-   "release_date": "2026-08-14",
-   "limit": {
-    "context": 262144,
-    "output": 262144
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "xhigh"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.45,
-      "cache": {
-       "read": 0.1
-      }
-     },
-     "output": {
-      "price": 3
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.tokenfactory.nebius.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    },
-    "responses": {
-     "base_url": "https://api.tokenfactory.nebius.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-08-14"
-  },
   "Qwen/Qwen3-Embedding-8B": {
    "id": "Qwen/Qwen3-Embedding-8B",
    "name": "Qwen3-Embedding-8B",
@@ -1844,6 +1753,97 @@
    "open_weights": true,
    "knowledge": "2025-12",
    "last_updated": "2025-07-28"
+  },
+  "Qwen/Qwen3.8-27B": {
+   "id": "Qwen/Qwen3.8-27B",
+   "name": "Qwen3.8 27B",
+   "description": "Dense 27B vision-language model for coding, agent tasks, and image and video understanding",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.8-27b",
+   "release_date": "2026-08-14",
+   "limit": {
+    "context": 262144,
+    "output": 262144
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.45,
+      "cache": {
+       "read": 0.1
+      }
+     },
+     "output": {
+      "price": 3
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.tokenfactory.nebius.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "responses": {
+     "base_url": "https://api.tokenfactory.nebius.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-14"
   },
   "Qwen/Qwen3-235B-A22B-Instruct-2507": {
    "id": "Qwen/Qwen3-235B-A22B-Instruct-2507",

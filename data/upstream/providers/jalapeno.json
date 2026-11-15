@@ -83,23 +83,22 @@
    "open_weights": true,
    "last_updated": "2026-02-15"
   },
-  "Qwen3-VL-235B-A22B-Thinking": {
-   "id": "Qwen3-VL-235B-A22B-Thinking",
-   "name": "Qwen3 VL 235B A22B Thinking",
-   "description": "Qwen vision-language thinking model for visual reasoning, documents, and agent tasks",
+  "Kimi-K2.7-Code": {
+   "id": "Kimi-K2.7-Code",
+   "name": "Kimi K2.7 Code",
+   "description": "Coding-focused Kimi model, stronger on long-horizon repo work with less overthinking",
    "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3-vl-235b-a22b-thinking",
-   "status": "deprecated",
-   "release_date": "2025-09-23",
+   "family": "kimi-k2",
+   "canonical_id": "moonshotai/kimi-k2.7-code",
+   "release_date": "2026-06-12",
    "limit": {
-    "context": 131072,
-    "output": 32768
+    "context": 271360,
+    "output": 262144
    },
    "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -113,22 +112,35 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.98
+      "price": 0.95,
+      "cache": {
+       "read": 0.19
+      }
      },
      "output": {
-      "price": 3.95
+      "price": 4
      }
     }
    },
    "modalities": {
     "input": [
      "text",
-     "image/bmp",
      "image/jpeg",
      "image/png",
-     "image/tiff",
+     "image/gif",
      "image/webp",
-     "image/heic"
+     "image/bmp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp"
     ],
     "output": [
      "text"
@@ -152,77 +164,8 @@
     }
    },
    "open_weights": true,
-   "knowledge": "2025-03-31",
-   "last_updated": "2025-09-23"
-  },
-  "Qwen3-VL-235B-A22B-Instruct": {
-   "id": "Qwen3-VL-235B-A22B-Instruct",
-   "name": "Qwen3 VL 235B A22B Instruct",
-   "description": "Qwen vision-language instruct model for visual reasoning, documents, and agent tasks",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3-vl-235b-a22b-instruct",
-   "status": "deprecated",
-   "release_date": "2025-09-23",
-   "limit": {
-    "context": 129024,
-    "output": 32768
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.3
-     },
-     "output": {
-      "price": 1.5
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.jalapeno-cloud.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-03-31",
-   "last_updated": "2025-09-23"
+   "knowledge": "2025-01",
+   "last_updated": "2026-06-12"
   },
   "GLM-5.2": {
    "id": "GLM-5.2",
@@ -361,17 +304,17 @@
    "knowledge": "2025-05",
    "last_updated": "2026-04-24"
   },
-  "Qwen3.5-27B": {
-   "id": "Qwen3.5-27B",
-   "name": "Qwen3.5 27B",
-   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
+  "GLM-5.1": {
+   "id": "GLM-5.1",
+   "name": "GLM-5.1",
+   "description": "Strong GLM coding model for agentic engineering, terminals, and repository generation",
    "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3.5-27b",
-   "release_date": "2026-02-23",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.1",
+   "release_date": "2026-04-07",
    "limit": {
-    "context": 262144,
-    "output": 65536
+    "context": 202752,
+    "output": 131072
    },
    "capabilities": {
     "temperature": true,
@@ -391,28 +334,19 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.3
+      "price": 1.38,
+      "cache": {
+       "read": 0.26
+      }
      },
      "output": {
-      "price": 2.4
+      "price": 4.4
      }
     }
    },
    "modalities": {
     "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/x-matroska",
-     "video/quicktime",
-     "video/x-flv",
-     "video/x-ms-wmv"
+     "text"
     ],
     "output": [
      "text"
@@ -436,7 +370,7 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2026-02-23"
+   "last_updated": "2026-04-07"
   },
   "MiniMax-M3": {
    "id": "MiniMax-M3",
@@ -513,6 +447,72 @@
    },
    "open_weights": true,
    "last_updated": "2026-06-01"
+  },
+  "Qwen3-Next-80B-A3B-Thinking": {
+   "id": "Qwen3-Next-80B-A3B-Thinking",
+   "name": "Qwen3-Next 80B-A3B (Thinking)",
+   "description": "Efficient Qwen thinking model for local reasoning, math, and coding agents",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3-next-80b-a3b-thinking",
+   "status": "deprecated",
+   "release_date": "2025-09",
+   "limit": {
+    "context": 262144,
+    "output": 32768
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.15
+     },
+     "output": {
+      "price": 1.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.jalapeno-cloud.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-04",
+   "last_updated": "2025-09"
   },
   "Kimi-K2.5": {
    "id": "Kimi-K2.5",
@@ -599,17 +599,17 @@
    "knowledge": "2025-01",
    "last_updated": "2026-01-27"
   },
-  "Qwen3-Next-80B-A3B-Thinking": {
-   "id": "Qwen3-Next-80B-A3B-Thinking",
-   "name": "Qwen3-Next 80B-A3B (Thinking)",
-   "description": "Efficient Qwen thinking model for local reasoning, math, and coding agents",
+  "Qwen3-VL-235B-A22B-Instruct": {
+   "id": "Qwen3-VL-235B-A22B-Instruct",
+   "name": "Qwen3 VL 235B A22B Instruct",
+   "description": "Qwen vision-language instruct model for visual reasoning, documents, and agent tasks",
    "type": "chat",
    "family": "qwen",
-   "canonical_id": "alibaba/qwen3-next-80b-a3b-thinking",
+   "canonical_id": "alibaba/qwen3-vl-235b-a22b-instruct",
    "status": "deprecated",
-   "release_date": "2025-09",
+   "release_date": "2025-09-23",
    "limit": {
-    "context": 262144,
+    "context": 129024,
     "output": 32768
    },
    "capabilities": {
@@ -623,13 +623,13 @@
      "supported": true
     },
     "reasoning": {
-     "supported": true
+     "supported": false
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.15
+      "price": 0.3
      },
      "output": {
       "price": 1.5
@@ -638,7 +638,13 @@
    },
    "modalities": {
     "input": [
-     "text"
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic"
     ],
     "output": [
      "text"
@@ -655,15 +661,12 @@
       "tools": {
        "updates": false
       }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
      }
     }
    },
    "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-09"
+   "knowledge": "2025-03-31",
+   "last_updated": "2025-09-23"
   },
   "DeepSeek-V4-Pro": {
    "id": "DeepSeek-V4-Pro",
@@ -734,17 +737,19 @@
    "knowledge": "2025-05",
    "last_updated": "2026-04-24"
   },
-  "GLM-5.1": {
-   "id": "GLM-5.1",
-   "name": "GLM-5.1",
-   "description": "Strong GLM coding model for agentic engineering, terminals, and repository generation",
+  "Hy3": {
+   "id": "Hy3",
+   "name": "Hy3",
+   "description": "Tencent Hy reasoning model for coding, instruction following, and agent tasks",
    "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-5.1",
-   "release_date": "2026-04-07",
+   "family": "Hy",
+   "canonical_id": "tencent/hy3",
+   "status": "deprecated",
+   "release_date": "2026-07-06",
    "limit": {
     "context": 202752,
-    "output": 131072
+    "input": 192000,
+    "output": 128000
    },
    "capabilities": {
     "temperature": true,
@@ -764,13 +769,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 1.38,
-      "cache": {
-       "read": 0.26
-      }
+      "price": 0.14
      },
      "output": {
-      "price": 4.4
+      "price": 0.58
      }
     }
    },
@@ -800,19 +802,20 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2026-04-07"
+   "last_updated": "2026-07-06"
   },
-  "Qwen3.5-122B-A10B": {
-   "id": "Qwen3.5-122B-A10B",
-   "name": "Qwen3.5 122B-A10B",
-   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
+  "Qwen3-VL-235B-A22B-Thinking": {
+   "id": "Qwen3-VL-235B-A22B-Thinking",
+   "name": "Qwen3 VL 235B A22B Thinking",
+   "description": "Qwen vision-language thinking model for visual reasoning, documents, and agent tasks",
    "type": "chat",
    "family": "qwen",
-   "canonical_id": "alibaba/qwen3.5-122b-a10b",
-   "release_date": "2026-02-23",
+   "canonical_id": "alibaba/qwen3-vl-235b-a22b-thinking",
+   "status": "deprecated",
+   "release_date": "2025-09-23",
    "limit": {
-    "context": 262144,
-    "output": 65536
+    "context": 131072,
+    "output": 32768
    },
    "capabilities": {
     "temperature": true,
@@ -825,17 +828,16 @@
      "supported": true
     },
     "reasoning": {
-     "supported": true,
-     "toggle": true
+     "supported": true
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.4
+      "price": 0.98
      },
      "output": {
-      "price": 3.2
+      "price": 3.95
      }
     }
    },
@@ -847,13 +849,7 @@
      "image/png",
      "image/tiff",
      "image/webp",
-     "image/heic",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/x-matroska",
-     "video/quicktime",
-     "video/x-flv",
-     "video/x-ms-wmv"
+     "image/heic"
     ],
     "output": [
      "text"
@@ -877,91 +873,8 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2026-02-23"
-  },
-  "Kimi-K2.7-Code": {
-   "id": "Kimi-K2.7-Code",
-   "name": "Kimi K2.7 Code",
-   "description": "Coding-focused Kimi model, stronger on long-horizon repo work with less overthinking",
-   "type": "chat",
-   "family": "kimi-k2",
-   "canonical_id": "moonshotai/kimi-k2.7-code",
-   "release_date": "2026-06-12",
-   "limit": {
-    "context": 271360,
-    "output": 262144
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.95,
-      "cache": {
-       "read": 0.19
-      }
-     },
-     "output": {
-      "price": 4
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/heic",
-     "image/heif",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.jalapeno-cloud.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-06-12"
+   "knowledge": "2025-03-31",
+   "last_updated": "2025-09-23"
   },
   "Qwen3-Next-80B-A3B-Instruct": {
    "id": "Qwen3-Next-80B-A3B-Instruct",
@@ -1026,6 +939,83 @@
    "knowledge": "2025-04",
    "last_updated": "2025-09"
   },
+  "Qwen3.5-27B": {
+   "id": "Qwen3.5-27B",
+   "name": "Qwen3.5 27B",
+   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.5-27b",
+   "release_date": "2026-02-23",
+   "limit": {
+    "context": 262144,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.3
+     },
+     "output": {
+      "price": 2.4
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/x-matroska",
+     "video/quicktime",
+     "video/x-flv",
+     "video/x-ms-wmv"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.jalapeno-cloud.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-02-23"
+  },
   "Qwen3.5-35B-A3B": {
    "id": "Qwen3.5-35B-A3B",
    "name": "Qwen3.5 35B-A3B",
@@ -1060,6 +1050,83 @@
      },
      "output": {
       "price": 2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/x-matroska",
+     "video/quicktime",
+     "video/x-flv",
+     "video/x-ms-wmv"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.jalapeno-cloud.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-02-23"
+  },
+  "Qwen3.5-122B-A10B": {
+   "id": "Qwen3.5-122B-A10B",
+   "name": "Qwen3.5 122B-A10B",
+   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.5-122b-a10b",
+   "release_date": "2026-02-23",
+   "limit": {
+    "context": 262144,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.4
+     },
+     "output": {
+      "price": 3.2
      }
     }
    },
@@ -1186,73 +1253,6 @@
    },
    "open_weights": true,
    "last_updated": "2026-07-16"
-  },
-  "Hy3": {
-   "id": "Hy3",
-   "name": "Hy3",
-   "description": "Tencent Hy reasoning model for coding, instruction following, and agent tasks",
-   "type": "chat",
-   "family": "Hy",
-   "canonical_id": "tencent/hy3",
-   "status": "deprecated",
-   "release_date": "2026-07-06",
-   "limit": {
-    "context": 202752,
-    "input": 192000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.14
-     },
-     "output": {
-      "price": 0.58
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.jalapeno-cloud.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-07-06"
   }
  }
 }

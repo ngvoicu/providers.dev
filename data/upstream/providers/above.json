@@ -6,6 +6,198 @@
   "ABOVE_API_KEY"
  ],
  "models": {
+  "qwen3.8-max": {
+   "id": "qwen3.8-max",
+   "name": "Qwen 3.8 Max",
+   "description": "2.4-trillion-parameter MoE flagship for coding, professional work, multimodal understanding, and long-horizon agentic workflows",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.8-max",
+   "release_date": "2026-08-03",
+   "limit": {
+    "context": 1000000,
+    "output": 32768
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2.2,
+      "cache": {
+       "read": 0.275
+      }
+     },
+     "output": {
+      "price": 6.6
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.above.dev/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-08-03"
+  },
+  "deepseek-v4-pro": {
+   "id": "deepseek-v4-pro",
+   "name": "DeepSeek V4 Pro",
+   "description": "DeepSeek V4 Pro snapshot with million-token context and support for thinking and non-thinking modes",
+   "type": "chat",
+   "family": "deepseek-thinking",
+   "canonical_id": "deepseek/deepseek-v4-pro-0813",
+   "release_date": "2026-08-13",
+   "limit": {
+    "context": 1000000,
+    "output": 384000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.726,
+      "cache": {
+       "read": 0.0242
+      }
+     },
+     "output": {
+      "price": 2.178,
+      "reasoning": 2.178
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "utc_days": {
+        "in": [
+         "mon",
+         "tue",
+         "wed",
+         "thu",
+         "fri"
+        ]
+       },
+       "any": [
+        {
+         "all": [
+          {
+           "utc_hours": {
+            "gte": "01:00"
+           }
+          },
+          {
+           "utc_hours": {
+            "lt": "04:00"
+           }
+          }
+         ]
+        },
+        {
+         "all": [
+          {
+           "utc_hours": {
+            "gte": "06:00"
+           }
+          },
+          {
+           "utc_hours": {
+            "lt": "10:00"
+           }
+          }
+         ]
+        }
+       ]
+      },
+      "factor": 2
+     }
+    ]
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.above.dev/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-22"
+  },
   "deepseek-v4-flash": {
    "id": "deepseek-v4-flash",
    "name": "DeepSeek V4 Flash",
@@ -131,231 +323,6 @@
    "open_weights": true,
    "knowledge": "2025-05",
    "last_updated": "2026-09-10"
-  },
-  "glm-5.2-fast": {
-   "id": "glm-5.2-fast",
-   "name": "GLM 5.2 Fast",
-   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
-   "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-5.2",
-   "release_date": "2026-06-13",
-   "limit": {
-    "context": 1000000,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2.31,
-      "cache": {
-       "read": 0.231
-      }
-     },
-     "output": {
-      "price": 7.26
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.above.dev/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-06-13"
-  },
-  "mimo-v2.6-pro-ultraspeed": {
-   "id": "mimo-v2.6-pro-ultraspeed",
-   "name": "MiMo V2.6 Pro UltraSpeed",
-   "description": "MiMo pro model for strong multimodal reasoning and agent execution",
-   "type": "chat",
-   "family": "mimo",
-   "canonical_id": "xiaomi/mimo-v2.6-pro-ultraspeed",
-   "release_date": "2026-09-21",
-   "limit": {
-    "context": 1048576,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 5.0769,
-      "cache": {
-       "read": 0.0423
-      }
-     },
-     "output": {
-      "price": 10.1538
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "audio/mpeg",
-     "audio/wav",
-     "audio/flac",
-     "audio/mp4",
-     "audio/ogg",
-     "video/mp4",
-     "video/quicktime",
-     "video/x-msvideo",
-     "video/x-ms-wmv"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.above.dev/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-09-21"
-  },
-  "glm-5.2": {
-   "id": "glm-5.2",
-   "name": "GLM 5.2",
-   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
-   "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-5.2",
-   "release_date": "2026-06-13",
-   "limit": {
-    "context": 1000000,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.54,
-      "cache": {
-       "read": 0.154
-      }
-     },
-     "output": {
-      "price": 4.84
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.above.dev/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-06-13"
   },
   "mimo-v2.6-pro": {
    "id": "mimo-v2.6-pro",
@@ -511,23 +478,22 @@
    "open_weights": true,
    "last_updated": "2026-08-26"
   },
-  "deepseek-v4-pro": {
-   "id": "deepseek-v4-pro",
-   "name": "DeepSeek V4 Pro",
-   "description": "DeepSeek V4 Pro snapshot with million-token context and support for thinking and non-thinking modes",
+  "mimo-v2.6-pro-ultraspeed": {
+   "id": "mimo-v2.6-pro-ultraspeed",
+   "name": "MiMo V2.6 Pro UltraSpeed",
+   "description": "MiMo pro model for strong multimodal reasoning and agent execution",
    "type": "chat",
-   "family": "deepseek-thinking",
-   "canonical_id": "deepseek/deepseek-v4-pro-0813",
-   "release_date": "2026-08-13",
+   "family": "mimo",
+   "canonical_id": "xiaomi/mimo-v2.6-pro-ultraspeed",
+   "release_date": "2026-09-21",
    "limit": {
-    "context": 1000000,
-    "output": 384000
+    "context": 1048576,
+    "output": 131072
    },
    "capabilities": {
     "temperature": true,
     "top_k": true,
     "top_p": true,
-    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -535,76 +501,39 @@
     },
     "reasoning": {
      "supported": true,
-     "toggle": true,
-     "effort": [
-      "high",
-      "max"
-     ]
+     "toggle": true
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.726,
+      "price": 5.0769,
       "cache": {
-       "read": 0.0242
+       "read": 0.0423
       }
      },
      "output": {
-      "price": 2.178,
-      "reasoning": 2.178
+      "price": 10.1538
      }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "utc_days": {
-        "in": [
-         "mon",
-         "tue",
-         "wed",
-         "thu",
-         "fri"
-        ]
-       },
-       "any": [
-        {
-         "all": [
-          {
-           "utc_hours": {
-            "gte": "01:00"
-           }
-          },
-          {
-           "utc_hours": {
-            "lt": "04:00"
-           }
-          }
-         ]
-        },
-        {
-         "all": [
-          {
-           "utc_hours": {
-            "gte": "06:00"
-           }
-          },
-          {
-           "utc_hours": {
-            "lt": "10:00"
-           }
-          }
-         ]
-        }
-       ]
-      },
-      "factor": 2
-     }
-    ]
+    }
    },
    "modalities": {
     "input": [
-     "text"
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "audio/mpeg",
+     "audio/wav",
+     "audio/flac",
+     "audio/mp4",
+     "audio/ogg",
+     "video/mp4",
+     "video/quicktime",
+     "video/x-msvideo",
+     "video/x-ms-wmv"
     ],
     "output": [
      "text"
@@ -628,7 +557,7 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2026-08-22"
+   "last_updated": "2026-09-21"
   },
   "mimo-v2.6-flash": {
    "id": "mimo-v2.6-flash",
@@ -710,6 +639,150 @@
    },
    "open_weights": true,
    "last_updated": "2026-09-22"
+  },
+  "glm-5.2": {
+   "id": "glm-5.2",
+   "name": "GLM 5.2",
+   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.2",
+   "release_date": "2026-06-13",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.54,
+      "cache": {
+       "read": 0.154
+      }
+     },
+     "output": {
+      "price": 4.84
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.above.dev/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-06-13"
+  },
+  "glm-5.2-fast": {
+   "id": "glm-5.2-fast",
+   "name": "GLM 5.2 Fast",
+   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.2",
+   "release_date": "2026-06-13",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2.31,
+      "cache": {
+       "read": 0.231
+      }
+     },
+     "output": {
+      "price": 7.26
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.above.dev/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-06-13"
   },
   "deepseek-v4.1-flash": {
    "id": "deepseek-v4.1-flash",
@@ -835,79 +908,6 @@
    "open_weights": true,
    "knowledge": "2025-05",
    "last_updated": "2026-09-10"
-  },
-  "qwen3.8-max": {
-   "id": "qwen3.8-max",
-   "name": "Qwen 3.8 Max",
-   "description": "2.4-trillion-parameter MoE flagship for coding, professional work, multimodal understanding, and long-horizon agentic workflows",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3.8-max",
-   "release_date": "2026-08-03",
-   "limit": {
-    "context": 1000000,
-    "output": 32768
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2.2,
-      "cache": {
-       "read": 0.275
-      }
-     },
-     "output": {
-      "price": 6.6
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.above.dev/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-08-03"
   }
  }
 }

@@ -6,9 +6,9 @@
   "ZHIPU_API_KEY"
  ],
  "models": {
-  "glm-5.2": {
-   "id": "glm-5.2",
-   "name": "GLM-5.2",
+  "glm-5.2-highspeed": {
+   "id": "glm-5.2-highspeed",
+   "name": "GLM-5.2 Highspeed",
    "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
    "type": "chat",
    "family": "glm",
@@ -206,16 +206,17 @@
    "open_weights": true,
    "last_updated": "2026-08-14"
   },
-  "glm-5.3": {
-   "id": "glm-5.3",
-   "name": "GLM-5.3",
-   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
+  "glm-4.7": {
+   "id": "glm-4.7",
+   "name": "GLM-4.7",
+   "description": "Mature GLM model for dependable coding, reasoning, and structured agent tasks",
    "type": "chat",
    "family": "glm",
-   "canonical_id": "zhipuai/glm-5.3",
-   "release_date": "2026-08-14",
+   "canonical_id": "zhipuai/glm-4.7",
+   "status": "deprecated",
+   "release_date": "2025-12-22",
    "limit": {
-    "context": 1000000,
+    "context": 204800,
     "output": 131072
    },
    "capabilities": {
@@ -225,7 +226,6 @@
     "temperature": true,
     "top_k": false,
     "top_p": true,
-    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -233,14 +233,10 @@
     },
     "reasoning": {
      "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ],
+     "toggle": true,
      "default": {
-      "type": "effort",
-      "value": "max"
+      "type": "toggle",
+      "value": true
      }
     }
    },
@@ -285,12 +281,75 @@
       "max_tokens_field": "max_tokens",
       "reasoning_field": "reasoning_content"
      }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-04",
+   "last_updated": "2025-12-22"
+  },
+  "glm-5-turbo": {
+   "id": "glm-5-turbo",
+   "name": "GLM-5-Turbo",
+   "description": "Faster GLM-5 lane for coding agents that need lower latency",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5-turbo",
+   "status": "deprecated",
+   "release_date": "2026-03-16",
+   "limit": {
+    "context": 200000,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
     },
-    "messages": {
-     "base_url": "https://api.z.ai/api/anthropic/v1",
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "default": {
+      "type": "toggle",
+      "value": true
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.z.ai/api/coding/paas/v4",
      "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/chat"
      },
      "capabilities": {
       "tools": {
@@ -299,27 +358,15 @@
        ],
        "updates": false
       }
-     }
-    },
-    "responses": {
-     "base_url": "https://api.z.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
      },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
      }
     }
    },
-   "open_weights": true,
-   "last_updated": "2026-08-14"
+   "open_weights": false,
+   "last_updated": "2026-03-16"
   },
   "glm-5.3-flash": {
    "id": "glm-5.3-flash",
@@ -442,17 +489,16 @@
    "open_weights": true,
    "last_updated": "2026-08-26"
   },
-  "glm-5-turbo": {
-   "id": "glm-5-turbo",
-   "name": "GLM-5-Turbo",
-   "description": "Faster GLM-5 lane for coding agents that need lower latency",
+  "glm-5.3": {
+   "id": "glm-5.3",
+   "name": "GLM-5.3",
+   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
    "type": "chat",
    "family": "glm",
-   "canonical_id": "zhipuai/glm-5-turbo",
-   "status": "deprecated",
-   "release_date": "2026-03-16",
+   "canonical_id": "zhipuai/glm-5.3",
+   "release_date": "2026-08-14",
    "limit": {
-    "context": 200000,
+    "context": 1000000,
     "output": 131072
    },
    "capabilities": {
@@ -470,10 +516,14 @@
     },
     "reasoning": {
      "supported": true,
-     "toggle": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ],
      "default": {
-      "type": "toggle",
-      "value": true
+      "type": "effort",
+      "value": "max"
      }
     }
    },
@@ -518,73 +568,12 @@
       "max_tokens_field": "max_tokens",
       "reasoning_field": "reasoning_content"
      }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-03-16"
-  },
-  "glm-4.7": {
-   "id": "glm-4.7",
-   "name": "GLM-4.7",
-   "description": "Mature GLM model for dependable coding, reasoning, and structured agent tasks",
-   "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-4.7",
-   "status": "deprecated",
-   "release_date": "2025-12-22",
-   "limit": {
-    "context": 204800,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
     },
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "default": {
-      "type": "toggle",
-      "value": true
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.z.ai/api/coding/paas/v4",
+    "messages": {
+     "base_url": "https://api.z.ai/api/anthropic/v1",
      "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/chat"
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
      },
      "capabilities": {
       "tools": {
@@ -593,20 +582,31 @@
        ],
        "updates": false
       }
+     }
+    },
+    "responses": {
+     "base_url": "https://api.z.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
      },
-     "compatibility": {
-      "max_tokens_field": "max_tokens",
-      "reasoning_field": "reasoning_content"
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
      }
     }
    },
    "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-12-22"
+   "last_updated": "2026-08-14"
   },
-  "glm-5.2-highspeed": {
-   "id": "glm-5.2-highspeed",
-   "name": "GLM-5.2 Highspeed",
+  "glm-5.2": {
+   "id": "glm-5.2",
+   "name": "GLM-5.2",
    "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
    "type": "chat",
    "family": "glm",

@@ -6,150 +6,8 @@
   "INFERENCE_COOP_API_KEY"
  ],
  "models": {
-  "greenpt/glm-5.3": {
-   "id": "greenpt/glm-5.3",
-   "name": "GLM-5.3",
-   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
-   "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-5.3",
-   "release_date": "2026-08-14",
-   "limit": {
-    "context": 1000000,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.1,
-      "cache": {
-       "read": 0.275
-      }
-     },
-     "output": {
-      "price": 4.4
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://gateway.inference.coop/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-08-14"
-  },
-  "greenpt/glm-5.3-flash": {
-   "id": "greenpt/glm-5.3-flash",
-   "name": "GLM-5.3-Flash",
-   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
-   "type": "chat",
-   "family": "glm-flash",
-   "canonical_id": "zhipuai/glm-5.3-flash",
-   "release_date": "2026-08-26",
-   "limit": {
-    "context": 1000000,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.11,
-      "cache": {
-       "read": 0.022
-      }
-     },
-     "output": {
-      "price": 0.44
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://gateway.inference.coop/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-08-26"
-  },
-  "greenpt/deepseek-v4.1-flash": {
-   "id": "greenpt/deepseek-v4.1-flash",
+  "tinfoil/deepseek-v4-1-flash": {
+   "id": "tinfoil/deepseek-v4-1-flash",
    "name": "DeepSeek V4.1 Flash",
    "description": "DeepSeek V4.1 Flash model for reasoning and agentic coding",
    "type": "chat",
@@ -157,10 +15,13 @@
    "canonical_id": "deepseek/deepseek-v4.1-flash",
    "release_date": "2026-09-10",
    "limit": {
-    "context": 1000000,
+    "context": 1048576,
     "output": 384000
    },
    "capabilities": {
+    "cache": {
+     "implicit": true
+    },
     "temperature": true,
     "top_k": true,
     "top_p": true,
@@ -177,20 +38,22 @@
       "minimal",
       "low",
       "medium",
-      "high"
+      "high",
+      "xhigh",
+      "max"
      ]
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.22,
+      "price": 0.65,
       "cache": {
-       "read": 0.011
+       "read": 0.13
       }
      },
      "output": {
-      "price": 1.1
+      "price": 1.45
      }
     }
    },
@@ -223,190 +86,6 @@
    "open_weights": true,
    "knowledge": "2025-05",
    "last_updated": "2026-09-10"
-  },
-  "regolo/apertus-70b": {
-   "id": "regolo/apertus-70b",
-   "name": "Apertus 1.5 70B",
-   "description": "Fully open multilingual multimodal reasoner from the Swiss AI Initiative with image and audio understanding, an optional thinking mode, and a 262K context window",
-   "type": "chat",
-   "canonical_id": "swiss-ai/apertus-v1.5-70b",
-   "release_date": "2026-07-24",
-   "limit": {
-    "context": 262144,
-    "output": 8192
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.16
-     },
-     "output": {
-      "price": 3.94
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/gif",
-     "image/jpeg",
-     "image/png",
-     "image/tiff"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://gateway.inference.coop/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-07-24"
-  },
-  "regolo/qwen3.5-122b": {
-   "id": "regolo/qwen3.5-122b",
-   "name": "Qwen3.5-122B",
-   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3.5-122b-a10b",
-   "release_date": "2026-02-23",
-   "limit": {
-    "context": 262144,
-    "output": 16384
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.7
-     },
-     "output": {
-      "price": 3.94
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://gateway.inference.coop/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-02-23"
-  },
-  "regolo/qwen-image": {
-   "id": "regolo/qwen-image",
-   "name": "Qwen-Image",
-   "description": "Open-weight Qwen image model for prompt-driven generation and visual design workflows",
-   "type": "image",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen-image",
-   "release_date": "2025-08-19",
-   "limit": {
-    "context": 8192,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "image": {
-     "output": {
-      "unit": "megapixel",
-      "price": 0.0174
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "image/png"
-    ]
-   },
-   "api": {
-    "images": {
-     "base_url": "https://gateway.inference.coop/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/images"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-08-19"
   },
   "tinfoil/gpt-oss-120b": {
    "id": "tinfoil/gpt-oss-120b",
@@ -597,22 +276,203 @@
    "open_weights": true,
    "last_updated": "2024-10-01"
   },
-  "tinfoil/deepseek-v4-1-flash": {
-   "id": "tinfoil/deepseek-v4-1-flash",
-   "name": "DeepSeek V4.1 Flash",
-   "description": "DeepSeek V4.1 Flash model for reasoning and agentic coding",
+  "regolo/qwen3.5-122b": {
+   "id": "regolo/qwen3.5-122b",
+   "name": "Qwen3.5-122B",
+   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
    "type": "chat",
-   "family": "deepseek-flash",
-   "canonical_id": "deepseek/deepseek-v4.1-flash",
-   "release_date": "2026-09-10",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.5-122b-a10b",
+   "release_date": "2026-02-23",
    "limit": {
-    "context": 1048576,
-    "output": 384000
+    "context": 262144,
+    "output": 16384
    },
    "capabilities": {
-    "cache": {
-     "implicit": true
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
     },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.7
+     },
+     "output": {
+      "price": 3.94
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://gateway.inference.coop/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-02-23"
+  },
+  "regolo/apertus-70b": {
+   "id": "regolo/apertus-70b",
+   "name": "Apertus 1.5 70B",
+   "description": "Fully open multilingual multimodal reasoner from the Swiss AI Initiative with image and audio understanding, an optional thinking mode, and a 262K context window",
+   "type": "chat",
+   "canonical_id": "swiss-ai/apertus-v1.5-70b",
+   "release_date": "2026-07-24",
+   "limit": {
+    "context": 262144,
+    "output": 8192
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.16
+     },
+     "output": {
+      "price": 3.94
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/gif",
+     "image/jpeg",
+     "image/png",
+     "image/tiff"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://gateway.inference.coop/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-07-24"
+  },
+  "regolo/qwen-image": {
+   "id": "regolo/qwen-image",
+   "name": "Qwen-Image",
+   "description": "Open-weight Qwen image model for prompt-driven generation and visual design workflows",
+   "type": "image",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen-image",
+   "release_date": "2025-08-19",
+   "limit": {
+    "context": 8192,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "image": {
+     "output": {
+      "unit": "megapixel",
+      "price": 0.0174
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "image/png"
+    ]
+   },
+   "api": {
+    "images": {
+     "base_url": "https://gateway.inference.coop/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/images"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-08-19"
+  },
+  "greenpt/glm-5.3-flash": {
+   "id": "greenpt/glm-5.3-flash",
+   "name": "GLM-5.3-Flash",
+   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
+   "type": "chat",
+   "family": "glm-flash",
+   "canonical_id": "zhipuai/glm-5.3-flash",
+   "release_date": "2026-08-26",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
     "temperature": true,
     "top_k": true,
     "top_p": true,
@@ -629,22 +489,162 @@
       "minimal",
       "low",
       "medium",
-      "high",
-      "xhigh",
-      "max"
+      "high"
      ]
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.65,
+      "price": 0.11,
       "cache": {
-       "read": 0.13
+       "read": 0.022
       }
      },
      "output": {
-      "price": 1.45
+      "price": 0.44
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://gateway.inference.coop/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-26"
+  },
+  "greenpt/glm-5.3": {
+   "id": "greenpt/glm-5.3",
+   "name": "GLM-5.3",
+   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.3",
+   "release_date": "2026-08-14",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.1,
+      "cache": {
+       "read": 0.275
+      }
+     },
+     "output": {
+      "price": 4.4
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://gateway.inference.coop/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-14"
+  },
+  "greenpt/deepseek-v4.1-flash": {
+   "id": "greenpt/deepseek-v4.1-flash",
+   "name": "DeepSeek V4.1 Flash",
+   "description": "DeepSeek V4.1 Flash model for reasoning and agentic coding",
+   "type": "chat",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4.1-flash",
+   "release_date": "2026-09-10",
+   "limit": {
+    "context": 1000000,
+    "output": 384000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.22,
+      "cache": {
+       "read": 0.011
+      }
+     },
+     "output": {
+      "price": 1.1
      }
     }
    },

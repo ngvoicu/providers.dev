@@ -6,51 +6,44 @@
   "EVROC_API_KEY"
  ],
  "models": {
-  "google/gemma-4-26B-A4B-it": {
-   "id": "google/gemma-4-26B-A4B-it",
-   "name": "Gemma 4 26B A4B IT",
-   "description": "Open Gemma instruction model for efficient chat and self-hosted deployments",
+  "nvidia/Llama-3.3-70B-Instruct-FP8": {
+   "id": "nvidia/Llama-3.3-70B-Instruct-FP8",
+   "name": "Llama-3.3-70B-Instruct",
+   "description": "Popular open Llama workhorse for multilingual chat, coding, and self-hosting",
    "type": "chat",
-   "family": "gemma",
-   "canonical_id": "google/gemma-4-26b-a4b-it",
-   "release_date": "2026-04-02",
+   "family": "llama",
+   "canonical_id": "meta/llama-3.3-70b-instruct",
+   "release_date": "2024-12-06",
    "limit": {
-    "context": 262144,
-    "output": 32768
+    "context": 128000,
+    "output": 4096
    },
    "capabilities": {
     "temperature": true,
     "top_k": true,
     "top_p": true,
-    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": true,
-     "toggle": true
+     "supported": false
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.144
+      "price": 1.15
      },
      "output": {
-      "price": 0.575
+      "price": 1.15
      }
     }
    },
    "modalities": {
     "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif"
+     "text"
     ],
     "output": [
      "text"
@@ -71,7 +64,8 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2026-04-02"
+   "knowledge": "2023-12",
+   "last_updated": "2024-12-06"
   },
   "moonshotai/Kimi-K2.6": {
    "id": "moonshotai/Kimi-K2.6",
@@ -152,77 +146,16 @@
    "knowledge": "2025-01",
    "last_updated": "2026-04-20"
   },
-  "nvidia/Llama-3.3-70B-Instruct-FP8": {
-   "id": "nvidia/Llama-3.3-70B-Instruct-FP8",
-   "name": "Llama-3.3-70B-Instruct",
-   "description": "Popular open Llama workhorse for multilingual chat, coding, and self-hosting",
-   "type": "chat",
-   "family": "llama",
-   "canonical_id": "meta/llama-3.3-70b-instruct",
-   "release_date": "2024-12-06",
+  "KBLab/kb-whisper-large": {
+   "id": "KBLab/kb-whisper-large",
+   "name": "KB Whisper",
+   "description": "Speech transcription model for accurate audio-to-text and captioning workflows",
+   "type": "transcription",
+   "family": "whisper",
+   "release_date": "2024-10-01",
    "limit": {
-    "context": 128000,
-    "output": 4096
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.15
-     },
-     "output": {
-      "price": 1.15
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://models.think.evroc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2023-12",
-   "last_updated": "2024-12-06"
-  },
-  "intfloat/multilingual-e5-large-instruct": {
-   "id": "intfloat/multilingual-e5-large-instruct",
-   "name": "E5 Multi-Lingual Large Embeddings 0.6B",
-   "description": "Embedding model for semantic search, retrieval, clustering, and ranking pipelines",
-   "type": "embedding",
-   "family": "text-embedding",
-   "release_date": "2024-06-01",
-   "limit": {
-    "context": 512,
-    "output": 512
+    "context": 448,
+    "output": 448
    },
    "capabilities": {
     "system_updates": false,
@@ -235,100 +168,32 @@
     }
    },
    "cost": {
-    "text": {
+    "audio": {
      "input": {
-      "price": 0.114
-     },
-     "output": {
-      "price": 0.114
+      "unit": "minute",
+      "price": 0.0023
      }
     }
    },
    "modalities": {
     "input": [
-     "text"
+     "audio"
     ],
     "output": [
      "text"
     ]
    },
    "api": {
-    "embeddings": {
+    "transcriptions": {
      "base_url": "https://models.think.evroc.com/v1",
      "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/protocols/openai-transcription"
      }
     }
    },
    "open_weights": true,
-   "last_updated": "2024-06-01"
-  },
-  "zai-org/GLM-5.2": {
-   "id": "zai-org/GLM-5.2",
-   "name": "GLM-5.2",
-   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
-   "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-5.2",
-   "release_date": "2026-06-13",
-   "limit": {
-    "context": 524288,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.4375
-     },
-     "output": {
-      "price": 5.75
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://models.think.evroc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-06-13"
+   "last_updated": "2024-10-01"
   },
   "evroc/roc": {
    "id": "evroc/roc",
@@ -393,6 +258,138 @@
    "open_weights": false,
    "knowledge": "2026-01",
    "last_updated": "2026-06-06"
+  },
+  "google/gemma-4-26B-A4B-it": {
+   "id": "google/gemma-4-26B-A4B-it",
+   "name": "Gemma 4 26B A4B IT",
+   "description": "Open Gemma instruction model for efficient chat and self-hosted deployments",
+   "type": "chat",
+   "family": "gemma",
+   "canonical_id": "google/gemma-4-26b-a4b-it",
+   "release_date": "2026-04-02",
+   "limit": {
+    "context": 262144,
+    "output": 32768
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.144
+     },
+     "output": {
+      "price": 0.575
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://models.think.evroc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-04-02"
+  },
+  "openai/whisper-large-v3": {
+   "id": "openai/whisper-large-v3",
+   "name": "Whisper 3 Large",
+   "description": "Open Whisper checkpoint for robust multilingual transcription and captioning",
+   "type": "transcription",
+   "family": "whisper",
+   "canonical_id": "openai/whisper-large-v3",
+   "release_date": "2023-11-06",
+   "limit": {
+    "context": 448,
+    "output": 448
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.0023
+     },
+     "output": {
+      "price": 0.0023
+     }
+    },
+    "audio": {
+     "output": {
+      "price": 2.3
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "audio/flac",
+     "audio/mpeg",
+     "audio/mp4",
+     "audio/ogg",
+     "audio/wav",
+     "audio/webm"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "transcriptions": {
+     "base_url": "https://models.think.evroc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/protocols/openai-transcription"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2023-11-06"
   },
   "openai/gpt-oss-120b": {
    "id": "openai/gpt-oss-120b",
@@ -525,122 +522,6 @@
    "open_weights": true,
    "last_updated": "2024-10-01"
   },
-  "openai/whisper-large-v3": {
-   "id": "openai/whisper-large-v3",
-   "name": "Whisper 3 Large",
-   "description": "Open Whisper checkpoint for robust multilingual transcription and captioning",
-   "type": "transcription",
-   "family": "whisper",
-   "canonical_id": "openai/whisper-large-v3",
-   "release_date": "2023-11-06",
-   "limit": {
-    "context": 448,
-    "output": 448
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.0023
-     },
-     "output": {
-      "price": 0.0023
-     }
-    },
-    "audio": {
-     "output": {
-      "price": 2.3
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "audio/flac",
-     "audio/mpeg",
-     "audio/mp4",
-     "audio/ogg",
-     "audio/wav",
-     "audio/webm"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "transcriptions": {
-     "base_url": "https://models.think.evroc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/protocols/openai-transcription"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2023-11-06"
-  },
-  "mistralai/Voxtral-Small-24B-2507": {
-   "id": "mistralai/Voxtral-Small-24B-2507",
-   "name": "Voxtral Small 24B",
-   "description": "Efficient Mistral model for fast chat, extraction, and production assistants",
-   "type": "transcription",
-   "family": "voxtral",
-   "release_date": "2025-03-01",
-   "limit": {
-    "context": 32000,
-    "output": 32000
-   },
-   "capabilities": {
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "audio": {
-     "input": {
-      "unit": "minute",
-      "price": 0.0023
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "audio/wav",
-     "audio/mpeg",
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "transcriptions": {
-     "base_url": "https://models.think.evroc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/protocols/openai-transcription"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-03-01"
-  },
   "mistralai/Mistral-Medium-3.5-128B": {
    "id": "mistralai/Mistral-Medium-3.5-128B",
    "name": "Mistral Medium 3.5",
@@ -710,17 +591,119 @@
    "open_weights": true,
    "last_updated": "2026-04-29"
   },
-  "Qwen/Qwen3.8-27B": {
-   "id": "Qwen/Qwen3.8-27B",
-   "name": "Qwen3.8-27B",
-   "description": "Dense 27B vision-language model for coding, agent tasks, and image and video understanding",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3.8-27b",
-   "release_date": "2026-08-14",
+  "mistralai/Voxtral-Small-24B-2507": {
+   "id": "mistralai/Voxtral-Small-24B-2507",
+   "name": "Voxtral Small 24B",
+   "description": "Efficient Mistral model for fast chat, extraction, and production assistants",
+   "type": "transcription",
+   "family": "voxtral",
+   "release_date": "2025-03-01",
    "limit": {
-    "context": 262144,
-    "output": 262144
+    "context": 32000,
+    "output": 32000
+   },
+   "capabilities": {
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "audio": {
+     "input": {
+      "unit": "minute",
+      "price": 0.0023
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "audio/wav",
+     "audio/mpeg",
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "transcriptions": {
+     "base_url": "https://models.think.evroc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/protocols/openai-transcription"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-03-01"
+  },
+  "intfloat/multilingual-e5-large-instruct": {
+   "id": "intfloat/multilingual-e5-large-instruct",
+   "name": "E5 Multi-Lingual Large Embeddings 0.6B",
+   "description": "Embedding model for semantic search, retrieval, clustering, and ranking pipelines",
+   "type": "embedding",
+   "family": "text-embedding",
+   "release_date": "2024-06-01",
+   "limit": {
+    "context": 512,
+    "output": 512
+   },
+   "capabilities": {
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.114
+     },
+     "output": {
+      "price": 0.114
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "embeddings": {
+     "base_url": "https://models.think.evroc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2024-06-01"
+  },
+  "zai-org/GLM-5.2": {
+   "id": "zai-org/GLM-5.2",
+   "name": "GLM-5.2",
+   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.2",
+   "release_date": "2026-06-13",
+   "limit": {
+    "context": 524288,
+    "output": 131072
    },
    "capabilities": {
     "temperature": true,
@@ -736,37 +719,24 @@
      "supported": true,
      "toggle": true,
      "effort": [
-      "low",
-      "medium",
-      "xhigh"
+      "high",
+      "max"
      ]
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.87
+      "price": 1.4375
      },
      "output": {
-      "price": 3.5
+      "price": 5.75
      }
     }
    },
    "modalities": {
     "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/x-matroska",
-     "video/quicktime",
-     "video/x-flv",
-     "video/x-ms-wmv"
+     "text"
     ],
     "output": [
      "text"
@@ -787,7 +757,7 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2026-08-14"
+   "last_updated": "2026-06-13"
   },
   "Qwen/Qwen3-Embedding-8B": {
    "id": "Qwen/Qwen3-Embedding-8B",
@@ -966,54 +936,84 @@
    "open_weights": true,
    "last_updated": "2025-07-30"
   },
-  "KBLab/kb-whisper-large": {
-   "id": "KBLab/kb-whisper-large",
-   "name": "KB Whisper",
-   "description": "Speech transcription model for accurate audio-to-text and captioning workflows",
-   "type": "transcription",
-   "family": "whisper",
-   "release_date": "2024-10-01",
+  "Qwen/Qwen3.8-27B": {
+   "id": "Qwen/Qwen3.8-27B",
+   "name": "Qwen3.8-27B",
+   "description": "Dense 27B vision-language model for coding, agent tasks, and image and video understanding",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.8-27b",
+   "release_date": "2026-08-14",
    "limit": {
-    "context": 448,
-    "output": 448
+    "context": 262144,
+    "output": 262144
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
-     "supported": false
+     "supported": true
     },
     "reasoning": {
-     "supported": false
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "medium",
+      "xhigh"
+     ]
     }
    },
    "cost": {
-    "audio": {
+    "text": {
      "input": {
-      "unit": "minute",
-      "price": 0.0023
+      "price": 0.87
+     },
+     "output": {
+      "price": 3.5
      }
     }
    },
    "modalities": {
     "input": [
-     "audio"
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/x-matroska",
+     "video/quicktime",
+     "video/x-flv",
+     "video/x-ms-wmv"
     ],
     "output": [
      "text"
     ]
    },
    "api": {
-    "transcriptions": {
+    "chat-completions": {
      "base_url": "https://models.think.evroc.com/v1",
      "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/protocols/openai-transcription"
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
      }
     }
    },
    "open_weights": true,
-   "last_updated": "2024-10-01"
+   "last_updated": "2026-08-14"
   }
  }
 }

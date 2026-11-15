@@ -6,86 +6,19 @@
   "QINIU_API_KEY"
  ],
  "models": {
-  "qwen3-next-80b-a3b-thinking": {
-   "id": "qwen3-next-80b-a3b-thinking",
-   "name": "Qwen3 Next 80B A3B Thinking",
-   "description": "Efficient Qwen thinking model for local reasoning, math, and coding agents",
+  "doubao-seed-1.6-thinking": {
+   "id": "doubao-seed-1.6-thinking",
+   "name": "Doubao-Seed 1.6 Thinking",
+   "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
    "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3-next-80b-a3b-thinking",
    "status": "deprecated",
-   "release_date": "2025-09",
-   "limit": {
-    "context": 131072,
-    "output": 32768
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.14492754
-     },
-     "output": {
-      "price": 1.44927536
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-09"
-  },
-  "doubao-seed-1.6-flash": {
-   "id": "doubao-seed-1.6-flash",
-   "name": "Doubao-Seed 1.6 Flash",
-   "description": "Low-latency ByteDance Seed model for high-throughput chat, extraction, and lightweight tool use",
-   "type": "chat",
-   "family": "seed",
-   "canonical_id": "bytedance-seed/seed-1-6-flash",
-   "status": "deprecated",
-   "release_date": "2025-08-28",
+   "release_date": "2025-08-15",
    "limit": {
     "context": 256000,
     "output": 32000
    },
    "capabilities": {
     "temperature": true,
-    "top_k": false,
-    "top_p": true,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -93,14 +26,13 @@
      "supported": true
     },
     "reasoning": {
-     "supported": true,
-     "toggle": true
+     "supported": true
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.02173913,
+      "price": 0.11594203,
       "overrides": [
        {
         "when": {
@@ -108,7 +40,7 @@
           "gt": 32000
          }
         },
-        "price": 0.04347826
+        "price": 0.17391304
        },
        {
         "when": {
@@ -116,12 +48,12 @@
           "gt": 128000
          }
         },
-        "price": 0.08695652
+        "price": 0.34782609
        }
       ]
      },
      "output": {
-      "price": 0.2173913,
+      "price": 1.15942029,
       "overrides": [
        {
         "when": {
@@ -129,7 +61,7 @@
           "gt": 32000
          }
         },
-        "price": 0.43478261
+        "price": 2.31884058
        },
        {
         "when": {
@@ -137,7 +69,7 @@
           "gt": 128000
          }
         },
-        "price": 0.86956522
+        "price": 3.47826087
        }
       ]
      }
@@ -145,7 +77,6 @@
    },
    "modalities": {
     "input": [
-     "text",
      "image/jpeg",
      "image/png",
      "image/gif",
@@ -157,6 +88,7 @@
      "image/sgi",
      "image/jp2",
      "image/heic",
+     "text",
      "video/mp4",
      "video/x-msvideo",
      "video/quicktime"
@@ -180,88 +112,7 @@
     }
    },
    "open_weights": false,
-   "last_updated": "2025-08-28"
-  },
-  "gemini-3.0-flash-preview": {
-   "id": "gemini-3.0-flash-preview",
-   "name": "Gemini 3.0 Flash Preview",
-   "description": "New Gemini flash lane bringing frontier-style multimodal reasoning to cheaper runs",
-   "type": "chat",
-   "family": "gemini-flash",
-   "canonical_id": "google/gemini-3-flash-preview",
-   "status": "deprecated",
-   "release_date": "2025-12-17",
-   "limit": {
-    "context": 1000000,
-    "output": 64000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "audio/wav",
-     "audio/mp3",
-     "audio/aiff",
-     "audio/aac",
-     "audio/ogg",
-     "audio/flac",
-     "audio/mpeg",
-     "audio/m4a",
-     "audio/l16",
-     "audio/opus",
-     "audio/alaw",
-     "audio/mulaw",
-     "audio/webm",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-01",
-   "last_updated": "2025-12-17"
+   "last_updated": "2025-08-15"
   },
   "gemini-2.5-pro": {
    "id": "gemini-2.5-pro",
@@ -343,18 +194,394 @@
    "knowledge": "2025-01",
    "last_updated": "2025-06-17"
   },
-  "qwen3-max-preview": {
-   "id": "qwen3-max-preview",
-   "name": "Qwen3 Max Preview",
+  "qwen3-32b": {
+   "id": "qwen3-32b",
+   "name": "Qwen3 32B",
+   "description": "Dense open Qwen model for self-hosted chat, reasoning, and coding",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3-32b",
+   "status": "deprecated",
+   "release_date": "2025-04-28",
+   "limit": {
+    "context": 40000,
+    "output": 4096
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.28985507
+     },
+     "output": {
+      "price": 1.15942029,
+      "overrides": [
+       {
+        "when": {
+         "thinking": {
+          "equals": true
+         }
+        },
+        "price": 2.89855072
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-04",
+   "last_updated": "2025-04-28"
+  },
+  "gemini-3.0-pro-image-preview": {
+   "id": "gemini-3.0-pro-image-preview",
+   "name": "Gemini 3.0 Pro Image Preview",
+   "description": "Nano Banana Pro for higher-fidelity image generation and design-heavy edits",
+   "type": "image",
+   "family": "gemini-pro",
+   "canonical_id": "google/gemini-3-pro-image-preview",
+   "status": "deprecated",
+   "release_date": "2025-11-20",
+   "limit": {
+    "context": 32768,
+    "output": 8192
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif"
+    ],
+    "output": [
+     "text",
+     "image/png",
+     "image/jpeg"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2025-11-20"
+  },
+  "qwen-max-2025-01-25": {
+   "id": "qwen-max-2025-01-25",
+   "name": "Qwen2.5-Max-2025-01-25",
    "description": "Flagship Qwen model for complex reasoning, coding, and agentic workflows",
    "type": "chat",
    "family": "qwen",
-   "canonical_id": "alibaba/qwen3-max-preview",
+   "canonical_id": "alibaba/qwen-max",
    "status": "deprecated",
-   "release_date": "2025-09-05",
+   "release_date": "2024-04-03",
    "limit": {
-    "context": 256000,
-    "output": 64000
+    "context": 128000,
+    "output": 4096
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.34782609
+     },
+     "output": {
+      "price": 1.39130435
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2024-04",
+   "last_updated": "2025-01-25"
+  },
+  "glm-4.5": {
+   "id": "glm-4.5",
+   "name": "GLM 4.5",
+   "description": "Hybrid-reasoning GLM release that made the 4.5 line broadly useful",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-4.5",
+   "status": "deprecated",
+   "release_date": "2025-07-28",
+   "limit": {
+    "context": 131072,
+    "output": 98304
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.57971014
+     },
+     "output": {
+      "price": 2.31884058
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-04",
+   "last_updated": "2025-07-28"
+  },
+  "claude-4.0-opus": {
+   "id": "claude-4.0-opus",
+   "name": "Claude 4.0 Opus",
+   "description": "Flagship Claude model for deep reasoning, coding, and long-horizon agents",
+   "type": "chat",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-4-0",
+   "status": "deprecated",
+   "release_date": "2025-05-22",
+   "limit": {
+    "context": 200000,
+    "output": 32000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-03-31",
+   "last_updated": "2025-05-22"
+  },
+  "qwen3-next-80b-a3b-instruct": {
+   "id": "qwen3-next-80b-a3b-instruct",
+   "name": "Qwen3 Next 80B A3B Instruct",
+   "description": "Qwen instruction model for multilingual chat, reasoning, and tool use",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3-next-80b-a3b-instruct",
+   "status": "deprecated",
+   "release_date": "2025-09",
+   "limit": {
+    "context": 131072,
+    "output": 32768
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.14492754
+     },
+     "output": {
+      "price": 0.57971014
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-04",
+   "last_updated": "2025-09"
+  },
+  "qwen3-max": {
+   "id": "qwen3-max",
+   "name": "Qwen3 Max",
+   "description": "Flagship Qwen3 model for coding agents, complex reasoning, and tool use",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3-max",
+   "status": "deprecated",
+   "release_date": "2025-09-23",
+   "limit": {
+    "context": 262144,
+    "output": 65536
    },
    "capabilities": {
     "temperature": true,
@@ -442,15 +669,15 @@
    "knowledge": "2025-04",
    "last_updated": "2025-09-23"
   },
-  "claude-4.0-sonnet": {
-   "id": "claude-4.0-sonnet",
-   "name": "Claude 4.0 Sonnet",
+  "claude-4.5-sonnet": {
+   "id": "claude-4.5-sonnet",
+   "name": "Claude 4.5 Sonnet",
    "description": "Balanced Claude model for coding, analysis, agent workflows, and cost control",
    "type": "chat",
    "family": "claude-sonnet",
-   "canonical_id": "anthropic/claude-sonnet-4-0",
+   "canonical_id": "anthropic/claude-sonnet-4-5",
    "status": "deprecated",
-   "release_date": "2025-05-22",
+   "release_date": "2025-09-29",
    "limit": {
     "context": 200000,
     "output": 64000
@@ -496,27 +723,96 @@
     }
    },
    "open_weights": false,
-   "knowledge": "2025-03-31",
-   "last_updated": "2025-05-22"
+   "knowledge": "2025-07-31",
+   "last_updated": "2025-09-29"
   },
-  "glm-4.5": {
-   "id": "glm-4.5",
-   "name": "GLM 4.5",
-   "description": "Hybrid-reasoning GLM release that made the 4.5 line broadly useful",
+  "qwen3-vl-30b-a3b-thinking": {
+   "id": "qwen3-vl-30b-a3b-thinking",
+   "name": "Qwen3-Vl 30b A3b Thinking",
+   "description": "Multimodal model for analyzing text, images, documents, and rich media",
    "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-4.5",
    "status": "deprecated",
-   "release_date": "2025-07-28",
+   "release_date": "2026-02-09",
    "limit": {
-    "context": 131072,
-    "output": 98304
+    "context": 128000,
+    "output": 32000
    },
    "capabilities": {
     "temperature": true,
-    "top_k": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.10869565
+     },
+     "output": {
+      "price": 1.08695652
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/x-matroska",
+     "video/quicktime",
+     "video/x-flv",
+     "video/x-ms-wmv"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-02-09"
+  },
+  "doubao-seed-2.0-lite": {
+   "id": "doubao-seed-2.0-lite",
+   "name": "Doubao Seed 2.0 Lite",
+   "description": "Cost-efficient ByteDance Seed 2.0 model for production chat, analysis, and structured generation",
+   "type": "chat",
+   "family": "seed",
+   "canonical_id": "bytedance-seed/seed-2.0-lite",
+   "release_date": "2026-02-14",
+   "limit": {
+    "context": 256000,
+    "output": 32000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
     "top_p": true,
-    "structured_output": false,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -530,10 +826,131 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.57971014
+      "price": 0.08695652,
+      "cache": {
+       "read": 0.0173913
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 32000
+         }
+        },
+        "price": 0.13043478,
+        "cache": {
+         "read": 0.02608696
+        }
+       },
+       {
+        "when": {
+         "context": {
+          "gt": 128000
+         }
+        },
+        "price": 0.26086957,
+        "cache": {
+         "read": 0.05217391
+        }
+       }
+      ]
      },
      "output": {
-      "price": 2.31884058
+      "price": 0.52173913,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 32000
+         }
+        },
+        "price": 0.7826087
+       },
+       {
+        "when": {
+         "context": {
+          "gt": 128000
+         }
+        },
+        "price": 1.56521739
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/tiff",
+     "image/x-icon",
+     "image/x-icns",
+     "image/sgi",
+     "image/jp2",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/quicktime"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-02-14"
+  },
+  "qwen3-next-80b-a3b-thinking": {
+   "id": "qwen3-next-80b-a3b-thinking",
+   "name": "Qwen3 Next 80B A3B Thinking",
+   "description": "Efficient Qwen thinking model for local reasoning, math, and coding agents",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3-next-80b-a3b-thinking",
+   "status": "deprecated",
+   "release_date": "2025-09",
+   "limit": {
+    "context": 131072,
+    "output": 32768
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.14492754
+     },
+     "output": {
+      "price": 1.44927536
      }
     }
    },
@@ -561,76 +978,19 @@
    },
    "open_weights": true,
    "knowledge": "2025-04",
-   "last_updated": "2025-07-28"
+   "last_updated": "2025-09"
   },
-  "claude-4.5-opus": {
-   "id": "claude-4.5-opus",
-   "name": "Claude 4.5 Opus",
-   "description": "Flagship Claude model for deep reasoning, coding, and long-horizon agents",
-   "type": "chat",
-   "family": "claude-opus",
-   "canonical_id": "anthropic/claude-opus-4-5",
-   "status": "deprecated",
-   "release_date": "2025-11-24",
-   "limit": {
-    "context": 200000,
-    "output": 200000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-05",
-   "last_updated": "2025-11-24"
-  },
-  "qwen3-32b": {
-   "id": "qwen3-32b",
-   "name": "Qwen3 32B",
-   "description": "Dense open Qwen model for self-hosted chat, reasoning, and coding",
+  "qwen-turbo": {
+   "id": "qwen-turbo",
+   "name": "Qwen-Turbo",
+   "description": "Efficient Qwen model for fast chat, extraction, and high-volume workloads",
    "type": "chat",
    "family": "qwen",
-   "canonical_id": "alibaba/qwen3-32b",
+   "canonical_id": "alibaba/qwen-turbo",
    "status": "deprecated",
-   "release_date": "2025-04-28",
+   "release_date": "2024-11-01",
    "limit": {
-    "context": 40000,
+    "context": 1000000,
     "output": 4096
    },
    "capabilities": {
@@ -651,10 +1011,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.28985507
+      "price": 0.04347826
      },
      "output": {
-      "price": 1.15942029,
+      "price": 0.08695652,
       "overrides": [
        {
         "when": {
@@ -662,7 +1022,7 @@
           "equals": true
          }
         },
-        "price": 2.89855072
+        "price": 0.43478261
        }
       ]
      }
@@ -690,35 +1050,35 @@
      }
     }
    },
-   "open_weights": true,
-   "knowledge": "2025-04",
+   "open_weights": false,
+   "knowledge": "2024-04",
    "last_updated": "2025-04-28"
   },
-  "kimi-k2": {
-   "id": "kimi-k2",
-   "name": "Kimi K2",
-   "description": "Kimi model for long-context chat, coding, and agentic reasoning",
+  "deepseek-v3.1": {
+   "id": "deepseek-v3.1",
+   "name": "DeepSeek-V3.1",
+   "description": "Hybrid-reasoning DeepSeek model with thinking and non-thinking modes",
    "type": "chat",
-   "family": "kimi-k2",
-   "canonical_id": "moonshotai/kimi-k2",
+   "family": "deepseek",
+   "canonical_id": "deepseek/deepseek-v3.1",
    "status": "deprecated",
-   "release_date": "2025-07-11",
+   "release_date": "2025-08-21",
    "limit": {
     "context": 128000,
-    "output": 128000
+    "output": 32000
    },
    "capabilities": {
     "temperature": true,
     "top_k": true,
     "top_p": true,
-    "structured_output": true,
+    "structured_output": false,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": false
+     "supported": true
     }
    },
    "cost": {
@@ -727,7 +1087,7 @@
       "price": 0.57971014
      },
      "output": {
-      "price": 2.31884058
+      "price": 1.73913043
      }
     }
    },
@@ -754,8 +1114,7 @@
     }
    },
    "open_weights": true,
-   "knowledge": "2024-12-31",
-   "last_updated": "2025-07-11"
+   "last_updated": "2025-08-21"
   },
   "doubao-seed-2.0-mini": {
    "id": "doubao-seed-2.0-mini",
@@ -878,6 +1237,688 @@
    "open_weights": false,
    "last_updated": "2026-02-14"
   },
+  "qwen3-30b-a3b-thinking-2507": {
+   "id": "qwen3-30b-a3b-thinking-2507",
+   "name": "Qwen3 30b A3b Thinking 2507",
+   "description": "Reasoning model for deliberate analysis, multi-step problem solving, and tool use",
+   "type": "chat",
+   "status": "deprecated",
+   "release_date": "2026-02-04",
+   "limit": {
+    "context": 126000,
+    "output": 32000
+   },
+   "capabilities": {
+    "temperature": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.10869565
+     },
+     "output": {
+      "price": 1.08695652
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-02-04"
+  },
+  "deepseek-r1-0528": {
+   "id": "deepseek-r1-0528",
+   "name": "DeepSeek-R1-0528",
+   "description": "May 2025 DeepSeek R1 update with improved mathematics, coding, and reasoning",
+   "type": "chat",
+   "family": "deepseek-thinking",
+   "canonical_id": "deepseek/deepseek-r1-0528",
+   "status": "deprecated",
+   "release_date": "2025-05-28",
+   "limit": {
+    "context": 128000,
+    "output": 32000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.57971014
+     },
+     "output": {
+      "price": 2.31884058
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-05-28"
+  },
+  "gemini-2.5-flash-image": {
+   "id": "gemini-2.5-flash-image",
+   "name": "Gemini 2.5 Flash Image",
+   "description": "Nano Banana image model for fast generation, edits, and character-consistent assets",
+   "type": "image",
+   "family": "gemini-flash",
+   "canonical_id": "google/gemini-2.5-flash-image",
+   "status": "deprecated",
+   "release_date": "2025-08-26",
+   "limit": {
+    "context": 32768,
+    "output": 8192
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif"
+    ],
+    "output": [
+     "image/png",
+     "image/jpeg"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2024-06",
+   "last_updated": "2025-08-26"
+  },
+  "doubao-1.5-thinking-pro": {
+   "id": "doubao-1.5-thinking-pro",
+   "name": "Doubao 1.5 Thinking Pro",
+   "description": "Flagship model for demanding analysis, coding, and production agent workflows",
+   "type": "chat",
+   "status": "deprecated",
+   "release_date": "2025-08-05",
+   "limit": {
+    "context": 128000,
+    "output": 16000
+   },
+   "capabilities": {
+    "temperature": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.57971014
+     },
+     "output": {
+      "price": 2.31884058
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-08-05"
+  },
+  "doubao-1.5-pro-32k": {
+   "id": "doubao-1.5-pro-32k",
+   "name": "Doubao 1.5 Pro 32k",
+   "description": "Flagship model for demanding analysis, coding, and production agent workflows",
+   "type": "chat",
+   "status": "deprecated",
+   "release_date": "2025-08-05",
+   "limit": {
+    "context": 128000,
+    "output": 12000
+   },
+   "capabilities": {
+    "temperature": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.11594203
+     },
+     "output": {
+      "price": 0.28985507
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-08-05"
+  },
+  "claude-3.5-haiku": {
+   "id": "claude-3.5-haiku",
+   "name": "Claude 3.5 Haiku",
+   "description": "Fast Claude model for responsive assistance, classification, and lightweight agents",
+   "type": "chat",
+   "family": "claude-haiku",
+   "canonical_id": "anthropic/claude-3-5-haiku-20241022",
+   "status": "deprecated",
+   "release_date": "2024-10-22",
+   "limit": {
+    "context": 200000,
+    "output": 8192
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2024-07-31",
+   "last_updated": "2024-10-22"
+  },
+  "claude-4.1-opus": {
+   "id": "claude-4.1-opus",
+   "name": "Claude 4.1 Opus",
+   "description": "Flagship Claude model for deep reasoning, coding, and long-horizon agents",
+   "type": "chat",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-4-1",
+   "status": "deprecated",
+   "release_date": "2025-08-05",
+   "limit": {
+    "context": 200000,
+    "output": 32000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-03-31",
+   "last_updated": "2025-08-05"
+  },
+  "qwen3-coder-480b-a35b-instruct": {
+   "id": "qwen3-coder-480b-a35b-instruct",
+   "name": "Qwen3 Coder 480B A35B Instruct",
+   "description": "Open Qwen coding heavyweight for repository reasoning and agentic engineering",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3-coder-480b-a35b-instruct",
+   "status": "deprecated",
+   "release_date": "2025-07-22",
+   "limit": {
+    "context": 262000,
+    "output": 4096
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.86956522,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 32000
+         }
+        },
+        "price": 1.30434783
+       },
+       {
+        "when": {
+         "context": {
+          "gt": 128000
+         }
+        },
+        "price": 2.17391304
+       }
+      ]
+     },
+     "output": {
+      "price": 3.47826087,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 32000
+         }
+        },
+        "price": 5.2173913
+       },
+       {
+        "when": {
+         "context": {
+          "gt": 128000
+         }
+        },
+        "price": 8.69565217
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-04",
+   "last_updated": "2025-07-22"
+  },
+  "doubao-seed-2.0-pro": {
+   "id": "doubao-seed-2.0-pro",
+   "name": "Doubao Seed 2.0 Pro",
+   "description": "Flagship ByteDance Seed 2.0 model for complex multimodal reasoning and long-horizon agent workflows",
+   "type": "chat",
+   "family": "seed",
+   "canonical_id": "bytedance-seed/seed-2.0-pro",
+   "status": "deprecated",
+   "release_date": "2026-02-14",
+   "limit": {
+    "context": 256000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.46376812,
+      "cache": {
+       "read": 0.09275362
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 32000
+         }
+        },
+        "price": 0.69565217,
+        "cache": {
+         "read": 0.13913043
+        }
+       },
+       {
+        "when": {
+         "context": {
+          "gt": 128000
+         }
+        },
+        "price": 1.39130435,
+        "cache": {
+         "read": 0.27826087
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 2.31884058,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 32000
+         }
+        },
+        "price": 3.47826087
+       },
+       {
+        "when": {
+         "context": {
+          "gt": 128000
+         }
+        },
+        "price": 6.95652174
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/tiff",
+     "image/x-icon",
+     "image/x-icns",
+     "image/sgi",
+     "image/jp2",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/quicktime"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-02-14"
+  },
+  "claude-4.5-haiku": {
+   "id": "claude-4.5-haiku",
+   "name": "Claude 4.5 Haiku",
+   "description": "Fast Claude lane for lightweight agents, office tasks, and responsive chat",
+   "type": "chat",
+   "family": "claude-haiku",
+   "canonical_id": "anthropic/claude-haiku-4-5",
+   "status": "deprecated",
+   "release_date": "2025-10-15",
+   "limit": {
+    "context": 200000,
+    "output": 64000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-02-28",
+   "last_updated": "2025-10-15"
+  },
   "gemini-2.0-flash-lite": {
    "id": "gemini-2.0-flash-lite",
    "name": "Gemini 2.0 Flash Lite",
@@ -958,75 +1999,18 @@
    "knowledge": "2024-06",
    "last_updated": "2024-12-11"
   },
-  "claude-3.5-sonnet": {
-   "id": "claude-3.5-sonnet",
-   "name": "Claude 3.5 Sonnet",
-   "description": "Balanced Claude model for coding, analysis, agent workflows, and cost control",
+  "deepseek-r1": {
+   "id": "deepseek-r1",
+   "name": "DeepSeek-R1",
+   "description": "Classic open reasoning model for transparent math, coding, and deliberate problem solving",
    "type": "chat",
-   "family": "claude-sonnet",
-   "canonical_id": "anthropic/claude-3-5-sonnet-20241022",
+   "family": "deepseek-thinking",
+   "canonical_id": "deepseek/deepseek-r1",
    "status": "deprecated",
-   "release_date": "2024-10-22",
+   "release_date": "2025-01-20",
    "limit": {
-    "context": 200000,
-    "output": 8192
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2024-04-30",
-   "last_updated": "2024-10-22"
-  },
-  "claude-3.7-sonnet": {
-   "id": "claude-3.7-sonnet",
-   "name": "Claude 3.7 Sonnet",
-   "description": "Balanced Claude model for coding, analysis, agent workflows, and cost control",
-   "type": "chat",
-   "family": "claude-sonnet",
-   "canonical_id": "anthropic/claude-3-7-sonnet-20250219",
-   "status": "deprecated",
-   "release_date": "2025-02-19",
-   "limit": {
-    "context": 200000,
-    "output": 128000
+    "context": 128000,
+    "output": 32000
    },
    "capabilities": {
     "temperature": true,
@@ -1040,72 +2024,15 @@
     },
     "reasoning": {
      "supported": true
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2024-10-31",
-   "last_updated": "2025-02-19"
-  },
-  "qwen3-235b-a22b-instruct-2507": {
-   "id": "qwen3-235b-a22b-instruct-2507",
-   "name": "Qwen3 235b A22B Instruct 2507",
-   "description": "Updated large open Qwen3 MoE instruct model for multilingual chat, coding, and tool use",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3-235b-a22b-instruct-2507",
-   "status": "deprecated",
-   "release_date": "2025-07-21",
-   "limit": {
-    "context": 262144,
-    "output": 64000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.28985507
+      "price": 0.57971014
      },
      "output": {
-      "price": 1.15942029
+      "price": 2.31884058
      }
     }
    },
@@ -1132,59 +2059,43 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2025-07-21"
+   "knowledge": "2024-07",
+   "last_updated": "2025-05-29"
   },
-  "qwen-turbo": {
-   "id": "qwen-turbo",
-   "name": "Qwen-Turbo",
-   "description": "Efficient Qwen model for fast chat, extraction, and high-volume workloads",
+  "claude-4.0-sonnet": {
+   "id": "claude-4.0-sonnet",
+   "name": "Claude 4.0 Sonnet",
+   "description": "Balanced Claude model for coding, analysis, agent workflows, and cost control",
    "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen-turbo",
+   "family": "claude-sonnet",
+   "canonical_id": "anthropic/claude-sonnet-4-0",
    "status": "deprecated",
-   "release_date": "2024-11-01",
+   "release_date": "2025-05-22",
    "limit": {
-    "context": 1000000,
-    "output": 4096
+    "context": 200000,
+    "output": 64000
    },
    "capabilities": {
     "temperature": true,
     "top_k": true,
     "top_p": true,
-    "structured_output": true,
+    "structured_output": false,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": true,
-     "toggle": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.04347826
-     },
-     "output": {
-      "price": 0.08695652,
-      "overrides": [
-       {
-        "when": {
-         "thinking": {
-          "equals": true
-         }
-        },
-        "price": 0.43478261
-       }
-      ]
-     }
+     "supported": true
     }
    },
    "modalities": {
     "input": [
-     "text"
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
     ],
     "output": [
      "text"
@@ -1205,8 +2116,8 @@
     }
    },
    "open_weights": false,
-   "knowledge": "2024-04",
-   "last_updated": "2025-04-28"
+   "knowledge": "2025-03-31",
+   "last_updated": "2025-05-22"
   },
   "doubao-1.5-vision-pro": {
    "id": "doubao-1.5-vision-pro",
@@ -1275,19 +2186,80 @@
    "open_weights": false,
    "last_updated": "2025-08-05"
   },
-  "doubao-1.5-thinking-pro": {
-   "id": "doubao-1.5-thinking-pro",
-   "name": "Doubao 1.5 Thinking Pro",
-   "description": "Flagship model for demanding analysis, coding, and production agent workflows",
+  "claude-3.5-sonnet": {
+   "id": "claude-3.5-sonnet",
+   "name": "Claude 3.5 Sonnet",
+   "description": "Balanced Claude model for coding, analysis, agent workflows, and cost control",
    "type": "chat",
+   "family": "claude-sonnet",
+   "canonical_id": "anthropic/claude-3-5-sonnet-20241022",
    "status": "deprecated",
-   "release_date": "2025-08-05",
+   "release_date": "2024-10-22",
    "limit": {
-    "context": 128000,
-    "output": 16000
+    "context": 200000,
+    "output": 8192
    },
    "capabilities": {
     "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2024-04-30",
+   "last_updated": "2024-10-22"
+  },
+  "qwen3-max-preview": {
+   "id": "qwen3-max-preview",
+   "name": "Qwen3 Max Preview",
+   "description": "Flagship Qwen model for complex reasoning, coding, and agentic workflows",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3-max-preview",
+   "status": "deprecated",
+   "release_date": "2025-09-05",
+   "limit": {
+    "context": 256000,
+    "output": 64000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -1295,16 +2267,52 @@
      "supported": true
     },
     "reasoning": {
-     "supported": true
+     "supported": false
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.57971014
+      "price": 0.86956522,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 32000
+         }
+        },
+        "price": 1.44927536
+       },
+       {
+        "when": {
+         "context": {
+          "gt": 128000
+         }
+        },
+        "price": 2.17391304
+       }
+      ]
      },
      "output": {
-      "price": 2.31884058
+      "price": 3.47826087,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 32000
+         }
+        },
+        "price": 5.79710145
+       },
+       {
+        "when": {
+         "context": {
+          "gt": 128000
+         }
+        },
+        "price": 8.69565217
+       }
+      ]
      }
     }
    },
@@ -1331,42 +2339,54 @@
     }
    },
    "open_weights": false,
-   "last_updated": "2025-08-05"
+   "knowledge": "2025-04",
+   "last_updated": "2025-09-23"
   },
-  "deepseek-v3.1": {
-   "id": "deepseek-v3.1",
-   "name": "DeepSeek-V3.1",
-   "description": "Hybrid-reasoning DeepSeek model with thinking and non-thinking modes",
+  "qwen3-30b-a3b": {
+   "id": "qwen3-30b-a3b",
+   "name": "Qwen3 30B A3B",
+   "description": "Sparse MoE Qwen model with 3B active parameters for efficient chat and reasoning",
    "type": "chat",
-   "family": "deepseek",
-   "canonical_id": "deepseek/deepseek-v3.1",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3-30b-a3b",
    "status": "deprecated",
-   "release_date": "2025-08-21",
+   "release_date": "2025-04-28",
    "limit": {
-    "context": 128000,
-    "output": 32000
+    "context": 40000,
+    "output": 4096
    },
    "capabilities": {
     "temperature": true,
     "top_k": true,
     "top_p": true,
-    "structured_output": false,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": true
+     "supported": true,
+     "toggle": true
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.57971014
+      "price": 0.10869565
      },
      "output": {
-      "price": 1.73913043
+      "price": 0.43478261,
+      "overrides": [
+       {
+        "when": {
+         "thinking": {
+          "equals": true
+         }
+        },
+        "price": 1.08695652
+       }
+      ]
      }
     }
    },
@@ -1393,20 +2413,20 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2025-08-21"
+   "last_updated": "2025-04-28"
   },
-  "claude-4.0-opus": {
-   "id": "claude-4.0-opus",
-   "name": "Claude 4.0 Opus",
+  "claude-4.5-opus": {
+   "id": "claude-4.5-opus",
+   "name": "Claude 4.5 Opus",
    "description": "Flagship Claude model for deep reasoning, coding, and long-horizon agents",
    "type": "chat",
    "family": "claude-opus",
-   "canonical_id": "anthropic/claude-opus-4-0",
+   "canonical_id": "anthropic/claude-opus-4-5",
    "status": "deprecated",
-   "release_date": "2025-05-22",
+   "release_date": "2025-11-24",
    "limit": {
     "context": 200000,
-    "output": 32000
+    "output": 200000
    },
    "capabilities": {
     "temperature": true,
@@ -1449,8 +2469,869 @@
     }
    },
    "open_weights": false,
-   "knowledge": "2025-03-31",
-   "last_updated": "2025-05-22"
+   "knowledge": "2025-05",
+   "last_updated": "2025-11-24"
+  },
+  "gemini-2.5-flash": {
+   "id": "gemini-2.5-flash",
+   "name": "Gemini 2.5 Flash",
+   "description": "Fast Gemini workhorse for multimodal apps where latency and price matter",
+   "type": "chat",
+   "family": "gemini-flash",
+   "canonical_id": "google/gemini-2.5-flash",
+   "status": "deprecated",
+   "release_date": "2025-06-17",
+   "limit": {
+    "context": 1048576,
+    "output": 64000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2025-06-17"
+  },
+  "qwen2.5-vl-72b-instruct": {
+   "id": "qwen2.5-vl-72b-instruct",
+   "name": "Qwen 2.5 VL 72B Instruct",
+   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen2-5-vl-72b-instruct",
+   "status": "deprecated",
+   "release_date": "2025-01-26",
+   "limit": {
+    "context": 128000,
+    "output": 8192
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2.31884058
+     },
+     "output": {
+      "price": 6.95652174
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/x-matroska",
+     "video/quicktime",
+     "video/x-flv",
+     "video/x-ms-wmv"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-04",
+   "last_updated": "2025-01-26"
+  },
+  "gemini-2.0-flash": {
+   "id": "gemini-2.0-flash",
+   "name": "Gemini 2.0 Flash",
+   "description": "Earlier Gemini Flash workhorse for responsive multimodal apps and tool use",
+   "type": "chat",
+   "family": "gemini-flash",
+   "canonical_id": "google/gemini-2.0-flash",
+   "status": "deprecated",
+   "release_date": "2024-12-11",
+   "limit": {
+    "context": 1048576,
+    "output": 8192
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2024-06",
+   "last_updated": "2024-12-11"
+  },
+  "qwen3-235b-a22b": {
+   "id": "qwen3-235b-a22b",
+   "name": "Qwen 3 235B A22B",
+   "description": "Large open Qwen MoE for multilingual reasoning, coding, and tool use",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3-235b-a22b",
+   "status": "deprecated",
+   "release_date": "2025-04-28",
+   "limit": {
+    "context": 128000,
+    "output": 32000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.28985507
+     },
+     "output": {
+      "price": 1.15942029,
+      "overrides": [
+       {
+        "when": {
+         "thinking": {
+          "equals": true
+         }
+        },
+        "price": 2.89855072
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-04",
+   "last_updated": "2025-04-28"
+  },
+  "deepseek-v3": {
+   "id": "deepseek-v3",
+   "name": "DeepSeek-V3",
+   "description": "Open DeepSeek MoE chat model for coding, math, and general reasoning",
+   "type": "chat",
+   "family": "deepseek",
+   "canonical_id": "deepseek/deepseek-v3",
+   "status": "deprecated",
+   "release_date": "2024-12-26",
+   "limit": {
+    "context": 128000,
+    "output": 16000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.28985507
+     },
+     "output": {
+      "price": 1.15942029
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2024-12-26"
+  },
+  "MiniMax-M1": {
+   "id": "MiniMax-M1",
+   "name": "MiniMax M1",
+   "description": "Open hybrid-attention MoE reasoning model with a million-token context and an 80K thinking budget",
+   "type": "chat",
+   "family": "minimax",
+   "canonical_id": "minimax/minimax-m1-80k",
+   "status": "deprecated",
+   "release_date": "2025-06-17",
+   "limit": {
+    "context": 1000000,
+    "output": 80000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.57971014
+     },
+     "output": {
+      "price": 2.31884058
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-06-17"
+  },
+  "mimo-v2-flash": {
+   "id": "mimo-v2-flash",
+   "name": "Mimo-V2-Flash",
+   "description": "MiMo flash model for fast multimodal assistance and agent workflows",
+   "type": "chat",
+   "family": "mimo",
+   "canonical_id": "xiaomi/mimo-v2-flash",
+   "status": "deprecated",
+   "release_date": "2025-12-16",
+   "limit": {
+    "context": 256000,
+    "output": 256000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1,
+      "cache": {
+       "read": 0.01
+      }
+     },
+     "output": {
+      "price": 0.3
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-12-01",
+   "last_updated": "2026-02-04"
+  },
+  "kling-v2-6": {
+   "id": "kling-v2-6",
+   "name": "Kling-V2 6",
+   "description": "Video model for prompt-guided generation, editing, and motion workflows",
+   "type": "video",
+   "release_date": "2026-01-13",
+   "limit": {
+    "context": 99999999,
+    "output": 99999999
+   },
+   "capabilities": {
+    "temperature": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "video"
+    ],
+    "output": [
+     "video/mp4"
+    ]
+   },
+   "api": {
+    "videos": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {}
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-01-13"
+  },
+  "claude-3.7-sonnet": {
+   "id": "claude-3.7-sonnet",
+   "name": "Claude 3.7 Sonnet",
+   "description": "Balanced Claude model for coding, analysis, agent workflows, and cost control",
+   "type": "chat",
+   "family": "claude-sonnet",
+   "canonical_id": "anthropic/claude-3-7-sonnet-20250219",
+   "status": "deprecated",
+   "release_date": "2025-02-19",
+   "limit": {
+    "context": 200000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2024-10-31",
+   "last_updated": "2025-02-19"
+  },
+  "doubao-seed-1.6-flash": {
+   "id": "doubao-seed-1.6-flash",
+   "name": "Doubao-Seed 1.6 Flash",
+   "description": "Low-latency ByteDance Seed model for high-throughput chat, extraction, and lightweight tool use",
+   "type": "chat",
+   "family": "seed",
+   "canonical_id": "bytedance-seed/seed-1-6-flash",
+   "status": "deprecated",
+   "release_date": "2025-08-28",
+   "limit": {
+    "context": 256000,
+    "output": 32000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.02173913,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 32000
+         }
+        },
+        "price": 0.04347826
+       },
+       {
+        "when": {
+         "context": {
+          "gt": 128000
+         }
+        },
+        "price": 0.08695652
+       }
+      ]
+     },
+     "output": {
+      "price": 0.2173913,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 32000
+         }
+        },
+        "price": 0.43478261
+       },
+       {
+        "when": {
+         "context": {
+          "gt": 128000
+         }
+        },
+        "price": 0.86956522
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/tiff",
+     "image/x-icon",
+     "image/x-icns",
+     "image/sgi",
+     "image/jp2",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/quicktime"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-08-28"
+  },
+  "gemini-2.5-flash-lite": {
+   "id": "gemini-2.5-flash-lite",
+   "name": "Gemini 2.5 Flash Lite",
+   "description": "Lean Gemini 2.5 lane for cheap multimodal traffic and quick agents",
+   "type": "chat",
+   "family": "gemini-flash-lite",
+   "canonical_id": "google/gemini-2.5-flash-lite",
+   "status": "deprecated",
+   "release_date": "2025-06-17",
+   "limit": {
+    "context": 1048576,
+    "output": 64000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2025-06-17"
+  },
+  "qwen-vl-max-2025-01-25": {
+   "id": "qwen-vl-max-2025-01-25",
+   "name": "Qwen VL-MAX-2025-01-25",
+   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
+   "type": "chat",
+   "status": "deprecated",
+   "release_date": "2025-08-05",
+   "limit": {
+    "context": 128000,
+    "output": 4096
+   },
+   "capabilities": {
+    "temperature": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.43478261
+     },
+     "output": {
+      "price": 1.30434783
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic",
+     "audio",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/x-matroska",
+     "video/quicktime",
+     "video/x-flv",
+     "video/x-ms-wmv"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-08-05"
   },
   "gemini-3.0-pro-preview": {
    "id": "gemini-3.0-pro-preview",
@@ -1646,425 +3527,24 @@
    "open_weights": false,
    "last_updated": "2025-10-15"
   },
-  "gemini-3.0-pro-image-preview": {
-   "id": "gemini-3.0-pro-image-preview",
-   "name": "Gemini 3.0 Pro Image Preview",
-   "description": "Nano Banana Pro for higher-fidelity image generation and design-heavy edits",
-   "type": "image",
-   "family": "gemini-pro",
-   "canonical_id": "google/gemini-3-pro-image-preview",
-   "status": "deprecated",
-   "release_date": "2025-11-20",
-   "limit": {
-    "context": 32768,
-    "output": 8192
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif"
-    ],
-    "output": [
-     "text",
-     "image/png",
-     "image/jpeg"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-01",
-   "last_updated": "2025-11-20"
-  },
-  "deepseek-r1": {
-   "id": "deepseek-r1",
-   "name": "DeepSeek-R1",
-   "description": "Classic open reasoning model for transparent math, coding, and deliberate problem solving",
-   "type": "chat",
-   "family": "deepseek-thinking",
-   "canonical_id": "deepseek/deepseek-r1",
-   "status": "deprecated",
-   "release_date": "2025-01-20",
-   "limit": {
-    "context": 128000,
-    "output": 32000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.57971014
-     },
-     "output": {
-      "price": 2.31884058
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2024-07",
-   "last_updated": "2025-05-29"
-  },
-  "qwen3-max": {
-   "id": "qwen3-max",
-   "name": "Qwen3 Max",
-   "description": "Flagship Qwen3 model for coding agents, complex reasoning, and tool use",
+  "qwen3-235b-a22b-instruct-2507": {
+   "id": "qwen3-235b-a22b-instruct-2507",
+   "name": "Qwen3 235b A22B Instruct 2507",
+   "description": "Updated large open Qwen3 MoE instruct model for multilingual chat, coding, and tool use",
    "type": "chat",
    "family": "qwen",
-   "canonical_id": "alibaba/qwen3-max",
+   "canonical_id": "alibaba/qwen3-235b-a22b-instruct-2507",
    "status": "deprecated",
-   "release_date": "2025-09-23",
+   "release_date": "2025-07-21",
    "limit": {
     "context": 262144,
-    "output": 65536
+    "output": 64000
    },
    "capabilities": {
     "temperature": true,
     "top_k": true,
     "top_p": true,
     "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.86956522,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 32000
-         }
-        },
-        "price": 1.44927536
-       },
-       {
-        "when": {
-         "context": {
-          "gt": 128000
-         }
-        },
-        "price": 2.17391304
-       }
-      ]
-     },
-     "output": {
-      "price": 3.47826087,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 32000
-         }
-        },
-        "price": 5.79710145
-       },
-       {
-        "when": {
-         "context": {
-          "gt": 128000
-         }
-        },
-        "price": 8.69565217
-       }
-      ]
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-04",
-   "last_updated": "2025-09-23"
-  },
-  "qwen3-30b-a3b-instruct-2507": {
-   "id": "qwen3-30b-a3b-instruct-2507",
-   "name": "Qwen3 30b A3b Instruct 2507",
-   "description": "Updated compact Qwen3 MoE instruct model for multilingual chat, coding, and tool use",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3-30b-a3b-instruct-2507",
-   "status": "deprecated",
-   "release_date": "2025-07-28",
-   "limit": {
-    "context": 128000,
-    "output": 32000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.10869565
-     },
-     "output": {
-      "price": 0.43478261
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-07-28"
-  },
-  "doubao-seed-2.0-pro": {
-   "id": "doubao-seed-2.0-pro",
-   "name": "Doubao Seed 2.0 Pro",
-   "description": "Flagship ByteDance Seed 2.0 model for complex multimodal reasoning and long-horizon agent workflows",
-   "type": "chat",
-   "family": "seed",
-   "canonical_id": "bytedance-seed/seed-2.0-pro",
-   "status": "deprecated",
-   "release_date": "2026-02-14",
-   "limit": {
-    "context": 256000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.46376812,
-      "cache": {
-       "read": 0.09275362
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 32000
-         }
-        },
-        "price": 0.69565217,
-        "cache": {
-         "read": 0.13913043
-        }
-       },
-       {
-        "when": {
-         "context": {
-          "gt": 128000
-         }
-        },
-        "price": 1.39130435,
-        "cache": {
-         "read": 0.27826087
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 2.31884058,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 32000
-         }
-        },
-        "price": 3.47826087
-       },
-       {
-        "when": {
-         "context": {
-          "gt": 128000
-         }
-        },
-        "price": 6.95652174
-       }
-      ]
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/tiff",
-     "image/x-icon",
-     "image/x-icns",
-     "image/sgi",
-     "image/jp2",
-     "image/heic",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/quicktime"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-02-14"
-  },
-  "deepseek-v3": {
-   "id": "deepseek-v3",
-   "name": "DeepSeek-V3",
-   "description": "Open DeepSeek MoE chat model for coding, math, and general reasoning",
-   "type": "chat",
-   "family": "deepseek",
-   "canonical_id": "deepseek/deepseek-v3",
-   "status": "deprecated",
-   "release_date": "2024-12-26",
-   "limit": {
-    "context": 128000,
-    "output": 16000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -2107,7 +3587,195 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2024-12-26"
+   "last_updated": "2025-07-21"
+  },
+  "gpt-oss-20b": {
+   "id": "gpt-oss-20b",
+   "name": "gpt-oss-20b",
+   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
+   "type": "chat",
+   "family": "gpt-oss",
+   "canonical_id": "openai/gpt-oss-20b",
+   "status": "deprecated",
+   "release_date": "2025-08-05",
+   "limit": {
+    "context": 128000,
+    "output": 4096
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-06",
+   "last_updated": "2025-08-05"
+  },
+  "glm-4.5-air": {
+   "id": "glm-4.5-air",
+   "name": "GLM 4.5 Air",
+   "description": "Lighter GLM-4.5 variant for fast coding assistance and cheaper agents",
+   "type": "chat",
+   "family": "glm-air",
+   "canonical_id": "zhipuai/glm-4.5-air",
+   "status": "deprecated",
+   "release_date": "2025-07-28",
+   "limit": {
+    "context": 131000,
+    "output": 4096
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-04",
+   "last_updated": "2025-07-28"
+  },
+  "gemini-3.0-flash-preview": {
+   "id": "gemini-3.0-flash-preview",
+   "name": "Gemini 3.0 Flash Preview",
+   "description": "New Gemini flash lane bringing frontier-style multimodal reasoning to cheaper runs",
+   "type": "chat",
+   "family": "gemini-flash",
+   "canonical_id": "google/gemini-3-flash-preview",
+   "status": "deprecated",
+   "release_date": "2025-12-17",
+   "limit": {
+    "context": 1000000,
+    "output": 64000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2025-12-17"
   },
   "qwen3.5-397b-a17b": {
    "id": "qwen3.5-397b-a17b",
@@ -2197,282 +3865,24 @@
    "open_weights": true,
    "last_updated": "2026-02-15"
   },
-  "claude-4.5-haiku": {
-   "id": "claude-4.5-haiku",
-   "name": "Claude 4.5 Haiku",
-   "description": "Fast Claude lane for lightweight agents, office tasks, and responsive chat",
+  "qwen3-30b-a3b-instruct-2507": {
+   "id": "qwen3-30b-a3b-instruct-2507",
+   "name": "Qwen3 30b A3b Instruct 2507",
+   "description": "Updated compact Qwen3 MoE instruct model for multilingual chat, coding, and tool use",
    "type": "chat",
-   "family": "claude-haiku",
-   "canonical_id": "anthropic/claude-haiku-4-5",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3-30b-a3b-instruct-2507",
    "status": "deprecated",
-   "release_date": "2025-10-15",
+   "release_date": "2025-07-28",
    "limit": {
-    "context": 200000,
-    "output": 64000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-02-28",
-   "last_updated": "2025-10-15"
-  },
-  "gemini-2.5-flash": {
-   "id": "gemini-2.5-flash",
-   "name": "Gemini 2.5 Flash",
-   "description": "Fast Gemini workhorse for multimodal apps where latency and price matter",
-   "type": "chat",
-   "family": "gemini-flash",
-   "canonical_id": "google/gemini-2.5-flash",
-   "status": "deprecated",
-   "release_date": "2025-06-17",
-   "limit": {
-    "context": 1048576,
-    "output": 64000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "audio/wav",
-     "audio/mp3",
-     "audio/aiff",
-     "audio/aac",
-     "audio/ogg",
-     "audio/flac",
-     "audio/mpeg",
-     "audio/m4a",
-     "audio/l16",
-     "audio/opus",
-     "audio/alaw",
-     "audio/mulaw",
-     "audio/webm",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-01",
-   "last_updated": "2025-06-17"
-  },
-  "doubao-seed-2.0-lite": {
-   "id": "doubao-seed-2.0-lite",
-   "name": "Doubao Seed 2.0 Lite",
-   "description": "Cost-efficient ByteDance Seed 2.0 model for production chat, analysis, and structured generation",
-   "type": "chat",
-   "family": "seed",
-   "canonical_id": "bytedance-seed/seed-2.0-lite",
-   "release_date": "2026-02-14",
-   "limit": {
-    "context": 256000,
+    "context": 128000,
     "output": 32000
    },
    "capabilities": {
     "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.08695652,
-      "cache": {
-       "read": 0.0173913
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 32000
-         }
-        },
-        "price": 0.13043478,
-        "cache": {
-         "read": 0.02608696
-        }
-       },
-       {
-        "when": {
-         "context": {
-          "gt": 128000
-         }
-        },
-        "price": 0.26086957,
-        "cache": {
-         "read": 0.05217391
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 0.52173913,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 32000
-         }
-        },
-        "price": 0.7826087
-       },
-       {
-        "when": {
-         "context": {
-          "gt": 128000
-         }
-        },
-        "price": 1.56521739
-       }
-      ]
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/tiff",
-     "image/x-icon",
-     "image/x-icns",
-     "image/sgi",
-     "image/jp2",
-     "image/heic",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/quicktime"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-02-14"
-  },
-  "qwen3-next-80b-a3b-instruct": {
-   "id": "qwen3-next-80b-a3b-instruct",
-   "name": "Qwen3 Next 80B A3B Instruct",
-   "description": "Qwen instruction model for multilingual chat, reasoning, and tool use",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3-next-80b-a3b-instruct",
-   "status": "deprecated",
-   "release_date": "2025-09",
-   "limit": {
-    "context": 131072,
-    "output": 32768
-   },
-   "capabilities": {
-    "temperature": true,
     "top_k": true,
     "top_p": true,
-    "structured_output": false,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -2485,10 +3895,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.14492754
+      "price": 0.10869565
      },
      "output": {
-      "price": 0.57971014
+      "price": 0.43478261
      }
     }
    },
@@ -2515,25 +3925,24 @@
     }
    },
    "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-09"
+   "last_updated": "2025-07-28"
   },
-  "MiniMax-M1": {
-   "id": "MiniMax-M1",
-   "name": "MiniMax M1",
-   "description": "Open hybrid-attention MoE reasoning model with a million-token context and an 80K thinking budget",
+  "kimi-k2": {
+   "id": "kimi-k2",
+   "name": "Kimi K2",
+   "description": "Kimi model for long-context chat, coding, and agentic reasoning",
    "type": "chat",
-   "family": "minimax",
-   "canonical_id": "minimax/minimax-m1-80k",
+   "family": "kimi-k2",
+   "canonical_id": "moonshotai/kimi-k2",
    "status": "deprecated",
-   "release_date": "2025-06-17",
+   "release_date": "2025-07-11",
    "limit": {
-    "context": 1000000,
-    "output": 80000
+    "context": 128000,
+    "output": 128000
    },
    "capabilities": {
     "temperature": true,
-    "top_k": false,
+    "top_k": true,
     "top_p": true,
     "structured_output": true,
     "system_updates": false,
@@ -2542,7 +3951,7 @@
      "supported": true
     },
     "reasoning": {
-     "supported": true
+     "supported": false
     }
    },
    "cost": {
@@ -2578,129 +3987,8 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2025-06-17"
-  },
-  "gemini-2.5-flash-lite": {
-   "id": "gemini-2.5-flash-lite",
-   "name": "Gemini 2.5 Flash Lite",
-   "description": "Lean Gemini 2.5 lane for cheap multimodal traffic and quick agents",
-   "type": "chat",
-   "family": "gemini-flash-lite",
-   "canonical_id": "google/gemini-2.5-flash-lite",
-   "status": "deprecated",
-   "release_date": "2025-06-17",
-   "limit": {
-    "context": 1048576,
-    "output": 64000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "audio/wav",
-     "audio/mp3",
-     "audio/aiff",
-     "audio/aac",
-     "audio/ogg",
-     "audio/flac",
-     "audio/mpeg",
-     "audio/m4a",
-     "audio/l16",
-     "audio/opus",
-     "audio/alaw",
-     "audio/mulaw",
-     "audio/webm",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-01",
-   "last_updated": "2025-06-17"
-  },
-  "kling-v2-6": {
-   "id": "kling-v2-6",
-   "name": "Kling-V2 6",
-   "description": "Video model for prompt-guided generation, editing, and motion workflows",
-   "type": "video",
-   "release_date": "2026-01-13",
-   "limit": {
-    "context": 99999999,
-    "output": 99999999
-   },
-   "capabilities": {
-    "temperature": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "video"
-    ],
-    "output": [
-     "video/mp4"
-    ]
-   },
-   "api": {
-    "videos": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {}
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-01-13"
+   "knowledge": "2024-12-31",
+   "last_updated": "2025-07-11"
   },
   "qwen3-235b-a22b-thinking-2507": {
    "id": "qwen3-235b-a22b-thinking-2507",
@@ -2763,754 +4051,6 @@
    },
    "open_weights": true,
    "last_updated": "2025-07-25"
-  },
-  "gemini-2.5-flash-image": {
-   "id": "gemini-2.5-flash-image",
-   "name": "Gemini 2.5 Flash Image",
-   "description": "Nano Banana image model for fast generation, edits, and character-consistent assets",
-   "type": "image",
-   "family": "gemini-flash",
-   "canonical_id": "google/gemini-2.5-flash-image",
-   "status": "deprecated",
-   "release_date": "2025-08-26",
-   "limit": {
-    "context": 32768,
-    "output": 8192
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif"
-    ],
-    "output": [
-     "image/png",
-     "image/jpeg"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2024-06",
-   "last_updated": "2025-08-26"
-  },
-  "mimo-v2-flash": {
-   "id": "mimo-v2-flash",
-   "name": "Mimo-V2-Flash",
-   "description": "MiMo flash model for fast multimodal assistance and agent workflows",
-   "type": "chat",
-   "family": "mimo",
-   "canonical_id": "xiaomi/mimo-v2-flash",
-   "status": "deprecated",
-   "release_date": "2025-12-16",
-   "limit": {
-    "context": 256000,
-    "output": 256000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.1,
-      "cache": {
-       "read": 0.01
-      }
-     },
-     "output": {
-      "price": 0.3
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2024-12-01",
-   "last_updated": "2026-02-04"
-  },
-  "qwen3-vl-30b-a3b-thinking": {
-   "id": "qwen3-vl-30b-a3b-thinking",
-   "name": "Qwen3-Vl 30b A3b Thinking",
-   "description": "Multimodal model for analyzing text, images, documents, and rich media",
-   "type": "chat",
-   "status": "deprecated",
-   "release_date": "2026-02-09",
-   "limit": {
-    "context": 128000,
-    "output": 32000
-   },
-   "capabilities": {
-    "temperature": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.10869565
-     },
-     "output": {
-      "price": 1.08695652
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/x-matroska",
-     "video/quicktime",
-     "video/x-flv",
-     "video/x-ms-wmv"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-02-09"
-  },
-  "qwen3-30b-a3b-thinking-2507": {
-   "id": "qwen3-30b-a3b-thinking-2507",
-   "name": "Qwen3 30b A3b Thinking 2507",
-   "description": "Reasoning model for deliberate analysis, multi-step problem solving, and tool use",
-   "type": "chat",
-   "status": "deprecated",
-   "release_date": "2026-02-04",
-   "limit": {
-    "context": 126000,
-    "output": 32000
-   },
-   "capabilities": {
-    "temperature": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.10869565
-     },
-     "output": {
-      "price": 1.08695652
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-02-04"
-  },
-  "gemini-2.0-flash": {
-   "id": "gemini-2.0-flash",
-   "name": "Gemini 2.0 Flash",
-   "description": "Earlier Gemini Flash workhorse for responsive multimodal apps and tool use",
-   "type": "chat",
-   "family": "gemini-flash",
-   "canonical_id": "google/gemini-2.0-flash",
-   "status": "deprecated",
-   "release_date": "2024-12-11",
-   "limit": {
-    "context": 1048576,
-    "output": 8192
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "audio/wav",
-     "audio/mp3",
-     "audio/aiff",
-     "audio/aac",
-     "audio/ogg",
-     "audio/flac",
-     "audio/mpeg",
-     "audio/m4a",
-     "audio/l16",
-     "audio/opus",
-     "audio/alaw",
-     "audio/mulaw",
-     "audio/webm",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2024-06",
-   "last_updated": "2024-12-11"
-  },
-  "claude-3.5-haiku": {
-   "id": "claude-3.5-haiku",
-   "name": "Claude 3.5 Haiku",
-   "description": "Fast Claude model for responsive assistance, classification, and lightweight agents",
-   "type": "chat",
-   "family": "claude-haiku",
-   "canonical_id": "anthropic/claude-3-5-haiku-20241022",
-   "status": "deprecated",
-   "release_date": "2024-10-22",
-   "limit": {
-    "context": 200000,
-    "output": 8192
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2024-07-31",
-   "last_updated": "2024-10-22"
-  },
-  "deepseek-r1-0528": {
-   "id": "deepseek-r1-0528",
-   "name": "DeepSeek-R1-0528",
-   "description": "May 2025 DeepSeek R1 update with improved mathematics, coding, and reasoning",
-   "type": "chat",
-   "family": "deepseek-thinking",
-   "canonical_id": "deepseek/deepseek-r1-0528",
-   "status": "deprecated",
-   "release_date": "2025-05-28",
-   "limit": {
-    "context": 128000,
-    "output": 32000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.57971014
-     },
-     "output": {
-      "price": 2.31884058
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-05-28"
-  },
-  "qwen-vl-max-2025-01-25": {
-   "id": "qwen-vl-max-2025-01-25",
-   "name": "Qwen VL-MAX-2025-01-25",
-   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
-   "type": "chat",
-   "status": "deprecated",
-   "release_date": "2025-08-05",
-   "limit": {
-    "context": 128000,
-    "output": 4096
-   },
-   "capabilities": {
-    "temperature": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.43478261
-     },
-     "output": {
-      "price": 1.30434783
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic",
-     "audio",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/x-matroska",
-     "video/quicktime",
-     "video/x-flv",
-     "video/x-ms-wmv"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2025-08-05"
-  },
-  "qwen3-coder-480b-a35b-instruct": {
-   "id": "qwen3-coder-480b-a35b-instruct",
-   "name": "Qwen3 Coder 480B A35B Instruct",
-   "description": "Open Qwen coding heavyweight for repository reasoning and agentic engineering",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3-coder-480b-a35b-instruct",
-   "status": "deprecated",
-   "release_date": "2025-07-22",
-   "limit": {
-    "context": 262000,
-    "output": 4096
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.86956522,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 32000
-         }
-        },
-        "price": 1.30434783
-       },
-       {
-        "when": {
-         "context": {
-          "gt": 128000
-         }
-        },
-        "price": 2.17391304
-       }
-      ]
-     },
-     "output": {
-      "price": 3.47826087,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 32000
-         }
-        },
-        "price": 5.2173913
-       },
-       {
-        "when": {
-         "context": {
-          "gt": 128000
-         }
-        },
-        "price": 8.69565217
-       }
-      ]
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-07-22"
-  },
-  "doubao-1.5-pro-32k": {
-   "id": "doubao-1.5-pro-32k",
-   "name": "Doubao 1.5 Pro 32k",
-   "description": "Flagship model for demanding analysis, coding, and production agent workflows",
-   "type": "chat",
-   "status": "deprecated",
-   "release_date": "2025-08-05",
-   "limit": {
-    "context": 128000,
-    "output": 12000
-   },
-   "capabilities": {
-    "temperature": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.11594203
-     },
-     "output": {
-      "price": 0.28985507
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2025-08-05"
-  },
-  "qwen3-235b-a22b": {
-   "id": "qwen3-235b-a22b",
-   "name": "Qwen 3 235B A22B",
-   "description": "Large open Qwen MoE for multilingual reasoning, coding, and tool use",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3-235b-a22b",
-   "status": "deprecated",
-   "release_date": "2025-04-28",
-   "limit": {
-    "context": 128000,
-    "output": 32000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.28985507
-     },
-     "output": {
-      "price": 1.15942029,
-      "overrides": [
-       {
-        "when": {
-         "thinking": {
-          "equals": true
-         }
-        },
-        "price": 2.89855072
-       }
-      ]
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-04-28"
   },
   "doubao-seed-2.0-code": {
    "id": "doubao-seed-2.0-code",
@@ -3634,170 +4174,21 @@
    "open_weights": false,
    "last_updated": "2026-02-14"
   },
-  "qwen3-30b-a3b": {
-   "id": "qwen3-30b-a3b",
-   "name": "Qwen3 30B A3B",
-   "description": "Sparse MoE Qwen model with 3B active parameters for efficient chat and reasoning",
+  "minimax/minimax-m2.5": {
+   "id": "minimax/minimax-m2.5",
+   "name": "Minimax/Minimax-M2.5",
+   "description": "Prior MiniMax coding model for agent workflows, office edits, and automation",
    "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3-30b-a3b",
-   "status": "deprecated",
-   "release_date": "2025-04-28",
+   "family": "minimax",
+   "canonical_id": "minimax/MiniMax-M2.5",
+   "release_date": "2026-02-12",
    "limit": {
-    "context": 40000,
-    "output": 4096
+    "context": 204800,
+    "output": 128000
    },
    "capabilities": {
     "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.10869565
-     },
-     "output": {
-      "price": 0.43478261,
-      "overrides": [
-       {
-        "when": {
-         "thinking": {
-          "equals": true
-         }
-        },
-        "price": 1.08695652
-       }
-      ]
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-04-28"
-  },
-  "qwen2.5-vl-72b-instruct": {
-   "id": "qwen2.5-vl-72b-instruct",
-   "name": "Qwen 2.5 VL 72B Instruct",
-   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen2-5-vl-72b-instruct",
-   "status": "deprecated",
-   "release_date": "2025-01-26",
-   "limit": {
-    "context": 128000,
-    "output": 8192
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2.31884058
-     },
-     "output": {
-      "price": 6.95652174
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/x-matroska",
-     "video/quicktime",
-     "video/x-flv",
-     "video/x-ms-wmv"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2024-04",
-   "last_updated": "2025-01-26"
-  },
-  "glm-4.5-air": {
-   "id": "glm-4.5-air",
-   "name": "GLM 4.5 Air",
-   "description": "Lighter GLM-4.5 variant for fast coding assistance and cheaper agents",
-   "type": "chat",
-   "family": "glm-air",
-   "canonical_id": "zhipuai/glm-4.5-air",
-   "status": "deprecated",
-   "release_date": "2025-07-28",
-   "limit": {
-    "context": 131000,
-    "output": 4096
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
+    "top_k": false,
     "top_p": true,
     "structured_output": false,
     "system_updates": false,
@@ -3806,8 +4197,17 @@
      "supported": true
     },
     "reasoning": {
-     "supported": true,
-     "toggle": true
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.30434783
+     },
+     "output": {
+      "price": 1.2173913
+     }
     }
    },
    "modalities": {
@@ -3833,22 +4233,25 @@
     }
    },
    "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-07-28"
+   "last_updated": "2026-02-12"
   },
-  "doubao-seed-1.6-thinking": {
-   "id": "doubao-seed-1.6-thinking",
-   "name": "Doubao-Seed 1.6 Thinking",
-   "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
+  "minimax/minimax-m2.1": {
+   "id": "minimax/minimax-m2.1",
+   "name": "Minimax/Minimax-M2.1",
+   "description": "Earlier MiniMax agent model for practical coding and productivity tasks",
    "type": "chat",
+   "family": "minimax",
+   "canonical_id": "minimax/MiniMax-M2.1",
    "status": "deprecated",
-   "release_date": "2025-08-15",
+   "release_date": "2025-12-23",
    "limit": {
-    "context": 256000,
-    "output": 32000
+    "context": 204800,
+    "output": 128000
    },
    "capabilities": {
     "temperature": true,
+    "top_k": false,
+    "top_p": true,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -3862,66 +4265,16 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.11594203,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 32000
-         }
-        },
-        "price": 0.17391304
-       },
-       {
-        "when": {
-         "context": {
-          "gt": 128000
-         }
-        },
-        "price": 0.34782609
-       }
-      ]
+      "price": 0.30434783
      },
      "output": {
-      "price": 1.15942029,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 32000
-         }
-        },
-        "price": 2.31884058
-       },
-       {
-        "when": {
-         "context": {
-          "gt": 128000
-         }
-        },
-        "price": 3.47826087
-       }
-      ]
+      "price": 1.2173913
      }
     }
    },
    "modalities": {
     "input": [
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/tiff",
-     "image/x-icon",
-     "image/x-icns",
-     "image/sgi",
-     "image/jp2",
-     "image/heic",
-     "text",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/quicktime"
+     "text"
     ],
     "output": [
      "text"
@@ -3941,27 +4294,27 @@
      }
     }
    },
-   "open_weights": false,
-   "last_updated": "2025-08-15"
+   "open_weights": true,
+   "last_updated": "2025-12-23"
   },
-  "claude-4.5-sonnet": {
-   "id": "claude-4.5-sonnet",
-   "name": "Claude 4.5 Sonnet",
-   "description": "Balanced Claude model for coding, analysis, agent workflows, and cost control",
+  "minimax/minimax-m2": {
+   "id": "minimax/minimax-m2",
+   "name": "Minimax/Minimax-M2",
+   "description": "Efficient open MiniMax model built for coding agents and tool-heavy workflows",
    "type": "chat",
-   "family": "claude-sonnet",
-   "canonical_id": "anthropic/claude-sonnet-4-5",
+   "family": "minimax",
+   "canonical_id": "minimax/MiniMax-M2",
    "status": "deprecated",
-   "release_date": "2025-09-29",
+   "release_date": "2025-10-27",
    "limit": {
     "context": 200000,
-    "output": 64000
+    "output": 128000
    },
    "capabilities": {
     "temperature": true,
-    "top_k": true,
+    "top_k": false,
     "top_p": true,
-    "structured_output": false,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -3971,61 +4324,14 @@
      "supported": true
     }
    },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.30434783
      },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
+     "output": {
+      "price": 1.2173913
      }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-07-31",
-   "last_updated": "2025-09-29"
-  },
-  "gpt-oss-20b": {
-   "id": "gpt-oss-20b",
-   "name": "gpt-oss-20b",
-   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
-   "type": "chat",
-   "family": "gpt-oss",
-   "canonical_id": "openai/gpt-oss-20b",
-   "status": "deprecated",
-   "release_date": "2025-08-05",
-   "limit": {
-    "context": 128000,
-    "output": 4096
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
     }
    },
    "modalities": {
@@ -4051,25 +4357,24 @@
     }
    },
    "open_weights": true,
-   "knowledge": "2024-06",
-   "last_updated": "2025-08-05"
+   "last_updated": "2025-10-27"
   },
-  "claude-4.1-opus": {
-   "id": "claude-4.1-opus",
-   "name": "Claude 4.1 Opus",
-   "description": "Flagship Claude model for deep reasoning, coding, and long-horizon agents",
+  "minimax/minimax-m2.5-highspeed": {
+   "id": "minimax/minimax-m2.5-highspeed",
+   "name": "Minimax/Minimax-M2.5 Highspeed",
+   "description": "High-speed MiniMax model for low-latency coding and agent workflows",
    "type": "chat",
-   "family": "claude-opus",
-   "canonical_id": "anthropic/claude-opus-4-1",
+   "family": "minimax",
+   "canonical_id": "minimax/MiniMax-M2.5-highspeed",
    "status": "deprecated",
-   "release_date": "2025-08-05",
+   "release_date": "2026-02-13",
    "limit": {
-    "context": 200000,
-    "output": 32000
+    "context": 204800,
+    "output": 128000
    },
    "capabilities": {
     "temperature": true,
-    "top_k": true,
+    "top_k": false,
     "top_p": true,
     "structured_output": false,
     "system_updates": false,
@@ -4081,70 +4386,13 @@
      "supported": true
     }
    },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-03-31",
-   "last_updated": "2025-08-05"
-  },
-  "qwen-max-2025-01-25": {
-   "id": "qwen-max-2025-01-25",
-   "name": "Qwen2.5-Max-2025-01-25",
-   "description": "Flagship Qwen model for complex reasoning, coding, and agentic workflows",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen-max",
-   "status": "deprecated",
-   "release_date": "2024-04-03",
-   "limit": {
-    "context": 128000,
-    "output": 4096
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
    "cost": {
     "text": {
      "input": {
-      "price": 0.34782609
+      "price": 0.60869565
      },
      "output": {
-      "price": 1.39130435
+      "price": 2.43478261
      }
     }
    },
@@ -4170,9 +4418,8 @@
      }
     }
    },
-   "open_weights": false,
-   "knowledge": "2024-04",
-   "last_updated": "2025-01-25"
+   "open_weights": true,
+   "last_updated": "2026-02-13"
   },
   "moonshotai/kimi-k2-0905": {
    "id": "moonshotai/kimi-k2-0905",
@@ -4368,6 +4615,756 @@
    "knowledge": "2024-08",
    "last_updated": "2025-11-06"
   },
+  "stepfun-ai/gelab-zero-4b-preview": {
+   "id": "stepfun-ai/gelab-zero-4b-preview",
+   "name": "Stepfun-Ai/Gelab Zero 4b Preview",
+   "description": "StepFun flash model for efficient multimodal reasoning, coding, and tool use",
+   "type": "chat",
+   "status": "deprecated",
+   "release_date": "2025-12-23",
+   "limit": {
+    "context": 8192,
+    "output": 4096
+   },
+   "capabilities": {
+    "temperature": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-12-23"
+  },
+  "x-ai/grok-code-fast-1": {
+   "id": "x-ai/grok-code-fast-1",
+   "name": "x-AI/Grok-Code-Fast 1",
+   "description": "Fast Grok model for responsive chat, reasoning, and tool-assisted work",
+   "type": "chat",
+   "family": "grok",
+   "canonical_id": "xai/grok-code-fast-1",
+   "status": "deprecated",
+   "release_date": "2025-09-02",
+   "limit": {
+    "context": 256000,
+    "output": 10000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-09-02"
+  },
+  "x-ai/grok-4.1-fast": {
+   "id": "x-ai/grok-4.1-fast",
+   "name": "x-AI/Grok-4.1-Fast",
+   "description": "Fast Grok model for responsive chat, reasoning, and tool-assisted work",
+   "type": "chat",
+   "status": "deprecated",
+   "release_date": "2025-11-20",
+   "limit": {
+    "context": 2000000,
+    "output": 2000000
+   },
+   "capabilities": {
+    "temperature": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-11-20"
+  },
+  "x-ai/grok-4-fast-reasoning": {
+   "id": "x-ai/grok-4-fast-reasoning",
+   "name": "X-Ai/Grok-4-Fast-Reasoning",
+   "description": "Fast Grok model for responsive chat, reasoning, and tool-assisted work",
+   "type": "chat",
+   "family": "grok",
+   "canonical_id": "xai/grok-4-fast-reasoning",
+   "status": "deprecated",
+   "release_date": "2025-12-18",
+   "limit": {
+    "context": 2000000,
+    "output": 2000000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "audio",
+     "video"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-12-18"
+  },
+  "x-ai/grok-4-fast": {
+   "id": "x-ai/grok-4-fast",
+   "name": "x-AI/Grok-4-Fast",
+   "description": "Fast Grok model for responsive chat, reasoning, and tool-assisted work",
+   "type": "chat",
+   "status": "deprecated",
+   "release_date": "2025-09-20",
+   "limit": {
+    "context": 2000000,
+    "output": 2000000
+   },
+   "capabilities": {
+    "temperature": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "audio",
+     "video"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-09-20"
+  },
+  "x-ai/grok-4-fast-non-reasoning": {
+   "id": "x-ai/grok-4-fast-non-reasoning",
+   "name": "X-Ai/Grok-4-Fast-Non-Reasoning",
+   "description": "Fast Grok model for responsive chat, reasoning, and tool-assisted work",
+   "type": "chat",
+   "family": "grok",
+   "canonical_id": "xai/grok-4-fast-non-reasoning",
+   "status": "deprecated",
+   "release_date": "2025-12-18",
+   "limit": {
+    "context": 2000000,
+    "output": 2000000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "audio",
+     "video"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-12-18"
+  },
+  "x-ai/grok-4.1-fast-reasoning": {
+   "id": "x-ai/grok-4.1-fast-reasoning",
+   "name": "X-Ai/Grok 4.1 Fast Reasoning",
+   "description": "xAI's fast agentic tool-calling model with a 2M context window and built-in reasoning",
+   "type": "chat",
+   "family": "grok",
+   "canonical_id": "xai/grok-4.1-fast-reasoning",
+   "status": "deprecated",
+   "release_date": "2025-11-19",
+   "limit": {
+    "context": 20000000,
+    "output": 2000000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-11-19"
+  },
+  "x-ai/grok-4.1-fast-non-reasoning": {
+   "id": "x-ai/grok-4.1-fast-non-reasoning",
+   "name": "X-Ai/Grok 4.1 Fast Non Reasoning",
+   "description": "xAI's fast agentic tool-calling model with a 2M context window; non-reasoning variant for low-latency responses",
+   "type": "chat",
+   "family": "grok",
+   "canonical_id": "xai/grok-4.1-fast",
+   "status": "deprecated",
+   "release_date": "2025-11-19",
+   "limit": {
+    "context": 2000000,
+    "output": 2000000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-11-19"
+  },
+  "openai/gpt-5.2": {
+   "id": "openai/gpt-5.2",
+   "name": "OpenAI/GPT-5.2",
+   "description": "Reliable GPT generation for broad coding, writing, and tool-assisted product work",
+   "type": "chat",
+   "family": "gpt",
+   "canonical_id": "openai/gpt-5.2",
+   "status": "deprecated",
+   "release_date": "2025-12-11",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2025-12-11"
+  },
+  "openai/gpt-5": {
+   "id": "openai/gpt-5",
+   "name": "OpenAI/GPT-5",
+   "description": "Original GPT-5 workhorse for reasoning, coding, writing, and tool workflows",
+   "type": "chat",
+   "family": "gpt",
+   "canonical_id": "openai/gpt-5",
+   "status": "deprecated",
+   "release_date": "2025-08-07",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2024-09-30",
+   "last_updated": "2025-08-07"
+  },
+  "deepseek/deepseek-math-v2": {
+   "id": "deepseek/deepseek-math-v2",
+   "name": "Deepseek/Deepseek-Math-V2",
+   "description": "DeepSeek chat model for instruction following, coding, and analysis",
+   "type": "chat",
+   "status": "deprecated",
+   "release_date": "2025-12-04",
+   "limit": {
+    "context": 160000,
+    "output": 160000
+   },
+   "capabilities": {
+    "temperature": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-12-04"
+  },
+  "deepseek/deepseek-v3.1-terminus-thinking": {
+   "id": "deepseek/deepseek-v3.1-terminus-thinking",
+   "name": "DeepSeek/DeepSeek-V3.1-Terminus-Thinking",
+   "description": "DeepSeek chat model for instruction following, coding, and analysis",
+   "type": "chat",
+   "status": "deprecated",
+   "release_date": "2025-09-22",
+   "limit": {
+    "context": 128000,
+    "output": 32000
+   },
+   "capabilities": {
+    "temperature": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.57971014
+     },
+     "output": {
+      "price": 1.73913043
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-09-22"
+  },
+  "deepseek/deepseek-v3.2-exp-thinking": {
+   "id": "deepseek/deepseek-v3.2-exp-thinking",
+   "name": "DeepSeek/DeepSeek-V3.2-Exp-Thinking",
+   "description": "DeepSeek chat model for instruction following, coding, and analysis",
+   "type": "chat",
+   "status": "deprecated",
+   "release_date": "2025-09-29",
+   "limit": {
+    "context": 128000,
+    "output": 32000
+   },
+   "capabilities": {
+    "temperature": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.28985507
+     },
+     "output": {
+      "price": 0.43478261
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-09-29"
+  },
+  "deepseek/deepseek-v3.2-exp": {
+   "id": "deepseek/deepseek-v3.2-exp",
+   "name": "DeepSeek/DeepSeek-V3.2-Exp",
+   "description": "DeepSeek chat model for instruction following, coding, and analysis",
+   "type": "chat",
+   "status": "deprecated",
+   "release_date": "2025-09-29",
+   "limit": {
+    "context": 128000,
+    "output": 32000
+   },
+   "capabilities": {
+    "temperature": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.28985507
+     },
+     "output": {
+      "price": 0.43478261
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-09-29"
+  },
   "deepseek/deepseek-v3.2-251201": {
    "id": "deepseek/deepseek-v3.2-251201",
    "name": "Deepseek/DeepSeek-V3.2",
@@ -4492,1073 +5489,28 @@
    "open_weights": false,
    "last_updated": "2025-09-22"
   },
-  "deepseek/deepseek-v3.2-exp-thinking": {
-   "id": "deepseek/deepseek-v3.2-exp-thinking",
-   "name": "DeepSeek/DeepSeek-V3.2-Exp-Thinking",
-   "description": "DeepSeek chat model for instruction following, coding, and analysis",
+  "stepfun/step-3.5-flash": {
+   "id": "stepfun/step-3.5-flash",
+   "name": "Stepfun/Step-3.5 Flash",
+   "description": "StepFun flash lane for quick multimodal reasoning and coding assistance",
    "type": "chat",
+   "family": "step",
+   "canonical_id": "stepfun/step-3.5-flash",
    "status": "deprecated",
-   "release_date": "2025-09-29",
+   "release_date": "2026-01-29",
    "limit": {
-    "context": 128000,
-    "output": 32000
-   },
-   "capabilities": {
-    "temperature": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.28985507
-     },
-     "output": {
-      "price": 0.43478261
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2025-09-29"
-  },
-  "deepseek/deepseek-v3.1-terminus-thinking": {
-   "id": "deepseek/deepseek-v3.1-terminus-thinking",
-   "name": "DeepSeek/DeepSeek-V3.1-Terminus-Thinking",
-   "description": "DeepSeek chat model for instruction following, coding, and analysis",
-   "type": "chat",
-   "status": "deprecated",
-   "release_date": "2025-09-22",
-   "limit": {
-    "context": 128000,
-    "output": 32000
-   },
-   "capabilities": {
-    "temperature": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.57971014
-     },
-     "output": {
-      "price": 1.73913043
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2025-09-22"
-  },
-  "deepseek/deepseek-v3.2-exp": {
-   "id": "deepseek/deepseek-v3.2-exp",
-   "name": "DeepSeek/DeepSeek-V3.2-Exp",
-   "description": "DeepSeek chat model for instruction following, coding, and analysis",
-   "type": "chat",
-   "status": "deprecated",
-   "release_date": "2025-09-29",
-   "limit": {
-    "context": 128000,
-    "output": 32000
-   },
-   "capabilities": {
-    "temperature": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.28985507
-     },
-     "output": {
-      "price": 0.43478261
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2025-09-29"
-  },
-  "deepseek/deepseek-math-v2": {
-   "id": "deepseek/deepseek-math-v2",
-   "name": "Deepseek/Deepseek-Math-V2",
-   "description": "DeepSeek chat model for instruction following, coding, and analysis",
-   "type": "chat",
-   "status": "deprecated",
-   "release_date": "2025-12-04",
-   "limit": {
-    "context": 160000,
-    "output": 160000
-   },
-   "capabilities": {
-    "temperature": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2025-12-04"
-  },
-  "x-ai/grok-4.1-fast-reasoning": {
-   "id": "x-ai/grok-4.1-fast-reasoning",
-   "name": "X-Ai/Grok 4.1 Fast Reasoning",
-   "description": "xAI's fast agentic tool-calling model with a 2M context window and built-in reasoning",
-   "type": "chat",
-   "family": "grok",
-   "canonical_id": "xai/grok-4.1-fast-reasoning",
-   "status": "deprecated",
-   "release_date": "2025-11-19",
-   "limit": {
-    "context": 20000000,
-    "output": 2000000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2025-11-19"
-  },
-  "x-ai/grok-4-fast-non-reasoning": {
-   "id": "x-ai/grok-4-fast-non-reasoning",
-   "name": "X-Ai/Grok-4-Fast-Non-Reasoning",
-   "description": "Fast Grok model for responsive chat, reasoning, and tool-assisted work",
-   "type": "chat",
-   "family": "grok",
-   "canonical_id": "xai/grok-4-fast-non-reasoning",
-   "status": "deprecated",
-   "release_date": "2025-12-18",
-   "limit": {
-    "context": 2000000,
-    "output": 2000000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "audio",
-     "video"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2025-12-18"
-  },
-  "x-ai/grok-code-fast-1": {
-   "id": "x-ai/grok-code-fast-1",
-   "name": "x-AI/Grok-Code-Fast 1",
-   "description": "Fast Grok model for responsive chat, reasoning, and tool-assisted work",
-   "type": "chat",
-   "family": "grok",
-   "canonical_id": "xai/grok-code-fast-1",
-   "status": "deprecated",
-   "release_date": "2025-09-02",
-   "limit": {
-    "context": 256000,
-    "output": 10000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2025-09-02"
-  },
-  "x-ai/grok-4-fast": {
-   "id": "x-ai/grok-4-fast",
-   "name": "x-AI/Grok-4-Fast",
-   "description": "Fast Grok model for responsive chat, reasoning, and tool-assisted work",
-   "type": "chat",
-   "status": "deprecated",
-   "release_date": "2025-09-20",
-   "limit": {
-    "context": 2000000,
-    "output": 2000000
-   },
-   "capabilities": {
-    "temperature": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "audio",
-     "video"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2025-09-20"
-  },
-  "x-ai/grok-4.1-fast-non-reasoning": {
-   "id": "x-ai/grok-4.1-fast-non-reasoning",
-   "name": "X-Ai/Grok 4.1 Fast Non Reasoning",
-   "description": "xAI's fast agentic tool-calling model with a 2M context window; non-reasoning variant for low-latency responses",
-   "type": "chat",
-   "family": "grok",
-   "canonical_id": "xai/grok-4.1-fast",
-   "status": "deprecated",
-   "release_date": "2025-11-19",
-   "limit": {
-    "context": 2000000,
-    "output": 2000000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2025-11-19"
-  },
-  "x-ai/grok-4.1-fast": {
-   "id": "x-ai/grok-4.1-fast",
-   "name": "x-AI/Grok-4.1-Fast",
-   "description": "Fast Grok model for responsive chat, reasoning, and tool-assisted work",
-   "type": "chat",
-   "status": "deprecated",
-   "release_date": "2025-11-20",
-   "limit": {
-    "context": 2000000,
-    "output": 2000000
-   },
-   "capabilities": {
-    "temperature": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2025-11-20"
-  },
-  "x-ai/grok-4-fast-reasoning": {
-   "id": "x-ai/grok-4-fast-reasoning",
-   "name": "X-Ai/Grok-4-Fast-Reasoning",
-   "description": "Fast Grok model for responsive chat, reasoning, and tool-assisted work",
-   "type": "chat",
-   "family": "grok",
-   "canonical_id": "xai/grok-4-fast-reasoning",
-   "status": "deprecated",
-   "release_date": "2025-12-18",
-   "limit": {
-    "context": 2000000,
-    "output": 2000000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "audio",
-     "video"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2025-12-18"
-  },
-  "meituan/longcat-flash-lite": {
-   "id": "meituan/longcat-flash-lite",
-   "name": "Meituan/Longcat-Flash-Lite",
-   "description": "Efficient model for low-latency assistance, extraction, and routine automation",
-   "type": "chat",
-   "status": "deprecated",
-   "release_date": "2026-02-06",
-   "limit": {
-    "context": 256000,
-    "output": 256000
-   },
-   "capabilities": {
-    "temperature": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-02-06"
-  },
-  "meituan/longcat-flash-chat": {
-   "id": "meituan/longcat-flash-chat",
-   "name": "Meituan/Longcat-Flash-Chat",
-   "description": "Efficient model for low-latency assistance, extraction, and routine automation",
-   "type": "chat",
-   "status": "deprecated",
-   "release_date": "2025-11-05",
-   "limit": {
-    "context": 131072,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2025-11-05"
-  },
-  "openai/gpt-5.2": {
-   "id": "openai/gpt-5.2",
-   "name": "OpenAI/GPT-5.2",
-   "description": "Reliable GPT generation for broad coding, writing, and tool-assisted product work",
-   "type": "chat",
-   "family": "gpt",
-   "canonical_id": "openai/gpt-5.2",
-   "status": "deprecated",
-   "release_date": "2025-12-11",
-   "limit": {
-    "context": 400000,
-    "input": 272000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2025-12-11"
-  },
-  "openai/gpt-5": {
-   "id": "openai/gpt-5",
-   "name": "OpenAI/GPT-5",
-   "description": "Original GPT-5 workhorse for reasoning, coding, writing, and tool workflows",
-   "type": "chat",
-   "family": "gpt",
-   "canonical_id": "openai/gpt-5",
-   "status": "deprecated",
-   "release_date": "2025-08-07",
-   "limit": {
-    "context": 400000,
-    "input": 272000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2024-09-30",
-   "last_updated": "2025-08-07"
-  },
-  "minimax/minimax-m2.5": {
-   "id": "minimax/minimax-m2.5",
-   "name": "Minimax/Minimax-M2.5",
-   "description": "Prior MiniMax coding model for agent workflows, office edits, and automation",
-   "type": "chat",
-   "family": "minimax",
-   "canonical_id": "minimax/MiniMax-M2.5",
-   "release_date": "2026-02-12",
-   "limit": {
-    "context": 204800,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.30434783
-     },
-     "output": {
-      "price": 1.2173913
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-02-12"
-  },
-  "minimax/minimax-m2.5-highspeed": {
-   "id": "minimax/minimax-m2.5-highspeed",
-   "name": "Minimax/Minimax-M2.5 Highspeed",
-   "description": "High-speed MiniMax model for low-latency coding and agent workflows",
-   "type": "chat",
-   "family": "minimax",
-   "canonical_id": "minimax/MiniMax-M2.5-highspeed",
-   "status": "deprecated",
-   "release_date": "2026-02-13",
-   "limit": {
-    "context": 204800,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.60869565
-     },
-     "output": {
-      "price": 2.43478261
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-02-13"
-  },
-  "minimax/minimax-m2.1": {
-   "id": "minimax/minimax-m2.1",
-   "name": "Minimax/Minimax-M2.1",
-   "description": "Earlier MiniMax agent model for practical coding and productivity tasks",
-   "type": "chat",
-   "family": "minimax",
-   "canonical_id": "minimax/MiniMax-M2.1",
-   "status": "deprecated",
-   "release_date": "2025-12-23",
-   "limit": {
-    "context": 204800,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.30434783
-     },
-     "output": {
-      "price": 1.2173913
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-12-23"
-  },
-  "minimax/minimax-m2": {
-   "id": "minimax/minimax-m2",
-   "name": "Minimax/Minimax-M2",
-   "description": "Efficient open MiniMax model built for coding agents and tool-heavy workflows",
-   "type": "chat",
-   "family": "minimax",
-   "canonical_id": "minimax/MiniMax-M2",
-   "status": "deprecated",
-   "release_date": "2025-10-27",
-   "limit": {
-    "context": 200000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.30434783
-     },
-     "output": {
-      "price": 1.2173913
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-10-27"
-  },
-  "stepfun-ai/gelab-zero-4b-preview": {
-   "id": "stepfun-ai/gelab-zero-4b-preview",
-   "name": "Stepfun-Ai/Gelab Zero 4b Preview",
-   "description": "StepFun flash model for efficient multimodal reasoning, coding, and tool use",
-   "type": "chat",
-   "status": "deprecated",
-   "release_date": "2025-12-23",
-   "limit": {
-    "context": 8192,
+    "context": 64000,
     "output": 4096
    },
    "capabilities": {
     "temperature": true,
+    "top_k": true,
+    "top_p": true,
     "structured_output": false,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
-     "supported": true
+     "supported": false
     },
     "reasoning": {
      "supported": false
@@ -5566,8 +5518,7 @@
    },
    "modalities": {
     "input": [
-     "text",
-     "image"
+     "text"
     ],
     "output": [
      "text"
@@ -5579,16 +5530,12 @@
      "sdk": {
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
      }
     }
    },
-   "open_weights": false,
-   "last_updated": "2025-12-23"
+   "open_weights": true,
+   "knowledge": "2025-01",
+   "last_updated": "2026-02-13"
   },
   "z-ai/autoglm-phone-9b": {
    "id": "z-ai/autoglm-phone-9b",
@@ -5639,134 +5586,6 @@
    },
    "open_weights": false,
    "last_updated": "2025-12-23"
-  },
-  "z-ai/glm-4.6": {
-   "id": "z-ai/glm-4.6",
-   "name": "Z-AI/GLM 4.6",
-   "description": "Late GLM-4 workhorse for coding agents, reasoning, and structured tasks",
-   "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-4.6",
-   "status": "deprecated",
-   "release_date": "2025-09-30",
-   "limit": {
-    "context": 200000,
-    "output": 200000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.04347826
-     },
-     "output": {
-      "price": 1.82608696
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-09-30"
-  },
-  "z-ai/glm-4.7": {
-   "id": "z-ai/glm-4.7",
-   "name": "Z-Ai/GLM 4.7",
-   "description": "Mature GLM model for dependable coding, reasoning, and structured agent tasks",
-   "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-4.7",
-   "status": "deprecated",
-   "release_date": "2025-12-22",
-   "limit": {
-    "context": 200000,
-    "output": 200000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.45913043
-     },
-     "output": {
-      "price": 1.81565217
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.qnaigc.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-12-22"
   },
   "z-ai/glm-5": {
    "id": "z-ai/glm-5",
@@ -5850,23 +5669,147 @@
    "open_weights": true,
    "last_updated": "2026-02-12"
   },
-  "stepfun/step-3.5-flash": {
-   "id": "stepfun/step-3.5-flash",
-   "name": "Stepfun/Step-3.5 Flash",
-   "description": "StepFun flash lane for quick multimodal reasoning and coding assistance",
+  "z-ai/glm-4.7": {
+   "id": "z-ai/glm-4.7",
+   "name": "Z-Ai/GLM 4.7",
+   "description": "Mature GLM model for dependable coding, reasoning, and structured agent tasks",
    "type": "chat",
-   "family": "step",
-   "canonical_id": "stepfun/step-3.5-flash",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-4.7",
    "status": "deprecated",
-   "release_date": "2026-01-29",
+   "release_date": "2025-12-22",
    "limit": {
-    "context": 64000,
-    "output": 4096
+    "context": 200000,
+    "output": 200000
    },
    "capabilities": {
     "temperature": true,
     "top_k": true,
     "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.45913043
+     },
+     "output": {
+      "price": 1.81565217
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-04",
+   "last_updated": "2025-12-22"
+  },
+  "z-ai/glm-4.6": {
+   "id": "z-ai/glm-4.6",
+   "name": "Z-AI/GLM 4.6",
+   "description": "Late GLM-4 workhorse for coding agents, reasoning, and structured tasks",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-4.6",
+   "status": "deprecated",
+   "release_date": "2025-09-30",
+   "limit": {
+    "context": 200000,
+    "output": 200000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.04347826
+     },
+     "output": {
+      "price": 1.82608696
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-04",
+   "last_updated": "2025-09-30"
+  },
+  "meituan/longcat-flash-chat": {
+   "id": "meituan/longcat-flash-chat",
+   "name": "Meituan/Longcat-Flash-Chat",
+   "description": "Efficient model for low-latency assistance, extraction, and routine automation",
+   "type": "chat",
+   "status": "deprecated",
+   "release_date": "2025-11-05",
+   "limit": {
+    "context": 131072,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
     "structured_output": false,
     "system_updates": false,
     "effort_updates": false,
@@ -5894,9 +5837,66 @@
      }
     }
    },
-   "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-02-13"
+   "open_weights": false,
+   "last_updated": "2025-11-05"
+  },
+  "meituan/longcat-flash-lite": {
+   "id": "meituan/longcat-flash-lite",
+   "name": "Meituan/Longcat-Flash-Lite",
+   "description": "Efficient model for low-latency assistance, extraction, and routine automation",
+   "type": "chat",
+   "status": "deprecated",
+   "release_date": "2026-02-06",
+   "limit": {
+    "context": 256000,
+    "output": 256000
+   },
+   "capabilities": {
+    "temperature": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.qnaigc.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-02-06"
   }
  }
 }

@@ -6,26 +6,25 @@
   "KLAVO_API_KEY"
  ],
  "models": {
-  "deepseek/deepseek-v4.1-flash-1017": {
-   "id": "deepseek/deepseek-v4.1-flash-1017",
-   "name": "DeepSeek V4.1 Flash 1017",
-   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
+  "minimax/minimax-m3.1-flash": {
+   "id": "minimax/minimax-m3.1-flash",
+   "name": "MiniMax-M3.1-Flash",
+   "description": "Frontier multimodal coding model with 1M context window and tunable thinking depth",
    "type": "chat",
-   "family": "deepseek-flash",
-   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
-   "release_date": "2026-10-17",
+   "family": "minimax",
+   "canonical_id": "minimax/MiniMax-M3.1-Flash",
+   "release_date": "2026-10-19",
    "limit": {
-    "context": 1048576,
-    "output": 65536
+    "context": 1000000,
+    "output": 524288
    },
    "capabilities": {
     "cache": {
      "implicit": true
     },
     "temperature": true,
-    "top_k": true,
+    "top_k": false,
     "top_p": true,
-    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -33,10 +32,11 @@
     },
     "reasoning": {
      "supported": true,
-     "toggle": true,
      "effort": [
       "low",
+      "medium",
       "high",
+      "xhigh",
       "max"
      ]
     }
@@ -46,236 +46,11 @@
      "input": {
       "price": 0.2907,
       "cache": {
-       "read": 0.0182
+       "read": 0.0303
       }
      },
      "output": {
-      "price": 1.2114
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.klavo.ru/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-10-17"
-  },
-  "deepseek/deepseek-v4-flash-0731": {
-   "id": "deepseek/deepseek-v4-flash-0731",
-   "name": "DeepSeek V4 Flash 0731",
-   "description": "Official DeepSeek V4 Flash release with enhanced agentic capabilities and integrated DSpark speculative decoding",
-   "type": "chat",
-   "family": "deepseek-flash",
-   "canonical_id": "deepseek/deepseek-v4-flash-0731",
-   "release_date": "2026-07-31",
-   "limit": {
-    "context": 1048576,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.4361,
-      "cache": {
-       "read": 0.0848
-      }
-     },
-     "output": {
-      "price": 1.3325
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.klavo.ru/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-07-31"
-  },
-  "deepseek/deepseek-v4.1-flash": {
-   "id": "deepseek/deepseek-v4.1-flash",
-   "name": "DeepSeek V4.1 Flash",
-   "description": "DeepSeek V4.1 Flash model for reasoning and agentic coding",
-   "type": "chat",
-   "family": "deepseek-flash",
-   "canonical_id": "deepseek/deepseek-v4.1-flash",
-   "release_date": "2026-09-10",
-   "limit": {
-    "context": 1048576,
-    "output": 65536
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.3029,
-      "cache": {
-       "read": 0.0606
-      }
-     },
-     "output": {
-      "price": 1.2114
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.klavo.ru/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-09-10"
-  },
-  "xiaomi/mimo-v2.6-pro": {
-   "id": "xiaomi/mimo-v2.6-pro",
-   "name": "MiMo-V2.6-Pro",
-   "description": "Stronger MiMo Pro tier for multimodal reasoning and coding-agent execution",
-   "type": "chat",
-   "family": "mimo",
-   "canonical_id": "xiaomi/mimo-v2.6-pro",
-   "release_date": "2026-09-22",
-   "limit": {
-    "context": 1048576,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.848,
-      "cache": {
-       "read": 0.0121
-      }
-     },
-     "output": {
-      "price": 1.696
+      "price": 1.1508
      }
     }
    },
@@ -286,16 +61,10 @@
      "image/png",
      "image/gif",
      "image/webp",
-     "image/bmp",
-     "audio/mpeg",
-     "audio/wav",
-     "audio/flac",
-     "audio/mp4",
-     "audio/ogg",
      "video/mp4",
-     "video/quicktime",
      "video/x-msvideo",
-     "video/x-ms-wmv"
+     "video/quicktime",
+     "video/x-matroska"
     ],
     "output": [
      "text"
@@ -316,7 +85,7 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2026-09-22"
+   "last_updated": "2026-10-19"
   },
   "qwen/qwen3.8-27b": {
    "id": "qwen/qwen3.8-27b",
@@ -538,25 +307,26 @@
    "knowledge": "2024-06",
    "last_updated": "2025-08-05"
   },
-  "minimax/minimax-m3.1-flash": {
-   "id": "minimax/minimax-m3.1-flash",
-   "name": "MiniMax-M3.1-Flash",
-   "description": "Frontier multimodal coding model with 1M context window and tunable thinking depth",
+  "deepseek/deepseek-v4-flash-0731": {
+   "id": "deepseek/deepseek-v4-flash-0731",
+   "name": "DeepSeek V4 Flash 0731",
+   "description": "Official DeepSeek V4 Flash release with enhanced agentic capabilities and integrated DSpark speculative decoding",
    "type": "chat",
-   "family": "minimax",
-   "canonical_id": "minimax/MiniMax-M3.1-Flash",
-   "release_date": "2026-10-19",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4-flash-0731",
+   "release_date": "2026-07-31",
    "limit": {
-    "context": 1000000,
-    "output": 524288
+    "context": 1048576,
+    "output": 128000
    },
    "capabilities": {
     "cache": {
      "implicit": true
     },
     "temperature": true,
-    "top_k": false,
+    "top_k": true,
     "top_p": true,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -564,11 +334,10 @@
     },
     "reasoning": {
      "supported": true,
+     "toggle": true,
      "effort": [
       "low",
-      "medium",
       "high",
-      "xhigh",
       "max"
      ]
     }
@@ -576,27 +345,19 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.2907,
+      "price": 0.4361,
       "cache": {
-       "read": 0.0303
+       "read": 0.0848
       }
      },
      "output": {
-      "price": 1.1508
+      "price": 1.3325
      }
     }
    },
    "modalities": {
     "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/quicktime",
-     "video/x-matroska"
+     "text"
     ],
     "output": [
      "text"
@@ -617,16 +378,173 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2026-10-19"
+   "knowledge": "2025-05",
+   "last_updated": "2026-07-31"
   },
-  "z-ai/glm-5.3": {
-   "id": "z-ai/glm-5.3",
-   "name": "GLM-5.3",
-   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
+  "deepseek/deepseek-v4.1-flash": {
+   "id": "deepseek/deepseek-v4.1-flash",
+   "name": "DeepSeek V4.1 Flash",
+   "description": "DeepSeek V4.1 Flash model for reasoning and agentic coding",
    "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-5.3",
-   "release_date": "2026-08-14",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4.1-flash",
+   "release_date": "2026-09-10",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.3029,
+      "cache": {
+       "read": 0.0606
+      }
+     },
+     "output": {
+      "price": 1.2114
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.klavo.ru/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-09-10"
+  },
+  "deepseek/deepseek-v4.1-flash-1017": {
+   "id": "deepseek/deepseek-v4.1-flash-1017",
+   "name": "DeepSeek V4.1 Flash 1017",
+   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
+   "type": "chat",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
+   "release_date": "2026-10-17",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.2907,
+      "cache": {
+       "read": 0.0182
+      }
+     },
+     "output": {
+      "price": 1.2114
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.klavo.ru/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-10-17"
+  },
+  "xiaomi/mimo-v2.6-pro": {
+   "id": "xiaomi/mimo-v2.6-pro",
+   "name": "MiMo-V2.6-Pro",
+   "description": "Stronger MiMo Pro tier for multimodal reasoning and coding-agent execution",
+   "type": "chat",
+   "family": "mimo",
+   "canonical_id": "xiaomi/mimo-v2.6-pro",
+   "release_date": "2026-09-22",
    "limit": {
     "context": 1048576,
     "output": 131072
@@ -646,29 +564,39 @@
     },
     "reasoning": {
      "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
+     "toggle": true
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 1.696,
+      "price": 0.848,
       "cache": {
-       "read": 0.3029
+       "read": 0.0121
       }
      },
      "output": {
-      "price": 5.3302
+      "price": 1.696
      }
     }
    },
    "modalities": {
     "input": [
-     "text"
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "audio/mpeg",
+     "audio/wav",
+     "audio/flac",
+     "audio/mp4",
+     "audio/ogg",
+     "video/mp4",
+     "video/quicktime",
+     "video/x-msvideo",
+     "video/x-ms-wmv"
     ],
     "output": [
      "text"
@@ -689,7 +617,7 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2026-08-14"
+   "last_updated": "2026-09-22"
   },
   "z-ai/glm-5.3-flash": {
    "id": "z-ai/glm-5.3-flash",
@@ -765,6 +693,78 @@
    },
    "open_weights": true,
    "last_updated": "2026-08-26"
+  },
+  "z-ai/glm-5.3": {
+   "id": "z-ai/glm-5.3",
+   "name": "GLM-5.3",
+   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.3",
+   "release_date": "2026-08-14",
+   "limit": {
+    "context": 1048576,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.696,
+      "cache": {
+       "read": 0.3029
+      }
+     },
+     "output": {
+      "price": 5.3302
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.klavo.ru/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-14"
   }
  }
 }

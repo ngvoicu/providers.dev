@@ -6,86 +6,6 @@
   "AUGURE_API_KEY"
  ],
  "models": {
-  "rosedale-1": {
-   "id": "rosedale-1",
-   "name": "Rosedale One",
-   "description": "Augure's premium reasoning model with a 1M-token context for whole-document analysis, reliable tool calling and agent loops, served on Canadian infrastructure",
-   "type": "chat",
-   "release_date": "2026-08",
-   "limit": {
-    "context": 1048576,
-    "output": 32768
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": true,
-    "stream_usage": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.78
-     },
-     "output": {
-      "price": 4.27
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/gif",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.augureai.ca/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-08"
-  },
   "open-glm-5-3": {
    "id": "open-glm-5-3",
    "name": "GLM-5.3",
@@ -152,14 +72,85 @@
    "open_weights": true,
    "last_updated": "2026-08-14"
   },
-  "ossington-4-1": {
-   "id": "ossington-4-1",
-   "name": "Ossington 4.1",
-   "description": "Augure's premium reasoning model on Canadian infrastructure for tool use and strong bilingual (English and French) work; kept for existing integrations",
+  "tofino-3": {
+   "id": "tofino-3",
+   "name": "Tofino 3",
+   "description": "Augure's fast everyday model: bilingual (English and Quebec French) drafting, translation, extraction and classification, thinking always off, served in Canada only",
+   "type": "chat",
+   "release_date": "2026-08-20",
+   "limit": {
+    "context": 262144,
+    "output": 16384
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "stream_usage": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.43
+     },
+     "output": {
+      "price": 1.42
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/gif",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.augureai.ca/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-08-20"
+  },
+  "rosedale-1": {
+   "id": "rosedale-1",
+   "name": "Rosedale One",
+   "description": "Augure's premium reasoning model with a 1M-token context for whole-document analysis, reliable tool calling and agent loops, served on Canadian infrastructure",
    "type": "chat",
    "release_date": "2026-08",
    "limit": {
-    "context": 262144,
+    "context": 1048576,
     "output": 32768
    },
    "capabilities": {
@@ -176,7 +167,6 @@
     "reasoning": {
      "supported": true,
      "effort": [
-      "none",
       "minimal",
       "low",
       "medium",
@@ -320,6 +310,87 @@
    "open_weights": false,
    "last_updated": "2026-08-13"
   },
+  "ossington-4-1": {
+   "id": "ossington-4-1",
+   "name": "Ossington 4.1",
+   "description": "Augure's premium reasoning model on Canadian infrastructure for tool use and strong bilingual (English and French) work; kept for existing integrations",
+   "type": "chat",
+   "release_date": "2026-08",
+   "limit": {
+    "context": 262144,
+    "output": 32768
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "stream_usage": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.78
+     },
+     "output": {
+      "price": 4.27
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/gif",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.augureai.ca/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-08"
+  },
   "open-qwen-3.8-flash-next": {
    "id": "open-qwen-3.8-flash-next",
    "name": "Qwen3.8 Flash Next",
@@ -390,77 +461,6 @@
    },
    "open_weights": true,
    "last_updated": "2026-08-27"
-  },
-  "tofino-3": {
-   "id": "tofino-3",
-   "name": "Tofino 3",
-   "description": "Augure's fast everyday model: bilingual (English and Quebec French) drafting, translation, extraction and classification, thinking always off, served in Canada only",
-   "type": "chat",
-   "release_date": "2026-08-20",
-   "limit": {
-    "context": 262144,
-    "output": 16384
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": true,
-    "stream_usage": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.43
-     },
-     "output": {
-      "price": 1.42
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/gif",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.augureai.ca/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-08-20"
   }
  }
 }

@@ -6,145 +6,6 @@
   "AICORE_SERVICE_KEY"
  ],
  "models": {
-  "gemini-3.6-flash": {
-   "id": "gemini-3.6-flash",
-   "name": "Gemini 3.6 Flash",
-   "description": "Fast Gemini model balancing multimodal reasoning, tool use, and cost",
-   "type": "chat",
-   "family": "gemini-flash",
-   "canonical_id": "google/gemini-3.6-flash",
-   "release_date": "2026-07-21",
-   "limit": {
-    "context": 1048576,
-    "output": 65536
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp",
-     "audio/wav",
-     "audio/mp3",
-     "audio/aiff",
-     "audio/aac",
-     "audio/ogg",
-     "audio/flac",
-     "audio/mpeg",
-     "audio/m4a",
-     "audio/l16",
-     "audio/opus",
-     "audio/alaw",
-     "audio/mulaw",
-     "audio/webm",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${AICORE_DEPLOYMENT_URL}",
-     "sdk": {
-      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-03",
-   "last_updated": "2026-07-21"
-  },
-  "text-embedding-3-large": {
-   "id": "text-embedding-3-large",
-   "name": "text-embedding-3-large",
-   "description": "Most capable OpenAI embedding model for English and non-English text",
-   "type": "embedding",
-   "family": "text-embedding",
-   "canonical_id": "openai/text-embedding-3-large",
-   "release_date": "2024-01-25",
-   "limit": {
-    "context": 8191,
-    "output": 3072
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.13
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "embeddings": {
-     "base_url": "${AICORE_DEPLOYMENT_URL}",
-     "sdk": {
-      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2024-01-25"
-  },
   "gemini-2.5-pro": {
    "id": "gemini-2.5-pro",
    "name": "gemini-2.5-pro",
@@ -242,17 +103,17 @@
    "knowledge": "2025-01",
    "last_updated": "2025-06-17"
   },
-  "amazon--nova-micro": {
-   "id": "amazon--nova-micro",
-   "name": "amazon--nova-micro",
-   "description": "Efficient model for low-latency assistance, extraction, and routine automation",
+  "anthropic--claude-4.5-haiku": {
+   "id": "anthropic--claude-4.5-haiku",
+   "name": "anthropic--claude-4.5-haiku",
+   "description": "Fast Claude lane for lightweight agents, office tasks, and responsive chat",
    "type": "chat",
-   "family": "nova-micro",
-   "canonical_id": "amazon/nova-micro",
-   "release_date": "2024-12-03",
+   "family": "claude-haiku",
+   "canonical_id": "anthropic/claude-haiku-4-5",
+   "release_date": "2025-10-15",
    "limit": {
-    "context": 128000,
-    "output": 8192
+    "context": 200000,
+    "output": 64000
    },
    "capabilities": {
     "temperature": true,
@@ -264,22 +125,34 @@
      "supported": true
     },
     "reasoning": {
-     "supported": false
+     "supported": true,
+     "budget": {
+      "min": 1024
+     }
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.035
+      "price": 1,
+      "cache": {
+       "read": 0.1,
+       "write": 1.25
+      }
      },
      "output": {
-      "price": 0.14
+      "price": 5
      }
     }
    },
    "modalities": {
     "input": [
-     "text"
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
     ],
     "output": [
      "text"
@@ -299,16 +172,16 @@
     }
    },
    "open_weights": false,
-   "knowledge": "2024-10",
-   "last_updated": "2024-12-03"
+   "knowledge": "2025-02-28",
+   "last_updated": "2025-10-15"
   },
-  "gpt-5.6-sol": {
-   "id": "gpt-5.6-sol",
-   "name": "gpt-5.6-sol",
-   "description": "Frontier GPT-5.6 model for complex professional work, coding, and agentic workflows",
+  "gpt-5.6-terra": {
+   "id": "gpt-5.6-terra",
+   "name": "gpt-5.6-terra",
+   "description": "Balanced GPT-5.6 model for capable, cost-efficient everyday work",
    "type": "chat",
-   "family": "gpt-sol",
-   "canonical_id": "openai/gpt-5.6-sol",
+   "family": "gpt-terra",
+   "canonical_id": "openai/gpt-5.6-terra",
    "release_date": "2026-07-09",
    "limit": {
     "context": 1050000,
@@ -340,9 +213,9 @@
    "cost": {
     "text": {
      "input": {
-      "price": 4,
+      "price": 2,
       "cache": {
-       "read": 0.4
+       "read": 0.2
       },
       "overrides": [
        {
@@ -351,15 +224,15 @@
           "gt": 272000
          }
         },
-        "price": 8,
+        "price": 4,
         "cache": {
-         "read": 0.8
+         "read": 0.4
         }
        }
       ]
      },
      "output": {
-      "price": 20,
+      "price": 12,
       "overrides": [
        {
         "when": {
@@ -367,7 +240,7 @@
           "gt": 272000
          }
         },
-        "price": 30
+        "price": 18
        }
       ]
      }
@@ -403,91 +276,14 @@
    "knowledge": "2026-02-16",
    "last_updated": "2026-07-09"
   },
-  "anthropic--claude-4.7-opus": {
-   "id": "anthropic--claude-4.7-opus",
-   "name": "anthropic--claude-4.7-opus",
-   "description": "Stronger Opus tier for advanced software work and high-stakes reasoning",
-   "type": "chat",
-   "family": "claude-opus",
-   "canonical_id": "anthropic/claude-opus-4-7",
-   "release_date": "2026-04-16",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 5,
-      "cache": {
-       "read": 0.5,
-       "write": 6.25
-      }
-     },
-     "output": {
-      "price": 25
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${AICORE_DEPLOYMENT_URL}",
-     "sdk": {
-      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-01-31",
-   "last_updated": "2026-04-16"
-  },
-  "anthropic--claude-4-sonnet": {
-   "id": "anthropic--claude-4-sonnet",
-   "name": "anthropic--claude-4-sonnet",
+  "anthropic--claude-4.5-sonnet": {
+   "id": "anthropic--claude-4.5-sonnet",
+   "name": "anthropic--claude-4.5-sonnet",
    "description": "Balanced Claude model for coding, analysis, agent workflows, and cost control",
    "type": "chat",
    "family": "claude-sonnet",
-   "canonical_id": "anthropic/claude-sonnet-4-20250514",
-   "status": "deprecated",
-   "release_date": "2025-05-22",
+   "canonical_id": "anthropic/claude-sonnet-4-5",
+   "release_date": "2025-09-29",
    "limit": {
     "context": 200000,
     "output": 64000
@@ -549,511 +345,8 @@
     }
    },
    "open_weights": false,
-   "knowledge": "2025-03-31",
-   "last_updated": "2025-05-22"
-  },
-  "gpt-4.1-nano": {
-   "id": "gpt-4.1-nano",
-   "name": "gpt-4.1-nano",
-   "description": "Tiny GPT-4.1 option for classification, routing, and very high-volume tasks",
-   "type": "chat",
-   "family": "gpt-nano",
-   "canonical_id": "openai/gpt-4.1-nano",
-   "status": "deprecated",
-   "release_date": "2025-04-14",
-   "limit": {
-    "context": 1047576,
-    "output": 32768
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.1
-     },
-     "output": {
-      "price": 0.4
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${AICORE_DEPLOYMENT_URL}",
-     "sdk": {
-      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2024-04",
-   "last_updated": "2025-04-14"
-  },
-  "sonar-deep-research": {
-   "id": "sonar-deep-research",
-   "name": "sonar-deep-research",
-   "description": "Sonar search model for autonomous research and citation-backed long-form reports",
-   "type": "chat",
-   "family": "sonar",
-   "canonical_id": "perplexity/sonar-deep-research",
-   "release_date": "2025-02-01",
-   "limit": {
-    "context": 128000,
-    "output": 32768
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2
-     },
-     "output": {
-      "price": 8,
-      "reasoning": 3
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${AICORE_DEPLOYMENT_URL}",
-     "sdk": {
-      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-01",
-   "last_updated": "2025-09-01"
-  },
-  "gemini-3.1-flash-lite": {
-   "id": "gemini-3.1-flash-lite",
-   "name": "gemini-3.1-flash-lite",
-   "description": "Low-latency Gemini model for high-volume multimodal and agent workloads",
-   "type": "chat",
-   "family": "gemini-flash-lite",
-   "canonical_id": "google/gemini-3.1-flash-lite",
-   "release_date": "2026-05-07",
-   "limit": {
-    "context": 1048576,
-    "output": 65536
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.25,
-      "cache": {
-       "read": 0.025
-      }
-     },
-     "output": {
-      "price": 1.5
-     }
-    },
-    "audio": {
-     "input": {
-      "price": 0.5
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp",
-     "audio/wav",
-     "audio/mp3",
-     "audio/aiff",
-     "audio/aac",
-     "audio/ogg",
-     "audio/flac",
-     "audio/mpeg",
-     "audio/m4a",
-     "audio/l16",
-     "audio/opus",
-     "audio/alaw",
-     "audio/mulaw",
-     "audio/webm",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${AICORE_DEPLOYMENT_URL}",
-     "sdk": {
-      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-01",
-   "last_updated": "2026-05-07"
-  },
-  "mistralai--mistral-small": {
-   "id": "mistralai--mistral-small",
-   "name": "mistralai--mistral-small",
-   "description": "Fast Mistral production model for chat, extraction, and cost-sensitive agents",
-   "type": "chat",
-   "family": "mistral-small",
-   "canonical_id": "mistral/mistral-small-2603",
-   "status": "deprecated",
-   "release_date": "2026-03-16",
-   "limit": {
-    "context": 128000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.15
-     },
-     "output": {
-      "price": 0.6
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/gif"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${AICORE_DEPLOYMENT_URL}",
-     "sdk": {
-      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-06",
-   "last_updated": "2026-03-16"
-  },
-  "gpt-5.4": {
-   "id": "gpt-5.4",
-   "name": "gpt-5.4",
-   "description": "Agent-ready GPT for coding and computer-use workflows at a lower cost",
-   "type": "chat",
-   "family": "gpt",
-   "canonical_id": "openai/gpt-5.4",
-   "release_date": "2026-03-05",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "xhigh"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2.5,
-      "cache": {
-       "read": 0.25
-      }
-     },
-     "output": {
-      "price": 15
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${AICORE_DEPLOYMENT_URL}",
-     "sdk": {
-      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2026-03-05"
-  },
-  "gpt-5.2": {
-   "id": "gpt-5.2",
-   "name": "gpt-5.2",
-   "description": "Reliable GPT generation for broad coding, writing, and tool-assisted product work",
-   "type": "chat",
-   "family": "gpt",
-   "canonical_id": "openai/gpt-5.2",
-   "release_date": "2025-12-11",
-   "limit": {
-    "context": 400000,
-    "input": 272000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.75,
-      "cache": {
-       "read": 0.175
-      }
-     },
-     "output": {
-      "price": 14
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${AICORE_DEPLOYMENT_URL}",
-     "sdk": {
-      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2025-12-11"
-  },
-  "amazon--titan-embed-text": {
-   "id": "amazon--titan-embed-text",
-   "name": "amazon--titan-embed-text",
-   "description": "Embedding model for semantic search, retrieval, clustering, and ranking pipelines",
-   "type": "chat",
-   "release_date": "2024-04-30",
-   "limit": {
-    "context": 8192,
-    "output": 1536
-   },
-   "capabilities": {
-    "temperature": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.02
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${AICORE_DEPLOYMENT_URL}",
-     "sdk": {
-      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2024-04-30"
+   "knowledge": "2025-07-31",
+   "last_updated": "2025-09-29"
   },
   "gpt-5-nano": {
    "id": "gpt-5-nano",
@@ -1130,944 +423,38 @@
    "knowledge": "2024-05-30",
    "last_updated": "2025-08-07"
   },
-  "gpt-4.1-mini": {
-   "id": "gpt-4.1-mini",
-   "name": "gpt-4.1-mini",
-   "description": "Affordable GPT-4.1 lane for fast coding help and structured extraction",
+  "sonar-pro": {
+   "id": "sonar-pro",
+   "name": "sonar-pro",
+   "description": "Deeper Sonar search model with broader retrieval and stronger synthesis",
    "type": "chat",
-   "family": "gpt-mini",
-   "canonical_id": "openai/gpt-4.1-mini",
-   "status": "deprecated",
-   "release_date": "2025-04-14",
-   "limit": {
-    "context": 1047576,
-    "output": 32768
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.4,
-      "cache": {
-       "read": 0.1
-      }
-     },
-     "output": {
-      "price": 1.6
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${AICORE_DEPLOYMENT_URL}",
-     "sdk": {
-      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2024-04",
-   "last_updated": "2025-04-14"
-  },
-  "gpt-4.1": {
-   "id": "gpt-4.1",
-   "name": "gpt-4.1",
-   "description": "Long-lived GPT workhorse for coding, instruction following, and production apps",
-   "type": "chat",
-   "family": "gpt",
-   "canonical_id": "openai/gpt-4.1",
-   "status": "deprecated",
-   "release_date": "2025-04-14",
-   "limit": {
-    "context": 1047576,
-    "output": 32768
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2,
-      "cache": {
-       "read": 0.5
-      }
-     },
-     "output": {
-      "price": 8
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${AICORE_DEPLOYMENT_URL}",
-     "sdk": {
-      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2024-04",
-   "last_updated": "2025-04-14"
-  },
-  "gpt-6.1-sol": {
-   "id": "gpt-6.1-sol",
-   "name": "GPT-6.1 Sol",
-   "description": "Near-Astra performance for complex coding, computer use, and professional work at a lower cost.",
-   "type": "chat",
-   "family": "gpt-sol",
-   "canonical_id": "openai/gpt-6.1-sol",
-   "release_date": "2026-09-29",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${AICORE_DEPLOYMENT_URL}",
-     "sdk": {
-      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-04-30",
-   "last_updated": "2026-09-29"
-  },
-  "anthropic--claude-4.5-sonnet": {
-   "id": "anthropic--claude-4.5-sonnet",
-   "name": "anthropic--claude-4.5-sonnet",
-   "description": "Balanced Claude model for coding, analysis, agent workflows, and cost control",
-   "type": "chat",
-   "family": "claude-sonnet",
-   "canonical_id": "anthropic/claude-sonnet-4-5",
-   "release_date": "2025-09-29",
+   "family": "sonar-pro",
+   "canonical_id": "perplexity/sonar-pro",
+   "release_date": "2024-01-01",
    "limit": {
     "context": 200000,
-    "output": 64000
+    "output": 8192
    },
    "capabilities": {
     "temperature": true,
-    "top_k": true,
+    "top_k": false,
     "top_p": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
-     "supported": true
+     "supported": false
     },
     "reasoning": {
-     "supported": true,
-     "budget": {
-      "min": 1024
-     }
+     "supported": false
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 3,
-      "cache": {
-       "read": 0.3,
-       "write": 3.75
-      }
+      "price": 3
      },
      "output": {
       "price": 15
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${AICORE_DEPLOYMENT_URL}",
-     "sdk": {
-      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-07-31",
-   "last_updated": "2025-09-29"
-  },
-  "gemini-embedding": {
-   "id": "gemini-embedding",
-   "name": "Gemini Embedding 001",
-   "description": "Embedding model for semantic search, retrieval, clustering, and ranking pipelines",
-   "type": "embedding",
-   "family": "gemini",
-   "canonical_id": "google/gemini-embedding-001",
-   "release_date": "2025-05-20",
-   "limit": {
-    "context": 2048,
-    "output": 1
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "embedding"
-    ]
-   },
-   "api": {
-    "embeddings": {
-     "base_url": "${AICORE_DEPLOYMENT_URL}",
-     "sdk": {
-      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-05",
-   "last_updated": "2025-05-20"
-  },
-  "gemini-2.5-flash": {
-   "id": "gemini-2.5-flash",
-   "name": "gemini-2.5-flash",
-   "description": "Fast Gemini workhorse for multimodal apps where latency and price matter",
-   "type": "chat",
-   "family": "gemini-flash",
-   "canonical_id": "google/gemini-2.5-flash",
-   "status": "deprecated",
-   "release_date": "2025-06-17",
-   "limit": {
-    "context": 1048576,
-    "output": 65536
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "budget": {
-      "min": 0,
-      "max": 24576
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.3,
-      "cache": {
-       "read": 0.03
-      }
-     },
-     "output": {
-      "price": 2.5
-     }
-    },
-    "audio": {
-     "input": {
-      "price": 1
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "audio/wav",
-     "audio/mp3",
-     "audio/aiff",
-     "audio/aac",
-     "audio/ogg",
-     "audio/flac",
-     "audio/mpeg",
-     "audio/m4a",
-     "audio/l16",
-     "audio/opus",
-     "audio/alaw",
-     "audio/mulaw",
-     "audio/webm",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${AICORE_DEPLOYMENT_URL}",
-     "sdk": {
-      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-01",
-   "last_updated": "2025-06-17"
-  },
-  "gemini-3.5-flash": {
-   "id": "gemini-3.5-flash",
-   "name": "gemini-3.5-flash",
-   "description": "Fast Gemini model balancing multimodal reasoning, tool use, and cost",
-   "type": "chat",
-   "family": "gemini-flash",
-   "canonical_id": "google/gemini-3.5-flash",
-   "release_date": "2026-05-19",
-   "limit": {
-    "context": 1048576,
-    "output": 65536
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.5,
-      "cache": {
-       "read": 0.15
-      }
-     },
-     "output": {
-      "price": 9
-     }
-    },
-    "audio": {
-     "input": {
-      "price": 1.5
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp",
-     "audio/wav",
-     "audio/mp3",
-     "audio/aiff",
-     "audio/aac",
-     "audio/ogg",
-     "audio/flac",
-     "audio/mpeg",
-     "audio/m4a",
-     "audio/l16",
-     "audio/opus",
-     "audio/alaw",
-     "audio/mulaw",
-     "audio/webm",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${AICORE_DEPLOYMENT_URL}",
-     "sdk": {
-      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-01",
-   "last_updated": "2026-05-19"
-  },
-  "sap-abap-1": {
-   "id": "sap-abap-1",
-   "name": "sap-abap-1",
-   "description": "SAP-hosted model for ABAP code generation and enterprise development tasks",
-   "type": "chat",
-   "status": "deprecated",
-   "release_date": "2025-11-26",
-   "limit": {
-    "context": 32768,
-    "output": 4096
-   },
-   "capabilities": {
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${AICORE_DEPLOYMENT_URL}",
-     "sdk": {
-      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2025-11-26"
-  },
-  "gemini-3.8-flash": {
-   "id": "gemini-3.8-flash",
-   "name": "Gemini 3.8 Flash",
-   "description": "Google's most intelligent Flash model, engineered for long-horizon software engineering, autonomous agents, and complex enterprise workflows",
-   "type": "chat",
-   "family": "gemini-flash",
-   "canonical_id": "google/gemini-3.8-flash",
-   "release_date": "2026-09-02",
-   "limit": {
-    "context": 1048576,
-    "output": 65536
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp",
-     "audio/wav",
-     "audio/mp3",
-     "audio/aiff",
-     "audio/aac",
-     "audio/ogg",
-     "audio/flac",
-     "audio/mpeg",
-     "audio/m4a",
-     "audio/l16",
-     "audio/opus",
-     "audio/alaw",
-     "audio/mulaw",
-     "audio/webm",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${AICORE_DEPLOYMENT_URL}",
-     "sdk": {
-      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-09-02"
-  },
-  "gemini-2.5-flash-lite": {
-   "id": "gemini-2.5-flash-lite",
-   "name": "gemini-2.5-flash-lite",
-   "description": "Lean Gemini 2.5 lane for cheap multimodal traffic and quick agents",
-   "type": "chat",
-   "family": "gemini-flash-lite",
-   "canonical_id": "google/gemini-2.5-flash-lite",
-   "status": "deprecated",
-   "release_date": "2025-06-17",
-   "limit": {
-    "context": 1048576,
-    "output": 65536
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "budget": {
-      "min": 512,
-      "max": 24576
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.1,
-      "cache": {
-       "read": 0.01
-      }
-     },
-     "output": {
-      "price": 0.4
-     }
-    },
-    "audio": {
-     "input": {
-      "price": 0.3
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "audio/wav",
-     "audio/mp3",
-     "audio/aiff",
-     "audio/aac",
-     "audio/ogg",
-     "audio/flac",
-     "audio/mpeg",
-     "audio/m4a",
-     "audio/l16",
-     "audio/opus",
-     "audio/alaw",
-     "audio/mulaw",
-     "audio/webm",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${AICORE_DEPLOYMENT_URL}",
-     "sdk": {
-      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-01",
-   "last_updated": "2025-06-17"
-  },
-  "gpt-5-mini": {
-   "id": "gpt-5-mini",
-   "name": "gpt-5-mini",
-   "description": "Small GPT-5 for responsive agents, coding help, and everyday automation",
-   "type": "chat",
-   "family": "gpt-mini",
-   "canonical_id": "openai/gpt-5-mini",
-   "release_date": "2025-08-07",
-   "limit": {
-    "context": 400000,
-    "input": 272000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.25,
-      "cache": {
-       "read": 0.025
-      }
-     },
-     "output": {
-      "price": 2
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${AICORE_DEPLOYMENT_URL}",
-     "sdk": {
-      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2024-05-30",
-   "last_updated": "2025-08-07"
-  },
-  "cohere--command-a-reasoning": {
-   "id": "cohere--command-a-reasoning",
-   "name": "cohere--command-a-reasoning",
-   "description": "Cohere reasoning model for multilingual enterprise agents, tools, and complex workflows",
-   "type": "chat",
-   "family": "command-a",
-   "canonical_id": "cohere/command-a-reasoning-08-2025",
-   "status": "deprecated",
-   "release_date": "2025-08-21",
-   "limit": {
-    "context": 256000,
-    "output": 32000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ],
-     "budget": {
-      "min": 1
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2.5
-     },
-     "output": {
-      "price": 10
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${AICORE_DEPLOYMENT_URL}",
-     "sdk": {
-      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2024-06-01",
-   "last_updated": "2025-08-21"
-  },
-  "mistralai--mistral-medium-instruct": {
-   "id": "mistralai--mistral-medium-instruct",
-   "name": "mistralai--mistral-medium-instruct",
-   "description": "Mistral model for multilingual chat, reasoning, and tool-assisted workflows",
-   "type": "chat",
-   "family": "mistral-medium",
-   "canonical_id": "mistral/mistral-medium-2505",
-   "status": "deprecated",
-   "release_date": "2025-05-07",
-   "limit": {
-    "context": 128000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.4
-     },
-     "output": {
-      "price": 2
      }
     }
    },
@@ -2088,294 +475,12 @@
      "base_url": "${AICORE_DEPLOYMENT_URL}",
      "sdk": {
       "aisdk": "@jerome-benoit/sap-ai-provider-v2"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
      }
     }
    },
    "open_weights": false,
-   "knowledge": "2025-05",
-   "last_updated": "2025-05-07"
-  },
-  "anthropic--claude-4.5-opus": {
-   "id": "anthropic--claude-4.5-opus",
-   "name": "anthropic--claude-4.5-opus",
-   "description": "Flagship Claude model for deep reasoning, coding, and long-horizon agents",
-   "type": "chat",
-   "family": "claude-opus",
-   "canonical_id": "anthropic/claude-opus-4-5",
-   "release_date": "2025-11-24",
-   "limit": {
-    "context": 200000,
-    "output": 64000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ],
-     "budget": {
-      "min": 1024
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 5,
-      "cache": {
-       "read": 0.5,
-       "write": 6.25
-      }
-     },
-     "output": {
-      "price": 25
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${AICORE_DEPLOYMENT_URL}",
-     "sdk": {
-      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-05",
-   "last_updated": "2025-11-24"
-  },
-  "anthropic--claude-4.6-sonnet": {
-   "id": "anthropic--claude-4.6-sonnet",
-   "name": "anthropic--claude-4.6-sonnet",
-   "description": "Claude workhorse for coding agents, careful analysis, and production cost control",
-   "type": "chat",
-   "family": "claude-sonnet",
-   "canonical_id": "anthropic/claude-sonnet-4-6",
-   "release_date": "2026-02-17",
-   "limit": {
-    "context": 1000000,
-    "output": 64000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "max"
-     ],
-     "budget": {
-      "min": 1024
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 3,
-      "cache": {
-       "read": 0.3,
-       "write": 3.75
-      }
-     },
-     "output": {
-      "price": 15
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${AICORE_DEPLOYMENT_URL}",
-     "sdk": {
-      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2026-03-13"
-  },
-  "mistralai--mistral-medium": {
-   "id": "mistralai--mistral-medium",
-   "name": "Mistral Medium 3.5",
-   "description": "Balanced Mistral model for enterprise assistants, multilingual work, and tools",
-   "type": "chat",
-   "family": "mistral-medium",
-   "canonical_id": "mistral/mistral-medium-2604",
-   "release_date": "2026-04-29",
-   "limit": {
-    "context": 262144,
-    "output": 262144
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "high"
-     ]
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/gif"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${AICORE_DEPLOYMENT_URL}",
-     "sdk": {
-      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-04-29"
-  },
-  "gpt-6-astra": {
-   "id": "gpt-6-astra",
-   "name": "GPT-6 Astra",
-   "description": "GPT-6 Astra is OpenAI's most capable model for complex reasoning, coding, computer use, research, and document creation.",
-   "type": "chat",
-   "family": "gpt-astra",
-   "canonical_id": "openai/gpt-6-astra",
-   "release_date": "2026-09-04",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${AICORE_DEPLOYMENT_URL}",
-     "sdk": {
-      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-04-30",
-   "last_updated": "2026-09-04"
+   "knowledge": "2025-09-01",
+   "last_updated": "2025-09-01"
   },
   "gemini-3.5-flash-lite": {
    "id": "gemini-3.5-flash-lite",
@@ -2462,17 +567,18 @@
    "knowledge": "2026-03",
    "last_updated": "2026-07-21"
   },
-  "anthropic--claude-3-haiku": {
-   "id": "anthropic--claude-3-haiku",
-   "name": "anthropic--claude-3-haiku",
-   "description": "Legacy model retained for compatibility with older integrations",
+  "cohere--command-a-reasoning": {
+   "id": "cohere--command-a-reasoning",
+   "name": "cohere--command-a-reasoning",
+   "description": "Cohere reasoning model for multilingual enterprise agents, tools, and complex workflows",
    "type": "chat",
-   "family": "claude-haiku",
-   "canonical_id": "anthropic/claude-3-haiku-20240307",
-   "release_date": "2024-03-13",
+   "family": "command-a",
+   "canonical_id": "cohere/command-a-reasoning-08-2025",
+   "status": "deprecated",
+   "release_date": "2025-08-21",
    "limit": {
-    "context": 200000,
-    "output": 4096
+    "context": 256000,
+    "output": 32000
    },
    "capabilities": {
     "temperature": true,
@@ -2484,7 +590,85 @@
      "supported": true
     },
     "reasoning": {
-     "supported": false
+     "supported": true,
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ],
+     "budget": {
+      "min": 1
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2.5
+     },
+     "output": {
+      "price": 10
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${AICORE_DEPLOYMENT_URL}",
+     "sdk": {
+      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-06-01",
+   "last_updated": "2025-08-21"
+  },
+  "gpt-5-mini": {
+   "id": "gpt-5-mini",
+   "name": "gpt-5-mini",
+   "description": "Small GPT-5 for responsive agents, coding help, and everyday automation",
+   "type": "chat",
+   "family": "gpt-mini",
+   "canonical_id": "openai/gpt-5-mini",
+   "release_date": "2025-08-07",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
     }
    },
    "cost": {
@@ -2492,12 +676,87 @@
      "input": {
       "price": 0.25,
       "cache": {
-       "read": 0.03,
-       "write": 0.3
+       "read": 0.025
       }
      },
      "output": {
-      "price": 1.25
+      "price": 2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${AICORE_DEPLOYMENT_URL}",
+     "sdk": {
+      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2024-05-30",
+   "last_updated": "2025-08-07"
+  },
+  "anthropic--claude-4.5-opus": {
+   "id": "anthropic--claude-4.5-opus",
+   "name": "anthropic--claude-4.5-opus",
+   "description": "Flagship Claude model for deep reasoning, coding, and long-horizon agents",
+   "type": "chat",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-4-5",
+   "release_date": "2025-11-24",
+   "limit": {
+    "context": 200000,
+    "output": 64000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ],
+     "budget": {
+      "min": 1024
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5,
+       "write": 6.25
+      }
+     },
+     "output": {
+      "price": 25
      }
     }
    },
@@ -2528,17 +787,96 @@
     }
    },
    "open_weights": false,
-   "knowledge": "2023-08-31",
-   "last_updated": "2024-03-13"
+   "knowledge": "2025-05",
+   "last_updated": "2025-11-24"
   },
-  "anthropic--claude-4.5-haiku": {
-   "id": "anthropic--claude-4.5-haiku",
-   "name": "anthropic--claude-4.5-haiku",
-   "description": "Fast Claude lane for lightweight agents, office tasks, and responsive chat",
+  "anthropic--claude-4.6-opus": {
+   "id": "anthropic--claude-4.6-opus",
+   "name": "anthropic--claude-4.6-opus",
+   "description": "High-end Claude for difficult coding, planning, and slower expert reasoning",
    "type": "chat",
-   "family": "claude-haiku",
-   "canonical_id": "anthropic/claude-haiku-4-5",
-   "release_date": "2025-10-15",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-4-6",
+   "release_date": "2026-02-05",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "max"
+     ],
+     "budget": {
+      "min": 1024
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5,
+       "write": 6.25
+      }
+     },
+     "output": {
+      "price": 25
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${AICORE_DEPLOYMENT_URL}",
+     "sdk": {
+      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-05-31",
+   "last_updated": "2026-03-13"
+  },
+  "anthropic--claude-4-sonnet": {
+   "id": "anthropic--claude-4-sonnet",
+   "name": "anthropic--claude-4-sonnet",
+   "description": "Balanced Claude model for coding, analysis, agent workflows, and cost control",
+   "type": "chat",
+   "family": "claude-sonnet",
+   "canonical_id": "anthropic/claude-sonnet-4-20250514",
+   "status": "deprecated",
+   "release_date": "2025-05-22",
    "limit": {
     "context": 200000,
     "output": 64000
@@ -2562,14 +900,14 @@
    "cost": {
     "text": {
      "input": {
-      "price": 1,
+      "price": 3,
       "cache": {
-       "read": 0.1,
-       "write": 1.25
+       "read": 0.3,
+       "write": 3.75
       }
      },
      "output": {
-      "price": 5
+      "price": 15
      }
     }
    },
@@ -2600,8 +938,8 @@
     }
    },
    "open_weights": false,
-   "knowledge": "2025-02-28",
-   "last_updated": "2025-10-15"
+   "knowledge": "2025-03-31",
+   "last_updated": "2025-05-22"
   },
   "gpt-5.5": {
    "id": "gpt-5.5",
@@ -2680,81 +1018,26 @@
    "knowledge": "2025-12-01",
    "last_updated": "2026-04-23"
   },
-  "sonar": {
-   "id": "sonar",
-   "name": "sonar",
-   "description": "Fast web-grounded Sonar for current answers, citations, and lightweight retrieval",
+  "amazon--nova-pro": {
+   "id": "amazon--nova-pro",
+   "name": "amazon--nova-pro",
+   "description": "Flagship model for demanding analysis, coding, and production agent workflows",
    "type": "chat",
-   "family": "sonar",
-   "canonical_id": "perplexity/sonar",
-   "release_date": "2024-01-01",
+   "family": "nova-pro",
+   "canonical_id": "amazon/nova-pro",
+   "release_date": "2024-12-03",
    "limit": {
-    "context": 128000,
-    "output": 4096
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1
-     },
-     "output": {
-      "price": 1
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${AICORE_DEPLOYMENT_URL}",
-     "sdk": {
-      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-09-01",
-   "last_updated": "2025-09-01"
-  },
-  "sonar-pro": {
-   "id": "sonar-pro",
-   "name": "sonar-pro",
-   "description": "Deeper Sonar search model with broader retrieval and stronger synthesis",
-   "type": "chat",
-   "family": "sonar-pro",
-   "canonical_id": "perplexity/sonar-pro",
-   "release_date": "2024-01-01",
-   "limit": {
-    "context": 200000,
+    "context": 300000,
     "output": 8192
    },
    "capabilities": {
     "temperature": true,
-    "top_k": false,
+    "top_k": true,
     "top_p": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
-     "supported": false
+     "supported": true
     },
     "reasoning": {
      "supported": false
@@ -2763,10 +1046,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 3
+      "price": 0.8
      },
      "output": {
-      "price": 15
+      "price": 3.2
      }
     }
    },
@@ -2775,8 +1058,16 @@
      "text",
      "image/png",
      "image/jpeg",
+     "image/gif",
      "image/webp",
-     "image/gif"
+     "video/mp4",
+     "video/quicktime",
+     "video/x-matroska",
+     "video/webm",
+     "video/x-flv",
+     "video/mpeg",
+     "video/x-ms-wmv",
+     "video/3gpp"
     ],
     "output": [
      "text"
@@ -2787,12 +1078,357 @@
      "base_url": "${AICORE_DEPLOYMENT_URL}",
      "sdk": {
       "aisdk": "@jerome-benoit/sap-ai-provider-v2"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
      }
     }
    },
    "open_weights": false,
-   "knowledge": "2025-09-01",
-   "last_updated": "2025-09-01"
+   "knowledge": "2024-10",
+   "last_updated": "2024-12-03"
+  },
+  "anthropic--claude-3-haiku": {
+   "id": "anthropic--claude-3-haiku",
+   "name": "anthropic--claude-3-haiku",
+   "description": "Legacy model retained for compatibility with older integrations",
+   "type": "chat",
+   "family": "claude-haiku",
+   "canonical_id": "anthropic/claude-3-haiku-20240307",
+   "release_date": "2024-03-13",
+   "limit": {
+    "context": 200000,
+    "output": 4096
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.25,
+      "cache": {
+       "read": 0.03,
+       "write": 0.3
+      }
+     },
+     "output": {
+      "price": 1.25
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${AICORE_DEPLOYMENT_URL}",
+     "sdk": {
+      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2023-08-31",
+   "last_updated": "2024-03-13"
+  },
+  "anthropic--claude-4.7-opus": {
+   "id": "anthropic--claude-4.7-opus",
+   "name": "anthropic--claude-4.7-opus",
+   "description": "Stronger Opus tier for advanced software work and high-stakes reasoning",
+   "type": "chat",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-4-7",
+   "release_date": "2026-04-16",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5,
+       "write": 6.25
+      }
+     },
+     "output": {
+      "price": 25
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${AICORE_DEPLOYMENT_URL}",
+     "sdk": {
+      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-01-31",
+   "last_updated": "2026-04-16"
+  },
+  "text-embedding-3-small": {
+   "id": "text-embedding-3-small",
+   "name": "text-embedding-3-small",
+   "description": "Small, efficient OpenAI text embedding model",
+   "type": "embedding",
+   "family": "text-embedding",
+   "canonical_id": "openai/text-embedding-3-small",
+   "release_date": "2024-01-25",
+   "limit": {
+    "context": 8191,
+    "output": 1536
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.02
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "embeddings": {
+     "base_url": "${AICORE_DEPLOYMENT_URL}",
+     "sdk": {
+      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2024-01-25"
+  },
+  "gpt-5.2": {
+   "id": "gpt-5.2",
+   "name": "gpt-5.2",
+   "description": "Reliable GPT generation for broad coding, writing, and tool-assisted product work",
+   "type": "chat",
+   "family": "gpt",
+   "canonical_id": "openai/gpt-5.2",
+   "release_date": "2025-12-11",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.75,
+      "cache": {
+       "read": 0.175
+      }
+     },
+     "output": {
+      "price": 14
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${AICORE_DEPLOYMENT_URL}",
+     "sdk": {
+      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2025-12-11"
+  },
+  "gpt-6-luna": {
+   "id": "gpt-6-luna",
+   "name": "GPT-6 Luna",
+   "description": "OpenAI's most efficient model for focused, high-volume tasks",
+   "type": "chat",
+   "family": "gpt-luna",
+   "canonical_id": "openai/gpt-6-luna",
+   "release_date": "2026-09-22",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${AICORE_DEPLOYMENT_URL}",
+     "sdk": {
+      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-05-18",
+   "last_updated": "2026-09-22"
   },
   "anthropic--claude-4-opus": {
    "id": "anthropic--claude-4-opus",
@@ -2919,132 +1555,6 @@
    "knowledge": "2025-11",
    "last_updated": "2026-04-22"
   },
-  "text-embedding-3-small": {
-   "id": "text-embedding-3-small",
-   "name": "text-embedding-3-small",
-   "description": "Small, efficient OpenAI text embedding model",
-   "type": "embedding",
-   "family": "text-embedding",
-   "canonical_id": "openai/text-embedding-3-small",
-   "release_date": "2024-01-25",
-   "limit": {
-    "context": 8191,
-    "output": 1536
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.02
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "embeddings": {
-     "base_url": "${AICORE_DEPLOYMENT_URL}",
-     "sdk": {
-      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2024-01-25"
-  },
-  "amazon--nova-pro": {
-   "id": "amazon--nova-pro",
-   "name": "amazon--nova-pro",
-   "description": "Flagship model for demanding analysis, coding, and production agent workflows",
-   "type": "chat",
-   "family": "nova-pro",
-   "canonical_id": "amazon/nova-pro",
-   "release_date": "2024-12-03",
-   "limit": {
-    "context": 300000,
-    "output": 8192
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.8
-     },
-     "output": {
-      "price": 3.2
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/gif",
-     "image/webp",
-     "video/mp4",
-     "video/quicktime",
-     "video/x-matroska",
-     "video/webm",
-     "video/x-flv",
-     "video/mpeg",
-     "video/x-ms-wmv",
-     "video/3gpp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${AICORE_DEPLOYMENT_URL}",
-     "sdk": {
-      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2024-10",
-   "last_updated": "2024-12-03"
-  },
   "nvidia--llama-3.2-nv-embedqa-1b": {
    "id": "nvidia--llama-3.2-nv-embedqa-1b",
    "name": "nvidia--llama-3.2-nv-embedqa-1b",
@@ -3085,6 +1595,143 @@
    },
    "open_weights": false,
    "last_updated": "2024-09-25"
+  },
+  "text-embedding-3-large": {
+   "id": "text-embedding-3-large",
+   "name": "text-embedding-3-large",
+   "description": "Most capable OpenAI embedding model for English and non-English text",
+   "type": "embedding",
+   "family": "text-embedding",
+   "canonical_id": "openai/text-embedding-3-large",
+   "release_date": "2024-01-25",
+   "limit": {
+    "context": 8191,
+    "output": 3072
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.13
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "embeddings": {
+     "base_url": "${AICORE_DEPLOYMENT_URL}",
+     "sdk": {
+      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2024-01-25"
+  },
+  "gemini-3.8-flash": {
+   "id": "gemini-3.8-flash",
+   "name": "Gemini 3.8 Flash",
+   "description": "Google's most intelligent Flash model, engineered for long-horizon software engineering, autonomous agents, and complex enterprise workflows",
+   "type": "chat",
+   "family": "gemini-flash",
+   "canonical_id": "google/gemini-3.8-flash",
+   "release_date": "2026-09-02",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${AICORE_DEPLOYMENT_URL}",
+     "sdk": {
+      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-09-02"
   },
   "gpt-5.6-luna": {
    "id": "gpt-5.6-luna",
@@ -3187,100 +1834,22 @@
    "knowledge": "2026-02-16",
    "last_updated": "2026-07-09"
   },
-  "anthropic--claude-4.6-opus": {
-   "id": "anthropic--claude-4.6-opus",
-   "name": "anthropic--claude-4.6-opus",
-   "description": "High-end Claude for difficult coding, planning, and slower expert reasoning",
+  "gemini-2.5-flash": {
+   "id": "gemini-2.5-flash",
+   "name": "gemini-2.5-flash",
+   "description": "Fast Gemini workhorse for multimodal apps where latency and price matter",
    "type": "chat",
-   "family": "claude-opus",
-   "canonical_id": "anthropic/claude-opus-4-6",
-   "release_date": "2026-02-05",
+   "family": "gemini-flash",
+   "canonical_id": "google/gemini-2.5-flash",
+   "status": "deprecated",
+   "release_date": "2025-06-17",
    "limit": {
-    "context": 1000000,
-    "output": 128000
+    "context": 1048576,
+    "output": 65536
    },
    "capabilities": {
     "temperature": true,
     "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "max"
-     ],
-     "budget": {
-      "min": 1024
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 5,
-      "cache": {
-       "read": 0.5,
-       "write": 6.25
-      }
-     },
-     "output": {
-      "price": 25
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${AICORE_DEPLOYMENT_URL}",
-     "sdk": {
-      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-05-31",
-   "last_updated": "2026-03-13"
-  },
-  "gpt-5.6-terra": {
-   "id": "gpt-5.6-terra",
-   "name": "gpt-5.6-terra",
-   "description": "Balanced GPT-5.6 model for capable, cost-efficient everyday work",
-   "type": "chat",
-   "family": "gpt-terra",
-   "canonical_id": "openai/gpt-5.6-terra",
-   "release_date": "2026-07-09",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
     "top_p": true,
     "structured_output": true,
     "system_updates": false,
@@ -3290,59 +1859,61 @@
     },
     "reasoning": {
      "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
+     "toggle": true,
+     "budget": {
+      "min": 0,
+      "max": 24576
+     }
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 2,
+      "price": 0.3,
       "cache": {
-       "read": 0.2
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 4,
-        "cache": {
-         "read": 0.4
-        }
-       }
-      ]
+       "read": 0.03
+      }
      },
      "output": {
-      "price": 12,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 18
-       }
-      ]
+      "price": 2.5
+     }
+    },
+    "audio": {
+     "input": {
+      "price": 1
      }
     }
    },
    "modalities": {
     "input": [
      "text",
-     "image/jpeg",
      "image/png",
-     "image/gif",
+     "image/jpeg",
      "image/webp",
+     "image/heic",
+     "image/heif",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp",
      "application/pdf"
     ],
     "output": [
@@ -3363,8 +1934,58 @@
     }
    },
    "open_weights": false,
-   "knowledge": "2026-02-16",
-   "last_updated": "2026-07-09"
+   "knowledge": "2025-01",
+   "last_updated": "2025-06-17"
+  },
+  "amazon--titan-embed-text": {
+   "id": "amazon--titan-embed-text",
+   "name": "amazon--titan-embed-text",
+   "description": "Embedding model for semantic search, retrieval, clustering, and ranking pipelines",
+   "type": "chat",
+   "release_date": "2024-04-30",
+   "limit": {
+    "context": 8192,
+    "output": 1536
+   },
+   "capabilities": {
+    "temperature": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.02
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${AICORE_DEPLOYMENT_URL}",
+     "sdk": {
+      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2024-04-30"
   },
   "nvidia--llama-nemotron-embed-1b": {
    "id": "nvidia--llama-nemotron-embed-1b",
@@ -3410,23 +2031,23 @@
    "open_weights": true,
    "last_updated": "2025-10-16"
   },
-  "gpt-6-luna": {
-   "id": "gpt-6-luna",
-   "name": "GPT-6 Luna",
-   "description": "OpenAI's most efficient model for focused, high-volume tasks",
+  "gpt-6-astra": {
+   "id": "gpt-6-astra",
+   "name": "GPT-6 Astra",
+   "description": "GPT-6 Astra is OpenAI's most capable model for complex reasoning, coding, computer use, research, and document creation.",
    "type": "chat",
-   "family": "gpt-luna",
-   "canonical_id": "openai/gpt-6-luna",
-   "release_date": "2026-09-22",
+   "family": "gpt-astra",
+   "canonical_id": "openai/gpt-6-astra",
+   "release_date": "2026-09-04",
    "limit": {
     "context": 1050000,
     "input": 922000,
     "output": 128000
    },
    "capabilities": {
-    "temperature": true,
+    "temperature": false,
     "top_k": false,
-    "top_p": true,
+    "top_p": false,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -3436,7 +2057,6 @@
     "reasoning": {
      "supported": true,
      "effort": [
-      "none",
       "low",
       "medium",
       "high",
@@ -3472,8 +2092,455 @@
     }
    },
    "open_weights": false,
-   "knowledge": "2026-05-18",
-   "last_updated": "2026-09-22"
+   "knowledge": "2026-04-30",
+   "last_updated": "2026-09-04"
+  },
+  "gpt-5.4": {
+   "id": "gpt-5.4",
+   "name": "gpt-5.4",
+   "description": "Agent-ready GPT for coding and computer-use workflows at a lower cost",
+   "type": "chat",
+   "family": "gpt",
+   "canonical_id": "openai/gpt-5.4",
+   "release_date": "2026-03-05",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2.5,
+      "cache": {
+       "read": 0.25
+      }
+     },
+     "output": {
+      "price": 15
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${AICORE_DEPLOYMENT_URL}",
+     "sdk": {
+      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-03-05"
+  },
+  "gemini-embedding": {
+   "id": "gemini-embedding",
+   "name": "Gemini Embedding 001",
+   "description": "Embedding model for semantic search, retrieval, clustering, and ranking pipelines",
+   "type": "embedding",
+   "family": "gemini",
+   "canonical_id": "google/gemini-embedding-001",
+   "release_date": "2025-05-20",
+   "limit": {
+    "context": 2048,
+    "output": 1
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "api": {
+    "embeddings": {
+     "base_url": "${AICORE_DEPLOYMENT_URL}",
+     "sdk": {
+      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-05",
+   "last_updated": "2025-05-20"
+  },
+  "sonar": {
+   "id": "sonar",
+   "name": "sonar",
+   "description": "Fast web-grounded Sonar for current answers, citations, and lightweight retrieval",
+   "type": "chat",
+   "family": "sonar",
+   "canonical_id": "perplexity/sonar",
+   "release_date": "2024-01-01",
+   "limit": {
+    "context": 128000,
+    "output": 4096
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1
+     },
+     "output": {
+      "price": 1
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${AICORE_DEPLOYMENT_URL}",
+     "sdk": {
+      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-09-01",
+   "last_updated": "2025-09-01"
+  },
+  "gpt-6.1-sol": {
+   "id": "gpt-6.1-sol",
+   "name": "GPT-6.1 Sol",
+   "description": "Near-Astra performance for complex coding, computer use, and professional work at a lower cost.",
+   "type": "chat",
+   "family": "gpt-sol",
+   "canonical_id": "openai/gpt-6.1-sol",
+   "release_date": "2026-09-29",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${AICORE_DEPLOYMENT_URL}",
+     "sdk": {
+      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-04-30",
+   "last_updated": "2026-09-29"
+  },
+  "gemini-3.5-flash": {
+   "id": "gemini-3.5-flash",
+   "name": "gemini-3.5-flash",
+   "description": "Fast Gemini model balancing multimodal reasoning, tool use, and cost",
+   "type": "chat",
+   "family": "gemini-flash",
+   "canonical_id": "google/gemini-3.5-flash",
+   "release_date": "2026-05-19",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.5,
+      "cache": {
+       "read": 0.15
+      }
+     },
+     "output": {
+      "price": 9
+     }
+    },
+    "audio": {
+     "input": {
+      "price": 1.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${AICORE_DEPLOYMENT_URL}",
+     "sdk": {
+      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2026-05-19"
+  },
+  "gemini-2.5-flash-lite": {
+   "id": "gemini-2.5-flash-lite",
+   "name": "gemini-2.5-flash-lite",
+   "description": "Lean Gemini 2.5 lane for cheap multimodal traffic and quick agents",
+   "type": "chat",
+   "family": "gemini-flash-lite",
+   "canonical_id": "google/gemini-2.5-flash-lite",
+   "status": "deprecated",
+   "release_date": "2025-06-17",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "budget": {
+      "min": 512,
+      "max": 24576
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1,
+      "cache": {
+       "read": 0.01
+      }
+     },
+     "output": {
+      "price": 0.4
+     }
+    },
+    "audio": {
+     "input": {
+      "price": 0.3
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${AICORE_DEPLOYMENT_URL}",
+     "sdk": {
+      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2025-06-17"
   },
   "amazon--nova-lite": {
    "id": "amazon--nova-lite",
@@ -3553,6 +2620,444 @@
    "knowledge": "2025-10",
    "last_updated": "2025-12-01"
   },
+  "sonar-deep-research": {
+   "id": "sonar-deep-research",
+   "name": "sonar-deep-research",
+   "description": "Sonar search model for autonomous research and citation-backed long-form reports",
+   "type": "chat",
+   "family": "sonar",
+   "canonical_id": "perplexity/sonar-deep-research",
+   "release_date": "2025-02-01",
+   "limit": {
+    "context": 128000,
+    "output": 32768
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2
+     },
+     "output": {
+      "price": 8,
+      "reasoning": 3
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${AICORE_DEPLOYMENT_URL}",
+     "sdk": {
+      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2025-09-01"
+  },
+  "gpt-5": {
+   "id": "gpt-5",
+   "name": "gpt-5",
+   "description": "Original GPT-5 workhorse for reasoning, coding, writing, and tool workflows",
+   "type": "chat",
+   "family": "gpt",
+   "canonical_id": "openai/gpt-5",
+   "release_date": "2025-08-07",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.25,
+      "cache": {
+       "read": 0.125
+      }
+     },
+     "output": {
+      "price": 10
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${AICORE_DEPLOYMENT_URL}",
+     "sdk": {
+      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2024-09-30",
+   "last_updated": "2025-08-07"
+  },
+  "gpt-4.1": {
+   "id": "gpt-4.1",
+   "name": "gpt-4.1",
+   "description": "Long-lived GPT workhorse for coding, instruction following, and production apps",
+   "type": "chat",
+   "family": "gpt",
+   "canonical_id": "openai/gpt-4.1",
+   "status": "deprecated",
+   "release_date": "2025-04-14",
+   "limit": {
+    "context": 1047576,
+    "output": 32768
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.5
+      }
+     },
+     "output": {
+      "price": 8
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${AICORE_DEPLOYMENT_URL}",
+     "sdk": {
+      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2024-04",
+   "last_updated": "2025-04-14"
+  },
+  "amazon--nova-micro": {
+   "id": "amazon--nova-micro",
+   "name": "amazon--nova-micro",
+   "description": "Efficient model for low-latency assistance, extraction, and routine automation",
+   "type": "chat",
+   "family": "nova-micro",
+   "canonical_id": "amazon/nova-micro",
+   "release_date": "2024-12-03",
+   "limit": {
+    "context": 128000,
+    "output": 8192
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.035
+     },
+     "output": {
+      "price": 0.14
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${AICORE_DEPLOYMENT_URL}",
+     "sdk": {
+      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2024-10",
+   "last_updated": "2024-12-03"
+  },
+  "gpt-4.1-mini": {
+   "id": "gpt-4.1-mini",
+   "name": "gpt-4.1-mini",
+   "description": "Affordable GPT-4.1 lane for fast coding help and structured extraction",
+   "type": "chat",
+   "family": "gpt-mini",
+   "canonical_id": "openai/gpt-4.1-mini",
+   "status": "deprecated",
+   "release_date": "2025-04-14",
+   "limit": {
+    "context": 1047576,
+    "output": 32768
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.4,
+      "cache": {
+       "read": 0.1
+      }
+     },
+     "output": {
+      "price": 1.6
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${AICORE_DEPLOYMENT_URL}",
+     "sdk": {
+      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2024-04",
+   "last_updated": "2025-04-14"
+  },
+  "gpt-5.6-sol": {
+   "id": "gpt-5.6-sol",
+   "name": "gpt-5.6-sol",
+   "description": "Frontier GPT-5.6 model for complex professional work, coding, and agentic workflows",
+   "type": "chat",
+   "family": "gpt-sol",
+   "canonical_id": "openai/gpt-5.6-sol",
+   "release_date": "2026-07-09",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 4,
+      "cache": {
+       "read": 0.4
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 8,
+        "cache": {
+         "read": 0.8
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 20,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 30
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${AICORE_DEPLOYMENT_URL}",
+     "sdk": {
+      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-02-16",
+   "last_updated": "2026-07-09"
+  },
   "anthropic--claude-4.8-opus": {
    "id": "anthropic--claude-4.8-opus",
    "name": "anthropic--claude-4.8-opus",
@@ -3630,23 +3135,204 @@
    "knowledge": "2026-01",
    "last_updated": "2026-05-28"
   },
-  "gpt-5": {
-   "id": "gpt-5",
-   "name": "gpt-5",
-   "description": "Original GPT-5 workhorse for reasoning, coding, writing, and tool workflows",
+  "sap-abap-1": {
+   "id": "sap-abap-1",
+   "name": "sap-abap-1",
+   "description": "SAP-hosted model for ABAP code generation and enterprise development tasks",
    "type": "chat",
-   "family": "gpt",
-   "canonical_id": "openai/gpt-5",
-   "release_date": "2025-08-07",
+   "status": "deprecated",
+   "release_date": "2025-11-26",
    "limit": {
-    "context": 400000,
-    "input": 272000,
-    "output": 128000
+    "context": 32768,
+    "output": 4096
    },
    "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
+    "temperature": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${AICORE_DEPLOYMENT_URL}",
+     "sdk": {
+      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-11-26"
+  },
+  "mistralai--mistral-medium": {
+   "id": "mistralai--mistral-medium",
+   "name": "Mistral Medium 3.5",
+   "description": "Balanced Mistral model for enterprise assistants, multilingual work, and tools",
+   "type": "chat",
+   "family": "mistral-medium",
+   "canonical_id": "mistral/mistral-medium-2604",
+   "release_date": "2026-04-29",
+   "limit": {
+    "context": 262144,
+    "output": 262144
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "high"
+     ]
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/gif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${AICORE_DEPLOYMENT_URL}",
+     "sdk": {
+      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-04-29"
+  },
+  "anthropic--claude-4.6-sonnet": {
+   "id": "anthropic--claude-4.6-sonnet",
+   "name": "anthropic--claude-4.6-sonnet",
+   "description": "Claude workhorse for coding agents, careful analysis, and production cost control",
+   "type": "chat",
+   "family": "claude-sonnet",
+   "canonical_id": "anthropic/claude-sonnet-4-6",
+   "release_date": "2026-02-17",
+   "limit": {
+    "context": 1000000,
+    "output": 64000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "max"
+     ],
+     "budget": {
+      "min": 1024
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 3,
+      "cache": {
+       "read": 0.3,
+       "write": 3.75
+      }
+     },
+     "output": {
+      "price": 15
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${AICORE_DEPLOYMENT_URL}",
+     "sdk": {
+      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-03-13"
+  },
+  "gemini-3.6-flash": {
+   "id": "gemini-3.6-flash",
+   "name": "Gemini 3.6 Flash",
+   "description": "Fast Gemini model balancing multimodal reasoning, tool use, and cost",
+   "type": "chat",
+   "family": "gemini-flash",
+   "canonical_id": "google/gemini-3.6-flash",
+   "release_date": "2026-07-21",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -3663,16 +3349,93 @@
      ]
     }
    },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${AICORE_DEPLOYMENT_URL}",
+     "sdk": {
+      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-03",
+   "last_updated": "2026-07-21"
+  },
+  "gpt-4.1-nano": {
+   "id": "gpt-4.1-nano",
+   "name": "gpt-4.1-nano",
+   "description": "Tiny GPT-4.1 option for classification, routing, and very high-volume tasks",
+   "type": "chat",
+   "family": "gpt-nano",
+   "canonical_id": "openai/gpt-4.1-nano",
+   "status": "deprecated",
+   "release_date": "2025-04-14",
+   "limit": {
+    "context": 1047576,
+    "output": 32768
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
    "cost": {
     "text": {
      "input": {
-      "price": 1.25,
-      "cache": {
-       "read": 0.125
-      }
+      "price": 0.1
      },
      "output": {
-      "price": 10
+      "price": 0.4
      }
     }
    },
@@ -3702,8 +3465,245 @@
     }
    },
    "open_weights": false,
-   "knowledge": "2024-09-30",
-   "last_updated": "2025-08-07"
+   "knowledge": "2024-04",
+   "last_updated": "2025-04-14"
+  },
+  "mistralai--mistral-small": {
+   "id": "mistralai--mistral-small",
+   "name": "mistralai--mistral-small",
+   "description": "Fast Mistral production model for chat, extraction, and cost-sensitive agents",
+   "type": "chat",
+   "family": "mistral-small",
+   "canonical_id": "mistral/mistral-small-2603",
+   "status": "deprecated",
+   "release_date": "2026-03-16",
+   "limit": {
+    "context": 128000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.15
+     },
+     "output": {
+      "price": 0.6
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/gif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${AICORE_DEPLOYMENT_URL}",
+     "sdk": {
+      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-06",
+   "last_updated": "2026-03-16"
+  },
+  "mistralai--mistral-medium-instruct": {
+   "id": "mistralai--mistral-medium-instruct",
+   "name": "mistralai--mistral-medium-instruct",
+   "description": "Mistral model for multilingual chat, reasoning, and tool-assisted workflows",
+   "type": "chat",
+   "family": "mistral-medium",
+   "canonical_id": "mistral/mistral-medium-2505",
+   "status": "deprecated",
+   "release_date": "2025-05-07",
+   "limit": {
+    "context": 128000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.4
+     },
+     "output": {
+      "price": 2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/gif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${AICORE_DEPLOYMENT_URL}",
+     "sdk": {
+      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-05",
+   "last_updated": "2025-05-07"
+  },
+  "gemini-3.1-flash-lite": {
+   "id": "gemini-3.1-flash-lite",
+   "name": "gemini-3.1-flash-lite",
+   "description": "Low-latency Gemini model for high-volume multimodal and agent workloads",
+   "type": "chat",
+   "family": "gemini-flash-lite",
+   "canonical_id": "google/gemini-3.1-flash-lite",
+   "release_date": "2026-05-07",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.25,
+      "cache": {
+       "read": 0.025
+      }
+     },
+     "output": {
+      "price": 1.5
+     }
+    },
+    "audio": {
+     "input": {
+      "price": 0.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${AICORE_DEPLOYMENT_URL}",
+     "sdk": {
+      "aisdk": "@jerome-benoit/sap-ai-provider-v2"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2026-05-07"
   }
  }
 }

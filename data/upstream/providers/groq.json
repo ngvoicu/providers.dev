@@ -6,6 +6,138 @@
   "GROQ_API_KEY"
  ],
  "models": {
+  "whisper-large-v3": {
+   "id": "whisper-large-v3",
+   "name": "Whisper",
+   "description": "Speech transcription model for accurate audio-to-text and captioning workflows",
+   "type": "transcription",
+   "family": "whisper",
+   "canonical_id": "openai/whisper-large-v3",
+   "release_date": "2023-11-06",
+   "limit": {
+    "context": 448,
+    "output": 448
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "audio": {
+     "input": {
+      "unit": "minute",
+      "price": 0.00185
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "audio/flac",
+     "audio/mpeg",
+     "audio/mp4",
+     "audio/ogg",
+     "audio/wav",
+     "audio/webm"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "transcriptions": {
+     "base_url": "https://api.groq.com/openai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/groq",
+      "opencodeai": "@opencode/ai/protocols/openai-transcription"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2023-11-06"
+  },
+  "llama-3.1-8b-instant": {
+   "id": "llama-3.1-8b-instant",
+   "name": "Llama 3.1 8B",
+   "description": "Compact Llama instruction model for fast chat and local deployment",
+   "type": "chat",
+   "family": "llama",
+   "canonical_id": "meta/llama-3.1-8b-instruct",
+   "status": "deprecated",
+   "release_date": "2024-07-23",
+   "limit": {
+    "context": 131072,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.05
+     },
+     "output": {
+      "price": 0.08
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.groq.com/openai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/groq",
+      "opencodeai": "@opencode/ai/providers/groq"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://api.groq.com/openai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2023-12",
+   "last_updated": "2024-07-23"
+  },
   "llama-3.3-70b-versatile": {
    "id": "llama-3.3-70b-versatile",
    "name": "Llama 3.3 70B",
@@ -138,80 +270,6 @@
    "open_weights": true,
    "last_updated": "2024-10-01"
   },
-  "llama-3.1-8b-instant": {
-   "id": "llama-3.1-8b-instant",
-   "name": "Llama 3.1 8B",
-   "description": "Compact Llama instruction model for fast chat and local deployment",
-   "type": "chat",
-   "family": "llama",
-   "canonical_id": "meta/llama-3.1-8b-instruct",
-   "status": "deprecated",
-   "release_date": "2024-07-23",
-   "limit": {
-    "context": 131072,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.05
-     },
-     "output": {
-      "price": 0.08
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.groq.com/openai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/groq",
-      "opencodeai": "@opencode/ai/providers/groq"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://api.groq.com/openai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2023-12",
-   "last_updated": "2024-07-23"
-  },
   "allam-2-7b": {
    "id": "allam-2-7b",
    "name": "ALLaM-2-7b",
@@ -275,304 +333,6 @@
    },
    "open_weights": true,
    "last_updated": "2025-01-23"
-  },
-  "whisper-large-v3": {
-   "id": "whisper-large-v3",
-   "name": "Whisper",
-   "description": "Speech transcription model for accurate audio-to-text and captioning workflows",
-   "type": "transcription",
-   "family": "whisper",
-   "canonical_id": "openai/whisper-large-v3",
-   "release_date": "2023-11-06",
-   "limit": {
-    "context": 448,
-    "output": 448
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "audio": {
-     "input": {
-      "unit": "minute",
-      "price": 0.00185
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "audio/flac",
-     "audio/mpeg",
-     "audio/mp4",
-     "audio/ogg",
-     "audio/wav",
-     "audio/webm"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "transcriptions": {
-     "base_url": "https://api.groq.com/openai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/groq",
-      "opencodeai": "@opencode/ai/protocols/openai-transcription"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2023-11-06"
-  },
-  "meta-llama/llama-prompt-guard-2-22m": {
-   "id": "meta-llama/llama-prompt-guard-2-22m",
-   "name": "Llama Prompt Guard 2 22M",
-   "description": "Safety model for policy screening, moderation, and risk-aware routing workflows",
-   "type": "chat",
-   "family": "llama",
-   "canonical_id": "meta/llama-prompt-guard-2-22m",
-   "status": "beta",
-   "release_date": "2025-04-29",
-   "limit": {
-    "context": 512,
-    "output": 512
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "service_tier": [
-     "flex"
-    ],
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.03
-     },
-     "output": {
-      "price": 0.03
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.groq.com/openai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/groq",
-      "opencodeai": "@opencode/ai/providers/groq"
-     }
-    },
-    "responses": {
-     "base_url": "https://api.groq.com/openai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-04-29"
-  },
-  "meta-llama/llama-prompt-guard-2-86m": {
-   "id": "meta-llama/llama-prompt-guard-2-86m",
-   "name": "Prompt Guard 2 86M",
-   "description": "Safety model for policy screening, moderation, and risk-aware routing workflows",
-   "type": "chat",
-   "family": "llama",
-   "canonical_id": "meta/llama-prompt-guard-2-86m",
-   "status": "beta",
-   "release_date": "2025-04-29",
-   "limit": {
-    "context": 512,
-    "output": 512
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "service_tier": [
-     "flex"
-    ],
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.04
-     },
-     "output": {
-      "price": 0.04
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.groq.com/openai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/groq",
-      "opencodeai": "@opencode/ai/providers/groq"
-     }
-    },
-    "responses": {
-     "base_url": "https://api.groq.com/openai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-04-29"
-  },
-  "canopylabs/orpheus-arabic-saudi": {
-   "id": "canopylabs/orpheus-arabic-saudi",
-   "name": "Canopy Labs Orpheus Arabic Saudi",
-   "description": "Speech generation model for controllable voice, narration, and audio delivery",
-   "type": "speech",
-   "family": "canopylabs",
-   "canonical_id": "canopylabs/orpheus-arabic-saudi",
-   "status": "beta",
-   "release_date": "2025-12-16",
-   "limit": {
-    "context": 4000,
-    "output": 50000
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 40,
-      "unit": "character"
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "audio/wav"
-    ]
-   },
-   "api": {
-    "speech": {
-     "base_url": "https://api.groq.com/openai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/protocols/openai-speech"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2025-12-16"
-  },
-  "canopylabs/orpheus-v1-english": {
-   "id": "canopylabs/orpheus-v1-english",
-   "name": "Canopy Labs Orpheus V1 English",
-   "description": "Speech generation model for controllable voice, narration, and audio delivery",
-   "type": "speech",
-   "family": "canopylabs",
-   "canonical_id": "canopylabs/orpheus-v1-english",
-   "status": "beta",
-   "release_date": "2025-12-19",
-   "limit": {
-    "context": 4000,
-    "output": 50000
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 22,
-      "unit": "character"
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "audio/wav"
-    ]
-   },
-   "api": {
-    "speech": {
-     "base_url": "https://api.groq.com/openai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/protocols/openai-speech"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2025-12-19"
   },
   "qwen/qwen3.8-27b": {
    "id": "qwen/qwen3.8-27b",
@@ -736,101 +496,6 @@
    "open_weights": true,
    "last_updated": "2026-04-22"
   },
-  "openai/gpt-oss-120b": {
-   "id": "openai/gpt-oss-120b",
-   "name": "GPT OSS 120B",
-   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
-   "type": "chat",
-   "family": "gpt-oss",
-   "canonical_id": "openai/gpt-oss-120b",
-   "release_date": "2025-08-05",
-   "limit": {
-    "context": 131072,
-    "output": 65536
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": {
-      "ttl": [
-       "2h"
-      ]
-     }
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "service_tier": [
-     "flex"
-    ],
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.15,
-      "cache": {
-       "read": 0.075
-      }
-     },
-     "output": {
-      "price": 0.6
-     }
-    },
-    "web_search": {
-     "price": 5
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.groq.com/openai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/groq",
-      "opencodeai": "@opencode/ai/providers/groq"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://api.groq.com/openai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2024-06",
-   "last_updated": "2025-08-05"
-  },
   "openai/gpt-oss-safeguard-20b": {
    "id": "openai/gpt-oss-safeguard-20b",
    "name": "Safety GPT OSS 20B",
@@ -926,6 +591,101 @@
    "open_weights": true,
    "last_updated": "2025-10-29"
   },
+  "openai/gpt-oss-120b": {
+   "id": "openai/gpt-oss-120b",
+   "name": "GPT OSS 120B",
+   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
+   "type": "chat",
+   "family": "gpt-oss",
+   "canonical_id": "openai/gpt-oss-120b",
+   "release_date": "2025-08-05",
+   "limit": {
+    "context": 131072,
+    "output": 65536
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": {
+      "ttl": [
+       "2h"
+      ]
+     }
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "service_tier": [
+     "flex"
+    ],
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.15,
+      "cache": {
+       "read": 0.075
+      }
+     },
+     "output": {
+      "price": 0.6
+     }
+    },
+    "web_search": {
+     "price": 5
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.groq.com/openai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/groq",
+      "opencodeai": "@opencode/ai/providers/groq"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://api.groq.com/openai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-06",
+   "last_updated": "2025-08-05"
+  },
   "openai/gpt-oss-20b": {
    "id": "openai/gpt-oss-20b",
    "name": "GPT OSS 20B",
@@ -1020,6 +780,246 @@
    "open_weights": true,
    "knowledge": "2024-06",
    "last_updated": "2025-08-05"
+  },
+  "canopylabs/orpheus-arabic-saudi": {
+   "id": "canopylabs/orpheus-arabic-saudi",
+   "name": "Canopy Labs Orpheus Arabic Saudi",
+   "description": "Speech generation model for controllable voice, narration, and audio delivery",
+   "type": "speech",
+   "family": "canopylabs",
+   "canonical_id": "canopylabs/orpheus-arabic-saudi",
+   "status": "beta",
+   "release_date": "2025-12-16",
+   "limit": {
+    "context": 4000,
+    "output": 50000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 40,
+      "unit": "character"
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "audio/wav"
+    ]
+   },
+   "api": {
+    "speech": {
+     "base_url": "https://api.groq.com/openai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/protocols/openai-speech"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-12-16"
+  },
+  "canopylabs/orpheus-v1-english": {
+   "id": "canopylabs/orpheus-v1-english",
+   "name": "Canopy Labs Orpheus V1 English",
+   "description": "Speech generation model for controllable voice, narration, and audio delivery",
+   "type": "speech",
+   "family": "canopylabs",
+   "canonical_id": "canopylabs/orpheus-v1-english",
+   "status": "beta",
+   "release_date": "2025-12-19",
+   "limit": {
+    "context": 4000,
+    "output": 50000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 22,
+      "unit": "character"
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "audio/wav"
+    ]
+   },
+   "api": {
+    "speech": {
+     "base_url": "https://api.groq.com/openai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/protocols/openai-speech"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-12-19"
+  },
+  "meta-llama/llama-prompt-guard-2-86m": {
+   "id": "meta-llama/llama-prompt-guard-2-86m",
+   "name": "Prompt Guard 2 86M",
+   "description": "Safety model for policy screening, moderation, and risk-aware routing workflows",
+   "type": "chat",
+   "family": "llama",
+   "canonical_id": "meta/llama-prompt-guard-2-86m",
+   "status": "beta",
+   "release_date": "2025-04-29",
+   "limit": {
+    "context": 512,
+    "output": 512
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "service_tier": [
+     "flex"
+    ],
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.04
+     },
+     "output": {
+      "price": 0.04
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.groq.com/openai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/groq",
+      "opencodeai": "@opencode/ai/providers/groq"
+     }
+    },
+    "responses": {
+     "base_url": "https://api.groq.com/openai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-04-29"
+  },
+  "meta-llama/llama-prompt-guard-2-22m": {
+   "id": "meta-llama/llama-prompt-guard-2-22m",
+   "name": "Llama Prompt Guard 2 22M",
+   "description": "Safety model for policy screening, moderation, and risk-aware routing workflows",
+   "type": "chat",
+   "family": "llama",
+   "canonical_id": "meta/llama-prompt-guard-2-22m",
+   "status": "beta",
+   "release_date": "2025-04-29",
+   "limit": {
+    "context": 512,
+    "output": 512
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "service_tier": [
+     "flex"
+    ],
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.03
+     },
+     "output": {
+      "price": 0.03
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.groq.com/openai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/groq",
+      "opencodeai": "@opencode/ai/providers/groq"
+     }
+    },
+    "responses": {
+     "base_url": "https://api.groq.com/openai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-04-29"
   }
  }
 }

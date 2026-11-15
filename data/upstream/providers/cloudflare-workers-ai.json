@@ -7,57 +7,52 @@
   "CLOUDFLARE_API_KEY"
  ],
  "models": {
-  "@cf/google/gemma-4-26b-a4b-it": {
-   "id": "@cf/google/gemma-4-26b-a4b-it",
-   "name": "Gemma 4 26B A4B IT",
-   "description": "Open Gemma instruction model for efficient chat and self-hosted deployments",
+  "@cf/nvidia/nemotron-3-120b-a12b": {
+   "id": "@cf/nvidia/nemotron-3-120b-a12b",
+   "name": "Nemotron 3 Super 120B",
+   "description": "Nemotron middle tier for collaborative agents and high-volume reasoning workloads",
    "type": "chat",
-   "family": "gemma",
-   "canonical_id": "google/gemma-4-26b-a4b-it",
-   "release_date": "2026-04-02",
+   "family": "nemotron",
+   "canonical_id": "nvidia/nemotron-3-super-120b-a12b",
+   "status": "deprecated",
+   "release_date": "2026-03-11",
    "limit": {
     "context": 256000,
-    "output": 16384
+    "output": 256000
    },
    "capabilities": {
-    "cache": {
-     "implicit": true
-    },
+    "cache": false,
     "temperature": true,
     "top_k": true,
     "top_p": true,
     "structured_output": true,
-    "system_updates": false,
+    "system_updates": true,
     "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": true,
-     "toggle": true
+     "toggle": true,
+     "effort": [
+      "low",
+      "high"
+     ]
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.1,
-      "cache": {
-       "read": 0.05
-      }
+      "price": 0.5
      },
      "output": {
-      "price": 0.3
+      "price": 1.5
      }
     }
    },
    "modalities": {
     "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif"
+     "text"
     ],
     "output": [
      "text"
@@ -84,7 +79,87 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2026-04-02"
+   "knowledge": "2025-06",
+   "last_updated": "2026-03-11"
+  },
+  "@cf/moonshotai/kimi-k2.7-code": {
+   "id": "@cf/moonshotai/kimi-k2.7-code",
+   "name": "Kimi K2.7 Code",
+   "description": "Coding-focused Kimi model, stronger on long-horizon repo work with less overthinking",
+   "type": "chat",
+   "family": "kimi-k2",
+   "canonical_id": "moonshotai/kimi-k2.7-code",
+   "status": "deprecated",
+   "release_date": "2026-06-12",
+   "limit": {
+    "context": 262144,
+    "output": 262144
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": true,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.95,
+      "cache": {
+       "read": 0.19
+      }
+     },
+     "output": {
+      "price": 4
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-01",
+   "last_updated": "2026-06-12"
   },
   "@cf/moonshotai/kimi-k2.6": {
    "id": "@cf/moonshotai/kimi-k2.6",
@@ -172,1383 +247,6 @@
    "knowledge": "2025-01",
    "last_updated": "2026-04-20"
   },
-  "@cf/moonshotai/kimi-k2.7-code": {
-   "id": "@cf/moonshotai/kimi-k2.7-code",
-   "name": "Kimi K2.7 Code",
-   "description": "Coding-focused Kimi model, stronger on long-horizon repo work with less overthinking",
-   "type": "chat",
-   "family": "kimi-k2",
-   "canonical_id": "moonshotai/kimi-k2.7-code",
-   "status": "deprecated",
-   "release_date": "2026-06-12",
-   "limit": {
-    "context": 262144,
-    "output": 262144
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": true,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.95,
-      "cache": {
-       "read": 0.19
-      }
-     },
-     "output": {
-      "price": 4
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-06-12"
-  },
-  "@cf/lykon/dreamshaper-8-lcm": {
-   "id": "@cf/lykon/dreamshaper-8-lcm",
-   "name": "DreamShaper 8 LCM",
-   "description": "Latent-consistency distilled DreamShaper 8 Stable Diffusion fine-tune for fast photorealistic images",
-   "type": "image",
-   "family": "stable-diffusion",
-   "canonical_id": "lykon/dreamshaper-8-lcm",
-   "status": "deprecated",
-   "release_date": "2023-12-06",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp"
-    ],
-    "output": [
-     "image/png"
-    ]
-   },
-   "api": {
-    "workers-ai-run": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
-     "sdk": {
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai/images"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2023-12-06"
-  },
-  "@cf/nvidia/nemotron-3-120b-a12b": {
-   "id": "@cf/nvidia/nemotron-3-120b-a12b",
-   "name": "Nemotron 3 Super 120B",
-   "description": "Nemotron middle tier for collaborative agents and high-volume reasoning workloads",
-   "type": "chat",
-   "family": "nemotron",
-   "canonical_id": "nvidia/nemotron-3-super-120b-a12b",
-   "status": "deprecated",
-   "release_date": "2026-03-11",
-   "limit": {
-    "context": 256000,
-    "output": 256000
-   },
-   "capabilities": {
-    "cache": false,
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": true,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.5
-     },
-     "output": {
-      "price": 1.5
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-06",
-   "last_updated": "2026-03-11"
-  },
-  "@cf/leonardo/lucid-origin": {
-   "id": "@cf/leonardo/lucid-origin",
-   "name": "Lucid Origin",
-   "description": "Prompt-adherent Full HD text-to-image model with text rendering and a wide range of styles",
-   "type": "image",
-   "family": "lucid",
-   "canonical_id": "leonardo/lucid-origin",
-   "release_date": "2025-08-05",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "image/jpeg"
-    ]
-   },
-   "api": {
-    "workers-ai-run": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
-     "sdk": {
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai/images"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2025-08-05"
-  },
-  "@cf/leonardo/phoenix-1.0": {
-   "id": "@cf/leonardo/phoenix-1.0",
-   "name": "Phoenix 1.0",
-   "description": "Leonardo.Ai's foundational text-to-image model with strong prompt adherence and coherent text",
-   "type": "image",
-   "family": "phoenix",
-   "canonical_id": "leonardo/phoenix-1.0",
-   "release_date": "2024-12-18",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "image/jpeg"
-    ]
-   },
-   "api": {
-    "workers-ai-run": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
-     "sdk": {
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai/images"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2024-12-18"
-  },
-  "@cf/black-forest-labs/flux-2-klein-9b": {
-   "id": "@cf/black-forest-labs/flux-2-klein-9b",
-   "name": "FLUX.2 [klein] 9B",
-   "description": "Fast 9B open-weight image generation and multi-reference editing model",
-   "type": "image",
-   "family": "flux",
-   "canonical_id": "black-forest-labs/flux-2-klein-9b",
-   "release_date": "2026-01-15",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp"
-    ],
-    "output": [
-     "image/jpeg"
-    ]
-   },
-   "api": {
-    "workers-ai-run": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
-     "sdk": {
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai/images"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-01-15"
-  },
-  "@cf/black-forest-labs/flux-2-klein-4b": {
-   "id": "@cf/black-forest-labs/flux-2-klein-4b",
-   "name": "FLUX.2 [klein] 4B",
-   "description": "Fast 4B open-weight image generation and editing model",
-   "type": "image",
-   "family": "flux",
-   "canonical_id": "black-forest-labs/flux-2-klein-4b",
-   "release_date": "2026-01-15",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "image": {
-     "input": {
-      "unit": "megapixel",
-      "price": 0.000225
-     },
-     "output": {
-      "unit": "megapixel",
-      "price": 0.001095
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp"
-    ],
-    "output": [
-     "image/jpeg"
-    ]
-   },
-   "api": {
-    "workers-ai-run": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
-     "sdk": {
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai/images"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-01-15"
-  },
-  "@cf/black-forest-labs/flux-2-dev": {
-   "id": "@cf/black-forest-labs/flux-2-dev",
-   "name": "FLUX.2 [dev]",
-   "description": "Open-weight 32B FLUX.2 image generation and multi-reference editing model",
-   "type": "image",
-   "family": "flux",
-   "canonical_id": "black-forest-labs/flux-2-dev",
-   "release_date": "2025-11-25",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp"
-    ],
-    "output": [
-     "image/jpeg"
-    ]
-   },
-   "api": {
-    "workers-ai-run": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
-     "sdk": {
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai/images"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-11-25"
-  },
-  "@cf/black-forest-labs/flux-1-schnell": {
-   "id": "@cf/black-forest-labs/flux-1-schnell",
-   "name": "FLUX.1 [schnell]",
-   "description": "Fast few-step FLUX.1 text-to-image model under Apache 2.0",
-   "type": "image",
-   "family": "flux",
-   "canonical_id": "black-forest-labs/flux-1-schnell",
-   "release_date": "2024-08-01",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "image/jpeg"
-    ]
-   },
-   "api": {
-    "workers-ai-run": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
-     "sdk": {
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai/images"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2024-08-01"
-  },
-  "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b": {
-   "id": "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
-   "name": "Deepseek R1 Distill Qwen 32B",
-   "description": "Classic open reasoning model for transparent math, coding, and deliberate problem solving",
-   "type": "chat",
-   "family": "deepseek-thinking",
-   "canonical_id": "deepseek/deepseek-r1",
-   "status": "deprecated",
-   "release_date": "2025-01-20",
-   "limit": {
-    "context": 80000,
-    "output": 80000
-   },
-   "capabilities": {
-    "cache": false,
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.497
-     },
-     "output": {
-      "price": 4.881
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2024-07",
-   "last_updated": "2025-05-29"
-  },
-  "@cf/deepseek-ai/deepseek-v4.1-flash-1017": {
-   "id": "@cf/deepseek-ai/deepseek-v4.1-flash-1017",
-   "name": "DeepSeek V4.1 Flash 1017",
-   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
-   "type": "chat",
-   "family": "deepseek-flash",
-   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
-   "release_date": "2026-10-17",
-   "limit": {
-    "context": 1048576,
-    "output": 1048576
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.3,
-      "cache": {
-       "read": 0.006
-      }
-     },
-     "output": {
-      "price": 1.2
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-10-17"
-  },
-  "@cf/deepseek-ai/deepseek-v4-pro-0813": {
-   "id": "@cf/deepseek-ai/deepseek-v4-pro-0813",
-   "name": "DeepSeek V4 Pro 0813",
-   "description": "DeepSeek V4 Pro snapshot with million-token context and support for thinking and non-thinking modes",
-   "type": "chat",
-   "family": "deepseek-thinking",
-   "canonical_id": "deepseek/deepseek-v4-pro-0813",
-   "status": "deprecated",
-   "release_date": "2026-08-13",
-   "limit": {
-    "context": 1048576,
-    "output": 1048576
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.32,
-      "cache": {
-       "read": 0.044
-      }
-     },
-     "output": {
-      "price": 3.96
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-08-22"
-  },
-  "@cf/deepseek-ai/deepseek-v4-flash-0731": {
-   "id": "@cf/deepseek-ai/deepseek-v4-flash-0731",
-   "name": "DeepSeek V4 Flash 0731",
-   "description": "Official DeepSeek V4 Flash release with enhanced agentic capabilities and integrated DSpark speculative decoding",
-   "type": "chat",
-   "family": "deepseek-flash",
-   "canonical_id": "deepseek/deepseek-v4-flash-0731",
-   "status": "deprecated",
-   "release_date": "2026-07-31",
-   "limit": {
-    "context": 1048576,
-    "output": 1048576
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": true,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.44,
-      "cache": {
-       "read": 0.014
-      }
-     },
-     "output": {
-      "price": 1.32
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-07-31"
-  },
-  "@cf/baai/bge-m3": {
-   "id": "@cf/baai/bge-m3",
-   "name": "BGE M3",
-   "description": "Multilingual embedding model combining dense, sparse, and multi-vector retrieval",
-   "type": "embedding",
-   "family": "bge",
-   "canonical_id": "baai/bge-m3",
-   "release_date": "2024-01-30",
-   "limit": {
-    "context": 8192,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.0118
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "embedding"
-    ]
-   },
-   "api": {
-    "embeddings": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2024-01-30"
-  },
-  "@cf/baai/bge-large-en-v1.5": {
-   "id": "@cf/baai/bge-large-en-v1.5",
-   "name": "BGE Large EN v1.5",
-   "description": "English text embedding model for retrieval and semantic search",
-   "type": "embedding",
-   "family": "bge",
-   "canonical_id": "baai/bge-large-en-v1.5",
-   "release_date": "2023-09-12",
-   "limit": {
-    "context": 512,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.204
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "embedding"
-    ]
-   },
-   "api": {
-    "embeddings": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2023-09-12"
-  },
-  "@cf/baai/bge-small-en-v1.5": {
-   "id": "@cf/baai/bge-small-en-v1.5",
-   "name": "BGE Small EN v1.5",
-   "description": "Small English text embedding model producing 384-dimensional vectors",
-   "type": "embedding",
-   "family": "bge",
-   "canonical_id": "baai/bge-small-en-v1.5",
-   "release_date": "2023-09-12",
-   "limit": {
-    "context": 512,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.0202
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "embedding"
-    ]
-   },
-   "api": {
-    "embeddings": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2023-09-12"
-  },
-  "@cf/baai/bge-base-en-v1.5": {
-   "id": "@cf/baai/bge-base-en-v1.5",
-   "name": "BGE Base EN v1.5",
-   "description": "English text embedding model for retrieval and semantic search",
-   "type": "embedding",
-   "family": "bge",
-   "canonical_id": "baai/bge-base-en-v1.5",
-   "release_date": "2023-09-12",
-   "limit": {
-    "context": 512,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.0666
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "embedding"
-    ]
-   },
-   "api": {
-    "embeddings": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2023-09-12"
-  },
-  "@cf/bytedance/stable-diffusion-xl-lightning": {
-   "id": "@cf/bytedance/stable-diffusion-xl-lightning",
-   "name": "SDXL-Lightning",
-   "description": "Few-step distilled Stable Diffusion XL model for fast 1024px text-to-image",
-   "type": "image",
-   "family": "stable-diffusion",
-   "canonical_id": "bytedance-seed/stable-diffusion-xl-lightning",
-   "status": "deprecated",
-   "release_date": "2024-02-21",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "image": {
-     "output": {
-      "unit": "image",
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "image/jpeg"
-    ]
-   },
-   "api": {
-    "workers-ai-run": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
-     "sdk": {
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai/images"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2024-02-21"
-  },
-  "@cf/zai-org/glm-5.2": {
-   "id": "@cf/zai-org/glm-5.2",
-   "name": "Glm 5.2",
-   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
-   "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-5.2",
-   "status": "deprecated",
-   "release_date": "2026-06-13",
-   "limit": {
-    "context": 262144,
-    "output": 256000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": true,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.4,
-      "cache": {
-       "read": 0.26
-      }
-     },
-     "output": {
-      "price": 4.4
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-06-13"
-  },
-  "@cf/zai-org/glm-5.3": {
-   "id": "@cf/zai-org/glm-5.3",
-   "name": "Glm 5.3",
-   "description": "Flagship GLM model for hybrid reasoning, coding, and agentic engineering",
-   "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-5.3",
-   "release_date": "2026-08-14",
-   "limit": {
-    "context": 1048576,
-    "output": 1048576
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": true,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.4,
-      "cache": {
-       "read": 0.26
-      }
-     },
-     "output": {
-      "price": 4.4
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-08-14"
-  },
-  "@cf/zai-org/glm-5.3-flash": {
-   "id": "@cf/zai-org/glm-5.3-flash",
-   "name": "Glm 5.3 Flash",
-   "description": "GLM vision model for visual reasoning, documents, and multimodal agents",
-   "type": "chat",
-   "family": "glm-flash",
-   "canonical_id": "zhipuai/glm-5.3-flash",
-   "status": "deprecated",
-   "release_date": "2026-08-26",
-   "limit": {
-    "context": 1048576,
-    "output": 1048576
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": true,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.15,
-      "cache": {
-       "read": 0.03
-      }
-     },
-     "output": {
-      "price": 0.5
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-08-26"
-  },
-  "@cf/zai-org/glm-4.7-flash": {
-   "id": "@cf/zai-org/glm-4.7-flash",
-   "name": "GLM-4.7-Flash",
-   "description": "Efficient GLM model for fast reasoning, coding, and agent workflows",
-   "type": "chat",
-   "family": "glm-flash",
-   "canonical_id": "zhipuai/glm-4.7-flash",
-   "release_date": "2026-01-19",
-   "limit": {
-    "context": 131072,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": false,
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": true,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.0605
-     },
-     "output": {
-      "price": 0.4
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2026-01-19"
-  },
   "@cf/thinkingmachines/inkling-2-small": {
    "id": "@cf/thinkingmachines/inkling-2-small",
    "name": "Inkling 2 Small",
@@ -1623,65 +321,6 @@
    },
    "open_weights": true,
    "last_updated": "2026-11-09"
-  },
-  "@cf/qwen/qwq-32b": {
-   "id": "@cf/qwen/qwq-32b",
-   "name": "Qwq 32B",
-   "description": "Qwen reasoning model for deliberate problem solving, math, and coding",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwq-32b",
-   "status": "deprecated",
-   "release_date": "2025-03-05",
-   "limit": {
-    "context": 24000,
-    "output": 24000
-   },
-   "capabilities": {
-    "cache": false,
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": true,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.66
-     },
-     "output": {
-      "price": 1
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2024-04",
-   "last_updated": "2025-03-05"
   },
   "@cf/qwen/qwen3.8-27b": {
    "id": "@cf/qwen/qwen3.8-27b",
@@ -1875,6 +514,65 @@
    "open_weights": true,
    "last_updated": "2025-06-05"
   },
+  "@cf/qwen/qwq-32b": {
+   "id": "@cf/qwen/qwq-32b",
+   "name": "Qwq 32B",
+   "description": "Qwen reasoning model for deliberate problem solving, math, and coding",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwq-32b",
+   "status": "deprecated",
+   "release_date": "2025-03-05",
+   "limit": {
+    "context": 24000,
+    "output": 24000
+   },
+   "capabilities": {
+    "cache": false,
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": true,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.66
+     },
+     "output": {
+      "price": 1
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-04",
+   "last_updated": "2025-03-05"
+  },
   "@cf/qwen/qwen3-30b-a3b-fp8": {
    "id": "@cf/qwen/qwen3-30b-a3b-fp8",
    "name": "Qwen3 30B A3b fp8",
@@ -1938,99 +636,57 @@
    "open_weights": true,
    "last_updated": "2025-04-28"
   },
-  "@cf/stabilityai/stable-diffusion-xl-base-1.0": {
-   "id": "@cf/stabilityai/stable-diffusion-xl-base-1.0",
-   "name": "Stable Diffusion XL Base 1.0",
-   "description": "Latent diffusion text-to-image model from Stability AI",
-   "type": "image",
-   "family": "stable-diffusion",
-   "canonical_id": "stabilityai/stable-diffusion-xl-base-1.0",
-   "status": "deprecated",
-   "release_date": "2023-07-26",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "image": {
-     "output": {
-      "unit": "image",
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "image/png"
-    ]
-   },
-   "api": {
-    "workers-ai-run": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
-     "sdk": {
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai/images"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2023-07-26"
-  },
-  "@cf/ibm-granite/granite-4.0-h-micro": {
-   "id": "@cf/ibm-granite/granite-4.0-h-micro",
-   "name": "Granite 4.0 H Micro",
-   "description": "Efficient model for low-latency assistance, extraction, and routine automation",
+  "@cf/google/gemma-4-26b-a4b-it": {
+   "id": "@cf/google/gemma-4-26b-a4b-it",
+   "name": "Gemma 4 26B A4B IT",
+   "description": "Open Gemma instruction model for efficient chat and self-hosted deployments",
    "type": "chat",
-   "family": "granite",
-   "canonical_id": "ibm/granite-4-h-micro",
-   "release_date": "2025-10-02",
+   "family": "gemma",
+   "canonical_id": "google/gemma-4-26b-a4b-it",
+   "release_date": "2026-04-02",
    "limit": {
-    "context": 131000,
-    "output": 131000
+    "context": 256000,
+    "output": 16384
    },
    "capabilities": {
-    "cache": false,
+    "cache": {
+     "implicit": true
+    },
     "temperature": true,
     "top_k": true,
     "top_p": true,
-    "structured_output": false,
-    "system_updates": true,
+    "structured_output": true,
+    "system_updates": false,
     "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": false
+     "supported": true,
+     "toggle": true
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.017
+      "price": 0.1,
+      "cache": {
+       "read": 0.05
+      }
      },
      "output": {
-      "price": 0.112
+      "price": 0.3
      }
     }
    },
    "modalities": {
     "input": [
-     "text"
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif"
     ],
     "output": [
      "text"
@@ -2045,231 +701,19 @@
      },
      "capabilities": {
       "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
        "updates": false
       }
      }
     }
    },
    "open_weights": true,
-   "last_updated": "2025-10-02"
-  },
-  "@cf/cloudflare/clef": {
-   "id": "@cf/cloudflare/clef",
-   "name": "Clef",
-   "description": "Multimodal decision model for typed questions over text, structured state, and images",
-   "type": "decision",
-   "release_date": "2026-09-29",
-   "limit": {
-    "context": 65536,
-    "output": 65536
-   },
-   "capabilities": {
-    "temperature": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.24
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "workers-ai-run": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
-     "sdk": {
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai/decisions"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-09-29"
-  },
-  "@cf/cloudflare/clairic": {
-   "id": "@cf/cloudflare/clairic",
-   "name": "Clairic",
-   "description": "Multimodal model for analyzing text, images, documents, and rich media",
-   "type": "extraction",
-   "release_date": "2026-10-14",
-   "limit": {
-    "context": 65536,
-    "output": 65536
-   },
-   "capabilities": {
-    "temperature": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.1
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "workers-ai-run": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
-     "sdk": {}
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-10-14"
-  },
-  "@cf/cloudflare/clef-flash": {
-   "id": "@cf/cloudflare/clef-flash",
-   "name": "Clef Flash",
-   "description": "Fast multimodal decision model for typed questions over text, structured state, and images",
-   "type": "decision",
-   "release_date": "2026-09-29",
-   "limit": {
-    "context": 24576,
-    "output": 24576
-   },
-   "capabilities": {
-    "temperature": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.038
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "workers-ai-run": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
-     "sdk": {
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai/decisions"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-09-29"
-  },
-  "@cf/cloudflare/clef-omni": {
-   "id": "@cf/cloudflare/clef-omni",
-   "name": "Clef Omni",
-   "description": "Mixture-of-experts multimodal decision model for typed questions over text, structured state, and media",
-   "type": "decision",
-   "release_date": "2026-10-09",
-   "limit": {
-    "context": 65536,
-    "output": 65536
-   },
-   "capabilities": {
-    "temperature": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.15
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "audio/wav",
-     "audio/mpeg",
-     "video/mp4",
-     "video/webm"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "workers-ai-run": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
-     "sdk": {
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai/decisions"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-10-09"
+   "last_updated": "2026-04-02"
   },
   "@cf/openai/gpt-oss-120b": {
    "id": "@cf/openai/gpt-oss-120b",
@@ -2610,6 +1054,389 @@
    "knowledge": "2024-06",
    "last_updated": "2025-03-17"
   },
+  "@cf/baai/bge-base-en-v1.5": {
+   "id": "@cf/baai/bge-base-en-v1.5",
+   "name": "BGE Base EN v1.5",
+   "description": "English text embedding model for retrieval and semantic search",
+   "type": "embedding",
+   "family": "bge",
+   "canonical_id": "baai/bge-base-en-v1.5",
+   "release_date": "2023-09-12",
+   "limit": {
+    "context": 512,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.0666
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "api": {
+    "embeddings": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2023-09-12"
+  },
+  "@cf/baai/bge-large-en-v1.5": {
+   "id": "@cf/baai/bge-large-en-v1.5",
+   "name": "BGE Large EN v1.5",
+   "description": "English text embedding model for retrieval and semantic search",
+   "type": "embedding",
+   "family": "bge",
+   "canonical_id": "baai/bge-large-en-v1.5",
+   "release_date": "2023-09-12",
+   "limit": {
+    "context": 512,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.204
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "api": {
+    "embeddings": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2023-09-12"
+  },
+  "@cf/baai/bge-m3": {
+   "id": "@cf/baai/bge-m3",
+   "name": "BGE M3",
+   "description": "Multilingual embedding model combining dense, sparse, and multi-vector retrieval",
+   "type": "embedding",
+   "family": "bge",
+   "canonical_id": "baai/bge-m3",
+   "release_date": "2024-01-30",
+   "limit": {
+    "context": 8192,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.0118
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "api": {
+    "embeddings": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2024-01-30"
+  },
+  "@cf/baai/bge-small-en-v1.5": {
+   "id": "@cf/baai/bge-small-en-v1.5",
+   "name": "BGE Small EN v1.5",
+   "description": "Small English text embedding model producing 384-dimensional vectors",
+   "type": "embedding",
+   "family": "bge",
+   "canonical_id": "baai/bge-small-en-v1.5",
+   "release_date": "2023-09-12",
+   "limit": {
+    "context": 512,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.0202
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "api": {
+    "embeddings": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2023-09-12"
+  },
+  "@cf/bytedance/stable-diffusion-xl-lightning": {
+   "id": "@cf/bytedance/stable-diffusion-xl-lightning",
+   "name": "SDXL-Lightning",
+   "description": "Few-step distilled Stable Diffusion XL model for fast 1024px text-to-image",
+   "type": "image",
+   "family": "stable-diffusion",
+   "canonical_id": "bytedance-seed/stable-diffusion-xl-lightning",
+   "status": "deprecated",
+   "release_date": "2024-02-21",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "image": {
+     "output": {
+      "unit": "image",
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "image/jpeg"
+    ]
+   },
+   "api": {
+    "workers-ai-run": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
+     "sdk": {
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai/images"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2024-02-21"
+  },
+  "@cf/ibm-granite/granite-4.0-h-micro": {
+   "id": "@cf/ibm-granite/granite-4.0-h-micro",
+   "name": "Granite 4.0 H Micro",
+   "description": "Efficient model for low-latency assistance, extraction, and routine automation",
+   "type": "chat",
+   "family": "granite",
+   "canonical_id": "ibm/granite-4-h-micro",
+   "release_date": "2025-10-02",
+   "limit": {
+    "context": 131000,
+    "output": 131000
+   },
+   "capabilities": {
+    "cache": false,
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": true,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.017
+     },
+     "output": {
+      "price": 0.112
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-10-02"
+  },
+  "@cf/lykon/dreamshaper-8-lcm": {
+   "id": "@cf/lykon/dreamshaper-8-lcm",
+   "name": "DreamShaper 8 LCM",
+   "description": "Latent-consistency distilled DreamShaper 8 Stable Diffusion fine-tune for fast photorealistic images",
+   "type": "image",
+   "family": "stable-diffusion",
+   "canonical_id": "lykon/dreamshaper-8-lcm",
+   "status": "deprecated",
+   "release_date": "2023-12-06",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp"
+    ],
+    "output": [
+     "image/png"
+    ]
+   },
+   "api": {
+    "workers-ai-run": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
+     "sdk": {
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai/images"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2023-12-06"
+  },
   "@cf/meta/llama-3.2-1b-instruct": {
    "id": "@cf/meta/llama-3.2-1b-instruct",
    "name": "Llama 3.2 1B Instruct",
@@ -2669,6 +1496,65 @@
    "knowledge": "2023-12",
    "last_updated": "2024-09-25"
   },
+  "@cf/meta/llama-3.2-11b-vision-instruct": {
+   "id": "@cf/meta/llama-3.2-11b-vision-instruct",
+   "name": "Llama 3.2 11B Vision Instruct",
+   "description": "Open Llama multimodal model for image understanding and text reasoning",
+   "type": "chat",
+   "family": "llama",
+   "canonical_id": "meta/llama-3.2-11b-vision-instruct",
+   "release_date": "2024-09-25",
+   "limit": {
+    "context": 128000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": false,
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.0485
+     },
+     "output": {
+      "price": 0.676
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2023-12",
+   "last_updated": "2024-09-25"
+  },
   "@cf/meta/llama-3.1-8b-instruct-fp8": {
    "id": "@cf/meta/llama-3.1-8b-instruct-fp8",
    "name": "Llama 3.1 8B Instruct fp8",
@@ -2704,64 +1590,6 @@
      },
      "output": {
       "price": 0.287
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2023-12",
-   "last_updated": "2024-07-23"
-  },
-  "@cf/meta/llama-guard-3-8b": {
-   "id": "@cf/meta/llama-guard-3-8b",
-   "name": "Llama Guard 3 8B",
-   "description": "Safety model for policy screening, moderation, and risk-aware routing workflows",
-   "type": "chat",
-   "family": "llama",
-   "canonical_id": "meta/llama-guard-3-8b",
-   "release_date": "2024-07-23",
-   "limit": {
-    "context": 131072,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": false,
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.484
-     },
-     "output": {
-      "price": 0.03
      }
     }
    },
@@ -2849,6 +1677,123 @@
    "knowledge": "2023-12",
    "last_updated": "2024-12-06"
   },
+  "@cf/meta/llama-3.2-3b-instruct": {
+   "id": "@cf/meta/llama-3.2-3b-instruct",
+   "name": "Llama 3.2 3B Instruct",
+   "description": "Open Llama instruction model for multilingual chat, reasoning, and coding",
+   "type": "chat",
+   "family": "llama",
+   "canonical_id": "meta/llama-3.2-3b",
+   "status": "deprecated",
+   "release_date": "2024-09-25",
+   "limit": {
+    "context": 80000,
+    "output": 80000
+   },
+   "capabilities": {
+    "cache": false,
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": true,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.0509
+     },
+     "output": {
+      "price": 0.335
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2023-12",
+   "last_updated": "2024-09-25"
+  },
+  "@cf/meta/llama-guard-3-8b": {
+   "id": "@cf/meta/llama-guard-3-8b",
+   "name": "Llama Guard 3 8B",
+   "description": "Safety model for policy screening, moderation, and risk-aware routing workflows",
+   "type": "chat",
+   "family": "llama",
+   "canonical_id": "meta/llama-guard-3-8b",
+   "release_date": "2024-07-23",
+   "limit": {
+    "context": 131072,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": false,
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.484
+     },
+     "output": {
+      "price": 0.03
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2023-12",
+   "last_updated": "2024-07-23"
+  },
   "@cf/meta/llama-4-scout-17b-16e-instruct": {
    "id": "@cf/meta/llama-4-scout-17b-16e-instruct",
    "name": "Llama 4 Scout 17B 16E Instruct",
@@ -2916,26 +1861,20 @@
    "knowledge": "2024-08",
    "last_updated": "2025-04-05"
   },
-  "@cf/meta/llama-3.2-3b-instruct": {
-   "id": "@cf/meta/llama-3.2-3b-instruct",
-   "name": "Llama 3.2 3B Instruct",
-   "description": "Open Llama instruction model for multilingual chat, reasoning, and coding",
-   "type": "chat",
-   "family": "llama",
-   "canonical_id": "meta/llama-3.2-3b",
-   "status": "deprecated",
-   "release_date": "2024-09-25",
+  "@cf/cloudflare/clef-omni": {
+   "id": "@cf/cloudflare/clef-omni",
+   "name": "Clef Omni",
+   "description": "Mixture-of-experts multimodal decision model for typed questions over text, structured state, and media",
+   "type": "decision",
+   "release_date": "2026-10-09",
    "limit": {
-    "context": 80000,
-    "output": 80000
+    "context": 65536,
+    "output": 65536
    },
    "capabilities": {
-    "cache": false,
     "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": true,
+    "structured_output": true,
+    "system_updates": false,
     "effort_updates": false,
     "tools": {
      "supported": false
@@ -2947,45 +1886,211 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.0509
+      "price": 0.15
      },
      "output": {
-      "price": 0.335
+      "price": 0
      }
     }
    },
    "modalities": {
     "input": [
-     "text"
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "audio/wav",
+     "audio/mpeg",
+     "video/mp4",
+     "video/webm"
     ],
     "output": [
      "text"
     ]
    },
    "api": {
-    "chat-completions": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+    "workers-ai-run": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
      "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai/decisions"
      }
     }
    },
    "open_weights": true,
-   "knowledge": "2023-12",
-   "last_updated": "2024-09-25"
+   "last_updated": "2026-10-09"
   },
-  "@cf/meta/llama-3.2-11b-vision-instruct": {
-   "id": "@cf/meta/llama-3.2-11b-vision-instruct",
-   "name": "Llama 3.2 11B Vision Instruct",
-   "description": "Open Llama multimodal model for image understanding and text reasoning",
-   "type": "chat",
-   "family": "llama",
-   "canonical_id": "meta/llama-3.2-11b-vision-instruct",
-   "release_date": "2024-09-25",
+  "@cf/cloudflare/clef-flash": {
+   "id": "@cf/cloudflare/clef-flash",
+   "name": "Clef Flash",
+   "description": "Fast multimodal decision model for typed questions over text, structured state, and images",
+   "type": "decision",
+   "release_date": "2026-09-29",
    "limit": {
-    "context": 128000,
-    "output": 128000
+    "context": 24576,
+    "output": 24576
+   },
+   "capabilities": {
+    "temperature": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.038
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "workers-ai-run": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
+     "sdk": {
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai/decisions"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-09-29"
+  },
+  "@cf/cloudflare/clef": {
+   "id": "@cf/cloudflare/clef",
+   "name": "Clef",
+   "description": "Multimodal decision model for typed questions over text, structured state, and images",
+   "type": "decision",
+   "release_date": "2026-09-29",
+   "limit": {
+    "context": 65536,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.24
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "workers-ai-run": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
+     "sdk": {
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai/decisions"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-09-29"
+  },
+  "@cf/cloudflare/clairic": {
+   "id": "@cf/cloudflare/clairic",
+   "name": "Clairic",
+   "description": "Multimodal model for analyzing text, images, documents, and rich media",
+   "type": "extraction",
+   "release_date": "2026-10-14",
+   "limit": {
+    "context": 65536,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "workers-ai-run": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
+     "sdk": {}
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-10-14"
+  },
+  "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b": {
+   "id": "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
+   "name": "Deepseek R1 Distill Qwen 32B",
+   "description": "Classic open reasoning model for transparent math, coding, and deliberate problem solving",
+   "type": "chat",
+   "family": "deepseek-thinking",
+   "canonical_id": "deepseek/deepseek-r1",
+   "status": "deprecated",
+   "release_date": "2025-01-20",
+   "limit": {
+    "context": 80000,
+    "output": 80000
    },
    "capabilities": {
     "cache": false,
@@ -2999,23 +2104,22 @@
      "supported": false
     },
     "reasoning": {
-     "supported": false
+     "supported": true
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.0485
+      "price": 0.497
      },
      "output": {
-      "price": 0.676
+      "price": 4.881
      }
     }
    },
    "modalities": {
     "input": [
-     "text",
-     "image"
+     "text"
     ],
     "output": [
      "text"
@@ -3031,8 +2135,904 @@
     }
    },
    "open_weights": true,
-   "knowledge": "2023-12",
-   "last_updated": "2024-09-25"
+   "knowledge": "2024-07",
+   "last_updated": "2025-05-29"
+  },
+  "@cf/deepseek-ai/deepseek-v4-flash-0731": {
+   "id": "@cf/deepseek-ai/deepseek-v4-flash-0731",
+   "name": "DeepSeek V4 Flash 0731",
+   "description": "Official DeepSeek V4 Flash release with enhanced agentic capabilities and integrated DSpark speculative decoding",
+   "type": "chat",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4-flash-0731",
+   "status": "deprecated",
+   "release_date": "2026-07-31",
+   "limit": {
+    "context": 1048576,
+    "output": 1048576
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": true,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.44,
+      "cache": {
+       "read": 0.014
+      }
+     },
+     "output": {
+      "price": 1.32
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-07-31"
+  },
+  "@cf/deepseek-ai/deepseek-v4-pro-0813": {
+   "id": "@cf/deepseek-ai/deepseek-v4-pro-0813",
+   "name": "DeepSeek V4 Pro 0813",
+   "description": "DeepSeek V4 Pro snapshot with million-token context and support for thinking and non-thinking modes",
+   "type": "chat",
+   "family": "deepseek-thinking",
+   "canonical_id": "deepseek/deepseek-v4-pro-0813",
+   "status": "deprecated",
+   "release_date": "2026-08-13",
+   "limit": {
+    "context": 1048576,
+    "output": 1048576
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.32,
+      "cache": {
+       "read": 0.044
+      }
+     },
+     "output": {
+      "price": 3.96
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-22"
+  },
+  "@cf/deepseek-ai/deepseek-v4.1-flash-1017": {
+   "id": "@cf/deepseek-ai/deepseek-v4.1-flash-1017",
+   "name": "DeepSeek V4.1 Flash 1017",
+   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
+   "type": "chat",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
+   "release_date": "2026-10-17",
+   "limit": {
+    "context": 1048576,
+    "output": 1048576
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.3,
+      "cache": {
+       "read": 0.006
+      }
+     },
+     "output": {
+      "price": 1.2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-10-17"
+  },
+  "@cf/zai-org/glm-4.7-flash": {
+   "id": "@cf/zai-org/glm-4.7-flash",
+   "name": "GLM-4.7-Flash",
+   "description": "Efficient GLM model for fast reasoning, coding, and agent workflows",
+   "type": "chat",
+   "family": "glm-flash",
+   "canonical_id": "zhipuai/glm-4.7-flash",
+   "release_date": "2026-01-19",
+   "limit": {
+    "context": 131072,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": false,
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": true,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.0605
+     },
+     "output": {
+      "price": 0.4
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-04",
+   "last_updated": "2026-01-19"
+  },
+  "@cf/zai-org/glm-5.3-flash": {
+   "id": "@cf/zai-org/glm-5.3-flash",
+   "name": "Glm 5.3 Flash",
+   "description": "GLM vision model for visual reasoning, documents, and multimodal agents",
+   "type": "chat",
+   "family": "glm-flash",
+   "canonical_id": "zhipuai/glm-5.3-flash",
+   "status": "deprecated",
+   "release_date": "2026-08-26",
+   "limit": {
+    "context": 1048576,
+    "output": 1048576
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": true,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.15,
+      "cache": {
+       "read": 0.03
+      }
+     },
+     "output": {
+      "price": 0.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-26"
+  },
+  "@cf/zai-org/glm-5.3": {
+   "id": "@cf/zai-org/glm-5.3",
+   "name": "Glm 5.3",
+   "description": "Flagship GLM model for hybrid reasoning, coding, and agentic engineering",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.3",
+   "release_date": "2026-08-14",
+   "limit": {
+    "context": 1048576,
+    "output": 1048576
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": true,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.4,
+      "cache": {
+       "read": 0.26
+      }
+     },
+     "output": {
+      "price": 4.4
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-14"
+  },
+  "@cf/zai-org/glm-5.2": {
+   "id": "@cf/zai-org/glm-5.2",
+   "name": "Glm 5.2",
+   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.2",
+   "status": "deprecated",
+   "release_date": "2026-06-13",
+   "limit": {
+    "context": 262144,
+    "output": 256000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": true,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.4,
+      "cache": {
+       "read": 0.26
+      }
+     },
+     "output": {
+      "price": 4.4
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-06-13"
+  },
+  "@cf/leonardo/lucid-origin": {
+   "id": "@cf/leonardo/lucid-origin",
+   "name": "Lucid Origin",
+   "description": "Prompt-adherent Full HD text-to-image model with text rendering and a wide range of styles",
+   "type": "image",
+   "family": "lucid",
+   "canonical_id": "leonardo/lucid-origin",
+   "release_date": "2025-08-05",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "image/jpeg"
+    ]
+   },
+   "api": {
+    "workers-ai-run": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
+     "sdk": {
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai/images"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-08-05"
+  },
+  "@cf/leonardo/phoenix-1.0": {
+   "id": "@cf/leonardo/phoenix-1.0",
+   "name": "Phoenix 1.0",
+   "description": "Leonardo.Ai's foundational text-to-image model with strong prompt adherence and coherent text",
+   "type": "image",
+   "family": "phoenix",
+   "canonical_id": "leonardo/phoenix-1.0",
+   "release_date": "2024-12-18",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "image/jpeg"
+    ]
+   },
+   "api": {
+    "workers-ai-run": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
+     "sdk": {
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai/images"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2024-12-18"
+  },
+  "@cf/stabilityai/stable-diffusion-xl-base-1.0": {
+   "id": "@cf/stabilityai/stable-diffusion-xl-base-1.0",
+   "name": "Stable Diffusion XL Base 1.0",
+   "description": "Latent diffusion text-to-image model from Stability AI",
+   "type": "image",
+   "family": "stable-diffusion",
+   "canonical_id": "stabilityai/stable-diffusion-xl-base-1.0",
+   "status": "deprecated",
+   "release_date": "2023-07-26",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "image": {
+     "output": {
+      "unit": "image",
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "image/png"
+    ]
+   },
+   "api": {
+    "workers-ai-run": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
+     "sdk": {
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai/images"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2023-07-26"
+  },
+  "@cf/black-forest-labs/flux-2-klein-4b": {
+   "id": "@cf/black-forest-labs/flux-2-klein-4b",
+   "name": "FLUX.2 [klein] 4B",
+   "description": "Fast 4B open-weight image generation and editing model",
+   "type": "image",
+   "family": "flux",
+   "canonical_id": "black-forest-labs/flux-2-klein-4b",
+   "release_date": "2026-01-15",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "image": {
+     "input": {
+      "unit": "megapixel",
+      "price": 0.000225
+     },
+     "output": {
+      "unit": "megapixel",
+      "price": 0.001095
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp"
+    ],
+    "output": [
+     "image/jpeg"
+    ]
+   },
+   "api": {
+    "workers-ai-run": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
+     "sdk": {
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai/images"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-01-15"
+  },
+  "@cf/black-forest-labs/flux-2-dev": {
+   "id": "@cf/black-forest-labs/flux-2-dev",
+   "name": "FLUX.2 [dev]",
+   "description": "Open-weight 32B FLUX.2 image generation and multi-reference editing model",
+   "type": "image",
+   "family": "flux",
+   "canonical_id": "black-forest-labs/flux-2-dev",
+   "release_date": "2025-11-25",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp"
+    ],
+    "output": [
+     "image/jpeg"
+    ]
+   },
+   "api": {
+    "workers-ai-run": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
+     "sdk": {
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai/images"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-11-25"
+  },
+  "@cf/black-forest-labs/flux-1-schnell": {
+   "id": "@cf/black-forest-labs/flux-1-schnell",
+   "name": "FLUX.1 [schnell]",
+   "description": "Fast few-step FLUX.1 text-to-image model under Apache 2.0",
+   "type": "image",
+   "family": "flux",
+   "canonical_id": "black-forest-labs/flux-1-schnell",
+   "release_date": "2024-08-01",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "image/jpeg"
+    ]
+   },
+   "api": {
+    "workers-ai-run": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
+     "sdk": {
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai/images"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2024-08-01"
+  },
+  "@cf/black-forest-labs/flux-2-klein-9b": {
+   "id": "@cf/black-forest-labs/flux-2-klein-9b",
+   "name": "FLUX.2 [klein] 9B",
+   "description": "Fast 9B open-weight image generation and multi-reference editing model",
+   "type": "image",
+   "family": "flux",
+   "canonical_id": "black-forest-labs/flux-2-klein-9b",
+   "release_date": "2026-01-15",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp"
+    ],
+    "output": [
+     "image/jpeg"
+    ]
+   },
+   "api": {
+    "workers-ai-run": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
+     "sdk": {
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai/images"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-01-15"
   }
  }
 }

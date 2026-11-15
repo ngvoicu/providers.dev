@@ -6,6 +6,94 @@
   "GRAPHN_API_KEY"
  ],
  "models": {
+  "qwen3.8-27b": {
+   "id": "qwen3.8-27b",
+   "name": "Qwen3.8 27B",
+   "description": "Dense 27B vision-language model for coding, agent tasks, and image and video understanding",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.8-27b",
+   "release_date": "2026-08-14",
+   "limit": {
+    "context": 262144,
+    "output": 32768
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "medium",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.45,
+      "cache": {
+       "read": 0.045
+      }
+     },
+     "output": {
+      "price": 3.2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/x-matroska",
+     "video/quicktime",
+     "video/x-flv",
+     "video/x-ms-wmv"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://model.graphn.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-14"
+  },
   "gpt-oss-120b": {
    "id": "gpt-oss-120b",
    "name": "GPT OSS 120B",
@@ -152,17 +240,85 @@
    "open_weights": true,
    "last_updated": "2026-02-23"
   },
-  "qwen3.8-27b": {
-   "id": "qwen3.8-27b",
-   "name": "Qwen3.8 27B",
-   "description": "Dense 27B vision-language model for coding, agent tasks, and image and video understanding",
+  "gemma-4-e4b": {
+   "id": "gemma-4-e4b",
+   "name": "Gemma 4 E4B",
+   "description": "Open Gemma instruction model for efficient chat and self-hosted deployments",
    "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3.8-27b",
+   "family": "gemma",
+   "canonical_id": "google/gemma-4-E4B-it",
+   "release_date": "2026-04-02",
+   "limit": {
+    "context": 65536,
+    "output": 8192
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.15
+     },
+     "output": {
+      "price": 0.6
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "audio/mpeg",
+     "audio/wav"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://model.graphn.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-04-02"
+  },
+  "glm-5.3": {
+   "id": "glm-5.3",
+   "name": "GLM-5.3",
+   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.3",
    "release_date": "2026-08-14",
    "limit": {
-    "context": 262144,
-    "output": 32768
+    "context": 250000,
+    "output": 131072
    },
    "capabilities": {
     "cache": {
@@ -171,7 +327,6 @@
     "temperature": true,
     "top_k": true,
     "top_p": true,
-    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -179,42 +334,33 @@
     },
     "reasoning": {
      "supported": true,
-     "toggle": true,
      "effort": [
       "low",
-      "medium",
-      "xhigh"
-     ]
+      "high",
+      "max"
+     ],
+     "default": {
+      "type": "effort",
+      "value": "max"
+     }
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.45,
+      "price": 1.4,
       "cache": {
-       "read": 0.045
+       "read": 0.14
       }
      },
      "output": {
-      "price": 3.2
+      "price": 4.4
      }
     }
    },
    "modalities": {
     "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/x-matroska",
-     "video/quicktime",
-     "video/x-flv",
-     "video/x-ms-wmv"
+     "text"
     ],
     "output": [
      "text"
@@ -302,84 +448,6 @@
    "knowledge": "2025-04",
    "last_updated": "2025-09"
   },
-  "glm-5.3": {
-   "id": "glm-5.3",
-   "name": "GLM-5.3",
-   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
-   "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-5.3",
-   "release_date": "2026-08-14",
-   "limit": {
-    "context": 250000,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ],
-     "default": {
-      "type": "effort",
-      "value": "max"
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.4,
-      "cache": {
-       "read": 0.14
-      }
-     },
-     "output": {
-      "price": 4.4
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://model.graphn.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-08-14"
-  },
   "deepseek-v4.1-flash": {
    "id": "deepseek-v4.1-flash",
    "name": "DeepSeek V4.1 Flash",
@@ -459,74 +527,6 @@
    "open_weights": true,
    "knowledge": "2025-05",
    "last_updated": "2026-10-17"
-  },
-  "gemma-4-e4b": {
-   "id": "gemma-4-e4b",
-   "name": "Gemma 4 E4B",
-   "description": "Open Gemma instruction model for efficient chat and self-hosted deployments",
-   "type": "chat",
-   "family": "gemma",
-   "canonical_id": "google/gemma-4-E4B-it",
-   "release_date": "2026-04-02",
-   "limit": {
-    "context": 65536,
-    "output": 8192
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.15
-     },
-     "output": {
-      "price": 0.6
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "audio/mpeg",
-     "audio/wav"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://model.graphn.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-04-02"
   }
  }
 }

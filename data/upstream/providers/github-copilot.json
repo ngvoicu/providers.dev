@@ -6,18 +6,18 @@
   "GITHUB_TOKEN"
  ],
  "models": {
-  "claude-sonnet-4.6": {
-   "id": "claude-sonnet-4.6",
-   "name": "Claude Sonnet 4.6",
-   "description": "Claude workhorse for coding agents, careful analysis, and production cost control",
+  "claude-haiku-4.5": {
+   "id": "claude-haiku-4.5",
+   "name": "Claude Haiku 4.5 (latest)",
+   "description": "Fast Claude lane for lightweight agents, office tasks, and responsive chat",
    "type": "chat",
-   "family": "claude-sonnet",
-   "canonical_id": "anthropic/claude-sonnet-4-6",
-   "release_date": "2026-02-17",
+   "family": "claude-haiku",
+   "canonical_id": "anthropic/claude-haiku-4-5",
+   "release_date": "2025-10-15",
    "limit": {
     "context": 200000,
-    "input": 168000,
-    "output": 32000
+    "input": 136000,
+    "output": 64000
    },
    "capabilities": {
     "temperature": true,
@@ -30,12 +30,6 @@
     },
     "reasoning": {
      "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "max"
-     ],
      "budget": {
       "min": 1024,
       "max": 32000
@@ -45,14 +39,14 @@
    "cost": {
     "text": {
      "input": {
-      "price": 3,
+      "price": 1,
       "cache": {
-       "read": 0.3,
-       "write": 3.75
+       "read": 0.1,
+       "write": 1.25
       }
      },
      "output": {
-      "price": 15
+      "price": 5
      }
     }
    },
@@ -61,7 +55,6 @@
      "text",
      "image/jpeg",
      "image/png",
-     "image/gif",
      "image/webp",
      "application/pdf"
     ],
@@ -96,8 +89,504 @@
     }
    },
    "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2026-03-13"
+   "knowledge": "2025-02-28",
+   "last_updated": "2025-10-15"
+  },
+  "gpt-5.6-terra": {
+   "id": "gpt-5.6-terra",
+   "name": "GPT-5.6 Terra",
+   "description": "Balanced GPT-5.6 model for capable, cost-efficient everyday work",
+   "type": "chat",
+   "family": "gpt-terra",
+   "canonical_id": "openai/gpt-5.6-terra",
+   "release_date": "2026-07-09",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.2,
+       "write": 2.5
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 4,
+        "cache": {
+         "read": 0.4,
+         "write": 5
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 12,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 18
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.githubcopilot.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "freeform": [
+        "text",
+        "lark",
+        "regex"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-02-16",
+   "last_updated": "2026-07-09"
+  },
+  "grok-4.7": {
+   "id": "grok-4.7",
+   "name": "Grok 4.7",
+   "description": "xAI's frontier model for long-running agents, coding, knowledge work, and visual projects",
+   "type": "chat",
+   "family": "grok",
+   "canonical_id": "xai/grok-4.7",
+   "release_date": "2026-09-21",
+   "limit": {
+    "context": 500000,
+    "input": 372000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.5
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 200000
+         }
+        },
+        "price": 4,
+        "cache": {
+         "read": 1
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 6,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 200000
+         }
+        },
+        "price": 12
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.githubcopilot.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-05",
+   "last_updated": "2026-09-21"
+  },
+  "claude-fable-5.1": {
+   "id": "claude-fable-5.1",
+   "name": "Claude Fable 5.1",
+   "description": "Claude model for demanding reasoning and long-horizon agentic work",
+   "type": "chat",
+   "family": "claude-fable",
+   "canonical_id": "anthropic/claude-fable-5-1",
+   "release_date": "2026-09-01",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 10,
+      "cache": {
+       "read": 0.25,
+       "write": 12.5
+      }
+     },
+     "output": {
+      "price": 50
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://api.githubcopilot.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic"
+     },
+     "capabilities": {
+      "system_updates": true,
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "https://api.githubcopilot.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-06",
+   "last_updated": "2026-09-01"
+  },
+  "claude-opus-5": {
+   "id": "claude-opus-5",
+   "name": "Claude Opus 5",
+   "description": "Strongest Claude Opus model for coding, agents, and professional work",
+   "type": "chat",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-5",
+   "release_date": "2026-07-24",
+   "limit": {
+    "context": 1000000,
+    "input": 936000,
+    "output": 64000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5,
+       "write": 6.25
+      }
+     },
+     "output": {
+      "price": 25
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://api.githubcopilot.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic"
+     },
+     "capabilities": {
+      "system_updates": true,
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "https://api.githubcopilot.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-05",
+   "last_updated": "2026-07-24"
+  },
+  "claude-opus-5.5": {
+   "id": "claude-opus-5.5",
+   "name": "Claude Opus 5.5",
+   "description": "Claude model for long-running agentic coding and knowledge work",
+   "type": "chat",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-5-5",
+   "release_date": "2026-09-22",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 4,
+      "cache": {
+       "read": 0.2,
+       "write": 5
+      }
+     },
+     "output": {
+      "price": 20
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://api.githubcopilot.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic"
+     },
+     "capabilities": {
+      "system_updates": true,
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "https://api.githubcopilot.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-06",
+   "last_updated": "2026-09-22"
   },
   "gpt-6.1-terra": {
    "id": "gpt-6.1-terra",
@@ -207,1921 +696,6 @@
    "open_weights": false,
    "knowledge": "2026-06-01",
    "last_updated": "2026-10-26"
-  },
-  "gemini-3.6-flash": {
-   "id": "gemini-3.6-flash",
-   "name": "Gemini 3.6 Flash",
-   "description": "Fast Gemini model balancing multimodal reasoning, tool use, and cost",
-   "type": "chat",
-   "family": "gemini-flash",
-   "canonical_id": "google/gemini-3.6-flash",
-   "status": "deprecated",
-   "release_date": "2026-07-21",
-   "limit": {
-    "context": 1000000,
-    "input": 936000,
-    "output": 64000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ],
-     "budget": {
-      "min": 256,
-      "max": 32000
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.75,
-      "cache": {
-       "read": 0.075
-      }
-     },
-     "output": {
-      "price": 3.75
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.githubcopilot.com",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-03",
-   "last_updated": "2026-07-21"
-  },
-  "gemini-4-carbon": {
-   "id": "gemini-4-carbon",
-   "name": "Gemini 4 Carbon",
-   "description": "Google's most capable reasoning model for complex software engineering, deep math and science, high factual accuracy, and long-horizon autonomous agents",
-   "type": "chat",
-   "family": "gemini",
-   "canonical_id": "google/gemini-4-carbon",
-   "release_date": "2026-11-10",
-   "limit": {
-    "context": 1048576,
-    "output": 65536
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2,
-      "cache": {
-       "read": 0.1
-      }
-     },
-     "output": {
-      "price": 10
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.githubcopilot.com",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-03",
-   "last_updated": "2026-11-10"
-  },
-  "gemini-4-hydrogen": {
-   "id": "gemini-4-hydrogen",
-   "name": "Gemini 4 Hydrogen",
-   "description": "Google's Gemini 4 model for everyday coding and agentic workflows, with four thinking levels and a 1M-token context window",
-   "type": "chat",
-   "family": "gemini",
-   "canonical_id": "google/gemini-4-hydrogen",
-   "release_date": "2026-11-12",
-   "limit": {
-    "context": 1048576,
-    "output": 65536
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.5,
-      "cache": {
-       "read": 0.075
-      }
-     },
-     "output": {
-      "price": 7.5
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.githubcopilot.com",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-03",
-   "last_updated": "2026-11-12"
-  },
-  "claude-opus-4.8": {
-   "id": "claude-opus-4.8",
-   "name": "Claude Opus 4.8",
-   "description": "Top Claude Opus tier for the hardest reasoning, coding, and long-horizon agents",
-   "type": "chat",
-   "family": "claude-opus",
-   "canonical_id": "anthropic/claude-opus-4-8",
-   "release_date": "2026-05-28",
-   "limit": {
-    "context": 200000,
-    "input": 168000,
-    "output": 64000
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 5,
-      "cache": {
-       "read": 0.5,
-       "write": 6.25
-      }
-     },
-     "output": {
-      "price": 25
-     }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "service_tier": {
-        "equals": "fast"
-       }
-      },
-      "factor": 2
-     }
-    ]
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "messages": {
-     "base_url": "https://api.githubcopilot.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic"
-     },
-     "capabilities": {
-      "system_updates": true,
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "https://api.githubcopilot.com",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-01",
-   "last_updated": "2026-05-28",
-   "experimental": {
-    "modes": {
-     "fast": {
-      "body": {
-       "speed": "fast"
-      },
-      "headers": {
-       "anthropic-beta": "fast-mode-2026-02-01"
-      }
-     }
-    }
-   }
-  },
-  "gpt-5.6-sol": {
-   "id": "gpt-5.6-sol",
-   "name": "GPT-5.6 Sol",
-   "description": "Frontier GPT-5.6 model for complex professional work, coding, and agentic workflows",
-   "type": "chat",
-   "family": "gpt-sol",
-   "canonical_id": "openai/gpt-5.6-sol",
-   "release_date": "2026-07-09",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 4,
-      "cache": {
-       "read": 0.4,
-       "write": 5
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 8,
-        "cache": {
-         "read": 0.8,
-         "write": 10
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 20,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 30
-       }
-      ]
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "responses": {
-     "base_url": "https://api.githubcopilot.com",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "freeform": [
-        "text",
-        "lark",
-        "regex"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-02-16",
-   "last_updated": "2026-07-09"
-  },
-  "claude-haiku-5.5": {
-   "id": "claude-haiku-5.5",
-   "name": "Claude Haiku 5.5",
-   "description": "Fast Claude model for responsive assistance, classification, and lightweight agents",
-   "type": "chat",
-   "family": "claude-haiku",
-   "canonical_id": "anthropic/claude-haiku-5-5",
-   "release_date": "2026-10-07",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.1,
-      "cache": {
-       "read": 0.01,
-       "write": 0.125
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 100000
-         }
-        },
-        "price": 0.5,
-        "cache": {
-         "read": 0.05,
-         "write": 0.625
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 0.5,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 100000
-         }
-        },
-        "price": 2.5
-       }
-      ]
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "messages": {
-     "base_url": "https://api.githubcopilot.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic"
-     },
-     "capabilities": {
-      "system_updates": true,
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "https://api.githubcopilot.com",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-06",
-   "last_updated": "2026-10-07"
-  },
-  "mai-code-1.1-flash": {
-   "id": "mai-code-1.1-flash",
-   "name": "MAI-Code-1.1-Flash",
-   "description": "Microsoft coding model with native vision support, optimized for fast and efficient software development",
-   "type": "chat",
-   "family": "mai",
-   "canonical_id": "microsoft/mai-code-1.1-flash",
-   "release_date": "2026-08-11",
-   "limit": {
-    "context": 256000,
-    "input": 128000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.2,
-      "cache": {
-       "read": 0.02
-      }
-     },
-     "output": {
-      "price": 1.2
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/webp",
-     "image/gif",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "responses": {
-     "base_url": "https://api.githubcopilot.com",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-08-11"
-  },
-  "claude-opus-4.7": {
-   "id": "claude-opus-4.7",
-   "name": "Claude Opus 4.7",
-   "description": "Stronger Opus tier for advanced software work and high-stakes reasoning",
-   "type": "chat",
-   "family": "claude-opus",
-   "canonical_id": "anthropic/claude-opus-4-7",
-   "status": "deprecated",
-   "release_date": "2026-04-16",
-   "limit": {
-    "context": 200000,
-    "input": 168000,
-    "output": 32000
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 5,
-      "cache": {
-       "read": 0.5,
-       "write": 6.25
-      }
-     },
-     "output": {
-      "price": 25
-     }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "service_tier": {
-        "equals": "fast"
-       }
-      },
-      "factor": 6
-     }
-    ]
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "messages": {
-     "base_url": "https://api.githubcopilot.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "https://api.githubcopilot.com",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-01-31",
-   "last_updated": "2026-04-16",
-   "experimental": {
-    "modes": {
-     "fast": {
-      "body": {
-       "speed": "fast"
-      },
-      "headers": {
-       "anthropic-beta": "fast-mode-2026-02-01"
-      }
-     }
-    }
-   }
-  },
-  "gpt-5.4": {
-   "id": "gpt-5.4",
-   "name": "GPT-5.4",
-   "description": "Agent-ready GPT for coding and computer-use workflows at a lower cost",
-   "type": "chat",
-   "family": "gpt",
-   "canonical_id": "openai/gpt-5.4",
-   "status": "deprecated",
-   "release_date": "2026-03-05",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "xhigh"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2.5,
-      "cache": {
-       "read": 0.25
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 5,
-        "cache": {
-         "read": 0.5
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 15,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 22.5
-       }
-      ]
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "responses": {
-     "base_url": "https://api.githubcopilot.com",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "freeform": [
-        "text",
-        "lark",
-        "regex"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2026-03-05"
-  },
-  "claude-fable-5.2": {
-   "id": "claude-fable-5.2",
-   "name": "Claude Fable 5.2",
-   "description": "Claude model for demanding reasoning and long-horizon agentic work",
-   "type": "chat",
-   "family": "claude-fable",
-   "canonical_id": "anthropic/claude-fable-5-2",
-   "release_date": "2026-11-09",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 8,
-      "cache": {
-       "read": 0.2,
-       "write": 10
-      }
-     },
-     "output": {
-      "price": 40
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "messages": {
-     "base_url": "https://api.githubcopilot.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic"
-     },
-     "capabilities": {
-      "system_updates": true,
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "https://api.githubcopilot.com",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-06",
-   "last_updated": "2026-11-09"
-  },
-  "claude-fable-5.1": {
-   "id": "claude-fable-5.1",
-   "name": "Claude Fable 5.1",
-   "description": "Claude model for demanding reasoning and long-horizon agentic work",
-   "type": "chat",
-   "family": "claude-fable",
-   "canonical_id": "anthropic/claude-fable-5-1",
-   "release_date": "2026-09-01",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 10,
-      "cache": {
-       "read": 0.25,
-       "write": 12.5
-      }
-     },
-     "output": {
-      "price": 50
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "messages": {
-     "base_url": "https://api.githubcopilot.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic"
-     },
-     "capabilities": {
-      "system_updates": true,
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "https://api.githubcopilot.com",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-06",
-   "last_updated": "2026-09-01"
-  },
-  "gpt-6.1-sol": {
-   "id": "gpt-6.1-sol",
-   "name": "GPT-6.1 Sol",
-   "description": "Near-Astra performance for complex coding, computer use, and professional work at a lower cost.",
-   "type": "chat",
-   "family": "gpt-sol",
-   "canonical_id": "openai/gpt-6.1-sol",
-   "release_date": "2026-09-29",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2,
-      "cache": {
-       "read": 0.1,
-       "write": 2.5
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 4,
-        "cache": {
-         "read": 0.2,
-         "write": 5
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 10,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 15
-       }
-      ]
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "responses": {
-     "base_url": "https://api.githubcopilot.com",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "freeform": [
-        "text",
-        "lark",
-        "regex"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-04-30",
-   "last_updated": "2026-09-29"
-  },
-  "claude-sonnet-5.5": {
-   "id": "claude-sonnet-5.5",
-   "name": "Claude Sonnet 5.5",
-   "description": "Fast Claude model for everyday coding, agents, and knowledge work",
-   "type": "chat",
-   "family": "claude-sonnet",
-   "canonical_id": "anthropic/claude-sonnet-5-5",
-   "release_date": "2026-09-28",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2,
-      "cache": {
-       "read": 0.1,
-       "write": 2.5
-      }
-     },
-     "output": {
-      "price": 10
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "messages": {
-     "base_url": "https://api.githubcopilot.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic"
-     },
-     "capabilities": {
-      "system_updates": true,
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "https://api.githubcopilot.com",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-06",
-   "last_updated": "2026-09-28"
-  },
-  "gemini-3.5-flash": {
-   "id": "gemini-3.5-flash",
-   "name": "Gemini 3.5 Flash",
-   "description": "Fast Gemini model balancing multimodal reasoning, tool use, and cost",
-   "type": "chat",
-   "family": "gemini-flash",
-   "canonical_id": "google/gemini-3.5-flash",
-   "status": "deprecated",
-   "release_date": "2026-05-19",
-   "limit": {
-    "context": 200000,
-    "input": 128000,
-    "output": 64000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ],
-     "budget": {
-      "min": 256,
-      "max": 24000
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.5,
-      "cache": {
-       "read": 0.15
-      }
-     },
-     "output": {
-      "price": 9
-     }
-    },
-    "audio": {
-     "input": {
-      "price": 1.5
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp",
-     "audio/wav",
-     "audio/mp3",
-     "audio/aiff",
-     "audio/aac",
-     "audio/ogg",
-     "audio/flac",
-     "audio/mpeg",
-     "audio/m4a",
-     "audio/l16",
-     "audio/opus",
-     "audio/alaw",
-     "audio/mulaw",
-     "audio/webm",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.githubcopilot.com",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-01",
-   "last_updated": "2026-05-19"
-  },
-  "gpt-5.4-nano": {
-   "id": "gpt-5.4-nano",
-   "name": "GPT-5.4 nano",
-   "description": "Cheapest GPT-5.4 lane for simple routing, extraction, and bulk automation",
-   "type": "chat",
-   "family": "gpt-nano",
-   "canonical_id": "openai/gpt-5.4-nano",
-   "release_date": "2026-03-17",
-   "limit": {
-    "context": 400000,
-    "input": 272000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "xhigh"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.2,
-      "cache": {
-       "read": 0.02
-      }
-     },
-     "output": {
-      "price": 1.25
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "responses": {
-     "base_url": "https://api.githubcopilot.com",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "freeform": [
-        "text",
-        "lark",
-        "regex"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2026-03-17"
-  },
-  "claude-fable-5": {
-   "id": "claude-fable-5",
-   "name": "Claude Fable 5",
-   "description": "Claude model for creative writing, analysis, and controlled agent workflows",
-   "type": "chat",
-   "family": "claude-fable",
-   "canonical_id": "anthropic/claude-fable-5",
-   "release_date": "2026-06-09",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 10,
-      "cache": {
-       "read": 1,
-       "write": 12.5
-      }
-     },
-     "output": {
-      "price": 50
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "messages": {
-     "base_url": "https://api.githubcopilot.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic"
-     },
-     "capabilities": {
-      "system_updates": true,
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "https://api.githubcopilot.com",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-01-31",
-   "last_updated": "2026-06-09"
-  },
-  "grok-4.6": {
-   "id": "grok-4.6",
-   "name": "Grok 4.6",
-   "description": "xAI's frontier model for long-running agents, coding, knowledge work, and visual projects",
-   "type": "chat",
-   "family": "grok",
-   "canonical_id": "xai/grok-4.6",
-   "release_date": "2026-08-12",
-   "limit": {
-    "context": 500000,
-    "input": 372000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2,
-      "cache": {
-       "read": 0.5
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 200000
-         }
-        },
-        "price": 4,
-        "cache": {
-         "read": 1
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 6,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 200000
-         }
-        },
-        "price": 12
-       }
-      ]
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "responses": {
-     "base_url": "https://api.githubcopilot.com",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-02-01",
-   "last_updated": "2026-08-12"
-  },
-  "gemini-3.8-flash": {
-   "id": "gemini-3.8-flash",
-   "name": "Gemini 3.8 Flash",
-   "description": "Google's most intelligent Flash model, engineered for long-horizon software engineering, autonomous agents, and complex enterprise workflows",
-   "type": "chat",
-   "family": "gemini-flash",
-   "canonical_id": "google/gemini-3.8-flash",
-   "release_date": "2026-09-02",
-   "limit": {
-    "context": 1000000,
-    "input": 936000,
-    "output": 64000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.75,
-      "cache": {
-       "read": 0.075
-      }
-     },
-     "output": {
-      "price": 3.75
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.githubcopilot.com",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-09-02"
-  },
-  "gemini-4-argon": {
-   "id": "gemini-4-argon",
-   "name": "Gemini 4 Argon",
-   "description": "Google's flagship reasoning model for complex software engineering, deep math and science, and long-horizon autonomous agents",
-   "type": "chat",
-   "family": "gemini",
-   "canonical_id": "google/gemini-4-argon",
-   "release_date": "2026-10-13",
-   "limit": {
-    "context": 1048576,
-    "output": 65536
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2,
-      "cache": {
-       "read": 0.1
-      }
-     },
-     "output": {
-      "price": 10
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.githubcopilot.com",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-03",
-   "last_updated": "2026-10-13"
-  },
-  "gpt-6-sol": {
-   "id": "gpt-6-sol",
-   "name": "GPT-6 Sol",
-   "description": "OpenAI model for complex coding and agentic workflows",
-   "type": "chat",
-   "family": "gpt-sol",
-   "canonical_id": "openai/gpt-6-sol",
-   "release_date": "2026-09-22",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2,
-      "cache": {
-       "read": 0.2,
-       "write": 2.5
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 4,
-        "cache": {
-         "read": 0.4,
-         "write": 5
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 10,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 15
-       }
-      ]
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "responses": {
-     "base_url": "https://api.githubcopilot.com",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "freeform": [
-        "text",
-        "lark",
-        "regex"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-04-20",
-   "last_updated": "2026-09-22"
   },
   "gpt-5-mini": {
    "id": "gpt-5-mini",
@@ -2371,560 +945,6 @@
    "knowledge": "2026-03",
    "last_updated": "2026-08-13"
   },
-  "claude-opus-5.5": {
-   "id": "claude-opus-5.5",
-   "name": "Claude Opus 5.5",
-   "description": "Claude model for long-running agentic coding and knowledge work",
-   "type": "chat",
-   "family": "claude-opus",
-   "canonical_id": "anthropic/claude-opus-5-5",
-   "release_date": "2026-09-22",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 4,
-      "cache": {
-       "read": 0.2,
-       "write": 5
-      }
-     },
-     "output": {
-      "price": 20
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "messages": {
-     "base_url": "https://api.githubcopilot.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic"
-     },
-     "capabilities": {
-      "system_updates": true,
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "https://api.githubcopilot.com",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-06",
-   "last_updated": "2026-09-22"
-  },
-  "claude-sonnet-5": {
-   "id": "claude-sonnet-5",
-   "name": "Claude Sonnet 5",
-   "description": "Everyday Claude agent model for coding, planning, browsing, and general work",
-   "type": "chat",
-   "family": "claude-sonnet",
-   "canonical_id": "anthropic/claude-sonnet-5",
-   "release_date": "2026-06-30",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2,
-      "cache": {
-       "read": 0.2,
-       "write": 2.5
-      }
-     },
-     "output": {
-      "price": 10
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "messages": {
-     "base_url": "https://api.githubcopilot.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "https://api.githubcopilot.com",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-01-31",
-   "last_updated": "2026-06-30"
-  },
-  "gpt-5.3-codex": {
-   "id": "gpt-5.3-codex",
-   "name": "GPT-5.3 Codex",
-   "description": "Coding-optimized GPT model for repository edits, reviews, and agentic software work",
-   "type": "chat",
-   "family": "gpt-codex",
-   "canonical_id": "openai/gpt-5.3-codex",
-   "release_date": "2026-02-05",
-   "limit": {
-    "context": 400000,
-    "input": 272000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.75,
-      "cache": {
-       "read": 0.175
-      }
-     },
-     "output": {
-      "price": 14
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "responses": {
-     "base_url": "https://api.githubcopilot.com",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "freeform": [
-        "text",
-        "lark",
-        "regex"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2026-02-05"
-  },
-  "gpt-6-astra": {
-   "id": "gpt-6-astra",
-   "name": "GPT-6 Astra",
-   "description": "GPT-6 Astra is OpenAI's most capable model for complex reasoning, coding, computer use, research, and document creation.",
-   "type": "chat",
-   "family": "gpt-astra",
-   "canonical_id": "openai/gpt-6-astra",
-   "release_date": "2026-09-04",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 10,
-      "cache": {
-       "read": 1,
-       "write": 12.5
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 20,
-        "cache": {
-         "read": 2,
-         "write": 25
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 50,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 75
-       }
-      ]
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "responses": {
-     "base_url": "https://api.githubcopilot.com",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "freeform": [
-        "text",
-        "lark",
-        "regex"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-04-30",
-   "last_updated": "2026-09-04"
-  },
-  "gpt-5.4-mini": {
-   "id": "gpt-5.4-mini",
-   "name": "GPT-5.4 mini",
-   "description": "Strong small GPT for coding subagents, quick tool use, and high-volume work",
-   "type": "chat",
-   "family": "gpt-mini",
-   "canonical_id": "openai/gpt-5.4-mini",
-   "status": "deprecated",
-   "release_date": "2026-03-17",
-   "limit": {
-    "context": 400000,
-    "input": 272000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "xhigh"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.75,
-      "cache": {
-       "read": 0.075
-      }
-     },
-     "output": {
-      "price": 4.5
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "responses": {
-     "base_url": "https://api.githubcopilot.com",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "freeform": [
-        "text",
-        "lark",
-        "regex"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2026-03-17"
-  },
-  "claude-opus-5": {
-   "id": "claude-opus-5",
-   "name": "Claude Opus 5",
-   "description": "Strongest Claude Opus model for coding, agents, and professional work",
-   "type": "chat",
-   "family": "claude-opus",
-   "canonical_id": "anthropic/claude-opus-5",
-   "release_date": "2026-07-24",
-   "limit": {
-    "context": 1000000,
-    "input": 936000,
-    "output": 64000
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 5,
-      "cache": {
-       "read": 0.5,
-       "write": 6.25
-      }
-     },
-     "output": {
-      "price": 25
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "messages": {
-     "base_url": "https://api.githubcopilot.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic"
-     },
-     "capabilities": {
-      "system_updates": true,
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "https://api.githubcopilot.com",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-05",
-   "last_updated": "2026-07-24"
-  },
   "gpt-5.5": {
    "id": "gpt-5.5",
    "name": "GPT-5.5",
@@ -3032,14 +1052,14 @@
    "knowledge": "2025-12-01",
    "last_updated": "2026-04-23"
   },
-  "grok-4.7": {
-   "id": "grok-4.7",
-   "name": "Grok 4.7",
+  "grok-4.6": {
+   "id": "grok-4.6",
+   "name": "Grok 4.6",
    "description": "xAI's frontier model for long-running agents, coding, knowledge work, and visual projects",
    "type": "chat",
    "family": "grok",
-   "canonical_id": "xai/grok-4.7",
-   "release_date": "2026-09-21",
+   "canonical_id": "xai/grok-4.6",
+   "release_date": "2026-08-12",
    "limit": {
     "context": 500000,
     "input": 372000,
@@ -3126,22 +1146,20 @@
     }
    },
    "open_weights": false,
-   "knowledge": "2026-05",
-   "last_updated": "2026-09-21"
+   "knowledge": "2026-02-01",
+   "last_updated": "2026-08-12"
   },
-  "kimi-k2.7-code": {
-   "id": "kimi-k2.7-code",
-   "name": "Kimi K2.7 Code",
-   "description": "Coding-focused Kimi model, stronger on long-horizon repo work with less overthinking",
+  "gemini-4-hydrogen": {
+   "id": "gemini-4-hydrogen",
+   "name": "Gemini 4 Hydrogen",
+   "description": "Google's Gemini 4 model for everyday coding and agentic workflows, with four thinking levels and a 1M-token context window",
    "type": "chat",
-   "family": "kimi-k2",
-   "canonical_id": "moonshotai/kimi-k2.7-code",
-   "status": "deprecated",
-   "release_date": "2026-06-12",
+   "family": "gemini",
+   "canonical_id": "google/gemini-4-hydrogen",
+   "release_date": "2026-11-12",
    "limit": {
-    "context": 256000,
-    "input": 224000,
-    "output": 32000
+    "context": 1048576,
+    "output": 65536
    },
    "capabilities": {
     "temperature": false,
@@ -3154,19 +1172,206 @@
      "supported": true
     },
     "reasoning": {
-     "supported": true
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.95,
+      "price": 1.5,
       "cache": {
-       "read": 0.19
+       "read": 0.075
       }
      },
      "output": {
-      "price": 4
+      "price": 7.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.githubcopilot.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-03",
+   "last_updated": "2026-11-12"
+  },
+  "gemini-4-carbon": {
+   "id": "gemini-4-carbon",
+   "name": "Gemini 4 Carbon",
+   "description": "Google's most capable reasoning model for complex software engineering, deep math and science, high factual accuracy, and long-horizon autonomous agents",
+   "type": "chat",
+   "family": "gemini",
+   "canonical_id": "google/gemini-4-carbon",
+   "release_date": "2026-11-10",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.1
+      }
+     },
+     "output": {
+      "price": 10
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.githubcopilot.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-03",
+   "last_updated": "2026-11-10"
+  },
+  "gpt-6-luna": {
+   "id": "gpt-6-luna",
+   "name": "GPT-6 Luna",
+   "description": "OpenAI's most efficient model for focused, high-volume tasks",
+   "type": "chat",
+   "family": "gpt-luna",
+   "canonical_id": "openai/gpt-6-luna",
+   "release_date": "2026-09-22",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1,
+      "cache": {
+       "read": 0.01,
+       "write": 0.125
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 0.2,
+        "cache": {
+         "read": 0.02,
+         "write": 0.25
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 0.5,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 0.75
+       }
+      ]
      }
     }
    },
@@ -3177,9 +1382,268 @@
      "image/png",
      "image/gif",
      "image/webp",
-     "image/bmp",
-     "image/heic",
-     "image/heif"
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.githubcopilot.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "freeform": [
+        "text",
+        "lark",
+        "regex"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-05-18",
+   "last_updated": "2026-09-22"
+  },
+  "claude-fable-5.2": {
+   "id": "claude-fable-5.2",
+   "name": "Claude Fable 5.2",
+   "description": "Claude model for demanding reasoning and long-horizon agentic work",
+   "type": "chat",
+   "family": "claude-fable",
+   "canonical_id": "anthropic/claude-fable-5-2",
+   "release_date": "2026-11-09",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 8,
+      "cache": {
+       "read": 0.2,
+       "write": 10
+      }
+     },
+     "output": {
+      "price": 40
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://api.githubcopilot.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic"
+     },
+     "capabilities": {
+      "system_updates": true,
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "https://api.githubcopilot.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-06",
+   "last_updated": "2026-11-09"
+  },
+  "gpt-5.4-mini": {
+   "id": "gpt-5.4-mini",
+   "name": "GPT-5.4 mini",
+   "description": "Strong small GPT for coding subagents, quick tool use, and high-volume work",
+   "type": "chat",
+   "family": "gpt-mini",
+   "canonical_id": "openai/gpt-5.4-mini",
+   "status": "deprecated",
+   "release_date": "2026-03-17",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.75,
+      "cache": {
+       "read": 0.075
+      }
+     },
+     "output": {
+      "price": 4.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.githubcopilot.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "freeform": [
+        "text",
+        "lark",
+        "regex"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-03-17"
+  },
+  "kimi-k3": {
+   "id": "kimi-k3",
+   "name": "Kimi K3",
+   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
+   "type": "chat",
+   "family": "kimi-k3",
+   "canonical_id": "moonshotai/kimi-k3",
+   "release_date": "2026-07-16",
+   "limit": {
+    "context": 1048576,
+    "output": 1048576
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 3,
+      "cache": {
+       "read": 0.3
+      }
+     },
+     "output": {
+      "price": 15
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp",
+     "image/gif"
     ],
     "output": [
      "text"
@@ -3200,26 +1664,26 @@
     }
    },
    "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-06-12"
+   "last_updated": "2026-07-16"
   },
-  "claude-haiku-4.5": {
-   "id": "claude-haiku-4.5",
-   "name": "Claude Haiku 4.5 (latest)",
-   "description": "Fast Claude lane for lightweight agents, office tasks, and responsive chat",
+  "gemini-3.8-flash": {
+   "id": "gemini-3.8-flash",
+   "name": "Gemini 3.8 Flash",
+   "description": "Google's most intelligent Flash model, engineered for long-horizon software engineering, autonomous agents, and complex enterprise workflows",
    "type": "chat",
-   "family": "claude-haiku",
-   "canonical_id": "anthropic/claude-haiku-4-5",
-   "release_date": "2025-10-15",
+   "family": "gemini-flash",
+   "canonical_id": "google/gemini-3.8-flash",
+   "release_date": "2026-09-02",
    "limit": {
-    "context": 200000,
-    "input": 136000,
+    "context": 1000000,
+    "input": 936000,
     "output": 64000
    },
    "capabilities": {
     "temperature": true,
     "top_k": true,
     "top_p": true,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -3227,23 +1691,23 @@
     },
     "reasoning": {
      "supported": true,
-     "budget": {
-      "min": 1024,
-      "max": 32000
-     }
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 1,
+      "price": 0.75,
       "cache": {
-       "read": 0.1,
-       "write": 1.25
+       "read": 0.075
       }
      },
      "output": {
-      "price": 5
+      "price": 3.75
      }
     }
    },
@@ -3253,6 +1717,8 @@
      "image/jpeg",
      "image/png",
      "image/webp",
+     "image/heic",
+     "image/heif",
      "application/pdf"
     ],
     "output": [
@@ -3260,18 +1726,6 @@
     ]
    },
    "api": {
-    "messages": {
-     "base_url": "https://api.githubcopilot.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
     "chat-completions": {
      "base_url": "https://api.githubcopilot.com",
      "sdk": {
@@ -3286,8 +1740,89 @@
     }
    },
    "open_weights": false,
-   "knowledge": "2025-02-28",
-   "last_updated": "2025-10-15"
+   "last_updated": "2026-09-02"
+  },
+  "gpt-5.3-codex": {
+   "id": "gpt-5.3-codex",
+   "name": "GPT-5.3 Codex",
+   "description": "Coding-optimized GPT model for repository edits, reviews, and agentic software work",
+   "type": "chat",
+   "family": "gpt-codex",
+   "canonical_id": "openai/gpt-5.3-codex",
+   "release_date": "2026-02-05",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.75,
+      "cache": {
+       "read": 0.175
+      }
+     },
+     "output": {
+      "price": 14
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.githubcopilot.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "freeform": [
+        "text",
+        "lark",
+        "regex"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-02-05"
   },
   "gpt-5.6-luna": {
    "id": "gpt-5.6-luna",
@@ -3398,17 +1933,100 @@
    "knowledge": "2026-02-16",
    "last_updated": "2026-07-09"
   },
-  "kimi-k3": {
-   "id": "kimi-k3",
-   "name": "Kimi K3",
-   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
+  "gpt-5.4-nano": {
+   "id": "gpt-5.4-nano",
+   "name": "GPT-5.4 nano",
+   "description": "Cheapest GPT-5.4 lane for simple routing, extraction, and bulk automation",
    "type": "chat",
-   "family": "kimi-k3",
-   "canonical_id": "moonshotai/kimi-k3",
-   "release_date": "2026-07-16",
+   "family": "gpt-nano",
+   "canonical_id": "openai/gpt-5.4-nano",
+   "release_date": "2026-03-17",
    "limit": {
-    "context": 1048576,
-    "output": 1048576
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.2,
+      "cache": {
+       "read": 0.02
+      }
+     },
+     "output": {
+      "price": 1.25
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.githubcopilot.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "freeform": [
+        "text",
+        "lark",
+        "regex"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-03-17"
+  },
+  "gpt-6-astra": {
+   "id": "gpt-6-astra",
+   "name": "GPT-6 Astra",
+   "description": "GPT-6 Astra is OpenAI's most capable model for complex reasoning, coding, computer use, research, and document creation.",
+   "type": "chat",
+   "family": "gpt-astra",
+   "canonical_id": "openai/gpt-6-astra",
+   "release_date": "2026-09-04",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
    },
    "capabilities": {
     "temperature": false,
@@ -3424,7 +2042,9 @@
      "supported": true,
      "effort": [
       "low",
+      "medium",
       "high",
+      "xhigh",
       "max"
      ]
     }
@@ -3432,13 +2052,38 @@
    "cost": {
     "text": {
      "input": {
-      "price": 3,
+      "price": 10,
       "cache": {
-       "read": 0.3
-      }
+       "read": 1,
+       "write": 12.5
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 20,
+        "cache": {
+         "read": 2,
+         "write": 25
+        }
+       }
+      ]
      },
      "output": {
-      "price": 15
+      "price": 50,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 75
+       }
+      ]
      }
     }
    },
@@ -3447,8 +2092,422 @@
      "text",
      "image/jpeg",
      "image/png",
+     "image/gif",
      "image/webp",
-     "image/gif"
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.githubcopilot.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "freeform": [
+        "text",
+        "lark",
+        "regex"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-04-30",
+   "last_updated": "2026-09-04"
+  },
+  "gpt-5.4": {
+   "id": "gpt-5.4",
+   "name": "GPT-5.4",
+   "description": "Agent-ready GPT for coding and computer-use workflows at a lower cost",
+   "type": "chat",
+   "family": "gpt",
+   "canonical_id": "openai/gpt-5.4",
+   "status": "deprecated",
+   "release_date": "2026-03-05",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2.5,
+      "cache": {
+       "read": 0.25
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 5,
+        "cache": {
+         "read": 0.5
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 15,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 22.5
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.githubcopilot.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "freeform": [
+        "text",
+        "lark",
+        "regex"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-03-05"
+  },
+  "claude-opus-4.8": {
+   "id": "claude-opus-4.8",
+   "name": "Claude Opus 4.8",
+   "description": "Top Claude Opus tier for the hardest reasoning, coding, and long-horizon agents",
+   "type": "chat",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-4-8",
+   "release_date": "2026-05-28",
+   "limit": {
+    "context": 200000,
+    "input": 168000,
+    "output": 64000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5,
+       "write": 6.25
+      }
+     },
+     "output": {
+      "price": 25
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "fast"
+       }
+      },
+      "factor": 2
+     }
+    ]
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://api.githubcopilot.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic"
+     },
+     "capabilities": {
+      "system_updates": true,
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "https://api.githubcopilot.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-01",
+   "last_updated": "2026-05-28",
+   "experimental": {
+    "modes": {
+     "fast": {
+      "body": {
+       "speed": "fast"
+      },
+      "headers": {
+       "anthropic-beta": "fast-mode-2026-02-01"
+      }
+     }
+    }
+   }
+  },
+  "claude-opus-4.7": {
+   "id": "claude-opus-4.7",
+   "name": "Claude Opus 4.7",
+   "description": "Stronger Opus tier for advanced software work and high-stakes reasoning",
+   "type": "chat",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-4-7",
+   "status": "deprecated",
+   "release_date": "2026-04-16",
+   "limit": {
+    "context": 200000,
+    "input": 168000,
+    "output": 32000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5,
+       "write": 6.25
+      }
+     },
+     "output": {
+      "price": 25
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "fast"
+       }
+      },
+      "factor": 6
+     }
+    ]
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://api.githubcopilot.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "https://api.githubcopilot.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-01-31",
+   "last_updated": "2026-04-16",
+   "experimental": {
+    "modes": {
+     "fast": {
+      "body": {
+       "speed": "fast"
+      },
+      "headers": {
+       "anthropic-beta": "fast-mode-2026-02-01"
+      }
+     }
+    }
+   }
+  },
+  "kimi-k2.7-code": {
+   "id": "kimi-k2.7-code",
+   "name": "Kimi K2.7 Code",
+   "description": "Coding-focused Kimi model, stronger on long-horizon repo work with less overthinking",
+   "type": "chat",
+   "family": "kimi-k2",
+   "canonical_id": "moonshotai/kimi-k2.7-code",
+   "status": "deprecated",
+   "release_date": "2026-06-12",
+   "limit": {
+    "context": 256000,
+    "input": 224000,
+    "output": 32000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.95,
+      "cache": {
+       "read": 0.19
+      }
+     },
+     "output": {
+      "price": 4
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/heic",
+     "image/heif"
     ],
     "output": [
      "text"
@@ -3469,16 +2528,17 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2026-07-16"
+   "knowledge": "2025-01",
+   "last_updated": "2026-06-12"
   },
-  "gpt-5.6-terra": {
-   "id": "gpt-5.6-terra",
-   "name": "GPT-5.6 Terra",
-   "description": "Balanced GPT-5.6 model for capable, cost-efficient everyday work",
+  "gpt-6-sol": {
+   "id": "gpt-6-sol",
+   "name": "GPT-6 Sol",
+   "description": "OpenAI model for complex coding and agentic workflows",
    "type": "chat",
-   "family": "gpt-terra",
-   "canonical_id": "openai/gpt-5.6-terra",
-   "release_date": "2026-07-09",
+   "family": "gpt-sol",
+   "canonical_id": "openai/gpt-6-sol",
+   "release_date": "2026-09-22",
    "limit": {
     "context": 1050000,
     "input": 922000,
@@ -3530,7 +2590,7 @@
       ]
      },
      "output": {
-      "price": 12,
+      "price": 10,
       "overrides": [
        {
         "when": {
@@ -3538,7 +2598,731 @@
           "gt": 272000
          }
         },
-        "price": 18
+        "price": 15
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.githubcopilot.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "freeform": [
+        "text",
+        "lark",
+        "regex"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-04-20",
+   "last_updated": "2026-09-22"
+  },
+  "gpt-6.1-sol": {
+   "id": "gpt-6.1-sol",
+   "name": "GPT-6.1 Sol",
+   "description": "Near-Astra performance for complex coding, computer use, and professional work at a lower cost.",
+   "type": "chat",
+   "family": "gpt-sol",
+   "canonical_id": "openai/gpt-6.1-sol",
+   "release_date": "2026-09-29",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.1,
+       "write": 2.5
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 4,
+        "cache": {
+         "read": 0.2,
+         "write": 5
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 10,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 15
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.githubcopilot.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "freeform": [
+        "text",
+        "lark",
+        "regex"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-04-30",
+   "last_updated": "2026-09-29"
+  },
+  "claude-sonnet-5": {
+   "id": "claude-sonnet-5",
+   "name": "Claude Sonnet 5",
+   "description": "Everyday Claude agent model for coding, planning, browsing, and general work",
+   "type": "chat",
+   "family": "claude-sonnet",
+   "canonical_id": "anthropic/claude-sonnet-5",
+   "release_date": "2026-06-30",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.2,
+       "write": 2.5
+      }
+     },
+     "output": {
+      "price": 10
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://api.githubcopilot.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "https://api.githubcopilot.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-01-31",
+   "last_updated": "2026-06-30"
+  },
+  "gemini-3.5-flash": {
+   "id": "gemini-3.5-flash",
+   "name": "Gemini 3.5 Flash",
+   "description": "Fast Gemini model balancing multimodal reasoning, tool use, and cost",
+   "type": "chat",
+   "family": "gemini-flash",
+   "canonical_id": "google/gemini-3.5-flash",
+   "status": "deprecated",
+   "release_date": "2026-05-19",
+   "limit": {
+    "context": 200000,
+    "input": 128000,
+    "output": 64000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ],
+     "budget": {
+      "min": 256,
+      "max": 24000
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.5,
+      "cache": {
+       "read": 0.15
+      }
+     },
+     "output": {
+      "price": 9
+     }
+    },
+    "audio": {
+     "input": {
+      "price": 1.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.githubcopilot.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2026-05-19"
+  },
+  "claude-sonnet-4.6": {
+   "id": "claude-sonnet-4.6",
+   "name": "Claude Sonnet 4.6",
+   "description": "Claude workhorse for coding agents, careful analysis, and production cost control",
+   "type": "chat",
+   "family": "claude-sonnet",
+   "canonical_id": "anthropic/claude-sonnet-4-6",
+   "release_date": "2026-02-17",
+   "limit": {
+    "context": 200000,
+    "input": 168000,
+    "output": 32000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "max"
+     ],
+     "budget": {
+      "min": 1024,
+      "max": 32000
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 3,
+      "cache": {
+       "read": 0.3,
+       "write": 3.75
+      }
+     },
+     "output": {
+      "price": 15
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://api.githubcopilot.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "https://api.githubcopilot.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-03-13"
+  },
+  "claude-haiku-5.5": {
+   "id": "claude-haiku-5.5",
+   "name": "Claude Haiku 5.5",
+   "description": "Fast Claude model for responsive assistance, classification, and lightweight agents",
+   "type": "chat",
+   "family": "claude-haiku",
+   "canonical_id": "anthropic/claude-haiku-5-5",
+   "release_date": "2026-10-07",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1,
+      "cache": {
+       "read": 0.01,
+       "write": 0.125
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 100000
+         }
+        },
+        "price": 0.5,
+        "cache": {
+         "read": 0.05,
+         "write": 0.625
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 0.5,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 100000
+         }
+        },
+        "price": 2.5
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://api.githubcopilot.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic"
+     },
+     "capabilities": {
+      "system_updates": true,
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "https://api.githubcopilot.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-06",
+   "last_updated": "2026-10-07"
+  },
+  "claude-sonnet-5.5": {
+   "id": "claude-sonnet-5.5",
+   "name": "Claude Sonnet 5.5",
+   "description": "Fast Claude model for everyday coding, agents, and knowledge work",
+   "type": "chat",
+   "family": "claude-sonnet",
+   "canonical_id": "anthropic/claude-sonnet-5-5",
+   "release_date": "2026-09-28",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.1,
+       "write": 2.5
+      }
+     },
+     "output": {
+      "price": 10
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://api.githubcopilot.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic"
+     },
+     "capabilities": {
+      "system_updates": true,
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "https://api.githubcopilot.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-06",
+   "last_updated": "2026-09-28"
+  },
+  "gpt-5.6-sol": {
+   "id": "gpt-5.6-sol",
+   "name": "GPT-5.6 Sol",
+   "description": "Frontier GPT-5.6 model for complex professional work, coding, and agentic workflows",
+   "type": "chat",
+   "family": "gpt-sol",
+   "canonical_id": "openai/gpt-5.6-sol",
+   "release_date": "2026-07-09",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 4,
+      "cache": {
+       "read": 0.4,
+       "write": 5
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 8,
+        "cache": {
+         "read": 0.8,
+         "write": 10
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 20,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 30
        }
       ]
      }
@@ -3580,23 +3364,22 @@
    "knowledge": "2026-02-16",
    "last_updated": "2026-07-09"
   },
-  "gpt-6-luna": {
-   "id": "gpt-6-luna",
-   "name": "GPT-6 Luna",
-   "description": "OpenAI's most efficient model for focused, high-volume tasks",
+  "claude-fable-5": {
+   "id": "claude-fable-5",
+   "name": "Claude Fable 5",
+   "description": "Claude model for creative writing, analysis, and controlled agent workflows",
    "type": "chat",
-   "family": "gpt-luna",
-   "canonical_id": "openai/gpt-6-luna",
-   "release_date": "2026-09-22",
+   "family": "claude-fable",
+   "canonical_id": "anthropic/claude-fable-5",
+   "release_date": "2026-06-09",
    "limit": {
-    "context": 1050000,
-    "input": 922000,
+    "context": 1000000,
     "output": 128000
    },
    "capabilities": {
-    "temperature": true,
+    "temperature": false,
     "top_k": false,
-    "top_p": true,
+    "top_p": false,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -3606,7 +3389,6 @@
     "reasoning": {
      "supported": true,
      "effort": [
-      "none",
       "low",
       "medium",
       "high",
@@ -3618,38 +3400,14 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.1,
+      "price": 10,
       "cache": {
-       "read": 0.01,
-       "write": 0.125
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 0.2,
-        "cache": {
-         "read": 0.02,
-         "write": 0.25
-        }
-       }
-      ]
+       "read": 1,
+       "write": 12.5
+      }
      },
      "output": {
-      "price": 0.5,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 0.75
-       }
-      ]
+      "price": 50
      }
     }
    },
@@ -3667,6 +3425,254 @@
     ]
    },
    "api": {
+    "messages": {
+     "base_url": "https://api.githubcopilot.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic"
+     },
+     "capabilities": {
+      "system_updates": true,
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "https://api.githubcopilot.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-01-31",
+   "last_updated": "2026-06-09"
+  },
+  "gemini-3.6-flash": {
+   "id": "gemini-3.6-flash",
+   "name": "Gemini 3.6 Flash",
+   "description": "Fast Gemini model balancing multimodal reasoning, tool use, and cost",
+   "type": "chat",
+   "family": "gemini-flash",
+   "canonical_id": "google/gemini-3.6-flash",
+   "status": "deprecated",
+   "release_date": "2026-07-21",
+   "limit": {
+    "context": 1000000,
+    "input": 936000,
+    "output": 64000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ],
+     "budget": {
+      "min": 256,
+      "max": 32000
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.75,
+      "cache": {
+       "read": 0.075
+      }
+     },
+     "output": {
+      "price": 3.75
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.githubcopilot.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-03",
+   "last_updated": "2026-07-21"
+  },
+  "gemini-4-argon": {
+   "id": "gemini-4-argon",
+   "name": "Gemini 4 Argon",
+   "description": "Google's flagship reasoning model for complex software engineering, deep math and science, and long-horizon autonomous agents",
+   "type": "chat",
+   "family": "gemini",
+   "canonical_id": "google/gemini-4-argon",
+   "release_date": "2026-10-13",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.1
+      }
+     },
+     "output": {
+      "price": 10
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.githubcopilot.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-03",
+   "last_updated": "2026-10-13"
+  },
+  "mai-code-1.1-flash": {
+   "id": "mai-code-1.1-flash",
+   "name": "MAI-Code-1.1-Flash",
+   "description": "Microsoft coding model with native vision support, optimized for fast and efficient software development",
+   "type": "chat",
+   "family": "mai",
+   "canonical_id": "microsoft/mai-code-1.1-flash",
+   "release_date": "2026-08-11",
+   "limit": {
+    "context": 256000,
+    "input": 128000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.2,
+      "cache": {
+       "read": 0.02
+      }
+     },
+     "output": {
+      "price": 1.2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp",
+     "image/gif",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
     "responses": {
      "base_url": "https://api.githubcopilot.com",
      "sdk": {
@@ -3675,19 +3681,13 @@
      },
      "capabilities": {
       "tools": {
-       "freeform": [
-        "text",
-        "lark",
-        "regex"
-       ],
        "updates": false
       }
      }
     }
    },
    "open_weights": false,
-   "knowledge": "2026-05-18",
-   "last_updated": "2026-09-22"
+   "last_updated": "2026-08-11"
   }
  }
 }

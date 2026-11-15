@@ -7,121 +7,14 @@
   "ZENIFRA_AI_KEY"
  ],
  "models": {
-  "zenifra/qwen3.6-flash": {
-   "id": "zenifra/qwen3.6-flash",
-   "name": "Qwen3.6 Flash",
-   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
-   "type": "chat",
-   "family": "qwen3.6",
-   "canonical_id": "alibaba/qwen3.6-flash",
-   "release_date": "2026-04-27",
-   "limit": {
-    "context": 991808,
-    "output": 65536
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "budget": {}
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.1541,
-      "cache": {
-       "read": 0.0163
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 256000
-         }
-        },
-        "price": 0.6165,
-        "cache": {
-         "read": 0.0617
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 0.9248,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 256000
-         }
-        },
-        "price": 3.6993
-       }
-      ]
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/x-matroska",
-     "video/quicktime",
-     "video/x-flv",
-     "video/x-ms-wmv"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ai.zenifra.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-04-27"
-  },
-  "zenifra/qwen3.8-flash": {
-   "id": "zenifra/qwen3.8-flash",
-   "name": "Qwen3.8 Flash",
-   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
+  "zenifra/qwen3.8-max": {
+   "id": "zenifra/qwen3.8-max",
+   "name": "Qwen3.8 Max",
+   "description": "2.4-trillion-parameter MoE flagship for coding, professional work, multimodal understanding, and long-horizon agentic workflows",
    "type": "chat",
    "family": "qwen",
-   "canonical_id": "alibaba/qwen3.8-flash",
-   "release_date": "2026-08-26",
+   "canonical_id": "alibaba/qwen3.8-max",
+   "release_date": "2026-08-03",
    "limit": {
     "context": 1000000,
     "output": 131072
@@ -160,277 +53,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.1088,
-      "cache": {
-       "read": 0.0181
-      }
-     },
-     "output": {
-      "price": 0.3627
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/x-matroska",
-     "video/quicktime",
-     "video/x-flv",
-     "video/x-ms-wmv"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ai.zenifra.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-08-26"
-  },
-  "zenifra/glm-5.2": {
-   "id": "zenifra/glm-5.2",
-   "name": "GLM-5.2",
-   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
-   "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-5.2",
-   "release_date": "2026-06-13",
-   "limit": {
-    "context": 1048576,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": {
-      "min_tokens": 1024
-     }
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "stream_usage": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "high",
-      "max"
-     ],
-     "default": {
-      "type": "effort",
-      "value": "high"
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.0336,
-      "cache": {
-       "read": 0.2539
-      }
-     },
-     "output": {
-      "price": 3.6267
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ai.zenifra.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-06-13"
-  },
-  "zenifra/qwen3.7-max": {
-   "id": "zenifra/qwen3.7-max",
-   "name": "Qwen3.7 Max",
-   "description": "Qwen frontier model tuned for agent frameworks, coding assistants, and long tasks",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3.7-max",
-   "release_date": "2026-05-21",
-   "limit": {
-    "context": 1000000,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": {
-      "min_tokens": 1024
-     }
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "stream_usage": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "budget": {}
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
       "price": 1.5414,
       "cache": {
-       "read": 0.3083
+       "read": 0.1995
       }
      },
      "output": {
-      "price": 4.6241
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ai.zenifra.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-05-21"
-  },
-  "zenifra/qwen3.6-plus": {
-   "id": "zenifra/qwen3.6-plus",
-   "name": "Qwen3.6 Plus",
-   "description": "Earlier Qwen multimodal workhorse for million-token agent and document tasks",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3.6-plus",
-   "release_date": "2026-04-02",
-   "limit": {
-    "context": 991808,
-    "output": 65536
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "budget": {}
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.2593,
-      "cache": {
-       "read": 0.0272
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 256000
-         }
-        },
-        "price": 1.03,
-        "cache": {
-         "read": 0.1052
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 1.5432,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 256000
-         }
-        },
-        "price": 6.1673
-       }
-      ]
+      "price": 4.6422
      }
     }
    },
@@ -472,8 +101,7 @@
     }
    },
    "open_weights": false,
-   "knowledge": "2025-04",
-   "last_updated": "2026-04-02"
+   "last_updated": "2026-08-03"
   },
   "zenifra/deepseek-v4-pro": {
    "id": "zenifra/deepseek-v4-pro",
@@ -581,6 +209,113 @@
    "open_weights": true,
    "last_updated": "2026-08-22"
   },
+  "zenifra/qwen3.6-flash": {
+   "id": "zenifra/qwen3.6-flash",
+   "name": "Qwen3.6 Flash",
+   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
+   "type": "chat",
+   "family": "qwen3.6",
+   "canonical_id": "alibaba/qwen3.6-flash",
+   "release_date": "2026-04-27",
+   "limit": {
+    "context": 991808,
+    "output": 65536
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "budget": {}
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1541,
+      "cache": {
+       "read": 0.0163
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 256000
+         }
+        },
+        "price": 0.6165,
+        "cache": {
+         "read": 0.0617
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 0.9248,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 256000
+         }
+        },
+        "price": 3.6993
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/x-matroska",
+     "video/quicktime",
+     "video/x-flv",
+     "video/x-ms-wmv"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ai.zenifra.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-04-27"
+  },
   "zenifra/deepseek-v4-flash-0731": {
    "id": "zenifra/deepseek-v4-flash-0731",
    "name": "DeepSeek V4 Flash 0731",
@@ -683,6 +418,95 @@
    "open_weights": true,
    "knowledge": "2025-05",
    "last_updated": "2026-07-31"
+  },
+  "zenifra/kimi-k3": {
+   "id": "zenifra/kimi-k3",
+   "name": "Kimi K3",
+   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
+   "type": "chat",
+   "family": "kimi-k3",
+   "canonical_id": "moonshotai/kimi-k3",
+   "release_date": "2026-07-16",
+   "limit": {
+    "context": 1048576,
+    "output": 1048576
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": {
+      "min_tokens": 1024
+     }
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "stream_usage": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ],
+     "default": {
+      "type": "effort",
+      "value": "max"
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2.6657,
+      "cache": {
+       "read": 0.272
+      }
+     },
+     "output": {
+      "price": 13.3264
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/heic",
+     "image/heif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ai.zenifra.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-07-16"
   },
   "zenifra/qwen3.7-plus": {
    "id": "zenifra/qwen3.7-plus",
@@ -794,6 +618,205 @@
    "open_weights": false,
    "knowledge": "2025-04",
    "last_updated": "2026-06-02"
+  },
+  "zenifra/kimi-k2.5": {
+   "id": "zenifra/kimi-k2.5",
+   "name": "Kimi K2.5",
+   "description": "Earlier Kimi frontier model for long-context agents, coding, and multimodal work",
+   "type": "chat",
+   "family": "kimi-k2",
+   "canonical_id": "moonshotai/kimi-k2.5",
+   "release_date": "2026-01-27",
+   "limit": {
+    "context": 229376,
+    "output": 16384
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": {
+      "min_tokens": 1024
+     }
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": false,
+    "stream_usage": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.544,
+      "cache": {
+       "read": 0.1088
+      }
+     },
+     "output": {
+      "price": 2.847
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ai.zenifra.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-01",
+   "last_updated": "2026-01-27"
+  },
+  "zenifra/qwen3.6-plus": {
+   "id": "zenifra/qwen3.6-plus",
+   "name": "Qwen3.6 Plus",
+   "description": "Earlier Qwen multimodal workhorse for million-token agent and document tasks",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.6-plus",
+   "release_date": "2026-04-02",
+   "limit": {
+    "context": 991808,
+    "output": 65536
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "budget": {}
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.2593,
+      "cache": {
+       "read": 0.0272
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 256000
+         }
+        },
+        "price": 1.03,
+        "cache": {
+         "read": 0.1052
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 1.5432,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 256000
+         }
+        },
+        "price": 6.1673
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/x-matroska",
+     "video/quicktime",
+     "video/x-flv",
+     "video/x-ms-wmv"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ai.zenifra.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-04",
+   "last_updated": "2026-04-02"
   },
   "zenifra/glm-5.1": {
    "id": "zenifra/glm-5.1",
@@ -980,17 +1003,17 @@
    "knowledge": "2025-01",
    "last_updated": "2026-06-12"
   },
-  "zenifra/kimi-k3": {
-   "id": "zenifra/kimi-k3",
-   "name": "Kimi K3",
-   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
+  "zenifra/glm-5.2": {
+   "id": "zenifra/glm-5.2",
+   "name": "GLM-5.2",
+   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
    "type": "chat",
-   "family": "kimi-k3",
-   "canonical_id": "moonshotai/kimi-k3",
-   "release_date": "2026-07-16",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.2",
+   "release_date": "2026-06-13",
    "limit": {
     "context": 1048576,
-    "output": 1048576
+    "output": 131072
    },
    "capabilities": {
     "cache": {
@@ -998,98 +1021,9 @@
       "min_tokens": 1024
      }
     },
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "stream_usage": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ],
-     "default": {
-      "type": "effort",
-      "value": "max"
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2.6657,
-      "cache": {
-       "read": 0.272
-      }
-     },
-     "output": {
-      "price": 13.3264
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/heic",
-     "image/heif"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ai.zenifra.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-07-16"
-  },
-  "zenifra/kimi-k2.5": {
-   "id": "zenifra/kimi-k2.5",
-   "name": "Kimi K2.5",
-   "description": "Earlier Kimi frontier model for long-context agents, coding, and multimodal work",
-   "type": "chat",
-   "family": "kimi-k2",
-   "canonical_id": "moonshotai/kimi-k2.5",
-   "release_date": "2026-01-27",
-   "limit": {
-    "context": 229376,
-    "output": 16384
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": {
-      "min_tokens": 1024
-     }
-    },
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
     "structured_output": false,
     "stream_usage": true,
     "system_updates": false,
@@ -1099,41 +1033,33 @@
     },
     "reasoning": {
      "supported": true,
-     "toggle": true
+     "toggle": true,
+     "effort": [
+      "high",
+      "max"
+     ],
+     "default": {
+      "type": "effort",
+      "value": "high"
+     }
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.544,
+      "price": 1.0336,
       "cache": {
-       "read": 0.1088
+       "read": 0.2539
       }
      },
      "output": {
-      "price": 2.847
+      "price": 3.6267
      }
     }
    },
    "modalities": {
     "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/heic",
-     "image/heif",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp"
+     "text"
     ],
     "output": [
      "text"
@@ -1157,17 +1083,91 @@
     }
    },
    "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-01-27"
+   "last_updated": "2026-06-13"
   },
-  "zenifra/qwen3.8-max": {
-   "id": "zenifra/qwen3.8-max",
-   "name": "Qwen3.8 Max",
-   "description": "2.4-trillion-parameter MoE flagship for coding, professional work, multimodal understanding, and long-horizon agentic workflows",
+  "zenifra/qwen3.7-max": {
+   "id": "zenifra/qwen3.7-max",
+   "name": "Qwen3.7 Max",
+   "description": "Qwen frontier model tuned for agent frameworks, coding assistants, and long tasks",
    "type": "chat",
    "family": "qwen",
-   "canonical_id": "alibaba/qwen3.8-max",
-   "release_date": "2026-08-03",
+   "canonical_id": "alibaba/qwen3.7-max",
+   "release_date": "2026-05-21",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": {
+      "min_tokens": 1024
+     }
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "stream_usage": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "budget": {}
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.5414,
+      "cache": {
+       "read": 0.3083
+      }
+     },
+     "output": {
+      "price": 4.6241
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ai.zenifra.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-05-21"
+  },
+  "zenifra/qwen3.8-flash": {
+   "id": "zenifra/qwen3.8-flash",
+   "name": "Qwen3.8 Flash",
+   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.8-flash",
+   "release_date": "2026-08-26",
    "limit": {
     "context": 1000000,
     "output": 131072
@@ -1206,13 +1206,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 1.5414,
+      "price": 0.1088,
       "cache": {
-       "read": 0.1995
+       "read": 0.0181
       }
      },
      "output": {
-      "price": 4.6422
+      "price": 0.3627
      }
     }
    },
@@ -1254,7 +1254,7 @@
     }
    },
    "open_weights": false,
-   "last_updated": "2026-08-03"
+   "last_updated": "2026-08-26"
   }
  }
 }
