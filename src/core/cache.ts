@@ -116,6 +116,64 @@ export interface EntryCache {
   evaluations: CacheEvaluation[];
 }
 
+/** Who a lifetime is from: models.dev's documentation as imported, or providers.dev (a correction, an added entry, a measurement). */
+export type LifetimeSource = "providers.dev" | "models.dev";
+
+/**
+ * One lifetime of an entry: documented by a source, or measured for one client with one retention setting. One shape
+ * for both kinds; a key that does not apply to the kind is null, 0 or [].
+ */
+export interface CacheLifetimeItem {
+  retention_profile: RetentionProfile;
+  basis: "measured" | "documented";
+  source: LifetimeSource;
+  /** Documented: the import date (models.dev) or the newest evidence date (providers.dev). Measured: the newest of its evaluations. */
+  date: string | null;
+  /** Documented: the lifetime in seconds, 0 on the "does not cache" item. Measured: the oldest age through which every check of every one of its evaluations hit, 0 = none. */
+  lifetime_s: number;
+  // what a documented item has; null on a measured one
+  mode: CacheMode | null;
+  documented_as: string | null;
+  // what a measured item has; null, 0 or [] on a documented one
+  client: string | null;
+  client_label: string | null;
+  parameter: string | null;
+  value: string | null;
+  evaluations: number;
+  evaluation_ids: string[];
+  checks: number;
+  hits: number;
+  tested_from_s: number | null;
+  first_miss_s: number | null;
+  results: CacheResult[] | null;
+}
+
+/** The safe lifetime of an entry for one retention profile, and what it was chosen from. */
+export interface SafeLifetime {
+  /** Seconds a cached prompt can be relied on: `documented_s` unless an evaluation contradicts it, else `measured_s`. Null = not known. */
+  safe_s: number | null;
+  basis: "measured" | "documented" | "none";
+  source: LifetimeSource | null;
+  date: string | null;
+  documented_s: number | null;
+  measured_s: number | null;
+  clients: number;
+  evaluations: number;
+  checks: number;
+  hits: number;
+  checks_inside: number | null;
+  hits_inside: number | null;
+  tested_from_s: number | null;
+  first_miss_s: number | null;
+}
+
+/** `providers_dev.cache.lifetime` of an entry and `cache_lifetime` of a summary. */
+export interface CacheLifetimeRecord {
+  short: SafeLifetime;
+  long: SafeLifetime;
+  lifetimes: CacheLifetimeItem[];
+}
+
 const UNIT_SECONDS: Record<string, number> = { ms: 0.001, s: 1, m: 60, h: 3600, d: 86400 };
 
 /** "5m" -> 300. Returns undefined for anything that is not a models.dev duration. */
@@ -283,6 +341,217 @@ export function summarizeCache(evaluations: readonly CacheEvaluation[]): CacheSu
   for (const profile of RETENTION_PROFILES) if (!rows.some((row) => row.retention_profile === profile)) rows.push(emptyRow(profile));
   const rank = (row: CacheSummaryRow): number => (row.retention_profile === "short" ? 0 : 1) * 2 + (row.value === null ? 0 : 1);
   return rows.sort((a, b) => rank(a) - rank(b) || (durationSeconds(a.value) ?? 0) - (durationSeconds(b.value) ?? 0) || String(a.value).localeCompare(String(b.value)));
+}
+
+// ---- The cache lifetime record: every lifetime of an entry in one list, and the safe value of each profile.
+// Worked out once, in the data build, from the documented caching and the published evaluations; a page prints it.
+
+/** What one evaluation shows about how long its cache held. */
+export interface EvaluationLifetime {
+  /** The oldest age through which every check hit, the control included. 0 = none. */
+  safe_s: number;
+  /** The age of the first result that was not a full hit. 0 = the control missed. Null = no miss. */
+  first_miss_s: number | null;
+  /** The youngest timed age checked. Null = no timed check. */
+  tested_from_s: number | null;
+}
+
+/**
+ * The strict measured value of one evaluation: walk the control, then the timed results by age, and stop at the
+ * first result where not every check hit. Null = the evaluation does not count: it has no timed result and its
+ * control (if any) hit, so it says that a prompt is cached and nothing about how long.
+ */
+export function evaluationLifetime(evaluation: CacheEvaluation): EvaluationLifetime | null {
+  const control = evaluation.results.find((result) => result.kind === "control");
+  const timed = evaluation.results.filter((result) => result.kind === "timed").sort((a, b) => a.age_s - b.age_s);
+  if (timed.length === 0 && !(control && control.hits < control.checks)) return null;
+  let safe = 0;
+  let firstMiss: number | null = null;
+  for (const result of [...(control ? [control] : []), ...timed]) {
+    if (result.hits === result.checks) safe = result.age_s;
+    else {
+      firstMiss = result.age_s;
+      break;
+    }
+  }
+  return { safe_s: safe, first_miss_s: firstMiss, tested_from_s: timed[0]?.age_s ?? null };
+}
+
+/**
+ * Whether one evaluation clearly contradicts a documented lifetime: at an age up to and including it (the control
+ * too), fewer than half of the checks hit. Exactly half does not. Nothing contradicts a documented 0.
+ */
+export function contradicts(evaluation: CacheEvaluation, documentedS: number): boolean {
+  if (documentedS <= 0) return false;
+  return evaluation.results.some((result) => result.age_s <= documentedS && 2 * result.hits < result.checks);
+}
+
+const documentedItem = (profile: RetentionProfile, lifetime: number, mode: CacheMode | null, text: string | null, from: { source: LifetimeSource; date: string | null }): CacheLifetimeItem => ({
+  retention_profile: profile,
+  basis: "documented",
+  source: from.source,
+  date: from.date,
+  lifetime_s: lifetime,
+  mode,
+  documented_as: text,
+  client: null,
+  client_label: null,
+  parameter: null,
+  value: null,
+  evaluations: 0,
+  evaluation_ids: [],
+  checks: 0,
+  hits: 0,
+  tested_from_s: null,
+  first_miss_s: null,
+  results: null,
+});
+
+/**
+ * The documented items of an entry: one per text of a supported mode's `ttl` that is a duration, `short` for the
+ * shortest lifetime documented over both modes and `long` for every other; or, where the entry is documented as not
+ * caching, one item of 0 seconds per profile. `sourceOf` names the source and date of a mode's lifetimes (null = the
+ * "does not cache" item). Ordered by profile, then seconds, implicit before explicit.
+ */
+export function documentedItems(documented: CacheDocumentation, sourceOf: (mode: CacheMode | null) => { source: LifetimeSource; date: string | null }): CacheLifetimeItem[] {
+  if (documented.support === "unsupported") {
+    const from = sourceOf(null);
+    return RETENTION_PROFILES.map((profile) => documentedItem(profile, 0, null, null, from));
+  }
+  const found: { mode: CacheMode; text: string; seconds: number }[] = [];
+  for (const mode of ["implicit", "explicit"] as const) {
+    const value = documented.modes[mode];
+    if (value.support !== "supported" || !value.ttl) continue;
+    for (const text of value.ttl) {
+      const seconds = durationSeconds(text);
+      if (seconds !== undefined) found.push({ mode, text, seconds });
+    }
+  }
+  if (found.length === 0) return [];
+  const shortest = Math.min(...found.map((item) => item.seconds));
+  const sources = new Map<CacheMode, { source: LifetimeSource; date: string | null }>();
+  const from = (mode: CacheMode) => sources.get(mode) ?? sources.set(mode, sourceOf(mode)).get(mode)!;
+  return found
+    .map((item) => documentedItem(item.seconds === shortest ? "short" : "long", item.seconds, item.mode, item.text, from(item.mode)))
+    .sort((a, b) => profileRank(a.retention_profile) - profileRank(b.retention_profile) || a.lifetime_s - b.lifetime_s || modeRank(a.mode) - modeRank(b.mode));
+}
+
+const profileRank = (profile: RetentionProfile): number => (profile === "short" ? 0 : 1);
+const modeRank = (mode: CacheMode | null): number => (mode === "implicit" ? 0 : 1);
+const lowest = (values: readonly (number | null)[]): number | null => {
+  const known = values.filter((value): value is number => value !== null);
+  return known.length > 0 ? Math.min(...known) : null;
+};
+const newest = (dates: readonly (string | null)[]): string | null => dates.filter((date): date is string => date !== null).sort().at(-1) ?? null;
+
+const emptySafeLifetime = (): SafeLifetime => ({
+  safe_s: null,
+  basis: "none",
+  source: null,
+  date: null,
+  documented_s: null,
+  measured_s: null,
+  clients: 0,
+  evaluations: 0,
+  checks: 0,
+  hits: 0,
+  checks_inside: null,
+  hits_inside: null,
+  tested_from_s: null,
+  first_miss_s: null,
+});
+
+/** The lifetime record of an entry nothing is known about: both profiles null, an empty list. */
+export function emptyCacheLifetime(): CacheLifetimeRecord {
+  return { short: emptySafeLifetime(), long: emptySafeLifetime(), lifetimes: [] };
+}
+
+/** One measured item: the counted evaluations of one profile, one setting and one client, combined by the minimum. */
+function measuredItem(members: readonly { evaluation: CacheEvaluation; lifetime: EvaluationLifetime }[]): CacheLifetimeItem {
+  const first = members[0]!.evaluation;
+  const results = addResults(members.map((member) => member.evaluation.results));
+  return {
+    retention_profile: first.retention_profile,
+    basis: "measured",
+    source: "providers.dev",
+    date: newest(members.map((member) => member.evaluation.date)),
+    lifetime_s: Math.min(...members.map((member) => member.lifetime.safe_s)),
+    mode: null,
+    documented_as: null,
+    client: first.client,
+    client_label: first.client_label,
+    parameter: first.parameter,
+    value: first.value,
+    evaluations: members.length,
+    evaluation_ids: members.map((member) => member.evaluation.id).sort(),
+    checks: results.reduce((sum, result) => sum + result.checks, 0),
+    hits: results.reduce((sum, result) => sum + result.hits, 0),
+    tested_from_s: lowest(members.map((member) => member.lifetime.tested_from_s)),
+    first_miss_s: lowest(members.map((member) => member.lifetime.first_miss_s)),
+    results,
+  };
+}
+
+/**
+ * The cache lifetime record of an entry: the documented items, a measured item per client and retention setting, in
+ * one ordered list, and the safe value of each profile. The safe value is the documented lifetime unless a counted
+ * evaluation of the profile contradicts it (`contradicts`), else the measured one (the lowest over the clients), else null.
+ */
+export function cacheLifetime(
+  documented: CacheDocumentation,
+  evaluations: readonly CacheEvaluation[],
+  sourceOf: (mode: CacheMode | null) => { source: LifetimeSource; date: string | null },
+): CacheLifetimeRecord {
+  const counted = evaluations.flatMap((evaluation) => {
+    const lifetime = evaluationLifetime(evaluation);
+    return lifetime ? [{ evaluation, lifetime }] : [];
+  });
+  const groups = new Map<string, typeof counted>();
+  for (const member of counted) {
+    const { retention_profile, parameter, value, client } = member.evaluation;
+    const key = JSON.stringify([retention_profile, parameter, value, client]);
+    groups.set(key, [...(groups.get(key) ?? []), member]);
+  }
+  const measured = [...groups.values()].map(measuredItem).sort(
+    (a, b) =>
+      profileRank(a.retention_profile) - profileRank(b.retention_profile) ||
+      (a.value === null ? 0 : 1) - (b.value === null ? 0 : 1) ||
+      (durationSeconds(a.value) ?? 0) - (durationSeconds(b.value) ?? 0) ||
+      String(a.value).localeCompare(String(b.value)) ||
+      (a.client! < b.client! ? -1 : a.client! > b.client! ? 1 : 0),
+  );
+  const docs = documentedItems(documented, sourceOf);
+  const lifetimes = RETENTION_PROFILES.flatMap((profile) => [...docs, ...measured].filter((item) => item.retention_profile === profile));
+
+  const safe = (profile: RetentionProfile): SafeLifetime => {
+    const own = docs.filter((item) => item.retention_profile === profile);
+    const items = measured.filter((item) => item.retention_profile === profile);
+    const runs = counted.filter((member) => member.evaluation.retention_profile === profile).map((member) => member.evaluation);
+    const documentedS = lowest(own.map((item) => item.lifetime_s));
+    const measuredS = lowest(items.map((item) => item.lifetime_s));
+    const record = emptySafeLifetime();
+    record.documented_s = documentedS;
+    record.measured_s = measuredS;
+    record.clients = new Set(items.map((item) => item.client)).size;
+    record.evaluations = items.reduce((sum, item) => sum + item.evaluations, 0);
+    record.checks = items.reduce((sum, item) => sum + item.checks, 0);
+    record.hits = items.reduce((sum, item) => sum + item.hits, 0);
+    record.tested_from_s = lowest(items.map((item) => item.tested_from_s));
+    record.first_miss_s = lowest(items.map((item) => item.first_miss_s));
+    if (documentedS !== null && measuredS !== null) {
+      const inside = runs.flatMap((run) => run.results).filter((result) => result.age_s <= documentedS);
+      record.checks_inside = inside.reduce((sum, result) => sum + result.checks, 0);
+      record.hits_inside = inside.reduce((sum, result) => sum + result.hits, 0);
+    }
+    if (documentedS !== null && !runs.some((run) => contradicts(run, documentedS))) {
+      const chosen = own.find((item) => item.lifetime_s === documentedS)!;
+      Object.assign(record, { safe_s: documentedS, basis: "documented", source: chosen.source, date: chosen.date });
+    } else if (measuredS !== null) {
+      Object.assign(record, { safe_s: measuredS, basis: "measured", source: "providers.dev", date: newest(items.map((item) => item.date)) });
+    }
+    return record;
+  };
+  return { short: safe("short"), long: safe("long"), lifetimes };
 }
 
 /**

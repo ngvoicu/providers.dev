@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { stringify } from "yaml";
 import type { ApiDeps } from "../src/core/api.ts";
-import { documentedCache, type EntryCache } from "../src/core/cache.ts";
+import { addResults, documentedCache, RETENTION_PROFILES, type CacheDocumentation, type CacheEvaluation, type CacheLifetimeRecord, type CacheResult, type EntryCache } from "../src/core/cache.ts";
 import type { Index, Summary } from "../src/core/entries.ts";
 import { controlsOf, pricingOf } from "../src/core/policies.ts";
 import type { MeasuredLimit, Meta, ModelExtension, UpstreamCatalog } from "../src/core/schema.ts";
@@ -48,6 +48,86 @@ export function summaryOf(more: Partial<Summary> = {}): Summary {
 }
 
 export const evidence = [{ kind: "documented", url: "https://example.com/docs", date: "2026-11-01" }];
+
+/**
+ * What always holds for the cache lifetime record of an entry (section 2.6 of design/safe-cache-lifetime.md), checked
+ * from the record, the entry's evaluations and its documented caching. Written apart from `cacheLifetime`: the walk
+ * and the test for "contradicted" are redone here. Returns the rules that fail, empty when all hold.
+ */
+export function lifetimeRuleBreaks(record: CacheLifetimeRecord, evaluations: readonly CacheEvaluation[], documented: CacheDocumentation): string[] {
+  const broken: string[] = [];
+  const fail = (rule: string, holds: boolean): void => {
+    if (!holds) broken.push(rule);
+  };
+  const min = (values: (number | null)[]): number | null => {
+    const known = values.filter((value): value is number => value !== null);
+    return known.length > 0 ? Math.min(...known) : null;
+  };
+  const walk = (results: readonly CacheResult[]): { safe: number; miss: number | null } => {
+    const ordered = [...results.filter((result) => result.kind === "control"), ...results.filter((result) => result.kind === "timed").sort((a, b) => a.age_s - b.age_s)];
+    let safe = 0;
+    for (const result of ordered) {
+      if (result.hits !== result.checks) return { safe, miss: result.age_s };
+      safe = result.age_s;
+    }
+    return { safe, miss: null };
+  };
+  const counts = (evaluation: CacheEvaluation): boolean => evaluation.results.some((result) => result.kind === "timed") || evaluation.results.some((result) => result.kind === "control" && result.hits < result.checks);
+  const counted = evaluations.filter(counts);
+  const byId = new Map(evaluations.map((evaluation) => [evaluation.id, evaluation]));
+  for (const profile of RETENTION_PROFILES) {
+    const p = record[profile];
+    const docs = record.lifetimes.filter((item) => item.retention_profile === profile && item.basis === "documented");
+    const measured = record.lifetimes.filter((item) => item.retention_profile === profile && item.basis === "measured");
+    const runs = counted.filter((evaluation) => evaluation.retention_profile === profile);
+    fail(`${profile} 1 documented_s`, p.documented_s === min(docs.map((item) => item.lifetime_s)));
+    fail(`${profile} 2 measured_s`, p.measured_s === min(measured.map((item) => item.lifetime_s)));
+    fail(`${profile} 2 sums`, p.evaluations === measured.reduce((sum, item) => sum + item.evaluations, 0) && p.checks === measured.reduce((sum, item) => sum + item.checks, 0) && p.hits === measured.reduce((sum, item) => sum + item.hits, 0));
+    fail(`${profile} 2 clients`, p.clients === new Set(measured.map((item) => item.client)).size);
+    fail(`${profile} 2 ages`, p.tested_from_s === min(measured.map((item) => item.tested_from_s)) && p.first_miss_s === min(measured.map((item) => item.first_miss_s)));
+    const none = p.basis === "none";
+    fail(`${profile} 3 none`, [p.safe_s === null, p.source === null, p.documented_s === null && p.measured_s === null, docs.length + measured.length === 0].every((value) => value === none));
+    if (p.basis === "documented") {
+      const first = docs.find((item) => item.lifetime_s === p.documented_s);
+      fail(`${profile} 4 documented`, p.documented_s !== null && p.safe_s === p.documented_s && first !== undefined && p.source === first.source && p.date === first.date);
+    }
+    if (p.basis === "measured") {
+      fail(`${profile} 5 measured`, p.measured_s !== null && p.safe_s === p.measured_s && p.source === "providers.dev" && p.date === (measured.map((item) => item.date!).sort().at(-1) ?? null));
+    }
+    if (p.documented_s !== null) fail(`${profile} 6 not above documented`, p.safe_s !== null && p.safe_s <= p.documented_s);
+    if (p.documented_s !== null && p.measured_s === null) fail(`${profile} 7 documented only`, p.basis === "documented");
+    if (p.documented_s === null && p.measured_s !== null) fail(`${profile} 7 measured only`, p.basis === "measured");
+    const both = p.documented_s !== null && p.measured_s !== null;
+    fail(`${profile} 8 inside`, (p.checks_inside !== null && p.hits_inside !== null) === both && (!both || (p.hits_inside! <= p.checks_inside! && p.checks_inside! <= p.checks)));
+    if (p.first_miss_s !== null) fail(`${profile} 9 first miss`, p.first_miss_s > (p.measured_s ?? -1) || (p.first_miss_s === 0 && p.measured_s === 0));
+    // 4.1, redone: the documented lifetime is the safe value unless a counted evaluation has fewer than half its checks hit at an age inside it.
+    const documentedS = p.documented_s;
+    const contradicted = documentedS !== null && documentedS > 0 && runs.some((run) => run.results.some((result) => result.age_s <= documentedS && result.hits * 2 < result.checks));
+    fail(`${profile} 4.1 rule`, p.basis === (documentedS !== null && !contradicted ? "documented" : p.measured_s !== null ? "measured" : "none"));
+  }
+  for (const item of record.lifetimes.filter((entry) => entry.basis === "measured")) {
+    const members = item.evaluation_ids.map((id) => byId.get(id));
+    const where = `item ${item.client} ${item.value}`;
+    fail(`${where} 10 evaluations`, members.every((member) => member !== undefined) && members.length === item.evaluations && item.evaluations >= 1);
+    const results = addResults(members.flatMap((member) => (member ? [member.results] : [])));
+    fail(`${where} 10 results`, JSON.stringify(item.results) === JSON.stringify(results));
+    fail(`${where} 10 sums`, item.checks === results.reduce((sum, result) => sum + result.checks, 0) && item.hits === results.reduce((sum, result) => sum + result.hits, 0));
+    const summed = walk(results).safe;
+    fail(`${where} 10 walk`, item.evaluations === 1 ? summed === item.lifetime_s : summed >= item.lifetime_s);
+    fail(`${where} 10 minimum`, item.lifetime_s === Math.min(...members.map((member) => walk(member!.results).safe)));
+    if (item.first_miss_s !== null) fail(`${where} 9 first miss`, item.first_miss_s > item.lifetime_s || (item.first_miss_s === 0 && item.lifetime_s === 0));
+    fail(`${where} kind`, item.mode === null && item.documented_as === null && item.source === "providers.dev" && members.every((member) => member?.client === item.client && member.retention_profile === item.retention_profile && member.parameter === item.parameter && member.value === item.value));
+  }
+  for (const evaluation of evaluations) {
+    const named = record.lifetimes.filter((item) => item.evaluation_ids.includes(evaluation.id)).length;
+    fail(`11 ${evaluation.id}`, named === (counts(evaluation) ? 1 : 0));
+  }
+  for (const profile of RETENTION_PROFILES) {
+    const zero = record.lifetimes.filter((item) => item.retention_profile === profile && item.basis === "documented" && item.lifetime_s === 0 && item.mode === null && item.documented_as === null).length;
+    fail(`${profile} 12 does not cache`, zero === (documented.support === "unsupported" ? 1 : 0));
+  }
+  return broken;
+}
 
 /** A small upstream catalog in the v2 shape: big enough to pass the sync's size checks when repeated. */
 export function fixtureUpstream(providers = 30, modelsEach = 20): UpstreamCatalog {
