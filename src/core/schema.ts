@@ -200,7 +200,18 @@ export const ObservedRun = z.looseObject({
   /** Set on runs taken with a client that lacked something the route needs; such runs are not published. */
   lacks: z.string().optional(),
   note: z.string().optional(),
-});
+})
+  // A run has one check result per age: groundtruth keys a run's checks by age, also where one run continues another.
+  // A file that holds an age twice is wrong, and is refused rather than read in an order-dependent way.
+  .superRefine((run, ctx) => {
+    const seen = new Set<number>();
+    for (const [index, item] of (run.checks ?? []).entries()) {
+      if (seen.has(item.age_s)) {
+        ctx.addIssue({ code: "custom", path: ["checks", index, "age_s"], message: `Run "${run.id}" has two checks at age ${item.age_s} s. A run has one check result per age.` });
+      }
+      seen.add(item.age_s);
+    }
+  });
 export type ObservedRun = z.infer<typeof ObservedRun>;
 
 export const ObservedLimit = z.looseObject({

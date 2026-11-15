@@ -1,4 +1,4 @@
-import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { publish } from "../scripts/lib/publish.ts";
@@ -7,6 +7,20 @@ import { stringify } from "yaml";
 import { fetchReturning, fixtureUpstream, ROOT, tempDataDir, writeAuthored } from "./helpers.ts";
 
 const good = JSON.stringify(fixtureUpstream());
+
+/** A measurements file with one run; `ages` are the ages of its checks, in the order the file lists them. */
+const observedWith = (ages: number[]): string =>
+  JSON.stringify({
+    schema: 1, repository: "https://github.com/example/probe", routes: {}, clients: {},
+    cache: [{ id: "probe/R1", route: "provider-00", client: "direct", model: "model-1", date: "2026-11-12", source: "results/r1.json", latest: true, control: { warm: 1, total: 1 }, checks: ages.map((age_s, index) => ({ age_s, warm: index === 0 ? 1 : 0, total: 1 })) }],
+  });
+const REPEATED_AGE = /Run "probe\/R1" has two checks at age 150 s\. A run has one check result per age\./;
+
+/** models.dev as in the fixture, and the measurements file with `body`. */
+const fetchWithObserved = (body: string): typeof fetch => {
+  const rest = fetchReturning(good);
+  return (async (input: RequestInfo | URL, init?: RequestInit) => (String(input).includes("observed.json") ? new Response(body, { status: 200, headers: { etag: `"${body.length}"` } }) : rest(input, init))) as typeof fetch;
+};
 
 async function firstImport(): Promise<string> {
   const dataDir = tempDataDir();
@@ -96,6 +110,22 @@ describe("sync", () => {
     expect(stored.models["model-5"]!.modalities).toEqual({ input: ["text", "image"], output: ["text"] });
   });
 
+  it("refuses a measurements file with two checks at one age in a run, and keeps the last good copy", async () => {
+    const dataDir = tempDataDir();
+    const first = await sync({ dataDir, fetch: fetchWithObserved(observedWith([150, 300])), now: () => new Date("2026-11-13T00:00:00Z") });
+    expect([first.ok, first.measurements.status]).toEqual([true, "updated"]);
+    const kept = readFileSync(join(dataDir, "sources", "observed.json"), "utf8");
+    const keptMeta = readFileSync(join(dataDir, "sources", "observed.meta.json"), "utf8");
+
+    const second = await sync({ dataDir, fetch: fetchWithObserved(observedWith([150, 150])), force: true, now: () => new Date("2026-11-14T00:00:00Z") });
+    expect([second.ok, second.measurements.status]).toEqual([false, "failed"]);
+    expect(second.measurements.error).toMatch(/^the measurements file does not match the expected structure: /);
+    expect(second.measurements.error).toMatch(REPEATED_AGE);
+    expect(readFileSync(join(dataDir, "sources", "observed.json"), "utf8")).toBe(kept);
+    expect(readFileSync(join(dataDir, "sources", "observed.meta.json"), "utf8")).toBe(keptMeta);
+    expect(JSON.parse(readFileSync(join(dataDir, "sync-status.json"), "utf8"))).toMatchObject({ last_attempt_ok: false, measurements: "failed", last_error: expect.stringMatching(REPEATED_AGE) });
+  });
+
   it("refuses to run while another sync holds the lock", async () => {
     const dataDir = await firstImport();
     writeFileSync(join(dataDir, ".sync.lock"), "1");
@@ -150,6 +180,22 @@ describe("publish", () => {
     expect(publish({ dataDir, rootDir: ROOT }).errors).toEqual([expect.stringMatching(/Public client id "other" has two labels: a client the file does not describe \("Another client"\) and "cli-a" \("Label A"\)/)]);
     labels({ "cli-a": { id: "other", label: "Another client" } });
     expect(publish({ dataDir, rootDir: ROOT }).ok).toBe(true);
+  });
+
+  it("fails the build on a measurements file with two checks at one age in a run, and keeps the last published dataset", async () => {
+    const dataDir = await firstImport();
+    writeAuthored(dataDir);
+    mkdirSync(join(dataDir, "sources"), { recursive: true });
+    const observed = (ages: number[]) => writeFileSync(join(dataDir, "sources", "observed.json"), observedWith(ages));
+    observed([150, 300]);
+    expect(publish({ dataDir, rootDir: ROOT }).errors).toEqual([]);
+    const before = readFileSync(join(dataDir, "published", "site", "data", "meta.json"), "utf8");
+
+    observed([150, 150]);
+    const report = publish({ dataDir, rootDir: ROOT });
+    expect(report.ok).toBe(false);
+    expect(report.errors).toEqual([expect.stringMatching(new RegExp(`observed\\.json: ${REPEATED_AGE.source}$`))]);
+    expect(readFileSync(join(dataDir, "published", "site", "data", "meta.json"), "utf8")).toBe(before);
   });
 
   it("says so when there is no upstream snapshot yet", () => {
