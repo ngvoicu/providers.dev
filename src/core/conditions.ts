@@ -62,7 +62,105 @@ function rangesText(ranges: Range[]): string {
   return ranges.map(([start, end]) => `${start}–${end}`).join(" and ");
 }
 
-/** "Mon–Fri", "Sat–Sun", "Mon, Wed, Fri": days of the week in their order, runs of three or more joined. */
+const DAY = 24 * 60;
+const WEEK = 7 * DAY;
+/** "23:00" as minutes of the day; "24:00" is the end of the day. Null = not a time of day. */
+const minutes = (time: string): number | null => {
+  const match = /^(\d{2}):([0-5]\d)$/.exec(time);
+  const value = match ? Number(match[1]) * 60 + Number(match[2]) : null;
+  return value !== null && value <= DAY ? value : null;
+};
+const clock = (value: number): string => `${String(Math.floor(value / 60)).padStart(2, "0")}:${String(value % 60).padStart(2, "0")}`;
+/** The days a predicate names, as indexes of DAYS. Null = it names something else. */
+function dayIndexes(condition: Condition): number[] | null {
+  if (!is(condition, "request.utc_days") || (condition.op !== "eq" && condition.op !== "in")) return null;
+  const at = (Array.isArray(condition.value) ? condition.value : [condition.value]).map((day) => DAYS.indexOf(String(day) as (typeof DAYS)[number]));
+  return at.length && !at.includes(-1) ? at : null;
+}
+
+/**
+ * The stretches of the week, in minutes from Monday 00:00 UTC, that a condition made of days and hours alone covers:
+ * each from its first minute up to, not including, its last. Null = the condition is something else.
+ */
+function weekSpans(condition: Condition): Array<[number, number]> | null {
+  const spans = (days: number[], ranges: Range[]): Array<[number, number]> | null => {
+    const out: Array<[number, number]> = [];
+    for (const [start, end] of ranges) {
+      const from = minutes(start);
+      const until = minutes(end);
+      if (from === null || until === null) return null;
+      // A window over midnight, "15:00–01:00" on a day, is the evening and the early morning of that same day.
+      const parts: Array<[number, number]> = from < until ? [[from, until]] : [[from, DAY], [0, until]];
+      for (const day of days) for (const [a, b] of parts) if (a < b) out.push([day * DAY + a, day * DAY + b]);
+    }
+    return out;
+  };
+  const days = dayIndexes(condition);
+  if (days) return spans(days, [["00:00", "24:00"]]);
+  const ranges = hourRanges(condition);
+  if (ranges) return spans([0, 1, 2, 3, 4, 5, 6], ranges);
+  if (condition.kind === "all" && condition.conditions.length === 2) {
+    const [a, b] = condition.conditions as [Condition, Condition];
+    const first = dayIndexes(a);
+    const [days, ranges] = first ? [first, hourRanges(b)] : [dayIndexes(b), hourRanges(a)];
+    return days && ranges ? spans(days, ranges) : null;
+  }
+  if (condition.kind === "any") {
+    const out: Array<[number, number]> = [];
+    for (const item of condition.conditions) {
+      const own = weekSpans(item);
+      if (!own) return null;
+      out.push(...own);
+    }
+    return out;
+  }
+  return null;
+}
+
+/**
+ * Day and hour windows that run into each other, said as the one period they make: "Thu 23:00–Sun 23:00 UTC",
+ * "Fri–Sun (UTC)". From the first time up to, not including, the second, as with hours. Null = not one period.
+ */
+function periodText(condition: Condition): string | null {
+  const spans = weekSpans(condition)?.sort((a, b) => a[0] - b[0]);
+  if (!spans?.length) return null;
+  const merged: Array<[number, number]> = [];
+  for (const [start, end] of spans) {
+    const last = merged.at(-1);
+    if (last && start <= last[1]) last[1] = Math.max(last[1], end);
+    else merged.push([start, end]);
+  }
+  // Sunday evening runs into Monday morning.
+  if (merged.length === 2 && merged[0]![0] === 0 && merged[1]![1] === WEEK) merged.splice(0, 2, [merged[1]![0], merged[0]![1] + WEEK]);
+  if (merged.length !== 1) return null;
+  const [start, end] = merged[0]!;
+  if (end - start >= WEEK) return null;
+  const name = (at: number): string => DAY_NAME[DAYS[Math.floor(at / DAY) % 7]!]!;
+  // The end is said on the day it closes: "Sun 24:00", not "Mon 00:00".
+  const last = end - 1;
+  if (start % DAY === 0 && end % DAY === 0) return `${end - start === DAY ? name(start) : `${name(start)}–${name(last)}`} (UTC)`;
+  if (end - start < DAY && name(start) === name(last)) return `${name(start)}, ${clock(start % DAY)}–${clock(last % DAY + 1)} UTC`;
+  return `${name(start)} ${clock(start % DAY)}–${name(last)} ${clock(last % DAY + 1)} UTC`;
+}
+
+/**
+ * A condition of time alone, said so that "outside" can stand before it: hours, days, days and hours, or one period.
+ * Null = something else, or a window with holidays in it, where "outside … except holidays" would read both ways.
+ */
+function timeText(condition: Condition): string | null {
+  const ranges = hourRanges(condition);
+  if (ranges) return `${rangesText(ranges)} UTC`;
+  if (dayIndexes(condition)) return predicate(condition as Predicate);
+  if (condition.kind === "all") {
+    const days = condition.conditions.filter((part) => dayIndexes(part));
+    const hours = condition.conditions.filter((part) => hourRanges(part));
+    if (days.length > 1 || hours.length > 1 || days.length + hours.length !== condition.conditions.length) return null;
+    return windowText(condition.conditions).window;
+  }
+  return condition.kind === "any" ? periodText(condition) : null;
+}
+
+/** "Mon–Fri", "Sat–Sun", "Mon, Wed, Fri": days of the week in their order, runs of two or more joined. */
 function daysText(values: Json): string {
   const wanted = (Array.isArray(values) ? values : [values]).map(String);
   const at = DAYS.map((day, index) => (wanted.includes(day) ? index : -1)).filter((index) => index !== -1);
@@ -84,6 +182,8 @@ const SETTING: Record<string, string> = {
   "request.search_context_size": "search context size", "request.duration": "duration", "request.megapixels": "megapixels", "request.input_images": "input images", "request.fps": "frames per second",
   "request.steps": "steps", "request.keyterms_prompt": "key terms",
 };
+/** A setting that counts things a request sends: above 0 is said as the things being there. */
+const PRESENT: Record<string, string> = { "request.input_images": "with image input" };
 const SWITCH: Record<string, [on: string, off: string]> = {
   "request.generate_audio": ["with generated audio", "without generated audio"], "request.input_video": ["with video input", "without video input"],
   "request.speaker_labels": ["with speaker labels", "without speaker labels"], "request.voice_control": ["with voice control", "without voice control"],
@@ -110,6 +210,8 @@ function predicate(condition: Predicate): string {
   if (field === "request.thinking" && op === "eq" && typeof value === "boolean") return value ? "thinking on" : "thinking off";
   const switched = SWITCH[field];
   if (switched && op === "eq" && typeof value === "boolean") return value ? switched[0] : switched[1];
+  const present = PRESENT[field];
+  if (present && op === "gt" && value === 0) return present;
   const setting = SETTING[field];
   if (setting) {
     if (op === "min_items") return `${text(value)} or more ${setting}`;
@@ -149,10 +251,14 @@ function phrase(condition: Condition): string {
   if (condition.kind === "predicate") return predicate(condition);
   const ranges = hourRanges(condition);
   if (ranges) return `${rangesText(ranges)} UTC`;
+  if (condition.kind === "any") {
+    const period = periodText(condition);
+    if (period) return period;
+  }
   if (condition.kind === "not") {
     const inner = condition.condition;
-    const outside = hourRanges(inner);
-    if (outside) return `outside ${rangesText(outside)} UTC`;
+    const outside = timeText(inner);
+    if (outside) return `outside ${outside}`;
     if (is(inner, "request.holiday") && inner.op === "eq") return `except holidays (${text(inner.value)})`;
     if (is(inner, "request.region") && (inner.op === "eq" || inner.op === "in")) return `any region but ${oneOf(inner.value)}`;
     if (is(inner, "request.service_tier") && (inner.op === "eq" || inner.op === "in")) return `any service tier but ${oneOf(inner.value)}`;
