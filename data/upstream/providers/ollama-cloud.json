@@ -6,560 +6,13 @@
   "OLLAMA_API_KEY"
  ],
  "models": {
-  "kimi-k2.7-code": {
-   "id": "kimi-k2.7-code",
-   "name": "kimi-k2.7-code",
-   "type": "chat",
-   "canonical_id": "moonshotai/kimi-k2.7-code",
-   "family": "kimi-k2",
-   "release_date": "2026-06-12",
-   "limit": {
-    "context": 262144,
-    "output": 262144
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    },
-    "structured_output": false,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Coding-focused Kimi model, stronger on long-horizon repo work with less overthinking",
-   "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-06-12",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/heic",
-     "image/heif"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.95,
-      "cache": {
-       "read": 0.19
-      }
-     },
-     "output": {
-      "price": 4
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "deepseek-v4-pro:0813": {
-   "id": "deepseek-v4-pro:0813",
-   "name": "DeepSeek V4 Pro 0813",
-   "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4-pro-0813",
-   "family": "deepseek-thinking",
-   "release_date": "2026-08-13",
-   "limit": {
-    "context": 1048576,
-    "output": 1048576
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": false,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "DeepSeek V4 Pro snapshot with million-token context and support for thinking and non-thinking modes",
-   "open_weights": true,
-   "last_updated": "2026-08-22",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.66,
-      "cache": {
-       "read": 0.022
-      }
-     },
-     "output": {
-      "price": 1.98
-     }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "utc_days": {
-        "in": [
-         "mon",
-         "tue",
-         "wed",
-         "thu",
-         "fri"
-        ]
-       },
-       "all": [
-        {
-         "utc_hours": {
-          "gte": "12:00"
-         }
-        },
-        {
-         "utc_hours": {
-          "lt": "18:00"
-         }
-        }
-       ]
-      },
-      "factor": 2
-     }
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "kimi-k3.1-pro": {
-   "id": "kimi-k3.1-pro",
-   "name": "Kimi K3.1 Pro",
-   "type": "chat",
-   "canonical_id": "moonshotai/kimi-k3.1-pro",
-   "family": "kimi-k3",
-   "release_date": "2026-10-23",
-   "limit": {
-    "context": 1048576,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "default": {
-      "type": "effort",
-      "value": "max"
-     },
-     "toggle": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": false,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Multimodal Kimi model with a 1M-token context window and always-on reasoning, for coding, 3D creation and financial research",
-   "open_weights": true,
-   "last_updated": "2026-10-23",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/heic",
-     "image/heif"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2,
-      "cache": {
-       "read": 0.2
-      }
-     },
-     "output": {
-      "price": 10
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "glm-5.3-flash": {
-   "id": "glm-5.3-flash",
-   "name": "GLM-5.3-Flash",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-5.3-flash",
-   "family": "glm-flash",
-   "release_date": "2026-08-26",
-   "limit": {
-    "context": 1000000,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": false,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
-   "open_weights": true,
-   "last_updated": "2026-08-26",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "video/mp4",
-     "video/x-matroska",
-     "video/quicktime"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.15,
-      "cache": {
-       "read": 0.03
-      }
-     },
-     "output": {
-      "price": 0.5
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gpt-oss:20b": {
-   "id": "gpt-oss:20b",
-   "name": "gpt-oss:20b",
-   "type": "chat",
-   "canonical_id": "openai/gpt-oss-20b",
-   "family": "gpt-oss",
-   "release_date": "2025-08-05",
-   "limit": {
-    "context": 131072,
-    "output": 32768
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": false,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open-weight GPT model for self-hosted reasoning and instruction-following workloads",
-   "open_weights": true,
-   "knowledge": "2024-06",
-   "last_updated": "2025-08-05",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.07,
-      "cache": {
-       "read": 0.035
-      }
-     },
-     "output": {
-      "price": 0.3
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
   "kimi-k2.6": {
    "id": "kimi-k2.6",
    "name": "kimi-k2.6",
+   "description": "Kimi multimodal agent model for visual understanding, coding, and planning",
    "type": "chat",
-   "canonical_id": "moonshotai/kimi-k2.6",
    "family": "kimi-k2",
+   "canonical_id": "moonshotai/kimi-k2.6",
    "release_date": "2026-04-20",
    "limit": {
     "context": 262144,
@@ -569,38 +22,19 @@
     "cache": {
      "implicit": true
     },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": true,
      "toggle": true
-    },
-    "structured_output": false,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Kimi multimodal agent model for visual understanding, coding, and planning",
-   "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-04-20",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/heic",
-     "image/heif"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -615,6 +49,21 @@
      }
     }
    },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/heic",
+     "image/heif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "https://ollama.com/v1",
@@ -622,13 +71,13 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     },
      "capabilities": {
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
      }
     },
     "responses": {
@@ -655,15 +104,119 @@
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "knowledge": "2025-01",
+   "last_updated": "2026-04-20"
   },
-  "deepseek-v4-pro": {
-   "id": "deepseek-v4-pro",
-   "name": "deepseek-v4-pro",
+  "glm-5.2": {
+   "id": "glm-5.2",
+   "name": "GLM-5.2",
+   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
    "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4-pro",
-   "family": "deepseek-thinking",
-   "release_date": "2026-04-24",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.2",
+   "release_date": "2026-06-13",
+   "limit": {
+    "context": 976000,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.4,
+      "cache": {
+       "read": 0.26
+      }
+     },
+     "output": {
+      "price": 4.4
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "responses": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-06-13"
+  },
+  "kimi-k3.1-pro": {
+   "id": "kimi-k3.1-pro",
+   "name": "Kimi K3.1 Pro",
+   "description": "Multimodal Kimi model with a 1M-token context window and always-on reasoning, for coding, 3D creation and financial research",
+   "type": "chat",
+   "family": "kimi-k3",
+   "canonical_id": "moonshotai/kimi-k3.1-pro",
+   "release_date": "2026-10-23",
    "limit": {
     "context": 1048576,
     "output": 1048576
@@ -672,6 +225,1307 @@
     "cache": {
      "implicit": true
     },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "max"
+     ],
+     "default": {
+      "type": "effort",
+      "value": "max"
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.2
+      }
+     },
+     "output": {
+      "price": 10
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/heic",
+     "image/heif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-10-23"
+  },
+  "gpt-oss:120b": {
+   "id": "gpt-oss:120b",
+   "name": "gpt-oss:120b",
+   "description": "Open-weight GPT model for self-hosted reasoning and instruction-following workloads",
+   "type": "chat",
+   "family": "gpt-oss",
+   "canonical_id": "openai/gpt-oss-120b",
+   "release_date": "2025-08-05",
+   "limit": {
+    "context": 131072,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.15,
+      "cache": {
+       "read": 0.014
+      }
+     },
+     "output": {
+      "price": 0.6
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-06",
+   "last_updated": "2025-08-05"
+  },
+  "nemotron-3-nano:30b": {
+   "id": "nemotron-3-nano:30b",
+   "name": "nemotron-3-nano:30b",
+   "description": "Small Nemotron 3 MoE for efficient coding, math, and long-context agents",
+   "type": "chat",
+   "family": "nemotron",
+   "canonical_id": "nvidia/nemotron-3-nano-30b-a3b",
+   "release_date": "2025-12-15",
+   "limit": {
+    "context": 1048576,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.06
+     },
+     "output": {
+      "price": 0.24
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-06-25",
+   "last_updated": "2025-12-15"
+  },
+  "mimo-v2.6-pro": {
+   "id": "mimo-v2.6-pro",
+   "name": "MiMo-V2.6-Pro",
+   "description": "Stronger MiMo Pro tier for multimodal reasoning and coding-agent execution",
+   "type": "chat",
+   "family": "mimo",
+   "canonical_id": "xiaomi/mimo-v2.6-pro",
+   "release_date": "2026-09-22",
+   "limit": {
+    "context": 1048576,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.435,
+      "cache": {
+       "read": 0.0036
+      }
+     },
+     "output": {
+      "price": 0.87
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-09-22"
+  },
+  "gpt-oss:20b": {
+   "id": "gpt-oss:20b",
+   "name": "gpt-oss:20b",
+   "description": "Open-weight GPT model for self-hosted reasoning and instruction-following workloads",
+   "type": "chat",
+   "family": "gpt-oss",
+   "canonical_id": "openai/gpt-oss-20b",
+   "release_date": "2025-08-05",
+   "limit": {
+    "context": 131072,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.07,
+      "cache": {
+       "read": 0.035
+      }
+     },
+     "output": {
+      "price": 0.3
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-06",
+   "last_updated": "2025-08-05"
+  },
+  "mistral-large-3:675b": {
+   "id": "mistral-large-3:675b",
+   "name": "mistral-large-3:675b",
+   "description": "Flagship Mistral model for advanced reasoning, coding, and multilingual work",
+   "type": "chat",
+   "family": "mistral-large",
+   "canonical_id": "mistral/mistral-large-2512",
+   "release_date": "2025-12-02",
+   "limit": {
+    "context": 262144,
+    "output": 262144
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.5
+     },
+     "output": {
+      "price": 1.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/gif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-11",
+   "last_updated": "2025-12-02"
+  },
+  "nemotron-3-super": {
+   "id": "nemotron-3-super",
+   "name": "nemotron-3-super",
+   "description": "Nemotron middle tier for collaborative agents and high-volume reasoning workloads",
+   "type": "chat",
+   "family": "nemotron",
+   "canonical_id": "nvidia/nemotron-3-super-120b-a12b",
+   "release_date": "2026-03-11",
+   "limit": {
+    "context": 262144,
+    "output": 65536
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.015,
+      "cache": {
+       "read": 0.015
+      }
+     },
+     "output": {
+      "price": 0.6
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-06",
+   "last_updated": "2026-03-11"
+  },
+  "minimax-m3": {
+   "id": "minimax-m3",
+   "name": "minimax-m3",
+   "description": "MiniMax multimodal coding model for long-context reasoning and agent tasks",
+   "type": "chat",
+   "family": "minimax",
+   "canonical_id": "minimax/MiniMax-M3",
+   "release_date": "2026-06-01",
+   "limit": {
+    "context": 512000,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.6,
+      "cache": {
+       "read": 0.12
+      }
+     },
+     "output": {
+      "price": 2.4
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/quicktime",
+     "video/x-matroska"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-01",
+   "last_updated": "2026-06-01"
+  },
+  "beam": {
+   "id": "beam",
+   "name": "Beam 1.0 501B A23B",
+   "description": "Sparse mixture-of-experts reasoning model with 23B active parameters for coding and agentic workflows",
+   "type": "chat",
+   "family": "beam",
+   "canonical_id": "reflection/beam-1.0-501b-a23b",
+   "release_date": "2026-10-05",
+   "limit": {
+    "context": 1048576,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2026-06-30",
+   "last_updated": "2026-10-16"
+  },
+  "glm-5.3": {
+   "id": "glm-5.3",
+   "name": "GLM-5.3",
+   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.3",
+   "release_date": "2026-08-14",
+   "limit": {
+    "context": 1048576,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.4,
+      "cache": {
+       "read": 0.26
+      }
+     },
+     "output": {
+      "price": 4.4
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "responses": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-14"
+  },
+  "minimax-m3.1-flash": {
+   "id": "minimax-m3.1-flash",
+   "name": "MiniMax-M3.1-Flash",
+   "description": "Frontier multimodal coding model with 1M context window and tunable thinking depth",
+   "type": "chat",
+   "family": "minimax",
+   "canonical_id": "minimax/MiniMax-M3.1-Flash",
+   "release_date": "2026-10-19",
+   "limit": {
+    "context": 1000000,
+    "output": 512000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.15,
+      "cache": {
+       "read": 0.015
+      }
+     },
+     "output": {
+      "price": 0.6
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/quicktime",
+     "video/x-matroska"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-10-19"
+  },
+  "glm-5.3-flash": {
+   "id": "glm-5.3-flash",
+   "name": "GLM-5.3-Flash",
+   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
+   "type": "chat",
+   "family": "glm-flash",
+   "canonical_id": "zhipuai/glm-5.3-flash",
+   "release_date": "2026-08-26",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.15,
+      "cache": {
+       "read": 0.03
+      }
+     },
+     "output": {
+      "price": 0.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "video/mp4",
+     "video/x-matroska",
+     "video/quicktime"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "responses": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-26"
+  },
+  "minimax-m2.7": {
+   "id": "minimax-m2.7",
+   "name": "minimax-m2.7",
+   "description": "MiniMax model for chat, coding, office work, and agentic tasks",
+   "type": "chat",
+   "family": "minimax",
+   "canonical_id": "minimax/MiniMax-M2.7",
+   "release_date": "2026-03-18",
+   "limit": {
+    "context": 196608,
+    "output": 196608
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.3,
+      "cache": {
+       "read": 0.06
+      }
+     },
+     "output": {
+      "price": 1.2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-03-18"
+  },
+  "deepseek-v4-pro": {
+   "id": "deepseek-v4-pro",
+   "name": "deepseek-v4-pro",
+   "description": "Flagship DeepSeek model for coding, reasoning, and agentic work",
+   "type": "chat",
+   "family": "deepseek-thinking",
+   "canonical_id": "deepseek/deepseek-v4-pro",
+   "release_date": "2026-04-24",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -683,25 +1537,7 @@
       "high",
       "max"
      ]
-    },
-    "structured_output": false,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Flagship DeepSeek model for coding, reasoning, and agentic work",
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-04-24",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -744,81 +1580,6 @@
      }
     ]
    },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "nemotron-3-ultra": {
-   "id": "nemotron-3-ultra",
-   "name": "nemotron-3-ultra",
-   "type": "chat",
-   "canonical_id": "nvidia/nemotron-3-ultra-550b-a55b",
-   "family": "nemotron",
-   "release_date": "2026-06-04",
-   "limit": {
-    "context": 262144,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    },
-    "structured_output": false,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Largest Nemotron 3 model for maximum open-weight reasoning and agent accuracy",
-   "open_weights": true,
-   "knowledge": "2025-09",
-   "last_updated": "2026-06-04",
    "modalities": {
     "input": [
      "text"
@@ -827,19 +1588,6 @@
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.1,
-      "cache": {
-       "read": 0.1
-      }
-     },
-     "output": {
-      "price": 3
-     }
-    }
-   },
    "api": {
     "chat-completions": {
      "base_url": "https://ollama.com/v1",
@@ -847,13 +1595,13 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     },
      "capabilities": {
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
      }
     },
     "responses": {
@@ -880,11 +1628,15 @@
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-04-24"
   },
   "clef:27b": {
    "id": "clef:27b",
    "name": "Clef",
+   "description": "Cloudflare's open-weight decision model that returns probabilities for typed choice, score and yes/no questions about text or images",
    "type": "decision",
    "canonical_id": "cloudflare/clef",
    "release_date": "2026-10-01",
@@ -892,32 +1644,18 @@
     "context": 65536
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": false
     },
     "reasoning": {
      "supported": false
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Cloudflare's open-weight decision model that returns probabilities for typed choice, score and yes/no questions about text or images",
-   "open_weights": true,
-   "last_updated": "2026-10-01",
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -928,6 +1666,17 @@
       "price": 0
      }
     }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
    },
    "api": {
     "systemone": {
@@ -940,204 +1689,17 @@
       "media_input": "root"
      }
     }
-   }
-  },
-  "nemotron-3-nano:30b": {
-   "id": "nemotron-3-nano:30b",
-   "name": "nemotron-3-nano:30b",
-   "type": "chat",
-   "canonical_id": "nvidia/nemotron-3-nano-30b-a3b",
-   "family": "nemotron",
-   "release_date": "2025-12-15",
-   "limit": {
-    "context": 1048576,
-    "output": 131072
    },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    },
-    "structured_output": false,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Small Nemotron 3 MoE for efficient coding, math, and long-context agents",
    "open_weights": true,
-   "knowledge": "2025-06-25",
-   "last_updated": "2025-12-15",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.06
-     },
-     "output": {
-      "price": 0.24
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "glm-5.2": {
-   "id": "glm-5.2",
-   "name": "GLM-5.2",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-5.2",
-   "family": "glm",
-   "release_date": "2026-06-13",
-   "limit": {
-    "context": 976000,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": false,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
-   "open_weights": true,
-   "last_updated": "2026-06-13",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.4,
-      "cache": {
-       "read": 0.26
-      }
-     },
-     "output": {
-      "price": 4.4
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
+   "last_updated": "2026-10-01"
   },
   "mimo-v2.6-flash": {
    "id": "mimo-v2.6-flash",
    "name": "MiMo-V2.6-Flash",
+   "description": "MiMo Flash model for multimodal coding agents and long-context automation",
    "type": "chat",
-   "canonical_id": "xiaomi/mimo-v2.6-flash",
    "family": "mimo",
+   "canonical_id": "xiaomi/mimo-v2.6-flash",
    "release_date": "2026-09-22",
    "limit": {
     "context": 1048576,
@@ -1147,35 +1709,19 @@
     "cache": {
      "implicit": true
     },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": true,
      "toggle": true
-    },
-    "structured_output": false,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "MiMo Flash model for multimodal coding agents and long-context automation",
-   "open_weights": true,
-   "last_updated": "2026-09-22",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -1190,726 +1736,6 @@
      }
     }
    },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "deepseek-v4.1-flash": {
-   "id": "deepseek-v4.1-flash",
-   "name": "DeepSeek V4.1 Flash",
-   "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4.1-flash",
-   "family": "deepseek-flash",
-   "release_date": "2026-09-10",
-   "limit": {
-    "context": 1048576,
-    "output": 384000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": false,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "DeepSeek V4.1 Flash model for reasoning and agentic coding",
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-09-10",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.15,
-      "cache": {
-       "read": 0.003
-      }
-     },
-     "output": {
-      "price": 0.6
-     }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "utc_days": {
-        "in": [
-         "mon",
-         "tue",
-         "wed",
-         "thu",
-         "fri"
-        ]
-       },
-       "all": [
-        {
-         "utc_hours": {
-          "gte": "12:00"
-         }
-        },
-        {
-         "utc_hours": {
-          "lt": "18:00"
-         }
-        }
-       ]
-      },
-      "factor": 2
-     }
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "mistral-large-3:675b": {
-   "id": "mistral-large-3:675b",
-   "name": "mistral-large-3:675b",
-   "type": "chat",
-   "canonical_id": "mistral/mistral-large-2512",
-   "family": "mistral-large",
-   "release_date": "2025-12-02",
-   "limit": {
-    "context": 262144,
-    "output": 262144
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "structured_output": false,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Flagship Mistral model for advanced reasoning, coding, and multilingual work",
-   "open_weights": true,
-   "knowledge": "2024-11",
-   "last_updated": "2025-12-02",
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/gif"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.5
-     },
-     "output": {
-      "price": 1.5
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "glm-5.3": {
-   "id": "glm-5.3",
-   "name": "GLM-5.3",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-5.3",
-   "family": "glm",
-   "release_date": "2026-08-14",
-   "limit": {
-    "context": 1048576,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": false,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
-   "open_weights": true,
-   "last_updated": "2026-08-14",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.4,
-      "cache": {
-       "read": 0.26
-      }
-     },
-     "output": {
-      "price": 4.4
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gpt-oss:120b": {
-   "id": "gpt-oss:120b",
-   "name": "gpt-oss:120b",
-   "type": "chat",
-   "canonical_id": "openai/gpt-oss-120b",
-   "family": "gpt-oss",
-   "release_date": "2025-08-05",
-   "limit": {
-    "context": 131072,
-    "output": 32768
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": false,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open-weight GPT model for self-hosted reasoning and instruction-following workloads",
-   "open_weights": true,
-   "knowledge": "2024-06",
-   "last_updated": "2025-08-05",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.15,
-      "cache": {
-       "read": 0.014
-      }
-     },
-     "output": {
-      "price": 0.6
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "minimax-m3": {
-   "id": "minimax-m3",
-   "name": "minimax-m3",
-   "type": "chat",
-   "canonical_id": "minimax/MiniMax-M3",
-   "family": "minimax",
-   "release_date": "2026-06-01",
-   "limit": {
-    "context": 512000,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": false,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "MiniMax multimodal coding model for long-context reasoning and agent tasks",
-   "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-06-01",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/quicktime",
-     "video/x-matroska"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.6,
-      "cache": {
-       "read": 0.12
-      }
-     },
-     "output": {
-      "price": 2.4
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "minimax-m3.1-flash": {
-   "id": "minimax-m3.1-flash",
-   "name": "MiniMax-M3.1-Flash",
-   "type": "chat",
-   "canonical_id": "minimax/MiniMax-M3.1-Flash",
-   "family": "minimax",
-   "release_date": "2026-10-19",
-   "limit": {
-    "context": 1000000,
-    "output": 512000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": false,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Frontier multimodal coding model with 1M context window and tunable thinking depth",
-   "open_weights": true,
-   "last_updated": "2026-10-19",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/quicktime",
-     "video/x-matroska"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.15,
-      "cache": {
-       "read": 0.015
-      }
-     },
-     "output": {
-      "price": 0.6
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "mimo-v2.6-pro": {
-   "id": "mimo-v2.6-pro",
-   "name": "MiMo-V2.6-Pro",
-   "type": "chat",
-   "canonical_id": "xiaomi/mimo-v2.6-pro",
-   "family": "mimo",
-   "release_date": "2026-09-22",
-   "limit": {
-    "context": 1048576,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    },
-    "structured_output": false,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Stronger MiMo Pro tier for multimodal reasoning and coding-agent execution",
-   "open_weights": true,
-   "last_updated": "2026-09-22",
    "modalities": {
     "input": [
      "text",
@@ -1923,19 +1749,6 @@
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.435,
-      "cache": {
-       "read": 0.0036
-      }
-     },
-     "output": {
-      "price": 0.87
-     }
-    }
-   },
    "api": {
     "chat-completions": {
      "base_url": "https://ollama.com/v1",
@@ -1943,13 +1756,13 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     },
      "capabilities": {
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
      }
     },
     "responses": {
@@ -1976,23 +1789,239 @@
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "last_updated": "2026-09-22"
   },
-  "deepseek-v4.1-flash:1017": {
-   "id": "deepseek-v4.1-flash:1017",
-   "name": "DeepSeek V4.1 Flash 1017",
+  "inkling-2-small": {
+   "id": "inkling-2-small",
+   "name": "Inkling 2 Small",
+   "description": "Multimodal MoE reasoning model (594B total, 17B active) for agentic coding, vision, and knowledge work",
    "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
-   "family": "deepseek-flash",
-   "release_date": "2026-10-17",
+   "family": "ling",
+   "canonical_id": "thinkingmachines/inkling-2-small",
+   "release_date": "2026-11-05",
    "limit": {
     "context": 1048576,
-    "output": 384000
+    "output": 131072
    },
    "capabilities": {
     "cache": {
      "implicit": true
     },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "max"
+     ],
+     "default": {
+      "type": "effort",
+      "value": "high"
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.3,
+      "cache": {
+       "read": 0.03
+      }
+     },
+     "output": {
+      "price": 1
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-11-12"
+  },
+  "gemma4:31b": {
+   "id": "gemma4:31b",
+   "name": "gemma4:31b",
+   "description": "Open Gemma instruction model for efficient chat and self-hosted deployments",
+   "type": "chat",
+   "family": "gemma",
+   "canonical_id": "google/gemma-4-31b-it",
+   "release_date": "2026-04-02",
+   "limit": {
+    "context": 262144,
+    "output": 262144
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.14,
+      "cache": {
+       "read": 0.05
+      }
+     },
+     "output": {
+      "price": 0.4
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-01",
+   "last_updated": "2026-04-02"
+  },
+  "deepseek-v4-pro:0813": {
+   "id": "deepseek-v4-pro:0813",
+   "name": "DeepSeek V4 Pro 0813",
+   "description": "DeepSeek V4 Pro snapshot with million-token context and support for thinking and non-thinking modes",
+   "type": "chat",
+   "family": "deepseek-thinking",
+   "canonical_id": "deepseek/deepseek-v4-pro-0813",
+   "release_date": "2026-08-13",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -2004,29 +2033,135 @@
       "high",
       "max"
      ]
-    },
-    "structured_output": false,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-10-17",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.66,
+      "cache": {
+       "read": 0.022
+      }
+     },
+     "output": {
+      "price": 1.98
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "utc_days": {
+        "in": [
+         "mon",
+         "tue",
+         "wed",
+         "thu",
+         "fri"
+        ]
+       },
+       "all": [
+        {
+         "utc_hours": {
+          "gte": "12:00"
+         }
+        },
+        {
+         "utc_hours": {
+          "lt": "18:00"
+         }
+        }
+       ]
+      },
+      "factor": 2
+     }
+    ]
+   },
    "modalities": {
     "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
+     "text"
     ],
     "output": [
      "text"
     ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-22"
+  },
+  "deepseek-v4.1-flash:1017": {
+   "id": "deepseek-v4.1-flash:1017",
+   "name": "DeepSeek V4.1 Flash 1017",
+   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
+   "type": "chat",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
+   "release_date": "2026-10-17",
+   "limit": {
+    "context": 1048576,
+    "output": 384000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
    },
    "cost": {
     "text": {
@@ -2069,6 +2204,18 @@
      }
     ]
    },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "https://ollama.com/v1",
@@ -2076,14 +2223,14 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
      "capabilities": {
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
      }
     },
     "responses": {
@@ -2110,15 +2257,19 @@
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-10-17"
   },
-  "kimi-k3": {
-   "id": "kimi-k3",
-   "name": "kimi-k3",
+  "muse-spark-open": {
+   "id": "muse-spark-open",
+   "name": "Muse Spark Open",
+   "description": "Muse Spark Open is an 816B total / 42B active open-weight multimodal reasoning model from Meta for coding and long-horizon agentic work, with 1M-token context.",
    "type": "chat",
-   "canonical_id": "moonshotai/kimi-k3",
-   "family": "kimi-k3",
-   "release_date": "2026-07-16",
+   "family": "muse",
+   "canonical_id": "meta/muse-spark-open",
+   "release_date": "2026-10-15",
    "limit": {
     "context": 1048576,
     "output": 131072
@@ -2127,6 +2278,12 @@
     "cache": {
      "implicit": true
     },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -2135,20 +2292,122 @@
      "toggle": true,
      "effort": [
       "low",
+      "medium",
       "high",
       "max"
      ]
-    },
-    "structured_output": false,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.25,
+      "cache": {
+       "read": 0.15
+      }
+     },
+     "output": {
+      "price": 4.25
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
    "open_weights": true,
-   "last_updated": "2026-07-16",
+   "knowledge": "2026-01-04",
+   "last_updated": "2026-10-15"
+  },
+  "kimi-k2.7-code": {
+   "id": "kimi-k2.7-code",
+   "name": "kimi-k2.7-code",
+   "description": "Coding-focused Kimi model, stronger on long-horizon repo work with less overthinking",
+   "type": "chat",
+   "family": "kimi-k2",
+   "canonical_id": "moonshotai/kimi-k2.7-code",
+   "release_date": "2026-06-12",
+   "limit": {
+    "context": 262144,
+    "output": 262144
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.95,
+      "cache": {
+       "read": 0.19
+      }
+     },
+     "output": {
+      "price": 4
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text",
@@ -2164,6 +2423,220 @@
      "text"
     ]
    },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-01",
+   "last_updated": "2026-06-12"
+  },
+  "deepseek-v4.1-flash": {
+   "id": "deepseek-v4.1-flash",
+   "name": "DeepSeek V4.1 Flash",
+   "description": "DeepSeek V4.1 Flash model for reasoning and agentic coding",
+   "type": "chat",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4.1-flash",
+   "release_date": "2026-09-10",
+   "limit": {
+    "context": 1048576,
+    "output": 384000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.15,
+      "cache": {
+       "read": 0.003
+      }
+     },
+     "output": {
+      "price": 0.6
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "utc_days": {
+        "in": [
+         "mon",
+         "tue",
+         "wed",
+         "thu",
+         "fri"
+        ]
+       },
+       "all": [
+        {
+         "utc_hours": {
+          "gte": "12:00"
+         }
+        },
+        {
+         "utc_hours": {
+          "lt": "18:00"
+         }
+        }
+       ]
+      },
+      "factor": 2
+     }
+    ]
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "responses": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://ollama.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-09-10"
+  },
+  "kimi-k3": {
+   "id": "kimi-k3",
+   "name": "kimi-k3",
+   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
+   "type": "chat",
+   "family": "kimi-k3",
+   "canonical_id": "moonshotai/kimi-k3",
+   "release_date": "2026-07-16",
+   "limit": {
+    "context": 1048576,
+    "output": 1048576
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
    "cost": {
     "text": {
      "input": {
@@ -2177,181 +2650,14 @@
      }
     }
    },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "minimax-m2.7": {
-   "id": "minimax-m2.7",
-   "name": "minimax-m2.7",
-   "type": "chat",
-   "canonical_id": "minimax/MiniMax-M2.7",
-   "family": "minimax",
-   "release_date": "2026-03-18",
-   "limit": {
-    "context": 196608,
-    "output": 196608
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    },
-    "structured_output": false,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "MiniMax model for chat, coding, office work, and agentic tasks",
-   "open_weights": true,
-   "last_updated": "2026-03-18",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.3,
-      "cache": {
-       "read": 0.06
-      }
-     },
-     "output": {
-      "price": 1.2
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gemma4:31b": {
-   "id": "gemma4:31b",
-   "name": "gemma4:31b",
-   "type": "chat",
-   "canonical_id": "google/gemma-4-31b-it",
-   "family": "gemma",
-   "release_date": "2026-04-02",
-   "limit": {
-    "context": 262144,
-    "output": 262144
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    },
-    "structured_output": false,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open Gemma instruction model for efficient chat and self-hosted deployments",
-   "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-04-02",
    "modalities": {
     "input": [
      "text",
-     "image/png",
      "image/jpeg",
+     "image/png",
+     "image/gif",
      "image/webp",
+     "image/bmp",
      "image/heic",
      "image/heif"
     ],
@@ -2359,19 +2665,6 @@
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.14,
-      "cache": {
-       "read": 0.05
-      }
-     },
-     "output": {
-      "price": 0.4
-     }
-    }
-   },
    "api": {
     "chat-completions": {
      "base_url": "https://ollama.com/v1",
@@ -2379,13 +2672,13 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     },
      "capabilities": {
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
      }
     },
     "responses": {
@@ -2412,41 +2705,53 @@
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "last_updated": "2026-07-16"
   },
-  "nemotron-3-super": {
-   "id": "nemotron-3-super",
-   "name": "nemotron-3-super",
+  "nemotron-3-ultra": {
+   "id": "nemotron-3-ultra",
+   "name": "nemotron-3-ultra",
+   "description": "Largest Nemotron 3 model for maximum open-weight reasoning and agent accuracy",
    "type": "chat",
-   "canonical_id": "nvidia/nemotron-3-super-120b-a12b",
    "family": "nemotron",
-   "release_date": "2026-03-11",
+   "canonical_id": "nvidia/nemotron-3-ultra-550b-a55b",
+   "release_date": "2026-06-04",
    "limit": {
     "context": 262144,
-    "output": 65536
+    "output": 128000
    },
    "capabilities": {
     "cache": {
      "implicit": true
     },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": true,
      "toggle": true
-    },
-    "structured_output": false,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Nemotron middle tier for collaborative agents and high-volume reasoning workloads",
-   "open_weights": true,
-   "knowledge": "2025-06",
-   "last_updated": "2026-03-11",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1,
+      "cache": {
+       "read": 0.1
+      }
+     },
+     "output": {
+      "price": 3
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text"
@@ -2455,19 +2760,6 @@
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.015,
-      "cache": {
-       "read": 0.015
-      }
-     },
-     "output": {
-      "price": 0.6
-     }
-    }
-   },
    "api": {
     "chat-completions": {
      "base_url": "https://ollama.com/v1",
@@ -2475,13 +2767,13 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     },
      "capabilities": {
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
      }
     },
     "responses": {
@@ -2508,14 +2800,18 @@
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "knowledge": "2025-09",
+   "last_updated": "2026-06-04"
   },
   "mistral-large-4": {
    "id": "mistral-large-4",
    "name": "Mistral Large 4",
+   "description": "Mistral's 1T-parameter multimodal MoE for reasoning, coding, and agentic work",
    "type": "chat",
-   "canonical_id": "mistral/mistral-large-4",
    "family": "mistral-large",
+   "canonical_id": "mistral/mistral-large-4",
    "release_date": "2026-10-06",
    "limit": {
     "context": 1048576,
@@ -2525,6 +2821,12 @@
     "cache": {
      "implicit": true
     },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -2534,28 +2836,7 @@
       "none",
       "high"
      ]
-    },
-    "structured_output": false,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Mistral's 1T-parameter multimodal MoE for reasoning, coding, and agentic work",
-   "open_weights": false,
-   "last_updated": "2026-10-06",
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/gif"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -2570,108 +2851,17 @@
      }
     }
    },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "muse-spark-open": {
-   "id": "muse-spark-open",
-   "name": "Muse Spark Open",
-   "type": "chat",
-   "canonical_id": "meta/muse-spark-open",
-   "family": "muse",
-   "release_date": "2026-10-15",
-   "limit": {
-    "context": 1048576,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": false,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Muse Spark Open is an 816B total / 42B active open-weight multimodal reasoning model from Meta for coding and long-horizon agentic work, with 1M-token context.",
-   "open_weights": true,
-   "knowledge": "2026-01-04",
-   "last_updated": "2026-10-15",
    "modalities": {
     "input": [
      "text",
-     "image"
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/gif"
     ],
     "output": [
      "text"
     ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.25,
-      "cache": {
-       "read": 0.15
-      }
-     },
-     "output": {
-      "price": 4.25
-     }
-    }
    },
    "api": {
     "chat-completions": {
@@ -2680,13 +2870,13 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     },
      "capabilities": {
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
      }
     },
     "responses": {
@@ -2713,93 +2903,9 @@
       }
      }
     }
-   }
-  },
-  "beam": {
-   "id": "beam",
-   "name": "Beam 1.0 501B A23B",
-   "type": "chat",
-   "canonical_id": "reflection/beam-1.0-501b-a23b",
-   "family": "beam",
-   "release_date": "2026-10-05",
-   "limit": {
-    "context": 1048576,
-    "output": 131072
    },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": false,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Sparse mixture-of-experts reasoning model with 23B active parameters for coding and agentic workflows",
-   "open_weights": true,
-   "knowledge": "2026-06-30",
-   "last_updated": "2026-10-16",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://ollama.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
+   "open_weights": false,
+   "last_updated": "2026-10-06"
   }
  }
 }

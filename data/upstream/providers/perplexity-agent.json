@@ -6,118 +6,10 @@
   "PERPLEXITY_API_KEY"
  ],
  "models": {
-  "pplx-embed-context-v1-0.6b": {
-   "id": "pplx-embed-context-v1-0.6b",
-   "name": "pplx-embed-context-v1-0.6b",
-   "type": "embedding",
-   "canonical_id": "perplexity/pplx-embed-context-v1-0.6b",
-   "release_date": "2026-02-26",
-   "limit": {
-    "context": 32000,
-    "output": 0
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open contextual text embedding model for document chunks that share surrounding context",
-   "open_weights": true,
-   "last_updated": "2026-02-26",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "embedding"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.008
-     }
-    }
-   },
-   "api": {
-    "contextualized-embeddings": {
-     "base_url": "https://api.perplexity.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai"
-     }
-    }
-   }
-  },
-  "pplx-decider-v1.2": {
-   "id": "pplx-decider-v1.2",
-   "name": "pplx-decider-v1.2",
-   "type": "decision",
-   "canonical_id": "perplexity/pplx-decider-v1.2",
-   "release_date": "2026-10-15",
-   "limit": {
-    "context": 262144
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Perplexity's open-weight decision model on Qwen3.8-27B that returns probabilities for typed yes/no, choice and score questions about text or images",
-   "open_weights": true,
-   "last_updated": "2026-10-15",
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp"
-    ],
-    "output": [
-     "decision"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.02
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "systemone": {
-     "base_url": "https://api.perplexity.ai",
-     "path": "/v1/decisions",
-     "sdk": {
-      "aisdk": "@ai-sdk/perplexity"
-     },
-     "compatibility": {
-      "media_input": "state"
-     }
-    }
-   }
-  },
   "pplx-embed-v1-4b": {
    "id": "pplx-embed-v1-4b",
    "name": "pplx-embed-v1-4b",
+   "description": "Open text embedding model for web-scale dense retrieval",
    "type": "embedding",
    "canonical_id": "perplexity/pplx-embed-v1-4b",
    "release_date": "2026-02-26",
@@ -126,28 +18,17 @@
     "output": 0
    },
    "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": false
     },
     "reasoning": {
      "supported": false
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open text embedding model for web-scale dense retrieval",
-   "open_weights": true,
-   "last_updated": "2026-02-26",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "embedding"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -156,41 +37,6 @@
      }
     }
    },
-   "api": {
-    "embeddings": {
-     "base_url": "https://api.perplexity.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai"
-     }
-    }
-   }
-  },
-  "pplx-embed-v1-0.6b": {
-   "id": "pplx-embed-v1-0.6b",
-   "name": "pplx-embed-v1-0.6b",
-   "type": "embedding",
-   "canonical_id": "perplexity/pplx-embed-v1-0.6b",
-   "release_date": "2026-02-26",
-   "limit": {
-    "context": 32000,
-    "output": 0
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open text embedding model for web-scale dense retrieval",
-   "open_weights": true,
-   "last_updated": "2026-02-26",
    "modalities": {
     "input": [
      "text"
@@ -199,12 +45,155 @@
      "embedding"
     ]
    },
+   "api": {
+    "embeddings": {
+     "base_url": "https://api.perplexity.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-02-26"
+  },
+  "pplx-embed-context-v1-4b": {
+   "id": "pplx-embed-context-v1-4b",
+   "name": "pplx-embed-context-v1-4b",
+   "description": "Open contextual text embedding model for document chunks that share surrounding context",
+   "type": "embedding",
+   "canonical_id": "perplexity/pplx-embed-context-v1-4b",
+   "release_date": "2026-02-26",
+   "limit": {
+    "context": 32000,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.05
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "api": {
+    "contextualized-embeddings": {
+     "base_url": "https://api.perplexity.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-02-26"
+  },
+  "pplx-embed-context-v1-0.6b": {
+   "id": "pplx-embed-context-v1-0.6b",
+   "name": "pplx-embed-context-v1-0.6b",
+   "description": "Open contextual text embedding model for document chunks that share surrounding context",
+   "type": "embedding",
+   "canonical_id": "perplexity/pplx-embed-context-v1-0.6b",
+   "release_date": "2026-02-26",
+   "limit": {
+    "context": 32000,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.008
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "api": {
+    "contextualized-embeddings": {
+     "base_url": "https://api.perplexity.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-02-26"
+  },
+  "pplx-embed-v1-0.6b": {
+   "id": "pplx-embed-v1-0.6b",
+   "name": "pplx-embed-v1-0.6b",
+   "description": "Open text embedding model for web-scale dense retrieval",
+   "type": "embedding",
+   "canonical_id": "perplexity/pplx-embed-v1-0.6b",
+   "release_date": "2026-02-26",
+   "limit": {
+    "context": 32000,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
    "cost": {
     "text": {
      "input": {
       "price": 0.004
      }
     }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "embedding"
+    ]
    },
    "api": {
     "embeddings": {
@@ -213,11 +202,14 @@
       "aisdk": "@ai-sdk/openai"
      }
     }
-   }
+   },
+   "open_weights": true,
+   "last_updated": "2026-02-26"
   },
   "pplx-decider-flash-v1.2": {
    "id": "pplx-decider-flash-v1.2",
    "name": "pplx-decider-flash-v1.2",
+   "description": "Smaller Perplexity decision model distilled onto Qwen3.5-4B for high-volume yes/no, choice and score questions about text or images",
    "type": "decision",
    "canonical_id": "perplexity/pplx-decider-flash-v1.2",
    "release_date": "2026-10-15",
@@ -225,31 +217,17 @@
     "context": 262144
    },
    "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": false
     },
     "reasoning": {
      "supported": false
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Smaller Perplexity decision model distilled onto Qwen3.5-4B for high-volume yes/no, choice and score questions about text or images",
-   "open_weights": true,
-   "last_updated": "2026-10-15",
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp"
-    ],
-    "output": [
-     "decision"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -261,6 +239,17 @@
      }
     }
    },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp"
+    ],
+    "output": [
+     "decision"
+    ]
+   },
    "api": {
     "systemone": {
      "base_url": "https://api.perplexity.ai",
@@ -272,153 +261,88 @@
       "media_input": "state"
      }
     }
-   }
+   },
+   "open_weights": true,
+   "last_updated": "2026-10-15"
   },
-  "pplx-embed-context-v1-4b": {
-   "id": "pplx-embed-context-v1-4b",
-   "name": "pplx-embed-context-v1-4b",
-   "type": "embedding",
-   "canonical_id": "perplexity/pplx-embed-context-v1-4b",
-   "release_date": "2026-02-26",
+  "pplx-decider-v1.2": {
+   "id": "pplx-decider-v1.2",
+   "name": "pplx-decider-v1.2",
+   "description": "Perplexity's open-weight decision model on Qwen3.8-27B that returns probabilities for typed yes/no, choice and score questions about text or images",
+   "type": "decision",
+   "canonical_id": "perplexity/pplx-decider-v1.2",
+   "release_date": "2026-10-15",
    "limit": {
-    "context": 32000,
-    "output": 0
+    "context": 262144
    },
    "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": false
     },
     "reasoning": {
      "supported": false
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open contextual text embedding model for document chunks that share surrounding context",
-   "open_weights": true,
-   "last_updated": "2026-02-26",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "embedding"
-    ]
+    }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.05
+      "price": 0.02
+     },
+     "output": {
+      "price": 0
      }
     }
    },
-   "api": {
-    "contextualized-embeddings": {
-     "base_url": "https://api.perplexity.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai"
-     }
-    }
-   }
-  },
-  "moonshot-ai/kimi-k2.7-code": {
-   "id": "moonshot-ai/kimi-k2.7-code",
-   "name": "Kimi K2.7 Code",
-   "type": "chat",
-   "canonical_id": "moonshotai/kimi-k2.7-code",
-   "family": "kimi-k2",
-   "status": "deprecated",
-   "release_date": "2026-06-12",
-   "limit": {
-    "context": 262144,
-    "output": 262144
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Coding-focused Kimi model, stronger on long-horizon repo work with less overthinking",
-   "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-06-12",
    "modalities": {
     "input": [
      "text",
-     "image/jpeg",
      "image/png",
-     "image/gif",
-     "image/webp",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp"
+     "image/jpeg",
+     "image/webp"
     ],
     "output": [
-     "text"
+     "decision"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.95,
-      "cache": {
-       "read": 0.19
-      }
+   "api": {
+    "systemone": {
+     "base_url": "https://api.perplexity.ai",
+     "path": "/v1/decisions",
+     "sdk": {
+      "aisdk": "@ai-sdk/perplexity"
      },
-     "output": {
-      "price": 4
+     "compatibility": {
+      "media_input": "state"
      }
-    },
-    "web_search": {
-     "price": 2.5
     }
    },
-   "api": {
-    "responses": {
-     "base_url": "https://api.perplexity.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
+   "open_weights": true,
+   "last_updated": "2026-10-15"
   },
-  "moonshot-ai/kimi-k3": {
-   "id": "moonshot-ai/kimi-k3",
-   "name": "Kimi K3",
+  "google/gemini-3.6-flash": {
+   "id": "google/gemini-3.6-flash",
+   "name": "Gemini 3.6 Flash",
+   "description": "Fast Gemini model balancing multimodal reasoning, tool use, and cost",
    "type": "chat",
-   "canonical_id": "moonshotai/kimi-k3",
-   "family": "kimi-k3",
-   "status": "deprecated",
-   "release_date": "2026-07-16",
+   "family": "gemini-flash",
+   "canonical_id": "google/gemini-3.6-flash",
+   "release_date": "2026-07-21",
    "limit": {
     "context": 1048576,
-    "output": 131072
+    "output": 65536
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -428,57 +352,37 @@
       "minimal",
       "low",
       "medium",
-      "high",
-      "xhigh",
-      "max"
+      "high"
      ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
-   "open_weights": true,
-   "last_updated": "2026-07-16",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 3,
+      "price": 1.5,
       "cache": {
-       "read": 0.3
+       "read": 0.15
       }
      },
      "output": {
-      "price": 15
+      "price": 7.5
      }
     },
     "web_search": {
      "price": 2.5
     }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
    },
    "api": {
     "responses": {
@@ -493,21 +397,29 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2026-03",
+   "last_updated": "2026-07-21"
   },
-  "openai/gpt-5.6-terra": {
-   "id": "openai/gpt-5.6-terra",
-   "name": "GPT-5.6 Terra",
+  "google/gemini-3-flash-preview": {
+   "id": "google/gemini-3-flash-preview",
+   "name": "Gemini 3 Flash Preview",
+   "description": "New Gemini flash lane bringing frontier-style multimodal reasoning to cheaper runs",
    "type": "chat",
-   "canonical_id": "openai/gpt-5.6-terra",
-   "family": "gpt-terra",
-   "release_date": "2026-07-09",
+   "family": "gemini-flash",
+   "canonical_id": "google/gemini-3-flash-preview",
+   "release_date": "2025-12-17",
    "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
+    "context": 1048576,
+    "output": 65536
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -520,48 +432,143 @@
       "xhigh",
       "max"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "service_tier": [
-     "flex",
-     "priority"
-    ]
+    }
    },
-   "description": "Balanced GPT-5.6 model for capable, cost-efficient everyday work",
-   "open_weights": false,
-   "knowledge": "2026-02-16",
-   "last_updated": "2026-07-09",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.5,
+      "cache": {
+       "read": 0.05
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 200000
+         }
+        },
+        "price": 0.5,
+        "cache": {
+         "read": 0.05
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 3,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 200000
+         }
+        },
+        "price": 3
+       }
+      ]
+     }
+    },
+    "web_search": {
+     "price": 2.5
+    }
+   },
    "modalities": {
     "input": [
      "text",
-     "image/jpeg",
      "image/png",
-     "image/gif",
+     "image/jpeg",
      "image/webp",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
      "application/pdf"
     ],
     "output": [
      "text"
     ]
    },
+   "api": {
+    "responses": {
+     "base_url": "https://api.perplexity.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2025-12-17"
+  },
+  "google/gemini-3.1-pro-preview": {
+   "id": "google/gemini-3.1-pro-preview",
+   "name": "Gemini 3.1 Pro Preview",
+   "description": "Reasoning-first Gemini preview for agentic coding and complex problem solving",
+   "type": "chat",
+   "family": "gemini-pro",
+   "canonical_id": "google/gemini-3.1-pro-preview",
+   "release_date": "2026-02-19",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
    "cost": {
     "text": {
      "input": {
       "price": 2,
       "cache": {
-       "read": 0.2,
-       "write": 2.5
+       "read": 0.2
       },
       "overrides": [
        {
         "when": {
          "context": {
-          "gt": 272000
+          "gt": 200000
          }
         },
         "price": 4,
@@ -577,7 +584,7 @@
        {
         "when": {
          "context": {
-          "gt": 272000
+          "gt": 200000
          }
         },
         "price": 18
@@ -587,28 +594,40 @@
     },
     "web_search": {
      "price": 2.5
-    },
-    "multipliers": [
-     {
-      "when": {
-       "service_tier": {
-        "equals": "priority"
-       }
-      },
-      "factor": {
-       "text": 2
-      }
-     },
-     {
-      "when": {
-       "service_tier": {
-        "equals": "flex"
-       }
-      },
-      "factor": {
-       "text": 0.5
-      }
-     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
     ]
    },
    "api": {
@@ -624,122 +643,68 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2026-02-19"
   },
-  "openai/gpt-5.6-sol": {
-   "id": "openai/gpt-5.6-sol",
-   "name": "GPT-5.6 Sol",
+  "google/gemini-3.8-flash": {
+   "id": "google/gemini-3.8-flash",
+   "name": "Gemini 3.8 Flash",
+   "description": "Google's most intelligent Flash model, engineered for long-horizon software engineering, autonomous agents, and complex enterprise workflows",
    "type": "chat",
-   "canonical_id": "openai/gpt-5.6-sol",
-   "family": "gpt-sol",
-   "release_date": "2026-07-09",
+   "family": "gemini-flash",
+   "canonical_id": "google/gemini-3.8-flash",
+   "release_date": "2026-09-02",
    "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
+    "context": 1048576,
+    "output": 65536
    },
    "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
     "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
     "system_updates": false,
     "effort_updates": false,
-    "service_tier": [
-     "flex",
-     "priority"
-    ]
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
    },
-   "description": "Frontier GPT-5.6 model for complex professional work, coding, and agentic workflows",
-   "open_weights": false,
-   "knowledge": "2026-02-16",
-   "last_updated": "2026-07-09",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.75,
+      "cache": {
+       "read": 0.075
+      }
+     },
+     "output": {
+      "price": 3.75
+     }
+    },
+    "web_search": {
+     "price": 2.5
+    }
+   },
    "modalities": {
     "input": [
      "text",
-     "image/jpeg",
      "image/png",
-     "image/gif",
+     "image/jpeg",
      "image/webp",
      "application/pdf"
     ],
     "output": [
      "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 4,
-      "cache": {
-       "read": 0.4,
-       "write": 5
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 8,
-        "cache": {
-         "read": 0.8
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 20,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 30
-       }
-      ]
-     }
-    },
-    "web_search": {
-     "price": 2.5
-    },
-    "multipliers": [
-     {
-      "when": {
-       "service_tier": {
-        "equals": "priority"
-       }
-      },
-      "factor": {
-       "text": 2
-      }
-     },
-     {
-      "when": {
-       "service_tier": {
-        "equals": "flex"
-       }
-      },
-      "factor": {
-       "text": 0.5
-      }
-     }
     ]
    },
    "api": {
@@ -755,469 +720,29 @@
       }
      }
     }
-   }
-  },
-  "openai/gpt-6-luna": {
-   "id": "openai/gpt-6-luna",
-   "name": "GPT-6 Luna",
-   "type": "chat",
-   "canonical_id": "openai/gpt-6-luna",
-   "family": "gpt-luna",
-   "release_date": "2026-09-22",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
    },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "service_tier": [
-     "flex",
-     "priority"
-    ]
-   },
-   "description": "OpenAI's most efficient model for focused, high-volume tasks",
    "open_weights": false,
-   "knowledge": "2026-05-18",
-   "last_updated": "2026-09-22",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.1,
-      "cache": {
-       "read": 0.01,
-       "write": 0.125
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 0.2,
-        "cache": {
-         "read": 0.02
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 0.5,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 0.75
-       }
-      ]
-     }
-    },
-    "web_search": {
-     "price": 2.5
-    },
-    "multipliers": [
-     {
-      "when": {
-       "service_tier": {
-        "equals": "priority"
-       }
-      },
-      "factor": {
-       "text": 2
-      }
-     },
-     {
-      "when": {
-       "service_tier": {
-        "equals": "flex"
-       }
-      },
-      "factor": {
-       "text": 0.5
-      }
-     }
-    ]
-   },
-   "api": {
-    "responses": {
-     "base_url": "https://api.perplexity.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
+   "last_updated": "2026-09-02"
   },
-  "openai/gpt-5.5": {
-   "id": "openai/gpt-5.5",
-   "name": "GPT-5.5",
+  "google/gemini-4-argon": {
+   "id": "google/gemini-4-argon",
+   "name": "Gemini 4 Argon",
+   "description": "Google's flagship reasoning model for complex software engineering, deep math and science, and long-horizon autonomous agents",
    "type": "chat",
-   "canonical_id": "openai/gpt-5.5",
-   "family": "gpt",
-   "release_date": "2026-04-23",
+   "family": "gemini",
+   "canonical_id": "google/gemini-4-argon",
+   "release_date": "2026-10-13",
    "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
+    "context": 1048576,
+    "output": 65536
    },
    "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "service_tier": [
-     "flex",
-     "priority"
-    ]
-   },
-   "description": "Default frontier GPT for coding, computer use, research, and knowledge work",
-   "open_weights": false,
-   "knowledge": "2025-12-01",
-   "last_updated": "2026-04-23",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 5,
-      "cache": {
-       "read": 0.5
-      }
-     },
-     "output": {
-      "price": 30
-     }
-    },
-    "web_search": {
-     "price": 2.5
-    },
-    "multipliers": [
-     {
-      "when": {
-       "service_tier": {
-        "equals": "priority"
-       }
-      },
-      "factor": {
-       "text": 2
-      }
-     },
-     {
-      "when": {
-       "service_tier": {
-        "equals": "flex"
-       }
-      },
-      "factor": {
-       "text": 0.5
-      }
-     }
-    ]
-   },
-   "api": {
-    "responses": {
-     "base_url": "https://api.perplexity.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "openai/gpt-5.6-luna": {
-   "id": "openai/gpt-5.6-luna",
-   "name": "GPT-5.6 Luna",
-   "type": "chat",
-   "canonical_id": "openai/gpt-5.6-luna",
-   "family": "gpt-luna",
-   "release_date": "2026-07-09",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "service_tier": [
-     "flex",
-     "priority"
-    ]
-   },
-   "description": "Cost-efficient GPT-5.6 model for fast, high-volume workloads",
-   "open_weights": false,
-   "knowledge": "2026-02-16",
-   "last_updated": "2026-07-09",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.2,
-      "cache": {
-       "read": 0.02,
-       "write": 0.25
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 0.4,
-        "cache": {
-         "read": 0.04
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 1.2,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 1.8
-       }
-      ]
-     }
-    },
-    "web_search": {
-     "price": 2.5
-    },
-    "multipliers": [
-     {
-      "when": {
-       "service_tier": {
-        "equals": "priority"
-       }
-      },
-      "factor": {
-       "text": 2
-      }
-     },
-     {
-      "when": {
-       "service_tier": {
-        "equals": "flex"
-       }
-      },
-      "factor": {
-       "text": 0.5
-      }
-     }
-    ]
-   },
-   "api": {
-    "responses": {
-     "base_url": "https://api.perplexity.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "openai/gpt-5-mini": {
-   "id": "openai/gpt-5-mini",
-   "name": "GPT-5 Mini",
-   "type": "chat",
-   "canonical_id": "openai/gpt-5-mini",
-   "family": "gpt-mini",
-   "status": "deprecated",
-   "release_date": "2025-08-07",
-   "limit": {
-    "context": 400000,
-    "input": 272000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
     "temperature": false,
-    "top_p": false,
     "top_k": false,
+    "top_p": false,
+    "structured_output": true,
     "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Small GPT-5 for responsive agents, coding help, and everyday automation",
-   "open_weights": false,
-   "knowledge": "2024-05-30",
-   "last_updated": "2025-08-07",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.25,
-      "cache": {
-       "read": 0.025
-      }
-     },
-     "output": {
-      "price": 2
-     }
-    },
-    "web_search": {
-     "price": 2.5
-    }
-   },
-   "api": {
-    "responses": {
-     "base_url": "https://api.perplexity.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "openai/gpt-6.1-sol": {
-   "id": "openai/gpt-6.1-sol",
-   "name": "GPT-6.1 Sol",
-   "type": "chat",
-   "canonical_id": "openai/gpt-6.1-sol",
-   "family": "gpt-sol",
-   "release_date": "2026-09-29",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -1226,593 +751,16 @@
      "effort": [
       "low",
       "medium",
-      "high",
-      "xhigh",
-      "max"
+      "high"
      ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "service_tier": [
-     "flex",
-     "priority"
-    ]
-   },
-   "description": "Near-Astra performance for complex coding, computer use, and professional work at a lower cost.",
-   "open_weights": false,
-   "knowledge": "2026-04-30",
-   "last_updated": "2026-09-29",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
      "input": {
       "price": 2,
       "cache": {
-       "read": 0.1,
-       "write": 2.5
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 4,
-        "cache": {
-         "read": 0.2
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 10,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 15
-       }
-      ]
-     }
-    },
-    "web_search": {
-     "price": 2.5
-    },
-    "multipliers": [
-     {
-      "when": {
-       "service_tier": {
-        "equals": "priority"
-       }
-      },
-      "factor": {
-       "text": 2
-      }
-     },
-     {
-      "when": {
-       "service_tier": {
-        "equals": "flex"
-       }
-      },
-      "factor": {
-       "text": 0.5
-      }
-     }
-    ]
-   },
-   "api": {
-    "responses": {
-     "base_url": "https://api.perplexity.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "openai/gpt-6-sol": {
-   "id": "openai/gpt-6-sol",
-   "name": "GPT-6 Sol",
-   "type": "chat",
-   "canonical_id": "openai/gpt-6-sol",
-   "family": "gpt-sol",
-   "release_date": "2026-09-22",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "service_tier": [
-     "flex",
-     "priority"
-    ]
-   },
-   "description": "OpenAI model for complex coding and agentic workflows",
-   "open_weights": false,
-   "knowledge": "2026-04-20",
-   "last_updated": "2026-09-22",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2,
-      "cache": {
-       "read": 0.2,
-       "write": 2.5
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 4,
-        "cache": {
-         "read": 0.4
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 10,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 15
-       }
-      ]
-     }
-    },
-    "web_search": {
-     "price": 2.5
-    },
-    "multipliers": [
-     {
-      "when": {
-       "service_tier": {
-        "equals": "priority"
-       }
-      },
-      "factor": {
-       "text": 2
-      }
-     },
-     {
-      "when": {
-       "service_tier": {
-        "equals": "flex"
-       }
-      },
-      "factor": {
-       "text": 0.5
-      }
-     }
-    ]
-   },
-   "api": {
-    "responses": {
-     "base_url": "https://api.perplexity.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "openai/gpt-5.2": {
-   "id": "openai/gpt-5.2",
-   "name": "GPT-5.2",
-   "type": "chat",
-   "canonical_id": "openai/gpt-5.2",
-   "family": "gpt",
-   "status": "deprecated",
-   "release_date": "2025-12-11",
-   "limit": {
-    "context": 400000,
-    "input": 272000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "temperature": false,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Reliable GPT generation for broad coding, writing, and tool-assisted product work",
-   "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2025-12-11",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.75,
-      "cache": {
-       "read": 0.175
-      }
-     },
-     "output": {
-      "price": 14
-     }
-    },
-    "web_search": {
-     "price": 2.5
-    }
-   },
-   "api": {
-    "responses": {
-     "base_url": "https://api.perplexity.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "openai/gpt-5.4": {
-   "id": "openai/gpt-5.4",
-   "name": "GPT-5.4",
-   "type": "chat",
-   "canonical_id": "openai/gpt-5.4",
-   "family": "gpt",
-   "status": "deprecated",
-   "release_date": "2026-03-05",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "temperature": false,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Agent-ready GPT for coding and computer-use workflows at a lower cost",
-   "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2026-03-05",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2.5,
-      "cache": {
-       "read": 0.25
-      }
-     },
-     "output": {
-      "price": 15
-     }
-    },
-    "web_search": {
-     "price": 2.5
-    }
-   },
-   "api": {
-    "responses": {
-     "base_url": "https://api.perplexity.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "openai/gpt-6-astra": {
-   "id": "openai/gpt-6-astra",
-   "name": "GPT-6 Astra",
-   "type": "chat",
-   "canonical_id": "openai/gpt-6-astra",
-   "family": "gpt-astra",
-   "release_date": "2026-09-04",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "service_tier": [
-     "flex",
-     "priority"
-    ]
-   },
-   "description": "GPT-6 Astra is OpenAI's most capable model for complex reasoning, coding, computer use, research, and document creation.",
-   "open_weights": false,
-   "knowledge": "2026-04-30",
-   "last_updated": "2026-09-04",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 10,
-      "cache": {
-       "read": 1,
-       "write": 12.5
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 20,
-        "cache": {
-         "read": 2
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 50,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 75
-       }
-      ]
-     }
-    },
-    "web_search": {
-     "price": 2.5
-    },
-    "multipliers": [
-     {
-      "when": {
-       "service_tier": {
-        "equals": "priority"
-       }
-      },
-      "factor": {
-       "text": 2
-      }
-     },
-     {
-      "when": {
-       "service_tier": {
-        "equals": "flex"
-       }
-      },
-      "factor": {
-       "text": 0.5
-      }
-     }
-    ]
-   },
-   "api": {
-    "responses": {
-     "base_url": "https://api.perplexity.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "openai/gpt-5.1": {
-   "id": "openai/gpt-5.1",
-   "name": "GPT-5.1",
-   "type": "chat",
-   "canonical_id": "openai/gpt-5.1",
-   "family": "gpt",
-   "status": "deprecated",
-   "release_date": "2025-11-13",
-   "limit": {
-    "context": 400000,
-    "input": 272000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "temperature": false,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Sharper GPT-5 generation for coding, product work, and tool-assisted tasks",
-   "open_weights": false,
-   "knowledge": "2024-09-30",
-   "last_updated": "2025-11-13",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.25,
-      "cache": {
-       "read": 0.125
+       "read": 0.1
       }
      },
      "output": {
@@ -1823,6 +771,18 @@
      "price": 2.5
     }
    },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "responses": {
      "base_url": "https://api.perplexity.ai/v1",
@@ -1836,14 +796,95 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2026-03",
+   "last_updated": "2026-10-13"
+  },
+  "google/gemini-3.7-flash": {
+   "id": "google/gemini-3.7-flash",
+   "name": "Gemini 3.7 Flash",
+   "description": "High-efficiency Gemini model for agentic workflows, coding, and multimodal reasoning",
+   "type": "chat",
+   "family": "gemini-flash",
+   "canonical_id": "google/gemini-3.7-flash",
+   "release_date": "2026-08-13",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.75,
+      "cache": {
+       "read": 0.075
+      }
+     },
+     "output": {
+      "price": 3.75
+     }
+    },
+    "web_search": {
+     "price": 2.5
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.perplexity.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-03",
+   "last_updated": "2026-08-13"
   },
   "xai/grok-4-1-fast-non-reasoning": {
    "id": "xai/grok-4-1-fast-non-reasoning",
    "name": "Grok 4.1 Fast (Non-Reasoning)",
+   "description": "xAI's fast agentic tool-calling model with a 2M context window; non-reasoning variant for low-latency responses",
    "type": "chat",
-   "canonical_id": "xai/grok-4.1-fast",
    "family": "grok",
+   "canonical_id": "xai/grok-4.1-fast",
    "status": "deprecated",
    "release_date": "2025-11-19",
    "limit": {
@@ -1851,31 +892,17 @@
     "output": 30000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": false
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "xAI's fast agentic tool-calling model with a 2M context window; non-reasoning variant for low-latency responses",
-   "open_weights": false,
-   "knowledge": "2025-07",
-   "last_updated": "2025-11-19",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -1893,6 +920,16 @@
      "price": 2.5
     }
    },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "responses": {
      "base_url": "https://api.perplexity.ai/v1",
@@ -1906,20 +943,30 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2025-07",
+   "last_updated": "2025-11-19"
   },
-  "xai/grok-4.5": {
-   "id": "xai/grok-4.5",
-   "name": "Grok 4.5",
+  "xai/grok-4.6": {
+   "id": "xai/grok-4.6",
+   "name": "Grok 4.6",
+   "description": "xAI's frontier model for long-running agents, coding, knowledge work, and visual projects",
    "type": "chat",
-   "canonical_id": "xai/grok-4.5",
    "family": "grok",
-   "release_date": "2026-07-08",
+   "canonical_id": "xai/grok-4.6",
+   "release_date": "2026-08-12",
    "limit": {
     "context": 500000,
     "output": 500000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -1931,17 +978,47 @@
       "high",
       "xhigh"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "xAI's Grok model for chat, coding, agentic tools, and lower hallucination risk",
-   "open_weights": false,
-   "last_updated": "2026-07-08",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.5
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 200000
+         }
+        },
+        "price": 4,
+        "cache": {
+         "read": 1
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 6,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 200000
+         }
+        },
+        "price": 12
+       }
+      ]
+     }
+    },
+    "web_search": {
+     "price": 2.5
+    }
+   },
    "modalities": {
     "input": [
      "text",
@@ -1951,6 +1028,56 @@
     "output": [
      "text"
     ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.perplexity.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-02-01",
+   "last_updated": "2026-08-12"
+  },
+  "xai/grok-4.5": {
+   "id": "xai/grok-4.5",
+   "name": "Grok 4.5",
+   "description": "xAI's Grok model for chat, coding, agentic tools, and lower hallucination risk",
+   "type": "chat",
+   "family": "grok",
+   "canonical_id": "xai/grok-4.5",
+   "release_date": "2026-07-08",
+   "limit": {
+    "context": 500000,
+    "output": 500000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    }
    },
    "cost": {
     "text": {
@@ -1991,6 +1118,16 @@
      "price": 2.5
     }
    },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "responses": {
      "base_url": "https://api.perplexity.ai/v1",
@@ -2004,20 +1141,29 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "last_updated": "2026-07-08"
   },
   "xai/grok-4.7": {
    "id": "xai/grok-4.7",
    "name": "Grok 4.7",
+   "description": "xAI's frontier model for long-running agents, coding, knowledge work, and visual projects",
    "type": "chat",
-   "canonical_id": "xai/grok-4.7",
    "family": "grok",
+   "canonical_id": "xai/grok-4.7",
    "release_date": "2026-09-21",
    "limit": {
     "context": 500000,
     "output": 500000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -2029,28 +1175,7 @@
       "high",
       "xhigh"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "xAI's frontier model for long-running agents, coding, knowledge work, and visual projects",
-   "open_weights": false,
-   "knowledge": "2026-05",
-   "last_updated": "2026-09-21",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -2092,6 +1217,17 @@
      "price": 2.5
     }
    },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "responses": {
      "base_url": "https://api.perplexity.ai/v1",
@@ -2105,20 +1241,104 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2026-05",
+   "last_updated": "2026-09-21"
   },
-  "xai/grok-4.6": {
-   "id": "xai/grok-4.6",
-   "name": "Grok 4.6",
+  "deepseek/deepseek-v4-flash-0731": {
+   "id": "deepseek/deepseek-v4-flash-0731",
+   "name": "DeepSeek V4 Flash 0731",
+   "description": "Official DeepSeek V4 Flash release with enhanced agentic capabilities and integrated DSpark speculative decoding",
    "type": "chat",
-   "canonical_id": "xai/grok-4.6",
-   "family": "grok",
-   "release_date": "2026-08-12",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4-flash-0731",
+   "status": "deprecated",
+   "release_date": "2026-07-31",
    "limit": {
-    "context": 500000,
-    "output": 500000
+    "context": 1000000,
+    "output": 384000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.13,
+      "cache": {
+       "read": 0.028
+      }
+     },
+     "output": {
+      "price": 0.26
+     }
+    },
+    "web_search": {
+     "price": 2.5
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.perplexity.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-07-31"
+  },
+  "nvidia/nemotron-3-super-120b-a12b": {
+   "id": "nvidia/nemotron-3-super-120b-a12b",
+   "name": "Nemotron 3 Super 120B",
+   "description": "Nemotron middle tier for collaborative agents and high-volume reasoning workloads",
+   "type": "chat",
+   "family": "nemotron",
+   "canonical_id": "nvidia/nemotron-3-super-120b-a12b",
+   "status": "deprecated",
+   "release_date": "2026-03-11",
+   "limit": {
+    "context": 1000000,
+    "output": 32000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -2128,68 +1348,704 @@
       "low",
       "medium",
       "high",
-      "xhigh"
+      "xhigh",
+      "max"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "xAI's frontier model for long-running agents, coding, knowledge work, and visual projects",
-   "open_weights": false,
-   "knowledge": "2026-02-01",
-   "last_updated": "2026-08-12",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.25
+     },
+     "output": {
+      "price": 2.5
+     }
+    },
+    "web_search": {
+     "price": 2.5
+    }
+   },
    "modalities": {
     "input": [
-     "text",
-     "image/jpeg",
-     "image/png"
+     "text"
     ],
     "output": [
      "text"
     ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.perplexity.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2026-02",
+   "last_updated": "2026-03-11"
+  },
+  "moonshot-ai/kimi-k2.7-code": {
+   "id": "moonshot-ai/kimi-k2.7-code",
+   "name": "Kimi K2.7 Code",
+   "description": "Coding-focused Kimi model, stronger on long-horizon repo work with less overthinking",
+   "type": "chat",
+   "family": "kimi-k2",
+   "canonical_id": "moonshotai/kimi-k2.7-code",
+   "status": "deprecated",
+   "release_date": "2026-06-12",
+   "limit": {
+    "context": 262144,
+    "output": 262144
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.95,
+      "cache": {
+       "read": 0.19
+      }
+     },
+     "output": {
+      "price": 4
+     }
+    },
+    "web_search": {
+     "price": 2.5
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.perplexity.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-01",
+   "last_updated": "2026-06-12"
+  },
+  "moonshot-ai/kimi-k3": {
+   "id": "moonshot-ai/kimi-k3",
+   "name": "Kimi K3",
+   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
+   "type": "chat",
+   "family": "kimi-k3",
+   "canonical_id": "moonshotai/kimi-k3",
+   "status": "deprecated",
+   "release_date": "2026-07-16",
+   "limit": {
+    "context": 1048576,
+    "output": 1048576
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "minimal",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 3,
+      "cache": {
+       "read": 0.3
+      }
+     },
+     "output": {
+      "price": 15
+     }
+    },
+    "web_search": {
+     "price": 2.5
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.perplexity.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-07-16"
+  },
+  "openai/gpt-5.1": {
+   "id": "openai/gpt-5.1",
+   "name": "GPT-5.1",
+   "description": "Sharper GPT-5 generation for coding, product work, and tool-assisted tasks",
+   "type": "chat",
+   "family": "gpt",
+   "canonical_id": "openai/gpt-5.1",
+   "status": "deprecated",
+   "release_date": "2025-11-13",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.25,
+      "cache": {
+       "read": 0.125
+      }
+     },
+     "output": {
+      "price": 10
+     }
+    },
+    "web_search": {
+     "price": 2.5
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.perplexity.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2024-09-30",
+   "last_updated": "2025-11-13"
+  },
+  "openai/gpt-5.6-sol": {
+   "id": "openai/gpt-5.6-sol",
+   "name": "GPT-5.6 Sol",
+   "description": "Frontier GPT-5.6 model for complex professional work, coding, and agentic workflows",
+   "type": "chat",
+   "family": "gpt-sol",
+   "canonical_id": "openai/gpt-5.6-sol",
+   "release_date": "2026-07-09",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "service_tier": [
+     "flex",
+     "priority"
+    ],
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 4,
+      "cache": {
+       "read": 0.4,
+       "write": 5
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 8,
+        "cache": {
+         "read": 0.8
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 20,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 30
+       }
+      ]
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": 0.5
+      }
+     }
+    ],
+    "web_search": {
+     "price": 2.5
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.perplexity.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-02-16",
+   "last_updated": "2026-07-09"
+  },
+  "openai/gpt-5.4": {
+   "id": "openai/gpt-5.4",
+   "name": "GPT-5.4",
+   "description": "Agent-ready GPT for coding and computer-use workflows at a lower cost",
+   "type": "chat",
+   "family": "gpt",
+   "canonical_id": "openai/gpt-5.4",
+   "status": "deprecated",
+   "release_date": "2026-03-05",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2.5,
+      "cache": {
+       "read": 0.25
+      }
+     },
+     "output": {
+      "price": 15
+     }
+    },
+    "web_search": {
+     "price": 2.5
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.perplexity.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-03-05"
+  },
+  "openai/gpt-5.2": {
+   "id": "openai/gpt-5.2",
+   "name": "GPT-5.2",
+   "description": "Reliable GPT generation for broad coding, writing, and tool-assisted product work",
+   "type": "chat",
+   "family": "gpt",
+   "canonical_id": "openai/gpt-5.2",
+   "status": "deprecated",
+   "release_date": "2025-12-11",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.75,
+      "cache": {
+       "read": 0.175
+      }
+     },
+     "output": {
+      "price": 14
+     }
+    },
+    "web_search": {
+     "price": 2.5
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.perplexity.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2025-12-11"
+  },
+  "openai/gpt-6.1-sol": {
+   "id": "openai/gpt-6.1-sol",
+   "name": "GPT-6.1 Sol",
+   "description": "Near-Astra performance for complex coding, computer use, and professional work at a lower cost.",
+   "type": "chat",
+   "family": "gpt-sol",
+   "canonical_id": "openai/gpt-6.1-sol",
+   "release_date": "2026-09-29",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "service_tier": [
+     "flex",
+     "priority"
+    ],
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
    },
    "cost": {
     "text": {
      "input": {
       "price": 2,
       "cache": {
-       "read": 0.5
+       "read": 0.1,
+       "write": 2.5
       },
       "overrides": [
        {
         "when": {
          "context": {
-          "gt": 200000
+          "gt": 272000
          }
         },
         "price": 4,
         "cache": {
-         "read": 1
+         "read": 0.2
         }
        }
       ]
      },
      "output": {
-      "price": 6,
+      "price": 10,
       "overrides": [
        {
         "when": {
          "context": {
-          "gt": 200000
+          "gt": 272000
          }
         },
-        "price": 12
+        "price": 15
        }
       ]
      }
     },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": 0.5
+      }
+     }
+    ],
     "web_search": {
      "price": 2.5
     }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
    },
    "api": {
     "responses": {
@@ -2204,20 +2060,35 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2026-04-30",
+   "last_updated": "2026-09-29"
   },
-  "anthropic/claude-opus-4-6": {
-   "id": "anthropic/claude-opus-4-6",
-   "name": "Claude Opus 4.6",
+  "openai/gpt-6-sol": {
+   "id": "openai/gpt-6-sol",
+   "name": "GPT-6 Sol",
+   "description": "OpenAI model for complex coding and agentic workflows",
    "type": "chat",
-   "canonical_id": "anthropic/claude-opus-4-6",
-   "family": "claude-opus",
-   "release_date": "2026-02-05",
+   "family": "gpt-sol",
+   "canonical_id": "openai/gpt-6-sol",
+   "release_date": "2026-09-22",
    "limit": {
-    "context": 200000,
+    "context": 1050000,
+    "input": 922000,
     "output": 128000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "service_tier": [
+     "flex",
+     "priority"
+    ],
     "tools": {
      "supported": true
     },
@@ -2230,46 +2101,82 @@
       "xhigh",
       "max"
      ]
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "High-end Claude for difficult coding, planning, and slower expert reasoning",
-   "open_weights": false,
-   "knowledge": "2025-05-31",
-   "last_updated": "2026-03-13",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 5,
+      "price": 2,
       "cache": {
-       "read": 0.5,
-       "write": 6.25
-      }
+       "read": 0.2,
+       "write": 2.5
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 4,
+        "cache": {
+         "read": 0.4
+        }
+       }
+      ]
      },
      "output": {
-      "price": 25
+      "price": 10,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 15
+       }
+      ]
      }
     },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": 0.5
+      }
+     }
+    ],
     "web_search": {
      "price": 2.5
     }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
    },
    "api": {
     "responses": {
@@ -2284,20 +2191,31 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2026-04-20",
+   "last_updated": "2026-09-22"
   },
-  "anthropic/claude-fable-5": {
-   "id": "anthropic/claude-fable-5",
-   "name": "Claude Fable 5",
+  "openai/gpt-5-mini": {
+   "id": "openai/gpt-5-mini",
+   "name": "GPT-5 Mini",
+   "description": "Small GPT-5 for responsive agents, coding help, and everyday automation",
    "type": "chat",
-   "canonical_id": "anthropic/claude-fable-5",
-   "family": "claude-fable",
-   "release_date": "2026-06-09",
+   "family": "gpt-mini",
+   "canonical_id": "openai/gpt-5-mini",
+   "status": "deprecated",
+   "release_date": "2025-08-07",
    "limit": {
-    "context": 1000000,
+    "context": 400000,
+    "input": 272000,
     "output": 128000
    },
    "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -2310,30 +2228,91 @@
       "xhigh",
       "max"
      ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Claude model for creative writing, analysis, and controlled agent workflows",
-   "open_weights": false,
-   "knowledge": "2026-01-31",
-   "last_updated": "2026-06-09",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.25,
+      "cache": {
+       "read": 0.025
+      }
+     },
+     "output": {
+      "price": 2
+     }
+    },
+    "web_search": {
+     "price": 2.5
+    }
+   },
    "modalities": {
     "input": [
      "text",
      "image/jpeg",
      "image/png",
      "image/gif",
-     "image/webp",
-     "application/pdf"
+     "image/webp"
     ],
     "output": [
      "text"
     ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.perplexity.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2024-05-30",
+   "last_updated": "2025-08-07"
+  },
+  "openai/gpt-6-astra": {
+   "id": "openai/gpt-6-astra",
+   "name": "GPT-6 Astra",
+   "description": "GPT-6 Astra is OpenAI's most capable model for complex reasoning, coding, computer use, research, and document creation.",
+   "type": "chat",
+   "family": "gpt-astra",
+   "canonical_id": "openai/gpt-6-astra",
+   "release_date": "2026-09-04",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "service_tier": [
+     "flex",
+     "priority"
+    ],
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
    },
    "cost": {
     "text": {
@@ -2342,15 +2321,73 @@
       "cache": {
        "read": 1,
        "write": 12.5
-      }
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 20,
+        "cache": {
+         "read": 2
+        }
+       }
+      ]
      },
      "output": {
-      "price": 50
+      "price": 50,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 75
+       }
+      ]
      }
     },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": 0.5
+      }
+     }
+    ],
     "web_search": {
      "price": 2.5
     }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
    },
    "api": {
     "responses": {
@@ -2365,20 +2402,34 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2026-04-30",
+   "last_updated": "2026-09-04"
   },
-  "anthropic/claude-haiku-4-5": {
-   "id": "anthropic/claude-haiku-4-5",
-   "name": "Claude Haiku 4.5",
+  "openai/gpt-5.5": {
+   "id": "openai/gpt-5.5",
+   "name": "GPT-5.5",
+   "description": "Default frontier GPT for coding, computer use, research, and knowledge work",
    "type": "chat",
-   "canonical_id": "anthropic/claude-haiku-4-5",
-   "family": "claude-haiku",
-   "release_date": "2025-10-15",
+   "family": "gpt",
+   "canonical_id": "openai/gpt-5.5",
+   "release_date": "2026-04-23",
    "limit": {
-    "context": 200000,
-    "output": 64000
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "service_tier": [
+     "flex",
+     "priority"
+    ],
     "tools": {
      "supported": true
     },
@@ -2391,17 +2442,46 @@
       "xhigh",
       "max"
      ]
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Fast Claude lane for lightweight agents, office tasks, and responsive chat",
-   "open_weights": false,
-   "knowledge": "2025-02-28",
-   "last_updated": "2025-10-15",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5
+      }
+     },
+     "output": {
+      "price": 30
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": 0.5
+      }
+     }
+    ],
+    "web_search": {
+     "price": 2.5
+    }
+   },
    "modalities": {
     "input": [
      "text",
@@ -2414,6 +2494,888 @@
     "output": [
      "text"
     ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.perplexity.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-12-01",
+   "last_updated": "2026-04-23"
+  },
+  "openai/gpt-5.6-luna": {
+   "id": "openai/gpt-5.6-luna",
+   "name": "GPT-5.6 Luna",
+   "description": "Cost-efficient GPT-5.6 model for fast, high-volume workloads",
+   "type": "chat",
+   "family": "gpt-luna",
+   "canonical_id": "openai/gpt-5.6-luna",
+   "release_date": "2026-07-09",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "service_tier": [
+     "flex",
+     "priority"
+    ],
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.2,
+      "cache": {
+       "read": 0.02,
+       "write": 0.25
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 0.4,
+        "cache": {
+         "read": 0.04
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 1.2,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 1.8
+       }
+      ]
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": 0.5
+      }
+     }
+    ],
+    "web_search": {
+     "price": 2.5
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.perplexity.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-02-16",
+   "last_updated": "2026-07-09"
+  },
+  "openai/gpt-5.6-terra": {
+   "id": "openai/gpt-5.6-terra",
+   "name": "GPT-5.6 Terra",
+   "description": "Balanced GPT-5.6 model for capable, cost-efficient everyday work",
+   "type": "chat",
+   "family": "gpt-terra",
+   "canonical_id": "openai/gpt-5.6-terra",
+   "release_date": "2026-07-09",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "service_tier": [
+     "flex",
+     "priority"
+    ],
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.2,
+       "write": 2.5
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 4,
+        "cache": {
+         "read": 0.4
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 12,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 18
+       }
+      ]
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": 0.5
+      }
+     }
+    ],
+    "web_search": {
+     "price": 2.5
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.perplexity.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-02-16",
+   "last_updated": "2026-07-09"
+  },
+  "openai/gpt-6-luna": {
+   "id": "openai/gpt-6-luna",
+   "name": "GPT-6 Luna",
+   "description": "OpenAI's most efficient model for focused, high-volume tasks",
+   "type": "chat",
+   "family": "gpt-luna",
+   "canonical_id": "openai/gpt-6-luna",
+   "release_date": "2026-09-22",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "service_tier": [
+     "flex",
+     "priority"
+    ],
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1,
+      "cache": {
+       "read": 0.01,
+       "write": 0.125
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 0.2,
+        "cache": {
+         "read": 0.02
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 0.5,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 0.75
+       }
+      ]
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": 0.5
+      }
+     }
+    ],
+    "web_search": {
+     "price": 2.5
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.perplexity.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-05-18",
+   "last_updated": "2026-09-22"
+  },
+  "perplexity/deepseek-v4-pro-0813": {
+   "id": "perplexity/deepseek-v4-pro-0813",
+   "name": "DeepSeek V4 Pro 0813",
+   "description": "DeepSeek V4 Pro snapshot with million-token context and support for thinking and non-thinking modes",
+   "type": "chat",
+   "family": "deepseek-thinking",
+   "canonical_id": "deepseek/deepseek-v4-pro-0813",
+   "release_date": "2026-08-13",
+   "limit": {
+    "context": 1000000,
+    "output": 384000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.32,
+      "cache": {
+       "read": 0.044
+      }
+     },
+     "output": {
+      "price": 3.96
+     }
+    },
+    "web_search": {
+     "price": 2.5
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.perplexity.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-22"
+  },
+  "perplexity/glm-5.3": {
+   "id": "perplexity/glm-5.3",
+   "name": "GLM-5.3",
+   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.3",
+   "release_date": "2026-08-14",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.4,
+      "cache": {
+       "read": 0.26
+      }
+     },
+     "output": {
+      "price": 4.4
+     }
+    },
+    "web_search": {
+     "price": 2.5
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.perplexity.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-14"
+  },
+  "perplexity/glm-5.3-flash": {
+   "id": "perplexity/glm-5.3-flash",
+   "name": "GLM-5.3-Flash",
+   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
+   "type": "chat",
+   "family": "glm-flash",
+   "canonical_id": "zhipuai/glm-5.3-flash",
+   "release_date": "2026-08-26",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.15,
+      "cache": {
+       "read": 0.03
+      }
+     },
+     "output": {
+      "price": 0.5
+     }
+    },
+    "web_search": {
+     "price": 2.5
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.perplexity.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-26"
+  },
+  "perplexity/sonar": {
+   "id": "perplexity/sonar",
+   "name": "Sonar",
+   "description": "Fast web-grounded Sonar for current answers, citations, and lightweight retrieval",
+   "type": "chat",
+   "family": "sonar",
+   "canonical_id": "perplexity/sonar",
+   "release_date": "2024-01-01",
+   "limit": {
+    "context": 128000,
+    "output": 8192
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.25,
+      "cache": {
+       "read": 0.0625
+      }
+     },
+     "output": {
+      "price": 2.5
+     }
+    },
+    "web_search": {
+     "price": 2.5
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.perplexity.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-09-01",
+   "last_updated": "2025-09-01"
+  },
+  "perplexity/nemotron-3.5-super-120b-a12b": {
+   "id": "perplexity/nemotron-3.5-super-120b-a12b",
+   "name": "Nemotron 3.5 Super 120B A12B",
+   "description": "NVIDIA Nemotron 3.5 Super reasoning model (120B total, 12B active) served with text-only input",
+   "type": "chat",
+   "family": "nemotron",
+   "canonical_id": "nvidia/nemotron-3.5-super-120b-a12b",
+   "release_date": "2026-10-15",
+   "limit": {
+    "context": 1048576,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.2,
+      "cache": {
+       "read": 0.04
+      }
+     },
+     "output": {
+      "price": 0.5
+     }
+    },
+    "web_search": {
+     "price": 2.5
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.perplexity.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-10-15"
+  },
+  "perplexity/kimi-k3": {
+   "id": "perplexity/kimi-k3",
+   "name": "Kimi K3",
+   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
+   "type": "chat",
+   "family": "kimi-k3",
+   "canonical_id": "moonshotai/kimi-k3",
+   "release_date": "2026-07-16",
+   "limit": {
+    "context": 1048576,
+    "output": 1048576
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "minimal",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 3,
+      "cache": {
+       "read": 0.3
+      }
+     },
+     "output": {
+      "price": 15
+     }
+    },
+    "web_search": {
+     "price": 2.5
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.perplexity.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-07-16"
+  },
+  "anthropic/claude-haiku-4-5": {
+   "id": "anthropic/claude-haiku-4-5",
+   "name": "Claude Haiku 4.5",
+   "description": "Fast Claude lane for lightweight agents, office tasks, and responsive chat",
+   "type": "chat",
+   "family": "claude-haiku",
+   "canonical_id": "anthropic/claude-haiku-4-5",
+   "release_date": "2025-10-15",
+   "limit": {
+    "context": 200000,
+    "output": 64000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
    },
    "cost": {
     "text": {
@@ -2432,57 +3394,6 @@
      "price": 2.5
     }
    },
-   "api": {
-    "responses": {
-     "base_url": "https://api.perplexity.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "anthropic/claude-sonnet-5-5": {
-   "id": "anthropic/claude-sonnet-5-5",
-   "name": "Claude Sonnet 5.5",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-sonnet-5-5",
-   "family": "claude-sonnet",
-   "release_date": "2026-09-28",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Fast Claude model for everyday coding, agents, and knowledge work",
-   "open_weights": false,
-   "knowledge": "2026-06",
-   "last_updated": "2026-09-28",
    "modalities": {
     "input": [
      "text",
@@ -2496,23 +3407,6 @@
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2,
-      "cache": {
-       "read": 0.1,
-       "write": 2.5
-      }
-     },
-     "output": {
-      "price": 10
-     }
-    },
-    "web_search": {
-     "price": 2.5
-    }
-   },
    "api": {
     "responses": {
      "base_url": "https://api.perplexity.ai/v1",
@@ -2522,274 +3416,33 @@
      },
      "capabilities": {
       "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
        "updates": false
       }
      }
     }
-   }
-  },
-  "anthropic/claude-fable-5-1": {
-   "id": "anthropic/claude-fable-5-1",
-   "name": "Claude Fable 5.1",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-fable-5-1",
-   "family": "claude-fable",
-   "release_date": "2026-09-01",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
    },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Claude model for demanding reasoning and long-horizon agentic work",
    "open_weights": false,
-   "knowledge": "2026-06",
-   "last_updated": "2026-09-01",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 10,
-      "cache": {
-       "read": 0.25,
-       "write": 12.5
-      }
-     },
-     "output": {
-      "price": 50
-     }
-    },
-    "web_search": {
-     "price": 2.5
-    }
-   },
-   "api": {
-    "responses": {
-     "base_url": "https://api.perplexity.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "anthropic/claude-sonnet-4-5": {
-   "id": "anthropic/claude-sonnet-4-5",
-   "name": "Claude Sonnet 4.5",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-sonnet-4-5",
-   "family": "claude-sonnet",
-   "release_date": "2025-09-29",
-   "limit": {
-    "context": 200000,
-    "output": 64000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Balanced Claude model for coding, analysis, agent workflows, and cost control",
-   "open_weights": false,
-   "knowledge": "2025-07-31",
-   "last_updated": "2025-09-29",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 3,
-      "cache": {
-       "read": 0.3,
-       "write": 3.75
-      }
-     },
-     "output": {
-      "price": 15
-     }
-    },
-    "web_search": {
-     "price": 2.5
-    }
-   },
-   "api": {
-    "responses": {
-     "base_url": "https://api.perplexity.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "anthropic/claude-sonnet-5": {
-   "id": "anthropic/claude-sonnet-5",
-   "name": "Claude Sonnet 5",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-sonnet-5",
-   "family": "claude-sonnet",
-   "release_date": "2026-06-30",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Everyday Claude agent model for coding, planning, browsing, and general work",
-   "open_weights": false,
-   "knowledge": "2026-01-31",
-   "last_updated": "2026-06-30",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2,
-      "cache": {
-       "read": 0.2,
-       "write": 2.5
-      }
-     },
-     "output": {
-      "price": 10
-     }
-    },
-    "web_search": {
-     "price": 2.5
-    }
-   },
-   "api": {
-    "responses": {
-     "base_url": "https://api.perplexity.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
+   "knowledge": "2025-02-28",
+   "last_updated": "2025-10-15"
   },
   "anthropic/claude-opus-4-5": {
    "id": "anthropic/claude-opus-4-5",
    "name": "Claude Opus 4.5",
+   "description": "Flagship Claude model for deep reasoning, coding, and long-horizon agents",
    "type": "chat",
-   "canonical_id": "anthropic/claude-opus-4-5",
    "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-4-5",
    "release_date": "2025-11-24",
    "limit": {
     "context": 200000,
     "output": 64000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -2802,29 +3455,7 @@
       "xhigh",
       "max"
      ]
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Flagship Claude model for deep reasoning, coding, and long-horizon agents",
-   "open_weights": false,
-   "knowledge": "2025-03-31",
-   "last_updated": "2025-11-24",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -2843,6 +3474,19 @@
      "price": 2.5
     }
    },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "responses": {
      "base_url": "https://api.perplexity.ai/v1",
@@ -2856,20 +3500,29 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2025-03-31",
+   "last_updated": "2025-11-24"
   },
-  "anthropic/claude-haiku-5-5": {
-   "id": "anthropic/claude-haiku-5-5",
-   "name": "Claude Haiku 5.5",
+  "anthropic/claude-sonnet-4-5": {
+   "id": "anthropic/claude-sonnet-4-5",
+   "name": "Claude Sonnet 4.5",
+   "description": "Balanced Claude model for coding, analysis, agent workflows, and cost control",
    "type": "chat",
-   "canonical_id": "anthropic/claude-haiku-5-5",
-   "family": "claude-haiku",
-   "release_date": "2026-10-07",
+   "family": "claude-sonnet",
+   "canonical_id": "anthropic/claude-sonnet-4-5",
+   "release_date": "2025-09-29",
    "limit": {
-    "context": 1000000,
-    "output": 128000
+    "context": 200000,
+    "output": 64000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -2882,18 +3535,25 @@
       "xhigh",
       "max"
      ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Fast Claude model for responsive assistance, classification, and lightweight agents",
-   "open_weights": false,
-   "knowledge": "2026-06",
-   "last_updated": "2026-10-07",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 3,
+      "cache": {
+       "read": 0.3,
+       "write": 3.75
+      }
+     },
+     "output": {
+      "price": 15
+     }
+    },
+    "web_search": {
+     "price": 2.5
+    }
+   },
    "modalities": {
     "input": [
      "text",
@@ -2906,6 +3566,57 @@
     "output": [
      "text"
     ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.perplexity.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-07-31",
+   "last_updated": "2025-09-29"
+  },
+  "anthropic/claude-haiku-5-5": {
+   "id": "anthropic/claude-haiku-5-5",
+   "name": "Claude Haiku 5.5",
+   "description": "Fast Claude model for responsive assistance, classification, and lightweight agents",
+   "type": "chat",
+   "family": "claude-haiku",
+   "canonical_id": "anthropic/claude-haiku-5-5",
+   "release_date": "2026-10-07",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
    },
    "cost": {
     "text": {
@@ -2947,57 +3658,6 @@
      "price": 2.5
     }
    },
-   "api": {
-    "responses": {
-     "base_url": "https://api.perplexity.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "anthropic/claude-opus-5": {
-   "id": "anthropic/claude-opus-5",
-   "name": "Claude Opus 5",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-opus-5",
-   "family": "claude-opus",
-   "release_date": "2026-07-24",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Strongest Claude Opus model for coding, agents, and professional work",
-   "open_weights": false,
-   "knowledge": "2026-05",
-   "last_updated": "2026-07-24",
    "modalities": {
     "input": [
      "text",
@@ -3011,22 +3671,86 @@
      "text"
     ]
    },
+   "api": {
+    "responses": {
+     "base_url": "https://api.perplexity.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-06",
+   "last_updated": "2026-10-07"
+  },
+  "anthropic/claude-fable-5": {
+   "id": "anthropic/claude-fable-5",
+   "name": "Claude Fable 5",
+   "description": "Claude model for creative writing, analysis, and controlled agent workflows",
+   "type": "chat",
+   "family": "claude-fable",
+   "canonical_id": "anthropic/claude-fable-5",
+   "release_date": "2026-06-09",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
    "cost": {
     "text": {
      "input": {
-      "price": 5,
+      "price": 10,
       "cache": {
-       "read": 0.5,
-       "write": 6.25
+       "read": 1,
+       "write": 12.5
       }
      },
      "output": {
-      "price": 25
+      "price": 50
      }
     },
     "web_search": {
      "price": 2.5
     }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
    },
    "api": {
     "responses": {
@@ -3041,43 +3765,61 @@
       }
      }
     }
-   }
-  },
-  "anthropic/claude-opus-4-7": {
-   "id": "anthropic/claude-opus-4-7",
-   "name": "Claude Opus 4.7",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-opus-4-7",
-   "family": "claude-opus",
-   "release_date": "2026-04-16",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
    },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Stronger Opus tier for advanced software work and high-stakes reasoning",
    "open_weights": false,
    "knowledge": "2026-01-31",
-   "last_updated": "2026-04-16",
+   "last_updated": "2026-06-09"
+  },
+  "anthropic/claude-sonnet-5": {
+   "id": "anthropic/claude-sonnet-5",
+   "name": "Claude Sonnet 5",
+   "description": "Everyday Claude agent model for coding, planning, browsing, and general work",
+   "type": "chat",
+   "family": "claude-sonnet",
+   "canonical_id": "anthropic/claude-sonnet-5",
+   "release_date": "2026-06-30",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.2,
+       "write": 2.5
+      }
+     },
+     "output": {
+      "price": 10
+     }
+    },
+    "web_search": {
+     "price": 2.5
+    }
+   },
    "modalities": {
     "input": [
      "text",
@@ -3090,23 +3832,6 @@
     "output": [
      "text"
     ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 5,
-      "cache": {
-       "read": 0.5,
-       "write": 6.25
-      }
-     },
-     "output": {
-      "price": 25
-     }
-    },
-    "web_search": {
-     "price": 2.5
-    }
    },
    "api": {
     "responses": {
@@ -3121,20 +3846,29 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2026-01-31",
+   "last_updated": "2026-06-30"
   },
   "anthropic/claude-sonnet-4-6": {
    "id": "anthropic/claude-sonnet-4-6",
    "name": "Claude Sonnet 4.6",
+   "description": "Claude workhorse for coding agents, careful analysis, and production cost control",
    "type": "chat",
-   "canonical_id": "anthropic/claude-sonnet-4-6",
    "family": "claude-sonnet",
+   "canonical_id": "anthropic/claude-sonnet-4-6",
    "release_date": "2026-02-17",
    "limit": {
     "context": 200000,
     "output": 64000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -3147,29 +3881,7 @@
       "xhigh",
       "max"
      ]
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Claude workhorse for coding agents, careful analysis, and production cost control",
-   "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2026-03-13",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -3188,57 +3900,6 @@
      "price": 2.5
     }
    },
-   "api": {
-    "responses": {
-     "base_url": "https://api.perplexity.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "anthropic/claude-opus-5-5": {
-   "id": "anthropic/claude-opus-5-5",
-   "name": "Claude Opus 5.5",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-opus-5-5",
-   "family": "claude-opus",
-   "release_date": "2026-09-22",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Claude model for long-running agentic coding and knowledge work",
-   "open_weights": false,
-   "knowledge": "2026-06",
-   "last_updated": "2026-09-22",
    "modalities": {
     "input": [
      "text",
@@ -3252,22 +3913,247 @@
      "text"
     ]
    },
+   "api": {
+    "responses": {
+     "base_url": "https://api.perplexity.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-03-13"
+  },
+  "anthropic/claude-opus-4-6": {
+   "id": "anthropic/claude-opus-4-6",
+   "name": "Claude Opus 4.6",
+   "description": "High-end Claude for difficult coding, planning, and slower expert reasoning",
+   "type": "chat",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-4-6",
+   "release_date": "2026-02-05",
+   "limit": {
+    "context": 200000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
    "cost": {
     "text": {
      "input": {
-      "price": 4,
+      "price": 5,
       "cache": {
-       "read": 0.2,
-       "write": 5
+       "read": 0.5,
+       "write": 6.25
       }
      },
      "output": {
-      "price": 20
+      "price": 25
      }
     },
     "web_search": {
      "price": 2.5
     }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.perplexity.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-05-31",
+   "last_updated": "2026-03-13"
+  },
+  "anthropic/claude-opus-5": {
+   "id": "anthropic/claude-opus-5",
+   "name": "Claude Opus 5",
+   "description": "Strongest Claude Opus model for coding, agents, and professional work",
+   "type": "chat",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-5",
+   "release_date": "2026-07-24",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5,
+       "write": 6.25
+      }
+     },
+     "output": {
+      "price": 25
+     }
+    },
+    "web_search": {
+     "price": 2.5
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.perplexity.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-05",
+   "last_updated": "2026-07-24"
+  },
+  "anthropic/claude-sonnet-5-5": {
+   "id": "anthropic/claude-sonnet-5-5",
+   "name": "Claude Sonnet 5.5",
+   "description": "Fast Claude model for everyday coding, agents, and knowledge work",
+   "type": "chat",
+   "family": "claude-sonnet",
+   "canonical_id": "anthropic/claude-sonnet-5-5",
+   "release_date": "2026-09-28",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.1,
+       "write": 2.5
+      }
+     },
+     "output": {
+      "price": 10
+     }
+    },
+    "web_search": {
+     "price": 2.5
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
    },
    "api": {
     "responses": {
@@ -3286,173 +4172,30 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2026-06",
+   "last_updated": "2026-09-28"
   },
-  "google/gemini-4-argon": {
-   "id": "google/gemini-4-argon",
-   "name": "Gemini 4 Argon",
+  "anthropic/claude-fable-5-1": {
+   "id": "anthropic/claude-fable-5-1",
+   "name": "Claude Fable 5.1",
+   "description": "Claude model for demanding reasoning and long-horizon agentic work",
    "type": "chat",
-   "canonical_id": "google/gemini-4-argon",
-   "family": "gemini",
-   "release_date": "2026-10-13",
+   "family": "claude-fable",
+   "canonical_id": "anthropic/claude-fable-5-1",
+   "release_date": "2026-09-01",
    "limit": {
-    "context": 1048576,
-    "output": 65536
+    "context": 1000000,
+    "output": 128000
    },
    "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": true,
     "temperature": false,
+    "top_k": false,
     "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Google's flagship reasoning model for complex software engineering, deep math and science, and long-horizon autonomous agents",
-   "open_weights": false,
-   "knowledge": "2026-03",
-   "last_updated": "2026-10-13",
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2,
-      "cache": {
-       "read": 0.1
-      }
-     },
-     "output": {
-      "price": 10
-     }
-    },
-    "web_search": {
-     "price": 2.5
-    }
-   },
-   "api": {
-    "responses": {
-     "base_url": "https://api.perplexity.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "google/gemini-3.8-flash": {
-   "id": "google/gemini-3.8-flash",
-   "name": "Gemini 3.8 Flash",
-   "type": "chat",
-   "canonical_id": "google/gemini-3.8-flash",
-   "family": "gemini-flash",
-   "release_date": "2026-09-02",
-   "limit": {
-    "context": 1048576,
-    "output": 65536
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    },
     "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
     "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Google's most intelligent Flash model, engineered for long-horizon software engineering, autonomous agents, and complex enterprise workflows",
-   "open_weights": false,
-   "last_updated": "2026-09-02",
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.75,
-      "cache": {
-       "read": 0.075
-      }
-     },
-     "output": {
-      "price": 3.75
-     }
-    },
-    "web_search": {
-     "price": 2.5
-    }
-   },
-   "api": {
-    "responses": {
-     "base_url": "https://api.perplexity.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "google/gemini-3.1-pro-preview": {
-   "id": "google/gemini-3.1-pro-preview",
-   "name": "Gemini 3.1 Pro Preview",
-   "type": "chat",
-   "canonical_id": "google/gemini-3.1-pro-preview",
-   "family": "gemini-pro",
-   "release_date": "2026-02-19",
-   "limit": {
-    "context": 1048576,
-    "output": 65536
-   },
-   "capabilities": {
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -3465,806 +4208,37 @@
       "xhigh",
       "max"
      ]
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Reasoning-first Gemini preview for agentic coding and complex problem solving",
-   "open_weights": false,
-   "knowledge": "2025-01",
-   "last_updated": "2026-02-19",
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp",
-     "audio/wav",
-     "audio/mp3",
-     "audio/aiff",
-     "audio/aac",
-     "audio/ogg",
-     "audio/flac",
-     "audio/mpeg",
-     "audio/m4a",
-     "audio/l16",
-     "audio/opus",
-     "audio/alaw",
-     "audio/mulaw",
-     "audio/webm",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 2,
+      "price": 10,
       "cache": {
-       "read": 0.2
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 200000
-         }
-        },
-        "price": 4,
-        "cache": {
-         "read": 0.4
-        }
-       }
-      ]
+       "read": 0.25,
+       "write": 12.5
+      }
      },
      "output": {
-      "price": 12,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 200000
-         }
-        },
-        "price": 18
-       }
-      ]
+      "price": 50
      }
     },
     "web_search": {
      "price": 2.5
     }
    },
-   "api": {
-    "responses": {
-     "base_url": "https://api.perplexity.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "google/gemini-3.6-flash": {
-   "id": "google/gemini-3.6-flash",
-   "name": "Gemini 3.6 Flash",
-   "type": "chat",
-   "canonical_id": "google/gemini-3.6-flash",
-   "family": "gemini-flash",
-   "release_date": "2026-07-21",
-   "limit": {
-    "context": 1048576,
-    "output": 65536
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Fast Gemini model balancing multimodal reasoning, tool use, and cost",
-   "open_weights": false,
-   "knowledge": "2026-03",
-   "last_updated": "2026-07-21",
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.5,
-      "cache": {
-       "read": 0.15
-      }
-     },
-     "output": {
-      "price": 7.5
-     }
-    },
-    "web_search": {
-     "price": 2.5
-    }
-   },
-   "api": {
-    "responses": {
-     "base_url": "https://api.perplexity.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "google/gemini-3.7-flash": {
-   "id": "google/gemini-3.7-flash",
-   "name": "Gemini 3.7 Flash",
-   "type": "chat",
-   "canonical_id": "google/gemini-3.7-flash",
-   "family": "gemini-flash",
-   "release_date": "2026-08-13",
-   "limit": {
-    "context": 1048576,
-    "output": 65536
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "High-efficiency Gemini model for agentic workflows, coding, and multimodal reasoning",
-   "open_weights": false,
-   "knowledge": "2026-03",
-   "last_updated": "2026-08-13",
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.75,
-      "cache": {
-       "read": 0.075
-      }
-     },
-     "output": {
-      "price": 3.75
-     }
-    },
-    "web_search": {
-     "price": 2.5
-    }
-   },
-   "api": {
-    "responses": {
-     "base_url": "https://api.perplexity.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "google/gemini-3-flash-preview": {
-   "id": "google/gemini-3-flash-preview",
-   "name": "Gemini 3 Flash Preview",
-   "type": "chat",
-   "canonical_id": "google/gemini-3-flash-preview",
-   "family": "gemini-flash",
-   "release_date": "2025-12-17",
-   "limit": {
-    "context": 1048576,
-    "output": 65536
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "New Gemini flash lane bringing frontier-style multimodal reasoning to cheaper runs",
-   "open_weights": false,
-   "knowledge": "2025-01",
-   "last_updated": "2025-12-17",
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp",
-     "audio/wav",
-     "audio/mp3",
-     "audio/aiff",
-     "audio/aac",
-     "audio/ogg",
-     "audio/flac",
-     "audio/mpeg",
-     "audio/m4a",
-     "audio/l16",
-     "audio/opus",
-     "audio/alaw",
-     "audio/mulaw",
-     "audio/webm",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.5,
-      "cache": {
-       "read": 0.05
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 200000
-         }
-        },
-        "price": 0.5,
-        "cache": {
-         "read": 0.05
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 3,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 200000
-         }
-        },
-        "price": 3
-       }
-      ]
-     }
-    },
-    "web_search": {
-     "price": 2.5
-    }
-   },
-   "api": {
-    "responses": {
-     "base_url": "https://api.perplexity.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "nvidia/nemotron-3-super-120b-a12b": {
-   "id": "nvidia/nemotron-3-super-120b-a12b",
-   "name": "Nemotron 3 Super 120B",
-   "type": "chat",
-   "canonical_id": "nvidia/nemotron-3-super-120b-a12b",
-   "family": "nemotron",
-   "status": "deprecated",
-   "release_date": "2026-03-11",
-   "limit": {
-    "context": 1000000,
-    "output": 32000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Nemotron middle tier for collaborative agents and high-volume reasoning workloads",
-   "open_weights": true,
-   "knowledge": "2026-02",
-   "last_updated": "2026-03-11",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.25
-     },
-     "output": {
-      "price": 2.5
-     }
-    },
-    "web_search": {
-     "price": 2.5
-    }
-   },
-   "api": {
-    "responses": {
-     "base_url": "https://api.perplexity.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "perplexity/glm-5.3-flash": {
-   "id": "perplexity/glm-5.3-flash",
-   "name": "GLM-5.3-Flash",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-5.3-flash",
-   "family": "glm-flash",
-   "release_date": "2026-08-26",
-   "limit": {
-    "context": 1000000,
-    "output": 131072
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
-   "open_weights": true,
-   "last_updated": "2026-08-26",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.15,
-      "cache": {
-       "read": 0.03
-      }
-     },
-     "output": {
-      "price": 0.5
-     }
-    },
-    "web_search": {
-     "price": 2.5
-    }
-   },
-   "api": {
-    "responses": {
-     "base_url": "https://api.perplexity.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "perplexity/nemotron-3.5-super-120b-a12b": {
-   "id": "perplexity/nemotron-3.5-super-120b-a12b",
-   "name": "Nemotron 3.5 Super 120B A12B",
-   "type": "chat",
-   "canonical_id": "nvidia/nemotron-3.5-super-120b-a12b",
-   "family": "nemotron",
-   "release_date": "2026-10-15",
-   "limit": {
-    "context": 1048576,
-    "output": 131072
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "NVIDIA Nemotron 3.5 Super reasoning model (120B total, 12B active) served with text-only input",
-   "open_weights": true,
-   "last_updated": "2026-10-15",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.2,
-      "cache": {
-       "read": 0.04
-      }
-     },
-     "output": {
-      "price": 0.5
-     }
-    },
-    "web_search": {
-     "price": 2.5
-    }
-   },
-   "api": {
-    "responses": {
-     "base_url": "https://api.perplexity.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "perplexity/sonar": {
-   "id": "perplexity/sonar",
-   "name": "Sonar",
-   "type": "chat",
-   "canonical_id": "perplexity/sonar",
-   "family": "sonar",
-   "release_date": "2024-01-01",
-   "limit": {
-    "context": 128000,
-    "output": 8192
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Fast web-grounded Sonar for current answers, citations, and lightweight retrieval",
-   "open_weights": false,
-   "knowledge": "2025-09-01",
-   "last_updated": "2025-09-01",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.25,
-      "cache": {
-       "read": 0.0625
-      }
-     },
-     "output": {
-      "price": 2.5
-     }
-    },
-    "web_search": {
-     "price": 2.5
-    }
-   },
-   "api": {
-    "responses": {
-     "base_url": "https://api.perplexity.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "perplexity/glm-5.3": {
-   "id": "perplexity/glm-5.3",
-   "name": "GLM-5.3",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-5.3",
-   "family": "glm",
-   "release_date": "2026-08-14",
-   "limit": {
-    "context": 1000000,
-    "output": 131072
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
-   "open_weights": true,
-   "last_updated": "2026-08-14",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.4,
-      "cache": {
-       "read": 0.26
-      }
-     },
-     "output": {
-      "price": 4.4
-     }
-    },
-    "web_search": {
-     "price": 2.5
-    }
-   },
-   "api": {
-    "responses": {
-     "base_url": "https://api.perplexity.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "perplexity/kimi-k3": {
-   "id": "perplexity/kimi-k3",
-   "name": "Kimi K3",
-   "type": "chat",
-   "canonical_id": "moonshotai/kimi-k3",
-   "family": "kimi-k3",
-   "release_date": "2026-07-16",
-   "limit": {
-    "context": 1048576,
-    "output": 131072
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "minimal",
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
-   "open_weights": true,
-   "last_updated": "2026-07-16",
    "modalities": {
     "input": [
      "text",
      "image/jpeg",
      "image/png",
      "image/gif",
-     "image/webp"
+     "image/webp",
+     "application/pdf"
     ],
     "output": [
      "text"
     ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 3,
-      "cache": {
-       "read": 0.3
-      }
-     },
-     "output": {
-      "price": 15
-     }
-    },
-    "web_search": {
-     "price": 2.5
-    }
    },
    "api": {
     "responses": {
@@ -4275,24 +4249,37 @@
      },
      "capabilities": {
       "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
        "updates": false
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2026-06",
+   "last_updated": "2026-09-01"
   },
-  "perplexity/deepseek-v4-pro-0813": {
-   "id": "perplexity/deepseek-v4-pro-0813",
-   "name": "DeepSeek V4 Pro 0813",
+  "anthropic/claude-opus-4-7": {
+   "id": "anthropic/claude-opus-4-7",
+   "name": "Claude Opus 4.7",
+   "description": "Stronger Opus tier for advanced software work and high-stakes reasoning",
    "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4-pro-0813",
-   "family": "deepseek-thinking",
-   "release_date": "2026-08-13",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-4-7",
+   "release_date": "2026-04-16",
    "limit": {
     "context": 1000000,
-    "output": 384000
+    "output": 128000
    },
    "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -4300,43 +4287,42 @@
      "supported": true,
      "effort": [
       "low",
+      "medium",
       "high",
+      "xhigh",
       "max"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "DeepSeek V4 Pro snapshot with million-token context and support for thinking and non-thinking modes",
-   "open_weights": true,
-   "last_updated": "2026-08-22",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 1.32,
+      "price": 5,
       "cache": {
-       "read": 0.044
+       "read": 0.5,
+       "write": 6.25
       }
      },
      "output": {
-      "price": 3.96
+      "price": 25
      }
     },
     "web_search": {
      "price": 2.5
     }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
    },
    "api": {
     "responses": {
@@ -4351,21 +4337,30 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2026-01-31",
+   "last_updated": "2026-04-16"
   },
-  "deepseek/deepseek-v4-flash-0731": {
-   "id": "deepseek/deepseek-v4-flash-0731",
-   "name": "DeepSeek V4 Flash 0731",
+  "anthropic/claude-opus-5-5": {
+   "id": "anthropic/claude-opus-5-5",
+   "name": "Claude Opus 5.5",
+   "description": "Claude model for long-running agentic coding and knowledge work",
    "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4-flash-0731",
-   "family": "deepseek-flash",
-   "status": "deprecated",
-   "release_date": "2026-07-31",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-5-5",
+   "release_date": "2026-09-22",
    "limit": {
     "context": 1000000,
-    "output": 384000
+    "output": 128000
    },
    "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -4373,44 +4368,42 @@
      "supported": true,
      "effort": [
       "low",
+      "medium",
       "high",
+      "xhigh",
       "max"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Official DeepSeek V4 Flash release with enhanced agentic capabilities and integrated DSpark speculative decoding",
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-07-31",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.13,
+      "price": 4,
       "cache": {
-       "read": 0.028
+       "read": 0.2,
+       "write": 5
       }
      },
      "output": {
-      "price": 0.26
+      "price": 20
      }
     },
     "web_search": {
      "price": 2.5
     }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
    },
    "api": {
     "responses": {
@@ -4421,11 +4414,18 @@
      },
      "capabilities": {
       "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
        "updates": false
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2026-06",
+   "last_updated": "2026-09-22"
   }
  }
 }

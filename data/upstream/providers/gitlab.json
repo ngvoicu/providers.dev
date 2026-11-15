@@ -6,96 +6,24 @@
   "GITLAB_TOKEN"
  ],
  "models": {
-  "duo-chat-sonnet-4-6": {
-   "id": "duo-chat-sonnet-4-6",
-   "name": "Agentic Chat (Claude Sonnet 4.6)",
+  "duo-chat-fable-5-2": {
+   "id": "duo-chat-fable-5-2",
+   "name": "Agentic Chat (Claude Fable 5.2)",
+   "description": "Claude model for demanding reasoning and long-horizon agentic work",
    "type": "chat",
-   "canonical_id": "anthropic/claude-sonnet-4-6",
-   "family": "claude-sonnet",
-   "release_date": "2026-02-17",
-   "limit": {
-    "context": 1000000,
-    "output": 64000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "max"
-     ],
-     "budget": {
-      "min": 1024
-     }
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Balanced Claude model for coding, analysis, agent workflows, and cost control",
-   "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2026-03-13",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "messages": {
-     "base_url": "https://gitlab.com/api/v4",
-     "sdk": {
-      "aisdk": "gitlab-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "duo-chat-opus-5-5": {
-   "id": "duo-chat-opus-5-5",
-   "name": "Agentic Chat (Claude Opus 5.5)",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-opus-5-5",
-   "family": "claude-opus",
-   "release_date": "2026-09-22",
+   "family": "claude-fable",
+   "canonical_id": "anthropic/claude-fable-5-2",
+   "release_date": "2026-11-09",
    "limit": {
     "context": 1000000,
     "output": 128000
    },
    "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -108,29 +36,7 @@
       "xhigh",
       "max"
      ]
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Claude model for long-running agentic coding and knowledge work",
-   "open_weights": false,
-   "knowledge": "2026-06",
-   "last_updated": "2026-09-22",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -145,6 +51,19 @@
       "price": 0
      }
     }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
    },
    "api": {
     "messages": {
@@ -162,14 +81,1408 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2026-06",
+   "last_updated": "2026-11-09"
+  },
+  "duo-chat-gpt-6-luna": {
+   "id": "duo-chat-gpt-6-luna",
+   "name": "Agentic Chat (GPT-6 Luna)",
+   "description": "OpenAI's most efficient model for focused, high-volume tasks",
+   "type": "chat",
+   "family": "gpt-luna",
+   "canonical_id": "openai/gpt-6-luna",
+   "release_date": "2026-09-22",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-05-18",
+   "last_updated": "2026-09-22"
+  },
+  "duo-chat-gpt-5-4-mini": {
+   "id": "duo-chat-gpt-5-4-mini",
+   "name": "Agentic Chat (GPT-5.4 Mini)",
+   "description": "Chat-tuned GPT model for conversational assistance, writing, and tool workflows",
+   "type": "chat",
+   "family": "gpt-mini",
+   "canonical_id": "openai/gpt-5.4-mini",
+   "release_date": "2026-03-17",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-03-17"
+  },
+  "duo-chat-gpt-5-3-codex": {
+   "id": "duo-chat-gpt-5-3-codex",
+   "name": "Agentic Chat (GPT-5.3 Codex)",
+   "description": "Coding-optimized GPT model for repository edits, reviews, and agentic software work",
+   "type": "chat",
+   "family": "gpt-codex",
+   "canonical_id": "openai/gpt-5.3-codex",
+   "status": "deprecated",
+   "release_date": "2026-02-05",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-02-05"
+  },
+  "duo-chat-sonnet-4-6": {
+   "id": "duo-chat-sonnet-4-6",
+   "name": "Agentic Chat (Claude Sonnet 4.6)",
+   "description": "Balanced Claude model for coding, analysis, agent workflows, and cost control",
+   "type": "chat",
+   "family": "claude-sonnet",
+   "canonical_id": "anthropic/claude-sonnet-4-6",
+   "release_date": "2026-02-17",
+   "limit": {
+    "context": 1000000,
+    "output": 64000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "max"
+     ],
+     "budget": {
+      "min": 1024
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-03-13"
+  },
+  "duo-chat-sonnet-5-5": {
+   "id": "duo-chat-sonnet-5-5",
+   "name": "Agentic Chat (Claude Sonnet 5.5)",
+   "description": "Fast Claude model for everyday coding, agents, and knowledge work",
+   "type": "chat",
+   "family": "claude-sonnet",
+   "canonical_id": "anthropic/claude-sonnet-5-5",
+   "release_date": "2026-09-28",
+   "limit": {
+    "context": 1000000,
+    "output": 64000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-06",
+   "last_updated": "2026-09-28"
+  },
+  "duo-chat-gpt-6-1-sol": {
+   "id": "duo-chat-gpt-6-1-sol",
+   "name": "Agentic Chat (GPT-6.1 Sol)",
+   "description": "Near-Astra performance for complex coding, computer use, and professional work at a lower cost.",
+   "type": "chat",
+   "family": "gpt-sol",
+   "canonical_id": "openai/gpt-6.1-sol",
+   "release_date": "2026-09-29",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-04-30",
+   "last_updated": "2026-09-29"
+  },
+  "duo-chat-gpt-5-codex": {
+   "id": "duo-chat-gpt-5-codex",
+   "name": "Agentic Chat (GPT-5 Codex)",
+   "description": "Coding-optimized GPT model for repository edits, reviews, and agentic software work",
+   "type": "chat",
+   "family": "gpt-codex",
+   "canonical_id": "openai/gpt-5-codex",
+   "status": "deprecated",
+   "release_date": "2025-09-15",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2024-09-30",
+   "last_updated": "2025-09-15"
+  },
+  "duo-chat-sonnet-5": {
+   "id": "duo-chat-sonnet-5",
+   "name": "Agentic Chat (Claude Sonnet 5)",
+   "description": "Everyday Claude agent model for coding, planning, browsing, and general work",
+   "type": "chat",
+   "family": "claude-sonnet",
+   "canonical_id": "anthropic/claude-sonnet-5",
+   "release_date": "2026-06-30",
+   "limit": {
+    "context": 1000000,
+    "output": 64000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-01-31",
+   "last_updated": "2026-06-30"
+  },
+  "duo-chat-opus-5": {
+   "id": "duo-chat-opus-5",
+   "name": "Agentic Chat (Claude Opus 5)",
+   "description": "Strongest Claude Opus model for coding, agents, and professional work",
+   "type": "chat",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-5",
+   "release_date": "2026-07-24",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-05",
+   "last_updated": "2026-07-24"
+  },
+  "duo-chat-opus-4-6": {
+   "id": "duo-chat-opus-4-6",
+   "name": "Agentic Chat (Claude Opus 4.6)",
+   "description": "Flagship Claude model for deep reasoning, coding, and long-horizon agents",
+   "type": "chat",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-4-6",
+   "release_date": "2026-02-05",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "max"
+     ],
+     "budget": {
+      "min": 1024
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-05-31",
+   "last_updated": "2026-03-13"
+  },
+  "duo-chat-haiku-4-5": {
+   "id": "duo-chat-haiku-4-5",
+   "name": "Agentic Chat (Claude Haiku 4.5)",
+   "description": "Fast Claude model for responsive assistance, classification, and lightweight agents",
+   "type": "chat",
+   "family": "claude-haiku",
+   "canonical_id": "anthropic/claude-haiku-4-5-20251001",
+   "release_date": "2025-10-15",
+   "limit": {
+    "context": 200000,
+    "output": 64000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "budget": {
+      "min": 1024
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-02-28",
+   "last_updated": "2025-10-15"
+  },
+  "duo-chat-gpt-5-2-codex": {
+   "id": "duo-chat-gpt-5-2-codex",
+   "name": "Agentic Chat (GPT-5.2 Codex)",
+   "description": "Coding-optimized GPT model for repository edits, reviews, and agentic software work",
+   "type": "chat",
+   "family": "gpt-codex",
+   "canonical_id": "openai/gpt-5.2-codex",
+   "status": "deprecated",
+   "release_date": "2025-12-11",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2025-12-11"
+  },
+  "duo-chat-fable-5": {
+   "id": "duo-chat-fable-5",
+   "name": "Agentic Chat (Claude Fable 5)",
+   "description": "Claude model for creative writing, analysis, and controlled agent workflows",
+   "type": "chat",
+   "family": "claude-fable",
+   "canonical_id": "anthropic/claude-fable-5",
+   "release_date": "2026-06-09",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-01-31",
+   "last_updated": "2026-06-09"
+  },
+  "duo-chat-gpt-5-5": {
+   "id": "duo-chat-gpt-5-5",
+   "name": "Agentic Chat (GPT-5.5)",
+   "description": "Chat-tuned GPT model for conversational assistance, writing, and tool workflows",
+   "type": "chat",
+   "family": "gpt",
+   "canonical_id": "openai/gpt-5.5",
+   "release_date": "2026-04-23",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-12-01",
+   "last_updated": "2026-04-23"
+  },
+  "duo-chat-opus-4-7": {
+   "id": "duo-chat-opus-4-7",
+   "name": "Agentic Chat (Claude Opus 4.7)",
+   "description": "Flagship Claude model for deep reasoning, coding, and long-horizon agents",
+   "type": "chat",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-4-7",
+   "release_date": "2026-04-16",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-01-31",
+   "last_updated": "2026-04-16"
+  },
+  "duo-chat-gpt-5-6-sol": {
+   "id": "duo-chat-gpt-5-6-sol",
+   "name": "Agentic Chat (GPT-5.6 Sol)",
+   "description": "Frontier GPT-5.6 model for complex professional work, coding, and agentic workflows",
+   "type": "chat",
+   "family": "gpt-sol",
+   "canonical_id": "openai/gpt-5.6-sol",
+   "release_date": "2026-07-09",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-02-16",
+   "last_updated": "2026-07-09"
+  },
+  "duo-chat-gpt-5-4": {
+   "id": "duo-chat-gpt-5-4",
+   "name": "Agentic Chat (GPT-5.4)",
+   "description": "Chat-tuned GPT model for conversational assistance, writing, and tool workflows",
+   "type": "chat",
+   "family": "gpt",
+   "canonical_id": "openai/gpt-5.4",
+   "release_date": "2026-03-05",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-03-05"
   },
   "duo-chat-gpt-5-mini": {
    "id": "duo-chat-gpt-5-mini",
    "name": "Agentic Chat (GPT-5 Mini)",
+   "description": "Chat-tuned GPT model for conversational assistance, writing, and tool workflows",
    "type": "chat",
-   "canonical_id": "openai/gpt-5-mini",
    "family": "gpt-mini",
+   "canonical_id": "openai/gpt-5-mini",
    "status": "deprecated",
    "release_date": "2025-08-07",
    "limit": {
@@ -178,6 +1491,12 @@
     "output": 128000
    },
    "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -189,18 +1508,18 @@
       "medium",
       "high"
      ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Chat-tuned GPT model for conversational assistance, writing, and tool workflows",
-   "open_weights": false,
-   "knowledge": "2024-05-30",
-   "last_updated": "2025-08-07",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text",
@@ -213,15 +1532,95 @@
      "text"
     ]
    },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2024-05-30",
+   "last_updated": "2025-08-07"
+  },
+  "duo-chat-gpt-5-6-luna": {
+   "id": "duo-chat-gpt-5-6-luna",
+   "name": "Agentic Chat (GPT-5.6 Luna)",
+   "description": "Cost-efficient GPT-5.6 model for fast, high-volume workloads",
+   "type": "chat",
+   "family": "gpt-luna",
+   "canonical_id": "openai/gpt-5.6-luna",
+   "release_date": "2026-07-09",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
    "cost": {
     "text": {
      "input": {
-      "price": 0
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
      },
      "output": {
       "price": 0
      }
     }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
    },
    "api": {
     "chat-completions": {
@@ -246,20 +1645,29 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2026-02-16",
+   "last_updated": "2026-07-09"
   },
-  "duo-chat-opus-5": {
-   "id": "duo-chat-opus-5",
-   "name": "Agentic Chat (Claude Opus 5)",
+  "duo-chat-fable-5-1": {
+   "id": "duo-chat-fable-5-1",
+   "name": "Agentic Chat (Claude Fable 5.1)",
+   "description": "Claude model for demanding reasoning and long-horizon agentic work",
    "type": "chat",
-   "canonical_id": "anthropic/claude-opus-5",
-   "family": "claude-opus",
-   "release_date": "2026-07-24",
+   "family": "claude-fable",
+   "canonical_id": "anthropic/claude-fable-5-1",
+   "release_date": "2026-09-01",
    "limit": {
     "context": 1000000,
     "output": 128000
    },
    "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -272,29 +1680,7 @@
       "xhigh",
       "max"
      ]
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Strongest Claude Opus model for coding, agents, and professional work",
-   "open_weights": false,
-   "knowledge": "2026-05",
-   "last_updated": "2026-07-24",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -310,55 +1696,6 @@
      }
     }
    },
-   "api": {
-    "messages": {
-     "base_url": "https://gitlab.com/api/v4",
-     "sdk": {
-      "aisdk": "gitlab-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "duo-chat-opus-4-7": {
-   "id": "duo-chat-opus-4-7",
-   "name": "Agentic Chat (Claude Opus 4.7)",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-opus-4-7",
-   "family": "claude-opus",
-   "release_date": "2026-04-16",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Flagship Claude model for deep reasoning, coding, and long-horizon agents",
-   "open_weights": false,
-   "knowledge": "2026-01-31",
-   "last_updated": "2026-04-16",
    "modalities": {
     "input": [
      "text",
@@ -372,20 +1709,6 @@
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
    "api": {
     "messages": {
      "base_url": "https://gitlab.com/api/v4",
@@ -394,25 +1717,129 @@
      },
      "capabilities": {
       "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
        "updates": false
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2026-06",
+   "last_updated": "2026-09-01"
   },
-  "duo-chat-gpt-5-4": {
-   "id": "duo-chat-gpt-5-4",
-   "name": "Agentic Chat (GPT-5.4)",
+  "duo-chat-gpt-6-sol": {
+   "id": "duo-chat-gpt-6-sol",
+   "name": "Agentic Chat (GPT-6 Sol)",
+   "description": "OpenAI model for complex coding and agentic workflows",
    "type": "chat",
-   "canonical_id": "openai/gpt-5.4",
-   "family": "gpt",
-   "release_date": "2026-03-05",
+   "family": "gpt-sol",
+   "canonical_id": "openai/gpt-6-sol",
+   "release_date": "2026-09-22",
    "limit": {
     "context": 1050000,
     "input": 922000,
     "output": 128000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-04-20",
+   "last_updated": "2026-09-22"
+  },
+  "duo-chat-gpt-5-2": {
+   "id": "duo-chat-gpt-5-2",
+   "name": "Agentic Chat (GPT-5.2)",
+   "description": "Chat-tuned GPT model for conversational assistance, writing, and tool workflows",
+   "type": "chat",
+   "family": "gpt",
+   "canonical_id": "openai/gpt-5.2",
+   "release_date": "2025-12-11",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -425,30 +1852,7 @@
       "high",
       "xhigh"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Chat-tuned GPT model for conversational assistance, writing, and tool workflows",
-   "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2026-03-05",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -459,6 +1863,18 @@
       "price": 0
      }
     }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
    },
    "api": {
     "chat-completions": {
@@ -483,14 +1899,264 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2025-12-11"
+  },
+  "duo-chat-opus-5-5": {
+   "id": "duo-chat-opus-5-5",
+   "name": "Agentic Chat (Claude Opus 5.5)",
+   "description": "Claude model for long-running agentic coding and knowledge work",
+   "type": "chat",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-5-5",
+   "release_date": "2026-09-22",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-06",
+   "last_updated": "2026-09-22"
+  },
+  "duo-chat-opus-4-8": {
+   "id": "duo-chat-opus-4-8",
+   "name": "Agentic Chat (Claude Opus 4.8)",
+   "description": "Flagship Claude model for deep reasoning, coding, and long-horizon agents",
+   "type": "chat",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-4-8",
+   "release_date": "2026-05-28",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-01",
+   "last_updated": "2026-05-28"
+  },
+  "duo-chat-gpt-5-6-terra": {
+   "id": "duo-chat-gpt-5-6-terra",
+   "name": "Agentic Chat (GPT-5.6 Terra)",
+   "description": "Balanced GPT-5.6 model for capable, cost-efficient everyday work",
+   "type": "chat",
+   "family": "gpt-terra",
+   "canonical_id": "openai/gpt-5.6-terra",
+   "release_date": "2026-07-09",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-02-16",
+   "last_updated": "2026-07-09"
   },
   "duo-chat-sonnet-4-5": {
    "id": "duo-chat-sonnet-4-5",
    "name": "Agentic Chat (Claude Sonnet 4.5)",
+   "description": "Balanced Claude model for coding, analysis, agent workflows, and cost control",
    "type": "chat",
-   "canonical_id": "anthropic/claude-sonnet-4-5-20250929",
    "family": "claude-sonnet",
+   "canonical_id": "anthropic/claude-sonnet-4-5-20250929",
    "status": "deprecated",
    "release_date": "2025-09-29",
    "limit": {
@@ -498,6 +2164,11 @@
     "output": 64000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -506,502 +2177,159 @@
      "budget": {
       "min": 1024
      }
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Balanced Claude model for coding, analysis, agent workflows, and cost control",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
    "open_weights": false,
    "knowledge": "2025-07-31",
-   "last_updated": "2025-09-29",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "messages": {
-     "base_url": "https://gitlab.com/api/v4",
-     "sdk": {
-      "aisdk": "gitlab-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
+   "last_updated": "2025-09-29"
   },
-  "duo-chat-gpt-6-sol": {
-   "id": "duo-chat-gpt-6-sol",
-   "name": "Agentic Chat (GPT-6 Sol)",
+  "duo-chat-gpt-6-astra": {
+   "id": "duo-chat-gpt-6-astra",
+   "name": "Agentic Chat (GPT-6 Astra)",
+   "description": "GPT-6 Astra is OpenAI's most capable model for complex reasoning, coding, computer use, research, and document creation.",
    "type": "chat",
-   "canonical_id": "openai/gpt-6-sol",
-   "family": "gpt-sol",
-   "release_date": "2026-09-22",
+   "family": "gpt-astra",
+   "canonical_id": "openai/gpt-6-astra",
+   "release_date": "2026-09-04",
    "limit": {
     "context": 1050000,
     "input": 922000,
     "output": 128000
    },
    "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "OpenAI model for complex coding and agentic workflows",
-   "open_weights": false,
-   "knowledge": "2026-04-20",
-   "last_updated": "2026-09-22",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://gitlab.com/api/v4",
-     "sdk": {
-      "aisdk": "gitlab-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://gitlab.com/api/v4",
-     "sdk": {
-      "aisdk": "gitlab-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "duo-chat-opus-4-8": {
-   "id": "duo-chat-opus-4-8",
-   "name": "Agentic Chat (Claude Opus 4.8)",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-opus-4-8",
-   "family": "claude-opus",
-   "release_date": "2026-05-28",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
     "temperature": false,
+    "top_k": false,
     "top_p": false,
-    "top_k": false,
+    "structured_output": true,
     "system_updates": false,
-    "effort_updates": false
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
    },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-04-30",
+   "last_updated": "2026-09-04"
+  },
+  "duo-chat-opus-4-5": {
+   "id": "duo-chat-opus-4-5",
+   "name": "Agentic Chat (Claude Opus 4.5)",
    "description": "Flagship Claude model for deep reasoning, coding, and long-horizon agents",
-   "open_weights": false,
-   "knowledge": "2026-01",
-   "last_updated": "2026-05-28",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "messages": {
-     "base_url": "https://gitlab.com/api/v4",
-     "sdk": {
-      "aisdk": "gitlab-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "duo-chat-gpt-5-6-sol": {
-   "id": "duo-chat-gpt-5-6-sol",
-   "name": "Agentic Chat (GPT-5.6 Sol)",
    "type": "chat",
-   "canonical_id": "openai/gpt-5.6-sol",
-   "family": "gpt-sol",
-   "release_date": "2026-07-09",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-4-5-20251101",
+   "release_date": "2025-11-24",
    "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
+    "context": 200000,
+    "output": 64000
    },
    "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": true,
     "temperature": true,
+    "top_k": true,
     "top_p": true,
-    "top_k": false,
     "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Frontier GPT-5.6 model for complex professional work, coding, and agentic workflows",
-   "open_weights": false,
-   "knowledge": "2026-02-16",
-   "last_updated": "2026-07-09",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://gitlab.com/api/v4",
-     "sdk": {
-      "aisdk": "gitlab-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://gitlab.com/api/v4",
-     "sdk": {
-      "aisdk": "gitlab-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "duo-chat-gpt-5-6-terra": {
-   "id": "duo-chat-gpt-5-6-terra",
-   "name": "Agentic Chat (GPT-5.6 Terra)",
-   "type": "chat",
-   "canonical_id": "openai/gpt-5.6-terra",
-   "family": "gpt-terra",
-   "release_date": "2026-07-09",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Balanced GPT-5.6 model for capable, cost-efficient everyday work",
-   "open_weights": false,
-   "knowledge": "2026-02-16",
-   "last_updated": "2026-07-09",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://gitlab.com/api/v4",
-     "sdk": {
-      "aisdk": "gitlab-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://gitlab.com/api/v4",
-     "sdk": {
-      "aisdk": "gitlab-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "duo-chat-gpt-5-2": {
-   "id": "duo-chat-gpt-5-2",
-   "name": "Agentic Chat (GPT-5.2)",
-   "type": "chat",
-   "canonical_id": "openai/gpt-5.2",
-   "family": "gpt",
-   "release_date": "2025-12-11",
-   "limit": {
-    "context": 400000,
-    "input": 272000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "xhigh"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Chat-tuned GPT model for conversational assistance, writing, and tool workflows",
-   "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2025-12-11",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://gitlab.com/api/v4",
-     "sdk": {
-      "aisdk": "gitlab-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://gitlab.com/api/v4",
-     "sdk": {
-      "aisdk": "gitlab-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "duo-chat-gpt-5-codex": {
-   "id": "duo-chat-gpt-5-codex",
-   "name": "Agentic Chat (GPT-5 Codex)",
-   "type": "chat",
-   "canonical_id": "openai/gpt-5-codex",
-   "family": "gpt-codex",
-   "status": "deprecated",
-   "release_date": "2025-09-15",
-   "limit": {
-    "context": 400000,
-    "input": 272000,
-    "output": 128000
-   },
-   "capabilities": {
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -1011,54 +2339,41 @@
       "low",
       "medium",
       "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Coding-optimized GPT model for repository edits, reviews, and agentic software work",
-   "open_weights": false,
-   "knowledge": "2024-09-30",
-   "last_updated": "2025-09-15",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
+     ],
+     "budget": {
+      "min": 1024
+     }
+    }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
      },
      "output": {
       "price": 0
      }
     }
    },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
-    "chat-completions": {
-     "base_url": "https://gitlab.com/api/v4",
-     "sdk": {
-      "aisdk": "gitlab-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "responses": {
+    "messages": {
      "base_url": "https://gitlab.com/api/v4",
      "sdk": {
       "aisdk": "gitlab-ai-provider"
@@ -1069,184 +2384,96 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2025-05",
+   "last_updated": "2025-11-24"
   },
-  "duo-chat-gpt-5-5": {
-   "id": "duo-chat-gpt-5-5",
-   "name": "Agentic Chat (GPT-5.5)",
+  "duo-chat-haiku-5-5": {
+   "id": "duo-chat-haiku-5-5",
+   "name": "Agentic Chat (Claude Haiku 5.5)",
+   "description": "Fast Claude model for responsive assistance, classification, and lightweight agents",
    "type": "chat",
-   "canonical_id": "openai/gpt-5.5",
-   "family": "gpt",
-   "release_date": "2026-04-23",
+   "family": "claude-haiku",
+   "canonical_id": "anthropic/claude-haiku-5-5",
+   "release_date": "2026-10-07",
    "limit": {
-    "context": 1050000,
-    "input": 922000,
+    "context": 1000000,
     "output": 128000
    },
    "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": true,
+     "toggle": true,
      "effort": [
-      "none",
       "low",
       "medium",
       "high",
-      "xhigh"
+      "xhigh",
+      "max"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-06",
+   "last_updated": "2026-10-07"
+  },
+  "duo-chat-gpt-5-4-nano": {
+   "id": "duo-chat-gpt-5-4-nano",
+   "name": "Agentic Chat (GPT-5.4 Nano)",
    "description": "Chat-tuned GPT model for conversational assistance, writing, and tool workflows",
-   "open_weights": false,
-   "knowledge": "2025-12-01",
-   "last_updated": "2026-04-23",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://gitlab.com/api/v4",
-     "sdk": {
-      "aisdk": "gitlab-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://gitlab.com/api/v4",
-     "sdk": {
-      "aisdk": "gitlab-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "duo-chat-gpt-5-2-codex": {
-   "id": "duo-chat-gpt-5-2-codex",
-   "name": "Agentic Chat (GPT-5.2 Codex)",
    "type": "chat",
-   "canonical_id": "openai/gpt-5.2-codex",
-   "family": "gpt-codex",
+   "family": "gpt-nano",
+   "canonical_id": "openai/gpt-5.4-nano",
    "status": "deprecated",
-   "release_date": "2025-12-11",
-   "limit": {
-    "context": 400000,
-    "input": 272000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Coding-optimized GPT model for repository edits, reviews, and agentic software work",
-   "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2025-12-11",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://gitlab.com/api/v4",
-     "sdk": {
-      "aisdk": "gitlab-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://gitlab.com/api/v4",
-     "sdk": {
-      "aisdk": "gitlab-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "duo-chat-gpt-5-4-mini": {
-   "id": "duo-chat-gpt-5-4-mini",
-   "name": "Agentic Chat (GPT-5.4 Mini)",
-   "type": "chat",
-   "canonical_id": "openai/gpt-5.4-mini",
-   "family": "gpt-mini",
    "release_date": "2026-03-17",
    "limit": {
     "context": 400000,
@@ -1254,6 +2481,12 @@
     "output": 128000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -1266,18 +2499,18 @@
       "high",
       "xhigh"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Chat-tuned GPT model for conversational assistance, writing, and tool workflows",
-   "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2026-03-17",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text",
@@ -1290,16 +2523,6 @@
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
    "api": {
     "chat-completions": {
      "base_url": "https://gitlab.com/api/v4",
@@ -1323,496 +2546,18 @@
       }
      }
     }
-   }
-  },
-  "duo-chat-sonnet-5-5": {
-   "id": "duo-chat-sonnet-5-5",
-   "name": "Agentic Chat (Claude Sonnet 5.5)",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-sonnet-5-5",
-   "family": "claude-sonnet",
-   "release_date": "2026-09-28",
-   "limit": {
-    "context": 1000000,
-    "output": 64000
    },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Fast Claude model for everyday coding, agents, and knowledge work",
    "open_weights": false,
-   "knowledge": "2026-06",
-   "last_updated": "2026-09-28",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "messages": {
-     "base_url": "https://gitlab.com/api/v4",
-     "sdk": {
-      "aisdk": "gitlab-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "duo-chat-gpt-6-luna": {
-   "id": "duo-chat-gpt-6-luna",
-   "name": "Agentic Chat (GPT-6 Luna)",
-   "type": "chat",
-   "canonical_id": "openai/gpt-6-luna",
-   "family": "gpt-luna",
-   "release_date": "2026-09-22",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "OpenAI's most efficient model for focused, high-volume tasks",
-   "open_weights": false,
-   "knowledge": "2026-05-18",
-   "last_updated": "2026-09-22",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://gitlab.com/api/v4",
-     "sdk": {
-      "aisdk": "gitlab-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://gitlab.com/api/v4",
-     "sdk": {
-      "aisdk": "gitlab-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "duo-chat-haiku-5-5": {
-   "id": "duo-chat-haiku-5-5",
-   "name": "Agentic Chat (Claude Haiku 5.5)",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-haiku-5-5",
-   "family": "claude-haiku",
-   "release_date": "2026-10-07",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Fast Claude model for responsive assistance, classification, and lightweight agents",
-   "open_weights": false,
-   "knowledge": "2026-06",
-   "last_updated": "2026-10-07",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "messages": {
-     "base_url": "https://gitlab.com/api/v4",
-     "sdk": {
-      "aisdk": "gitlab-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "duo-chat-sonnet-5": {
-   "id": "duo-chat-sonnet-5",
-   "name": "Agentic Chat (Claude Sonnet 5)",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-sonnet-5",
-   "family": "claude-sonnet",
-   "release_date": "2026-06-30",
-   "limit": {
-    "context": 1000000,
-    "output": 64000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Everyday Claude agent model for coding, planning, browsing, and general work",
-   "open_weights": false,
-   "knowledge": "2026-01-31",
-   "last_updated": "2026-06-30",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "messages": {
-     "base_url": "https://gitlab.com/api/v4",
-     "sdk": {
-      "aisdk": "gitlab-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "duo-chat-opus-4-6": {
-   "id": "duo-chat-opus-4-6",
-   "name": "Agentic Chat (Claude Opus 4.6)",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-opus-4-6",
-   "family": "claude-opus",
-   "release_date": "2026-02-05",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "max"
-     ],
-     "budget": {
-      "min": 1024
-     }
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Flagship Claude model for deep reasoning, coding, and long-horizon agents",
-   "open_weights": false,
-   "knowledge": "2025-05-31",
-   "last_updated": "2026-03-13",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "messages": {
-     "base_url": "https://gitlab.com/api/v4",
-     "sdk": {
-      "aisdk": "gitlab-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "duo-chat-fable-5-1": {
-   "id": "duo-chat-fable-5-1",
-   "name": "Agentic Chat (Claude Fable 5.1)",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-fable-5-1",
-   "family": "claude-fable",
-   "release_date": "2026-09-01",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Claude model for demanding reasoning and long-horizon agentic work",
-   "open_weights": false,
-   "knowledge": "2026-06",
-   "last_updated": "2026-09-01",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "messages": {
-     "base_url": "https://gitlab.com/api/v4",
-     "sdk": {
-      "aisdk": "gitlab-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   }
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-03-17"
   },
   "duo-chat-gpt-5-1": {
    "id": "duo-chat-gpt-5-1",
    "name": "Agentic Chat (GPT-5.1)",
+   "description": "Chat-tuned GPT model for conversational assistance, writing, and tool workflows",
    "type": "chat",
-   "canonical_id": "openai/gpt-5.1",
    "family": "gpt",
+   "canonical_id": "openai/gpt-5.1",
    "status": "deprecated",
    "release_date": "2025-11-13",
    "limit": {
@@ -1821,6 +2566,12 @@
     "output": 128000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -1832,728 +2583,57 @@
       "medium",
       "high"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Chat-tuned GPT model for conversational assistance, writing, and tool workflows",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://gitlab.com/api/v4",
+     "sdk": {
+      "aisdk": "gitlab-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
    "open_weights": false,
    "knowledge": "2024-09-30",
-   "last_updated": "2025-11-13",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://gitlab.com/api/v4",
-     "sdk": {
-      "aisdk": "gitlab-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://gitlab.com/api/v4",
-     "sdk": {
-      "aisdk": "gitlab-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "duo-chat-gpt-6-astra": {
-   "id": "duo-chat-gpt-6-astra",
-   "name": "Agentic Chat (GPT-6 Astra)",
-   "type": "chat",
-   "canonical_id": "openai/gpt-6-astra",
-   "family": "gpt-astra",
-   "release_date": "2026-09-04",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "GPT-6 Astra is OpenAI's most capable model for complex reasoning, coding, computer use, research, and document creation.",
-   "open_weights": false,
-   "knowledge": "2026-04-30",
-   "last_updated": "2026-09-04",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://gitlab.com/api/v4",
-     "sdk": {
-      "aisdk": "gitlab-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://gitlab.com/api/v4",
-     "sdk": {
-      "aisdk": "gitlab-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "duo-chat-opus-4-5": {
-   "id": "duo-chat-opus-4-5",
-   "name": "Agentic Chat (Claude Opus 4.5)",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-opus-4-5-20251101",
-   "family": "claude-opus",
-   "release_date": "2025-11-24",
-   "limit": {
-    "context": 200000,
-    "output": 64000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ],
-     "budget": {
-      "min": 1024
-     }
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Flagship Claude model for deep reasoning, coding, and long-horizon agents",
-   "open_weights": false,
-   "knowledge": "2025-05",
-   "last_updated": "2025-11-24",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "messages": {
-     "base_url": "https://gitlab.com/api/v4",
-     "sdk": {
-      "aisdk": "gitlab-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "duo-chat-gpt-5-3-codex": {
-   "id": "duo-chat-gpt-5-3-codex",
-   "name": "Agentic Chat (GPT-5.3 Codex)",
-   "type": "chat",
-   "canonical_id": "openai/gpt-5.3-codex",
-   "family": "gpt-codex",
-   "status": "deprecated",
-   "release_date": "2026-02-05",
-   "limit": {
-    "context": 400000,
-    "input": 272000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "xhigh"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Coding-optimized GPT model for repository edits, reviews, and agentic software work",
-   "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2026-02-05",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://gitlab.com/api/v4",
-     "sdk": {
-      "aisdk": "gitlab-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://gitlab.com/api/v4",
-     "sdk": {
-      "aisdk": "gitlab-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "duo-chat-gpt-6-1-sol": {
-   "id": "duo-chat-gpt-6-1-sol",
-   "name": "Agentic Chat (GPT-6.1 Sol)",
-   "type": "chat",
-   "canonical_id": "openai/gpt-6.1-sol",
-   "family": "gpt-sol",
-   "release_date": "2026-09-29",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Near-Astra performance for complex coding, computer use, and professional work at a lower cost.",
-   "open_weights": false,
-   "knowledge": "2026-04-30",
-   "last_updated": "2026-09-29",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://gitlab.com/api/v4",
-     "sdk": {
-      "aisdk": "gitlab-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://gitlab.com/api/v4",
-     "sdk": {
-      "aisdk": "gitlab-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "duo-chat-haiku-4-5": {
-   "id": "duo-chat-haiku-4-5",
-   "name": "Agentic Chat (Claude Haiku 4.5)",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-haiku-4-5-20251001",
-   "family": "claude-haiku",
-   "release_date": "2025-10-15",
-   "limit": {
-    "context": 200000,
-    "output": 64000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "budget": {
-      "min": 1024
-     }
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Fast Claude model for responsive assistance, classification, and lightweight agents",
-   "open_weights": false,
-   "knowledge": "2025-02-28",
-   "last_updated": "2025-10-15",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "messages": {
-     "base_url": "https://gitlab.com/api/v4",
-     "sdk": {
-      "aisdk": "gitlab-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "duo-chat-gpt-5-4-nano": {
-   "id": "duo-chat-gpt-5-4-nano",
-   "name": "Agentic Chat (GPT-5.4 Nano)",
-   "type": "chat",
-   "canonical_id": "openai/gpt-5.4-nano",
-   "family": "gpt-nano",
-   "status": "deprecated",
-   "release_date": "2026-03-17",
-   "limit": {
-    "context": 400000,
-    "input": 272000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "xhigh"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Chat-tuned GPT model for conversational assistance, writing, and tool workflows",
-   "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2026-03-17",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://gitlab.com/api/v4",
-     "sdk": {
-      "aisdk": "gitlab-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://gitlab.com/api/v4",
-     "sdk": {
-      "aisdk": "gitlab-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "duo-chat-gpt-5-6-luna": {
-   "id": "duo-chat-gpt-5-6-luna",
-   "name": "Agentic Chat (GPT-5.6 Luna)",
-   "type": "chat",
-   "canonical_id": "openai/gpt-5.6-luna",
-   "family": "gpt-luna",
-   "release_date": "2026-07-09",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Cost-efficient GPT-5.6 model for fast, high-volume workloads",
-   "open_weights": false,
-   "knowledge": "2026-02-16",
-   "last_updated": "2026-07-09",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://gitlab.com/api/v4",
-     "sdk": {
-      "aisdk": "gitlab-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://gitlab.com/api/v4",
-     "sdk": {
-      "aisdk": "gitlab-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "duo-chat-fable-5": {
-   "id": "duo-chat-fable-5",
-   "name": "Agentic Chat (Claude Fable 5)",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-fable-5",
-   "family": "claude-fable",
-   "release_date": "2026-06-09",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Claude model for creative writing, analysis, and controlled agent workflows",
-   "open_weights": false,
-   "knowledge": "2026-01-31",
-   "last_updated": "2026-06-09",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "messages": {
-     "base_url": "https://gitlab.com/api/v4",
-     "sdk": {
-      "aisdk": "gitlab-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
+   "last_updated": "2025-11-13"
   }
  }
 }

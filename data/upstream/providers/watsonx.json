@@ -7,34 +7,41 @@
   "WATSONX_AI_PROJECT_ID"
  ],
  "models": {
-  "ibm/granite-4-h-small": {
-   "id": "ibm/granite-4-h-small",
-   "name": "Granite-4.0-H-Small",
+  "meta-llama/llama-3-3-70b-instruct": {
+   "id": "meta-llama/llama-3-3-70b-instruct",
+   "name": "Llama-3.3-70B-Instruct",
+   "description": "Popular open Llama workhorse for multilingual chat, coding, and self-hosting",
    "type": "chat",
-   "canonical_id": "ibm/granite-4-h-small",
-   "family": "granite",
-   "release_date": "2025-10-02",
+   "family": "llama",
+   "canonical_id": "meta/llama-3.3-70b-instruct",
+   "release_date": "2024-12-06",
    "limit": {
     "context": 131072,
-    "output": 131072
+    "output": 4096
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": false
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Open-weight hybrid model for enterprise chat, coding, retrieval-augmented generation, and tool-calling workloads",
-   "open_weights": true,
-   "last_updated": "2025-10-02",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.7526
+     },
+     "output": {
+      "price": 0.7526
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text"
@@ -42,16 +49,6 @@
     "output": [
      "text"
     ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.0636
-     },
-     "output": {
-      "price": 0.265
-     }
-    }
    },
    "api": {
     "chat-completions": {
@@ -65,167 +62,46 @@
       }
      }
     }
-   }
-  },
-  "openai/gpt-oss-120b": {
-   "id": "openai/gpt-oss-120b",
-   "name": "GPT OSS 120B",
-   "type": "chat",
-   "canonical_id": "openai/gpt-oss-120b",
-   "family": "gpt-oss",
-   "release_date": "2025-08-05",
-   "limit": {
-    "context": 131072,
-    "output": 32768
    },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
    "open_weights": true,
-   "knowledge": "2024-06",
-   "last_updated": "2025-08-05",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.159
-     },
-     "output": {
-      "price": 0.636
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://${WATSONX_REGION}.ml.cloud.ibm.com",
-     "sdk": {
-      "aisdk": "watsonx-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "mistralai/mistral-small-3-1-24b-instruct-2503": {
-   "id": "mistralai/mistral-small-3-1-24b-instruct-2503",
-   "name": "Mistral Small 3.1 24B",
-   "type": "chat",
-   "canonical_id": "mistral/mistral-small-3-1-24b-instruct-2503",
-   "family": "mistral-small",
-   "release_date": "2025-03-17",
-   "limit": {
-    "context": 131072,
-    "output": 16384
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Efficient multimodal model for instruction following, coding, reasoning, and function calling",
-   "open_weights": true,
-   "knowledge": "2024-06",
-   "last_updated": "2025-03-17",
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/gif"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.106
-     },
-     "output": {
-      "price": 0.318
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://${WATSONX_REGION}.ml.cloud.ibm.com",
-     "sdk": {
-      "aisdk": "watsonx-ai-provider"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
+   "knowledge": "2023-12",
+   "last_updated": "2024-12-06"
   },
   "meta-llama/llama-4-maverick-17b-128e-instruct-fp8": {
    "id": "meta-llama/llama-4-maverick-17b-128e-instruct-fp8",
    "name": "Llama 4 Maverick 17B 128E Instruct FP8",
+   "description": "Open multimodal Llama for strong reasoning with efficient everyday serving",
    "type": "chat",
-   "canonical_id": "meta/llama-4-maverick-17b-instruct",
    "family": "llama",
+   "canonical_id": "meta/llama-4-maverick-17b-instruct",
    "release_date": "2025-04-05",
    "limit": {
     "context": 131072,
     "output": 8192
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": false
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Open multimodal Llama for strong reasoning with efficient everyday serving",
-   "open_weights": true,
-   "knowledge": "2024-08",
-   "last_updated": "2025-04-05",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.371
+     },
+     "output": {
+      "price": 1.484
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text",
@@ -238,16 +114,6 @@
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.371
-     },
-     "output": {
-      "price": 1.484
-     }
-    }
-   },
    "api": {
     "chat-completions": {
      "base_url": "https://${WATSONX_REGION}.ml.cloud.ibm.com",
@@ -260,36 +126,52 @@
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "knowledge": "2024-08",
+   "last_updated": "2025-04-05"
   },
-  "meta-llama/llama-3-3-70b-instruct": {
-   "id": "meta-llama/llama-3-3-70b-instruct",
-   "name": "Llama-3.3-70B-Instruct",
+  "openai/gpt-oss-120b": {
+   "id": "openai/gpt-oss-120b",
+   "name": "GPT OSS 120B",
+   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
    "type": "chat",
-   "canonical_id": "meta/llama-3.3-70b-instruct",
-   "family": "llama",
-   "release_date": "2024-12-06",
+   "family": "gpt-oss",
+   "canonical_id": "openai/gpt-oss-120b",
+   "release_date": "2025-08-05",
    "limit": {
     "context": 131072,
-    "output": 4096
+    "output": 131072
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": false
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
    },
-   "description": "Popular open Llama workhorse for multilingual chat, coding, and self-hosting",
-   "open_weights": true,
-   "knowledge": "2023-12",
-   "last_updated": "2024-12-06",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.159
+     },
+     "output": {
+      "price": 0.636
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text"
@@ -298,15 +180,66 @@
      "text"
     ]
    },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${WATSONX_REGION}.ml.cloud.ibm.com",
+     "sdk": {
+      "aisdk": "watsonx-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-06",
+   "last_updated": "2025-08-05"
+  },
+  "ibm/granite-4-h-small": {
+   "id": "ibm/granite-4-h-small",
+   "name": "Granite-4.0-H-Small",
+   "description": "Open-weight hybrid model for enterprise chat, coding, retrieval-augmented generation, and tool-calling workloads",
+   "type": "chat",
+   "family": "granite",
+   "canonical_id": "ibm/granite-4-h-small",
+   "release_date": "2025-10-02",
+   "limit": {
+    "context": 131072,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
    "cost": {
     "text": {
      "input": {
-      "price": 0.7526
+      "price": 0.0636
      },
      "output": {
-      "price": 0.7526
+      "price": 0.265
      }
     }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
    },
    "api": {
     "chat-completions": {
@@ -320,7 +253,74 @@
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "last_updated": "2025-10-02"
+  },
+  "mistralai/mistral-small-3-1-24b-instruct-2503": {
+   "id": "mistralai/mistral-small-3-1-24b-instruct-2503",
+   "name": "Mistral Small 3.1 24B",
+   "description": "Efficient multimodal model for instruction following, coding, reasoning, and function calling",
+   "type": "chat",
+   "family": "mistral-small",
+   "canonical_id": "mistral/mistral-small-3-1-24b-instruct-2503",
+   "release_date": "2025-03-17",
+   "limit": {
+    "context": 131072,
+    "output": 16384
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.106
+     },
+     "output": {
+      "price": 0.318
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/gif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${WATSONX_REGION}.ml.cloud.ibm.com",
+     "sdk": {
+      "aisdk": "watsonx-ai-provider"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-06",
+   "last_updated": "2025-03-17"
   }
  }
 }

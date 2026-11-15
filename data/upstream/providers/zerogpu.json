@@ -1,0 +1,883 @@
+{
+ "id": "zerogpu",
+ "name": "ZeroGPU",
+ "doc": "https://docs.zerogpu.ai/docs/model-catalog",
+ "env": [
+  "ZEROGPU_API_KEY"
+ ],
+ "models": {
+  "gpt-oss-120b": {
+   "id": "gpt-oss-120b",
+   "name": "GPT OSS 120B",
+   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
+   "type": "chat",
+   "family": "gpt-oss",
+   "canonical_id": "openai/gpt-oss-120b",
+   "release_date": "2025-08-05",
+   "limit": {
+    "context": 131072,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": false,
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.15
+     },
+     "output": {
+      "price": 0.6
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.zerogpu.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-06",
+   "last_updated": "2025-08-05"
+  },
+  "chatterbox-nano": {
+   "id": "chatterbox-nano",
+   "name": "Chatterbox Nano",
+   "description": "Compact English text-to-speech model with zero-shot voice cloning",
+   "type": "speech",
+   "canonical_id": "resemble-ai/chatterbox-nano",
+   "release_date": "2026-04-14",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "audio": {
+     "output": {
+      "unit": "minute",
+      "price": 0.01
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "audio/mpeg",
+     "audio/wav",
+     "audio/opus"
+    ]
+   },
+   "api": {
+    "speech": {
+     "base_url": "https://api.zerogpu.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/protocols/openai-speech"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-04-14"
+  },
+  "llama-3.1-8b-instruct-fast": {
+   "id": "llama-3.1-8b-instruct-fast",
+   "name": "Llama-3.1-8B-Instruct",
+   "description": "Compact open Llama model for lightweight chat, drafting, and self-hosting",
+   "type": "chat",
+   "family": "llama",
+   "canonical_id": "meta/llama-3.1-8b-instruct",
+   "release_date": "2024-07-23",
+   "limit": {
+    "context": 131072,
+    "output": 8192
+   },
+   "capabilities": {
+    "cache": false,
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.15
+     },
+     "output": {
+      "price": 0.28
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.zerogpu.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2023-12",
+   "last_updated": "2024-07-23"
+  },
+  "qwen3.6-35b-a3b": {
+   "id": "qwen3.6-35b-a3b",
+   "name": "Qwen3.6 35B-A3B",
+   "description": "Open multimodal Qwen MoE for local agents that need vision, audio, and code",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.6-35b-a3b",
+   "release_date": "2026-04-17",
+   "limit": {
+    "context": 262144,
+    "output": 16384
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.2,
+      "cache": {
+       "read": 0.2
+      }
+     },
+     "output": {
+      "price": 1.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/x-matroska",
+     "video/quicktime",
+     "video/x-flv",
+     "video/x-ms-wmv"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.zerogpu.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-04-17"
+  },
+  "gpt-4.1-mini": {
+   "id": "gpt-4.1-mini",
+   "name": "GPT-4.1 mini",
+   "description": "Affordable GPT-4.1 lane for fast coding help and structured extraction",
+   "type": "chat",
+   "family": "gpt-mini",
+   "canonical_id": "openai/gpt-4.1-mini",
+   "release_date": "2025-04-14",
+   "limit": {
+    "context": 1047576,
+    "output": 32768
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.4,
+      "cache": {
+       "read": 0.1
+      }
+     },
+     "output": {
+      "price": 1.6
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.zerogpu.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2024-04",
+   "last_updated": "2025-04-14"
+  },
+  "glm-5.3-flash": {
+   "id": "glm-5.3-flash",
+   "name": "GLM-5.3-Flash",
+   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
+   "type": "chat",
+   "family": "glm-flash",
+   "canonical_id": "zhipuai/glm-5.3-flash",
+   "release_date": "2026-08-26",
+   "limit": {
+    "context": 1048576,
+    "output": 32768
+   },
+   "capabilities": {
+    "cache": false,
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1
+     },
+     "output": {
+      "price": 0.35
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.zerogpu.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-26"
+  },
+  "all-minilm-l6-v2": {
+   "id": "all-minilm-l6-v2",
+   "name": "all-MiniLM-L6-v2",
+   "description": "Sentence and short-paragraph embedding model for clustering and semantic search",
+   "type": "embedding",
+   "canonical_id": "sentence-transformers/all-minilm-l6-v2",
+   "release_date": "2021-08-30",
+   "limit": {
+    "context": 256,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.004
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "api": {
+    "embeddings": {
+     "base_url": "https://api.zerogpu.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2021-08-30"
+  },
+  "gpt-5.4-nano": {
+   "id": "gpt-5.4-nano",
+   "name": "GPT-5.4 nano",
+   "description": "Cheapest GPT-5.4 lane for simple routing, extraction, and bulk automation",
+   "type": "chat",
+   "family": "gpt-nano",
+   "canonical_id": "openai/gpt-5.4-nano",
+   "release_date": "2026-03-17",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.2,
+      "cache": {
+       "read": 0.02
+      }
+     },
+     "output": {
+      "price": 1.25
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.zerogpu.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "freeform": [
+        "text",
+        "lark",
+        "regex"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-03-17"
+  },
+  "qwen3-30b-a3b-fp8": {
+   "id": "qwen3-30b-a3b-fp8",
+   "name": "Qwen3 30B A3B",
+   "description": "Sparse MoE Qwen model with 3B active parameters for efficient chat and reasoning",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3-30b-a3b",
+   "release_date": "2025-04-28",
+   "limit": {
+    "context": 32768,
+    "output": 16384
+   },
+   "capabilities": {
+    "cache": false,
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1
+     },
+     "output": {
+      "price": 0.45
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.zerogpu.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-04-28"
+  },
+  "bge-small-en-v1.5": {
+   "id": "bge-small-en-v1.5",
+   "name": "BGE Small EN v1.5",
+   "description": "Small English text embedding model producing 384-dimensional vectors",
+   "type": "embedding",
+   "family": "bge",
+   "canonical_id": "baai/bge-small-en-v1.5",
+   "release_date": "2023-09-12",
+   "limit": {
+    "context": 512,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.004
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "api": {
+    "embeddings": {
+     "base_url": "https://api.zerogpu.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2023-09-12"
+  },
+  "deepseek-v4.1-flash": {
+   "id": "deepseek-v4.1-flash",
+   "name": "DeepSeek V4.1 Flash",
+   "description": "DeepSeek V4.1 Flash model for reasoning and agentic coding",
+   "type": "chat",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4.1-flash",
+   "release_date": "2026-09-10",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.3,
+      "cache": {
+       "read": 0.003
+      }
+     },
+     "output": {
+      "price": 1.2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.zerogpu.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-09-10"
+  },
+  "gpt-5.6-luna": {
+   "id": "gpt-5.6-luna",
+   "name": "GPT-5.6 Luna",
+   "description": "Cost-efficient GPT-5.6 model for fast, high-volume workloads",
+   "type": "chat",
+   "family": "gpt-luna",
+   "canonical_id": "openai/gpt-5.6-luna",
+   "release_date": "2026-07-09",
+   "limit": {
+    "context": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.2,
+      "cache": {
+       "read": 0.2
+      }
+     },
+     "output": {
+      "price": 1.2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.zerogpu.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "freeform": [
+        "text",
+        "lark",
+        "regex"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-02-16",
+   "last_updated": "2026-07-09"
+  },
+  "whisper-tiny": {
+   "id": "whisper-tiny",
+   "name": "Whisper Tiny",
+   "description": "Smallest multilingual Whisper checkpoint for fast, low-cost speech transcription",
+   "type": "transcription",
+   "family": "whisper",
+   "canonical_id": "openai/whisper-tiny",
+   "release_date": "2022-09-21",
+   "limit": {
+    "context": 448,
+    "output": 448
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "audio": {
+     "input": {
+      "unit": "minute",
+      "price": 0.02
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "audio/flac",
+     "audio/mpeg",
+     "audio/mp4",
+     "audio/ogg",
+     "audio/wav",
+     "audio/webm"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "transcriptions": {
+     "base_url": "https://api.zerogpu.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/protocols/openai-transcription"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2022-09-21"
+  }
+ }
+}

@@ -6,42 +6,30 @@
   "MEGANOVA_API_KEY"
  ],
  "models": {
-  "XiaomiMiMo/MiMo-V2-Flash": {
-   "id": "XiaomiMiMo/MiMo-V2-Flash",
-   "name": "MiMo V2 Flash",
+  "meta-llama/Llama-3.3-70B-Instruct": {
+   "id": "meta-llama/Llama-3.3-70B-Instruct",
+   "name": "Llama 3.3 70B Instruct",
+   "description": "Open Llama instruction model for multilingual chat, reasoning, and coding",
    "type": "chat",
-   "canonical_id": "xiaomi/mimo-v2-flash",
-   "family": "mimo",
-   "status": "deprecated",
-   "release_date": "2025-12-16",
+   "family": "llama",
+   "canonical_id": "meta/llama-3.3-70b-instruct",
+   "release_date": "2024-12-06",
    "limit": {
-    "context": 262144,
-    "output": 32000
+    "context": 131072,
+    "output": 16384
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "MiMo flash model for fast multimodal assistance and agent workflows",
-   "open_weights": true,
-   "knowledge": "2024-12-01",
-   "last_updated": "2026-02-04",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
+     "supported": false
+    }
    },
    "cost": {
     "text": {
@@ -53,50 +41,6 @@
      }
     }
    },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.meganova.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "mistralai/Mistral-Nemo-Instruct-2407": {
-   "id": "mistralai/Mistral-Nemo-Instruct-2407",
-   "name": "Mistral Nemo Instruct 2407",
-   "type": "chat",
-   "canonical_id": "mistral/mistral-nemo",
-   "family": "mistral-nemo",
-   "release_date": "2024-07-18",
-   "limit": {
-    "context": 131072,
-    "output": 65536
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Mistral model for multilingual chat, reasoning, and tool-assisted workflows",
-   "open_weights": true,
-   "knowledge": "2024-07",
-   "last_updated": "2024-07-18",
    "modalities": {
     "input": [
      "text"
@@ -105,16 +49,6 @@
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.02
-     },
-     "output": {
-      "price": 0.04
-     }
-    }
-   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.meganova.ai/v1",
@@ -128,59 +62,54 @@
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "knowledge": "2023-12",
+   "last_updated": "2024-12-06"
   },
-  "mistralai/Mistral-Small-3.2-24B-Instruct-2506": {
-   "id": "mistralai/Mistral-Small-3.2-24B-Instruct-2506",
-   "name": "Mistral Small 3.2 24B Instruct",
+  "moonshotai/Kimi-K2-Thinking": {
+   "id": "moonshotai/Kimi-K2-Thinking",
+   "name": "Kimi K2 Thinking",
+   "description": "Kimi reasoning model for long-horizon research, planning, and tool use",
    "type": "chat",
-   "canonical_id": "mistral/mistral-small-2506",
-   "family": "mistral-small",
-   "release_date": "2025-06-20",
+   "family": "kimi-thinking",
+   "canonical_id": "moonshotai/kimi-k2-thinking",
+   "release_date": "2025-11-06",
    "limit": {
-    "context": 32768,
-    "output": 8192
+    "context": 262144,
+    "output": 262144
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": false
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
+     "supported": true
+    }
    },
-   "description": "Efficient Mistral model for fast chat, extraction, and production assistants",
-   "open_weights": true,
-   "knowledge": "2024-10",
-   "last_updated": "2025-06-20",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.6
+     },
+     "output": {
+      "price": 2.6
+     }
+    }
+   },
    "modalities": {
     "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/gif"
+     "text"
     ],
     "output": [
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.meganova.ai/v1",
@@ -192,38 +121,54 @@
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
      }
     }
-   }
+   },
+   "open_weights": true,
+   "knowledge": "2024-08",
+   "last_updated": "2025-11-06"
   },
   "moonshotai/Kimi-K2.5": {
    "id": "moonshotai/Kimi-K2.5",
    "name": "Kimi K2.5",
+   "description": "Kimi multimodal agent model for visual understanding, coding, and planning",
    "type": "chat",
-   "canonical_id": "moonshotai/kimi-k2.5",
    "family": "kimi-k2",
+   "canonical_id": "moonshotai/kimi-k2.5",
    "release_date": "2026-01-27",
    "limit": {
     "context": 262144,
     "output": 262144
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": true
-    },
-    "temperature": true,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Kimi multimodal agent model for visual understanding, coding, and planning",
-   "open_weights": true,
-   "knowledge": "2026-01",
-   "last_updated": "2026-01-27",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.45,
+      "cache": {
+       "read": 0.07
+      }
+     },
+     "output": {
+      "price": 2.25
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text",
@@ -239,18 +184,70 @@
      "text"
     ]
    },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.meganova.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2026-01",
+   "last_updated": "2026-01-27"
+  },
+  "deepseek-ai/DeepSeek-V3.2-Exp": {
+   "id": "deepseek-ai/DeepSeek-V3.2-Exp",
+   "name": "DeepSeek V3.2 Exp",
+   "description": "DeepSeek chat model for instruction following, coding, and analysis",
+   "type": "chat",
+   "family": "deepseek",
+   "release_date": "2025-10-10",
+   "limit": {
+    "context": 164000,
+    "output": 164000
+   },
+   "capabilities": {
+    "temperature": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
    "cost": {
     "text": {
      "input": {
-      "price": 0.45,
+      "price": 0.26,
       "cache": {
-       "read": 0.07
+       "read": 0.13
       }
      },
      "output": {
-      "price": 2.25
+      "price": 0.38
      }
     }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
    },
    "api": {
     "chat-completions": {
@@ -259,45 +256,52 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
      "capabilities": {
       "tools": {
        "updates": false
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "last_updated": "2025-10-10"
   },
-  "moonshotai/Kimi-K2-Thinking": {
-   "id": "moonshotai/Kimi-K2-Thinking",
-   "name": "Kimi K2 Thinking",
+  "deepseek-ai/DeepSeek-V3.1": {
+   "id": "deepseek-ai/DeepSeek-V3.1",
+   "name": "DeepSeek V3.1",
+   "description": "DeepSeek chat model for instruction following, coding, and analysis",
    "type": "chat",
-   "canonical_id": "moonshotai/kimi-k2-thinking",
-   "family": "kimi-thinking",
-   "release_date": "2025-11-06",
+   "family": "deepseek",
+   "canonical_id": "deepseek/deepseek-v3.1",
+   "release_date": "2025-08-21",
    "limit": {
-    "context": 262144,
-    "output": 262144
+    "context": 164000,
+    "output": 164000
    },
    "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    },
     "temperature": true,
-    "top_p": true,
     "top_k": true,
+    "top_p": true,
+    "structured_output": true,
     "system_updates": false,
-    "effort_updates": false
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
    },
-   "description": "Kimi reasoning model for long-horizon research, planning, and tool use",
-   "open_weights": true,
-   "knowledge": "2024-08",
-   "last_updated": "2025-11-06",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.19
+     },
+     "output": {
+      "price": 0.79
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text"
@@ -306,16 +310,6 @@
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.6
-     },
-     "output": {
-      "price": 2.6
-     }
-    }
-   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.meganova.ai/v1",
@@ -323,112 +317,51 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
      "capabilities": {
       "tools": {
        "updates": false
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "last_updated": "2025-08-21"
   },
-  "zai-org/GLM-5": {
-   "id": "zai-org/GLM-5",
-   "name": "GLM-5",
+  "deepseek-ai/DeepSeek-V3-0324": {
+   "id": "deepseek-ai/DeepSeek-V3-0324",
+   "name": "DeepSeek V3 0324",
+   "description": "DeepSeek chat model for instruction following, coding, and analysis",
    "type": "chat",
-   "canonical_id": "zhipuai/glm-5",
-   "family": "glm",
-   "release_date": "2026-02-12",
+   "family": "deepseek",
+   "canonical_id": "deepseek/deepseek-v3-0324",
+   "release_date": "2025-03-24",
    "limit": {
-    "context": 202752,
-    "output": 131072
+    "context": 163840,
+    "output": 163840
    },
    "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    },
     "temperature": true,
-    "top_p": true,
     "top_k": true,
+    "top_p": true,
     "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Flagship GLM model for hybrid reasoning, coding, and agentic engineering",
-   "open_weights": true,
-   "last_updated": "2026-02-12",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.8,
-      "cache": {
-       "read": 0.2
-      }
-     },
-     "output": {
-      "price": 2.56
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.meganova.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "zai-org/GLM-4.7": {
-   "id": "zai-org/GLM-4.7",
-   "name": "GLM-4.7",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-4.7",
-   "family": "glm",
-   "release_date": "2025-12-22",
-   "limit": {
-    "context": 202752,
-    "output": 131072
-   },
-   "capabilities": {
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
+     "supported": false
+    }
    },
-   "description": "Flagship GLM model for hybrid reasoning, coding, and agentic engineering",
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-12-22",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.275
+     },
+     "output": {
+      "price": 1.1
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text"
@@ -437,19 +370,6 @@
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.4,
-      "cache": {
-       "read": 0.08
-      }
-     },
-     "output": {
-      "price": 1.75
-     }
-    }
-   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.meganova.ai/v1",
@@ -457,245 +377,40 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
      "capabilities": {
       "tools": {
        "updates": false
       }
      }
     }
-   }
-  },
-  "zai-org/GLM-4.6": {
-   "id": "zai-org/GLM-4.6",
-   "name": "GLM-4.6",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-4.6",
-   "family": "glm",
-   "release_date": "2025-09-30",
-   "limit": {
-    "context": 202752,
-    "output": 131072
    },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Flagship GLM model for hybrid reasoning, coding, and agentic engineering",
    "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-09-30",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.45
-     },
-     "output": {
-      "price": 1.9
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.meganova.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "MiniMaxAI/MiniMax-M2.1": {
-   "id": "MiniMaxAI/MiniMax-M2.1",
-   "name": "MiniMax M2.1",
-   "type": "chat",
-   "canonical_id": "minimax/MiniMax-M2.1",
-   "family": "minimax",
-   "release_date": "2025-12-23",
-   "limit": {
-    "context": 196608,
-    "output": 131072
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "MiniMax model for chat, coding, office work, and agentic tasks",
-   "open_weights": true,
-   "last_updated": "2025-12-23",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.28
-     },
-     "output": {
-      "price": 1.2
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.meganova.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "MiniMaxAI/MiniMax-M2.5": {
-   "id": "MiniMaxAI/MiniMax-M2.5",
-   "name": "MiniMax M2.5",
-   "type": "chat",
-   "canonical_id": "minimax/MiniMax-M2.5",
-   "family": "minimax",
-   "release_date": "2026-02-12",
-   "limit": {
-    "context": 204800,
-    "output": 131072
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "MiniMax model for chat, coding, office work, and agentic tasks",
-   "open_weights": true,
-   "last_updated": "2026-02-12",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.3,
-      "cache": {
-       "read": 0.15
-      }
-     },
-     "output": {
-      "price": 1.2
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.meganova.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
+   "last_updated": "2025-03-24"
   },
   "deepseek-ai/DeepSeek-R1-0528": {
    "id": "deepseek-ai/DeepSeek-R1-0528",
    "name": "DeepSeek R1 0528",
+   "description": "DeepSeek reasoning model for multi-step analysis, math, coding, and tools",
    "type": "chat",
-   "canonical_id": "deepseek/deepseek-r1-0528",
    "family": "deepseek-thinking",
+   "canonical_id": "deepseek/deepseek-r1-0528",
    "release_date": "2025-05-28",
    "limit": {
     "context": 163840,
     "output": 64000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": false
     },
     "reasoning": {
      "supported": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "DeepSeek reasoning model for multi-step analysis, math, coding, and tools",
-   "open_weights": true,
-   "knowledge": "2024-07",
-   "last_updated": "2025-05-28",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -710,6 +425,14 @@
      }
     }
    },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.meganova.ai/v1",
@@ -721,105 +444,36 @@
       "reasoning_field": "reasoning_content"
      }
     }
-   }
-  },
-  "deepseek-ai/DeepSeek-V3.2-Exp": {
-   "id": "deepseek-ai/DeepSeek-V3.2-Exp",
-   "name": "DeepSeek V3.2 Exp",
-   "type": "chat",
-   "family": "deepseek",
-   "release_date": "2025-10-10",
-   "limit": {
-    "context": 164000,
-    "output": 164000
    },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "structured_output": true,
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "DeepSeek chat model for instruction following, coding, and analysis",
    "open_weights": true,
-   "last_updated": "2025-10-10",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.26,
-      "cache": {
-       "read": 0.13
-      }
-     },
-     "output": {
-      "price": 0.38
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.meganova.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
+   "knowledge": "2024-07",
+   "last_updated": "2025-05-28"
   },
   "deepseek-ai/DeepSeek-V3.2": {
    "id": "deepseek-ai/DeepSeek-V3.2",
    "name": "DeepSeek V3.2",
+   "description": "DeepSeek chat model for instruction following, coding, and analysis",
    "type": "chat",
-   "canonical_id": "deepseek/deepseek-v3.2",
    "family": "deepseek",
+   "canonical_id": "deepseek/deepseek-v3.2",
    "release_date": "2025-12-01",
    "limit": {
     "context": 164000,
     "output": 164000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": false
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "DeepSeek chat model for instruction following, coding, and analysis",
-   "open_weights": true,
-   "knowledge": "2024-07",
-   "last_updated": "2025-12-01",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -834,6 +488,14 @@
      }
     }
    },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.meganova.ai/v1",
@@ -847,53 +509,57 @@
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "knowledge": "2024-07",
+   "last_updated": "2025-12-01"
   },
-  "deepseek-ai/DeepSeek-V3.1": {
-   "id": "deepseek-ai/DeepSeek-V3.1",
-   "name": "DeepSeek V3.1",
+  "zai-org/GLM-5": {
+   "id": "zai-org/GLM-5",
+   "name": "GLM-5",
+   "description": "Flagship GLM model for hybrid reasoning, coding, and agentic engineering",
    "type": "chat",
-   "canonical_id": "deepseek/deepseek-v3.1",
-   "family": "deepseek",
-   "release_date": "2025-08-21",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5",
+   "release_date": "2026-02-12",
    "limit": {
-    "context": 164000,
-    "output": 164000
+    "context": 202752,
+    "output": 131072
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": false
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "DeepSeek chat model for instruction following, coding, and analysis",
-   "open_weights": true,
-   "last_updated": "2025-08-21",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
+     "supported": true,
+     "toggle": true
+    }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.19
+      "price": 0.8,
+      "cache": {
+       "read": 0.2
+      }
      },
      "output": {
-      "price": 0.79
+      "price": 2.56
      }
     }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
    },
    "api": {
     "chat-completions": {
@@ -906,54 +572,60 @@
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
      }
     }
-   }
+   },
+   "open_weights": true,
+   "last_updated": "2026-02-12"
   },
-  "deepseek-ai/DeepSeek-V3-0324": {
-   "id": "deepseek-ai/DeepSeek-V3-0324",
-   "name": "DeepSeek V3 0324",
+  "zai-org/GLM-4.7": {
+   "id": "zai-org/GLM-4.7",
+   "name": "GLM-4.7",
+   "description": "Flagship GLM model for hybrid reasoning, coding, and agentic engineering",
    "type": "chat",
-   "canonical_id": "deepseek/deepseek-v3-0324",
-   "family": "deepseek",
-   "release_date": "2025-03-24",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-4.7",
+   "release_date": "2025-12-22",
    "limit": {
-    "context": 163840,
-    "output": 163840
+    "context": 202752,
+    "output": 131072
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": false
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "DeepSeek chat model for instruction following, coding, and analysis",
-   "open_weights": true,
-   "last_updated": "2025-03-24",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
+     "supported": true
+    }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.275
+      "price": 0.4,
+      "cache": {
+       "read": 0.08
+      }
      },
      "output": {
-      "price": 1.1
+      "price": 1.75
      }
     }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
    },
    "api": {
     "chat-completions": {
@@ -966,38 +638,51 @@
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
      }
     }
-   }
+   },
+   "open_weights": true,
+   "knowledge": "2025-04",
+   "last_updated": "2025-12-22"
   },
-  "meta-llama/Llama-3.3-70B-Instruct": {
-   "id": "meta-llama/Llama-3.3-70B-Instruct",
-   "name": "Llama 3.3 70B Instruct",
+  "zai-org/GLM-4.6": {
+   "id": "zai-org/GLM-4.6",
+   "name": "GLM-4.6",
+   "description": "Flagship GLM model for hybrid reasoning, coding, and agentic engineering",
    "type": "chat",
-   "canonical_id": "meta/llama-3.3-70b-instruct",
-   "family": "llama",
-   "release_date": "2024-12-06",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-4.6",
+   "release_date": "2025-09-30",
    "limit": {
-    "context": 131072,
-    "output": 16384
+    "context": 202752,
+    "output": 131072
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": false
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
+     "supported": true
+    }
    },
-   "description": "Open Llama instruction model for multilingual chat, reasoning, and coding",
-   "open_weights": true,
-   "knowledge": "2023-12",
-   "last_updated": "2024-12-06",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.45
+     },
+     "output": {
+      "price": 1.9
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text"
@@ -1005,6 +690,53 @@
     "output": [
      "text"
     ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.meganova.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-04",
+   "last_updated": "2025-09-30"
+  },
+  "XiaomiMiMo/MiMo-V2-Flash": {
+   "id": "XiaomiMiMo/MiMo-V2-Flash",
+   "name": "MiMo V2 Flash",
+   "description": "MiMo flash model for fast multimodal assistance and agent workflows",
+   "type": "chat",
+   "family": "mimo",
+   "canonical_id": "xiaomi/mimo-v2-flash",
+   "status": "deprecated",
+   "release_date": "2025-12-16",
+   "limit": {
+    "context": 262144,
+    "output": 32000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
    },
    "cost": {
     "text": {
@@ -1016,49 +748,6 @@
      }
     }
    },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.meganova.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "Qwen/Qwen3-235B-A22B-Instruct-2507": {
-   "id": "Qwen/Qwen3-235B-A22B-Instruct-2507",
-   "name": "Qwen3 235B A22B Instruct 2507",
-   "type": "chat",
-   "canonical_id": "alibaba/qwen3-235b-a22b-instruct-2507",
-   "family": "qwen",
-   "release_date": "2025-07-21",
-   "limit": {
-    "context": 262000,
-    "output": 262000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Qwen instruction model for multilingual chat, reasoning, and tool use",
-   "open_weights": true,
-   "last_updated": "2025-07-21",
    "modalities": {
     "input": [
      "text"
@@ -1067,16 +756,6 @@
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.09
-     },
-     "output": {
-      "price": 0.1
-     }
-    }
-   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.meganova.ai/v1",
@@ -1090,56 +769,58 @@
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "knowledge": "2024-12-01",
+   "last_updated": "2026-02-04"
   },
-  "Qwen/Qwen2.5-VL-32B-Instruct": {
-   "id": "Qwen/Qwen2.5-VL-32B-Instruct",
-   "name": "Qwen2.5 VL 32B Instruct",
+  "mistralai/Mistral-Small-3.2-24B-Instruct-2506": {
+   "id": "mistralai/Mistral-Small-3.2-24B-Instruct-2506",
+   "name": "Mistral Small 3.2 24B Instruct",
+   "description": "Efficient Mistral model for fast chat, extraction, and production assistants",
    "type": "chat",
-   "family": "qwen",
-   "release_date": "2025-03-24",
+   "family": "mistral-small",
+   "canonical_id": "mistral/mistral-small-2506",
+   "release_date": "2025-06-20",
    "limit": {
-    "context": 16384,
-    "output": 16384
+    "context": 32768,
+    "output": 8192
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": false
-    },
-    "structured_output": true,
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
-   "open_weights": true,
-   "last_updated": "2025-03-24",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text",
-     "image/bmp",
-     "image/jpeg",
      "image/png",
-     "image/tiff",
+     "image/jpeg",
      "image/webp",
-     "image/heic"
+     "image/gif"
     ],
     "output": [
      "text"
     ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.2
-     },
-     "output": {
-      "price": 0.6
-     }
-    }
    },
    "api": {
     "chat-completions": {
@@ -1154,36 +835,238 @@
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "knowledge": "2024-10",
+   "last_updated": "2025-06-20"
+  },
+  "mistralai/Mistral-Nemo-Instruct-2407": {
+   "id": "mistralai/Mistral-Nemo-Instruct-2407",
+   "name": "Mistral Nemo Instruct 2407",
+   "description": "Mistral model for multilingual chat, reasoning, and tool-assisted workflows",
+   "type": "chat",
+   "family": "mistral-nemo",
+   "canonical_id": "mistral/mistral-nemo",
+   "release_date": "2024-07-18",
+   "limit": {
+    "context": 131072,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.02
+     },
+     "output": {
+      "price": 0.04
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.meganova.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-07",
+   "last_updated": "2024-07-18"
+  },
+  "MiniMaxAI/MiniMax-M2.5": {
+   "id": "MiniMaxAI/MiniMax-M2.5",
+   "name": "MiniMax M2.5",
+   "description": "MiniMax model for chat, coding, office work, and agentic tasks",
+   "type": "chat",
+   "family": "minimax",
+   "canonical_id": "minimax/MiniMax-M2.5",
+   "release_date": "2026-02-12",
+   "limit": {
+    "context": 204800,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.3,
+      "cache": {
+       "read": 0.15
+      }
+     },
+     "output": {
+      "price": 1.2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.meganova.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-02-12"
+  },
+  "MiniMaxAI/MiniMax-M2.1": {
+   "id": "MiniMaxAI/MiniMax-M2.1",
+   "name": "MiniMax M2.1",
+   "description": "MiniMax model for chat, coding, office work, and agentic tasks",
+   "type": "chat",
+   "family": "minimax",
+   "canonical_id": "minimax/MiniMax-M2.1",
+   "release_date": "2025-12-23",
+   "limit": {
+    "context": 196608,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.28
+     },
+     "output": {
+      "price": 1.2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.meganova.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-12-23"
   },
   "Qwen/Qwen3.5-Plus": {
    "id": "Qwen/Qwen3.5-Plus",
    "name": "Qwen3.5 Plus",
+   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
    "type": "chat",
-   "canonical_id": "alibaba/qwen3.5-plus",
    "family": "qwen",
+   "canonical_id": "alibaba/qwen3.5-plus",
    "release_date": "2026-02-16",
    "limit": {
     "context": 1000000,
     "output": 65536
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
-   "open_weights": false,
-   "knowledge": "2025-04",
-   "last_updated": "2026-02-16",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.4
+     },
+     "output": {
+      "price": 2.4,
+      "reasoning": 2.4
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text",
@@ -1204,16 +1087,70 @@
      "text"
     ]
    },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.meganova.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-04",
+   "last_updated": "2026-02-16"
+  },
+  "Qwen/Qwen2.5-VL-32B-Instruct": {
+   "id": "Qwen/Qwen2.5-VL-32B-Instruct",
+   "name": "Qwen2.5 VL 32B Instruct",
+   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
+   "type": "chat",
+   "family": "qwen",
+   "release_date": "2025-03-24",
+   "limit": {
+    "context": 16384,
+    "output": 16384
+   },
+   "capabilities": {
+    "temperature": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
    "cost": {
     "text": {
      "input": {
-      "price": 0.4
+      "price": 0.2
      },
      "output": {
-      "price": 2.4,
-      "reasoning": 2.4
+      "price": 0.6
      }
     }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic"
+    ],
+    "output": [
+     "text"
+    ]
    },
    "api": {
     "chat-completions": {
@@ -1228,7 +1165,70 @@
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "last_updated": "2025-03-24"
+  },
+  "Qwen/Qwen3-235B-A22B-Instruct-2507": {
+   "id": "Qwen/Qwen3-235B-A22B-Instruct-2507",
+   "name": "Qwen3 235B A22B Instruct 2507",
+   "description": "Qwen instruction model for multilingual chat, reasoning, and tool use",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3-235b-a22b-instruct-2507",
+   "release_date": "2025-07-21",
+   "limit": {
+    "context": 262000,
+    "output": 262000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.09
+     },
+     "output": {
+      "price": 0.1
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.meganova.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-07-21"
   }
  }
 }

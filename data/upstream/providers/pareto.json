@@ -6,18 +6,231 @@
   "PARETO_API_KEY"
  ],
  "models": {
+  "deepseek/deepseek-v4.1-flash": {
+   "id": "deepseek/deepseek-v4.1-flash",
+   "name": "DeepSeek V4.1 Flash",
+   "description": "DeepSeek V4.1 Flash model for reasoning and agentic coding",
+   "type": "chat",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4.1-flash",
+   "release_date": "2026-09-10",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.105,
+      "cache": {
+       "read": 0.0021
+      }
+     },
+     "output": {
+      "price": 0.42
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "utc_days": {
+        "in": [
+         "mon",
+         "tue",
+         "wed",
+         "thu",
+         "fri"
+        ]
+       },
+       "any": [
+        {
+         "all": [
+          {
+           "utc_hours": {
+            "gte": "01:00"
+           }
+          },
+          {
+           "utc_hours": {
+            "lt": "04:00"
+           }
+          }
+         ]
+        },
+        {
+         "all": [
+          {
+           "utc_hours": {
+            "gte": "06:00"
+           }
+          },
+          {
+           "utc_hours": {
+            "lt": "10:00"
+           }
+          }
+         ]
+        }
+       ],
+       "not": {
+        "holiday": {
+         "equals": "CN"
+        }
+       }
+      },
+      "factor": 2
+     }
+    ]
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.paretoinference.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-09-10"
+  },
+  "xiaomi/mimo-v2.6-flash": {
+   "id": "xiaomi/mimo-v2.6-flash",
+   "name": "MiMo-V2.6-Flash",
+   "description": "MiMo Flash model for multimodal coding agents and long-context automation",
+   "type": "chat",
+   "family": "mimo",
+   "canonical_id": "xiaomi/mimo-v2.6-flash",
+   "release_date": "2026-09-22",
+   "limit": {
+    "context": 1048576,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.126,
+      "cache": {
+       "read": 0.00252
+      }
+     },
+     "output": {
+      "price": 0.252
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.paretoinference.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-09-22"
+  },
   "z-ai/glm-5.3-flash": {
    "id": "z-ai/glm-5.3-flash",
    "name": "GLM-5.3-Flash",
+   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
    "type": "chat",
-   "canonical_id": "zhipuai/glm-5.3-flash",
    "family": "glm-flash",
+   "canonical_id": "zhipuai/glm-5.3-flash",
    "release_date": "2026-08-26",
    "limit": {
     "context": 1000000,
     "output": 131072
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -28,29 +241,7 @@
       "high",
       "max"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
-   "open_weights": true,
-   "last_updated": "2026-08-26",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "video/mp4",
-     "video/x-matroska",
-     "video/quicktime"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -65,6 +256,19 @@
      }
     }
    },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "video/mp4",
+     "video/x-matroska",
+     "video/quicktime"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.paretoinference.com/v1",
@@ -72,16 +276,18 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
      "capabilities": {
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
      }
     }
-   }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-26"
   }
  }
 }

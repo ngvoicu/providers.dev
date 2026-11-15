@@ -9,9 +9,10 @@
   "trinity-large-thinking": {
    "id": "trinity-large-thinking",
    "name": "Trinity Large Thinking",
+   "description": "Reasoning-optimized 398B MoE agent model with extended thinking for long-horizon and multi-turn tool use",
    "type": "chat",
-   "canonical_id": "arcee-ai/trinity-large-thinking",
    "family": "trinity",
+   "canonical_id": "arcee-ai/trinity-large-thinking",
    "status": "beta",
    "release_date": "2026-04-01",
    "limit": {
@@ -19,28 +20,17 @@
     "output": 80000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Reasoning-optimized 398B MoE agent model with extended thinking for long-horizon and multi-turn tool use",
-   "open_weights": true,
-   "last_updated": "2026-05-28",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -55,6 +45,14 @@
      }
     }
    },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.arcee.ai/api/v1",
@@ -62,31 +60,40 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
      "capabilities": {
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
      }
     }
-   }
+   },
+   "open_weights": true,
+   "last_updated": "2026-05-28"
   },
   "moonshotai/kimi-k3": {
    "id": "moonshotai/kimi-k3",
    "name": "Kimi K3",
+   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
    "type": "chat",
-   "canonical_id": "moonshotai/kimi-k3",
    "family": "kimi-k3",
+   "canonical_id": "moonshotai/kimi-k3",
    "status": "beta",
    "release_date": "2026-07-16",
    "limit": {
     "context": 1048576,
-    "output": 131072
+    "output": 1048576
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -97,24 +104,7 @@
       "high",
       "max"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
-   "open_weights": true,
-   "last_updated": "2026-07-16",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -129,137 +119,6 @@
      }
     }
    },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.arcee.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "zai-org/glm-5.3-flash": {
-   "id": "zai-org/glm-5.3-flash",
-   "name": "GLM-5.3-Flash",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-5.3-flash",
-   "family": "glm-flash",
-   "status": "beta",
-   "release_date": "2026-08-26",
-   "limit": {
-    "context": 1000000,
-    "output": 131072
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
-   "open_weights": true,
-   "last_updated": "2026-08-26",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "video/mp4",
-     "video/x-matroska",
-     "video/quicktime",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.15,
-      "cache": {
-       "read": 0.03
-      }
-     },
-     "output": {
-      "price": 0.5
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.arcee.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "zai-org/glm-5.2": {
-   "id": "zai-org/glm-5.2",
-   "name": "GLM-5.2",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-5.2",
-   "family": "glm",
-   "status": "beta",
-   "release_date": "2026-06-13",
-   "limit": {
-    "context": 262144,
-    "output": 131072
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
-   "open_weights": true,
-   "last_updated": "2026-06-13",
    "modalities": {
     "input": [
      "text"
@@ -268,19 +127,6 @@
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.4,
-      "cache": {
-       "read": 0.26
-      }
-     },
-     "output": {
-      "price": 4.4
-     }
-    }
-   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.arcee.ai/api/v1",
@@ -288,239 +134,27 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
      "capabilities": {
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
      }
     }
-   }
-  },
-  "zai-org/glm-5.3": {
-   "id": "zai-org/glm-5.3",
-   "name": "GLM-5.3",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-5.3",
-   "family": "glm",
-   "status": "beta",
-   "release_date": "2026-08-14",
-   "limit": {
-    "context": 1000000,
-    "output": 131072
    },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
    "open_weights": true,
-   "last_updated": "2026-08-14",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.4,
-      "cache": {
-       "read": 0.26
-      }
-     },
-     "output": {
-      "price": 4.4
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.arcee.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "thinkingmachines/inkling-small": {
-   "id": "thinkingmachines/inkling-small",
-   "name": "Inkling Small",
-   "type": "chat",
-   "canonical_id": "thinkingmachines/inkling-small",
-   "family": "ling",
-   "status": "deprecated",
-   "release_date": "2026-07-30",
-   "limit": {
-    "context": 262144,
-    "output": 262144
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Multimodal MoE reasoning model (276B total, 12B active) for text, image, and audio",
-   "open_weights": true,
-   "last_updated": "2026-07-30",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.5,
-      "cache": {
-       "read": 0.1
-      }
-     },
-     "output": {
-      "price": 1.2
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.arcee.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "deepseek/deepseek-v4-pro": {
-   "id": "deepseek/deepseek-v4-pro",
-   "name": "DeepSeek V4 Pro",
-   "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4-pro",
-   "family": "deepseek-thinking",
-   "status": "deprecated",
-   "release_date": "2026-04-24",
-   "limit": {
-    "context": 512000,
-    "output": 384000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open MoE flagship with million-token context for coding and long agent runs",
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-04-24",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.74,
-      "cache": {
-       "read": 0.2
-      }
-     },
-     "output": {
-      "price": 3.48
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.arcee.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
+   "last_updated": "2026-07-16"
   },
   "deepseek/deepseek-v4.1-flash-1017": {
    "id": "deepseek/deepseek-v4.1-flash-1017",
    "name": "DeepSeek V4.1 Flash 1017",
+   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
    "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
    "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
    "status": "beta",
    "release_date": "2026-10-17",
    "limit": {
@@ -528,6 +162,12 @@
     "output": 384000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -537,29 +177,7 @@
       "high",
       "max"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-10-17",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -574,59 +192,6 @@
      }
     }
    },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.arcee.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "deepseek/deepseek-v4.1-flash": {
-   "id": "deepseek/deepseek-v4.1-flash",
-   "name": "DeepSeek V4.1 Flash",
-   "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4.1-flash",
-   "family": "deepseek-flash",
-   "status": "beta",
-   "release_date": "2026-09-10",
-   "limit": {
-    "context": 1000000,
-    "output": 384000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "DeepSeek V4.1 Flash model for reasoning and agentic coding",
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-09-10",
    "modalities": {
     "input": [
      "text",
@@ -639,19 +204,6 @@
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.22,
-      "cache": {
-       "read": 0.007
-      }
-     },
-     "output": {
-      "price": 0.66
-     }
-    }
-   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.arcee.ai/api/v1",
@@ -659,24 +211,28 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
      "capabilities": {
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
      }
     }
-   }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-10-17"
   },
   "deepseek/deepseek-v4-pro-0813": {
    "id": "deepseek/deepseek-v4-pro-0813",
    "name": "DeepSeek V4 Pro 0813",
+   "description": "DeepSeek V4 Pro snapshot with million-token context and support for thinking and non-thinking modes",
    "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4-pro-0813",
    "family": "deepseek-thinking",
+   "canonical_id": "deepseek/deepseek-v4-pro-0813",
    "status": "beta",
    "release_date": "2026-08-13",
    "limit": {
@@ -684,6 +240,12 @@
     "output": 384000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -693,24 +255,7 @@
       "high",
       "max"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "DeepSeek V4 Pro snapshot with million-token context and support for thinking and non-thinking modes",
-   "open_weights": true,
-   "last_updated": "2026-08-22",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -725,6 +270,14 @@
      }
     }
    },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.arcee.ai/api/v1",
@@ -732,31 +285,40 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
      "capabilities": {
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
      }
     }
-   }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-22"
   },
-  "deepseek/deepseek-v4-flash-latest": {
-   "id": "deepseek/deepseek-v4-flash-latest",
-   "name": "DeepSeek V4 Flash Latest",
+  "deepseek/deepseek-v4-pro": {
+   "id": "deepseek/deepseek-v4-pro",
+   "name": "DeepSeek V4 Pro",
+   "description": "Open MoE flagship with million-token context for coding and long agent runs",
    "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4-flash-0731",
-   "family": "deepseek-flash",
-   "status": "beta",
-   "release_date": "2026-07-31",
+   "family": "deepseek-thinking",
+   "canonical_id": "deepseek/deepseek-v4-pro",
+   "status": "deprecated",
+   "release_date": "2026-04-24",
    "limit": {
-    "context": 1048576,
+    "context": 512000,
     "output": 384000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -766,18 +328,21 @@
       "high",
       "max"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Official DeepSeek V4 Flash release with enhanced agentic capabilities and integrated DSpark speculative decoding",
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-07-31",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.74,
+      "cache": {
+       "read": 0.2
+      }
+     },
+     "output": {
+      "price": 3.48
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text"
@@ -785,6 +350,59 @@
     "output": [
      "text"
     ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.arcee.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-04-24"
+  },
+  "deepseek/deepseek-v4-flash-latest": {
+   "id": "deepseek/deepseek-v4-flash-latest",
+   "name": "DeepSeek V4 Flash Latest",
+   "description": "Official DeepSeek V4 Flash release with enhanced agentic capabilities and integrated DSpark speculative decoding",
+   "type": "chat",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4-flash-0731",
+   "status": "beta",
+   "release_date": "2026-07-31",
+   "limit": {
+    "context": 1048576,
+    "output": 384000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "high",
+      "max"
+     ]
+    }
    },
    "cost": {
     "text": {
@@ -799,6 +417,14 @@
      }
     }
    },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.arcee.ai/api/v1",
@@ -806,17 +432,391 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
      "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-07-31"
+  },
+  "deepseek/deepseek-v4.1-flash": {
+   "id": "deepseek/deepseek-v4.1-flash",
+   "name": "DeepSeek V4.1 Flash",
+   "description": "DeepSeek V4.1 Flash model for reasoning and agentic coding",
+   "type": "chat",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4.1-flash",
+   "status": "beta",
+   "release_date": "2026-09-10",
+   "limit": {
+    "context": 1000000,
+    "output": 384000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.22,
+      "cache": {
+       "read": 0.007
+      }
+     },
+     "output": {
+      "price": 0.66
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.arcee.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
      "capabilities": {
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
      }
     }
-   }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-09-10"
+  },
+  "zai-org/glm-5.2": {
+   "id": "zai-org/glm-5.2",
+   "name": "GLM-5.2",
+   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.2",
+   "status": "beta",
+   "release_date": "2026-06-13",
+   "limit": {
+    "context": 262144,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.4,
+      "cache": {
+       "read": 0.26
+      }
+     },
+     "output": {
+      "price": 4.4
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.arcee.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-06-13"
+  },
+  "zai-org/glm-5.3": {
+   "id": "zai-org/glm-5.3",
+   "name": "GLM-5.3",
+   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.3",
+   "status": "beta",
+   "release_date": "2026-08-14",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.4,
+      "cache": {
+       "read": 0.26
+      }
+     },
+     "output": {
+      "price": 4.4
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.arcee.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-14"
+  },
+  "zai-org/glm-5.3-flash": {
+   "id": "zai-org/glm-5.3-flash",
+   "name": "GLM-5.3-Flash",
+   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
+   "type": "chat",
+   "family": "glm-flash",
+   "canonical_id": "zhipuai/glm-5.3-flash",
+   "status": "beta",
+   "release_date": "2026-08-26",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.15,
+      "cache": {
+       "read": 0.03
+      }
+     },
+     "output": {
+      "price": 0.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "video/mp4",
+     "video/x-matroska",
+     "video/quicktime",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.arcee.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-26"
+  },
+  "thinkingmachines/inkling-small": {
+   "id": "thinkingmachines/inkling-small",
+   "name": "Inkling Small",
+   "description": "Multimodal MoE reasoning model (276B total, 12B active) for text, image, and audio",
+   "type": "chat",
+   "family": "ling",
+   "canonical_id": "thinkingmachines/inkling-small",
+   "status": "deprecated",
+   "release_date": "2026-07-30",
+   "limit": {
+    "context": 262144,
+    "output": 262144
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.5,
+      "cache": {
+       "read": 0.1
+      }
+     },
+     "output": {
+      "price": 1.2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.arcee.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-07-30"
   }
  }
 }

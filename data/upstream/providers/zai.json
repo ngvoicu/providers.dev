@@ -6,177 +6,65 @@
   "ZHIPU_API_KEY"
  ],
  "models": {
-  "cogvideox-3": {
-   "id": "cogvideox-3",
-   "name": "CogVideoX-3",
-   "type": "video",
-   "canonical_id": "zhipuai/cogvideox-3",
-   "release_date": "2025-07-15",
+  "glm-image": {
+   "id": "glm-image",
+   "name": "GLM-Image",
+   "description": "GLM-Image is an image generation model adopts a hybrid autoregressive + diffusion decoder architecture. In general image generation quality, GLM‑Image aligns with mainstream latent diffusion approaches, but it shows significant advantages in text-rendering and knowledge‑intensive generation scenarios. It performs especially well in tasks requiring precise semantic understanding and complex information expression, while maintaining strong capabilities in high‑fidelity and fine‑grained detail generation. In addition to text‑to‑image generation, GLM‑Image also supports a rich set of image‑to‑image tasks including image editing, style transfer, identity‑preserving generation, and multi‑subject consistency.",
+   "type": "image",
+   "canonical_id": "zhipuai/glm-image",
+   "release_date": "2026-01-14",
    "limit": {
-    "context": 512,
+    "context": 10240,
     "output": 0
    },
    "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
     "temperature": false,
-    "top_p": false,
     "top_k": false,
+    "top_p": false,
     "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Video generation model for text-to-video, image-to-video, and first/last-frame clips with optional sound effects",
-   "open_weights": false,
-   "last_updated": "2025-07-15",
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg"
-    ],
-    "output": [
-     "video/mp4"
-    ]
-   },
-   "api": {
-    "videos": {
-     "base_url": "https://api.z.ai/api/paas/v4",
-     "sdk": {}
-    }
-   }
-  },
-  "glm-5.3-flash": {
-   "id": "glm-5.3-flash",
-   "name": "GLM-5.3-Flash",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-5.3-flash",
-   "family": "glm-flash",
-   "release_date": "2026-08-26",
-   "limit": {
-    "context": 1000000,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
+    "effort_updates": false,
     "tools": {
-     "supported": true
+     "supported": false
     },
     "reasoning": {
-     "supported": true,
-     "default": {
-      "type": "effort",
-      "value": "max"
-     },
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
-   "open_weights": true,
-   "last_updated": "2026-08-26",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "video/mp4",
-     "video/x-matroska",
-     "video/quicktime",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
+     "supported": false
+    }
    },
    "cost": {
-    "text": {
-     "input": {
-      "price": 0.15,
-      "cache": {
-       "read": 0.03,
-       "write": 0
-      }
-     },
+    "image": {
      "output": {
-      "price": 0.5
+      "unit": "image",
+      "price": 0.015
      }
     }
    },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "image"
+    ]
+   },
    "api": {
-    "chat-completions": {
+    "images": {
      "base_url": "https://api.z.ai/api/paas/v4",
      "sdk": {
       "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/zai/chat"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "system_updates": true,
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.z.ai/api/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://api.z.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
+      "opencodeai": "@opencode/ai/providers/zai/images"
      }
     }
-   }
+   },
+   "open_weights": true,
+   "last_updated": "2026-01-14"
   },
   "glm-4.5": {
    "id": "glm-4.5",
    "name": "GLM-4.5",
+   "description": "Hybrid-reasoning GLM release that made the 4.5 line broadly useful",
    "type": "chat",
-   "canonical_id": "zhipuai/glm-4.5",
    "family": "glm",
+   "canonical_id": "zhipuai/glm-4.5",
    "release_date": "2025-07-28",
    "limit": {
     "context": 131072,
@@ -186,34 +74,22 @@
     "cache": {
      "implicit": true
     },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": true,
+     "toggle": true,
      "default": {
       "type": "toggle",
       "value": true
-     },
-     "toggle": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Hybrid-reasoning GLM release that made the 4.5 line broadly useful",
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-07-28",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
+     }
+    }
    },
    "cost": {
     "text": {
@@ -229,16 +105,20 @@
      }
     }
    },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.z.ai/api/paas/v4",
      "sdk": {
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/zai/chat"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
      },
      "capabilities": {
       "tools": {
@@ -247,6 +127,10 @@
        ],
        "updates": false
       }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
      }
     },
     "messages": {
@@ -280,14 +164,18 @@
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "knowledge": "2025-04",
+   "last_updated": "2025-07-28"
   },
   "glm-5.2": {
    "id": "glm-5.2",
    "name": "GLM-5.2",
+   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
    "type": "chat",
-   "canonical_id": "zhipuai/glm-5.2",
    "family": "glm",
+   "canonical_id": "zhipuai/glm-5.2",
    "release_date": "2026-06-13",
    "limit": {
     "context": 1000000,
@@ -297,1164 +185,27 @@
     "cache": {
      "implicit": true
     },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": true,
-     "default": {
-      "type": "effort",
-      "value": "max"
-     },
      "toggle": true,
      "effort": [
       "high",
       "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
-   "open_weights": true,
-   "last_updated": "2026-06-13",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.4,
-      "cache": {
-       "read": 0.26,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 4.4
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.z.ai/api/paas/v4",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/zai/chat"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.z.ai/api/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://api.z.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "glm-4.5-flash": {
-   "id": "glm-4.5-flash",
-   "name": "GLM-4.5-Flash",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-4.5-flash",
-   "family": "glm-flash",
-   "release_date": "2025-07-28",
-   "limit": {
-    "context": 131072,
-    "output": 98304
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "default": {
-      "type": "toggle",
-      "value": true
-     },
-     "toggle": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Efficient GLM model for fast reasoning, coding, and agent workflows",
-   "open_weights": false,
-   "knowledge": "2025-04",
-   "last_updated": "2025-07-28",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.z.ai/api/paas/v4",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/zai/chat"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.z.ai/api/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://api.z.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "glm-4.5-air": {
-   "id": "glm-4.5-air",
-   "name": "GLM-4.5-Air",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-4.5-air",
-   "family": "glm-air",
-   "release_date": "2025-07-28",
-   "limit": {
-    "context": 131072,
-    "output": 98304
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "default": {
-      "type": "toggle",
-      "value": true
-     },
-     "toggle": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Lighter GLM-4.5 variant for fast coding assistance and cheaper agents",
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-07-28",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.2,
-      "cache": {
-       "read": 0.03,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 1.1
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.z.ai/api/paas/v4",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/zai/chat"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.z.ai/api/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://api.z.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "glm-4.6v": {
-   "id": "glm-4.6v",
-   "name": "GLM-4.6V",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-4.6v",
-   "family": "glm",
-   "release_date": "2025-12-08",
-   "limit": {
-    "context": 128000,
-    "output": 32768
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "default": {
-      "type": "toggle",
-      "value": true
-     },
-     "toggle": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "GLM vision model for visual reasoning, documents, and multimodal agents",
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-12-08",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "video/mp4",
-     "video/x-matroska",
-     "video/quicktime"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.3,
-      "cache": {
-       "read": 0.05,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0.9
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.z.ai/api/paas/v4",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/zai/chat"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "system_updates": true,
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.z.ai/api/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://api.z.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "glm-4.5-x": {
-   "id": "glm-4.5-x",
-   "name": "GLM-4.5-X",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-4.5",
-   "family": "glm",
-   "release_date": "2025-07-28",
-   "limit": {
-    "context": 131072,
-    "output": 98304
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "default": {
-      "type": "toggle",
-      "value": true
-     },
-     "toggle": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "High-speed GLM-4.5 serving option for latency-sensitive reasoning, coding, and agent workflows",
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-07-28",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2.2,
-      "cache": {
-       "read": 0.45,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 8.9
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.z.ai/api/paas/v4",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/zai/chat"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.z.ai/api/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://api.z.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "glm-4.7": {
-   "id": "glm-4.7",
-   "name": "GLM-4.7",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-4.7",
-   "family": "glm",
-   "release_date": "2025-12-22",
-   "limit": {
-    "context": 204800,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "default": {
-      "type": "toggle",
-      "value": true
-     },
-     "toggle": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Mature GLM model for dependable coding, reasoning, and structured agent tasks",
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-12-22",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.6,
-      "cache": {
-       "read": 0.11,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 2.2
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.z.ai/api/paas/v4",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/zai/chat"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.z.ai/api/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://api.z.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "glm-5": {
-   "id": "glm-5",
-   "name": "GLM-5",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-5",
-   "family": "glm",
-   "release_date": "2026-02-12",
-   "limit": {
-    "context": 204800,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "default": {
-      "type": "toggle",
-      "value": true
-     },
-     "toggle": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "General GLM flagship for coding, analysis, and tool-heavy engineering workflows",
-   "open_weights": true,
-   "last_updated": "2026-02-12",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1,
-      "cache": {
-       "read": 0.2,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 3.2
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.z.ai/api/paas/v4",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/zai/chat"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "system_updates": true,
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.z.ai/api/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://api.z.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "glm-4.7-flash": {
-   "id": "glm-4.7-flash",
-   "name": "GLM-4.7-Flash",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-4.7-flash",
-   "family": "glm-flash",
-   "release_date": "2026-01-19",
-   "limit": {
-    "context": 200000,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "default": {
-      "type": "toggle",
-      "value": true
-     },
-     "toggle": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Budget GLM lane for fast coding help, routing, and everyday automation",
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2026-01-19",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.z.ai/api/paas/v4",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/zai/chat"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.z.ai/api/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://api.z.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "glm-5.1": {
-   "id": "glm-5.1",
-   "name": "GLM-5.1",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-5.1",
-   "family": "glm",
-   "release_date": "2026-04-07",
-   "limit": {
-    "context": 200000,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "default": {
-      "type": "toggle",
-      "value": true
-     },
-     "toggle": true
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Strong GLM coding model for agentic engineering, terminals, and repository generation",
-   "open_weights": true,
-   "last_updated": "2026-04-07",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.4,
-      "cache": {
-       "read": 0.26,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 4.4
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.z.ai/api/paas/v4",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/zai/chat"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.z.ai/api/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://api.z.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "glm-5v-turbo": {
-   "id": "glm-5v-turbo",
-   "name": "GLM-5V-Turbo",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-5v-turbo",
-   "family": "glm",
-   "release_date": "2026-04-01",
-   "limit": {
-    "context": 200000,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "default": {
-      "type": "toggle",
-      "value": true
-     },
-     "toggle": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Fast GLM vision model for screenshots, documents, and multimodal agent tasks",
-   "open_weights": false,
-   "last_updated": "2026-04-01",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "video/mp4",
-     "video/quicktime",
-     "video/x-matroska",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.2,
-      "cache": {
-       "read": 0.24,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 4
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.z.ai/api/paas/v4",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/zai/chat"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "system_updates": true,
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.z.ai/api/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://api.z.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "glm-5.3": {
-   "id": "glm-5.3",
-   "name": "GLM-5.3",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-5.3",
-   "family": "glm",
-   "release_date": "2026-08-14",
-   "limit": {
-    "context": 1000000,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
+     ],
      "default": {
       "type": "effort",
       "value": "max"
-     },
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
-   "open_weights": true,
-   "last_updated": "2026-08-14",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
+     }
+    }
    },
    "cost": {
     "text": {
@@ -1470,218 +221,6 @@
      }
     }
    },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.z.ai/api/paas/v4",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/zai/chat"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "system_updates": true,
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.z.ai/api/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://api.z.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "glm-5.3-flashx": {
-   "id": "glm-5.3-flashx",
-   "name": "GLM-5.3-FlashX",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-5.3-flash",
-   "family": "glm-flash",
-   "release_date": "2026-09-18",
-   "limit": {
-    "context": 1000000,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "default": {
-      "type": "effort",
-      "value": "max"
-     },
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "High-speed GLM-5.3-Flash serving option for coding and agent workflows",
-   "open_weights": true,
-   "last_updated": "2026-09-18",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "video/mp4",
-     "video/x-matroska",
-     "video/quicktime",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.37,
-      "cache": {
-       "read": 0.075,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 1.25
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.z.ai/api/paas/v4",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/zai/chat"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "system_updates": true,
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.z.ai/api/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://api.z.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "glm-4.6": {
-   "id": "glm-4.6",
-   "name": "GLM-4.6",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-4.6",
-   "family": "glm",
-   "release_date": "2025-09-30",
-   "limit": {
-    "context": 204800,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "default": {
-      "type": "toggle",
-      "value": true
-     },
-     "toggle": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Late GLM-4 workhorse for coding agents, reasoning, and structured tasks",
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-09-30",
    "modalities": {
     "input": [
      "text"
@@ -1690,30 +229,12 @@
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.6,
-      "cache": {
-       "read": 0.11,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 2.2
-     }
-    }
-   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.z.ai/api/paas/v4",
      "sdk": {
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/zai/chat"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
      },
      "capabilities": {
       "tools": {
@@ -1722,6 +243,10 @@
        ],
        "updates": false
       }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
      }
     },
     "messages": {
@@ -1755,35 +280,35 @@
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "last_updated": "2026-06-13"
   },
   "glm-asr-2512": {
    "id": "glm-asr-2512",
    "name": "GLM-ASR-2512",
+   "description": "Speech recognition model for multilingual and dialect transcription with custom hotwords",
    "type": "transcription",
-   "canonical_id": "zhipuai/glm-asr-2512",
    "family": "glm",
+   "canonical_id": "zhipuai/glm-asr-2512",
    "release_date": "2025-12-10",
    "limit": {
     "context": 0,
     "output": 0
    },
    "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": false
     },
     "reasoning": {
      "supported": false
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Speech recognition model for multilingual and dialect transcription with custom hotwords",
-   "open_weights": false,
-   "last_updated": "2025-12-10",
    "modalities": {
     "input": [
      "audio/wav",
@@ -1801,632 +326,17 @@
       "opencodeai": "@opencode/ai/protocols/openai-transcription"
      }
     }
-   }
-  },
-  "glm-4.7-flashx": {
-   "id": "glm-4.7-flashx",
-   "name": "GLM-4.7-FlashX",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-4.7-flashx",
-   "family": "glm-flash",
-   "release_date": "2026-01-19",
-   "limit": {
-    "context": 200000,
-    "output": 131072
    },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "default": {
-      "type": "toggle",
-      "value": true
-     },
-     "toggle": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Efficient GLM model for fast reasoning, coding, and agent workflows",
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2026-01-19",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.07,
-      "cache": {
-       "read": 0.01,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0.4
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.z.ai/api/paas/v4",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/zai/chat"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.z.ai/api/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://api.z.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "glm-4.6v-flash": {
-   "id": "glm-4.6v-flash",
-   "name": "GLM-4.6V-Flash",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-4.6v-flash",
-   "family": "glm-flash",
-   "release_date": "2025-12-08",
-   "limit": {
-    "context": 128000,
-    "output": 32768
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "default": {
-      "type": "toggle",
-      "value": true
-     },
-     "toggle": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Lightweight GLM vision model for visual reasoning, documents, and multimodal agents",
-   "open_weights": true,
-   "last_updated": "2025-12-08",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "video/mp4",
-     "video/x-matroska",
-     "video/quicktime"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.z.ai/api/paas/v4",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/zai/chat"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "system_updates": true,
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.z.ai/api/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://api.z.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "glm-4.5v": {
-   "id": "glm-4.5v",
-   "name": "GLM-4.5V",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-4.5v",
-   "family": "glm",
-   "release_date": "2025-08-11",
-   "limit": {
-    "context": 64000,
-    "output": 16384
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "default": {
-      "type": "toggle",
-      "value": true
-     },
-     "toggle": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "GLM vision model for visual reasoning, documents, and multimodal agents",
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-08-11",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "video/mp4",
-     "video/x-matroska",
-     "video/quicktime"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.6,
-      "cache": {
-       "read": 0.11,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 1.8
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.z.ai/api/paas/v4",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/zai/chat"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "system_updates": true,
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.z.ai/api/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://api.z.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "glm-4.5-airx": {
-   "id": "glm-4.5-airx",
-   "name": "GLM-4.5-AirX",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-4.5-air",
-   "family": "glm-air",
-   "release_date": "2025-07-28",
-   "limit": {
-    "context": 131072,
-    "output": 98304
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "default": {
-      "type": "toggle",
-      "value": true
-     },
-     "toggle": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "High-speed GLM-4.5-Air serving option for low-latency coding assistance and agents",
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-07-28",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.1,
-      "cache": {
-       "read": 0.22,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 4.5
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.z.ai/api/paas/v4",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/zai/chat"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.z.ai/api/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://api.z.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "glm-5-turbo": {
-   "id": "glm-5-turbo",
-   "name": "GLM-5-Turbo",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-5-turbo",
-   "family": "glm",
-   "release_date": "2026-03-16",
-   "limit": {
-    "context": 200000,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "default": {
-      "type": "toggle",
-      "value": true
-     },
-     "toggle": true
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Faster GLM-5 lane for coding agents that need lower latency",
    "open_weights": false,
-   "last_updated": "2026-03-16",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.2,
-      "cache": {
-       "read": 0.24,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 4
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.z.ai/api/paas/v4",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/zai/chat"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.z.ai/api/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://api.z.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "glm-image": {
-   "id": "glm-image",
-   "name": "GLM-Image",
-   "type": "image",
-   "canonical_id": "zhipuai/glm-image",
-   "release_date": "2026-01-14",
-   "limit": {
-    "context": 10240,
-    "output": 0
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "GLM-Image is an image generation model adopts a hybrid autoregressive + diffusion decoder architecture. In general image generation quality, GLM‑Image aligns with mainstream latent diffusion approaches, but it shows significant advantages in text-rendering and knowledge‑intensive generation scenarios. It performs especially well in tasks requiring precise semantic understanding and complex information expression, while maintaining strong capabilities in high‑fidelity and fine‑grained detail generation. In addition to text‑to‑image generation, GLM‑Image also supports a rich set of image‑to‑image tasks including image editing, style transfer, identity‑preserving generation, and multi‑subject consistency.",
-   "open_weights": true,
-   "last_updated": "2026-01-14",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "image"
-    ]
-   },
-   "cost": {
-    "image": {
-     "output": {
-      "unit": "image",
-      "price": 0.015
-     }
-    }
-   },
-   "api": {
-    "images": {
-     "base_url": "https://api.z.ai/api/paas/v4",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/zai/images"
-     }
-    }
-   }
+   "last_updated": "2025-12-10"
   },
   "glm-4.6v-flashx": {
    "id": "glm-4.6v-flashx",
    "name": "GLM-4.6V-FlashX",
+   "description": "Paid high-speed GLM-4.6V-Flash serving option for affordable visual reasoning and multimodal agents",
    "type": "chat",
-   "canonical_id": "zhipuai/glm-4.6v-flash",
    "family": "glm-flash",
+   "canonical_id": "zhipuai/glm-4.6v-flash",
    "release_date": "2025-12-08",
    "limit": {
     "context": 128000,
@@ -2436,38 +346,22 @@
     "cache": {
      "implicit": true
     },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": true,
+     "toggle": true,
      "default": {
       "type": "toggle",
       "value": true
-     },
-     "toggle": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Paid high-speed GLM-4.6V-Flash serving option for affordable visual reasoning and multimodal agents",
-   "open_weights": true,
-   "last_updated": "2025-12-08",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "video/mp4",
-     "video/x-matroska",
-     "video/quicktime"
-    ],
-    "output": [
-     "text"
-    ]
+     }
+    }
    },
    "cost": {
     "text": {
@@ -2483,16 +377,25 @@
      }
     }
    },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "video/mp4",
+     "video/x-matroska",
+     "video/quicktime"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.z.ai/api/paas/v4",
      "sdk": {
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/zai/chat"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
      },
      "capabilities": {
       "system_updates": true,
@@ -2502,6 +405,10 @@
        ],
        "updates": false
       }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
      }
     },
     "messages": {
@@ -2535,7 +442,2100 @@
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "last_updated": "2025-12-08"
+  },
+  "glm-4.7-flashx": {
+   "id": "glm-4.7-flashx",
+   "name": "GLM-4.7-FlashX",
+   "description": "Efficient GLM model for fast reasoning, coding, and agent workflows",
+   "type": "chat",
+   "family": "glm-flash",
+   "canonical_id": "zhipuai/glm-4.7-flashx",
+   "release_date": "2026-01-19",
+   "limit": {
+    "context": 200000,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "default": {
+      "type": "toggle",
+      "value": true
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.07,
+      "cache": {
+       "read": 0.01,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0.4
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.z.ai/api/paas/v4",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/zai/chat"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "messages": {
+     "base_url": "https://api.z.ai/api/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://api.z.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-04",
+   "last_updated": "2026-01-19"
+  },
+  "glm-4.6": {
+   "id": "glm-4.6",
+   "name": "GLM-4.6",
+   "description": "Late GLM-4 workhorse for coding agents, reasoning, and structured tasks",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-4.6",
+   "release_date": "2025-09-30",
+   "limit": {
+    "context": 204800,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "default": {
+      "type": "toggle",
+      "value": true
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.6,
+      "cache": {
+       "read": 0.11,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 2.2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.z.ai/api/paas/v4",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/zai/chat"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "messages": {
+     "base_url": "https://api.z.ai/api/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://api.z.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-04",
+   "last_updated": "2025-09-30"
+  },
+  "glm-5.3": {
+   "id": "glm-5.3",
+   "name": "GLM-5.3",
+   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.3",
+   "release_date": "2026-08-14",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ],
+     "default": {
+      "type": "effort",
+      "value": "max"
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.4,
+      "cache": {
+       "read": 0.26,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 4.4
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.z.ai/api/paas/v4",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/zai/chat"
+     },
+     "capabilities": {
+      "system_updates": true,
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "messages": {
+     "base_url": "https://api.z.ai/api/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://api.z.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-14"
+  },
+  "glm-5.3-flash": {
+   "id": "glm-5.3-flash",
+   "name": "GLM-5.3-Flash",
+   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
+   "type": "chat",
+   "family": "glm-flash",
+   "canonical_id": "zhipuai/glm-5.3-flash",
+   "release_date": "2026-08-26",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ],
+     "default": {
+      "type": "effort",
+      "value": "max"
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.15,
+      "cache": {
+       "read": 0.03,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "video/mp4",
+     "video/x-matroska",
+     "video/quicktime",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.z.ai/api/paas/v4",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/zai/chat"
+     },
+     "capabilities": {
+      "system_updates": true,
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "messages": {
+     "base_url": "https://api.z.ai/api/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://api.z.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-26"
+  },
+  "glm-4.5v": {
+   "id": "glm-4.5v",
+   "name": "GLM-4.5V",
+   "description": "GLM vision model for visual reasoning, documents, and multimodal agents",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-4.5v",
+   "release_date": "2025-08-11",
+   "limit": {
+    "context": 64000,
+    "output": 16384
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "default": {
+      "type": "toggle",
+      "value": true
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.6,
+      "cache": {
+       "read": 0.11,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 1.8
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "video/mp4",
+     "video/x-matroska",
+     "video/quicktime"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.z.ai/api/paas/v4",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/zai/chat"
+     },
+     "capabilities": {
+      "system_updates": true,
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "messages": {
+     "base_url": "https://api.z.ai/api/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://api.z.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-04",
+   "last_updated": "2025-08-11"
+  },
+  "glm-5-turbo": {
+   "id": "glm-5-turbo",
+   "name": "GLM-5-Turbo",
+   "description": "Faster GLM-5 lane for coding agents that need lower latency",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5-turbo",
+   "release_date": "2026-03-16",
+   "limit": {
+    "context": 200000,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "default": {
+      "type": "toggle",
+      "value": true
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.2,
+      "cache": {
+       "read": 0.24,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 4
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.z.ai/api/paas/v4",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/zai/chat"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "messages": {
+     "base_url": "https://api.z.ai/api/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://api.z.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-03-16"
+  },
+  "glm-4.5-airx": {
+   "id": "glm-4.5-airx",
+   "name": "GLM-4.5-AirX",
+   "description": "High-speed GLM-4.5-Air serving option for low-latency coding assistance and agents",
+   "type": "chat",
+   "family": "glm-air",
+   "canonical_id": "zhipuai/glm-4.5-air",
+   "release_date": "2025-07-28",
+   "limit": {
+    "context": 131072,
+    "output": 98304
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "default": {
+      "type": "toggle",
+      "value": true
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.1,
+      "cache": {
+       "read": 0.22,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 4.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.z.ai/api/paas/v4",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/zai/chat"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "messages": {
+     "base_url": "https://api.z.ai/api/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://api.z.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-04",
+   "last_updated": "2025-07-28"
+  },
+  "glm-5.3-flashx": {
+   "id": "glm-5.3-flashx",
+   "name": "GLM-5.3-FlashX",
+   "description": "High-speed GLM-5.3-Flash serving option for coding and agent workflows",
+   "type": "chat",
+   "family": "glm-flash",
+   "canonical_id": "zhipuai/glm-5.3-flash",
+   "release_date": "2026-09-18",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ],
+     "default": {
+      "type": "effort",
+      "value": "max"
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.37,
+      "cache": {
+       "read": 0.075,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 1.25
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "video/mp4",
+     "video/x-matroska",
+     "video/quicktime",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.z.ai/api/paas/v4",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/zai/chat"
+     },
+     "capabilities": {
+      "system_updates": true,
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "messages": {
+     "base_url": "https://api.z.ai/api/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://api.z.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-09-18"
+  },
+  "glm-4.7": {
+   "id": "glm-4.7",
+   "name": "GLM-4.7",
+   "description": "Mature GLM model for dependable coding, reasoning, and structured agent tasks",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-4.7",
+   "release_date": "2025-12-22",
+   "limit": {
+    "context": 204800,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "default": {
+      "type": "toggle",
+      "value": true
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.6,
+      "cache": {
+       "read": 0.11,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 2.2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.z.ai/api/paas/v4",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/zai/chat"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "messages": {
+     "base_url": "https://api.z.ai/api/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://api.z.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-04",
+   "last_updated": "2025-12-22"
+  },
+  "glm-4.6v-flash": {
+   "id": "glm-4.6v-flash",
+   "name": "GLM-4.6V-Flash",
+   "description": "Lightweight GLM vision model for visual reasoning, documents, and multimodal agents",
+   "type": "chat",
+   "family": "glm-flash",
+   "canonical_id": "zhipuai/glm-4.6v-flash",
+   "release_date": "2025-12-08",
+   "limit": {
+    "context": 128000,
+    "output": 32768
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "default": {
+      "type": "toggle",
+      "value": true
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "video/mp4",
+     "video/x-matroska",
+     "video/quicktime"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.z.ai/api/paas/v4",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/zai/chat"
+     },
+     "capabilities": {
+      "system_updates": true,
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "messages": {
+     "base_url": "https://api.z.ai/api/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://api.z.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-12-08"
+  },
+  "cogvideox-3": {
+   "id": "cogvideox-3",
+   "name": "CogVideoX-3",
+   "description": "Video generation model for text-to-video, image-to-video, and first/last-frame clips with optional sound effects",
+   "type": "video",
+   "canonical_id": "zhipuai/cogvideox-3",
+   "release_date": "2025-07-15",
+   "limit": {
+    "context": 512,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg"
+    ],
+    "output": [
+     "video/mp4"
+    ]
+   },
+   "api": {
+    "videos": {
+     "base_url": "https://api.z.ai/api/paas/v4",
+     "sdk": {}
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-07-15"
+  },
+  "glm-4.5-x": {
+   "id": "glm-4.5-x",
+   "name": "GLM-4.5-X",
+   "description": "High-speed GLM-4.5 serving option for latency-sensitive reasoning, coding, and agent workflows",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-4.5",
+   "release_date": "2025-07-28",
+   "limit": {
+    "context": 131072,
+    "output": 98304
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "default": {
+      "type": "toggle",
+      "value": true
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2.2,
+      "cache": {
+       "read": 0.45,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 8.9
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.z.ai/api/paas/v4",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/zai/chat"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "messages": {
+     "base_url": "https://api.z.ai/api/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://api.z.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-04",
+   "last_updated": "2025-07-28"
+  },
+  "glm-5v-turbo": {
+   "id": "glm-5v-turbo",
+   "name": "GLM-5V-Turbo",
+   "description": "Fast GLM vision model for screenshots, documents, and multimodal agent tasks",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5v-turbo",
+   "release_date": "2026-04-01",
+   "limit": {
+    "context": 200000,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "default": {
+      "type": "toggle",
+      "value": true
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.2,
+      "cache": {
+       "read": 0.24,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 4
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "video/mp4",
+     "video/quicktime",
+     "video/x-matroska",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.z.ai/api/paas/v4",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/zai/chat"
+     },
+     "capabilities": {
+      "system_updates": true,
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "messages": {
+     "base_url": "https://api.z.ai/api/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://api.z.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-04-01"
+  },
+  "glm-4.5-air": {
+   "id": "glm-4.5-air",
+   "name": "GLM-4.5-Air",
+   "description": "Lighter GLM-4.5 variant for fast coding assistance and cheaper agents",
+   "type": "chat",
+   "family": "glm-air",
+   "canonical_id": "zhipuai/glm-4.5-air",
+   "release_date": "2025-07-28",
+   "limit": {
+    "context": 131072,
+    "output": 98304
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "default": {
+      "type": "toggle",
+      "value": true
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.2,
+      "cache": {
+       "read": 0.03,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 1.1
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.z.ai/api/paas/v4",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/zai/chat"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "messages": {
+     "base_url": "https://api.z.ai/api/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://api.z.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-04",
+   "last_updated": "2025-07-28"
+  },
+  "glm-4.7-flash": {
+   "id": "glm-4.7-flash",
+   "name": "GLM-4.7-Flash",
+   "description": "Budget GLM lane for fast coding help, routing, and everyday automation",
+   "type": "chat",
+   "family": "glm-flash",
+   "canonical_id": "zhipuai/glm-4.7-flash",
+   "release_date": "2026-01-19",
+   "limit": {
+    "context": 200000,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "default": {
+      "type": "toggle",
+      "value": true
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.z.ai/api/paas/v4",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/zai/chat"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "messages": {
+     "base_url": "https://api.z.ai/api/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://api.z.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-04",
+   "last_updated": "2026-01-19"
+  },
+  "glm-4.6v": {
+   "id": "glm-4.6v",
+   "name": "GLM-4.6V",
+   "description": "GLM vision model for visual reasoning, documents, and multimodal agents",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-4.6v",
+   "release_date": "2025-12-08",
+   "limit": {
+    "context": 128000,
+    "output": 32768
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "default": {
+      "type": "toggle",
+      "value": true
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.3,
+      "cache": {
+       "read": 0.05,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0.9
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "video/mp4",
+     "video/x-matroska",
+     "video/quicktime"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.z.ai/api/paas/v4",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/zai/chat"
+     },
+     "capabilities": {
+      "system_updates": true,
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "messages": {
+     "base_url": "https://api.z.ai/api/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://api.z.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-04",
+   "last_updated": "2025-12-08"
+  },
+  "glm-5": {
+   "id": "glm-5",
+   "name": "GLM-5",
+   "description": "General GLM flagship for coding, analysis, and tool-heavy engineering workflows",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5",
+   "release_date": "2026-02-12",
+   "limit": {
+    "context": 204800,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "default": {
+      "type": "toggle",
+      "value": true
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1,
+      "cache": {
+       "read": 0.2,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 3.2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.z.ai/api/paas/v4",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/zai/chat"
+     },
+     "capabilities": {
+      "system_updates": true,
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "messages": {
+     "base_url": "https://api.z.ai/api/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://api.z.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-02-12"
+  },
+  "glm-4.5-flash": {
+   "id": "glm-4.5-flash",
+   "name": "GLM-4.5-Flash",
+   "description": "Efficient GLM model for fast reasoning, coding, and agent workflows",
+   "type": "chat",
+   "family": "glm-flash",
+   "canonical_id": "zhipuai/glm-4.5-flash",
+   "release_date": "2025-07-28",
+   "limit": {
+    "context": 131072,
+    "output": 98304
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "default": {
+      "type": "toggle",
+      "value": true
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.z.ai/api/paas/v4",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/zai/chat"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "messages": {
+     "base_url": "https://api.z.ai/api/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://api.z.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-04",
+   "last_updated": "2025-07-28"
+  },
+  "glm-5.1": {
+   "id": "glm-5.1",
+   "name": "GLM-5.1",
+   "description": "Strong GLM coding model for agentic engineering, terminals, and repository generation",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.1",
+   "release_date": "2026-04-07",
+   "limit": {
+    "context": 200000,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "default": {
+      "type": "toggle",
+      "value": true
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.4,
+      "cache": {
+       "read": 0.26,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 4.4
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.z.ai/api/paas/v4",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/zai/chat"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "messages": {
+     "base_url": "https://api.z.ai/api/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://api.z.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-04-07"
   }
  }
 }

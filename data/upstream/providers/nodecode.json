@@ -1,0 +1,177 @@
+{
+ "id": "nodecode",
+ "name": "Nodecode",
+ "doc": "https://nodecode.ai/docs/models",
+ "env": [
+  "NODECODE_API_KEY"
+ ],
+ "models": {
+  "nodecode-cyber-v1": {
+   "id": "nodecode-cyber-v1",
+   "name": "Cyber v1",
+   "description": "Abliterated DeepSeek V4.1 Flash 1017 for authorized security testing and pentest agents",
+   "type": "chat",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
+   "release_date": "2026-10-19",
+   "limit": {
+    "context": 1048576,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ],
+     "default": {
+      "type": "effort",
+      "value": "high"
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.33,
+      "cache": {
+       "read": 0.009
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 262144
+         }
+        },
+        "cache": {
+         "read": 0.036
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 1.32
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "any": [
+        {
+         "utc_days": {
+          "in": [
+           "fri",
+           "sat"
+          ]
+         }
+        },
+        {
+         "all": [
+          {
+           "utc_days": {
+            "in": [
+             "thu"
+            ]
+           }
+          },
+          {
+           "utc_hours": {
+            "gte": "23:00"
+           }
+          }
+         ]
+        },
+        {
+         "all": [
+          {
+           "utc_days": {
+            "in": [
+             "sun"
+            ]
+           }
+          },
+          {
+           "utc_hours": {
+            "lt": "23:00"
+           }
+          }
+         ]
+        }
+       ]
+      },
+      "factor": 0.5
+     }
+    ]
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.nodecode.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://api.nodecode.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://api.nodecode.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-10-19"
+  }
+ }
+}

@@ -9,15 +9,22 @@
   "gpt-oss-120b": {
    "id": "gpt-oss-120b",
    "name": "GPT OSS 120B",
+   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
    "type": "chat",
-   "canonical_id": "openai/gpt-oss-120b",
    "family": "gpt-oss",
+   "canonical_id": "openai/gpt-oss-120b",
    "release_date": "2025-08-05",
    "limit": {
     "context": 131072,
     "output": 131072
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -28,25 +35,7 @@
       "medium",
       "high"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
-   "open_weights": true,
-   "knowledge": "2024-06",
-   "last_updated": "2025-08-05",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -58,51 +47,6 @@
      }
     }
    },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.sambanova.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "DeepSeek-V3.2": {
-   "id": "DeepSeek-V3.2",
-   "name": "DeepSeek V3.2",
-   "type": "chat",
-   "canonical_id": "deepseek/deepseek-v3.2",
-   "family": "deepseek",
-   "release_date": "2025-12-01",
-   "limit": {
-    "context": 32768,
-    "output": 7168
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Hybrid-reasoning DeepSeek model with thinking and non-thinking modes, sparse attention, and tool-use",
-   "open_weights": true,
-   "knowledge": "2024-07",
-   "last_updated": "2025-12-01",
    "modalities": {
     "input": [
      "text"
@@ -111,16 +55,6 @@
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 3
-     },
-     "output": {
-      "price": 4.5
-     }
-    }
-   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.sambanova.ai/v1",
@@ -134,43 +68,35 @@
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "knowledge": "2024-06",
+   "last_updated": "2025-08-05"
   },
   "Meta-Llama-3.3-70B-Instruct": {
    "id": "Meta-Llama-3.3-70B-Instruct",
    "name": "Llama-3.3-70B-Instruct",
+   "description": "Popular open Llama workhorse for multilingual chat, coding, and self-hosting",
    "type": "chat",
-   "canonical_id": "meta/llama-3.3-70b-instruct",
    "family": "llama",
+   "canonical_id": "meta/llama-3.3-70b-instruct",
    "release_date": "2024-12-06",
    "limit": {
     "context": 131072,
     "output": 3072
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": false
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Popular open Llama workhorse for multilingual chat, coding, and self-hosting",
-   "open_weights": true,
-   "knowledge": "2023-12",
-   "last_updated": "2024-12-06",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -182,49 +108,6 @@
      }
     }
    },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.sambanova.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "MiniMax-M3": {
-   "id": "MiniMax-M3",
-   "name": "MiniMax-M3",
-   "type": "chat",
-   "canonical_id": "minimax/MiniMax-M3",
-   "family": "minimax",
-   "release_date": "2026-06-01",
-   "limit": {
-    "context": 1048576,
-    "output": 1048576
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "MiniMax multimodal model for long-context coding, perception, and agent planning",
-   "open_weights": true,
-   "last_updated": "2026-06-01",
    "modalities": {
     "input": [
      "text"
@@ -233,19 +116,6 @@
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.6,
-      "cache": {
-       "read": 0.06
-      }
-     },
-     "output": {
-      "price": 2.4
-     }
-    }
-   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.sambanova.ai/v1",
@@ -259,99 +129,48 @@
       }
      }
     }
-   }
-  },
-  "DeepSeek-V3.1": {
-   "id": "DeepSeek-V3.1",
-   "name": "DeepSeek-V3.1",
-   "type": "chat",
-   "canonical_id": "deepseek/deepseek-v3.1",
-   "family": "deepseek",
-   "release_date": "2025-08-21",
-   "limit": {
-    "context": 131072,
-    "output": 7168
    },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Hybrid-reasoning DeepSeek model with thinking and non-thinking modes",
    "open_weights": true,
-   "last_updated": "2025-08-21",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 3
-     },
-     "output": {
-      "price": 4.5
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.sambanova.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
+   "knowledge": "2023-12",
+   "last_updated": "2024-12-06"
   },
   "gemma-4-31B-it": {
    "id": "gemma-4-31B-it",
    "name": "Gemma 4 31B IT",
+   "description": "Largest Gemma 4 instruction model for open, self-hosted chat and reasoning",
    "type": "chat",
-   "canonical_id": "google/gemma-4-31b-it",
    "family": "gemma",
+   "canonical_id": "google/gemma-4-31b-it",
    "release_date": "2026-04-02",
    "limit": {
     "context": 131072,
     "output": 131072
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": true,
      "toggle": true
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Largest Gemma 4 instruction model for open, self-hosted chat and reasoning",
-   "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-04-02",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.38
+     },
+     "output": {
+      "price": 1.15
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text",
@@ -366,15 +185,85 @@
      "text"
     ]
    },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.sambanova.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-01",
+   "last_updated": "2026-04-02"
+  },
+  "MiniMax-M3.1-Flash": {
+   "id": "MiniMax-M3.1-Flash",
+   "name": "MiniMax-M3.1-Flash",
+   "description": "Frontier multimodal coding model with 1M context window and tunable thinking depth",
+   "type": "chat",
+   "family": "minimax",
+   "canonical_id": "minimax/MiniMax-M3.1-Flash",
+   "status": "beta",
+   "release_date": "2026-10-19",
+   "limit": {
+    "context": 1048576,
+    "output": 1048576
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
    "cost": {
     "text": {
      "input": {
-      "price": 0.38
+      "price": 0.3,
+      "cache": {
+       "read": 0.03
+      }
      },
      "output": {
-      "price": 1.15
+      "price": 1.2
      }
     }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
    },
    "api": {
     "chat-completions": {
@@ -389,7 +278,81 @@
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "last_updated": "2026-10-19"
+  },
+  "GLM-5.3": {
+   "id": "GLM-5.3",
+   "name": "GLM-5.3",
+   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.3",
+   "release_date": "2026-08-14",
+   "limit": {
+    "context": 1048576,
+    "output": 1048576
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2.8,
+      "cache": {
+       "read": 0.14
+      }
+     },
+     "output": {
+      "price": 8.8
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.sambanova.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-14"
   }
  }
 }

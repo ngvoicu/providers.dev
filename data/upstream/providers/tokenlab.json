@@ -1,0 +1,99 @@
+{
+ "id": "tokenlab",
+ "name": "TokenLab",
+ "doc": "https://tokenlab.sh/docs",
+ "env": [
+  "TOKENLAB_API_KEY"
+ ],
+ "models": {
+  "grok-4.20-non-reasoning": {
+   "id": "grok-4.20-non-reasoning",
+   "name": "Grok 4.20 (Non-Reasoning)",
+   "description": "Grok model for agentic tool use, reasoning, coding, and live assistance",
+   "type": "chat",
+   "family": "grok",
+   "canonical_id": "xai/grok-4.20-0309-non-reasoning",
+   "release_date": "2026-03-09",
+   "limit": {
+    "context": 1000000,
+    "output": 30000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.625,
+      "cache": {
+       "read": 0.1
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gte": 200000
+         }
+        },
+        "price": 1.25,
+        "cache": {
+         "read": 0.2
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 1.25,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gte": 200000
+         }
+        },
+        "price": 2.5
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.tokenlab.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-03-09"
+  }
+ }
+}

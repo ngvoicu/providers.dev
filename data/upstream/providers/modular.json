@@ -6,132 +6,35 @@
   "MODULAR_API_KEY"
  ],
  "models": {
-  "MiniMaxAI/MiniMax-M3.1-Flash": {
-   "id": "MiniMaxAI/MiniMax-M3.1-Flash",
-   "name": "MiniMax-M3.1-Flash",
-   "type": "chat",
-   "canonical_id": "minimax/MiniMax-M3.1-Flash",
-   "family": "minimax",
-   "release_date": "2026-10-19",
-   "limit": {
-    "context": 1048576,
-    "output": 512000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Frontier multimodal coding model with 1M context window and tunable thinking depth",
-   "open_weights": true,
-   "last_updated": "2026-10-19",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/quicktime",
-     "video/x-matroska"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.15,
-      "cache": {
-       "read": 0.015
-      }
-     },
-     "output": {
-      "price": 0.6
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.modular.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
   "google/gemma-4-31b-it": {
    "id": "google/gemma-4-31b-it",
    "name": "Gemma 4 31B IT",
+   "description": "Largest Gemma 4 instruction model for open, self-hosted chat and reasoning",
    "type": "chat",
-   "canonical_id": "google/gemma-4-31b-it",
    "family": "gemma",
+   "canonical_id": "google/gemma-4-31b-it",
    "release_date": "2026-04-02",
    "limit": {
     "context": 262144,
     "output": 32768
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": true,
+     "toggle": true,
      "default": {
       "type": "toggle",
       "value": false
-     },
-     "toggle": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Largest Gemma 4 instruction model for open, self-hosted chat and reasoning",
-   "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-04-02",
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif"
-    ],
-    "output": [
-     "text"
-    ]
+     }
+    }
    },
    "cost": {
     "text": {
@@ -146,6 +49,19 @@
      }
     }
    },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.modular.com/v1",
@@ -153,29 +69,38 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
      "capabilities": {
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
      }
     }
-   }
+   },
+   "open_weights": true,
+   "knowledge": "2025-01",
+   "last_updated": "2026-04-02"
   },
   "deepseek/deepseek-v4.1-flash-1017": {
    "id": "deepseek/deepseek-v4.1-flash-1017",
    "name": "DeepSeek V4.1 Flash 1017",
+   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
    "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
    "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
    "release_date": "2026-10-17",
    "limit": {
     "context": 1048576,
     "output": 384000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -187,28 +112,7 @@
       "high",
       "max"
      ]
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-10-17",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -223,6 +127,18 @@
      }
     }
    },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.modular.com/v1",
@@ -236,40 +152,54 @@
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-10-17"
   },
   "minimax/minimax-m3": {
    "id": "minimax/minimax-m3",
    "name": "MiniMax-M3",
+   "description": "MiniMax multimodal model for long-context coding, perception, and agent planning",
    "type": "chat",
-   "canonical_id": "minimax/MiniMax-M3",
    "family": "minimax",
+   "canonical_id": "minimax/MiniMax-M3",
    "release_date": "2026-06-01",
    "limit": {
     "context": 1048576,
     "output": 512000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": true,
+     "toggle": true,
      "default": {
       "type": "toggle",
       "value": true
-     },
-     "toggle": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
+     }
+    }
    },
-   "description": "MiniMax multimodal model for long-context coding, perception, and agent planning",
-   "open_weights": true,
-   "last_updated": "2026-06-01",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.3,
+      "cache": {
+       "read": 0.06
+      }
+     },
+     "output": {
+      "price": 1.2
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text",
@@ -286,18 +216,86 @@
      "text"
     ]
    },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.modular.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-06-01"
+  },
+  "MiniMaxAI/MiniMax-M3.1-Flash": {
+   "id": "MiniMaxAI/MiniMax-M3.1-Flash",
+   "name": "MiniMax-M3.1-Flash",
+   "description": "Frontier multimodal coding model with 1M context window and tunable thinking depth",
+   "type": "chat",
+   "family": "minimax",
+   "canonical_id": "minimax/MiniMax-M3.1-Flash",
+   "release_date": "2026-10-19",
+   "limit": {
+    "context": 1048576,
+    "output": 512000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
    "cost": {
     "text": {
      "input": {
-      "price": 0.3,
+      "price": 0.15,
       "cache": {
-       "read": 0.06
+       "read": 0.015
       }
      },
      "output": {
-      "price": 1.2
+      "price": 0.6
      }
     }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/quicktime",
+     "video/x-matroska"
+    ],
+    "output": [
+     "text"
+    ]
    },
    "api": {
     "chat-completions": {
@@ -306,16 +304,18 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
      "capabilities": {
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
      }
     }
-   }
+   },
+   "open_weights": true,
+   "last_updated": "2026-10-19"
   }
  }
 }

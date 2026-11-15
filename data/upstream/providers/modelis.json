@@ -6,18 +6,189 @@
   "MODELIS_API_KEY"
  ],
  "models": {
-  "gemini-2.5-flash": {
-   "id": "gemini-2.5-flash",
-   "name": "Gemini 2.5 Flash",
+  "deepseek-v4-flash": {
+   "id": "deepseek-v4-flash",
+   "name": "DeepSeek V4 Flash",
+   "description": "Fast DeepSeek V4 lane for economical reasoning, coding, and long-context work",
    "type": "chat",
-   "canonical_id": "google/gemini-2.5-flash",
-   "family": "gemini-flash",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4-flash",
+   "release_date": "2026-04-24",
+   "limit": {
+    "context": 1000000,
+    "output": 384000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.0983
+     },
+     "output": {
+      "price": 0.1966
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://modelishub.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-04-24"
+  },
+  "gemini-2.5-pro": {
+   "id": "gemini-2.5-pro",
+   "name": "Gemini 2.5 Pro",
+   "description": "Google's proven reasoning model for coding, math, and multimodal analysis",
+   "type": "chat",
+   "family": "gemini-pro",
+   "canonical_id": "google/gemini-2.5-pro",
    "release_date": "2025-06-17",
    "limit": {
     "context": 1048576,
     "output": 65536
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "max"
+     ],
+     "budget": {}
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.25
+     },
+     "output": {
+      "price": 10
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://modelishub.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2025-06-17"
+  },
+  "gemini-2.5-flash": {
+   "id": "gemini-2.5-flash",
+   "name": "Gemini 2.5 Flash",
+   "description": "Fast Gemini workhorse for multimodal apps where latency and price matter",
+   "type": "chat",
+   "family": "gemini-flash",
+   "canonical_id": "google/gemini-2.5-flash",
+   "release_date": "2025-06-17",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -32,53 +203,7 @@
       "max"
      ],
      "budget": {}
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Fast Gemini workhorse for multimodal apps where latency and price matter",
-   "open_weights": false,
-   "knowledge": "2025-01",
-   "last_updated": "2025-06-17",
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "audio/wav",
-     "audio/mp3",
-     "audio/aiff",
-     "audio/aac",
-     "audio/ogg",
-     "audio/flac",
-     "audio/mpeg",
-     "audio/m4a",
-     "audio/l16",
-     "audio/opus",
-     "audio/alaw",
-     "audio/mulaw",
-     "audio/webm",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -90,57 +215,6 @@
      }
     }
    },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://modelishub.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gemini-2.5-pro": {
-   "id": "gemini-2.5-pro",
-   "name": "Gemini 2.5 Pro",
-   "type": "chat",
-   "canonical_id": "google/gemini-2.5-pro",
-   "family": "gemini-pro",
-   "release_date": "2025-06-17",
-   "limit": {
-    "context": 1048576,
-    "output": 65536
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "max"
-     ],
-     "budget": {}
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Google's proven reasoning model for coding, math, and multimodal analysis",
-   "open_weights": false,
-   "knowledge": "2025-01",
-   "last_updated": "2025-06-17",
    "modalities": {
     "input": [
      "text",
@@ -177,16 +251,6 @@
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.25
-     },
-     "output": {
-      "price": 10
-     }
-    }
-   },
    "api": {
     "chat-completions": {
      "base_url": "https://modelishub.com/v1",
@@ -200,20 +264,29 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2025-06-17"
   },
   "claude-fable-5": {
    "id": "claude-fable-5",
    "name": "Claude Fable 5",
+   "description": "Claude model for creative writing, analysis, and controlled agent workflows",
    "type": "chat",
-   "canonical_id": "anthropic/claude-fable-5",
    "family": "claude-fable",
+   "canonical_id": "anthropic/claude-fable-5",
    "release_date": "2026-06-09",
    "limit": {
     "context": 1000000,
     "output": 128000
    },
    "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -226,29 +299,7 @@
       "xhigh",
       "max"
      ]
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Claude model for creative writing, analysis, and controlled agent workflows",
-   "open_weights": false,
-   "knowledge": "2026-01-31",
-   "last_updated": "2026-06-09",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -260,123 +311,6 @@
      }
     }
    },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://modelishub.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "deepseek-v4-pro": {
-   "id": "deepseek-v4-pro",
-   "name": "DeepSeek V4 Pro",
-   "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4-pro",
-   "family": "deepseek-thinking",
-   "release_date": "2026-04-24",
-   "limit": {
-    "context": 1000000,
-    "output": 384000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open MoE flagship with million-token context for coding and long agent runs",
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-04-24",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.435
-     },
-     "output": {
-      "price": 0.87
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://modelishub.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "claude-sonnet-4-6": {
-   "id": "claude-sonnet-4-6",
-   "name": "Claude Sonnet 4.6",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-sonnet-4-6",
-   "family": "claude-sonnet",
-   "release_date": "2026-02-17",
-   "limit": {
-    "context": 1000000,
-    "output": 64000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "max"
-     ]
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Claude workhorse for coding agents, careful analysis, and production cost control",
-   "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2026-03-13",
    "modalities": {
     "input": [
      "text",
@@ -390,16 +324,6 @@
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 3
-     },
-     "output": {
-      "price": 15
-     }
-    }
-   },
    "api": {
     "chat-completions": {
      "base_url": "https://modelishub.com/v1",
@@ -413,20 +337,30 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2026-01-31",
+   "last_updated": "2026-06-09"
   },
-  "deepseek-v4-flash": {
-   "id": "deepseek-v4-flash",
-   "name": "DeepSeek V4 Flash",
+  "deepseek-v4-pro": {
+   "id": "deepseek-v4-pro",
+   "name": "DeepSeek V4 Pro",
+   "description": "Open MoE flagship with million-token context for coding and long agent runs",
    "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4-flash",
-   "family": "deepseek-flash",
+   "family": "deepseek-thinking",
+   "canonical_id": "deepseek/deepseek-v4-pro",
    "release_date": "2026-04-24",
    "limit": {
     "context": 1000000,
     "output": 384000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -437,18 +371,18 @@
       "high",
       "max"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Fast DeepSeek V4 lane for economical reasoning, coding, and long-context work",
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-04-24",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.435
+     },
+     "output": {
+      "price": 0.87
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text"
@@ -456,16 +390,6 @@
     "output": [
      "text"
     ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.0983
-     },
-     "output": {
-      "price": 0.1966
-     }
-    }
    },
    "api": {
     "chat-completions": {
@@ -480,20 +404,102 @@
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-04-24"
+  },
+  "claude-sonnet-4-6": {
+   "id": "claude-sonnet-4-6",
+   "name": "Claude Sonnet 4.6",
+   "description": "Claude workhorse for coding agents, careful analysis, and production cost control",
+   "type": "chat",
+   "family": "claude-sonnet",
+   "canonical_id": "anthropic/claude-sonnet-4-6",
+   "release_date": "2026-02-17",
+   "limit": {
+    "context": 1000000,
+    "output": 64000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 3
+     },
+     "output": {
+      "price": 15
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://modelishub.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-03-13"
   },
   "claude-opus-4-8": {
    "id": "claude-opus-4-8",
    "name": "Claude Opus 4.8",
+   "description": "Top Claude Opus tier for the hardest reasoning, coding, and long-horizon agents",
    "type": "chat",
-   "canonical_id": "anthropic/claude-opus-4-8",
    "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-4-8",
    "release_date": "2026-05-28",
    "limit": {
     "context": 1000000,
     "output": 128000
    },
    "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -507,17 +513,18 @@
       "xhigh",
       "max"
      ]
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Top Claude Opus tier for the hardest reasoning, coding, and long-horizon agents",
-   "open_weights": false,
-   "knowledge": "2026-01",
-   "last_updated": "2026-05-28",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5
+     },
+     "output": {
+      "price": 25
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text",
@@ -530,16 +537,6 @@
     "output": [
      "text"
     ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 5
-     },
-     "output": {
-      "price": 25
-     }
-    }
    },
    "api": {
     "chat-completions": {
@@ -554,20 +551,29 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2026-01",
+   "last_updated": "2026-05-28"
   },
-  "qwen/qwen3.7-plus": {
-   "id": "qwen/qwen3.7-plus",
-   "name": "Qwen3.7 Plus",
+  "qwen/qwen3.7-max": {
+   "id": "qwen/qwen3.7-max",
+   "name": "Qwen3.7 Max",
+   "description": "Qwen frontier model tuned for agent frameworks, coding assistants, and long tasks",
    "type": "chat",
-   "canonical_id": "alibaba/qwen3.7-plus",
    "family": "qwen",
-   "release_date": "2026-06-02",
+   "canonical_id": "alibaba/qwen3.7-max",
+   "release_date": "2026-05-21",
    "limit": {
     "context": 1000000,
-    "output": 64000
+    "output": 131072
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -575,17 +581,80 @@
      "supported": true,
      "toggle": true,
      "budget": {}
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Multimodal Qwen workhorse for long-context agents, visual inputs, and coding",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 3
+     },
+     "output": {
+      "price": 9
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://modelishub.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
    "open_weights": false,
-   "knowledge": "2025-04",
-   "last_updated": "2026-06-02",
+   "last_updated": "2026-05-21"
+  },
+  "qwen/qwen3.7-plus": {
+   "id": "qwen/qwen3.7-plus",
+   "name": "Qwen3.7 Plus",
+   "description": "Multimodal Qwen workhorse for long-context agents, visual inputs, and coding",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.7-plus",
+   "release_date": "2026-06-02",
+   "limit": {
+    "context": 1000000,
+    "output": 64000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "budget": {}
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.768
+     },
+     "output": {
+      "price": 3.072
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text",
@@ -606,16 +675,6 @@
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.768
-     },
-     "output": {
-      "price": 3.072
-     }
-    }
-   },
    "api": {
     "chat-completions": {
      "base_url": "https://modelishub.com/v1",
@@ -629,69 +688,10 @@
       }
      }
     }
-   }
-  },
-  "qwen/qwen3.7-max": {
-   "id": "qwen/qwen3.7-max",
-   "name": "Qwen3.7 Max",
-   "type": "chat",
-   "canonical_id": "alibaba/qwen3.7-max",
-   "family": "qwen",
-   "release_date": "2026-05-21",
-   "limit": {
-    "context": 1000000,
-    "output": 131072
    },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "budget": {}
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Qwen frontier model tuned for agent frameworks, coding assistants, and long tasks",
    "open_weights": false,
-   "last_updated": "2026-05-21",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 3
-     },
-     "output": {
-      "price": 9
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://modelishub.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
+   "knowledge": "2025-04",
+   "last_updated": "2026-06-02"
   }
  }
 }

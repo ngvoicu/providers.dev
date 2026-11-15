@@ -6,9 +6,118 @@
   "STEPFUN_API_KEY"
  ],
  "models": {
+  "step-tts-2": {
+   "id": "step-tts-2",
+   "name": "Step TTS 2",
+   "description": "Speech generation model for controllable voice, narration, and audio delivery",
+   "type": "speech",
+   "family": "step",
+   "release_date": "2026-03-01",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 41.84529,
+      "unit": "character"
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "audio/wav",
+     "audio/mpeg",
+     "audio/flac",
+     "audio/opus",
+     "audio/pcm"
+    ]
+   },
+   "api": {
+    "speech": {
+     "base_url": "https://api.stepfun.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/protocols/openai-speech"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-07-02"
+  },
+  "stepaudio-2.5-tts": {
+   "id": "stepaudio-2.5-tts",
+   "name": "StepAudio 2.5 TTS",
+   "description": "Speech generation model for controllable voice, narration, and audio delivery",
+   "type": "speech",
+   "family": "step",
+   "release_date": "2026-04-16",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 86.67954,
+      "unit": "character"
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "audio/wav",
+     "audio/mpeg",
+     "audio/flac",
+     "audio/opus",
+     "audio/pcm"
+    ]
+   },
+   "api": {
+    "speech": {
+     "base_url": "https://api.stepfun.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/protocols/openai-speech"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-07-02"
+  },
   "step-5-preview": {
    "id": "step-5-preview",
    "name": "Step 5 Preview",
+   "description": "StepFun's next-generation flagship base model for coding and professional knowledge work, with native text, image, and video input and a 1M-token context window",
    "type": "chat",
    "canonical_id": "stepfun/step-5-preview",
    "release_date": "2026-09-16",
@@ -23,6 +132,12 @@
       "min_tokens": 256
      }
     },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -33,31 +148,7 @@
       "medium",
       "high"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "StepFun's next-generation flagship base model for coding and professional knowledge work, with native text, image, and video input and a 1M-token context window",
-   "open_weights": true,
-   "last_updated": "2026-09-20",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "video/mp4",
-     "video/quicktime",
-     "video/x-matroska"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -72,378 +163,6 @@
      }
     }
    },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.stepfun.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.stepfun.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://api.stepfun.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "step-3.5-flash": {
-   "id": "step-3.5-flash",
-   "name": "Step 3.5 Flash",
-   "type": "chat",
-   "canonical_id": "stepfun/step-3.5-flash",
-   "family": "step",
-   "release_date": "2026-01-29",
-   "limit": {
-    "context": 256000,
-    "input": 256000,
-    "output": 256000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": {
-      "min_tokens": 256
-     }
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "StepFun flash lane for quick multimodal reasoning and coding assistance",
-   "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-02-13",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.10461,
-      "cache": {
-       "read": 0.02092
-      }
-     },
-     "output": {
-      "price": 0.31384
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.stepfun.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.stepfun.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "stepaudio-2.5-tts": {
-   "id": "stepaudio-2.5-tts",
-   "name": "StepAudio 2.5 TTS",
-   "type": "speech",
-   "family": "step",
-   "release_date": "2026-04-16",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Speech generation model for controllable voice, narration, and audio delivery",
-   "open_weights": false,
-   "last_updated": "2026-07-02",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "audio/wav",
-     "audio/mpeg",
-     "audio/flac",
-     "audio/opus",
-     "audio/pcm"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "unit": "character",
-      "price": 86.67954
-     }
-    }
-   },
-   "api": {
-    "speech": {
-     "base_url": "https://api.stepfun.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/protocols/openai-speech"
-     }
-    }
-   }
-  },
-  "step-3.5-flash-2603": {
-   "id": "step-3.5-flash-2603",
-   "name": "Step 3.5 Flash 2603",
-   "type": "chat",
-   "canonical_id": "stepfun/step-3.5-flash-2603",
-   "family": "step",
-   "release_date": "2026-04-02",
-   "limit": {
-    "context": 256000,
-    "input": 256000,
-    "output": 256000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": {
-      "min_tokens": 256
-     }
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "StepFun flash model for efficient multimodal reasoning, coding, and tool use",
-   "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-04-02",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.10461,
-      "cache": {
-       "read": 0.02092
-      }
-     },
-     "output": {
-      "price": 0.31384
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.stepfun.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.stepfun.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "step-tts-2": {
-   "id": "step-tts-2",
-   "name": "Step TTS 2",
-   "type": "speech",
-   "family": "step",
-   "release_date": "2026-03-01",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Speech generation model for controllable voice, narration, and audio delivery",
-   "open_weights": false,
-   "last_updated": "2026-07-02",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "audio/wav",
-     "audio/mpeg",
-     "audio/flac",
-     "audio/opus",
-     "audio/pcm"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "unit": "character",
-      "price": 41.84529
-     }
-    }
-   },
-   "api": {
-    "speech": {
-     "base_url": "https://api.stepfun.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/protocols/openai-speech"
-     }
-    }
-   }
-  },
-  "step-3.7-flash": {
-   "id": "step-3.7-flash",
-   "name": "Step 3.7 Flash",
-   "type": "chat",
-   "canonical_id": "stepfun/step-3.7-flash",
-   "release_date": "2026-05-29",
-   "limit": {
-    "context": 256000,
-    "input": 256000,
-    "output": 256000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": {
-      "min_tokens": 256
-     }
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Newer StepFun flash model for faster agents, coding, and multimodal prompts",
-   "open_weights": true,
-   "knowledge": "2026-03-01",
-   "last_updated": "2026-05-29",
    "modalities": {
     "input": [
      "text",
@@ -459,19 +178,6 @@
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.20175,
-      "cache": {
-       "read": 0.04035
-      }
-     },
-     "output": {
-      "price": 1.21052
-     }
-    }
-   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.stepfun.com/v1",
@@ -479,14 +185,14 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
      "capabilities": {
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
      }
     },
     "messages": {
@@ -513,11 +219,124 @@
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "last_updated": "2026-09-20"
+  },
+  "step-3.7-flash": {
+   "id": "step-3.7-flash",
+   "name": "Step 3.7 Flash",
+   "description": "Newer StepFun flash model for faster agents, coding, and multimodal prompts",
+   "type": "chat",
+   "canonical_id": "stepfun/step-3.7-flash",
+   "release_date": "2026-05-29",
+   "limit": {
+    "context": 256000,
+    "input": 256000,
+    "output": 256000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": {
+      "min_tokens": 256
+     }
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.20175,
+      "cache": {
+       "read": 0.04035
+      }
+     },
+     "output": {
+      "price": 1.21052
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "video/mp4",
+     "video/quicktime",
+     "video/x-matroska"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.stepfun.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "messages": {
+     "base_url": "https://api.stepfun.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://api.stepfun.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2026-03-01",
+   "last_updated": "2026-05-29"
   },
   "stepaudio-2.5-asr": {
    "id": "stepaudio-2.5-asr",
    "name": "StepAudio 2.5 ASR",
+   "description": "Speech transcription model for accurate audio-to-text and captioning workflows",
    "type": "transcription",
    "family": "step",
    "release_date": "2026-04-24",
@@ -526,19 +345,24 @@
     "output": 0
    },
    "capabilities": {
+    "temperature": false,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": false
     },
     "reasoning": {
      "supported": false
-    },
-    "temperature": false,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Speech transcription model for accurate audio-to-text and captioning workflows",
-   "open_weights": false,
-   "last_updated": "2026-07-02",
+   "cost": {
+    "audio": {
+     "input": {
+      "unit": "minute",
+      "price": 0.00037362
+     }
+    }
+   },
    "modalities": {
     "input": [
      "audio/ogg",
@@ -551,14 +375,6 @@
      "text"
     ]
    },
-   "cost": {
-    "audio": {
-     "input": {
-      "unit": "minute",
-      "price": 0.00037362
-     }
-    }
-   },
    "api": {
     "transcriptions": {
      "base_url": "https://api.stepfun.com/v1",
@@ -567,7 +383,191 @@
       "opencodeai": "@opencode/ai/protocols/openai-transcription"
      }
     }
-   }
+   },
+   "open_weights": false,
+   "last_updated": "2026-07-02"
+  },
+  "step-3.5-flash": {
+   "id": "step-3.5-flash",
+   "name": "Step 3.5 Flash",
+   "description": "StepFun flash lane for quick multimodal reasoning and coding assistance",
+   "type": "chat",
+   "family": "step",
+   "canonical_id": "stepfun/step-3.5-flash",
+   "release_date": "2026-01-29",
+   "limit": {
+    "context": 256000,
+    "input": 256000,
+    "output": 256000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": {
+      "min_tokens": 256
+     }
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.10461,
+      "cache": {
+       "read": 0.02092
+      }
+     },
+     "output": {
+      "price": 0.31384
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.stepfun.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "messages": {
+     "base_url": "https://api.stepfun.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-01",
+   "last_updated": "2026-02-13"
+  },
+  "step-3.5-flash-2603": {
+   "id": "step-3.5-flash-2603",
+   "name": "Step 3.5 Flash 2603",
+   "description": "StepFun flash model for efficient multimodal reasoning, coding, and tool use",
+   "type": "chat",
+   "family": "step",
+   "canonical_id": "stepfun/step-3.5-flash-2603",
+   "release_date": "2026-04-02",
+   "limit": {
+    "context": 256000,
+    "input": 256000,
+    "output": 256000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": {
+      "min_tokens": 256
+     }
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.10461,
+      "cache": {
+       "read": 0.02092
+      }
+     },
+     "output": {
+      "price": 0.31384
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.stepfun.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "messages": {
+     "base_url": "https://api.stepfun.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-01",
+   "last_updated": "2026-04-02"
   }
  }
 }

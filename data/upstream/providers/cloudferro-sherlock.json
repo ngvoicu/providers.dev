@@ -6,98 +6,41 @@
   "CLOUDFERRO_SHERLOCK_API_KEY"
  ],
  "models": {
-  "openai/gpt-oss-120b": {
-   "id": "openai/gpt-oss-120b",
-   "name": "OpenAI GPT OSS 120B",
+  "meta-llama/Llama-3.3-70B-Instruct": {
+   "id": "meta-llama/Llama-3.3-70B-Instruct",
+   "name": "Llama 3.3 70B Instruct",
+   "description": "Open Llama instruction model for multilingual chat, reasoning, and coding",
    "type": "chat",
-   "canonical_id": "openai/gpt-oss-120b",
-   "family": "gpt-oss",
-   "release_date": "2025-08-05",
+   "family": "llama",
+   "canonical_id": "meta/llama-3.3-70b-instruct",
+   "release_date": "2024-12-06",
    "limit": {
-    "context": 131000,
-    "output": 131000
+    "context": 70000,
+    "output": 70000
    },
    "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": true,
     "temperature": true,
-    "top_p": true,
     "top_k": true,
+    "top_p": true,
     "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
-   "open_weights": true,
-   "knowledge": "2024-06",
-   "last_updated": "2025-08-05",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2.92
-     },
-     "output": {
-      "price": 2.92
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api-sherlock.cloudferro.com/openai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "speakleash/Bielik-11B-v3.0-Instruct": {
-   "id": "speakleash/Bielik-11B-v3.0-Instruct",
-   "name": "Bielik 11B v3.0 Instruct",
-   "type": "chat",
-   "release_date": "2025-03-13",
-   "limit": {
-    "context": 32000,
-    "output": 32000
-   },
-   "capabilities": {
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": false
-    },
-    "structured_output": true,
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Open-weight instruction model for adaptable chat and self-hosted production workloads",
-   "open_weights": true,
-   "knowledge": "2025-03",
-   "last_updated": "2025-03-13",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2.92
+     },
+     "output": {
+      "price": 2.92
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text"
@@ -105,16 +48,6 @@
     "output": [
      "text"
     ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.67
-     },
-     "output": {
-      "price": 0.67
-     }
-    }
    },
    "api": {
     "chat-completions": {
@@ -129,20 +62,30 @@
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "knowledge": "2024-10-09",
+   "last_updated": "2024-12-06"
   },
   "zai-org/GLM-5.3": {
    "id": "zai-org/GLM-5.3",
    "name": "GLM-5.3",
+   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
    "type": "chat",
-   "canonical_id": "zhipuai/glm-5.3",
    "family": "glm",
+   "canonical_id": "zhipuai/glm-5.3",
    "release_date": "2026-08-14",
    "limit": {
     "context": 262144,
     "output": 131072
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -152,24 +95,7 @@
       "low",
       "high"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
-   "open_weights": true,
-   "last_updated": "2026-08-14",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -181,6 +107,14 @@
      }
     }
    },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "https://api-sherlock.cloudferro.com/openai/v1",
@@ -194,38 +128,51 @@
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-14"
   },
-  "MiniMaxAI/MiniMax-M2.5": {
-   "id": "MiniMaxAI/MiniMax-M2.5",
-   "name": "MiniMax-M2.5",
+  "openai/gpt-oss-120b": {
+   "id": "openai/gpt-oss-120b",
+   "name": "OpenAI GPT OSS 120B",
+   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
    "type": "chat",
-   "canonical_id": "minimax/MiniMax-M2.5",
-   "family": "minimax",
-   "release_date": "2026-02-12",
+   "family": "gpt-oss",
+   "canonical_id": "openai/gpt-oss-120b",
+   "release_date": "2025-08-05",
    "limit": {
-    "context": 196000,
-    "input": 180000,
-    "output": 16000
+    "context": 131000,
+    "output": 131000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": true
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
    },
-   "description": "MiniMax model for chat, coding, office work, and agentic tasks",
-   "open_weights": true,
-   "knowledge": "2026-01",
-   "last_updated": "2026-02-12",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2.92
+     },
+     "output": {
+      "price": 2.92
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text"
@@ -233,6 +180,51 @@
     "output": [
      "text"
     ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api-sherlock.cloudferro.com/openai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-06",
+   "last_updated": "2025-08-05"
+  },
+  "MiniMaxAI/MiniMax-M2.5": {
+   "id": "MiniMaxAI/MiniMax-M2.5",
+   "name": "MiniMax-M2.5",
+   "description": "MiniMax model for chat, coding, office work, and agentic tasks",
+   "type": "chat",
+   "family": "minimax",
+   "canonical_id": "minimax/MiniMax-M2.5",
+   "release_date": "2026-02-12",
+   "limit": {
+    "context": 196000,
+    "input": 180000,
+    "output": 16000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
    },
    "cost": {
     "text": {
@@ -244,49 +236,6 @@
      }
     }
    },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api-sherlock.cloudferro.com/openai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "meta-llama/Llama-3.3-70B-Instruct": {
-   "id": "meta-llama/Llama-3.3-70B-Instruct",
-   "name": "Llama 3.3 70B Instruct",
-   "type": "chat",
-   "canonical_id": "meta/llama-3.3-70b-instruct",
-   "family": "llama",
-   "release_date": "2024-12-06",
-   "limit": {
-    "context": 70000,
-    "output": 70000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open Llama instruction model for multilingual chat, reasoning, and coding",
-   "open_weights": true,
-   "knowledge": "2024-10-09",
-   "last_updated": "2024-12-06",
    "modalities": {
     "input": [
      "text"
@@ -295,15 +244,63 @@
      "text"
     ]
    },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api-sherlock.cloudferro.com/openai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2026-01",
+   "last_updated": "2026-02-12"
+  },
+  "speakleash/Bielik-11B-v3.0-Instruct": {
+   "id": "speakleash/Bielik-11B-v3.0-Instruct",
+   "name": "Bielik 11B v3.0 Instruct",
+   "description": "Open-weight instruction model for adaptable chat and self-hosted production workloads",
+   "type": "chat",
+   "release_date": "2025-03-13",
+   "limit": {
+    "context": 32000,
+    "output": 32000
+   },
+   "capabilities": {
+    "temperature": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
    "cost": {
     "text": {
      "input": {
-      "price": 2.92
+      "price": 0.67
      },
      "output": {
-      "price": 2.92
+      "price": 0.67
      }
     }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
    },
    "api": {
     "chat-completions": {
@@ -318,7 +315,10 @@
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "knowledge": "2025-03",
+   "last_updated": "2025-03-13"
   }
  }
 }

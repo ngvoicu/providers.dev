@@ -9,6 +9,7 @@
   "step-5-preview": {
    "id": "step-5-preview",
    "name": "Step 5 Preview",
+   "description": "StepFun's next-generation flagship base model for coding and professional knowledge work, with native text, image, and video input and a 1M-token context window",
    "type": "chat",
    "canonical_id": "stepfun/step-5-preview",
    "release_date": "2026-09-16",
@@ -23,6 +24,12 @@
       "min_tokens": 256
      }
     },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -33,17 +40,8 @@
       "medium",
       "high"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "StepFun's next-generation flagship base model for coding and professional knowledge work, with native text, image, and video input and a 1M-token context window",
-   "open_weights": true,
-   "last_updated": "2026-09-20",
    "modalities": {
     "input": [
      "text",
@@ -66,14 +64,14 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
      "capabilities": {
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
      }
     },
     "messages": {
@@ -88,230 +86,14 @@
       }
      }
     }
-   }
-  },
-  "step-router-v1": {
-   "id": "step-router-v1",
-   "name": "Step Router v1",
-   "type": "chat",
-   "release_date": "2026-05-29",
-   "limit": {
-    "context": 256000,
-    "input": 256000,
-    "output": 256000
    },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "StepFun routing model that dispatches requests to the appropriate Step model.",
-   "open_weights": false,
-   "knowledge": "2025-01",
-   "last_updated": "2026-05-29",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.stepfun.com/step_plan/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.stepfun.com/step_plan/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "step-3.5-flash": {
-   "id": "step-3.5-flash",
-   "name": "Step 3.5 Flash",
-   "type": "chat",
-   "canonical_id": "stepfun/step-3.5-flash",
-   "family": "step",
-   "release_date": "2026-01-29",
-   "limit": {
-    "context": 256000,
-    "input": 256000,
-    "output": 256000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": {
-      "min_tokens": 256
-     }
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "StepFun flash lane for quick multimodal reasoning and coding assistance",
    "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-02-13",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.stepfun.com/step_plan/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.stepfun.com/step_plan/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "step-3.5-flash-2603": {
-   "id": "step-3.5-flash-2603",
-   "name": "Step 3.5 Flash 2603",
-   "type": "chat",
-   "canonical_id": "stepfun/step-3.5-flash-2603",
-   "family": "step",
-   "release_date": "2026-04-02",
-   "limit": {
-    "context": 256000,
-    "input": 256000,
-    "output": 256000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": {
-      "min_tokens": 256
-     }
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "StepFun flash model for efficient multimodal reasoning, coding, and tool use",
-   "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-04-02",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.stepfun.com/step_plan/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.stepfun.com/step_plan/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
+   "last_updated": "2026-09-20"
   },
   "step-3.7-flash": {
    "id": "step-3.7-flash",
    "name": "Step 3.7 Flash",
+   "description": "Newer StepFun flash model for faster agents, coding, and multimodal prompts",
    "type": "chat",
    "canonical_id": "stepfun/step-3.7-flash",
    "release_date": "2026-05-29",
@@ -326,6 +108,12 @@
       "min_tokens": 256
      }
     },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -336,18 +124,8 @@
       "medium",
       "high"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Newer StepFun flash model for faster agents, coding, and multimodal prompts",
-   "open_weights": true,
-   "knowledge": "2026-03-01",
-   "last_updated": "2026-05-29",
    "modalities": {
     "input": [
      "text",
@@ -370,14 +148,14 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
      "capabilities": {
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
      }
     },
     "messages": {
@@ -392,7 +170,229 @@
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "knowledge": "2026-03-01",
+   "last_updated": "2026-05-29"
+  },
+  "step-router-v1": {
+   "id": "step-router-v1",
+   "name": "Step Router v1",
+   "description": "StepFun routing model that dispatches requests to the appropriate Step model.",
+   "type": "chat",
+   "release_date": "2026-05-29",
+   "limit": {
+    "context": 256000,
+    "input": 256000,
+    "output": 256000
+   },
+   "capabilities": {
+    "temperature": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.stepfun.com/step_plan/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "messages": {
+     "base_url": "https://api.stepfun.com/step_plan/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2026-05-29"
+  },
+  "step-3.5-flash": {
+   "id": "step-3.5-flash",
+   "name": "Step 3.5 Flash",
+   "description": "StepFun flash lane for quick multimodal reasoning and coding assistance",
+   "type": "chat",
+   "family": "step",
+   "canonical_id": "stepfun/step-3.5-flash",
+   "release_date": "2026-01-29",
+   "limit": {
+    "context": 256000,
+    "input": 256000,
+    "output": 256000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": {
+      "min_tokens": 256
+     }
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high"
+     ]
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.stepfun.com/step_plan/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "messages": {
+     "base_url": "https://api.stepfun.com/step_plan/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-01",
+   "last_updated": "2026-02-13"
+  },
+  "step-3.5-flash-2603": {
+   "id": "step-3.5-flash-2603",
+   "name": "Step 3.5 Flash 2603",
+   "description": "StepFun flash model for efficient multimodal reasoning, coding, and tool use",
+   "type": "chat",
+   "family": "step",
+   "canonical_id": "stepfun/step-3.5-flash-2603",
+   "release_date": "2026-04-02",
+   "limit": {
+    "context": 256000,
+    "input": 256000,
+    "output": 256000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": {
+      "min_tokens": 256
+     }
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high"
+     ]
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.stepfun.com/step_plan/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "messages": {
+     "base_url": "https://api.stepfun.com/step_plan/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-01",
+   "last_updated": "2026-04-02"
   }
  }
 }

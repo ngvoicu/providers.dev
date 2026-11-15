@@ -6,159 +6,79 @@
   "TINFOIL_API_KEY"
  ],
  "models": {
-  "deepseek-v4-1-flash": {
-   "id": "deepseek-v4-1-flash",
-   "name": "DeepSeek V4.1 Flash",
-   "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4.1-flash",
-   "family": "deepseek-flash",
+  "decision-medium": {
+   "id": "decision-medium",
+   "name": "Decision Medium",
+   "description": "vLLM Semantic Router 9B decision model that answers typed choice, yes/no and score questions about text, images or video with probabilities",
+   "type": "decision",
+   "canonical_id": "vllm-sr/d3-flash",
    "status": "beta",
-   "release_date": "2026-09-10",
+   "release_date": "2026-10-10",
    "limit": {
-    "context": 1048576,
-    "output": 384000
+    "context": 32768
    },
    "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
+    "cache": false,
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
     "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "DeepSeek V4.1 Flash model for reasoning and agentic coding",
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-09-10",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.6,
-      "cache": {
-       "read": 0.01
-      }
-     },
-     "output": {
-      "price": 1.45
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://inference.tinfoil.sh/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "llama3-3-70b": {
-   "id": "llama3-3-70b",
-   "name": "Llama-3.3-70B-Instruct",
-   "type": "chat",
-   "canonical_id": "meta/llama-3.3-70b-instruct",
-   "family": "llama",
-   "release_date": "2024-12-06",
-   "limit": {
-    "context": 131072,
-    "output": 4096
-   },
-   "capabilities": {
+    "effort_updates": false,
     "tools": {
-     "supported": true
+     "supported": false
     },
     "reasoning": {
      "supported": false
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Popular open Llama workhorse for multilingual chat, coding, and self-hosting",
-   "open_weights": true,
-   "knowledge": "2023-12",
-   "last_updated": "2024-12-06",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.06
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text"
     ],
     "output": [
-     "text"
+     "decision"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.75
-     },
-     "output": {
-      "price": 2.75
+   "api": {
+    "decisions": {
+     "base_url": "https://inference.tinfoil.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai"
      }
     }
    },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://inference.tinfoil.sh/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
+   "open_weights": true,
+   "last_updated": "2026-10-10"
   },
   "gpt-oss-120b": {
    "id": "gpt-oss-120b",
    "name": "gpt-oss-120b",
+   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
    "type": "chat",
-   "canonical_id": "openai/gpt-oss-120b",
    "family": "gpt-oss",
+   "canonical_id": "openai/gpt-oss-120b",
    "release_date": "2025-08-05",
    "limit": {
     "context": 131072,
-    "output": 32768
+    "output": 131072
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -169,25 +89,7 @@
       "medium",
       "high"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
-   "open_weights": true,
-   "knowledge": "2024-06",
-   "last_updated": "2025-08-05",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -199,84 +101,13 @@
      }
     }
    },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://inference.tinfoil.sh/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "kimi-k3-1-pro": {
-   "id": "kimi-k3-1-pro",
-   "name": "Kimi K3.1 Pro",
-   "type": "chat",
-   "canonical_id": "moonshotai/kimi-k3.1-pro",
-   "family": "kimi-k3",
-   "release_date": "2026-10-23",
-   "limit": {
-    "context": 262144,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "default": {
-      "type": "effort",
-      "value": "max"
-     },
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Multimodal Kimi model with a 1M-token context window and always-on reasoning, for coding, 3D creation and financial research",
-   "open_weights": true,
-   "last_updated": "2026-10-23",
    "modalities": {
     "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/webp"
+     "text"
     ],
     "output": [
      "text"
     ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 4,
-      "cache": {
-       "read": 0.4
-      }
-     },
-     "output": {
-      "price": 20
-     }
-    }
    },
    "api": {
     "chat-completions": {
@@ -291,72 +122,30 @@
       }
      }
     }
-   }
-  },
-  "nomic-embed-text": {
-   "id": "nomic-embed-text",
-   "name": "Nomic Embed Text v1.5",
-   "type": "chat",
-   "release_date": "2024-02",
-   "limit": {
-    "context": 8192,
-    "output": 768
    },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "structured_output": false,
-    "temperature": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Embedding model for semantic search, retrieval, clustering, and ranking pipelines",
    "open_weights": true,
-   "last_updated": "2024-02",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.016
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://inference.tinfoil.sh/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     }
-    }
-   }
+   "knowledge": "2024-06",
+   "last_updated": "2025-08-05"
   },
   "gemma4-31b": {
    "id": "gemma4-31b",
    "name": "Gemma 4 31B IT",
+   "description": "Largest Gemma 4 instruction model for open, self-hosted chat and reasoning",
    "type": "chat",
-   "canonical_id": "google/gemma-4-31b-it",
    "family": "gemma",
+   "canonical_id": "google/gemma-4-31b-it",
    "release_date": "2026-04-02",
    "limit": {
     "context": 262144,
     "output": 32768
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -371,18 +160,18 @@
       "xhigh",
       "max"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Largest Gemma 4 instruction model for open, self-hosted chat and reasoning",
-   "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-04-02",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.4
+     },
+     "output": {
+      "price": 1
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text",
@@ -396,15 +185,85 @@
      "text"
     ]
    },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://inference.tinfoil.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-01",
+   "last_updated": "2026-04-02"
+  },
+  "kimi-k3-1-pro": {
+   "id": "kimi-k3-1-pro",
+   "name": "Kimi K3.1 Pro",
+   "description": "Multimodal Kimi model with a 1M-token context window and always-on reasoning, for coding, 3D creation and financial research",
+   "type": "chat",
+   "family": "kimi-k3",
+   "canonical_id": "moonshotai/kimi-k3.1-pro",
+   "release_date": "2026-10-23",
+   "limit": {
+    "context": 262144,
+    "output": 262144
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ],
+     "default": {
+      "type": "effort",
+      "value": "max"
+     }
+    }
+   },
    "cost": {
     "text": {
      "input": {
-      "price": 0.4
+      "price": 4,
+      "cache": {
+       "read": 0.4
+      }
      },
      "output": {
-      "price": 1
+      "price": 20
      }
     }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
    },
    "api": {
     "chat-completions": {
@@ -419,42 +278,45 @@
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "last_updated": "2026-10-23"
   },
-  "gpt-oss-safeguard-120b": {
-   "id": "gpt-oss-safeguard-120b",
-   "name": "gpt-oss-safeguard-120b",
+  "llama3-3-70b": {
+   "id": "llama3-3-70b",
+   "name": "Llama-3.3-70B-Instruct",
+   "description": "Popular open Llama workhorse for multilingual chat, coding, and self-hosting",
    "type": "chat",
-   "canonical_id": "openai/gpt-oss-safeguard-120b",
-   "family": "gpt-oss",
-   "release_date": "2025-10-29",
+   "family": "llama",
+   "canonical_id": "meta/llama-3.3-70b-instruct",
+   "release_date": "2024-12-06",
    "limit": {
     "context": 131072,
-    "output": 32768
+    "output": 4096
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
+     "supported": false
+    }
    },
-   "description": "Safety model for policy screening, moderation, and risk-aware routing workflows",
-   "open_weights": true,
-   "knowledge": "2024-06",
-   "last_updated": "2025-10-29",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.75
+     },
+     "output": {
+      "price": 2.75
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text"
@@ -463,16 +325,6 @@
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.15
-     },
-     "output": {
-      "price": 0.6
-     }
-    }
-   },
    "api": {
     "chat-completions": {
      "base_url": "https://inference.tinfoil.sh/v1",
@@ -486,14 +338,124 @@
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "knowledge": "2023-12",
+   "last_updated": "2024-12-06"
+  },
+  "decision-small": {
+   "id": "decision-small",
+   "name": "Decision Small",
+   "description": "vLLM Semantic Router 4B decision model that answers typed choice, yes/no and score questions about text, images or video with probabilities",
+   "type": "decision",
+   "canonical_id": "vllm-sr/d3-mini",
+   "status": "beta",
+   "release_date": "2026-10-10",
+   "limit": {
+    "context": 32768
+   },
+   "capabilities": {
+    "cache": false,
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.02
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "decision"
+    ]
+   },
+   "api": {
+    "decisions": {
+     "base_url": "https://inference.tinfoil.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-10-10"
+  },
+  "nomic-embed-text": {
+   "id": "nomic-embed-text",
+   "name": "Nomic Embed Text v1.5",
+   "description": "Embedding model for semantic search, retrieval, clustering, and ranking pipelines",
+   "type": "chat",
+   "release_date": "2024-02",
+   "limit": {
+    "context": 8192,
+    "output": 768
+   },
+   "capabilities": {
+    "temperature": false,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.016
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://inference.tinfoil.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2024-02"
   },
   "glm-5-3": {
    "id": "glm-5-3",
    "name": "GLM-5.3",
+   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
    "type": "chat",
-   "canonical_id": "zhipuai/glm-5.3",
    "family": "glm",
+   "canonical_id": "zhipuai/glm-5.3",
    "release_date": "2026-08-14",
    "limit": {
     "context": 1048576,
@@ -503,6 +465,12 @@
     "cache": {
      "implicit": true
     },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -513,24 +481,7 @@
       "high",
       "max"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
-   "open_weights": true,
-   "last_updated": "2026-08-14",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -545,6 +496,14 @@
      }
     }
    },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "https://inference.tinfoil.sh/v1",
@@ -558,7 +517,210 @@
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-14"
+  },
+  "decision-large": {
+   "id": "decision-large",
+   "name": "Decision Large",
+   "description": "vLLM Semantic Router 27B decision model that answers typed choice, yes/no and score questions about text, images or video with probabilities",
+   "type": "decision",
+   "canonical_id": "vllm-sr/d3",
+   "status": "beta",
+   "release_date": "2026-10-10",
+   "limit": {
+    "context": 32768
+   },
+   "capabilities": {
+    "cache": false,
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.4
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "decision"
+    ]
+   },
+   "api": {
+    "decisions": {
+     "base_url": "https://inference.tinfoil.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-10-10"
+  },
+  "gpt-oss-safeguard-120b": {
+   "id": "gpt-oss-safeguard-120b",
+   "name": "gpt-oss-safeguard-120b",
+   "description": "Safety model for policy screening, moderation, and risk-aware routing workflows",
+   "type": "chat",
+   "family": "gpt-oss",
+   "canonical_id": "openai/gpt-oss-safeguard-120b",
+   "release_date": "2025-10-29",
+   "limit": {
+    "context": 131072,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.15
+     },
+     "output": {
+      "price": 0.6
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://inference.tinfoil.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-06",
+   "last_updated": "2025-10-29"
+  },
+  "deepseek-v4-1-flash": {
+   "id": "deepseek-v4-1-flash",
+   "name": "DeepSeek V4.1 Flash",
+   "description": "DeepSeek V4.1 Flash model for reasoning and agentic coding",
+   "type": "chat",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4.1-flash",
+   "status": "beta",
+   "release_date": "2026-09-10",
+   "limit": {
+    "context": 1048576,
+    "output": 384000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.6,
+      "cache": {
+       "read": 0.01
+      }
+     },
+     "output": {
+      "price": 1.45
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://inference.tinfoil.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-09-10"
   }
  }
 }

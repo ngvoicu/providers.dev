@@ -6,106 +6,43 @@
   "OPENREASON_API_KEY"
  ],
  "models": {
-  "openai/gpt-oss-120b": {
-   "id": "openai/gpt-oss-120b",
-   "name": "GPT OSS 120B",
-   "type": "chat",
-   "canonical_id": "openai/gpt-oss-120b",
-   "family": "gpt-oss",
-   "release_date": "2025-08-05",
-   "limit": {
-    "context": 131072,
-    "output": 32768
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
-   "open_weights": true,
-   "knowledge": "2024-06",
-   "last_updated": "2025-08-05",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.1055
-     },
-     "output": {
-      "price": 0.422
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.openreason.app/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
   "moonshotai/kimi-k2.7-code": {
    "id": "moonshotai/kimi-k2.7-code",
    "name": "Kimi K2.7 Code",
+   "description": "Coding-focused Kimi model, stronger on long-horizon repo work with less overthinking",
    "type": "chat",
-   "canonical_id": "moonshotai/kimi-k2.7-code",
    "family": "kimi-k2",
+   "canonical_id": "moonshotai/kimi-k2.7-code",
    "release_date": "2026-06-12",
    "limit": {
     "context": 262144,
     "output": 262144
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": true,
      "toggle": true
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Coding-focused Kimi model, stronger on long-horizon repo work with less overthinking",
-   "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-06-12",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.0022
+     },
+     "output": {
+      "price": 4.22
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text",
@@ -121,16 +58,6 @@
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.0022
-     },
-     "output": {
-      "price": 4.22
-     }
-    }
-   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.openreason.app/v1",
@@ -138,29 +65,39 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
      "capabilities": {
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
      }
     }
-   }
+   },
+   "open_weights": true,
+   "knowledge": "2025-01",
+   "last_updated": "2026-06-12"
   },
   "deepseek-ai/deepseek-v4-flash-0731": {
    "id": "deepseek-ai/deepseek-v4-flash-0731",
    "name": "DeepSeek V4 Flash 0731",
+   "description": "Official DeepSeek V4 Flash release with enhanced agentic capabilities and integrated DSpark speculative decoding",
    "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4-flash-0731",
    "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4-flash-0731",
    "release_date": "2026-07-31",
    "limit": {
     "context": 1000000,
     "output": 384000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -175,25 +112,7 @@
       "xhigh",
       "max"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Official DeepSeek V4 Flash release with enhanced agentic capabilities and integrated DSpark speculative decoding",
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-07-31",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -205,6 +124,14 @@
      }
     }
    },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.openreason.app/v1",
@@ -212,16 +139,89 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
      "compatibility": {
       "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-07-31"
+  },
+  "openai/gpt-oss-120b": {
+   "id": "openai/gpt-oss-120b",
+   "name": "GPT OSS 120B",
+   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
+   "type": "chat",
+   "family": "gpt-oss",
+   "canonical_id": "openai/gpt-oss-120b",
+   "release_date": "2025-08-05",
+   "limit": {
+    "context": 131072,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1055
+     },
+     "output": {
+      "price": 0.422
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.openreason.app/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
      "capabilities": {
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
      }
     }
-   }
+   },
+   "open_weights": true,
+   "knowledge": "2024-06",
+   "last_updated": "2025-08-05"
   }
  }
 }

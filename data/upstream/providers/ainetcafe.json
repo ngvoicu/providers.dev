@@ -9,15 +9,22 @@
   "Kimi-K3": {
    "id": "Kimi-K3",
    "name": "Kimi K3",
+   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
    "type": "chat",
-   "canonical_id": "moonshotai/kimi-k3",
    "family": "kimi-k3",
+   "canonical_id": "moonshotai/kimi-k3",
    "release_date": "2026-07-16",
    "limit": {
     "context": 262144,
     "output": 32768
    },
    "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -28,17 +35,21 @@
       "high",
       "max"
      ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
-   "open_weights": true,
-   "last_updated": "2026-07-16",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2.1,
+      "cache": {
+       "read": 0.3
+      }
+     },
+     "output": {
+      "price": 10.5
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text",
@@ -54,19 +65,6 @@
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2.1,
-      "cache": {
-       "read": 0.3
-      }
-     },
-     "output": {
-      "price": 10.5
-     }
-    }
-   },
    "api": {
     "chat-completions": {
      "base_url": "https://microquickjs.com/v1",
@@ -74,16 +72,18 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
      "capabilities": {
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
      }
     }
-   }
+   },
+   "open_weights": true,
+   "last_updated": "2026-07-16"
   }
  }
 }

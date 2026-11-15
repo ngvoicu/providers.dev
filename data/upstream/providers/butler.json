@@ -1,0 +1,81 @@
+{
+ "id": "butler",
+ "name": "Butler",
+ "doc": "https://butlercompute.com/platform/",
+ "env": [
+  "BUTLER_API_KEY"
+ ],
+ "models": {
+  "cicero": {
+   "id": "cicero",
+   "name": "Cicero",
+   "description": "Open-weight decision model built on Qwen3.5-35B-A3B that answers typed yes/no, choice and score questions about text, chats or images with calibrated probabilities",
+   "type": "decision",
+   "canonical_id": "butler/cicero",
+   "release_date": "2026-11-05",
+   "limit": {
+    "context": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.01,
+      "cache": {
+       "read": 0.005
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp"
+    ],
+    "output": [
+     "decision"
+    ]
+   },
+   "api": {
+    "systemone": {
+     "base_url": "https://api.butlercompute.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/typesafe-ai",
+      "opencodeai": "@opencode/ai/providers/typesafe-ai/decisions"
+     },
+     "compatibility": {
+      "media_input": "root"
+     }
+    },
+    "decisions": {
+     "base_url": "https://api.butlercompute.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-11-05"
+  }
+ }
+}

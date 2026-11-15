@@ -9,38 +9,28 @@
   "LongCat-2.0": {
    "id": "LongCat-2.0",
    "name": "LongCat-2.0",
+   "description": "Meituan LongCat-2.0, a reasoning model with tool calling and a 1M-token context window",
    "type": "chat",
-   "canonical_id": "meituan/longcat-2.0",
    "family": "longcat",
+   "canonical_id": "meituan/longcat-2.0",
    "release_date": "2026-06-30",
    "limit": {
     "context": 1048576,
     "output": 131072
    },
    "capabilities": {
+    "temperature": false,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": true,
      "toggle": true
-    },
-    "temperature": false,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Meituan LongCat-2.0, a reasoning model with tool calling and a 1M-token context window",
-   "open_weights": true,
-   "last_updated": "2026-06-30",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -55,6 +45,14 @@
      }
     }
    },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.longcat.chat/openai",
@@ -62,14 +60,14 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
      "capabilities": {
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
      }
     },
     "responses": {
@@ -96,36 +94,49 @@
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "last_updated": "2026-06-30"
   },
   "LongCat-2.5-Preview": {
    "id": "LongCat-2.5-Preview",
    "name": "LongCat-2.5-Preview",
+   "description": "Meituan's multimodal reasoning model for coding and agent tasks, with image understanding and a 1M-token context window",
    "type": "chat",
-   "canonical_id": "meituan/longcat-2.5-preview",
    "family": "longcat",
+   "canonical_id": "meituan/longcat-2.5-preview",
    "release_date": "2026-09-25",
    "limit": {
     "context": 1048576,
     "output": 262144
    },
    "capabilities": {
+    "temperature": false,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": true,
      "toggle": true
-    },
-    "temperature": false,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Meituan's multimodal reasoning model for coding and agent tasks, with image understanding and a 1M-token context window",
-   "open_weights": false,
-   "last_updated": "2026-09-25",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.3,
+      "cache": {
+       "read": 0.006
+      }
+     },
+     "output": {
+      "price": 1.2
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text",
@@ -135,19 +146,6 @@
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.3,
-      "cache": {
-       "read": 0.006
-      }
-     },
-     "output": {
-      "price": 1.2
-     }
-    }
-   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.longcat.chat/openai",
@@ -155,14 +153,14 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
-     "compatibility": {
-      "reasoning_field": "reasoning_content",
-      "max_tokens_field": "max_tokens"
-     },
      "capabilities": {
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
      }
     },
     "responses": {
@@ -189,7 +187,9 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "last_updated": "2026-09-25"
   }
  }
 }

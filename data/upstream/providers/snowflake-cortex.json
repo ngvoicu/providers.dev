@@ -10,9 +10,10 @@
   "openai-gpt-5.2": {
    "id": "openai-gpt-5.2",
    "name": "GPT-5.2",
+   "description": "Reliable GPT generation for broad coding, writing, and tool-assisted product work",
    "type": "chat",
-   "canonical_id": "openai/gpt-5.2",
    "family": "gpt",
+   "canonical_id": "openai/gpt-5.2",
    "release_date": "2025-12-11",
    "limit": {
     "context": 400000,
@@ -25,6 +26,14 @@
       "min_tokens": 1024
      }
     },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "prompt_cache_key": true,
+    "store": false,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -37,31 +46,7 @@
       "medium",
       "high"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "store": false,
-    "prompt_cache_key": true
-   },
-   "description": "Reliable GPT generation for broad coding, writing, and tool-assisted product work",
-   "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2025-12-11",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -88,6 +73,18 @@
      }
     ]
    },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
@@ -101,18 +98,22 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2025-12-11"
   },
-  "claude-opus-4-6": {
-   "id": "claude-opus-4-6",
-   "name": "Claude Opus 4.6",
+  "claude-haiku-4-5": {
+   "id": "claude-haiku-4-5",
+   "name": "Claude Haiku 4.5 (latest)",
+   "description": "Fast Claude lane for lightweight agents, office tasks, and responsive chat",
    "type": "chat",
-   "canonical_id": "anthropic/claude-opus-4-6",
-   "family": "claude-opus",
-   "release_date": "2026-02-05",
+   "family": "claude-haiku",
+   "canonical_id": "anthropic/claude-haiku-4-5",
+   "release_date": "2025-10-15",
    "limit": {
-    "context": 1000000,
-    "output": 128000
+    "context": 200000,
+    "output": 64000
    },
    "capabilities": {
     "cache": {
@@ -127,25 +128,47 @@
       ]
      }
     },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "store": false,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": true,
      "budget": {}
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "store": false
+    }
    },
-   "description": "High-end Claude for difficult coding, planning, and slower expert reasoning",
-   "open_weights": false,
-   "knowledge": "2025-05-31",
-   "last_updated": "2026-03-13",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1,
+      "cache": {
+       "read": 0.1,
+       "write": 1.25
+      }
+     },
+     "output": {
+      "price": 5
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "not": {
+        "region": {
+         "equals": "global"
+        }
+       }
+      },
+      "factor": 1.1
+     }
+    ]
+   },
    "modalities": {
     "input": [
      "text",
@@ -157,6 +180,76 @@
     "output": [
      "text"
     ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-02-28",
+   "last_updated": "2025-10-15"
+  },
+  "claude-opus-4-5": {
+   "id": "claude-opus-4-5",
+   "name": "Claude Opus 4.5 (latest)",
+   "description": "Flagship Claude model for deep reasoning, coding, and long-horizon agents",
+   "type": "chat",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-4-5",
+   "release_date": "2025-11-24",
+   "limit": {
+    "context": 200000,
+    "output": 64000
+   },
+   "capabilities": {
+    "cache": {
+     "explicit": {
+      "ttl": [
+       "5m"
+      ],
+      "max_breakpoints": 4,
+      "targets": [
+       "system",
+       "messages"
+      ]
+     }
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "store": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "budget": {}
+    }
    },
    "cost": {
     "text": {
@@ -184,6 +277,18 @@
      }
     ]
    },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
@@ -209,211 +314,22 @@
       }
      }
     }
-   }
-  },
-  "mistral-large2": {
-   "id": "mistral-large2",
-   "name": "Mistral Large 2407",
-   "type": "chat",
-   "canonical_id": "mistral/mistral-large-2407",
-   "family": "mistral-large",
-   "release_date": "2024-07-24",
-   "limit": {
-    "context": 128000,
-    "output": 8192
    },
-   "capabilities": {
-    "cache": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "structured_output": false,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "store": false
-   },
-   "description": "Flagship Mistral model for advanced reasoning, coding, and multilingual work",
-   "open_weights": true,
-   "knowledge": "2024-03-31",
-   "last_updated": "2024-07-24",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2
-     },
-     "output": {
-      "price": 6
-     }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "not": {
-        "region": {
-         "equals": "global"
-        }
-       }
-      },
-      "factor": 1.1
-     }
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     }
-    }
-   }
-  },
-  "openai-gpt-5.6-luna": {
-   "id": "openai-gpt-5.6-luna",
-   "name": "GPT-5.6 Luna",
-   "type": "chat",
-   "canonical_id": "openai/gpt-5.6-luna",
-   "family": "gpt-luna",
-   "release_date": "2026-07-09",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": {
-      "min_tokens": 1024
-     }
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "store": false,
-    "prompt_cache_key": true
-   },
-   "description": "Cost-efficient GPT-5.6 model for fast, high-volume workloads",
    "open_weights": false,
-   "knowledge": "2026-02-16",
-   "last_updated": "2026-07-09",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.2,
-      "cache": {
-       "read": 0.02,
-       "write": 0.25
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 0.4,
-        "cache": {
-         "read": 0.04,
-         "write": 0.5
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 1.2,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 1.8
-       }
-      ]
-     }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "not": {
-        "region": {
-         "equals": "global"
-        }
-       }
-      },
-      "factor": 1.1
-     }
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
+   "knowledge": "2025-05",
+   "last_updated": "2025-11-24"
   },
-  "claude-fable-5": {
-   "id": "claude-fable-5",
-   "name": "Claude Fable 5",
+  "claude-sonnet-4-5": {
+   "id": "claude-sonnet-4-5",
+   "name": "Claude Sonnet 4.5 (latest)",
+   "description": "Balanced Claude model for coding, analysis, agent workflows, and cost control",
    "type": "chat",
-   "canonical_id": "anthropic/claude-fable-5",
-   "family": "claude-fable",
-   "status": "beta",
-   "release_date": "2026-06-09",
+   "family": "claude-sonnet",
+   "canonical_id": "anthropic/claude-sonnet-4-5",
+   "release_date": "2025-09-29",
    "limit": {
-    "context": 1000000,
-    "output": 128000
+    "context": 200000,
+    "output": 64000
    },
    "capabilities": {
     "cache": {
@@ -428,47 +344,32 @@
       ]
      }
     },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "store": false,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": true
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "store": false
-   },
-   "description": "Claude model for creative writing, analysis, and controlled agent workflows",
-   "open_weights": false,
-   "knowledge": "2026-01-31",
-   "last_updated": "2026-06-09",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
+     "supported": true,
+     "budget": {}
+    }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 10,
+      "price": 3,
       "cache": {
-       "read": 1,
-       "write": 12.5
+       "read": 0.3,
+       "write": 3.75
       }
      },
      "output": {
-      "price": 50
+      "price": 15
      }
     },
     "multipliers": [
@@ -482,6 +383,18 @@
       },
       "factor": 1.1
      }
+    ]
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
     ]
    },
    "api": {
@@ -509,14 +422,116 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2025-07-31",
+   "last_updated": "2025-09-29"
+  },
+  "snowflake-llama3.3-70b": {
+   "id": "snowflake-llama3.3-70b",
+   "name": "Llama-3.3-70B-Instruct",
+   "description": "Popular open Llama workhorse for multilingual chat, coding, and self-hosting",
+   "type": "chat",
+   "family": "llama",
+   "canonical_id": "meta/llama-3.3-70b-instruct",
+   "release_date": "2024-12-06",
+   "limit": {
+    "context": 128000,
+    "output": 4096
+   },
+   "capabilities": {
+    "cache": false,
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "store": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2023-12",
+   "last_updated": "2024-12-06"
+  },
+  "deepseek-r1": {
+   "id": "deepseek-r1",
+   "name": "DeepSeek-R1",
+   "description": "Classic open reasoning model for transparent math, coding, and deliberate problem solving",
+   "type": "chat",
+   "family": "deepseek-thinking",
+   "canonical_id": "deepseek/deepseek-r1",
+   "release_date": "2025-01-20",
+   "limit": {
+    "context": 128000,
+    "output": 32768
+   },
+   "capabilities": {
+    "cache": false,
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "store": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-07",
+   "last_updated": "2025-05-29"
   },
   "openai-gpt-5.6-terra": {
    "id": "openai-gpt-5.6-terra",
    "name": "GPT-5.6 Terra",
+   "description": "Balanced GPT-5.6 model for capable, cost-efficient everyday work",
    "type": "chat",
-   "canonical_id": "openai/gpt-5.6-terra",
    "family": "gpt-terra",
+   "canonical_id": "openai/gpt-5.6-terra",
    "release_date": "2026-07-09",
    "limit": {
     "context": 1050000,
@@ -529,6 +544,14 @@
       "min_tokens": 1024
      }
     },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "prompt_cache_key": true,
+    "store": false,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -541,31 +564,7 @@
       "medium",
       "high"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "store": false,
-    "prompt_cache_key": true
-   },
-   "description": "Balanced GPT-5.6 model for capable, cost-efficient everyday work",
-   "open_weights": false,
-   "knowledge": "2026-02-16",
-   "last_updated": "2026-07-09",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -617,6 +616,18 @@
      }
     ]
    },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
@@ -630,18 +641,143 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2026-02-16",
+   "last_updated": "2026-07-09"
   },
-  "claude-haiku-4-5": {
-   "id": "claude-haiku-4-5",
-   "name": "Claude Haiku 4.5 (latest)",
+  "openai-gpt-5.5": {
+   "id": "openai-gpt-5.5",
+   "name": "GPT-5.5",
+   "description": "Default frontier GPT for coding, computer use, research, and knowledge work",
    "type": "chat",
-   "canonical_id": "anthropic/claude-haiku-4-5",
-   "family": "claude-haiku",
-   "release_date": "2025-10-15",
+   "family": "gpt",
+   "canonical_id": "openai/gpt-5.5",
+   "status": "beta",
+   "release_date": "2026-04-23",
    "limit": {
-    "context": 200000,
-    "output": 64000
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": {
+      "min_tokens": 1024
+     }
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "prompt_cache_key": true,
+    "store": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 10,
+        "cache": {
+         "read": 1
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 30,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 45
+       }
+      ]
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "not": {
+        "region": {
+         "equals": "global"
+        }
+       }
+      },
+      "factor": 1.1
+     }
+    ]
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-12-01",
+   "last_updated": "2026-04-23"
+  },
+  "claude-fable-5": {
+   "id": "claude-fable-5",
+   "name": "Claude Fable 5",
+   "description": "Claude model for creative writing, analysis, and controlled agent workflows",
+   "type": "chat",
+   "family": "claude-fable",
+   "canonical_id": "anthropic/claude-fable-5",
+   "status": "beta",
+   "release_date": "2026-06-09",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
    },
    "capabilities": {
     "cache": {
@@ -656,48 +792,31 @@
       ]
      }
     },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "store": false,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": true,
-     "budget": {}
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "store": false
-   },
-   "description": "Fast Claude lane for lightweight agents, office tasks, and responsive chat",
-   "open_weights": false,
-   "knowledge": "2025-02-28",
-   "last_updated": "2025-10-15",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
+     "supported": true
+    }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 1,
+      "price": 10,
       "cache": {
-       "read": 0.1,
-       "write": 1.25
+       "read": 1,
+       "write": 12.5
       }
      },
      "output": {
-      "price": 5
+      "price": 50
      }
     },
     "multipliers": [
@@ -711,6 +830,18 @@
       },
       "factor": 1.1
      }
+    ]
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
     ]
    },
    "api": {
@@ -738,15 +869,19 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2026-01-31",
+   "last_updated": "2026-06-09"
   },
-  "openai-gpt-5.6-sol": {
-   "id": "openai-gpt-5.6-sol",
-   "name": "GPT-5.6 Sol",
+  "openai-gpt-5.4": {
+   "id": "openai-gpt-5.4",
+   "name": "GPT-5.4",
+   "description": "Agent-ready GPT for coding and computer-use workflows at a lower cost",
    "type": "chat",
-   "canonical_id": "openai/gpt-5.6-sol",
-   "family": "gpt-sol",
-   "release_date": "2026-07-09",
+   "family": "gpt",
+   "canonical_id": "openai/gpt-5.4",
+   "release_date": "2026-03-05",
    "limit": {
     "context": 1050000,
     "input": 922000,
@@ -758,6 +893,14 @@
       "min_tokens": 1024
      }
     },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "prompt_cache_key": true,
+    "store": false,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -770,20 +913,56 @@
       "medium",
       "high"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "store": false,
-    "prompt_cache_key": true
+    }
    },
-   "description": "Frontier GPT-5.6 model for complex professional work, coding, and agentic workflows",
-   "open_weights": false,
-   "knowledge": "2026-02-16",
-   "last_updated": "2026-07-09",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2.5,
+      "cache": {
+       "read": 0.25
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 5,
+        "cache": {
+         "read": 0.5
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 15,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 22.5
+       }
+      ]
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "not": {
+        "region": {
+         "equals": "global"
+        }
+       }
+      },
+      "factor": 1.1
+     }
+    ]
+   },
    "modalities": {
     "input": [
      "text",
@@ -795,6 +974,591 @@
     "output": [
      "text"
     ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-03-05"
+  },
+  "openai-gpt-5-nano": {
+   "id": "openai-gpt-5-nano",
+   "name": "GPT-5 Nano",
+   "description": "Tiny GPT-5 lane for routing, extraction, classification, and bulk jobs",
+   "type": "chat",
+   "family": "gpt-nano",
+   "canonical_id": "openai/gpt-5-nano",
+   "release_date": "2025-08-07",
+   "limit": {
+    "context": 272000,
+    "input": 272000,
+    "output": 8192
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": {
+      "min_tokens": 1024
+     }
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "prompt_cache_key": true,
+    "store": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.06,
+      "cache": {
+       "read": 0.01
+      }
+     },
+     "output": {
+      "price": 0.44
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "not": {
+        "region": {
+         "equals": "global"
+        }
+       }
+      },
+      "factor": 1.1
+     }
+    ]
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2024-05-30",
+   "last_updated": "2025-08-07"
+  },
+  "claude-sonnet-5": {
+   "id": "claude-sonnet-5",
+   "name": "Claude Sonnet 5",
+   "description": "Everyday Claude agent model for coding, planning, browsing, and general work",
+   "type": "chat",
+   "family": "claude-sonnet",
+   "canonical_id": "anthropic/claude-sonnet-5",
+   "release_date": "2026-06-30",
+   "limit": {
+    "context": 1000000,
+    "output": 64000
+   },
+   "capabilities": {
+    "cache": {
+     "explicit": {
+      "ttl": [
+       "5m"
+      ],
+      "max_breakpoints": 4,
+      "targets": [
+       "system",
+       "messages"
+      ]
+     }
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "store": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.2,
+       "write": 2.5
+      }
+     },
+     "output": {
+      "price": 10
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "not": {
+        "region": {
+         "equals": "global"
+        }
+       }
+      },
+      "factor": 1.1
+     }
+    ]
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-01-31",
+   "last_updated": "2026-06-30"
+  },
+  "claude-sonnet-4-6": {
+   "id": "claude-sonnet-4-6",
+   "name": "Claude Sonnet 4.6",
+   "description": "Claude workhorse for coding agents, careful analysis, and production cost control",
+   "type": "chat",
+   "family": "claude-sonnet",
+   "canonical_id": "anthropic/claude-sonnet-4-6",
+   "release_date": "2026-02-17",
+   "limit": {
+    "context": 1000000,
+    "output": 64000
+   },
+   "capabilities": {
+    "cache": {
+     "explicit": {
+      "ttl": [
+       "5m"
+      ],
+      "max_breakpoints": 4,
+      "targets": [
+       "system",
+       "messages"
+      ]
+     }
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "store": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "budget": {}
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 3,
+      "cache": {
+       "read": 0.3,
+       "write": 3.75
+      }
+     },
+     "output": {
+      "price": 15
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "not": {
+        "region": {
+         "equals": "global"
+        }
+       }
+      },
+      "factor": 1.1
+     }
+    ]
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-03-13"
+  },
+  "claude-opus-4-6": {
+   "id": "claude-opus-4-6",
+   "name": "Claude Opus 4.6",
+   "description": "High-end Claude for difficult coding, planning, and slower expert reasoning",
+   "type": "chat",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-4-6",
+   "release_date": "2026-02-05",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "explicit": {
+      "ttl": [
+       "5m"
+      ],
+      "max_breakpoints": 4,
+      "targets": [
+       "system",
+       "messages"
+      ]
+     }
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "store": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "budget": {}
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5,
+       "write": 6.25
+      }
+     },
+     "output": {
+      "price": 25
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "not": {
+        "region": {
+         "equals": "global"
+        }
+       }
+      },
+      "factor": 1.1
+     }
+    ]
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-05-31",
+   "last_updated": "2026-03-13"
+  },
+  "claude-opus-4-8": {
+   "id": "claude-opus-4-8",
+   "name": "Claude Opus 4.8",
+   "description": "Top Claude Opus tier for the hardest reasoning, coding, and long-horizon agents",
+   "type": "chat",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-4-8",
+   "release_date": "2026-05-28",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "explicit": {
+      "ttl": [
+       "5m"
+      ],
+      "max_breakpoints": 4,
+      "targets": [
+       "system",
+       "messages"
+      ]
+     }
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "store": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5,
+       "write": 6.25
+      }
+     },
+     "output": {
+      "price": 25
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "not": {
+        "region": {
+         "equals": "global"
+        }
+       }
+      },
+      "factor": 1.1
+     }
+    ]
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-01",
+   "last_updated": "2026-05-28"
+  },
+  "openai-gpt-5.6-sol": {
+   "id": "openai-gpt-5.6-sol",
+   "name": "GPT-5.6 Sol",
+   "description": "Frontier GPT-5.6 model for complex professional work, coding, and agentic workflows",
+   "type": "chat",
+   "family": "gpt-sol",
+   "canonical_id": "openai/gpt-5.6-sol",
+   "release_date": "2026-07-09",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": {
+      "min_tokens": 1024
+     }
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "prompt_cache_key": true,
+    "store": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
    },
    "cost": {
     "text": {
@@ -846,113 +1610,6 @@
      }
     ]
    },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "snowflake-llama3.3-70b": {
-   "id": "snowflake-llama3.3-70b",
-   "name": "Llama-3.3-70B-Instruct",
-   "type": "chat",
-   "canonical_id": "meta/llama-3.3-70b-instruct",
-   "family": "llama",
-   "release_date": "2024-12-06",
-   "limit": {
-    "context": 128000,
-    "output": 4096
-   },
-   "capabilities": {
-    "cache": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "structured_output": false,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "store": false
-   },
-   "description": "Popular open Llama workhorse for multilingual chat, coding, and self-hosting",
-   "open_weights": true,
-   "knowledge": "2023-12",
-   "last_updated": "2024-12-06",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     }
-    }
-   }
-  },
-  "claude-sonnet-4-5": {
-   "id": "claude-sonnet-4-5",
-   "name": "Claude Sonnet 4.5 (latest)",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-sonnet-4-5",
-   "family": "claude-sonnet",
-   "release_date": "2025-09-29",
-   "limit": {
-    "context": 200000,
-    "output": 64000
-   },
-   "capabilities": {
-    "cache": {
-     "explicit": {
-      "ttl": [
-       "5m"
-      ],
-      "max_breakpoints": 4,
-      "targets": [
-       "system",
-       "messages"
-      ]
-     }
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "budget": {}
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "store": false
-   },
-   "description": "Balanced Claude model for coding, analysis, agent workflows, and cost control",
-   "open_weights": false,
-   "knowledge": "2025-07-31",
-   "last_updated": "2025-09-29",
    "modalities": {
     "input": [
      "text",
@@ -965,32 +1622,6 @@
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 3,
-      "cache": {
-       "read": 0.3,
-       "write": 3.75
-      }
-     },
-     "output": {
-      "price": 15
-     }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "not": {
-        "region": {
-         "equals": "global"
-        }
-       }
-      },
-      "factor": 1.1
-     }
-    ]
-   },
    "api": {
     "chat-completions": {
      "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
@@ -1003,27 +1634,19 @@
        "updates": false
       }
      }
-    },
-    "messages": {
-     "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2026-02-16",
+   "last_updated": "2026-07-09"
   },
   "openai-gpt-5.1": {
    "id": "openai-gpt-5.1",
    "name": "GPT-5.1",
+   "description": "Sharper GPT-5 generation for coding, product work, and tool-assisted tasks",
    "type": "chat",
-   "canonical_id": "openai/gpt-5.1",
    "family": "gpt",
+   "canonical_id": "openai/gpt-5.1",
    "release_date": "2025-11-13",
    "limit": {
     "context": 272000,
@@ -1036,102 +1659,14 @@
       "min_tokens": 1024
      }
     },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": true,
     "temperature": true,
-    "top_p": true,
     "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "prompt_cache_key": true,
+    "store": false,
     "system_updates": false,
     "effort_updates": false,
-    "store": false,
-    "prompt_cache_key": true
-   },
-   "description": "Sharper GPT-5 generation for coding, product work, and tool-assisted tasks",
-   "open_weights": false,
-   "knowledge": "2024-09-30",
-   "last_updated": "2025-11-13",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.25,
-      "cache": {
-       "read": 0.13
-      }
-     },
-     "output": {
-      "price": 10
-     }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "not": {
-        "region": {
-         "equals": "global"
-        }
-       }
-      },
-      "factor": 1.1
-     }
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "openai-gpt-5": {
-   "id": "openai-gpt-5",
-   "name": "GPT-5",
-   "type": "chat",
-   "canonical_id": "openai/gpt-5",
-   "family": "gpt",
-   "release_date": "2025-08-07",
-   "limit": {
-    "context": 272000,
-    "input": 272000,
-    "output": 8192
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": {
-      "min_tokens": 1024
-     }
-    },
     "tools": {
      "supported": true
     },
@@ -1144,31 +1679,7 @@
       "medium",
       "high"
      ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "store": false,
-    "prompt_cache_key": true
-   },
-   "description": "Original GPT-5 workhorse for reasoning, coding, writing, and tool workflows",
-   "open_weights": false,
-   "knowledge": "2024-09-30",
-   "last_updated": "2025-08-07",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -1195,6 +1706,18 @@
      }
     ]
    },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
@@ -1208,18 +1731,22 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2024-09-30",
+   "last_updated": "2025-11-13"
   },
-  "claude-sonnet-5": {
-   "id": "claude-sonnet-5",
-   "name": "Claude Sonnet 5",
+  "claude-opus-5": {
+   "id": "claude-opus-5",
+   "name": "Claude Opus 5",
+   "description": "Strongest Claude Opus model for coding, agents, and professional work",
    "type": "chat",
-   "canonical_id": "anthropic/claude-sonnet-5",
-   "family": "claude-sonnet",
-   "release_date": "2026-06-30",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-5",
+   "release_date": "2026-07-24",
    "limit": {
     "context": 1000000,
-    "output": 64000
+    "output": 128000
    },
    "capabilities": {
     "cache": {
@@ -1234,143 +1761,19 @@
       ]
      }
     },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    },
-    "structured_output": true,
     "temperature": false,
-    "top_p": false,
     "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "store": false,
     "system_updates": false,
     "effort_updates": false,
-    "store": false
-   },
-   "description": "Everyday Claude agent model for coding, planning, browsing, and general work",
-   "open_weights": false,
-   "knowledge": "2026-01-31",
-   "last_updated": "2026-06-30",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2,
-      "cache": {
-       "read": 0.2,
-       "write": 2.5
-      }
-     },
-     "output": {
-      "price": 10
-     }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "not": {
-        "region": {
-         "equals": "global"
-        }
-       }
-      },
-      "factor": 1.1
-     }
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "claude-opus-4-5": {
-   "id": "claude-opus-4-5",
-   "name": "Claude Opus 4.5 (latest)",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-opus-4-5",
-   "family": "claude-opus",
-   "release_date": "2025-11-24",
-   "limit": {
-    "context": 200000,
-    "output": 64000
-   },
-   "capabilities": {
-    "cache": {
-     "explicit": {
-      "ttl": [
-       "5m"
-      ],
-      "max_breakpoints": 4,
-      "targets": [
-       "system",
-       "messages"
-      ]
-     }
-    },
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": true,
-     "budget": {}
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "store": false
-   },
-   "description": "Flagship Claude model for deep reasoning, coding, and long-horizon agents",
-   "open_weights": false,
-   "knowledge": "2025-05",
-   "last_updated": "2025-11-24",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
+     "supported": true
+    }
    },
    "cost": {
     "text": {
@@ -1398,6 +1801,18 @@
      }
     ]
    },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
@@ -1423,19 +1838,23 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2026-05",
+   "last_updated": "2026-07-24"
   },
-  "openai-gpt-5-mini": {
-   "id": "openai-gpt-5-mini",
-   "name": "GPT-5 Mini",
+  "openai-gpt-5.6-luna": {
+   "id": "openai-gpt-5.6-luna",
+   "name": "GPT-5.6 Luna",
+   "description": "Cost-efficient GPT-5.6 model for fast, high-volume workloads",
    "type": "chat",
-   "canonical_id": "openai/gpt-5-mini",
-   "family": "gpt-mini",
-   "release_date": "2025-08-07",
+   "family": "gpt-luna",
+   "canonical_id": "openai/gpt-5.6-luna",
+   "release_date": "2026-07-09",
    "limit": {
-    "context": 272000,
-    "input": 272000,
-    "output": 8192
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
    },
    "capabilities": {
     "cache": {
@@ -1443,6 +1862,14 @@
       "min_tokens": 1024
      }
     },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "prompt_cache_key": true,
+    "store": false,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -1455,20 +1882,58 @@
       "medium",
       "high"
      ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "store": false,
-    "prompt_cache_key": true
+    }
    },
-   "description": "Small GPT-5 for responsive agents, coding help, and everyday automation",
-   "open_weights": false,
-   "knowledge": "2024-05-30",
-   "last_updated": "2025-08-07",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.2,
+      "cache": {
+       "read": 0.02,
+       "write": 0.25
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 0.4,
+        "cache": {
+         "read": 0.04,
+         "write": 0.5
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 1.2,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 1.8
+       }
+      ]
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "not": {
+        "region": {
+         "equals": "global"
+        }
+       }
+      },
+      "factor": 1.1
+     }
+    ]
+   },
    "modalities": {
     "input": [
      "text",
@@ -1480,6 +1945,161 @@
     "output": [
      "text"
     ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-02-16",
+   "last_updated": "2026-07-09"
+  },
+  "openai-gpt-5": {
+   "id": "openai-gpt-5",
+   "name": "GPT-5",
+   "description": "Original GPT-5 workhorse for reasoning, coding, writing, and tool workflows",
+   "type": "chat",
+   "family": "gpt",
+   "canonical_id": "openai/gpt-5",
+   "release_date": "2025-08-07",
+   "limit": {
+    "context": 272000,
+    "input": 272000,
+    "output": 8192
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": {
+      "min_tokens": 1024
+     }
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "prompt_cache_key": true,
+    "store": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.25,
+      "cache": {
+       "read": 0.13
+      }
+     },
+     "output": {
+      "price": 10
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "not": {
+        "region": {
+         "equals": "global"
+        }
+       }
+      },
+      "factor": 1.1
+     }
+    ]
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2024-09-30",
+   "last_updated": "2025-08-07"
+  },
+  "openai-gpt-5-mini": {
+   "id": "openai-gpt-5-mini",
+   "name": "GPT-5 Mini",
+   "description": "Small GPT-5 for responsive agents, coding help, and everyday automation",
+   "type": "chat",
+   "family": "gpt-mini",
+   "canonical_id": "openai/gpt-5-mini",
+   "release_date": "2025-08-07",
+   "limit": {
+    "context": 272000,
+    "input": 272000,
+    "output": 8192
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": {
+      "min_tokens": 1024
+     }
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "prompt_cache_key": true,
+    "store": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
    },
    "cost": {
     "text": {
@@ -1506,6 +2126,18 @@
      }
     ]
    },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
@@ -1519,74 +2151,46 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2024-05-30",
+   "last_updated": "2025-08-07"
   },
-  "openai-gpt-5-nano": {
-   "id": "openai-gpt-5-nano",
-   "name": "GPT-5 Nano",
+  "mistral-large2": {
+   "id": "mistral-large2",
+   "name": "Mistral Large 2407",
+   "description": "Flagship Mistral model for advanced reasoning, coding, and multilingual work",
    "type": "chat",
-   "canonical_id": "openai/gpt-5-nano",
-   "family": "gpt-nano",
-   "release_date": "2025-08-07",
+   "family": "mistral-large",
+   "canonical_id": "mistral/mistral-large-2407",
+   "release_date": "2024-07-24",
    "limit": {
-    "context": 272000,
-    "input": 272000,
+    "context": 128000,
     "output": 8192
    },
    "capabilities": {
-    "cache": {
-     "implicit": {
-      "min_tokens": 1024
-     }
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
+    "cache": false,
+    "temperature": true,
     "top_k": false,
+    "top_p": true,
+    "structured_output": false,
+    "store": false,
     "system_updates": false,
     "effort_updates": false,
-    "store": false,
-    "prompt_cache_key": true
-   },
-   "description": "Tiny GPT-5 lane for routing, extraction, classification, and bulk jobs",
-   "open_weights": false,
-   "knowledge": "2024-05-30",
-   "last_updated": "2025-08-07",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.06,
-      "cache": {
-       "read": 0.01
-      }
+      "price": 2
      },
      "output": {
-      "price": 0.44
+      "price": 6
      }
     },
     "multipliers": [
@@ -1602,28 +2206,35 @@
      }
     ]
    },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
      "sdk": {
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "knowledge": "2024-03-31",
+   "last_updated": "2024-07-24"
   },
-  "claude-opus-5": {
-   "id": "claude-opus-5",
-   "name": "Claude Opus 5",
+  "claude-opus-4-7": {
+   "id": "claude-opus-4-7",
+   "name": "Claude Opus 4.7",
+   "description": "Stronger Opus tier for advanced software work and high-stakes reasoning",
    "type": "chat",
-   "canonical_id": "anthropic/claude-opus-5",
    "family": "claude-opus",
-   "release_date": "2026-07-24",
+   "canonical_id": "anthropic/claude-opus-4-7",
+   "release_date": "2026-04-16",
    "limit": {
     "context": 1000000,
     "output": 128000
@@ -1641,35 +2252,19 @@
       ]
      }
     },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "store": false,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": true
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "store": false
-   },
-   "description": "Strongest Claude Opus model for coding, agents, and professional work",
-   "open_weights": false,
-   "knowledge": "2026-05",
-   "last_updated": "2026-07-24",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -1697,6 +2292,18 @@
      }
     ]
    },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
@@ -1722,14 +2329,18 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2026-01-31",
+   "last_updated": "2026-04-16"
   },
   "gemini-3.1-pro": {
    "id": "gemini-3.1-pro",
    "name": "Gemini 3.1 Pro Preview",
+   "description": "Reasoning-first Gemini preview for agentic coding and complex problem solving",
    "type": "chat",
-   "canonical_id": "google/gemini-3.1-pro-preview",
    "family": "gemini-pro",
+   "canonical_id": "google/gemini-3.1-pro-preview",
    "status": "beta",
    "release_date": "2026-02-19",
    "limit": {
@@ -1737,23 +2348,19 @@
     "output": 64000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": true
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Reasoning-first Gemini preview for agentic coding and complex problem solving",
-   "open_weights": false,
-   "knowledge": "2025-01",
-   "last_updated": "2026-02-19",
    "modalities": {
     "input": [
      "text",
@@ -1803,624 +2410,18 @@
       }
      }
     }
-   }
-  },
-  "claude-opus-4-7": {
-   "id": "claude-opus-4-7",
-   "name": "Claude Opus 4.7",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-opus-4-7",
-   "family": "claude-opus",
-   "release_date": "2026-04-16",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
    },
-   "capabilities": {
-    "cache": {
-     "explicit": {
-      "ttl": [
-       "5m"
-      ],
-      "max_breakpoints": 4,
-      "targets": [
-       "system",
-       "messages"
-      ]
-     }
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "store": false
-   },
-   "description": "Stronger Opus tier for advanced software work and high-stakes reasoning",
    "open_weights": false,
-   "knowledge": "2026-01-31",
-   "last_updated": "2026-04-16",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 5,
-      "cache": {
-       "read": 0.5,
-       "write": 6.25
-      }
-     },
-     "output": {
-      "price": 25
-     }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "not": {
-        "region": {
-         "equals": "global"
-        }
-       }
-      },
-      "factor": 1.1
-     }
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "claude-sonnet-4-6": {
-   "id": "claude-sonnet-4-6",
-   "name": "Claude Sonnet 4.6",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-sonnet-4-6",
-   "family": "claude-sonnet",
-   "release_date": "2026-02-17",
-   "limit": {
-    "context": 1000000,
-    "output": 64000
-   },
-   "capabilities": {
-    "cache": {
-     "explicit": {
-      "ttl": [
-       "5m"
-      ],
-      "max_breakpoints": 4,
-      "targets": [
-       "system",
-       "messages"
-      ]
-     }
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "budget": {}
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "store": false
-   },
-   "description": "Claude workhorse for coding agents, careful analysis, and production cost control",
-   "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2026-03-13",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 3,
-      "cache": {
-       "read": 0.3,
-       "write": 3.75
-      }
-     },
-     "output": {
-      "price": 15
-     }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "not": {
-        "region": {
-         "equals": "global"
-        }
-       }
-      },
-      "factor": 1.1
-     }
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "deepseek-r1": {
-   "id": "deepseek-r1",
-   "name": "DeepSeek-R1",
-   "type": "chat",
-   "canonical_id": "deepseek/deepseek-r1",
-   "family": "deepseek-thinking",
-   "release_date": "2025-01-20",
-   "limit": {
-    "context": 128000,
-    "output": 32768
-   },
-   "capabilities": {
-    "cache": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": true
-    },
-    "structured_output": false,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "store": false
-   },
-   "description": "Classic open reasoning model for transparent math, coding, and deliberate problem solving",
-   "open_weights": true,
-   "knowledge": "2024-07",
-   "last_updated": "2025-05-29",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     }
-    }
-   }
-  },
-  "openai-gpt-5.5": {
-   "id": "openai-gpt-5.5",
-   "name": "GPT-5.5",
-   "type": "chat",
-   "canonical_id": "openai/gpt-5.5",
-   "family": "gpt",
-   "status": "beta",
-   "release_date": "2026-04-23",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": {
-      "min_tokens": 1024
-     }
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "store": false,
-    "prompt_cache_key": true
-   },
-   "description": "Default frontier GPT for coding, computer use, research, and knowledge work",
-   "open_weights": false,
-   "knowledge": "2025-12-01",
-   "last_updated": "2026-04-23",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 5,
-      "cache": {
-       "read": 0.5
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 10,
-        "cache": {
-         "read": 1
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 30,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 45
-       }
-      ]
-     }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "not": {
-        "region": {
-         "equals": "global"
-        }
-       }
-      },
-      "factor": 1.1
-     }
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "openai-gpt-5.4": {
-   "id": "openai-gpt-5.4",
-   "name": "GPT-5.4",
-   "type": "chat",
-   "canonical_id": "openai/gpt-5.4",
-   "family": "gpt",
-   "release_date": "2026-03-05",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": {
-      "min_tokens": 1024
-     }
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "store": false,
-    "prompt_cache_key": true
-   },
-   "description": "Agent-ready GPT for coding and computer-use workflows at a lower cost",
-   "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2026-03-05",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2.5,
-      "cache": {
-       "read": 0.25
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 5,
-        "cache": {
-         "read": 0.5
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 15,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 22.5
-       }
-      ]
-     }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "not": {
-        "region": {
-         "equals": "global"
-        }
-       }
-      },
-      "factor": 1.1
-     }
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "claude-opus-4-8": {
-   "id": "claude-opus-4-8",
-   "name": "Claude Opus 4.8",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-opus-4-8",
-   "family": "claude-opus",
-   "release_date": "2026-05-28",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "explicit": {
-      "ttl": [
-       "5m"
-      ],
-      "max_breakpoints": 4,
-      "targets": [
-       "system",
-       "messages"
-      ]
-     }
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "store": false
-   },
-   "description": "Top Claude Opus tier for the hardest reasoning, coding, and long-horizon agents",
-   "open_weights": false,
-   "knowledge": "2026-01",
-   "last_updated": "2026-05-28",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 5,
-      "cache": {
-       "read": 0.5,
-       "write": 6.25
-      }
-     },
-     "output": {
-      "price": 25
-     }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "not": {
-        "region": {
-         "equals": "global"
-        }
-       }
-      },
-      "factor": 1.1
-     }
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
+   "knowledge": "2025-01",
+   "last_updated": "2026-02-19"
   },
   "openai-gpt-4.1": {
    "id": "openai-gpt-4.1",
    "name": "GPT-4.1",
+   "description": "Long-lived GPT workhorse for coding, instruction following, and production apps",
    "type": "chat",
-   "canonical_id": "openai/gpt-4.1",
    "family": "gpt",
+   "canonical_id": "openai/gpt-4.1",
    "release_date": "2025-04-14",
    "limit": {
     "context": 128000,
@@ -2432,36 +2433,20 @@
       "min_tokens": 1024
      }
     },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "prompt_cache_key": true,
+    "store": false,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": false
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "store": false,
-    "prompt_cache_key": true
-   },
-   "description": "Long-lived GPT workhorse for coding, instruction following, and production apps",
-   "open_weights": false,
-   "knowledge": "2024-04",
-   "last_updated": "2025-04-14",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -2488,6 +2473,18 @@
      }
     ]
    },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "https://${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com/api/v2/cortex/v1",
@@ -2501,7 +2498,10 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2024-04",
+   "last_updated": "2025-04-14"
   }
  }
 }

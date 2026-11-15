@@ -6,32 +6,240 @@
   "KLINGAI_API_KEY"
  ],
  "models": {
-  "kling-v2-6": {
-   "id": "kling-v2-6",
-   "name": "Kling VIDEO 2.6",
+  "kling-3.0-turbo": {
+   "id": "kling-3.0-turbo",
+   "name": "Kling VIDEO 3.0 Turbo",
+   "description": "Lower-cost Kling 3.0 tier for text-to-video and first-frame image-to-video with native audio",
    "type": "video",
-   "canonical_id": "kuaishou/kling-v2.6",
-   "release_date": "2025-12-03",
+   "canonical_id": "kuaishou/kling-v3.0-turbo",
+   "release_date": "2026-06-17",
    "limit": {
     "context": 0,
     "output": 0
    },
    "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": false
     },
     "reasoning": {
      "supported": false
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Kling video model with simultaneous audio-visual generation, first and last frame control and motion control",
+   "cost": {
+    "video": {
+     "output": {
+      "unit": "second",
+      "price": 0.112,
+      "overrides": [
+       {
+        "when": {
+         "resolution": {
+          "equals": "1080p"
+         }
+        },
+        "price": 0.14
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png"
+    ],
+    "output": [
+     "video/mp4"
+    ]
+   },
+   "api": {
+    "videos": {
+     "base_url": "https://api-singapore.klingai.com",
+     "sdk": {}
+    }
+   },
    "open_weights": false,
-   "last_updated": "2025-12-03",
+   "last_updated": "2026-06-17"
+  },
+  "kling-v2-5-turbo": {
+   "id": "kling-v2-5-turbo",
+   "name": "Kling VIDEO 2.5 Turbo",
+   "description": "Faster, lower-cost Kling video model for text-to-video and image-to-video with first and last frame control",
+   "type": "video",
+   "canonical_id": "kuaishou/kling-v2.5-turbo",
+   "release_date": "2025-09-23",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "video": {
+     "output": {
+      "unit": "second",
+      "price": 0.042,
+      "overrides": [
+       {
+        "when": {
+         "resolution": {
+          "equals": "1080p"
+         }
+        },
+        "price": 0.07
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png"
+    ],
+    "output": [
+     "video/mp4"
+    ]
+   },
+   "api": {
+    "videos": {
+     "base_url": "https://api-singapore.klingai.com",
+     "sdk": {}
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-09-23"
+  },
+  "kling-v3": {
+   "id": "kling-v3",
+   "name": "Kling IMAGE 3.0",
+   "description": "Kling 3.0 image model for text-to-image and image-to-image with element references at up to 2K",
+   "type": "image",
+   "canonical_id": "kuaishou/kling-image-v3.0",
+   "release_date": "2026-02-05",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "image": {
+     "output": {
+      "unit": "image",
+      "price": 0.028
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png"
+    ],
+    "output": [
+     "image"
+    ]
+   },
+   "api": {
+    "images": {
+     "base_url": "https://api-singapore.klingai.com/v1",
+     "sdk": {}
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-02-05"
+  },
+  "kling-video-o1": {
+   "id": "kling-video-o1",
+   "name": "Kling VIDEO O1",
+   "description": "Unified multimodal Kling model for video generation and editing",
+   "type": "video",
+   "canonical_id": "kuaishou/kling-video-o1",
+   "release_date": "2025-12-01",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "video": {
+     "output": {
+      "unit": "second",
+      "price": 0.084,
+      "overrides": [
+       {
+        "when": {
+         "resolution": {
+          "equals": "1080p"
+         }
+        },
+        "price": 0.112
+       },
+       {
+        "when": {
+         "input_video": {
+          "equals": true
+         }
+        },
+        "price": 0.126
+       },
+       {
+        "when": {
+         "resolution": {
+          "equals": "1080p"
+         },
+         "input_video": {
+          "equals": true
+         }
+        },
+        "price": 0.168
+       }
+      ]
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text",
@@ -43,6 +251,106 @@
     "output": [
      "video/mp4"
     ]
+   },
+   "api": {
+    "videos": {
+     "base_url": "https://api-singapore.klingai.com",
+     "sdk": {}
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-12-01"
+  },
+  "kling-4.0-flash": {
+   "id": "kling-4.0-flash",
+   "name": "Kling VIDEO 4.0 Flash",
+   "description": "Faster, lower-cost Kling 4.0 tier for 720P video up to 20 seconds with omni references, video editing and native audio",
+   "type": "video",
+   "canonical_id": "kuaishou/kling-v4.0-flash",
+   "release_date": "2026-11-04",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "video": {
+     "input": {
+      "unit": "second",
+      "price": 0.063
+     },
+     "output": {
+      "unit": "second",
+      "price": 0.094,
+      "overrides": [
+       {
+        "when": {
+         "input_video": {
+          "equals": true
+         }
+        },
+        "price": 0.063
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "video/mp4",
+     "video/quicktime"
+    ],
+    "output": [
+     "video/mp4"
+    ]
+   },
+   "api": {
+    "videos": {
+     "base_url": "https://api-singapore.klingai.com",
+     "sdk": {}
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-04"
+  },
+  "kling-v2-6": {
+   "id": "kling-v2-6",
+   "name": "Kling VIDEO 2.6",
+   "description": "Kling video model with simultaneous audio-visual generation, first and last frame control and motion control",
+   "type": "video",
+   "canonical_id": "kuaishou/kling-v2.6",
+   "release_date": "2025-12-03",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
    },
    "cost": {
     "video": {
@@ -100,39 +408,6 @@
      }
     }
    },
-   "api": {
-    "videos": {
-     "base_url": "https://api-singapore.klingai.com",
-     "sdk": {}
-    }
-   }
-  },
-  "kling-video-o1": {
-   "id": "kling-video-o1",
-   "name": "Kling VIDEO O1",
-   "type": "video",
-   "canonical_id": "kuaishou/kling-video-o1",
-   "release_date": "2025-12-01",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Unified multimodal Kling model for video generation and editing",
-   "open_weights": false,
-   "last_updated": "2025-12-01",
    "modalities": {
     "input": [
      "text",
@@ -145,625 +420,19 @@
      "video/mp4"
     ]
    },
-   "cost": {
-    "video": {
-     "output": {
-      "unit": "second",
-      "price": 0.084,
-      "overrides": [
-       {
-        "when": {
-         "resolution": {
-          "equals": "1080p"
-         }
-        },
-        "price": 0.112
-       },
-       {
-        "when": {
-         "input_video": {
-          "equals": true
-         }
-        },
-        "price": 0.126
-       },
-       {
-        "when": {
-         "resolution": {
-          "equals": "1080p"
-         },
-         "input_video": {
-          "equals": true
-         }
-        },
-        "price": 0.168
-       }
-      ]
-     }
-    }
-   },
    "api": {
     "videos": {
      "base_url": "https://api-singapore.klingai.com",
      "sdk": {}
     }
-   }
-  },
-  "kling-v3": {
-   "id": "kling-v3",
-   "name": "Kling IMAGE 3.0",
-   "type": "image",
-   "canonical_id": "kuaishou/kling-image-v3.0",
-   "release_date": "2026-02-05",
-   "limit": {
-    "context": 0,
-    "output": 0
    },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Kling 3.0 image model for text-to-image and image-to-image with element references at up to 2K",
    "open_weights": false,
-   "last_updated": "2026-02-05",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png"
-    ],
-    "output": [
-     "image"
-    ]
-   },
-   "cost": {
-    "image": {
-     "output": {
-      "unit": "image",
-      "price": 0.028
-     }
-    }
-   },
-   "api": {
-    "images": {
-     "base_url": "https://api-singapore.klingai.com/v1",
-     "sdk": {}
-    }
-   }
-  },
-  "kling-3.0-omni": {
-   "id": "kling-3.0-omni",
-   "name": "Kling VIDEO 3.0 Omni",
-   "type": "video",
-   "canonical_id": "kuaishou/kling-v3.0-omni",
-   "release_date": "2026-02-05",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Kling 3.0 multimodal video model for reference-based generation and editing with images, videos and elements, multi-shot storyboards and native audio",
-   "open_weights": false,
-   "last_updated": "2026-02-05",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "video/mp4",
-     "video/quicktime"
-    ],
-    "output": [
-     "video/mp4"
-    ]
-   },
-   "cost": {
-    "video": {
-     "output": {
-      "unit": "second",
-      "price": 0.084,
-      "overrides": [
-       {
-        "when": {
-         "resolution": {
-          "equals": "1080p"
-         }
-        },
-        "price": 0.112
-       },
-       {
-        "when": {
-         "generate_audio": {
-          "equals": true
-         }
-        },
-        "price": 0.112
-       },
-       {
-        "when": {
-         "resolution": {
-          "equals": "1080p"
-         },
-         "generate_audio": {
-          "equals": true
-         }
-        },
-        "price": 0.14
-       },
-       {
-        "when": {
-         "input_video": {
-          "equals": true
-         }
-        },
-        "price": 0.126
-       },
-       {
-        "when": {
-         "resolution": {
-          "equals": "1080p"
-         },
-         "input_video": {
-          "equals": true
-         }
-        },
-        "price": 0.168
-       },
-       {
-        "when": {
-         "resolution": {
-          "equals": "4k"
-         }
-        },
-        "price": 0.42
-       }
-      ]
-     }
-    }
-   },
-   "api": {
-    "videos": {
-     "base_url": "https://api-singapore.klingai.com",
-     "sdk": {}
-    }
-   }
-  },
-  "kling-4.0-flash": {
-   "id": "kling-4.0-flash",
-   "name": "Kling VIDEO 4.0 Flash",
-   "type": "video",
-   "canonical_id": "kuaishou/kling-v4.0-flash",
-   "release_date": "2026-11-04",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Faster, lower-cost Kling 4.0 tier for 720P video up to 20 seconds with omni references, video editing and native audio",
-   "open_weights": false,
-   "last_updated": "2026-11-04",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "video/mp4",
-     "video/quicktime"
-    ],
-    "output": [
-     "video/mp4"
-    ]
-   },
-   "cost": {
-    "video": {
-     "input": {
-      "unit": "second",
-      "price": 0.063
-     },
-     "output": {
-      "unit": "second",
-      "price": 0.094,
-      "overrides": [
-       {
-        "when": {
-         "input_video": {
-          "equals": true
-         }
-        },
-        "price": 0.063
-       }
-      ]
-     }
-    }
-   },
-   "api": {
-    "videos": {
-     "base_url": "https://api-singapore.klingai.com",
-     "sdk": {}
-    }
-   }
-  },
-  "kling-v3-omni": {
-   "id": "kling-v3-omni",
-   "name": "Kling IMAGE 3.0 Omni",
-   "type": "image",
-   "canonical_id": "kuaishou/kling-image-v3.0-omni",
-   "release_date": "2026-02-05",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Kling 3.0 multimodal image model for generation, editing and image series from text and up to 10 references, with 4K output",
-   "open_weights": false,
-   "last_updated": "2026-02-05",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png"
-    ],
-    "output": [
-     "image"
-    ]
-   },
-   "cost": {
-    "image": {
-     "output": {
-      "unit": "image",
-      "price": 0.028,
-      "overrides": [
-       {
-        "when": {
-         "resolution": {
-          "equals": "4k"
-         }
-        },
-        "price": 0.056
-       }
-      ]
-     }
-    }
-   },
-   "api": {
-    "images": {
-     "base_url": "https://api-singapore.klingai.com/v1",
-     "path": "/images/omni-image",
-     "sdk": {}
-    }
-   }
-  },
-  "kling-v2-5-turbo": {
-   "id": "kling-v2-5-turbo",
-   "name": "Kling VIDEO 2.5 Turbo",
-   "type": "video",
-   "canonical_id": "kuaishou/kling-v2.5-turbo",
-   "release_date": "2025-09-23",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Faster, lower-cost Kling video model for text-to-video and image-to-video with first and last frame control",
-   "open_weights": false,
-   "last_updated": "2025-09-23",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png"
-    ],
-    "output": [
-     "video/mp4"
-    ]
-   },
-   "cost": {
-    "video": {
-     "output": {
-      "unit": "second",
-      "price": 0.042,
-      "overrides": [
-       {
-        "when": {
-         "resolution": {
-          "equals": "1080p"
-         }
-        },
-        "price": 0.07
-       }
-      ]
-     }
-    }
-   },
-   "api": {
-    "videos": {
-     "base_url": "https://api-singapore.klingai.com",
-     "sdk": {}
-    }
-   }
-  },
-  "kling-3.0-turbo": {
-   "id": "kling-3.0-turbo",
-   "name": "Kling VIDEO 3.0 Turbo",
-   "type": "video",
-   "canonical_id": "kuaishou/kling-v3.0-turbo",
-   "release_date": "2026-06-17",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Lower-cost Kling 3.0 tier for text-to-video and first-frame image-to-video with native audio",
-   "open_weights": false,
-   "last_updated": "2026-06-17",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png"
-    ],
-    "output": [
-     "video/mp4"
-    ]
-   },
-   "cost": {
-    "video": {
-     "output": {
-      "unit": "second",
-      "price": 0.112,
-      "overrides": [
-       {
-        "when": {
-         "resolution": {
-          "equals": "1080p"
-         }
-        },
-        "price": 0.14
-       }
-      ]
-     }
-    }
-   },
-   "api": {
-    "videos": {
-     "base_url": "https://api-singapore.klingai.com",
-     "sdk": {}
-    }
-   }
-  },
-  "kling-image-o1": {
-   "id": "kling-image-o1",
-   "name": "Kling IMAGE O1",
-   "type": "image",
-   "canonical_id": "kuaishou/kling-image-o1",
-   "release_date": "2025-12-15",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Unified Kling image model for generation and editing from text and up to 10 reference images",
-   "open_weights": false,
-   "last_updated": "2025-12-15",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png"
-    ],
-    "output": [
-     "image"
-    ]
-   },
-   "cost": {
-    "image": {
-     "output": {
-      "unit": "image",
-      "price": 0.028
-     }
-    }
-   },
-   "api": {
-    "images": {
-     "base_url": "https://api-singapore.klingai.com/v1",
-     "path": "/images/omni-image",
-     "sdk": {}
-    }
-   }
-  },
-  "kling-3.0": {
-   "id": "kling-3.0",
-   "name": "Kling VIDEO 3.0",
-   "type": "video",
-   "canonical_id": "kuaishou/kling-v3.0-pro",
-   "release_date": "2026-02-05",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Kling 3.0 video model with first and last frame control, multi-shot storyboards, motion control and native audio",
-   "open_weights": false,
-   "last_updated": "2026-02-05",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "video/mp4",
-     "video/quicktime"
-    ],
-    "output": [
-     "video/mp4"
-    ]
-   },
-   "cost": {
-    "video": {
-     "output": {
-      "unit": "second",
-      "price": 0.084,
-      "overrides": [
-       {
-        "when": {
-         "resolution": {
-          "equals": "1080p"
-         }
-        },
-        "price": 0.112
-       },
-       {
-        "when": {
-         "generate_audio": {
-          "equals": true
-         }
-        },
-        "price": 0.126
-       },
-       {
-        "when": {
-         "resolution": {
-          "equals": "1080p"
-         },
-         "generate_audio": {
-          "equals": true
-         }
-        },
-        "price": 0.168
-       },
-       {
-        "when": {
-         "resolution": {
-          "equals": "4k"
-         }
-        },
-        "price": 0.42
-       },
-       {
-        "when": {
-         "mode": {
-          "equals": "motion-control"
-         }
-        },
-        "price": 0.126
-       },
-       {
-        "when": {
-         "resolution": {
-          "equals": "1080p"
-         },
-         "mode": {
-          "equals": "motion-control"
-         }
-        },
-        "price": 0.168
-       }
-      ]
-     }
-    }
-   },
-   "api": {
-    "videos": {
-     "base_url": "https://api-singapore.klingai.com",
-     "sdk": {}
-    }
-   }
+   "last_updated": "2025-12-03"
   },
   "kling-4.0": {
    "id": "kling-4.0",
    "name": "Kling VIDEO 4.0",
+   "description": "Kling video model with native 30-second generation, multi-keyframe control, omni references, video editing and native audio",
    "type": "video",
    "canonical_id": "kuaishou/kling-v4.0",
    "release_date": "2026-10-15",
@@ -772,32 +441,17 @@
     "output": 0
    },
    "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": false
     },
     "reasoning": {
      "supported": false
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Kling video model with native 30-second generation, multi-keyframe control, omni references, video editing and native audio",
-   "open_weights": false,
-   "last_updated": "2026-10-15",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "video/mp4",
-     "video/quicktime"
-    ],
-    "output": [
-     "video/mp4"
-    ]
+    }
    },
    "cost": {
     "video": {
@@ -850,16 +504,31 @@
      }
     }
    },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "video/mp4",
+     "video/quicktime"
+    ],
+    "output": [
+     "video/mp4"
+    ]
+   },
    "api": {
     "videos": {
      "base_url": "https://api-singapore.klingai.com",
      "sdk": {}
     }
-   }
+   },
+   "open_weights": false,
+   "last_updated": "2026-10-15"
   },
   "kling-v2-1": {
    "id": "kling-v2-1",
    "name": "Kling IMAGE 2.1",
+   "description": "Kling image model for text-to-image, image-to-image with subject or face reference, and multi-image composition",
    "type": "image",
    "canonical_id": "kuaishou/kling-image-v2.1",
    "release_date": "2025-07-30",
@@ -868,30 +537,17 @@
     "output": 0
    },
    "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": false
     },
     "reasoning": {
      "supported": false
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Kling image model for text-to-image, image-to-image with subject or face reference, and multi-image composition",
-   "open_weights": false,
-   "last_updated": "2025-07-30",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png"
-    ],
-    "output": [
-     "image"
-    ]
+    }
    },
    "cost": {
     "image": {
@@ -919,12 +575,356 @@
      }
     }
    },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png"
+    ],
+    "output": [
+     "image"
+    ]
+   },
    "api": {
     "images": {
      "base_url": "https://api-singapore.klingai.com/v1",
      "sdk": {}
     }
-   }
+   },
+   "open_weights": false,
+   "last_updated": "2025-07-30"
+  },
+  "kling-3.0": {
+   "id": "kling-3.0",
+   "name": "Kling VIDEO 3.0",
+   "description": "Kling 3.0 video model with first and last frame control, multi-shot storyboards, motion control and native audio",
+   "type": "video",
+   "canonical_id": "kuaishou/kling-v3.0-pro",
+   "release_date": "2026-02-05",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "video": {
+     "output": {
+      "unit": "second",
+      "price": 0.084,
+      "overrides": [
+       {
+        "when": {
+         "resolution": {
+          "equals": "1080p"
+         }
+        },
+        "price": 0.112
+       },
+       {
+        "when": {
+         "generate_audio": {
+          "equals": true
+         }
+        },
+        "price": 0.126
+       },
+       {
+        "when": {
+         "resolution": {
+          "equals": "1080p"
+         },
+         "generate_audio": {
+          "equals": true
+         }
+        },
+        "price": 0.168
+       },
+       {
+        "when": {
+         "resolution": {
+          "equals": "4k"
+         }
+        },
+        "price": 0.42
+       },
+       {
+        "when": {
+         "mode": {
+          "equals": "motion-control"
+         }
+        },
+        "price": 0.126
+       },
+       {
+        "when": {
+         "resolution": {
+          "equals": "1080p"
+         },
+         "mode": {
+          "equals": "motion-control"
+         }
+        },
+        "price": 0.168
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "video/mp4",
+     "video/quicktime"
+    ],
+    "output": [
+     "video/mp4"
+    ]
+   },
+   "api": {
+    "videos": {
+     "base_url": "https://api-singapore.klingai.com",
+     "sdk": {}
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-02-05"
+  },
+  "kling-3.0-omni": {
+   "id": "kling-3.0-omni",
+   "name": "Kling VIDEO 3.0 Omni",
+   "description": "Kling 3.0 multimodal video model for reference-based generation and editing with images, videos and elements, multi-shot storyboards and native audio",
+   "type": "video",
+   "canonical_id": "kuaishou/kling-v3.0-omni",
+   "release_date": "2026-02-05",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "video": {
+     "output": {
+      "unit": "second",
+      "price": 0.084,
+      "overrides": [
+       {
+        "when": {
+         "resolution": {
+          "equals": "1080p"
+         }
+        },
+        "price": 0.112
+       },
+       {
+        "when": {
+         "generate_audio": {
+          "equals": true
+         }
+        },
+        "price": 0.112
+       },
+       {
+        "when": {
+         "resolution": {
+          "equals": "1080p"
+         },
+         "generate_audio": {
+          "equals": true
+         }
+        },
+        "price": 0.14
+       },
+       {
+        "when": {
+         "input_video": {
+          "equals": true
+         }
+        },
+        "price": 0.126
+       },
+       {
+        "when": {
+         "resolution": {
+          "equals": "1080p"
+         },
+         "input_video": {
+          "equals": true
+         }
+        },
+        "price": 0.168
+       },
+       {
+        "when": {
+         "resolution": {
+          "equals": "4k"
+         }
+        },
+        "price": 0.42
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "video/mp4",
+     "video/quicktime"
+    ],
+    "output": [
+     "video/mp4"
+    ]
+   },
+   "api": {
+    "videos": {
+     "base_url": "https://api-singapore.klingai.com",
+     "sdk": {}
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-02-05"
+  },
+  "kling-image-o1": {
+   "id": "kling-image-o1",
+   "name": "Kling IMAGE O1",
+   "description": "Unified Kling image model for generation and editing from text and up to 10 reference images",
+   "type": "image",
+   "canonical_id": "kuaishou/kling-image-o1",
+   "release_date": "2025-12-15",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "image": {
+     "output": {
+      "unit": "image",
+      "price": 0.028
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png"
+    ],
+    "output": [
+     "image"
+    ]
+   },
+   "api": {
+    "images": {
+     "base_url": "https://api-singapore.klingai.com/v1",
+     "path": "/images/omni-image",
+     "sdk": {}
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-12-15"
+  },
+  "kling-v3-omni": {
+   "id": "kling-v3-omni",
+   "name": "Kling IMAGE 3.0 Omni",
+   "description": "Kling 3.0 multimodal image model for generation, editing and image series from text and up to 10 references, with 4K output",
+   "type": "image",
+   "canonical_id": "kuaishou/kling-image-v3.0-omni",
+   "release_date": "2026-02-05",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "image": {
+     "output": {
+      "unit": "image",
+      "price": 0.028,
+      "overrides": [
+       {
+        "when": {
+         "resolution": {
+          "equals": "4k"
+         }
+        },
+        "price": 0.056
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png"
+    ],
+    "output": [
+     "image"
+    ]
+   },
+   "api": {
+    "images": {
+     "base_url": "https://api-singapore.klingai.com/v1",
+     "path": "/images/omni-image",
+     "sdk": {}
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-02-05"
   }
  }
 }

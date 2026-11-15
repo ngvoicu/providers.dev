@@ -9,15 +9,25 @@
   "Beam-1.0-501B-A23B": {
    "id": "Beam-1.0-501B-A23B",
    "name": "Beam 1.0 501B A23B",
+   "description": "Sparse mixture-of-experts reasoning model with 23B active parameters for coding and agentic workflows",
    "type": "chat",
-   "canonical_id": "reflection/beam-1.0-501b-a23b",
    "family": "beam",
+   "canonical_id": "reflection/beam-1.0-501b-a23b",
    "release_date": "2026-10-05",
    "limit": {
     "context": 1048576,
     "output": 131072
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "prompt_cache_key": false,
+    "store": false,
+    "stream_usage": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -30,28 +40,7 @@
       "xhigh",
       "max"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "store": false,
-    "stream_usage": true,
-    "prompt_cache_key": false
-   },
-   "description": "Sparse mixture-of-experts reasoning model with 23B active parameters for coding and agentic workflows",
-   "open_weights": true,
-   "knowledge": "2026-06-30",
-   "last_updated": "2026-10-16",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -66,6 +55,14 @@
      }
     }
    },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.reflection.ai/openai/v1",
@@ -73,23 +70,26 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
      "capabilities": {
       "tools": {
-       "strict": true,
        "choice": [
         "auto",
         "none",
         "required",
         "tool"
        ],
+       "strict": true,
        "updates": false
       }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
      }
     }
-   }
+   },
+   "open_weights": true,
+   "knowledge": "2026-06-30",
+   "last_updated": "2026-10-16"
   }
  }
 }

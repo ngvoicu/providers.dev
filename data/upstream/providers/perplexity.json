@@ -6,19 +6,25 @@
   "PERPLEXITY_API_KEY"
  ],
  "models": {
-  "sonar-reasoning-pro": {
-   "id": "sonar-reasoning-pro",
-   "name": "Sonar Reasoning Pro",
+  "sonar-deep-research": {
+   "id": "sonar-deep-research",
+   "name": "Perplexity Sonar Deep Research",
+   "description": "Sonar search model for current answers, retrieval, and citation-backed chat",
    "type": "chat",
-   "canonical_id": "perplexity/sonar-reasoning-pro",
-   "family": "sonar-reasoning",
+   "family": "sonar",
+   "canonical_id": "perplexity/sonar-deep-research",
    "status": "deprecated",
-   "release_date": "2024-01-01",
+   "release_date": "2025-02-01",
    "limit": {
     "context": 128000,
-    "output": 4096
+    "output": 32768
    },
    "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": false
     },
@@ -30,28 +36,74 @@
       "medium",
       "high"
      ]
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Web-grounded Sonar for multi-step research questions that need cited reasoning",
-   "open_weights": false,
-   "knowledge": "2025-09-01",
-   "last_updated": "2025-09-01",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2
+     },
+     "output": {
+      "price": 8,
+      "reasoning": 3
+     }
+    },
+    "web_search": {
+     "price": 5
+    }
+   },
    "modalities": {
     "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/gif"
+     "text"
     ],
     "output": [
      "text"
     ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.perplexity.ai",
+     "sdk": {
+      "aisdk": "@ai-sdk/perplexity",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2025-09-01"
+  },
+  "sonar-reasoning-pro": {
+   "id": "sonar-reasoning-pro",
+   "name": "Sonar Reasoning Pro",
+   "description": "Web-grounded Sonar for multi-step research questions that need cited reasoning",
+   "type": "chat",
+   "family": "sonar-reasoning",
+   "canonical_id": "perplexity/sonar-reasoning-pro",
+   "status": "deprecated",
+   "release_date": "2024-01-01",
+   "limit": {
+    "context": 128000,
+    "output": 4096
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
    },
    "cost": {
     "text": {
@@ -84,73 +136,18 @@
      ]
     }
    },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.perplexity.ai",
-     "sdk": {
-      "aisdk": "@ai-sdk/perplexity",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     }
-    }
-   }
-  },
-  "sonar-deep-research": {
-   "id": "sonar-deep-research",
-   "name": "Perplexity Sonar Deep Research",
-   "type": "chat",
-   "canonical_id": "perplexity/sonar-deep-research",
-   "family": "sonar",
-   "status": "deprecated",
-   "release_date": "2025-02-01",
-   "limit": {
-    "context": 128000,
-    "output": 32768
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Sonar search model for current answers, retrieval, and citation-backed chat",
-   "open_weights": false,
-   "knowledge": "2025-01",
-   "last_updated": "2025-09-01",
    "modalities": {
     "input": [
-     "text"
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/gif"
     ],
     "output": [
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2
-     },
-     "output": {
-      "price": 8,
-      "reasoning": 3
-     }
-    },
-    "web_search": {
-     "price": 5
-    }
-   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.perplexity.ai",
@@ -159,14 +156,18 @@
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2025-09-01",
+   "last_updated": "2025-09-01"
   },
   "sonar": {
    "id": "sonar",
    "name": "Sonar",
+   "description": "Fast web-grounded Sonar for current answers, citations, and lightweight retrieval",
    "type": "chat",
-   "canonical_id": "perplexity/sonar",
    "family": "sonar",
+   "canonical_id": "perplexity/sonar",
    "status": "deprecated",
    "release_date": "2024-01-01",
    "limit": {
@@ -174,29 +175,17 @@
     "output": 4096
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": false
     },
     "reasoning": {
      "supported": false
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Fast web-grounded Sonar for current answers, citations, and lightweight retrieval",
-   "open_weights": false,
-   "knowledge": "2025-09-01",
-   "last_updated": "2025-09-01",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -229,6 +218,14 @@
      ]
     }
    },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.perplexity.ai",
@@ -237,14 +234,18 @@
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2025-09-01",
+   "last_updated": "2025-09-01"
   },
   "sonar-pro": {
    "id": "sonar-pro",
    "name": "Sonar Pro",
+   "description": "Deeper Sonar search model with broader retrieval and stronger synthesis",
    "type": "chat",
-   "canonical_id": "perplexity/sonar-pro",
    "family": "sonar-pro",
+   "canonical_id": "perplexity/sonar-pro",
    "status": "deprecated",
    "release_date": "2024-01-01",
    "limit": {
@@ -252,33 +253,17 @@
     "output": 8192
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": false
     },
     "reasoning": {
      "supported": false
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Deeper Sonar search model with broader retrieval and stronger synthesis",
-   "open_weights": false,
-   "knowledge": "2025-09-01",
-   "last_updated": "2025-09-01",
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/gif"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -311,6 +296,18 @@
      ]
     }
    },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/gif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.perplexity.ai",
@@ -319,7 +316,10 @@
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2025-09-01",
+   "last_updated": "2025-09-01"
   }
  }
 }

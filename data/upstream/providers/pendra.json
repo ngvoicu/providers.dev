@@ -6,41 +6,36 @@
   "PENDRA_API_KEY"
  ],
  "models": {
-  "qwen3-coder:30b": {
-   "id": "qwen3-coder:30b",
-   "name": "Qwen3-Coder 30B-A3B Instruct",
+  "deepseek-v4-flash": {
+   "id": "deepseek-v4-flash",
+   "name": "DeepSeek V4 Flash",
+   "description": "Fast DeepSeek V4 lane for economical reasoning, coding, and long-context work",
    "type": "chat",
-   "canonical_id": "alibaba/qwen3-coder-30b-a3b-instruct",
-   "family": "qwen",
-   "release_date": "2025-07-31",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4-flash",
+   "release_date": "2026-04-24",
    "limit": {
-    "context": 262144,
-    "output": 65536
+    "context": 1000000,
+    "output": 384000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": false
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Smaller Qwen coder for efficient local agents and repo-level fixes",
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-07-31",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
    },
    "cost": {
     "text": {
@@ -51,6 +46,14 @@
       "price": 0
      }
     }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
    },
    "api": {
     "chat-completions": {
@@ -65,142 +68,30 @@
       }
      }
     }
-   }
-  },
-  "llama3.3:70b": {
-   "id": "llama3.3:70b",
-   "name": "Llama-3.3-70B-Instruct",
-   "type": "chat",
-   "canonical_id": "meta/llama-3.3-70b-instruct",
-   "family": "llama",
-   "release_date": "2024-12-06",
-   "limit": {
-    "context": 128000,
-    "output": 4096
    },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Popular open Llama workhorse for multilingual chat, coding, and self-hosting",
    "open_weights": true,
-   "knowledge": "2023-12",
-   "last_updated": "2024-12-06",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.pendra.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "glm-4.7-flash": {
-   "id": "glm-4.7-flash",
-   "name": "GLM-4.7-Flash",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-4.7-flash",
-   "family": "glm-flash",
-   "release_date": "2026-01-19",
-   "limit": {
-    "context": 200000,
-    "output": 131072
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Budget GLM lane for fast coding help, routing, and everyday automation",
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2026-01-19",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.pendra.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
+   "knowledge": "2025-05",
+   "last_updated": "2026-04-24"
   },
   "gpt-oss:120b": {
    "id": "gpt-oss:120b",
    "name": "GPT OSS 120B",
+   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
    "type": "chat",
-   "canonical_id": "openai/gpt-oss-120b",
    "family": "gpt-oss",
+   "canonical_id": "openai/gpt-oss-120b",
    "release_date": "2025-08-05",
    "limit": {
     "context": 131072,
-    "output": 32768
+    "output": 131072
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -211,25 +102,7 @@
       "medium",
       "high"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
-   "open_weights": true,
-   "knowledge": "2024-06",
-   "last_updated": "2025-08-05",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -240,6 +113,14 @@
       "price": 0
      }
     }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
    },
    "api": {
     "chat-completions": {
@@ -254,36 +135,169 @@
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "knowledge": "2024-06",
+   "last_updated": "2025-08-05"
+  },
+  "qwen3-coder:30b": {
+   "id": "qwen3-coder:30b",
+   "name": "Qwen3-Coder 30B-A3B Instruct",
+   "description": "Smaller Qwen coder for efficient local agents and repo-level fixes",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3-coder-30b-a3b-instruct",
+   "release_date": "2025-07-31",
+   "limit": {
+    "context": 262144,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.pendra.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-04",
+   "last_updated": "2025-07-31"
+  },
+  "llama3.3:70b": {
+   "id": "llama3.3:70b",
+   "name": "Llama-3.3-70B-Instruct",
+   "description": "Popular open Llama workhorse for multilingual chat, coding, and self-hosting",
+   "type": "chat",
+   "family": "llama",
+   "canonical_id": "meta/llama-3.3-70b-instruct",
+   "release_date": "2024-12-06",
+   "limit": {
+    "context": 128000,
+    "output": 4096
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.pendra.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2023-12",
+   "last_updated": "2024-12-06"
   },
   "qwen3.6:27b": {
    "id": "qwen3.6:27b",
    "name": "Qwen3.6 27B",
+   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
    "type": "chat",
-   "canonical_id": "alibaba/qwen3.6-27b",
    "family": "qwen",
+   "canonical_id": "alibaba/qwen3.6-27b",
    "release_date": "2026-04-22",
    "limit": {
     "context": 262144,
     "output": 65536
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": true
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
-   "open_weights": true,
-   "last_updated": "2026-04-22",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text",
@@ -298,16 +312,6 @@
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.pendra.ai/api/v1",
@@ -321,42 +325,45 @@
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "last_updated": "2026-04-22"
   },
-  "deepseek-v4-flash": {
-   "id": "deepseek-v4-flash",
-   "name": "DeepSeek V4 Flash",
+  "glm-4.7-flash": {
+   "id": "glm-4.7-flash",
+   "name": "GLM-4.7-Flash",
+   "description": "Budget GLM lane for fast coding help, routing, and everyday automation",
    "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4-flash",
-   "family": "deepseek-flash",
-   "release_date": "2026-04-24",
+   "family": "glm-flash",
+   "canonical_id": "zhipuai/glm-4.7-flash",
+   "release_date": "2026-01-19",
    "limit": {
-    "context": 1000000,
-    "output": 384000
+    "context": 200000,
+    "output": 131072
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
+     "supported": true
+    }
    },
-   "description": "Fast DeepSeek V4 lane for economical reasoning, coding, and long-context work",
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-04-24",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text"
@@ -365,16 +372,6 @@
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.pendra.ai/api/v1",
@@ -388,7 +385,10 @@
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "knowledge": "2025-04",
+   "last_updated": "2026-01-19"
   }
  }
 }

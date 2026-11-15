@@ -6,159 +6,25 @@
   "AURIKO_API_KEY"
  ],
  "models": {
-  "minimax-m2-7-highspeed": {
-   "id": "minimax-m2-7-highspeed",
-   "name": "MiniMax-M2.7-highspeed",
+  "deepseek-v4-flash": {
+   "id": "deepseek-v4-flash",
+   "name": "DeepSeek V4 Flash",
+   "description": "Fast DeepSeek V4 lane for economical reasoning, coding, and long-context work",
    "type": "chat",
-   "canonical_id": "minimax/MiniMax-M2.7-highspeed",
-   "family": "minimax",
-   "release_date": "2026-03-18",
-   "limit": {
-    "context": 204800,
-    "output": 131072
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Low-latency M2.7 variant for interactive coding plans and agent loops",
-   "open_weights": true,
-   "last_updated": "2026-03-18",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.6,
-      "cache": {
-       "read": 0.06,
-       "write": 0.375
-      }
-     },
-     "output": {
-      "price": 2.4
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.auriko.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "claude-opus-4-6": {
-   "id": "claude-opus-4-6",
-   "name": "Claude Opus 4.6",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-opus-4-6",
-   "family": "claude-opus",
-   "release_date": "2026-02-05",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4-flash",
+   "release_date": "2026-04-24",
    "limit": {
     "context": 1000000,
-    "output": 128000
+    "output": 384000
    },
    "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "max"
-     ]
-    },
     "temperature": true,
-    "top_p": true,
     "top_k": true,
+    "top_p": true,
+    "structured_output": true,
     "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "High-end Claude for difficult coding, planning, and slower expert reasoning",
-   "open_weights": false,
-   "knowledge": "2025-05-31",
-   "last_updated": "2026-03-13",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 5,
-      "cache": {
-       "read": 0.5,
-       "write": 6.25
-      }
-     },
-     "output": {
-      "price": 25
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.auriko.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gemini-2.5-flash": {
-   "id": "gemini-2.5-flash",
-   "name": "Gemini 2.5 Flash",
-   "type": "chat",
-   "canonical_id": "google/gemini-2.5-flash",
-   "family": "gemini-flash",
-   "release_date": "2025-06-17",
-   "limit": {
-    "context": 1048576,
-    "output": 65536
-   },
-   "capabilities": {
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -172,66 +38,28 @@
       "xhigh",
       "max"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Fast Gemini workhorse for multimodal apps where latency and price matter",
-   "open_weights": false,
-   "knowledge": "2025-01",
-   "last_updated": "2025-06-17",
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "audio/wav",
-     "audio/mp3",
-     "audio/aiff",
-     "audio/aac",
-     "audio/ogg",
-     "audio/flac",
-     "audio/mpeg",
-     "audio/m4a",
-     "audio/l16",
-     "audio/opus",
-     "audio/alaw",
-     "audio/mulaw",
-     "audio/webm",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.3,
+      "price": 0.14,
       "cache": {
-       "read": 0.03
+       "read": 0.0028
       }
      },
      "output": {
-      "price": 2.5
+      "price": 0.28
      }
     }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
    },
    "api": {
     "chat-completions": {
@@ -244,22 +72,35 @@
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
      }
     }
-   }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-04-24"
   },
   "gemini-2.5-pro": {
    "id": "gemini-2.5-pro",
    "name": "Gemini 2.5 Pro",
+   "description": "Google's proven reasoning model for coding, math, and multimodal analysis",
    "type": "chat",
-   "canonical_id": "google/gemini-2.5-pro",
    "family": "gemini-pro",
+   "canonical_id": "google/gemini-2.5-pro",
    "release_date": "2025-06-17",
    "limit": {
     "context": 1048576,
     "output": 65536
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -272,53 +113,7 @@
       "xhigh",
       "max"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Google's proven reasoning model for coding, math, and multimodal analysis",
-   "open_weights": false,
-   "knowledge": "2025-01",
-   "last_updated": "2025-06-17",
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "audio/wav",
-     "audio/mp3",
-     "audio/aiff",
-     "audio/aac",
-     "audio/ogg",
-     "audio/flac",
-     "audio/mpeg",
-     "audio/m4a",
-     "audio/l16",
-     "audio/opus",
-     "audio/alaw",
-     "audio/mulaw",
-     "audio/webm",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -356,6 +151,42 @@
      }
     }
    },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.auriko.ai/v1",
@@ -369,20 +200,30 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2025-06-17"
   },
   "kimi-k2.6": {
    "id": "kimi-k2.6",
    "name": "Kimi K2.6",
+   "description": "Multimodal Kimi workhorse for agent loops, coding tasks, and visual context",
    "type": "chat",
-   "canonical_id": "moonshotai/kimi-k2.6",
    "family": "kimi-k2",
+   "canonical_id": "moonshotai/kimi-k2.6",
    "release_date": "2026-04-20",
    "limit": {
     "context": 262144,
     "output": 262144
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -396,41 +237,7 @@
       "xhigh",
       "max"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Multimodal Kimi workhorse for agent loops, coding tasks, and visual context",
-   "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-04-20",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/heic",
-     "image/heif",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -445,61 +252,6 @@
      }
     }
    },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.auriko.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "kimi-k2.5": {
-   "id": "kimi-k2.5",
-   "name": "Kimi K2.5",
-   "type": "chat",
-   "canonical_id": "moonshotai/kimi-k2.5",
-   "family": "kimi-k2",
-   "release_date": "2026-01-27",
-   "limit": {
-    "context": 262144,
-    "output": 262144
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Earlier Kimi frontier model for long-context agents, coding, and multimodal work",
-   "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-01-27",
    "modalities": {
     "input": [
      "text",
@@ -524,452 +276,46 @@
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.45,
-      "cache": {
-       "read": 0.07
-      }
-     },
-     "output": {
-      "price": 2.25
-     }
-    }
-   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.auriko.ai/v1",
      "sdk": {
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
      },
      "compatibility": {
       "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
      }
     }
-   }
-  },
-  "deepseek-v4-pro": {
-   "id": "deepseek-v4-pro",
-   "name": "DeepSeek V4 Pro",
-   "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4-pro",
-   "family": "deepseek-thinking",
-   "release_date": "2026-04-24",
-   "limit": {
-    "context": 1000000,
-    "output": 384000
    },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open MoE flagship with million-token context for coding and long agent runs",
    "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-04-24",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.32,
-      "cache": {
-       "read": 0.044
-      }
-     },
-     "output": {
-      "price": 3.96
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.auriko.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "minimax-m2-7": {
-   "id": "minimax-m2-7",
-   "name": "MiniMax-M2.7",
-   "type": "chat",
-   "canonical_id": "minimax/MiniMax-M2.7",
-   "family": "minimax",
-   "release_date": "2026-03-18",
-   "limit": {
-    "context": 204800,
-    "output": 131072
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open MiniMax flagship for coding agents, office automation, and complex environments",
-   "open_weights": true,
-   "last_updated": "2026-03-18",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.3,
-      "cache": {
-       "read": 0.06,
-       "write": 0.375
-      }
-     },
-     "output": {
-      "price": 1.2
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.auriko.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "glm-5.1": {
-   "id": "glm-5.1",
-   "name": "GLM-5.1",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-5.1",
-   "family": "glm",
-   "release_date": "2026-04-07",
-   "limit": {
-    "context": 200000,
-    "output": 131072
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Strong GLM coding model for agentic engineering, terminals, and repository generation",
-   "open_weights": true,
-   "last_updated": "2026-04-07",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.4,
-      "cache": {
-       "read": 0.26
-      }
-     },
-     "output": {
-      "price": 4.4
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.auriko.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "claude-opus-4-7": {
-   "id": "claude-opus-4-7",
-   "name": "Claude Opus 4.7",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-opus-4-7",
-   "family": "claude-opus",
-   "release_date": "2026-04-16",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Stronger Opus tier for advanced software work and high-stakes reasoning",
-   "open_weights": false,
-   "knowledge": "2026-01-31",
-   "last_updated": "2026-04-16",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 5,
-      "cache": {
-       "read": 0.5,
-       "write": 6.25
-      }
-     },
-     "output": {
-      "price": 25
-     }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "service_tier": {
-        "equals": "fast"
-       }
-      },
-      "factor": 6
-     }
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.auriko.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "experimental": {
-    "modes": {
-     "fast": {
-      "body": {
-       "speed": "fast"
-      },
-      "headers": {
-       "anthropic-beta": "fast-mode-2026-02-01"
-      }
-     }
-    }
-   }
-  },
-  "grok-4.3": {
-   "id": "grok-4.3",
-   "name": "Grok 4.3",
-   "type": "chat",
-   "canonical_id": "xai/grok-4.3",
-   "family": "grok",
-   "release_date": "2026-04-17",
-   "limit": {
-    "context": 1000000,
-    "output": 30000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "xAI's default Grok for chat, coding, agentic tools, and lower hallucination risk",
-   "open_weights": false,
-   "last_updated": "2026-04-17",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.25,
-      "cache": {
-       "read": 0.2
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 200000
-         }
-        },
-        "price": 2.5,
-        "cache": {
-         "read": 0.4
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 2.5,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 200000
-         }
-        },
-        "price": 5
-       }
-      ]
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.auriko.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
+   "knowledge": "2025-01",
+   "last_updated": "2026-04-20"
   },
   "gemini-3.1-pro-preview": {
    "id": "gemini-3.1-pro-preview",
    "name": "Gemini 3.1 Pro Preview",
+   "description": "Reasoning-first Gemini preview for agentic coding and complex problem solving",
    "type": "chat",
-   "canonical_id": "google/gemini-3.1-pro-preview",
    "family": "gemini-pro",
+   "canonical_id": "google/gemini-3.1-pro-preview",
    "release_date": "2026-02-19",
    "limit": {
     "context": 1048576,
     "output": 65536
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -980,53 +326,7 @@
       "medium",
       "high"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Reasoning-first Gemini preview for agentic coding and complex problem solving",
-   "open_weights": false,
-   "knowledge": "2025-01",
-   "last_updated": "2026-02-19",
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp",
-     "audio/wav",
-     "audio/mp3",
-     "audio/aiff",
-     "audio/aac",
-     "audio/ogg",
-     "audio/flac",
-     "audio/mpeg",
-     "audio/m4a",
-     "audio/l16",
-     "audio/opus",
-     "audio/alaw",
-     "audio/mulaw",
-     "audio/webm",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -1064,6 +364,42 @@
      }
     }
    },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.auriko.ai/v1",
@@ -1077,20 +413,190 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2026-02-19"
   },
-  "claude-sonnet-4-6": {
-   "id": "claude-sonnet-4-6",
-   "name": "Claude Sonnet 4.6",
+  "grok-4.3": {
+   "id": "grok-4.3",
+   "name": "Grok 4.3",
+   "description": "xAI's default Grok for chat, coding, agentic tools, and lower hallucination risk",
    "type": "chat",
-   "canonical_id": "anthropic/claude-sonnet-4-6",
-   "family": "claude-sonnet",
-   "release_date": "2026-02-17",
+   "family": "grok",
+   "canonical_id": "xai/grok-4.3",
+   "release_date": "2026-04-17",
    "limit": {
     "context": 1000000,
-    "output": 64000
+    "output": 30000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.25,
+      "cache": {
+       "read": 0.2
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 200000
+         }
+        },
+        "price": 2.5,
+        "cache": {
+         "read": 0.4
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 2.5,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 200000
+         }
+        },
+        "price": 5
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.auriko.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-04-17"
+  },
+  "minimax-m2-7": {
+   "id": "minimax-m2-7",
+   "name": "MiniMax-M2.7",
+   "description": "Open MiniMax flagship for coding agents, office automation, and complex environments",
+   "type": "chat",
+   "family": "minimax",
+   "canonical_id": "minimax/MiniMax-M2.7",
+   "release_date": "2026-03-18",
+   "limit": {
+    "context": 204800,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.3,
+      "cache": {
+       "read": 0.06,
+       "write": 0.375
+      }
+     },
+     "output": {
+      "price": 1.2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.auriko.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-03-18"
+  },
+  "gemini-2.5-flash": {
+   "id": "gemini-2.5-flash",
+   "name": "Gemini 2.5 Flash",
+   "description": "Fast Gemini workhorse for multimodal apps where latency and price matter",
+   "type": "chat",
+   "family": "gemini-flash",
+   "canonical_id": "google/gemini-2.5-flash",
+   "release_date": "2025-06-17",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -1101,45 +607,59 @@
       "low",
       "medium",
       "high",
+      "xhigh",
       "max"
      ]
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Claude workhorse for coding agents, careful analysis, and production cost control",
-   "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2026-03-13",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.3,
+      "cache": {
+       "read": 0.03
+      }
+     },
+     "output": {
+      "price": 2.5
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text",
-     "image/jpeg",
      "image/png",
-     "image/gif",
+     "image/jpeg",
      "image/webp",
+     "image/heic",
+     "image/heif",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp",
      "application/pdf"
     ],
     "output": [
      "text"
     ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 3,
-      "cache": {
-       "read": 0.3,
-       "write": 3.75
-      }
-     },
-     "output": {
-      "price": 15
-     }
-    }
    },
    "api": {
     "chat-completions": {
@@ -1154,55 +674,111 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2025-06-17"
+  },
+  "deepseek-v4-pro": {
+   "id": "deepseek-v4-pro",
+   "name": "DeepSeek V4 Pro",
+   "description": "Open MoE flagship with million-token context for coding and long agent runs",
+   "type": "chat",
+   "family": "deepseek-thinking",
+   "canonical_id": "deepseek/deepseek-v4-pro",
+   "release_date": "2026-04-24",
+   "limit": {
+    "context": 1000000,
+    "output": 384000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.32,
+      "cache": {
+       "read": 0.044
+      }
+     },
+     "output": {
+      "price": 3.96
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.auriko.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-04-24"
   },
   "qwen-3.6-plus": {
    "id": "qwen-3.6-plus",
    "name": "Qwen3.6 Plus",
+   "description": "Earlier Qwen multimodal workhorse for million-token agent and document tasks",
    "type": "chat",
-   "canonical_id": "alibaba/qwen3.6-plus",
    "family": "qwen",
+   "canonical_id": "alibaba/qwen3.6-plus",
    "release_date": "2026-04-02",
    "limit": {
     "context": 1000000,
     "output": 65536
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Earlier Qwen multimodal workhorse for million-token agent and document tasks",
-   "open_weights": false,
-   "knowledge": "2025-04",
-   "last_updated": "2026-04-02",
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/x-matroska",
-     "video/quicktime",
-     "video/x-flv",
-     "video/x-ms-wmv"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -1241,6 +817,26 @@
      }
     }
    },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/x-matroska",
+     "video/quicktime",
+     "video/x-flv",
+     "video/x-ms-wmv"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.auriko.ai/v1",
@@ -1254,20 +850,251 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2025-04",
+   "last_updated": "2026-04-02"
   },
-  "deepseek-v4-flash": {
-   "id": "deepseek-v4-flash",
-   "name": "DeepSeek V4 Flash",
+  "claude-sonnet-4-6": {
+   "id": "claude-sonnet-4-6",
+   "name": "Claude Sonnet 4.6",
+   "description": "Claude workhorse for coding agents, careful analysis, and production cost control",
    "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4-flash",
-   "family": "deepseek-flash",
-   "release_date": "2026-04-24",
+   "family": "claude-sonnet",
+   "canonical_id": "anthropic/claude-sonnet-4-6",
+   "release_date": "2026-02-17",
    "limit": {
     "context": 1000000,
-    "output": 384000
+    "output": 64000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 3,
+      "cache": {
+       "read": 0.3,
+       "write": 3.75
+      }
+     },
+     "output": {
+      "price": 15
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.auriko.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-03-13"
+  },
+  "claude-opus-4-6": {
+   "id": "claude-opus-4-6",
+   "name": "Claude Opus 4.6",
+   "description": "High-end Claude for difficult coding, planning, and slower expert reasoning",
+   "type": "chat",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-4-6",
+   "release_date": "2026-02-05",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5,
+       "write": 6.25
+      }
+     },
+     "output": {
+      "price": 25
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.auriko.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-05-31",
+   "last_updated": "2026-03-13"
+  },
+  "glm-5.1": {
+   "id": "glm-5.1",
+   "name": "GLM-5.1",
+   "description": "Strong GLM coding model for agentic engineering, terminals, and repository generation",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.1",
+   "release_date": "2026-04-07",
+   "limit": {
+    "context": 200000,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.4,
+      "cache": {
+       "read": 0.26
+      }
+     },
+     "output": {
+      "price": 4.4
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.auriko.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-04-07"
+  },
+  "kimi-k2.5": {
+   "id": "kimi-k2.5",
+   "name": "Kimi K2.5",
+   "description": "Earlier Kimi frontier model for long-context agents, coding, and multimodal work",
+   "type": "chat",
+   "family": "kimi-k2",
+   "canonical_id": "moonshotai/kimi-k2.5",
+   "release_date": "2026-01-27",
+   "limit": {
+    "context": 262144,
+    "output": 262144
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -1281,38 +1108,44 @@
       "xhigh",
       "max"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Fast DeepSeek V4 lane for economical reasoning, coding, and long-context work",
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-04-24",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.14,
+      "price": 0.45,
       "cache": {
-       "read": 0.0028
+       "read": 0.07
       }
      },
      "output": {
-      "price": 0.28
+      "price": 2.25
      }
     }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp"
+    ],
+    "output": [
+     "text"
+    ]
    },
    "api": {
     "chat-completions": {
@@ -1321,12 +1154,179 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
      "compatibility": {
       "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-01",
+   "last_updated": "2026-01-27"
+  },
+  "minimax-m2-7-highspeed": {
+   "id": "minimax-m2-7-highspeed",
+   "name": "MiniMax-M2.7-highspeed",
+   "description": "Low-latency M2.7 variant for interactive coding plans and agent loops",
+   "type": "chat",
+   "family": "minimax",
+   "canonical_id": "minimax/MiniMax-M2.7-highspeed",
+   "release_date": "2026-03-18",
+   "limit": {
+    "context": 204800,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.6,
+      "cache": {
+       "read": 0.06,
+       "write": 0.375
+      }
+     },
+     "output": {
+      "price": 2.4
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.auriko.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
      "capabilities": {
       "tools": {
        "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-03-18"
+  },
+  "claude-opus-4-7": {
+   "id": "claude-opus-4-7",
+   "name": "Claude Opus 4.7",
+   "description": "Stronger Opus tier for advanced software work and high-stakes reasoning",
+   "type": "chat",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-4-7",
+   "release_date": "2026-04-16",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5,
+       "write": 6.25
+      }
+     },
+     "output": {
+      "price": 25
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "fast"
+       }
+      },
+      "factor": 6
+     }
+    ]
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.auriko.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-01-31",
+   "last_updated": "2026-04-16",
+   "experimental": {
+    "modes": {
+     "fast": {
+      "body": {
+       "speed": "fast"
+      },
+      "headers": {
+       "anthropic-beta": "fast-mode-2026-02-01"
       }
      }
     }

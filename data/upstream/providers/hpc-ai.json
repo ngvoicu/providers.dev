@@ -6,12 +6,444 @@
   "HPC_AI_API_KEY"
  ],
  "models": {
+  "moonshotai/kimi-k2.7-code": {
+   "id": "moonshotai/kimi-k2.7-code",
+   "name": "Kimi K2.7 Code",
+   "description": "Coding-focused Kimi model, stronger on long-horizon repo work with less overthinking",
+   "type": "chat",
+   "family": "kimi-k2",
+   "canonical_id": "moonshotai/kimi-k2.7-code",
+   "release_date": "2026-06-12",
+   "limit": {
+    "context": 256000,
+    "output": 256000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.95,
+      "cache": {
+       "read": 0.19
+      }
+     },
+     "output": {
+      "price": 4
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/heic",
+     "image/heif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.hpc-ai.com/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-01",
+   "last_updated": "2026-06-12"
+  },
+  "moonshotai/kimi-k2.5": {
+   "id": "moonshotai/kimi-k2.5",
+   "name": "Kimi K2.5",
+   "description": "Earlier Kimi frontier model for long-context agents, coding, and multimodal work",
+   "type": "chat",
+   "family": "kimi-k2",
+   "canonical_id": "moonshotai/kimi-k2.5",
+   "release_date": "2026-01-27",
+   "limit": {
+    "context": 256000,
+    "output": 256000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.6,
+      "cache": {
+       "read": 0.1
+      }
+     },
+     "output": {
+      "price": 3
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/heic",
+     "image/heif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.hpc-ai.com/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-01",
+   "last_updated": "2026-01-27"
+  },
+  "deepseek/deepseek-v4-flash": {
+   "id": "deepseek/deepseek-v4-flash",
+   "name": "DeepSeek V4 Flash",
+   "description": "Fast DeepSeek V4 lane for economical reasoning, coding, and long-context work",
+   "type": "chat",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4-flash",
+   "release_date": "2026-04-24",
+   "limit": {
+    "context": 1048576,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.14,
+      "cache": {
+       "read": 0.028
+      }
+     },
+     "output": {
+      "price": 0.28
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.hpc-ai.com/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-04-24"
+  },
+  "deepseek/deepseek-v4-pro": {
+   "id": "deepseek/deepseek-v4-pro",
+   "name": "DeepSeek V4 Pro",
+   "description": "Open MoE flagship with million-token context for coding and long agent runs",
+   "type": "chat",
+   "family": "deepseek-thinking",
+   "canonical_id": "deepseek/deepseek-v4-pro",
+   "release_date": "2026-04-24",
+   "limit": {
+    "context": 1002000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.74,
+      "cache": {
+       "read": 0.145
+      }
+     },
+     "output": {
+      "price": 3.48
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.hpc-ai.com/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-04-24"
+  },
+  "zai-org/glm-5.2": {
+   "id": "zai-org/glm-5.2",
+   "name": "GLM-5.2",
+   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.2",
+   "release_date": "2026-06-13",
+   "limit": {
+    "context": 1048576,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.4,
+      "cache": {
+       "read": 0.26
+      }
+     },
+     "output": {
+      "price": 4.4
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.hpc-ai.com/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-06-13"
+  },
+  "zai-org/glm-5.1": {
+   "id": "zai-org/glm-5.1",
+   "name": "GLM 5.1",
+   "description": "Flagship GLM model for hybrid reasoning, coding, and agentic engineering",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.1",
+   "release_date": "2026-04-07",
+   "limit": {
+    "context": 202000,
+    "output": 202000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.615,
+      "cache": {
+       "read": 0.133
+      }
+     },
+     "output": {
+      "price": 2.46
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.hpc-ai.com/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-04-07"
+  },
   "openai/gpt-5.5": {
    "id": "openai/gpt-5.5",
    "name": "GPT-5.5",
+   "description": "Default frontier GPT for coding, computer use, research, and knowledge work",
    "type": "chat",
-   "canonical_id": "openai/gpt-5.5",
    "family": "gpt",
+   "canonical_id": "openai/gpt-5.5",
    "release_date": "2026-04-23",
    "limit": {
     "context": 1050000,
@@ -19,6 +451,12 @@
     "output": 128000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -30,29 +468,7 @@
       "medium",
       "high"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Default frontier GPT for coding, computer use, research, and knowledge work",
-   "open_weights": false,
-   "knowledge": "2025-12-01",
-   "last_updated": "2026-04-23",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -90,202 +506,6 @@
      }
     }
    },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.hpc-ai.com/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "moonshotai/kimi-k2.7-code": {
-   "id": "moonshotai/kimi-k2.7-code",
-   "name": "Kimi K2.7 Code",
-   "type": "chat",
-   "canonical_id": "moonshotai/kimi-k2.7-code",
-   "family": "kimi-k2",
-   "release_date": "2026-06-12",
-   "limit": {
-    "context": 256000,
-    "output": 256000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Coding-focused Kimi model, stronger on long-horizon repo work with less overthinking",
-   "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-06-12",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/heic",
-     "image/heif"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.95,
-      "cache": {
-       "read": 0.19
-      }
-     },
-     "output": {
-      "price": 4
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.hpc-ai.com/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "moonshotai/kimi-k2.5": {
-   "id": "moonshotai/kimi-k2.5",
-   "name": "Kimi K2.5",
-   "type": "chat",
-   "canonical_id": "moonshotai/kimi-k2.5",
-   "family": "kimi-k2",
-   "release_date": "2026-01-27",
-   "limit": {
-    "context": 256000,
-    "output": 256000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Earlier Kimi frontier model for long-context agents, coding, and multimodal work",
-   "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-01-27",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/heic",
-     "image/heif"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.6,
-      "cache": {
-       "read": 0.1
-      }
-     },
-     "output": {
-      "price": 3
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.hpc-ai.com/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "anthropic/claude-opus-4.7": {
-   "id": "anthropic/claude-opus-4.7",
-   "name": "Claude Opus 4.7",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-opus-4-7",
-   "family": "claude-opus",
-   "release_date": "2026-04-16",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "temperature": true,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Stronger Opus tier for advanced software work and high-stakes reasoning",
-   "open_weights": false,
-   "knowledge": "2026-01-31",
-   "last_updated": "2026-04-16",
    "modalities": {
     "input": [
      "text",
@@ -298,19 +518,6 @@
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 5,
-      "cache": {
-       "read": 0.5
-      }
-     },
-     "output": {
-      "price": 25
-     }
-    }
-   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.hpc-ai.com/inference/v1",
@@ -324,326 +531,36 @@
       }
      }
     }
-   }
-  },
-  "zai-org/glm-5.2": {
-   "id": "zai-org/glm-5.2",
-   "name": "GLM-5.2",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-5.2",
-   "family": "glm",
-   "release_date": "2026-06-13",
-   "limit": {
-    "context": 1048576,
-    "output": 131072
    },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
-   "open_weights": true,
-   "last_updated": "2026-06-13",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.4,
-      "cache": {
-       "read": 0.26
-      }
-     },
-     "output": {
-      "price": 4.4
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.hpc-ai.com/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "zai-org/glm-5.1": {
-   "id": "zai-org/glm-5.1",
-   "name": "GLM 5.1",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-5.1",
-   "family": "glm",
-   "release_date": "2026-04-07",
-   "limit": {
-    "context": 202000,
-    "output": 202000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Flagship GLM model for hybrid reasoning, coding, and agentic engineering",
-   "open_weights": true,
-   "last_updated": "2026-04-07",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.615,
-      "cache": {
-       "read": 0.133
-      }
-     },
-     "output": {
-      "price": 2.46
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.hpc-ai.com/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "deepseek/deepseek-v4-pro": {
-   "id": "deepseek/deepseek-v4-pro",
-   "name": "DeepSeek V4 Pro",
-   "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4-pro",
-   "family": "deepseek-thinking",
-   "release_date": "2026-04-24",
-   "limit": {
-    "context": 1002000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open MoE flagship with million-token context for coding and long agent runs",
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-04-24",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.74,
-      "cache": {
-       "read": 0.145
-      }
-     },
-     "output": {
-      "price": 3.48
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.hpc-ai.com/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "deepseek/deepseek-v4-flash": {
-   "id": "deepseek/deepseek-v4-flash",
-   "name": "DeepSeek V4 Flash",
-   "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4-flash",
-   "family": "deepseek-flash",
-   "release_date": "2026-04-24",
-   "limit": {
-    "context": 1048576,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Fast DeepSeek V4 lane for economical reasoning, coding, and long-context work",
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-04-24",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.14,
-      "cache": {
-       "read": 0.028
-      }
-     },
-     "output": {
-      "price": 0.28
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.hpc-ai.com/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
+   "open_weights": false,
+   "knowledge": "2025-12-01",
+   "last_updated": "2026-04-23"
   },
   "minimax/minimax-m2.5": {
    "id": "minimax/minimax-m2.5",
    "name": "MiniMax-M2.5",
+   "description": "Prior MiniMax coding model for agent workflows, office edits, and automation",
    "type": "chat",
-   "canonical_id": "minimax/MiniMax-M2.5",
    "family": "minimax",
+   "canonical_id": "minimax/MiniMax-M2.5",
    "release_date": "2026-02-12",
    "limit": {
     "context": 196000,
     "output": 195000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": true
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Prior MiniMax coding model for agent workflows, office edits, and automation",
-   "open_weights": true,
-   "last_updated": "2026-02-12",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -658,6 +575,14 @@
      }
     }
    },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.hpc-ai.com/inference/v1",
@@ -671,7 +596,82 @@
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "last_updated": "2026-02-12"
+  },
+  "anthropic/claude-opus-4.7": {
+   "id": "anthropic/claude-opus-4.7",
+   "name": "Claude Opus 4.7",
+   "description": "Stronger Opus tier for advanced software work and high-stakes reasoning",
+   "type": "chat",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-4-7",
+   "release_date": "2026-04-16",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5
+      }
+     },
+     "output": {
+      "price": 25
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.hpc-ai.com/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-01-31",
+   "last_updated": "2026-04-16"
   }
  }
 }

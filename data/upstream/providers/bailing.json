@@ -1,36 +1,42 @@
 {
  "id": "bailing",
  "name": "Bailing",
- "doc": "https://alipaytbox.yuque.com/sxs0ba/ling/intro",
+ "doc": "https://developer.ant-ling.com/zh-CN/docs",
  "env": [
   "BAILING_API_TOKEN"
  ],
  "models": {
-  "Ling-1T": {
-   "id": "Ling-1T",
-   "name": "Ling-1T",
+  "Ling-3.0-tiny": {
+   "id": "Ling-3.0-tiny",
+   "name": "Ling 3.0 Tiny",
+   "description": "Lightweight hybrid-linear MoE reasoning model with 7.9B total and 1.3B active parameters for on-device deployment and offline agents",
    "type": "chat",
    "family": "ling",
-   "release_date": "2025-10",
+   "canonical_id": "inclusionai/ling-3.0-tiny",
+   "release_date": "2026-08-07",
    "limit": {
-    "context": 128000,
-    "output": 32000
+    "context": 131072,
+    "output": 32768
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": false
-    },
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false
+     "supported": true,
+     "toggle": true,
+     "default": {
+      "type": "toggle",
+      "value": true
+     }
+    }
    },
-   "description": "Open-weight instruction model for adaptable chat and self-hosted production workloads",
-   "open_weights": true,
-   "knowledge": "2024-06",
-   "last_updated": "2025-10",
    "modalities": {
     "input": [
      "text"
@@ -39,19 +45,9 @@
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.57
-     },
-     "output": {
-      "price": 2.29
-     }
-    }
-   },
    "api": {
     "chat-completions": {
-     "base_url": "https://api.tbox.cn/api/llm/v1",
+     "base_url": "https://api.ant-ling.com/v1",
      "sdk": {
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
@@ -61,34 +57,140 @@
        "updates": false
       }
      }
+    },
+    "messages": {
+     "base_url": "https://api.ant-ling.com/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
     }
-   }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-07"
   },
-  "Ring-1T": {
-   "id": "Ring-1T",
-   "name": "Ring-1T",
+  "Ling-3.2-flash": {
+   "id": "Ling-3.2-flash",
+   "name": "Ling 3.2 Flash",
+   "description": "Native multimodal MoE model with 560B total and 25B active parameters for complex visual understanding, multimodal agents, 3D interaction, and medical imaging",
    "type": "chat",
-   "family": "ring",
-   "release_date": "2025-10",
+   "family": "ling",
+   "canonical_id": "inclusionai/ling-3.2-flash",
+   "release_date": "2026-11-05",
    "limit": {
-    "context": 128000,
-    "output": 32000
+    "context": 1000000,
+    "output": 32768
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
-     "supported": false
-    },
-    "reasoning": {
      "supported": true
     },
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "default": {
+      "type": "toggle",
+      "value": true
+     }
+    }
    },
-   "description": "Reasoning model for deliberate analysis, multi-step problem solving, and tool use",
-   "open_weights": true,
-   "knowledge": "2024-06",
-   "last_updated": "2025-10",
+   "modalities": {
+    "input": [
+     "text",
+     "image",
+     "video"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.ant-ling.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://api.ant-ling.com/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-05"
+  },
+  "Ling-3.0-flash": {
+   "id": "Ling-3.0-flash",
+   "name": "Ling 3.0 Flash",
+   "description": "Hybrid-linear MoE reasoning model with 124B total and 5.1B active parameters for efficient agents",
+   "type": "chat",
+   "family": "ling",
+   "canonical_id": "inclusionai/ling-3.0-flash",
+   "release_date": "2026-07-23",
+   "limit": {
+    "context": 262144,
+    "output": 32768
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "default": {
+      "type": "toggle",
+      "value": true
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.075,
+      "cache": {
+       "read": 0.015
+      }
+     },
+     "output": {
+      "price": 0.224
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text"
@@ -97,25 +199,310 @@
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.57
-     },
-     "output": {
-      "price": 2.29
-     }
-    }
-   },
    "api": {
     "chat-completions": {
-     "base_url": "https://api.tbox.cn/api/llm/v1",
+     "base_url": "https://api.ant-ling.com/v1",
      "sdk": {
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://api.ant-ling.com/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "last_updated": "2026-07-23"
+  },
+  "Ling-3.1-flash": {
+   "id": "Ling-3.1-flash",
+   "name": "Ling 3.1 Flash",
+   "description": "Efficient model for low-latency assistance, extraction, and routine automation",
+   "type": "chat",
+   "family": "ling",
+   "canonical_id": "inclusionai/ling-3.1-flash",
+   "release_date": "2026-09-29",
+   "limit": {
+    "context": 1000000,
+    "output": 32768
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "default": {
+      "type": "toggle",
+      "value": true
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.3,
+      "cache": {
+       "read": 0.06
+      }
+     },
+     "output": {
+      "price": 0.9
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.ant-ling.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://api.ant-ling.com/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-09-29"
+  },
+  "Ming-Image-0.1-Design-Layer": {
+   "id": "Ming-Image-0.1-Design-Layer",
+   "name": "Ming Image 0.1 Design Layer",
+   "description": "Image model that decomposes a design into separate transparent layers for editing workflows",
+   "type": "image",
+   "canonical_id": "inclusionai/ming-image-0.1-design-layer",
+   "release_date": "2026-10-27",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "image": {
+     "output": {
+      "unit": "image",
+      "price": 0.01495
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "image/png"
+    ]
+   },
+   "api": {
+    "images": {
+     "base_url": "https://api.ant-ling.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/images"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-10-27"
+  },
+  "Ling-3.0-flash-VL": {
+   "id": "Ling-3.0-flash-VL",
+   "name": "Ling 3.0 Flash VL",
+   "description": "Native multimodal hybrid MoE model for image and video understanding, reasoning, and visual agents",
+   "type": "chat",
+   "family": "ling",
+   "canonical_id": "inclusionai/ling-3.0-flash-vl",
+   "release_date": "2026-09-10",
+   "limit": {
+    "context": 262144,
+    "output": 32768
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "default": {
+      "type": "toggle",
+      "value": true
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.075,
+      "cache": {
+       "read": 0.015
+      }
+     },
+     "output": {
+      "price": 0.224
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image",
+     "video"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.ant-ling.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://api.ant-ling.com/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-09-10"
+  },
+  "Ming-Image-0.1-Design": {
+   "id": "Ming-Image-0.1-Design",
+   "name": "Ming Image 0.1 Design",
+   "description": "Design image generation and editing model for UI drafts and visual design workflows",
+   "type": "image",
+   "canonical_id": "inclusionai/ming-image-0.1-design",
+   "release_date": "2026-10-27",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "image": {
+     "output": {
+      "unit": "image",
+      "price": 0.01495
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "image"
+    ]
+   },
+   "api": {
+    "images": {
+     "base_url": "https://api.ant-ling.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/images"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-10-27"
   }
  }
 }

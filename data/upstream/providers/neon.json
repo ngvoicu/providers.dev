@@ -7,42 +7,36 @@
   "NEON_AI_GATEWAY_TOKEN"
  ],
  "models": {
-  "qwen3-next-80b-a3b-instruct": {
-   "id": "qwen3-next-80b-a3b-instruct",
-   "name": "Qwen3-Next 80B-A3B Instruct",
+  "gpt-oss-120b": {
+   "id": "gpt-oss-120b",
+   "name": "GPT OSS 120B",
+   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
    "type": "chat",
-   "canonical_id": "alibaba/qwen3-next-80b-a3b-instruct",
-   "family": "qwen",
-   "release_date": "2025-09",
+   "family": "gpt-oss",
+   "canonical_id": "openai/gpt-oss-120b",
+   "release_date": "2025-08-05",
    "limit": {
     "context": 131072,
-    "output": 10000
+    "output": 25000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": false
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Qwen instruction model for multilingual chat, reasoning, and tool use",
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-09",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
    },
    "cost": {
     "text": {
@@ -50,9 +44,17 @@
       "price": 0.15
      },
      "output": {
-      "price": 1.2
+      "price": 0.6
      }
     }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
    },
    "api": {
     "chat-completions": {
@@ -67,18 +69,342 @@
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "knowledge": "2024-06",
+   "last_updated": "2025-08-05"
   },
-  "claude-opus-4-6": {
-   "id": "claude-opus-4-6",
-   "name": "Claude Opus 4.6",
+  "grok-4-6": {
+   "id": "grok-4-6",
+   "name": "Grok 4.6",
+   "description": "xAI's frontier model for long-running agents, coding, knowledge work, and visual projects",
    "type": "chat",
-   "canonical_id": "anthropic/claude-opus-4-6",
-   "family": "claude-opus",
-   "release_date": "2026-02-05",
+   "family": "grok",
+   "canonical_id": "xai/grok-4.6",
+   "release_date": "2026-08-12",
    "limit": {
-    "context": 1000000,
-    "output": 128000
+    "context": 500000,
+    "output": 500000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.5
+      }
+     },
+     "output": {
+      "price": 6
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/openai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-02-01",
+   "last_updated": "2026-08-12"
+  },
+  "gemini-3-1-flash-lite": {
+   "id": "gemini-3-1-flash-lite",
+   "name": "Gemini 3.1 Flash Lite Preview",
+   "description": "Low-latency Gemini model for high-volume multimodal and agent workloads",
+   "type": "chat",
+   "family": "gemini-flash-lite",
+   "canonical_id": "google/gemini-3.1-flash-lite-preview",
+   "release_date": "2026-03-03",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.25,
+      "cache": {
+       "read": 0.025
+      }
+     },
+     "output": {
+      "price": 1.5
+     }
+    },
+    "audio": {
+     "input": {
+      "price": 0.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "generate-content": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/gemini/v1beta",
+     "sdk": {
+      "aisdk": "@ai-sdk/google",
+      "opencodeai": "@opencode/ai/providers/google"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2026-03-03"
+  },
+  "gemini-3-5-flash-lite": {
+   "id": "gemini-3-5-flash-lite",
+   "name": "Gemini 3.5 Flash Lite",
+   "description": "Fast Gemini model balancing multimodal reasoning, tool use, and cost",
+   "type": "chat",
+   "family": "gemini-flash-lite",
+   "canonical_id": "google/gemini-3.5-flash-lite",
+   "release_date": "2026-07-21",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.3,
+      "cache": {
+       "read": 0.03
+      }
+     },
+     "output": {
+      "price": 2.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "generate-content": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/gemini/v1beta",
+     "sdk": {
+      "aisdk": "@ai-sdk/google",
+      "opencodeai": "@opencode/ai/providers/google"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-03",
+   "last_updated": "2026-07-21"
+  },
+  "claude-haiku-4-5": {
+   "id": "claude-haiku-4-5",
+   "name": "Claude Haiku 4.5 (latest)",
+   "description": "Fast Claude lane for lightweight agents, office tasks, and responsive chat",
+   "type": "chat",
+   "family": "claude-haiku",
+   "canonical_id": "anthropic/claude-haiku-4-5",
+   "release_date": "2025-10-15",
+   "limit": {
+    "context": 200000,
+    "output": 64000
    },
    "capabilities": {
     "cache": {
@@ -86,15 +412,21 @@
       "ttl": [
        "5m"
       ],
+      "min_tokens": 4096,
       "max_breakpoints": 4,
       "targets": [
        "tools",
        "system",
        "messages"
-      ],
-      "min_tokens": 4096
+      ]
      }
     },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -103,20 +435,24 @@
      "toggle": true,
      "budget": {
       "min": 1024,
-      "max": 127999
+      "max": 63999
      }
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "High-end Claude for difficult coding, planning, and slower expert reasoning",
-   "open_weights": false,
-   "knowledge": "2025-05-31",
-   "last_updated": "2026-03-13",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1,
+      "cache": {
+       "read": 0.1,
+       "write": 1.25
+      }
+     },
+     "output": {
+      "price": 5
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text",
@@ -129,6 +465,133 @@
     "output": [
      "text"
     ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-02-28",
+   "last_updated": "2025-10-15"
+  },
+  "qwen3-embedding-0-6b": {
+   "id": "qwen3-embedding-0-6b",
+   "name": "Qwen3 Embedding 0.6B",
+   "description": "Compact multilingual text embedding model for retrieval, code search, classification, and clustering",
+   "type": "embedding",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3-embedding-0.6b",
+   "release_date": "2025-06-05",
+   "limit": {
+    "context": 32768,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.02
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "api": {
+    "embeddings": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-06-05"
+  },
+  "claude-opus-4-5": {
+   "id": "claude-opus-4-5",
+   "name": "Claude Opus 4.5 (latest)",
+   "description": "Flagship Claude model for deep reasoning, coding, and long-horizon agents",
+   "type": "chat",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-4-5",
+   "release_date": "2025-11-24",
+   "limit": {
+    "context": 200000,
+    "output": 64000
+   },
+   "capabilities": {
+    "cache": {
+     "explicit": {
+      "ttl": [
+       "5m"
+      ],
+      "min_tokens": 4096,
+      "max_breakpoints": 4,
+      "targets": [
+       "tools",
+       "system",
+       "messages"
+      ]
+     }
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "budget": {
+      "min": 1024,
+      "max": 63999
+     }
+    }
    },
    "cost": {
     "text": {
@@ -144,6 +607,19 @@
      }
     }
    },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
@@ -169,519 +645,18 @@
       }
      }
     }
-   }
-  },
-  "meta-llama-3-1-8b-instruct": {
-   "id": "meta-llama-3-1-8b-instruct",
-   "name": "Llama 3.1 8B Instruct",
-   "type": "chat",
-   "canonical_id": "meta/llama-3.1-8b-instruct",
-   "family": "llama",
-   "release_date": "2024-07-23",
-   "limit": {
-    "context": 131072,
-    "output": 8192
    },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Meta's compact open-weight Llama 3.1 model for fast, low-cost text generation",
-   "open_weights": true,
-   "knowledge": "2023-12-31",
-   "last_updated": "2024-07-23",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.15
-     },
-     "output": {
-      "price": 0.45
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "deepseek-v4-1-flash": {
-   "id": "deepseek-v4-1-flash",
-   "name": "DeepSeek V4.1 Flash",
-   "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4.1-flash",
-   "family": "deepseek-flash",
-   "status": "deprecated",
-   "release_date": "2026-09-10",
-   "limit": {
-    "context": 1000000,
-    "output": 384000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "DeepSeek V4.1 Flash model for reasoning and agentic coding",
-   "open_weights": true,
+   "open_weights": false,
    "knowledge": "2025-05",
-   "last_updated": "2026-09-10",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.3,
-      "cache": {
-       "read": 0.03
-      }
-     },
-     "output": {
-      "price": 1.2
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "claude-fable-5": {
-   "id": "claude-fable-5",
-   "name": "Claude Fable 5",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-fable-5",
-   "family": "claude-fable",
-   "release_date": "2026-06-09",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "explicit": {
-      "ttl": [
-       "5m"
-      ],
-      "max_breakpoints": 4,
-      "targets": [
-       "tools",
-       "system",
-       "messages"
-      ],
-      "min_tokens": 512
-     }
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Claude model for creative writing, analysis, and controlled agent workflows",
-   "open_weights": false,
-   "knowledge": "2026-01-31",
-   "last_updated": "2026-06-09",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 10,
-      "cache": {
-       "read": 1,
-       "write": 12.5
-      }
-     },
-     "output": {
-      "price": 50
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gpt-5-6-sol": {
-   "id": "gpt-5-6-sol",
-   "name": "GPT-5.6 Sol",
-   "type": "chat",
-   "canonical_id": "openai/gpt-5.6-sol",
-   "family": "gpt-sol",
-   "release_date": "2026-07-09",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Frontier GPT-5.6 model for complex professional work, coding, and agentic workflows",
-   "open_weights": false,
-   "knowledge": "2026-02-16",
-   "last_updated": "2026-07-09",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 5,
-      "cache": {
-       "read": 0.5,
-       "write": 6.25
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 10,
-        "cache": {
-         "read": 1,
-         "write": 12.5
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 30,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 45
-       }
-      ]
-     }
-    }
-   },
-   "api": {
-    "responses": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/openai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gpt-5": {
-   "id": "gpt-5",
-   "name": "GPT-5",
-   "type": "chat",
-   "canonical_id": "openai/gpt-5",
-   "family": "gpt",
-   "release_date": "2025-08-07",
-   "limit": {
-    "context": 400000,
-    "input": 272000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Original GPT-5 workhorse for reasoning, coding, writing, and tool workflows",
-   "open_weights": false,
-   "knowledge": "2024-09-30",
-   "last_updated": "2025-08-07",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.25,
-      "cache": {
-       "read": 0.125
-      }
-     },
-     "output": {
-      "price": 10
-     }
-    }
-   },
-   "api": {
-    "responses": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/openai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gte-large-en": {
-   "id": "gte-large-en",
-   "name": "GTE Large (En)",
-   "type": "embedding",
-   "canonical_id": "alibaba/gte-large-en-v1.5",
-   "release_date": "2024-04-20",
-   "limit": {
-    "context": 8192,
-    "output": 0
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "English long-context text embedding model producing 1024-dimensional vectors",
-   "open_weights": true,
-   "last_updated": "2024-04-20",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "embedding"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.13
-     }
-    }
-   },
-   "api": {
-    "embeddings": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
-     }
-    }
-   }
+   "last_updated": "2025-11-24"
   },
   "gpt-5-6-luna": {
    "id": "gpt-5-6-luna",
    "name": "GPT-5.6 Luna",
+   "description": "Cost-efficient GPT-5.6 model for fast, high-volume workloads",
    "type": "chat",
-   "canonical_id": "openai/gpt-5.6-luna",
    "family": "gpt-luna",
+   "canonical_id": "openai/gpt-5.6-luna",
    "release_date": "2026-07-09",
    "limit": {
     "context": 1050000,
@@ -692,6 +667,12 @@
     "cache": {
      "implicit": true
     },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -705,30 +686,7 @@
       "xhigh",
       "max"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Cost-efficient GPT-5.6 model for fast, high-volume workloads",
-   "open_weights": false,
-   "knowledge": "2026-02-16",
-   "last_updated": "2026-07-09",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -768,81 +726,6 @@
      }
     }
    },
-   "api": {
-    "responses": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/openai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "claude-haiku-4-5": {
-   "id": "claude-haiku-4-5",
-   "name": "Claude Haiku 4.5 (latest)",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-haiku-4-5",
-   "family": "claude-haiku",
-   "release_date": "2025-10-15",
-   "limit": {
-    "context": 200000,
-    "output": 64000
-   },
-   "capabilities": {
-    "cache": {
-     "explicit": {
-      "ttl": [
-       "5m"
-      ],
-      "max_breakpoints": 4,
-      "targets": [
-       "tools",
-       "system",
-       "messages"
-      ],
-      "min_tokens": 4096
-     }
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "budget": {
-      "min": 1024,
-      "max": 63999
-     }
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Fast Claude lane for lightweight agents, office tasks, and responsive chat",
-   "open_weights": false,
-   "knowledge": "2025-02-28",
-   "last_updated": "2025-10-15",
    "modalities": {
     "input": [
      "text",
@@ -855,486 +738,6 @@
     "output": [
      "text"
     ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1,
-      "cache": {
-       "read": 0.1,
-       "write": 1.25
-      }
-     },
-     "output": {
-      "price": 5
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "claude-opus-4-1": {
-   "id": "claude-opus-4-1",
-   "name": "Claude Opus 4.1 (latest)",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-opus-4-1",
-   "family": "claude-opus",
-   "release_date": "2025-08-05",
-   "limit": {
-    "context": 200000,
-    "output": 32000
-   },
-   "capabilities": {
-    "cache": {
-     "explicit": {
-      "ttl": [
-       "5m"
-      ],
-      "max_breakpoints": 4,
-      "targets": [
-       "tools",
-       "system",
-       "messages"
-      ],
-      "min_tokens": 1024
-     }
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "budget": {
-      "min": 1024,
-      "max": 31999
-     }
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Flagship Claude model for deep reasoning, coding, and long-horizon agents",
-   "open_weights": false,
-   "knowledge": "2025-03-31",
-   "last_updated": "2025-08-05",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 15,
-      "cache": {
-       "read": 1.5,
-       "write": 18.75
-      }
-     },
-     "output": {
-      "price": 75
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gpt-oss-120b": {
-   "id": "gpt-oss-120b",
-   "name": "GPT OSS 120B",
-   "type": "chat",
-   "canonical_id": "openai/gpt-oss-120b",
-   "family": "gpt-oss",
-   "release_date": "2025-08-05",
-   "limit": {
-    "context": 131072,
-    "output": 25000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
-   "open_weights": true,
-   "knowledge": "2024-06",
-   "last_updated": "2025-08-05",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.15
-     },
-     "output": {
-      "price": 0.6
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "qwen35-122b-a10b": {
-   "id": "qwen35-122b-a10b",
-   "name": "Qwen3.5 122B-A10B",
-   "type": "chat",
-   "canonical_id": "alibaba/qwen3.5-122b-a10b",
-   "family": "qwen",
-   "release_date": "2026-02-23",
-   "limit": {
-    "context": 262144,
-    "output": 25000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
-   "open_weights": true,
-   "last_updated": "2026-02-23",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.22
-     },
-     "output": {
-      "price": 2.2
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "claude-sonnet-5-5": {
-   "id": "claude-sonnet-5-5",
-   "name": "Claude Sonnet 5.5",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-sonnet-5-5",
-   "family": "claude-sonnet",
-   "release_date": "2026-09-28",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "explicit": {
-      "ttl": [
-       "5m"
-      ],
-      "max_breakpoints": 4,
-      "targets": [
-       "tools",
-       "system",
-       "messages"
-      ],
-      "min_tokens": 512
-     }
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": false,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Fast Claude model for everyday coding, agents, and knowledge work",
-   "open_weights": false,
-   "knowledge": "2026-06",
-   "last_updated": "2026-09-28",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2,
-      "cache": {
-       "read": 0.2,
-       "write": 2.5
-      }
-     },
-     "output": {
-      "price": 10
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gpt-6-luna": {
-   "id": "gpt-6-luna",
-   "name": "GPT-6 Luna",
-   "type": "chat",
-   "canonical_id": "openai/gpt-6-luna",
-   "family": "gpt-luna",
-   "release_date": "2026-09-22",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "xhigh"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "OpenAI's most efficient model for focused, high-volume tasks",
-   "open_weights": false,
-   "knowledge": "2026-05-18",
-   "last_updated": "2026-09-22",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.1,
-      "cache": {
-       "read": 0.01,
-       "write": 0.125
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 0.2,
-        "cache": {
-         "read": 0.02,
-         "write": 0.25
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 0.5,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 0.75
-       }
-      ]
-     }
-    }
    },
    "api": {
     "responses": {
@@ -1361,1132 +764,18 @@
       }
      }
     }
-   }
-  },
-  "grok-4-7": {
-   "id": "grok-4-7",
-   "name": "Grok 4.7",
-   "type": "chat",
-   "canonical_id": "xai/grok-4.7",
-   "family": "grok",
-   "release_date": "2026-09-21",
-   "limit": {
-    "context": 500000,
-    "output": 500000
    },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "xAI's frontier model for long-running agents, coding, knowledge work, and visual projects",
-   "open_weights": false,
-   "knowledge": "2026-05",
-   "last_updated": "2026-09-21",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2.5,
-      "cache": {
-       "read": 0.5
-      }
-     },
-     "output": {
-      "price": 7.5
-     }
-    }
-   },
-   "api": {
-    "responses": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/openai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gemini-4-argon": {
-   "id": "gemini-4-argon",
-   "name": "Gemini 4 Argon",
-   "type": "chat",
-   "canonical_id": "google/gemini-4-argon",
-   "family": "gemini",
-   "release_date": "2026-10-13",
-   "limit": {
-    "context": 1048576,
-    "output": 65536
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Google's flagship reasoning model for complex software engineering, deep math and science, and long-horizon autonomous agents",
-   "open_weights": false,
-   "knowledge": "2026-03",
-   "last_updated": "2026-10-13",
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp",
-     "audio/wav",
-     "audio/mp3",
-     "audio/aiff",
-     "audio/aac",
-     "audio/ogg",
-     "audio/flac",
-     "audio/mpeg",
-     "audio/m4a",
-     "audio/l16",
-     "audio/opus",
-     "audio/alaw",
-     "audio/mulaw",
-     "audio/webm",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 4,
-      "cache": {
-       "read": 0.2
-      }
-     },
-     "output": {
-      "price": 20
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "generate-content": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/gemini/v1beta",
-     "sdk": {
-      "aisdk": "@ai-sdk/google",
-      "opencodeai": "@opencode/ai/providers/google"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gpt-oss-20b": {
-   "id": "gpt-oss-20b",
-   "name": "GPT OSS 20B",
-   "type": "chat",
-   "canonical_id": "openai/gpt-oss-20b",
-   "family": "gpt-oss",
-   "release_date": "2025-08-05",
-   "limit": {
-    "context": 131072,
-    "output": 25000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open-weight GPT model for self-hosted reasoning and instruction-following workloads",
-   "open_weights": true,
-   "knowledge": "2024-06",
-   "last_updated": "2025-08-05",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.07
-     },
-     "output": {
-      "price": 0.3
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gpt-6-1-sol": {
-   "id": "gpt-6-1-sol",
-   "name": "GPT-6.1 Sol",
-   "type": "chat",
-   "canonical_id": "openai/gpt-6.1-sol",
-   "family": "gpt-sol",
-   "release_date": "2026-09-29",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Near-Astra performance for complex coding, computer use, and professional work at a lower cost.",
-   "open_weights": false,
-   "knowledge": "2026-04-30",
-   "last_updated": "2026-09-29",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2,
-      "cache": {
-       "read": 0.1,
-       "write": 2.5
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 4,
-        "cache": {
-         "read": 0.2,
-         "write": 5
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 10,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 15
-       }
-      ]
-     }
-    }
-   },
-   "api": {
-    "responses": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/openai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gpt-5-4-nano": {
-   "id": "gpt-5-4-nano",
-   "name": "GPT-5.4 nano",
-   "type": "chat",
-   "canonical_id": "openai/gpt-5.4-nano",
-   "family": "gpt-nano",
-   "release_date": "2026-03-17",
-   "limit": {
-    "context": 400000,
-    "input": 272000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "xhigh"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Cheapest GPT-5.4 lane for simple routing, extraction, and bulk automation",
-   "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2026-03-17",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.2,
-      "cache": {
-       "read": 0.02
-      }
-     },
-     "output": {
-      "price": 1.25
-     }
-    }
-   },
-   "api": {
-    "responses": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/openai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gpt-5-mini": {
-   "id": "gpt-5-mini",
-   "name": "GPT-5 Mini",
-   "type": "chat",
-   "canonical_id": "openai/gpt-5-mini",
-   "family": "gpt-mini",
-   "release_date": "2025-08-07",
-   "limit": {
-    "context": 400000,
-    "input": 272000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Small GPT-5 for responsive agents, coding help, and everyday automation",
-   "open_weights": false,
-   "knowledge": "2024-05-30",
-   "last_updated": "2025-08-07",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.25,
-      "cache": {
-       "read": 0.025
-      }
-     },
-     "output": {
-      "price": 2
-     }
-    }
-   },
-   "api": {
-    "responses": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/openai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gemini-3-8-flash": {
-   "id": "gemini-3-8-flash",
-   "name": "Gemini 3.8 Flash",
-   "type": "chat",
-   "canonical_id": "google/gemini-3.8-flash",
-   "family": "gemini-flash",
-   "release_date": "2026-09-02",
-   "limit": {
-    "context": 1048576,
-    "output": 65536
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Google's most intelligent Flash model, engineered for long-horizon software engineering, autonomous agents, and complex enterprise workflows",
-   "open_weights": false,
-   "last_updated": "2026-09-02",
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp",
-     "audio/wav",
-     "audio/mp3",
-     "audio/aiff",
-     "audio/aac",
-     "audio/ogg",
-     "audio/flac",
-     "audio/mpeg",
-     "audio/m4a",
-     "audio/l16",
-     "audio/opus",
-     "audio/alaw",
-     "audio/mulaw",
-     "audio/webm",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.5,
-      "cache": {
-       "read": 0.15
-      }
-     },
-     "output": {
-      "price": 7.5
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "generate-content": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/gemini/v1beta",
-     "sdk": {
-      "aisdk": "@ai-sdk/google",
-      "opencodeai": "@opencode/ai/providers/google"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gpt-5-nano": {
-   "id": "gpt-5-nano",
-   "name": "GPT-5 Nano",
-   "type": "chat",
-   "canonical_id": "openai/gpt-5-nano",
-   "family": "gpt-nano",
-   "release_date": "2025-08-07",
-   "limit": {
-    "context": 400000,
-    "input": 272000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Tiny GPT-5 lane for routing, extraction, classification, and bulk jobs",
-   "open_weights": false,
-   "knowledge": "2024-05-30",
-   "last_updated": "2025-08-07",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.05,
-      "cache": {
-       "read": 0.01
-      }
-     },
-     "output": {
-      "price": 0.4
-     }
-    }
-   },
-   "api": {
-    "responses": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/openai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "claude-fable-5-1": {
-   "id": "claude-fable-5-1",
-   "name": "Claude Fable 5.1",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-fable-5-1",
-   "family": "claude-fable",
-   "release_date": "2026-09-01",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "explicit": {
-      "ttl": [
-       "5m"
-      ],
-      "max_breakpoints": 4,
-      "targets": [
-       "tools",
-       "system",
-       "messages"
-      ],
-      "min_tokens": 512
-     }
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": false,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Claude model for demanding reasoning and long-horizon agentic work",
-   "open_weights": false,
-   "knowledge": "2026-06",
-   "last_updated": "2026-09-01",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 10,
-      "cache": {
-       "read": 0.25,
-       "write": 12.5
-      }
-     },
-     "output": {
-      "price": 50
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gpt-5-6-terra": {
-   "id": "gpt-5-6-terra",
-   "name": "GPT-5.6 Terra",
-   "type": "chat",
-   "canonical_id": "openai/gpt-5.6-terra",
-   "family": "gpt-terra",
-   "release_date": "2026-07-09",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Balanced GPT-5.6 model for capable, cost-efficient everyday work",
    "open_weights": false,
    "knowledge": "2026-02-16",
-   "last_updated": "2026-07-09",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2,
-      "cache": {
-       "read": 0.2,
-       "write": 2.5
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 4,
-        "cache": {
-         "read": 0.4,
-         "write": 5
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 12,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 18
-       }
-      ]
-     }
-    }
-   },
-   "api": {
-    "responses": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/openai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gemini-3-1-flash-lite": {
-   "id": "gemini-3-1-flash-lite",
-   "name": "Gemini 3.1 Flash Lite Preview",
-   "type": "chat",
-   "canonical_id": "google/gemini-3.1-flash-lite-preview",
-   "family": "gemini-flash-lite",
-   "release_date": "2026-03-03",
-   "limit": {
-    "context": 1048576,
-    "output": 65536
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Low-latency Gemini model for high-volume multimodal and agent workloads",
-   "open_weights": false,
-   "knowledge": "2025-01",
-   "last_updated": "2026-03-03",
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp",
-     "audio/wav",
-     "audio/mp3",
-     "audio/aiff",
-     "audio/aac",
-     "audio/ogg",
-     "audio/flac",
-     "audio/mpeg",
-     "audio/m4a",
-     "audio/l16",
-     "audio/opus",
-     "audio/alaw",
-     "audio/mulaw",
-     "audio/webm",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.25,
-      "cache": {
-       "read": 0.025
-      }
-     },
-     "output": {
-      "price": 1.5
-     }
-    },
-    "audio": {
-     "input": {
-      "price": 0.5
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "generate-content": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/gemini/v1beta",
-     "sdk": {
-      "aisdk": "@ai-sdk/google",
-      "opencodeai": "@opencode/ai/providers/google"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
+   "last_updated": "2026-07-09"
   },
   "claude-sonnet-4-5": {
    "id": "claude-sonnet-4-5",
    "name": "Claude Sonnet 4.5 (latest)",
+   "description": "Balanced Claude model for coding, analysis, agent workflows, and cost control",
    "type": "chat",
-   "canonical_id": "anthropic/claude-sonnet-4-5",
    "family": "claude-sonnet",
+   "canonical_id": "anthropic/claude-sonnet-4-5",
    "release_date": "2025-09-29",
    "limit": {
     "context": 200000,
@@ -2498,15 +787,21 @@
       "ttl": [
        "5m"
       ],
+      "min_tokens": 1024,
       "max_breakpoints": 4,
       "targets": [
        "tools",
        "system",
        "messages"
-      ],
-      "min_tokens": 1024
+      ]
      }
     },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -2517,30 +812,7 @@
       "min": 1024,
       "max": 63999
      }
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Balanced Claude model for coding, analysis, agent workflows, and cost control",
-   "open_weights": false,
-   "knowledge": "2025-07-31",
-   "last_updated": "2025-09-29",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -2556,73 +828,6 @@
      }
     }
    },
-   "api": {
-    "chat-completions": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gpt-6-sol": {
-   "id": "gpt-6-sol",
-   "name": "GPT-6 Sol",
-   "type": "chat",
-   "canonical_id": "openai/gpt-6-sol",
-   "family": "gpt-sol",
-   "release_date": "2026-09-22",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "xhigh"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "OpenAI model for complex coding and agentic workflows",
-   "open_weights": false,
-   "knowledge": "2026-04-20",
-   "last_updated": "2026-09-22",
    "modalities": {
     "input": [
      "text",
@@ -2635,358 +840,6 @@
     "output": [
      "text"
     ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2,
-      "cache": {
-       "read": 0.2,
-       "write": 2.5
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 4,
-        "cache": {
-         "read": 0.4,
-         "write": 5
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 10,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 15
-       }
-      ]
-     }
-    }
-   },
-   "api": {
-    "responses": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/openai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gpt-5-5": {
-   "id": "gpt-5-5",
-   "name": "GPT-5.5",
-   "type": "chat",
-   "canonical_id": "openai/gpt-5.5",
-   "family": "gpt",
-   "release_date": "2026-04-23",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "xhigh"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Default frontier GPT for coding, computer use, research, and knowledge work",
-   "open_weights": false,
-   "knowledge": "2025-12-01",
-   "last_updated": "2026-04-23",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 5,
-      "cache": {
-       "read": 0.5
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 10,
-        "cache": {
-         "read": 1
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 30,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 45
-       }
-      ]
-     }
-    }
-   },
-   "api": {
-    "responses": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/openai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gpt-5-5-pro": {
-   "id": "gpt-5-5-pro",
-   "name": "GPT-5.5 Pro",
-   "type": "chat",
-   "canonical_id": "openai/gpt-5.5-pro",
-   "family": "gpt-pro",
-   "release_date": "2026-04-23",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "medium",
-      "high",
-      "xhigh"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Highest-accuracy GPT-5.5 tier for slower, precision-heavy reasoning and coding",
-   "open_weights": false,
-   "knowledge": "2025-12-01",
-   "last_updated": "2026-04-23",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 30,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 60
-       }
-      ]
-     },
-     "output": {
-      "price": 180,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 270
-       }
-      ]
-     }
-    }
-   },
-   "api": {
-    "responses": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/openai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "claude-sonnet-5": {
-   "id": "claude-sonnet-5",
-   "name": "Claude Sonnet 5",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-sonnet-5",
-   "family": "claude-sonnet",
-   "release_date": "2026-06-30",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "explicit": {
-      "ttl": [
-       "5m"
-      ],
-      "max_breakpoints": 4,
-      "targets": [
-       "tools",
-       "system",
-       "messages"
-      ],
-      "min_tokens": 1024
-     }
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Everyday Claude agent model for coding, planning, browsing, and general work",
-   "open_weights": false,
-   "knowledge": "2026-01-31",
-   "last_updated": "2026-06-30",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2,
-      "cache": {
-       "read": 0.2,
-       "write": 2.5
-      }
-     },
-     "output": {
-      "price": 10
-     }
-    }
    },
    "api": {
     "chat-completions": {
@@ -3013,82 +866,93 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2025-07-31",
+   "last_updated": "2025-09-29"
   },
-  "claude-opus-4-5": {
-   "id": "claude-opus-4-5",
-   "name": "Claude Opus 4.5 (latest)",
+  "gemini-3-7-flash": {
+   "id": "gemini-3-7-flash",
+   "name": "Gemini 3.7 Flash",
+   "description": "High-efficiency Gemini model for agentic workflows, coding, and multimodal reasoning",
    "type": "chat",
-   "canonical_id": "anthropic/claude-opus-4-5",
-   "family": "claude-opus",
-   "release_date": "2025-11-24",
+   "family": "gemini-flash",
+   "canonical_id": "google/gemini-3.7-flash",
+   "release_date": "2026-08-13",
    "limit": {
-    "context": 200000,
-    "output": 64000
+    "context": 1048576,
+    "output": 65536
    },
    "capabilities": {
     "cache": {
-     "explicit": {
-      "ttl": [
-       "5m"
-      ],
-      "max_breakpoints": 4,
-      "targets": [
-       "tools",
-       "system",
-       "messages"
-      ],
-      "min_tokens": 4096
-     }
+     "implicit": true
     },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "budget": {
-      "min": 1024,
-      "max": 63999
-     }
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
+    "temperature": false,
     "top_k": true,
+    "top_p": true,
+    "structured_output": true,
     "system_updates": false,
-    "effort_updates": false
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
    },
-   "description": "Flagship Claude model for deep reasoning, coding, and long-horizon agents",
-   "open_weights": false,
-   "knowledge": "2025-05",
-   "last_updated": "2025-11-24",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.5,
+      "cache": {
+       "read": 0.15
+      }
+     },
+     "output": {
+      "price": 7.5
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text",
-     "image/jpeg",
      "image/png",
-     "image/gif",
+     "image/jpeg",
      "image/webp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
      "application/pdf"
     ],
     "output": [
      "text"
     ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 5,
-      "cache": {
-       "read": 0.5,
-       "write": 6.25
-      }
-     },
-     "output": {
-      "price": 25
-     }
-    }
    },
    "api": {
     "chat-completions": {
@@ -3103,11 +967,11 @@
       }
      }
     },
-    "messages": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/anthropic/v1",
+    "generate-content": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/gemini/v1beta",
      "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+      "aisdk": "@ai-sdk/google",
+      "opencodeai": "@opencode/ai/providers/google"
      },
      "capabilities": {
       "tools": {
@@ -3115,14 +979,80 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2026-03",
+   "last_updated": "2026-08-13"
+  },
+  "meta-llama-3-1-8b-instruct": {
+   "id": "meta-llama-3-1-8b-instruct",
+   "name": "Llama 3.1 8B Instruct",
+   "description": "Meta's compact open-weight Llama 3.1 model for fast, low-cost text generation",
+   "type": "chat",
+   "family": "llama",
+   "canonical_id": "meta/llama-3.1-8b-instruct",
+   "release_date": "2024-07-23",
+   "limit": {
+    "context": 131072,
+    "output": 8192
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.15
+     },
+     "output": {
+      "price": 0.45
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2023-12-31",
+   "last_updated": "2024-07-23"
   },
   "claude-haiku-5-5": {
    "id": "claude-haiku-5-5",
    "name": "Claude Haiku 5.5",
+   "description": "Fast Claude model for responsive assistance, classification, and lightweight agents",
    "type": "chat",
-   "canonical_id": "anthropic/claude-haiku-5-5",
    "family": "claude-haiku",
+   "canonical_id": "anthropic/claude-haiku-5-5",
    "release_date": "2026-10-07",
    "limit": {
     "context": 1000000,
@@ -3134,15 +1064,21 @@
       "ttl": [
        "5m"
       ],
+      "min_tokens": 512,
       "max_breakpoints": 4,
       "targets": [
        "tools",
        "system",
        "messages"
-      ],
-      "min_tokens": 512
+      ]
      }
     },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -3153,30 +1089,7 @@
       "min": 1024,
       "max": 63999
      }
-    },
-    "structured_output": false,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Fast Claude model for responsive assistance, classification, and lightweight agents",
-   "open_weights": false,
-   "knowledge": "2026-06",
-   "last_updated": "2026-10-07",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -3216,6 +1129,19 @@
      }
     }
    },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
@@ -3241,15 +1167,473 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2026-06",
+   "last_updated": "2026-10-07"
   },
-  "gemini-3-7-flash": {
-   "id": "gemini-3-7-flash",
-   "name": "Gemini 3.7 Flash",
+  "gpt-5-nano": {
+   "id": "gpt-5-nano",
+   "name": "GPT-5 Nano",
+   "description": "Tiny GPT-5 lane for routing, extraction, classification, and bulk jobs",
    "type": "chat",
-   "canonical_id": "google/gemini-3.7-flash",
+   "family": "gpt-nano",
+   "canonical_id": "openai/gpt-5-nano",
+   "release_date": "2025-08-07",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.05,
+      "cache": {
+       "read": 0.01
+      }
+     },
+     "output": {
+      "price": 0.4
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/openai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2024-05-30",
+   "last_updated": "2025-08-07"
+  },
+  "gpt-5-6-terra": {
+   "id": "gpt-5-6-terra",
+   "name": "GPT-5.6 Terra",
+   "description": "Balanced GPT-5.6 model for capable, cost-efficient everyday work",
+   "type": "chat",
+   "family": "gpt-terra",
+   "canonical_id": "openai/gpt-5.6-terra",
+   "release_date": "2026-07-09",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.2,
+       "write": 2.5
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 4,
+        "cache": {
+         "read": 0.4,
+         "write": 5
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 12,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 18
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/openai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-02-16",
+   "last_updated": "2026-07-09"
+  },
+  "gpt-5-5": {
+   "id": "gpt-5-5",
+   "name": "GPT-5.5",
+   "description": "Default frontier GPT for coding, computer use, research, and knowledge work",
+   "type": "chat",
+   "family": "gpt",
+   "canonical_id": "openai/gpt-5.5",
+   "release_date": "2026-04-23",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 10,
+        "cache": {
+         "read": 1
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 30,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 45
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/openai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-12-01",
+   "last_updated": "2026-04-23"
+  },
+  "llama-4-maverick": {
+   "id": "llama-4-maverick",
+   "name": "Llama 4 Maverick 17B Instruct",
+   "description": "Open multimodal Llama for strong reasoning with efficient everyday serving",
+   "type": "chat",
+   "family": "llama",
+   "canonical_id": "meta/llama-4-maverick-17b-instruct",
+   "release_date": "2025-04-05",
+   "limit": {
+    "context": 1000000,
+    "output": 8192
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.5
+     },
+     "output": {
+      "price": 1.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-08",
+   "last_updated": "2025-04-05"
+  },
+  "meta-llama-3-3-70b-instruct": {
+   "id": "meta-llama-3-3-70b-instruct",
+   "name": "Llama-3.3-70B-Instruct",
+   "description": "Popular open Llama workhorse for multilingual chat, coding, and self-hosting",
+   "type": "chat",
+   "family": "llama",
+   "canonical_id": "meta/llama-3.3-70b-instruct",
+   "release_date": "2024-12-06",
+   "limit": {
+    "context": 128000,
+    "output": 8192
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.5
+     },
+     "output": {
+      "price": 1.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2023-12",
+   "last_updated": "2024-12-06"
+  },
+  "gemini-3-6-flash": {
+   "id": "gemini-3-6-flash",
+   "name": "Gemini 3.6 Flash",
+   "description": "Fast Gemini model balancing multimodal reasoning, tool use, and cost",
+   "type": "chat",
    "family": "gemini-flash",
-   "release_date": "2026-08-13",
+   "canonical_id": "google/gemini-3.6-flash",
+   "release_date": "2026-07-21",
    "limit": {
     "context": 1048576,
     "output": 65536
@@ -3258,28 +1642,43 @@
     "cache": {
      "implicit": true
     },
+    "temperature": false,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": true,
      "effort": [
+      "minimal",
       "low",
       "medium",
       "high"
      ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "High-efficiency Gemini model for agentic workflows, coding, and multimodal reasoning",
-   "open_weights": false,
-   "knowledge": "2026-03",
-   "last_updated": "2026-08-13",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.5,
+      "cache": {
+       "read": 0.15
+      }
+     },
+     "output": {
+      "price": 7.5
+     }
+    },
+    "audio": {
+     "input": {
+      "price": 1.5
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text",
@@ -3315,19 +1714,6 @@
     "output": [
      "text"
     ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.5,
-      "cache": {
-       "read": 0.15
-      }
-     },
-     "output": {
-      "price": 7.5
-     }
-    }
    },
    "api": {
     "chat-completions": {
@@ -3354,15 +1740,19 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2026-03",
+   "last_updated": "2026-07-21"
   },
-  "gemini-3-1-pro": {
-   "id": "gemini-3-1-pro",
-   "name": "Gemini 3.1 Pro Preview Custom Tools",
+  "gemini-3-5-flash": {
+   "id": "gemini-3-5-flash",
+   "name": "Gemini 3.5 Flash",
+   "description": "Fast Gemini model balancing multimodal reasoning, tool use, and cost",
    "type": "chat",
-   "canonical_id": "google/gemini-3.1-pro-preview-customtools",
-   "family": "gemini-pro",
-   "release_date": "2026-02-19",
+   "family": "gemini-flash",
+   "canonical_id": "google/gemini-3.5-flash",
+   "release_date": "2026-05-19",
    "limit": {
     "context": 1048576,
     "output": 65536
@@ -3371,28 +1761,43 @@
     "cache": {
      "implicit": true
     },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": true,
      "effort": [
+      "minimal",
       "low",
       "medium",
       "high"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Advanced Gemini model for complex reasoning, coding, and multimodal analysis",
-   "open_weights": false,
-   "knowledge": "2025-01",
-   "last_updated": "2026-02-19",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.5,
+      "cache": {
+       "read": 0.15
+      }
+     },
+     "output": {
+      "price": 9
+     }
+    },
+    "audio": {
+     "input": {
+      "price": 1.5
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text",
@@ -3428,6 +1833,717 @@
     "output": [
      "text"
     ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "generate-content": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/gemini/v1beta",
+     "sdk": {
+      "aisdk": "@ai-sdk/google",
+      "opencodeai": "@opencode/ai/providers/google"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2026-05-19"
+  },
+  "gemma-3-12b": {
+   "id": "gemma-3-12b",
+   "name": "Gemma 3 12B",
+   "description": "Google's open-weight Gemma 3 vision-language model for text and image understanding",
+   "type": "chat",
+   "family": "gemma",
+   "canonical_id": "google/gemma-3-12b-it",
+   "release_date": "2025-03-12",
+   "limit": {
+    "context": 131072,
+    "output": 8192
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.15
+     },
+     "output": {
+      "price": 0.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-08-31",
+   "last_updated": "2025-03-12"
+  },
+  "claude-fable-5": {
+   "id": "claude-fable-5",
+   "name": "Claude Fable 5",
+   "description": "Claude model for creative writing, analysis, and controlled agent workflows",
+   "type": "chat",
+   "family": "claude-fable",
+   "canonical_id": "anthropic/claude-fable-5",
+   "release_date": "2026-06-09",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "explicit": {
+      "ttl": [
+       "5m"
+      ],
+      "min_tokens": 512,
+      "max_breakpoints": 4,
+      "targets": [
+       "tools",
+       "system",
+       "messages"
+      ]
+     }
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 10,
+      "cache": {
+       "read": 1,
+       "write": 12.5
+      }
+     },
+     "output": {
+      "price": 50
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-01-31",
+   "last_updated": "2026-06-09"
+  },
+  "qwen3-next-80b-a3b-instruct": {
+   "id": "qwen3-next-80b-a3b-instruct",
+   "name": "Qwen3-Next 80B-A3B Instruct",
+   "description": "Qwen instruction model for multilingual chat, reasoning, and tool use",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3-next-80b-a3b-instruct",
+   "release_date": "2025-09",
+   "limit": {
+    "context": 131072,
+    "output": 10000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.15
+     },
+     "output": {
+      "price": 1.2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-04",
+   "last_updated": "2025-09"
+  },
+  "gemini-4-argon": {
+   "id": "gemini-4-argon",
+   "name": "Gemini 4 Argon",
+   "description": "Google's flagship reasoning model for complex software engineering, deep math and science, and long-horizon autonomous agents",
+   "type": "chat",
+   "family": "gemini",
+   "canonical_id": "google/gemini-4-argon",
+   "release_date": "2026-10-13",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 4,
+      "cache": {
+       "read": 0.2
+      }
+     },
+     "output": {
+      "price": 20
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "generate-content": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/gemini/v1beta",
+     "sdk": {
+      "aisdk": "@ai-sdk/google",
+      "opencodeai": "@opencode/ai/providers/google"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-03",
+   "last_updated": "2026-10-13"
+  },
+  "gpt-5-4-nano": {
+   "id": "gpt-5-4-nano",
+   "name": "GPT-5.4 nano",
+   "description": "Cheapest GPT-5.4 lane for simple routing, extraction, and bulk automation",
+   "type": "chat",
+   "family": "gpt-nano",
+   "canonical_id": "openai/gpt-5.4-nano",
+   "release_date": "2026-03-17",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.2,
+      "cache": {
+       "read": 0.02
+      }
+     },
+     "output": {
+      "price": 1.25
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/openai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-03-17"
+  },
+  "gpt-6-sol": {
+   "id": "gpt-6-sol",
+   "name": "GPT-6 Sol",
+   "description": "OpenAI model for complex coding and agentic workflows",
+   "type": "chat",
+   "family": "gpt-sol",
+   "canonical_id": "openai/gpt-6-sol",
+   "release_date": "2026-09-22",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.2,
+       "write": 2.5
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 4,
+        "cache": {
+         "read": 0.4,
+         "write": 5
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 10,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 15
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/openai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-04-20",
+   "last_updated": "2026-09-22"
+  },
+  "gpt-5-mini": {
+   "id": "gpt-5-mini",
+   "name": "GPT-5 Mini",
+   "description": "Small GPT-5 for responsive agents, coding help, and everyday automation",
+   "type": "chat",
+   "family": "gpt-mini",
+   "canonical_id": "openai/gpt-5-mini",
+   "release_date": "2025-08-07",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.25,
+      "cache": {
+       "read": 0.025
+      }
+     },
+     "output": {
+      "price": 2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/openai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2024-05-30",
+   "last_updated": "2025-08-07"
+  },
+  "gemini-3-1-pro": {
+   "id": "gemini-3-1-pro",
+   "name": "Gemini 3.1 Pro Preview Custom Tools",
+   "description": "Advanced Gemini model for complex reasoning, coding, and multimodal analysis",
+   "type": "chat",
+   "family": "gemini-pro",
+   "canonical_id": "google/gemini-3.1-pro-preview-customtools",
+   "release_date": "2026-02-19",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
    },
    "cost": {
     "text": {
@@ -3465,1186 +2581,6 @@
      }
     }
    },
-   "api": {
-    "chat-completions": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "generate-content": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/gemini/v1beta",
-     "sdk": {
-      "aisdk": "@ai-sdk/google",
-      "opencodeai": "@opencode/ai/providers/google"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "glm-5-3-flash": {
-   "id": "glm-5-3-flash",
-   "name": "GLM-5.3 Flash",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-5.3-flash",
-   "family": "glm-flash",
-   "release_date": "2026-08-26",
-   "limit": {
-    "context": 1048576,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
-   "open_weights": true,
-   "last_updated": "2026-08-26",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.15,
-      "cache": {
-       "read": 0.03
-      }
-     },
-     "output": {
-      "price": 0.5
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "meta-llama-3-3-70b-instruct": {
-   "id": "meta-llama-3-3-70b-instruct",
-   "name": "Llama-3.3-70B-Instruct",
-   "type": "chat",
-   "canonical_id": "meta/llama-3.3-70b-instruct",
-   "family": "llama",
-   "release_date": "2024-12-06",
-   "limit": {
-    "context": 128000,
-    "output": 8192
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Popular open Llama workhorse for multilingual chat, coding, and self-hosting",
-   "open_weights": true,
-   "knowledge": "2023-12",
-   "last_updated": "2024-12-06",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.5
-     },
-     "output": {
-      "price": 1.5
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gemma-3-12b": {
-   "id": "gemma-3-12b",
-   "name": "Gemma 3 12B",
-   "type": "chat",
-   "canonical_id": "google/gemma-3-12b-it",
-   "family": "gemma",
-   "release_date": "2025-03-12",
-   "limit": {
-    "context": 131072,
-    "output": 8192
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Google's open-weight Gemma 3 vision-language model for text and image understanding",
-   "open_weights": true,
-   "knowledge": "2024-08-31",
-   "last_updated": "2025-03-12",
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.15
-     },
-     "output": {
-      "price": 0.5
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "grok-4-6": {
-   "id": "grok-4-6",
-   "name": "Grok 4.6",
-   "type": "chat",
-   "canonical_id": "xai/grok-4.6",
-   "family": "grok",
-   "release_date": "2026-08-12",
-   "limit": {
-    "context": 500000,
-    "output": 524288
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "xAI's frontier model for long-running agents, coding, knowledge work, and visual projects",
-   "open_weights": false,
-   "knowledge": "2026-02-01",
-   "last_updated": "2026-08-12",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2,
-      "cache": {
-       "read": 0.5
-      }
-     },
-     "output": {
-      "price": 6
-     }
-    }
-   },
-   "api": {
-    "responses": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/openai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gpt-5-3-codex": {
-   "id": "gpt-5-3-codex",
-   "name": "GPT-5.3 Codex",
-   "type": "chat",
-   "canonical_id": "openai/gpt-5.3-codex",
-   "family": "gpt-codex",
-   "release_date": "2026-02-05",
-   "limit": {
-    "context": 400000,
-    "input": 272000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "xhigh"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Coding-optimized GPT model for repository edits, reviews, and agentic software work",
-   "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2026-02-05",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.75,
-      "cache": {
-       "read": 0.175
-      }
-     },
-     "output": {
-      "price": 14
-     }
-    }
-   },
-   "api": {
-    "responses": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/openai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "glm-5-2": {
-   "id": "glm-5-2",
-   "name": "GLM-5.2",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-5.2",
-   "family": "glm",
-   "release_date": "2026-06-13",
-   "limit": {
-    "context": 1000000,
-    "output": 65536
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "none",
-      "minimal",
-      "low",
-      "medium",
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
-   "open_weights": true,
-   "last_updated": "2026-06-13",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.4,
-      "cache": {
-       "read": 0.26
-      }
-     },
-     "output": {
-      "price": 4.4
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "llama-4-maverick": {
-   "id": "llama-4-maverick",
-   "name": "Llama 4 Maverick 17B Instruct",
-   "type": "chat",
-   "canonical_id": "meta/llama-4-maverick-17b-instruct",
-   "family": "llama",
-   "release_date": "2025-04-05",
-   "limit": {
-    "context": 1000000,
-    "output": 8192
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open multimodal Llama for strong reasoning with efficient everyday serving",
-   "open_weights": true,
-   "knowledge": "2024-08",
-   "last_updated": "2025-04-05",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.5
-     },
-     "output": {
-      "price": 1.5
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "claude-opus-5": {
-   "id": "claude-opus-5",
-   "name": "Claude Opus 5",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-opus-5",
-   "family": "claude-opus",
-   "release_date": "2026-07-24",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "explicit": {
-      "ttl": [
-       "5m"
-      ],
-      "max_breakpoints": 4,
-      "targets": [
-       "tools",
-       "system",
-       "messages"
-      ],
-      "min_tokens": 512
-     }
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Strongest Claude Opus model for coding, agents, and professional work",
-   "open_weights": false,
-   "knowledge": "2026-05",
-   "last_updated": "2026-07-24",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 5,
-      "cache": {
-       "read": 0.5,
-       "write": 6.25
-      }
-     },
-     "output": {
-      "price": 25
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "claude-opus-4-7": {
-   "id": "claude-opus-4-7",
-   "name": "Claude Opus 4.7",
-   "type": "chat",
-   "canonical_id": "anthropic/claude-opus-4-7",
-   "family": "claude-opus",
-   "release_date": "2026-04-16",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "explicit": {
-      "ttl": [
-       "5m"
-      ],
-      "max_breakpoints": 4,
-      "targets": [
-       "tools",
-       "system",
-       "messages"
-      ],
-      "min_tokens": 2048
-     }
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Stronger Opus tier for advanced software work and high-stakes reasoning",
-   "open_weights": false,
-   "knowledge": "2026-01-31",
-   "last_updated": "2026-04-16",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 5,
-      "cache": {
-       "read": 0.5,
-       "write": 6.25
-      }
-     },
-     "output": {
-      "price": 25
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gpt-5-1": {
-   "id": "gpt-5-1",
-   "name": "GPT-5.1",
-   "type": "chat",
-   "canonical_id": "openai/gpt-5.1",
-   "family": "gpt",
-   "release_date": "2025-11-13",
-   "limit": {
-    "context": 400000,
-    "input": 272000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Sharper GPT-5 generation for coding, product work, and tool-assisted tasks",
-   "open_weights": false,
-   "knowledge": "2024-09-30",
-   "last_updated": "2025-11-13",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.25,
-      "cache": {
-       "read": 0.125
-      }
-     },
-     "output": {
-      "price": 10
-     }
-    }
-   },
-   "api": {
-    "responses": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/openai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gpt-5-2": {
-   "id": "gpt-5-2",
-   "name": "GPT-5.2",
-   "type": "chat",
-   "canonical_id": "openai/gpt-5.2",
-   "family": "gpt",
-   "release_date": "2025-12-11",
-   "limit": {
-    "context": 400000,
-    "input": 272000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "xhigh"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Reliable GPT generation for broad coding, writing, and tool-assisted product work",
-   "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2025-12-11",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.75,
-      "cache": {
-       "read": 0.175
-      }
-     },
-     "output": {
-      "price": 14
-     }
-    }
-   },
-   "api": {
-    "responses": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/openai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "kimi-k3": {
-   "id": "kimi-k3",
-   "name": "Kimi K3",
-   "type": "chat",
-   "canonical_id": "moonshotai/kimi-k3",
-   "family": "kimi-k3",
-   "release_date": "2026-07-16",
-   "limit": {
-    "context": 1048576,
-    "output": 65536
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "none",
-      "minimal",
-      "low",
-      "medium",
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
-   "open_weights": true,
-   "last_updated": "2026-07-16",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/heic",
-     "image/heif",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 3,
-      "cache": {
-       "read": 0.3
-      }
-     },
-     "output": {
-      "price": 15
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gpt-5-4": {
-   "id": "gpt-5-4",
-   "name": "GPT-5.4",
-   "type": "chat",
-   "canonical_id": "openai/gpt-5.4",
-   "family": "gpt",
-   "release_date": "2026-03-05",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "xhigh"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Agent-ready GPT for coding and computer-use workflows at a lower cost",
-   "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2026-03-05",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2.5,
-      "cache": {
-       "read": 0.25
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 5,
-        "cache": {
-         "read": 0.5
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 15,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 22.5
-       }
-      ]
-     }
-    }
-   },
-   "api": {
-    "responses": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/openai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "chat-completions": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gemini-3-5-flash": {
-   "id": "gemini-3-5-flash",
-   "name": "Gemini 3.5 Flash",
-   "type": "chat",
-   "canonical_id": "google/gemini-3.5-flash",
-   "family": "gemini-flash",
-   "release_date": "2026-05-19",
-   "limit": {
-    "context": 1048576,
-    "output": 65536
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Fast Gemini model balancing multimodal reasoning, tool use, and cost",
-   "open_weights": false,
-   "knowledge": "2025-01",
-   "last_updated": "2026-05-19",
    "modalities": {
     "input": [
      "text",
@@ -4681,24 +2617,6 @@
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.5,
-      "cache": {
-       "read": 0.15
-      }
-     },
-     "output": {
-      "price": 9
-     }
-    },
-    "audio": {
-     "input": {
-      "price": 1.5
-     }
-    }
-   },
    "api": {
     "chat-completions": {
      "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
@@ -4724,122 +2642,22 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2026-02-19"
   },
-  "bge-large-en": {
-   "id": "bge-large-en",
-   "name": "BGE Large (En)",
-   "type": "embedding",
-   "canonical_id": "baai/bge-large-en-v1.5",
-   "family": "bge",
-   "release_date": "2023-09-12",
-   "limit": {
-    "context": 512,
-    "output": 0
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "English text embedding model for retrieval and semantic search",
-   "open_weights": true,
-   "last_updated": "2023-09-12",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "embedding"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.1
-     }
-    }
-   },
-   "api": {
-    "embeddings": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
-     }
-    }
-   }
-  },
-  "qwen3-embedding-0-6b": {
-   "id": "qwen3-embedding-0-6b",
-   "name": "Qwen3 Embedding 0.6B",
-   "type": "embedding",
-   "canonical_id": "alibaba/qwen3-embedding-0.6b",
-   "family": "qwen",
-   "release_date": "2025-06-05",
-   "limit": {
-    "context": 32768,
-    "output": 0
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Compact multilingual text embedding model for retrieval, code search, classification, and clustering",
-   "open_weights": true,
-   "last_updated": "2025-06-05",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "embedding"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.02
-     }
-    }
-   },
-   "api": {
-    "embeddings": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
-     }
-    }
-   }
-  },
-  "claude-sonnet-4-6": {
-   "id": "claude-sonnet-4-6",
-   "name": "Claude Sonnet 4.6",
+  "claude-sonnet-5": {
+   "id": "claude-sonnet-5",
+   "name": "Claude Sonnet 5",
+   "description": "Everyday Claude agent model for coding, planning, browsing, and general work",
    "type": "chat",
-   "canonical_id": "anthropic/claude-sonnet-4-6",
    "family": "claude-sonnet",
-   "release_date": "2026-02-17",
+   "canonical_id": "anthropic/claude-sonnet-5",
+   "release_date": "2026-06-30",
    "limit": {
     "context": 1000000,
-    "output": 64000
+    "output": 128000
    },
    "capabilities": {
     "cache": {
@@ -4847,37 +2665,50 @@
       "ttl": [
        "5m"
       ],
+      "min_tokens": 1024,
       "max_breakpoints": 4,
       "targets": [
        "tools",
        "system",
        "messages"
-      ],
-      "min_tokens": 1024
+      ]
      }
     },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": true,
      "toggle": true,
-     "budget": {
-      "min": 1024,
-      "max": 63999
-     }
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
    },
-   "description": "Claude workhorse for coding agents, careful analysis, and production cost control",
-   "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2026-03-13",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.2,
+       "write": 2.5
+      }
+     },
+     "output": {
+      "price": 10
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text",
@@ -4890,6 +2721,200 @@
     "output": [
      "text"
     ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-01-31",
+   "last_updated": "2026-06-30"
+  },
+  "gpt-5-6-sol": {
+   "id": "gpt-5-6-sol",
+   "name": "GPT-5.6 Sol",
+   "description": "Frontier GPT-5.6 model for complex professional work, coding, and agentic workflows",
+   "type": "chat",
+   "family": "gpt-sol",
+   "canonical_id": "openai/gpt-5.6-sol",
+   "release_date": "2026-07-09",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5,
+       "write": 6.25
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 10,
+        "cache": {
+         "read": 1,
+         "write": 12.5
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 30,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 45
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/openai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-02-16",
+   "last_updated": "2026-07-09"
+  },
+  "claude-sonnet-4-6": {
+   "id": "claude-sonnet-4-6",
+   "name": "Claude Sonnet 4.6",
+   "description": "Claude workhorse for coding agents, careful analysis, and production cost control",
+   "type": "chat",
+   "family": "claude-sonnet",
+   "canonical_id": "anthropic/claude-sonnet-4-6",
+   "release_date": "2026-02-17",
+   "limit": {
+    "context": 1000000,
+    "output": 64000
+   },
+   "capabilities": {
+    "cache": {
+     "explicit": {
+      "ttl": [
+       "5m"
+      ],
+      "min_tokens": 1024,
+      "max_breakpoints": 4,
+      "targets": [
+       "tools",
+       "system",
+       "messages"
+      ]
+     }
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "budget": {
+      "min": 1024,
+      "max": 63999
+     }
+    }
    },
    "cost": {
     "text": {
@@ -4905,6 +2930,19 @@
      }
     }
    },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
@@ -4930,15 +2968,317 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-03-13"
   },
-  "gemini-3-flash": {
-   "id": "gemini-3-flash",
-   "name": "Gemini 3 Flash Preview",
+  "claude-opus-4-6": {
+   "id": "claude-opus-4-6",
+   "name": "Claude Opus 4.6",
+   "description": "High-end Claude for difficult coding, planning, and slower expert reasoning",
    "type": "chat",
-   "canonical_id": "google/gemini-3-flash-preview",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-4-6",
+   "release_date": "2026-02-05",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "explicit": {
+      "ttl": [
+       "5m"
+      ],
+      "min_tokens": 4096,
+      "max_breakpoints": 4,
+      "targets": [
+       "tools",
+       "system",
+       "messages"
+      ]
+     }
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "budget": {
+      "min": 1024,
+      "max": 127999
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5,
+       "write": 6.25
+      }
+     },
+     "output": {
+      "price": 25
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-05-31",
+   "last_updated": "2026-03-13"
+  },
+  "claude-opus-4-8": {
+   "id": "claude-opus-4-8",
+   "name": "Claude Opus 4.8",
+   "description": "Top Claude Opus tier for the hardest reasoning, coding, and long-horizon agents",
+   "type": "chat",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-4-8",
+   "release_date": "2026-05-28",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "explicit": {
+      "ttl": [
+       "5m"
+      ],
+      "min_tokens": 1024,
+      "max_breakpoints": 4,
+      "targets": [
+       "tools",
+       "system",
+       "messages"
+      ]
+     }
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5,
+       "write": 6.25
+      }
+     },
+     "output": {
+      "price": 25
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-01",
+   "last_updated": "2026-05-28"
+  },
+  "gpt-5-1": {
+   "id": "gpt-5-1",
+   "name": "GPT-5.1",
+   "description": "Sharper GPT-5 generation for coding, product work, and tool-assisted tasks",
+   "type": "chat",
+   "family": "gpt",
+   "canonical_id": "openai/gpt-5.1",
+   "release_date": "2025-11-13",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.25,
+      "cache": {
+       "read": 0.125
+      }
+     },
+     "output": {
+      "price": 10
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/openai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2024-09-30",
+   "last_updated": "2025-11-13"
+  },
+  "gemini-3-8-flash": {
+   "id": "gemini-3-8-flash",
+   "name": "Gemini 3.8 Flash",
+   "description": "Google's most intelligent Flash model, engineered for long-horizon software engineering, autonomous agents, and complex enterprise workflows",
+   "type": "chat",
    "family": "gemini-flash",
-   "release_date": "2025-12-17",
+   "canonical_id": "google/gemini-3.8-flash",
+   "release_date": "2026-09-02",
    "limit": {
     "context": 1048576,
     "output": 65536
@@ -4947,6 +3287,12 @@
     "cache": {
      "implicit": true
     },
+    "temperature": false,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -4957,18 +3303,21 @@
       "medium",
       "high"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "New Gemini flash lane bringing frontier-style multimodal reasoning to cheaper runs",
-   "open_weights": false,
-   "knowledge": "2025-01",
-   "last_updated": "2025-12-17",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.5,
+      "cache": {
+       "read": 0.15
+      }
+     },
+     "output": {
+      "price": 7.5
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text",
@@ -5005,24 +3354,6 @@
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.5,
-      "cache": {
-       "read": 0.05
-      }
-     },
-     "output": {
-      "price": 3
-     }
-    },
-    "audio": {
-     "input": {
-      "price": 1
-     }
-    }
-   },
    "api": {
     "chat-completions": {
      "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
@@ -5048,14 +3379,109 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "last_updated": "2026-09-02"
+  },
+  "gpt-5-4-mini": {
+   "id": "gpt-5-4-mini",
+   "name": "GPT-5.4 mini",
+   "description": "Strong small GPT for coding subagents, quick tool use, and high-volume work",
+   "type": "chat",
+   "family": "gpt-mini",
+   "canonical_id": "openai/gpt-5.4-mini",
+   "release_date": "2026-03-17",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.75,
+      "cache": {
+       "read": 0.075
+      }
+     },
+     "output": {
+      "price": 4.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/openai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-03-17"
   },
   "gpt-6-astra": {
    "id": "gpt-6-astra",
    "name": "GPT-6 Astra",
+   "description": "GPT-6 Astra is OpenAI's most capable model for complex reasoning, coding, computer use, research, and document creation.",
    "type": "chat",
-   "canonical_id": "openai/gpt-6-astra",
    "family": "gpt-astra",
+   "canonical_id": "openai/gpt-6-astra",
    "release_date": "2026-09-04",
    "limit": {
     "context": 1050000,
@@ -5066,6 +3492,12 @@
     "cache": {
      "implicit": true
     },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -5078,30 +3510,7 @@
       "xhigh",
       "max"
      ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "GPT-6 Astra is OpenAI's most capable model for complex reasoning, coding, computer use, research, and document creation.",
-   "open_weights": false,
-   "knowledge": "2026-04-30",
-   "last_updated": "2026-09-04",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -5141,6 +3550,19 @@
      }
     }
    },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "responses": {
      "base_url": "${NEON_AI_GATEWAY_BASE_URL}/openai/v1",
@@ -5166,94 +3588,65 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2026-04-30",
+   "last_updated": "2026-09-04"
   },
-  "gemini-3-5-flash-lite": {
-   "id": "gemini-3-5-flash-lite",
-   "name": "Gemini 3.5 Flash Lite",
+  "glm-5-3": {
+   "id": "glm-5-3",
+   "name": "GLM-5.3",
+   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
    "type": "chat",
-   "canonical_id": "google/gemini-3.5-flash-lite",
-   "family": "gemini-flash-lite",
-   "release_date": "2026-07-21",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.3",
+   "release_date": "2026-08-14",
    "limit": {
     "context": 1048576,
-    "output": 65536
+    "output": 131072
    },
    "capabilities": {
     "cache": {
      "implicit": true
     },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": true,
      "effort": [
-      "minimal",
       "low",
-      "medium",
-      "high"
+      "high",
+      "max"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Fast Gemini model balancing multimodal reasoning, tool use, and cost",
-   "open_weights": false,
-   "knowledge": "2026-03",
-   "last_updated": "2026-07-21",
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp",
-     "audio/wav",
-     "audio/mp3",
-     "audio/aiff",
-     "audio/aac",
-     "audio/ogg",
-     "audio/flac",
-     "audio/mpeg",
-     "audio/m4a",
-     "audio/l16",
-     "audio/opus",
-     "audio/alaw",
-     "audio/mulaw",
-     "audio/webm",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.3,
+      "price": 1.4,
       "cache": {
-       "read": 0.03
+       "read": 0.26
       }
      },
      "output": {
-      "price": 2.5
+      "price": 4.4
      }
     }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
    },
    "api": {
     "chat-completions": {
@@ -5267,28 +3660,19 @@
        "updates": false
       }
      }
-    },
-    "generate-content": {
-     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/gemini/v1beta",
-     "sdk": {
-      "aisdk": "@ai-sdk/google",
-      "opencodeai": "@opencode/ai/providers/google"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
     }
-   }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-14"
   },
-  "claude-opus-4-8": {
-   "id": "claude-opus-4-8",
-   "name": "Claude Opus 4.8",
+  "claude-opus-5": {
+   "id": "claude-opus-5",
+   "name": "Claude Opus 5",
+   "description": "Strongest Claude Opus model for coding, agents, and professional work",
    "type": "chat",
-   "canonical_id": "anthropic/claude-opus-4-8",
    "family": "claude-opus",
-   "release_date": "2026-05-28",
+   "canonical_id": "anthropic/claude-opus-5",
+   "release_date": "2026-07-24",
    "limit": {
     "context": 1000000,
     "output": 128000
@@ -5299,15 +3683,21 @@
       "ttl": [
        "5m"
       ],
+      "min_tokens": 512,
       "max_breakpoints": 4,
       "targets": [
        "tools",
        "system",
        "messages"
-      ],
-      "min_tokens": 1024
+      ]
      }
     },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -5321,30 +3711,7 @@
       "xhigh",
       "max"
      ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Top Claude Opus tier for the hardest reasoning, coding, and long-horizon agents",
-   "open_weights": false,
-   "knowledge": "2026-01",
-   "last_updated": "2026-05-28",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -5360,6 +3727,19 @@
      }
     }
    },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
@@ -5385,15 +3765,659 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2026-05",
+   "last_updated": "2026-07-24"
   },
-  "gemini-3-6-flash": {
-   "id": "gemini-3-6-flash",
-   "name": "Gemini 3.6 Flash",
+  "claude-sonnet-5-5": {
+   "id": "claude-sonnet-5-5",
+   "name": "Claude Sonnet 5.5",
+   "description": "Fast Claude model for everyday coding, agents, and knowledge work",
    "type": "chat",
-   "canonical_id": "google/gemini-3.6-flash",
+   "family": "claude-sonnet",
+   "canonical_id": "anthropic/claude-sonnet-5-5",
+   "release_date": "2026-09-28",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "explicit": {
+      "ttl": [
+       "5m"
+      ],
+      "min_tokens": 512,
+      "max_breakpoints": 4,
+      "targets": [
+       "tools",
+       "system",
+       "messages"
+      ]
+     }
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.2,
+       "write": 2.5
+      }
+     },
+     "output": {
+      "price": 10
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-06",
+   "last_updated": "2026-09-28"
+  },
+  "deepseek-v4-1-flash": {
+   "id": "deepseek-v4-1-flash",
+   "name": "DeepSeek V4.1 Flash",
+   "description": "DeepSeek V4.1 Flash model for reasoning and agentic coding",
+   "type": "chat",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4.1-flash",
+   "status": "deprecated",
+   "release_date": "2026-09-10",
+   "limit": {
+    "context": 1000000,
+    "output": 384000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.3,
+      "cache": {
+       "read": 0.03
+      }
+     },
+     "output": {
+      "price": 1.2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-09-10"
+  },
+  "claude-opus-4-1": {
+   "id": "claude-opus-4-1",
+   "name": "Claude Opus 4.1 (latest)",
+   "description": "Flagship Claude model for deep reasoning, coding, and long-horizon agents",
+   "type": "chat",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-4-1",
+   "release_date": "2025-08-05",
+   "limit": {
+    "context": 200000,
+    "output": 32000
+   },
+   "capabilities": {
+    "cache": {
+     "explicit": {
+      "ttl": [
+       "5m"
+      ],
+      "min_tokens": 1024,
+      "max_breakpoints": 4,
+      "targets": [
+       "tools",
+       "system",
+       "messages"
+      ]
+     }
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "budget": {
+      "min": 1024,
+      "max": 31999
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 15,
+      "cache": {
+       "read": 1.5,
+       "write": 18.75
+      }
+     },
+     "output": {
+      "price": 75
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-03-31",
+   "last_updated": "2025-08-05"
+  },
+  "claude-fable-5-1": {
+   "id": "claude-fable-5-1",
+   "name": "Claude Fable 5.1",
+   "description": "Claude model for demanding reasoning and long-horizon agentic work",
+   "type": "chat",
+   "family": "claude-fable",
+   "canonical_id": "anthropic/claude-fable-5-1",
+   "release_date": "2026-09-01",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "explicit": {
+      "ttl": [
+       "5m"
+      ],
+      "min_tokens": 512,
+      "max_breakpoints": 4,
+      "targets": [
+       "tools",
+       "system",
+       "messages"
+      ]
+     }
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 10,
+      "cache": {
+       "read": 0.25,
+       "write": 12.5
+      }
+     },
+     "output": {
+      "price": 50
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-06",
+   "last_updated": "2026-09-01"
+  },
+  "gpt-6-1-sol": {
+   "id": "gpt-6-1-sol",
+   "name": "GPT-6.1 Sol",
+   "description": "Near-Astra performance for complex coding, computer use, and professional work at a lower cost.",
+   "type": "chat",
+   "family": "gpt-sol",
+   "canonical_id": "openai/gpt-6.1-sol",
+   "release_date": "2026-09-29",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.1,
+       "write": 2.5
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 4,
+        "cache": {
+         "read": 0.2,
+         "write": 5
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 10,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 15
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/openai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-04-30",
+   "last_updated": "2026-09-29"
+  },
+  "bge-large-en": {
+   "id": "bge-large-en",
+   "name": "BGE Large (En)",
+   "description": "English text embedding model for retrieval and semantic search",
+   "type": "embedding",
+   "family": "bge",
+   "canonical_id": "baai/bge-large-en-v1.5",
+   "release_date": "2023-09-12",
+   "limit": {
+    "context": 512,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "api": {
+    "embeddings": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2023-09-12"
+  },
+  "qwen35-122b-a10b": {
+   "id": "qwen35-122b-a10b",
+   "name": "Qwen3.5 122B-A10B",
+   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.5-122b-a10b",
+   "release_date": "2026-02-23",
+   "limit": {
+    "context": 262144,
+    "output": 25000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.22
+     },
+     "output": {
+      "price": 2.2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-02-23"
+  },
+  "gemini-3-flash": {
+   "id": "gemini-3-flash",
+   "name": "Gemini 3 Flash Preview",
+   "description": "New Gemini flash lane bringing frontier-style multimodal reasoning to cheaper runs",
+   "type": "chat",
    "family": "gemini-flash",
-   "release_date": "2026-07-21",
+   "canonical_id": "google/gemini-3-flash-preview",
+   "release_date": "2025-12-17",
    "limit": {
     "context": 1048576,
     "output": 65536
@@ -5402,29 +4426,42 @@
     "cache": {
      "implicit": true
     },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": true,
      "effort": [
-      "minimal",
       "low",
       "medium",
       "high"
      ]
-    },
-    "structured_output": true,
-    "temperature": false,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Fast Gemini model balancing multimodal reasoning, tool use, and cost",
-   "open_weights": false,
-   "knowledge": "2026-03",
-   "last_updated": "2026-07-21",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.5,
+      "cache": {
+       "read": 0.05
+      }
+     },
+     "output": {
+      "price": 3
+     }
+    },
+    "audio": {
+     "input": {
+      "price": 1
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text",
@@ -5461,24 +4498,6 @@
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.5,
-      "cache": {
-       "read": 0.15
-      }
-     },
-     "output": {
-      "price": 7.5
-     }
-    },
-    "audio": {
-     "input": {
-      "price": 1.5
-     }
-    }
-   },
    "api": {
     "chat-completions": {
      "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
@@ -5504,64 +4523,85 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2025-12-17"
   },
-  "glm-5-3": {
-   "id": "glm-5-3",
-   "name": "GLM-5.3",
+  "kimi-k3": {
+   "id": "kimi-k3",
+   "name": "Kimi K3",
+   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
    "type": "chat",
-   "canonical_id": "zhipuai/glm-5.3",
-   "family": "glm",
-   "release_date": "2026-08-14",
+   "family": "kimi-k3",
+   "canonical_id": "moonshotai/kimi-k3",
+   "release_date": "2026-07-16",
    "limit": {
     "context": 1048576,
-    "output": 131072
+    "output": 65536
    },
    "capabilities": {
     "cache": {
      "implicit": true
     },
+    "temperature": true,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": true,
+     "toggle": true,
      "effort": [
+      "none",
+      "minimal",
       "low",
+      "medium",
       "high",
       "max"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
-   "open_weights": true,
-   "last_updated": "2026-08-14",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 1.4,
+      "price": 3,
       "cache": {
-       "read": 0.26
+       "read": 0.3
       }
      },
      "output": {
-      "price": 4.4
+      "price": 15
      }
     }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp"
+    ],
+    "output": [
+     "text"
+    ]
    },
    "api": {
     "chat-completions": {
@@ -5576,24 +4616,33 @@
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "last_updated": "2026-07-16"
   },
-  "gpt-5-4-mini": {
-   "id": "gpt-5-4-mini",
-   "name": "GPT-5.4 mini",
+  "gpt-6-luna": {
+   "id": "gpt-6-luna",
+   "name": "GPT-6 Luna",
+   "description": "OpenAI's most efficient model for focused, high-volume tasks",
    "type": "chat",
-   "canonical_id": "openai/gpt-5.4-mini",
-   "family": "gpt-mini",
-   "release_date": "2026-03-17",
+   "family": "gpt-luna",
+   "canonical_id": "openai/gpt-6-luna",
+   "release_date": "2026-09-22",
    "limit": {
-    "context": 400000,
-    "input": 272000,
+    "context": 1050000,
+    "input": 922000,
     "output": 128000
    },
    "capabilities": {
     "cache": {
      "implicit": true
     },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -5606,42 +4655,58 @@
       "high",
       "xhigh"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Strong small GPT for coding subagents, quick tool use, and high-volume work",
-   "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2026-03-17",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1,
+      "cache": {
+       "read": 0.01,
+       "write": 0.125
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 0.2,
+        "cache": {
+         "read": 0.02,
+         "write": 0.25
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 0.5,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 0.75
+       }
+      ]
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text",
      "image/jpeg",
      "image/png",
      "image/gif",
-     "image/webp"
+     "image/webp",
+     "application/pdf"
     ],
     "output": [
      "text"
     ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.75,
-      "cache": {
-       "read": 0.075
-      }
-     },
-     "output": {
-      "price": 4.5
-     }
-    }
    },
    "api": {
     "responses": {
@@ -5668,15 +4733,19 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2026-05-18",
+   "last_updated": "2026-09-22"
   },
-  "claude-opus-5-5": {
-   "id": "claude-opus-5-5",
-   "name": "Claude Opus 5.5",
+  "claude-opus-4-7": {
+   "id": "claude-opus-4-7",
+   "name": "Claude Opus 4.7",
+   "description": "Stronger Opus tier for advanced software work and high-stakes reasoning",
    "type": "chat",
-   "canonical_id": "anthropic/claude-opus-5-5",
    "family": "claude-opus",
-   "release_date": "2026-09-22",
+   "canonical_id": "anthropic/claude-opus-4-7",
+   "release_date": "2026-04-16",
    "limit": {
     "context": 1000000,
     "output": 128000
@@ -5687,20 +4756,27 @@
       "ttl": [
        "5m"
       ],
+      "min_tokens": 2048,
       "max_breakpoints": 4,
       "targets": [
        "tools",
        "system",
        "messages"
-      ],
-      "min_tokens": 512
+      ]
      }
     },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": true,
+     "toggle": true,
      "effort": [
       "low",
       "medium",
@@ -5708,18 +4784,22 @@
       "xhigh",
       "max"
      ]
-    },
-    "structured_output": false,
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Claude model for long-running agentic coding and knowledge work",
-   "open_weights": false,
-   "knowledge": "2026-06",
-   "last_updated": "2026-09-22",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5,
+       "write": 6.25
+      }
+     },
+     "output": {
+      "price": 25
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text",
@@ -5732,6 +4812,280 @@
     "output": [
      "text"
     ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-01-31",
+   "last_updated": "2026-04-16"
+  },
+  "gpt-5-4": {
+   "id": "gpt-5-4",
+   "name": "GPT-5.4",
+   "description": "Agent-ready GPT for coding and computer-use workflows at a lower cost",
+   "type": "chat",
+   "family": "gpt",
+   "canonical_id": "openai/gpt-5.4",
+   "release_date": "2026-03-05",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2.5,
+      "cache": {
+       "read": 0.25
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 5,
+        "cache": {
+         "read": 0.5
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 15,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 22.5
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/openai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-03-05"
+  },
+  "gpt-5-3-codex": {
+   "id": "gpt-5-3-codex",
+   "name": "GPT-5.3 Codex",
+   "description": "Coding-optimized GPT model for repository edits, reviews, and agentic software work",
+   "type": "chat",
+   "family": "gpt-codex",
+   "canonical_id": "openai/gpt-5.3-codex",
+   "release_date": "2026-02-05",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.75,
+      "cache": {
+       "read": 0.175
+      }
+     },
+     "output": {
+      "price": 14
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/openai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-02-05"
+  },
+  "claude-opus-5-5": {
+   "id": "claude-opus-5-5",
+   "name": "Claude Opus 5.5",
+   "description": "Claude model for long-running agentic coding and knowledge work",
+   "type": "chat",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-5-5",
+   "release_date": "2026-09-22",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "explicit": {
+      "ttl": [
+       "5m"
+      ],
+      "min_tokens": 512,
+      "max_breakpoints": 4,
+      "targets": [
+       "tools",
+       "system",
+       "messages"
+      ]
+     }
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
    },
    "cost": {
     "text": {
@@ -5746,6 +5100,19 @@
       "price": 20
      }
     }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
    },
    "api": {
     "chat-completions": {
@@ -5780,24 +5147,33 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "knowledge": "2026-06",
+   "last_updated": "2026-09-22"
   },
-  "inkling": {
-   "id": "inkling",
-   "name": "Inkling",
+  "glm-5-2": {
+   "id": "glm-5-2",
+   "name": "GLM-5.2",
+   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
    "type": "chat",
-   "canonical_id": "thinkingmachines/inkling",
-   "family": "ling",
-   "status": "deprecated",
-   "release_date": "2026-07-15",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.2",
+   "release_date": "2026-06-13",
    "limit": {
-    "context": 1048576,
+    "context": 1000000,
     "output": 65536
    },
    "capabilities": {
     "cache": {
      "implicit": true
     },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -5812,40 +5188,28 @@
       "high",
       "max"
      ]
-    },
-    "structured_output": false,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Multimodal MoE reasoning model (975B total, 41B active) for text, image, and audio",
-   "open_weights": true,
-   "last_updated": "2026-07-15",
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "audio/wav"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 1,
+      "price": 1.4,
       "cache": {
-       "read": 0.17
+       "read": 0.26
       }
      },
      "output": {
-      "price": 4.05
+      "price": 4.4
      }
     }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
    },
    "api": {
     "chat-completions": {
@@ -5860,7 +5224,563 @@
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "last_updated": "2026-06-13"
+  },
+  "glm-5-3-flash": {
+   "id": "glm-5-3-flash",
+   "name": "GLM-5.3 Flash",
+   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
+   "type": "chat",
+   "family": "glm-flash",
+   "canonical_id": "zhipuai/glm-5.3-flash",
+   "release_date": "2026-08-26",
+   "limit": {
+    "context": 1048576,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.15,
+      "cache": {
+       "read": 0.03
+      }
+     },
+     "output": {
+      "price": 0.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-26"
+  },
+  "gpt-oss-20b": {
+   "id": "gpt-oss-20b",
+   "name": "GPT OSS 20B",
+   "description": "Open-weight GPT model for self-hosted reasoning and instruction-following workloads",
+   "type": "chat",
+   "family": "gpt-oss",
+   "canonical_id": "openai/gpt-oss-20b",
+   "release_date": "2025-08-05",
+   "limit": {
+    "context": 131072,
+    "output": 25000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.07
+     },
+     "output": {
+      "price": 0.3
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-06",
+   "last_updated": "2025-08-05"
+  },
+  "grok-4-7": {
+   "id": "grok-4-7",
+   "name": "Grok 4.7",
+   "description": "xAI's frontier model for long-running agents, coding, knowledge work, and visual projects",
+   "type": "chat",
+   "family": "grok",
+   "canonical_id": "xai/grok-4.7",
+   "release_date": "2026-09-21",
+   "limit": {
+    "context": 500000,
+    "output": 500000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2.5,
+      "cache": {
+       "read": 0.5
+      }
+     },
+     "output": {
+      "price": 7.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/openai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-05",
+   "last_updated": "2026-09-21"
+  },
+  "gpt-5": {
+   "id": "gpt-5",
+   "name": "GPT-5",
+   "description": "Original GPT-5 workhorse for reasoning, coding, writing, and tool workflows",
+   "type": "chat",
+   "family": "gpt",
+   "canonical_id": "openai/gpt-5",
+   "release_date": "2025-08-07",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.25,
+      "cache": {
+       "read": 0.125
+      }
+     },
+     "output": {
+      "price": 10
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/openai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2024-09-30",
+   "last_updated": "2025-08-07"
+  },
+  "gpt-5-2": {
+   "id": "gpt-5-2",
+   "name": "GPT-5.2",
+   "description": "Reliable GPT generation for broad coding, writing, and tool-assisted product work",
+   "type": "chat",
+   "family": "gpt",
+   "canonical_id": "openai/gpt-5.2",
+   "release_date": "2025-12-11",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.75,
+      "cache": {
+       "read": 0.175
+      }
+     },
+     "output": {
+      "price": 14
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/openai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2025-12-11"
+  },
+  "gpt-5-5-pro": {
+   "id": "gpt-5-5-pro",
+   "name": "GPT-5.5 Pro",
+   "description": "Highest-accuracy GPT-5.5 tier for slower, precision-heavy reasoning and coding",
+   "type": "chat",
+   "family": "gpt-pro",
+   "canonical_id": "openai/gpt-5.5-pro",
+   "release_date": "2026-04-23",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 30,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 60
+       }
+      ]
+     },
+     "output": {
+      "price": 180,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 270
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/openai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-12-01",
+   "last_updated": "2026-04-23"
+  },
+  "gte-large-en": {
+   "id": "gte-large-en",
+   "name": "GTE Large (En)",
+   "description": "English long-context text embedding model producing 1024-dimensional vectors",
+   "type": "embedding",
+   "canonical_id": "alibaba/gte-large-en-v1.5",
+   "release_date": "2024-04-20",
+   "limit": {
+    "context": 8192,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.13
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "api": {
+    "embeddings": {
+     "base_url": "${NEON_AI_GATEWAY_BASE_URL}/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2024-04-20"
   }
  }
 }

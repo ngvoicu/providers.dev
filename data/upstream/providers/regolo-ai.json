@@ -6,111 +6,53 @@
   "REGOLO_API_KEY"
  ],
  "models": {
-  "qwen3-embedding-8b": {
-   "id": "qwen3-embedding-8b",
-   "name": "Qwen3-Embedding-8B",
-   "type": "embedding",
-   "canonical_id": "alibaba/qwen3-embedding-8b",
-   "family": "qwen",
-   "release_date": "2025-06-05",
-   "limit": {
-    "context": 32768,
-    "output": 8192
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Embedding model for semantic search, retrieval, clustering, and ranking pipelines",
-   "open_weights": true,
-   "last_updated": "2025-06-05",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "embedding"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.1
-     },
-     "output": {
-      "price": 0.1
-     }
-    }
-   },
-   "api": {
-    "embeddings": {
-     "base_url": "https://api.regolo.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
-     }
-    }
-   }
-  },
-  "qwen3.5-9b": {
-   "id": "qwen3.5-9b",
-   "name": "Qwen3.5-9B",
+  "gpt-oss-120b": {
+   "id": "gpt-oss-120b",
+   "name": "GPT-OSS-120B",
+   "description": "Open-weight GPT model for self-hosted reasoning and instruction-following workloads",
    "type": "chat",
-   "canonical_id": "alibaba/qwen3.5-9b",
-   "family": "qwen",
-   "release_date": "2026-02-23",
+   "family": "gpt-oss",
+   "canonical_id": "openai/gpt-oss-120b",
+   "release_date": "2025-08-05",
    "limit": {
-    "context": 262144,
-    "output": 8192
+    "context": 128000,
+    "output": 16384
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
-   "open_weights": true,
-   "last_updated": "2026-02-23",
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic"
-    ],
-    "output": [
-     "text"
-    ]
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.078505
+      "price": 1.1215
      },
      "output": {
-      "price": 0.392525
+      "price": 4.7103
      }
     }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
    },
    "api": {
     "chat-completions": {
@@ -125,35 +67,278 @@
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "knowledge": "2024-06",
+   "last_updated": "2025-08-05"
   },
-  "faster-whisper-large-v3": {
-   "id": "faster-whisper-large-v3",
-   "name": "Faster Whisper Large v3",
-   "type": "transcription",
-   "canonical_id": "openai/whisper-large-v3",
-   "family": "whisper",
-   "release_date": "2023-11-06",
+  "deepseek-ocr-2": {
+   "id": "deepseek-ocr-2",
+   "name": "DeepSeek OCR 2",
+   "description": "High-accuracy OCR model for extracting text from documents, screenshots, receipts, and natural scenes",
+   "type": "chat",
+   "canonical_id": "deepseek/deepseek-ocr-2",
+   "release_date": "2026-01-27",
    "limit": {
-    "context": 448,
-    "output": 4096
+    "context": 4000,
+    "output": 4000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": false
     },
     "reasoning": {
      "supported": false
-    },
-    "temperature": true,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Open Whisper checkpoint for robust multilingual transcription and captioning",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.regolo.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     }
+    }
+   },
    "open_weights": true,
-   "last_updated": "2023-11-06",
+   "last_updated": "2026-01-27"
+  },
+  "qwen3-embedding-8b": {
+   "id": "qwen3-embedding-8b",
+   "name": "Qwen3-Embedding-8B",
+   "description": "Embedding model for semantic search, retrieval, clustering, and ranking pipelines",
+   "type": "embedding",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3-embedding-8b",
+   "release_date": "2025-06-05",
+   "limit": {
+    "context": 32768,
+    "output": 8192
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1
+     },
+     "output": {
+      "price": 0.1
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "api": {
+    "embeddings": {
+     "base_url": "https://api.regolo.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-06-05"
+  },
+  "llama-3.3-70b-instruct": {
+   "id": "llama-3.3-70b-instruct",
+   "name": "Llama 3.3 70B Instruct",
+   "description": "Open Llama instruction model for multilingual chat, reasoning, and coding",
+   "type": "chat",
+   "family": "llama",
+   "canonical_id": "meta/llama-3.3-70b-instruct",
+   "status": "deprecated",
+   "release_date": "2024-12-06",
+   "limit": {
+    "context": 128000,
+    "output": 16384
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.6
+     },
+     "output": {
+      "price": 2.7
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.regolo.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2023-12",
+   "last_updated": "2024-12-06"
+  },
+  "apertus-70b": {
+   "id": "apertus-70b",
+   "name": "Apertus 70B",
+   "description": "Fully open 70B multilingual LLM supporting 1800+ languages with 65K context. Trained on 15T tokens of compliant open data. Apache 2.0, EU AI Act compliant.",
+   "type": "chat",
+   "canonical_id": "swiss-ai/apertus-70b",
+   "release_date": "2025-09-02",
+   "limit": {
+    "context": 30000,
+    "output": 30000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.46
+     },
+     "output": {
+      "price": 2.42
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.regolo.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-09",
+   "last_updated": "2025-09-02"
+  },
+  "faster-whisper-large-v3": {
+   "id": "faster-whisper-large-v3",
+   "name": "Faster Whisper Large v3",
+   "description": "Open Whisper checkpoint for robust multilingual transcription and captioning",
+   "type": "transcription",
+   "family": "whisper",
+   "canonical_id": "openai/whisper-large-v3",
+   "release_date": "2023-11-06",
+   "limit": {
+    "context": 448,
+    "output": 448
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
    "modalities": {
     "input": [
      "audio/flac",
@@ -167,16 +352,6 @@
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
    "api": {
     "transcriptions": {
      "base_url": "https://api.regolo.ai/v1",
@@ -184,286 +359,34 @@
       "opencodeai": "@opencode/ai/protocols/openai-transcription"
      }
     }
-   }
-  },
-  "qwen3-reranker-4b": {
-   "id": "qwen3-reranker-4b",
-   "name": "Qwen3-Reranker-4B",
-   "type": "reranking",
-   "family": "qwen",
-   "release_date": "2026-02-01",
-   "limit": {
-    "context": 32768,
-    "output": 8192
    },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Reranking model for improving retrieval quality in search and recommendation systems",
    "open_weights": true,
-   "last_updated": "2026-02-01",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.12
-     },
-     "output": {
-      "price": 0.12
-     }
-    }
-   },
-   "api": {
-    "rerank": {
-     "base_url": "https://api.regolo.ai/v1",
-     "sdk": {}
-    }
-   }
+   "last_updated": "2023-11-06"
   },
-  "llama-3.3-70b-instruct": {
-   "id": "llama-3.3-70b-instruct",
-   "name": "Llama 3.3 70B Instruct",
+  "qwen3.5-122b": {
+   "id": "qwen3.5-122b",
+   "name": "Qwen3.5-122B",
+   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
    "type": "chat",
-   "canonical_id": "meta/llama-3.3-70b-instruct",
-   "family": "llama",
-   "status": "deprecated",
-   "release_date": "2024-12-06",
-   "limit": {
-    "context": 128000,
-    "output": 16384
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open Llama instruction model for multilingual chat, reasoning, and coding",
-   "open_weights": true,
-   "knowledge": "2023-12",
-   "last_updated": "2024-12-06",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.6
-     },
-     "output": {
-      "price": 2.7
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.regolo.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "qwen3-coder-next": {
-   "id": "qwen3-coder-next",
-   "name": "Qwen3-Coder-Next",
-   "type": "chat",
-   "canonical_id": "alibaba/qwen3-coder-next",
    "family": "qwen",
-   "status": "deprecated",
-   "release_date": "2026-02-03",
+   "canonical_id": "alibaba/qwen3.5-122b-a10b",
+   "release_date": "2026-02-23",
    "limit": {
     "context": 262144,
     "output": 16384
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Qwen coding model for software agents, repository edits, and code reasoning",
-   "open_weights": true,
-   "knowledge": "2025-09",
-   "last_updated": "2026-02-03",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.3
-     },
-     "output": {
-      "price": 1.2
-     }
     }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.regolo.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "glm5.2": {
-   "id": "glm5.2",
-   "name": "GLM-5.2",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-5.2",
-   "family": "glm",
-   "release_date": "2026-06-13",
-   "limit": {
-    "context": 96000,
-    "output": 96000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
-   "open_weights": true,
-   "last_updated": "2026-06-13",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2.31
-     },
-     "output": {
-      "price": 6
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.regolo.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gpt-oss-120b": {
-   "id": "gpt-oss-120b",
-   "name": "GPT-OSS-120B",
-   "type": "chat",
-   "canonical_id": "openai/gpt-oss-120b",
-   "family": "gpt-oss",
-   "release_date": "2025-08-05",
-   "limit": {
-    "context": 128000,
-    "output": 16384
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open-weight GPT model for self-hosted reasoning and instruction-following workloads",
-   "open_weights": true,
-   "knowledge": "2024-06",
-   "last_updated": "2025-08-05",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
    },
    "cost": {
     "text": {
@@ -475,350 +398,6 @@
      }
     }
    },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.regolo.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "brick-complexity-pro": {
-   "id": "brick-complexity-pro",
-   "name": "Brick Complexity Pro",
-   "type": "chat",
-   "release_date": "2026-02-06",
-   "limit": {
-    "context": 100000,
-    "output": 15000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Complexity classifier that powers the Brick semantic router by extracting query difficulty",
-   "open_weights": false,
-   "last_updated": "2026-02-06",
-   "modalities": {
-    "input": [
-     "text",
-     "image"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.12
-     },
-     "output": {
-      "price": 0.46
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.regolo.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "gpt-oss-20b": {
-   "id": "gpt-oss-20b",
-   "name": "GPT-OSS-20B",
-   "type": "chat",
-   "canonical_id": "openai/gpt-oss-20b",
-   "family": "gpt-oss",
-   "release_date": "2025-08-05",
-   "limit": {
-    "context": 128000,
-    "output": 16384
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open-weight GPT model for self-hosted reasoning and instruction-following workloads",
-   "open_weights": true,
-   "knowledge": "2024-06",
-   "last_updated": "2025-08-05",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.11215
-     },
-     "output": {
-      "price": 0.47103
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.regolo.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "brick-v1-beta": {
-   "id": "brick-v1-beta",
-   "name": "Brick v1 Beta",
-   "type": "chat",
-   "family": "model-router",
-   "status": "beta",
-   "release_date": "2026-02-06",
-   "limit": {
-    "context": 100000,
-    "output": 15000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Semantic router by Regolo.ai that directs each request to the most suitable model, optimizing costs and performance",
-   "open_weights": false,
-   "last_updated": "2026-02-06",
-   "modalities": {
-    "input": [
-     "text",
-     "image"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.regolo.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "qwen-image": {
-   "id": "qwen-image",
-   "name": "Qwen-Image",
-   "type": "image",
-   "family": "qwen",
-   "release_date": "2026-03-01",
-   "limit": {
-    "context": 8192,
-    "output": 4096
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Image model for prompt-driven generation, editing, and visual design workflows",
-   "open_weights": false,
-   "last_updated": "2026-03-01",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "image"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.5
-     },
-     "output": {
-      "price": 2
-     }
-    }
-   },
-   "api": {
-    "images": {
-     "base_url": "https://api.regolo.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/images"
-     }
-    }
-   }
-  },
-  "gemma4-31b": {
-   "id": "gemma4-31b",
-   "name": "Gemma 4 31B IT",
-   "type": "chat",
-   "canonical_id": "google/gemma-4-31b-it",
-   "family": "gemma",
-   "release_date": "2026-04-02",
-   "limit": {
-    "context": 100000,
-    "output": 100000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Largest Gemma 4 instruction model for open, self-hosted chat and reasoning",
-   "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-04-02",
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.46
-     },
-     "output": {
-      "price": 2.42
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.regolo.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "qwen3.5-122b": {
-   "id": "qwen3.5-122b",
-   "name": "Qwen3.5-122B",
-   "type": "chat",
-   "canonical_id": "alibaba/qwen3.5-122b-a10b",
-   "family": "qwen",
-   "release_date": "2026-02-23",
-   "limit": {
-    "context": 262144,
-    "output": 16384
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
-   "open_weights": true,
-   "last_updated": "2026-02-23",
    "modalities": {
     "input": [
      "text",
@@ -833,16 +412,6 @@
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.1215
-     },
-     "output": {
-      "price": 4.7103
-     }
-    }
-   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.regolo.ai/v1",
@@ -856,107 +425,36 @@
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "last_updated": "2026-02-23"
   },
-  "mistral-small-4-119b": {
-   "id": "mistral-small-4-119b",
-   "name": "Mistral Small 4 119B",
+  "gemma4-31b": {
+   "id": "gemma4-31b",
+   "name": "Gemma 4 31B IT",
+   "description": "Largest Gemma 4 instruction model for open, self-hosted chat and reasoning",
    "type": "chat",
-   "canonical_id": "mistral/mistral-small-2603",
-   "family": "mistral-small",
-   "release_date": "2026-03-16",
+   "family": "gemma",
+   "canonical_id": "google/gemma-4-31b-it",
+   "release_date": "2026-04-02",
    "limit": {
-    "context": 256000,
-    "output": 16384
+    "context": 100000,
+    "output": 100000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": true
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Efficient Mistral model for fast chat, extraction, and production assistants",
-   "open_weights": true,
-   "knowledge": "2025-06",
-   "last_updated": "2026-03-16",
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/gif"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.56075
-     },
-     "output": {
-      "price": 2.35515
-     }
+     "supported": true,
+     "toggle": true
     }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.regolo.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "apertus-70b": {
-   "id": "apertus-70b",
-   "name": "Apertus 70B",
-   "type": "chat",
-   "canonical_id": "swiss-ai/apertus-70b",
-   "release_date": "2025-09-02",
-   "limit": {
-    "context": 30000,
-    "output": 30000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Fully open 70B multilingual LLM supporting 1800+ languages with 65K context. Trained on 15T tokens of compliant open data. Apache 2.0, EU AI Act compliant.",
-   "open_weights": true,
-   "knowledge": "2025-09",
-   "last_updated": "2025-09-02",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
    },
    "cost": {
     "text": {
@@ -968,6 +466,19 @@
      }
     }
    },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.regolo.ai/v1",
@@ -981,52 +492,58 @@
       }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "knowledge": "2025-01",
+   "last_updated": "2026-04-02"
   },
-  "deepseek-ocr-2": {
-   "id": "deepseek-ocr-2",
-   "name": "DeepSeek OCR 2",
+  "glm5.2": {
+   "id": "glm5.2",
+   "name": "GLM-5.2",
+   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
    "type": "chat",
-   "canonical_id": "deepseek/deepseek-ocr-2",
-   "release_date": "2026-01-27",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.2",
+   "release_date": "2026-06-13",
    "limit": {
-    "context": 4000,
-    "output": 4000
+    "context": 96000,
+    "output": 96000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
-     "supported": false
+     "supported": true
     },
     "reasoning": {
-     "supported": false
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "High-accuracy OCR model for extracting text from documents, screenshots, receipts, and natural scenes",
-   "open_weights": true,
-   "last_updated": "2026-01-27",
-   "modalities": {
-    "input": [
-     "text",
-     "image"
-    ],
-    "output": [
-     "text"
-    ]
+     "supported": true,
+     "effort": [
+      "high",
+      "max"
+     ]
+    }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0
+      "price": 2.31
      },
      "output": {
-      "price": 0
+      "price": 6
      }
     }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
    },
    "api": {
     "chat-completions": {
@@ -1034,39 +551,54 @@
      "sdk": {
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
      }
     }
-   }
+   },
+   "open_weights": true,
+   "last_updated": "2026-06-13"
   },
   "qwen3.8-27b": {
    "id": "qwen3.8-27b",
    "name": "Qwen3.8 27B",
+   "description": "Dense 27B vision-language model for coding, agent tasks, and image and video understanding",
    "type": "chat",
-   "canonical_id": "alibaba/qwen3.8-27b",
    "family": "qwen",
+   "canonical_id": "alibaba/qwen3.8-27b",
    "release_date": "2026-08-14",
    "limit": {
     "context": 120000,
     "output": 120000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": true,
      "toggle": true
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Dense 27B vision-language model for coding, agent tasks, and image and video understanding",
-   "open_weights": true,
-   "last_updated": "2026-08-14",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.58
+     },
+     "output": {
+      "price": 2.42
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text",
@@ -1087,15 +619,62 @@
      "text"
     ]
    },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.regolo.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-14"
+  },
+  "brick-complexity-pro": {
+   "id": "brick-complexity-pro",
+   "name": "Brick Complexity Pro",
+   "description": "Complexity classifier that powers the Brick semantic router by extracting query difficulty",
+   "type": "chat",
+   "release_date": "2026-02-06",
+   "limit": {
+    "context": 100000,
+    "output": 15000
+   },
+   "capabilities": {
+    "temperature": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
    "cost": {
     "text": {
      "input": {
-      "price": 0.58
+      "price": 0.12
      },
      "output": {
-      "price": 2.42
+      "price": 0.46
      }
     }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
    },
    "api": {
     "chat-completions": {
@@ -1110,7 +689,428 @@
       }
      }
     }
-   }
+   },
+   "open_weights": false,
+   "last_updated": "2026-02-06"
+  },
+  "qwen3.5-9b": {
+   "id": "qwen3.5-9b",
+   "name": "Qwen3.5-9B",
+   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.5-9b",
+   "release_date": "2026-02-23",
+   "limit": {
+    "context": 262144,
+    "output": 8192
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.078505
+     },
+     "output": {
+      "price": 0.392525
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.regolo.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-02-23"
+  },
+  "qwen3-coder-next": {
+   "id": "qwen3-coder-next",
+   "name": "Qwen3-Coder-Next",
+   "description": "Qwen coding model for software agents, repository edits, and code reasoning",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3-coder-next",
+   "status": "deprecated",
+   "release_date": "2026-02-03",
+   "limit": {
+    "context": 262144,
+    "output": 16384
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.3
+     },
+     "output": {
+      "price": 1.2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.regolo.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-09",
+   "last_updated": "2026-02-03"
+  },
+  "brick-v1-beta": {
+   "id": "brick-v1-beta",
+   "name": "Brick v1 Beta",
+   "description": "Semantic router by Regolo.ai that directs each request to the most suitable model, optimizing costs and performance",
+   "type": "chat",
+   "family": "model-router",
+   "status": "beta",
+   "release_date": "2026-02-06",
+   "limit": {
+    "context": 100000,
+    "output": 15000
+   },
+   "capabilities": {
+    "temperature": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.regolo.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-02-06"
+  },
+  "qwen-image": {
+   "id": "qwen-image",
+   "name": "Qwen-Image",
+   "description": "Image model for prompt-driven generation, editing, and visual design workflows",
+   "type": "image",
+   "family": "qwen",
+   "release_date": "2026-03-01",
+   "limit": {
+    "context": 8192,
+    "output": 4096
+   },
+   "capabilities": {
+    "temperature": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.5
+     },
+     "output": {
+      "price": 2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "image"
+    ]
+   },
+   "api": {
+    "images": {
+     "base_url": "https://api.regolo.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/images"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-03-01"
+  },
+  "qwen3-reranker-4b": {
+   "id": "qwen3-reranker-4b",
+   "name": "Qwen3-Reranker-4B",
+   "description": "Reranking model for improving retrieval quality in search and recommendation systems",
+   "type": "reranking",
+   "family": "qwen",
+   "release_date": "2026-02-01",
+   "limit": {
+    "context": 32768,
+    "output": 8192
+   },
+   "capabilities": {
+    "temperature": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.12
+     },
+     "output": {
+      "price": 0.12
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "rerank": {
+     "base_url": "https://api.regolo.ai/v1",
+     "sdk": {}
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-02-01"
+  },
+  "mistral-small-4-119b": {
+   "id": "mistral-small-4-119b",
+   "name": "Mistral Small 4 119B",
+   "description": "Efficient Mistral model for fast chat, extraction, and production assistants",
+   "type": "chat",
+   "family": "mistral-small",
+   "canonical_id": "mistral/mistral-small-2603",
+   "release_date": "2026-03-16",
+   "limit": {
+    "context": 256000,
+    "output": 16384
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.56075
+     },
+     "output": {
+      "price": 2.35515
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/gif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.regolo.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-06",
+   "last_updated": "2026-03-16"
+  },
+  "gpt-oss-20b": {
+   "id": "gpt-oss-20b",
+   "name": "GPT-OSS-20B",
+   "description": "Open-weight GPT model for self-hosted reasoning and instruction-following workloads",
+   "type": "chat",
+   "family": "gpt-oss",
+   "canonical_id": "openai/gpt-oss-20b",
+   "release_date": "2025-08-05",
+   "limit": {
+    "context": 128000,
+    "output": 16384
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.11215
+     },
+     "output": {
+      "price": 0.47103
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.regolo.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-06",
+   "last_updated": "2025-08-05"
   }
  }
 }

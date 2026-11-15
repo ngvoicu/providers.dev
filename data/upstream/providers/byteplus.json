@@ -9,15 +9,22 @@
   "deepseek-v4-1-flash-economy-261017": {
    "id": "deepseek-v4-1-flash-economy-261017",
    "name": "DeepSeek V4.1 Flash 1017",
+   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
    "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
    "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
    "release_date": "2026-10-17",
    "limit": {
     "context": 1000000,
     "output": 384000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -29,29 +36,7 @@
       "high",
       "max"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-10-17",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -112,6 +97,18 @@
      }
     ]
    },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "https://ark.ap-southeast.bytepluses.com/api/v3",
@@ -119,29 +116,38 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
      "capabilities": {
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
      }
     }
-   }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-10-17"
   },
   "deepseek-v4-pro-260425": {
    "id": "deepseek-v4-pro-260425",
    "name": "DeepSeek V4 Pro",
+   "description": "Open MoE flagship with million-token context for coding and long agent runs",
    "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4-pro",
    "family": "deepseek-thinking",
+   "canonical_id": "deepseek/deepseek-v4-pro",
    "release_date": "2026-04-24",
    "limit": {
     "context": 1000000,
     "output": 384000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -153,24 +159,7 @@
       "high",
       "max"
      ]
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open MoE flagship with million-token context for coding and long agent runs",
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-04-24",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -185,6 +174,14 @@
      }
     }
    },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "https://ark.ap-southeast.bytepluses.com/api/v3",
@@ -192,44 +189,227 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
      "compatibility": {
       "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-04-24"
+  },
+  "deepseek-v4-flash-ga-260731": {
+   "id": "deepseek-v4-flash-ga-260731",
+   "name": "DeepSeek V4 Flash 0731",
+   "description": "Official DeepSeek V4 Flash release with enhanced agentic capabilities and integrated DSpark speculative decoding",
+   "type": "chat",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4-flash-0731",
+   "release_date": "2026-07-31",
+   "limit": {
+    "context": 1000000,
+    "output": 384000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.44,
+      "cache": {
+       "read": 0.014
+      }
+     },
+     "output": {
+      "price": 1.32
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ark.ap-southeast.bytepluses.com/api/v3",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
      "capabilities": {
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
      }
     }
-   }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-07-31"
+  },
+  "dola-seed-2-1-turbo-260628": {
+   "id": "dola-seed-2-1-turbo-260628",
+   "name": "Seed 2.1 Turbo",
+   "description": "Faster ByteDance Seed 2.1 model for multimodal reasoning and latency-sensitive agent workflows",
+   "type": "chat",
+   "family": "seed",
+   "canonical_id": "bytedance-seed/seed-2.1-turbo",
+   "release_date": "2026-06-23",
+   "limit": {
+    "context": 256000,
+    "output": 256000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.5,
+      "cache": {
+       "read": 0.1
+      }
+     },
+     "output": {
+      "price": 2.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/tiff",
+     "image/x-icon",
+     "image/x-icns",
+     "image/sgi",
+     "image/jp2",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/quicktime"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ark.ap-southeast.bytepluses.com/api/v3",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-06-23"
   },
   "dreamina-seedance-2-0-mini-260615": {
    "id": "dreamina-seedance-2-0-mini-260615",
    "name": "Seedance 2.0 Mini",
+   "description": "Lower-cost, faster Seedance 2.0 audio-video model at 480p and 720p",
    "type": "video",
-   "canonical_id": "bytedance-seed/seedance-2.0-mini",
    "family": "seed",
+   "canonical_id": "bytedance-seed/seedance-2.0-mini",
    "release_date": "2026-06-15",
    "limit": {
     "context": 0,
     "output": 0
    },
    "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": false
     },
     "reasoning": {
      "supported": false
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Lower-cost, faster Seedance 2.0 audio-video model at 480p and 720p",
-   "open_weights": false,
-   "last_updated": "2026-06-15",
+   "cost": {
+    "video": {
+     "output": {
+      "price": 3.5,
+      "overrides": [
+       {
+        "when": {
+         "input_video": {
+          "equals": true
+         }
+        },
+        "price": 2.1
+       }
+      ]
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text",
@@ -250,23 +430,6 @@
      "video/mp4"
     ]
    },
-   "cost": {
-    "video": {
-     "output": {
-      "price": 3.5,
-      "overrides": [
-       {
-        "when": {
-         "input_video": {
-          "equals": true
-         }
-        },
-        "price": 2.1
-       }
-      ]
-     }
-    }
-   },
    "api": {
     "videos": {
      "base_url": "https://ark.ap-southeast.bytepluses.com/api/v3",
@@ -275,20 +438,140 @@
       "opencodeai": "@opencode/ai/providers/byteplus/videos"
      }
     }
-   }
+   },
+   "open_weights": false,
+   "last_updated": "2026-06-15"
   },
-  "deepseek-v4-1-flash-260910": {
-   "id": "deepseek-v4-1-flash-260910",
-   "name": "DeepSeek V4.1 Flash",
+  "seed-2-0-pro-260328": {
+   "id": "seed-2-0-pro-260328",
+   "name": "Seed 2.0 Pro",
+   "description": "Flagship ByteDance Seed 2.0 model for complex multimodal reasoning and long-horizon agent workflows",
    "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4.1-flash",
+   "family": "seed",
+   "canonical_id": "bytedance-seed/seed-2.0-pro",
+   "release_date": "2026-02-14",
+   "limit": {
+    "context": 256000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.5,
+      "cache": {
+       "read": 0.1
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 128000
+         }
+        },
+        "price": 1,
+        "cache": {
+         "read": 0.2
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 3,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 128000
+         }
+        },
+        "price": 6
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/tiff",
+     "image/x-icon",
+     "image/x-icns",
+     "image/sgi",
+     "image/jp2",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/quicktime"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ark.ap-southeast.bytepluses.com/api/v3",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-02-14"
+  },
+  "deepseek-v4-flash-260425": {
+   "id": "deepseek-v4-flash-260425",
+   "name": "DeepSeek V4 Flash",
+   "description": "Fast DeepSeek V4 lane for economical reasoning, coding, and long-context work",
+   "type": "chat",
    "family": "deepseek-flash",
-   "release_date": "2026-09-10",
+   "canonical_id": "deepseek/deepseek-v4-flash",
+   "release_date": "2026-04-24",
    "limit": {
     "context": 1000000,
     "output": 384000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -300,29 +583,155 @@
       "high",
       "max"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "DeepSeek V4.1 Flash model for reasoning and agentic coding",
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-09-10",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.44,
+      "cache": {
+       "read": 0.014
+      }
+     },
+     "output": {
+      "price": 1.32
+     }
+    }
+   },
    "modalities": {
     "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
+     "text"
     ],
     "output": [
      "text"
     ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ark.ap-southeast.bytepluses.com/api/v3",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-04-24"
+  },
+  "glm-5-2-260617": {
+   "id": "glm-5-2-260617",
+   "name": "GLM-5.2",
+   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.2",
+   "release_date": "2026-06-13",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.4,
+      "cache": {
+       "read": 0.26
+      }
+     },
+     "output": {
+      "price": 4.4
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ark.ap-southeast.bytepluses.com/api/v3",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-06-13"
+  },
+  "deepseek-v4-1-flash-260910": {
+   "id": "deepseek-v4-1-flash-260910",
+   "name": "DeepSeek V4.1 Flash",
+   "description": "DeepSeek V4.1 Flash model for reasoning and agentic coding",
+   "type": "chat",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4.1-flash",
+   "release_date": "2026-09-10",
+   "limit": {
+    "context": 1000000,
+    "output": 384000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
    },
    "cost": {
     "text": {
@@ -383,6 +792,18 @@
      }
     ]
    },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
    "api": {
     "chat-completions": {
      "base_url": "https://ark.ap-southeast.bytepluses.com/api/v3",
@@ -390,47 +811,87 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
      "capabilities": {
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
      }
     }
-   }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-09-10"
   },
-  "seedance-1-0-pro-fast-251015": {
-   "id": "seedance-1-0-pro-fast-251015",
-   "name": "Seedance 1.0 Pro Fast",
+  "dreamina-seedance-2-5-260628": {
+   "id": "dreamina-seedance-2-5-260628",
+   "name": "Seedance 2.5",
+   "description": "ByteDance multimodal audio-video model with up to 30-second single-pass generation, multi-round extension, reference inputs and timestamp-level editing.",
    "type": "video",
-   "canonical_id": "bytedance-seed/seedance-1.0-pro-fast",
    "family": "seed",
-   "release_date": "2025-10-24",
+   "canonical_id": "bytedance-seed/seedance-2.5",
+   "release_date": "2026-07-31",
    "limit": {
     "context": 0,
     "output": 0
    },
    "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": false
     },
     "reasoning": {
      "supported": false
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "service_tier": [
-     "flex"
-    ]
+    }
    },
-   "description": "Faster, lower-cost Seedance 1.0 Pro variant for text-to-video and first-frame image-to-video",
-   "open_weights": false,
-   "last_updated": "2025-10-24",
+   "cost": {
+    "video": {
+     "output": {
+      "price": 10.7,
+      "overrides": [
+       {
+        "when": {
+         "resolution": {
+          "equals": "1080p"
+         }
+        },
+        "price": 11.7
+       },
+       {
+        "when": {
+         "resolution": {
+          "in": [
+           "480p",
+           "720p"
+          ]
+         },
+         "input_video": {
+          "equals": true
+         }
+        },
+        "price": 6.4
+       },
+       {
+        "when": {
+         "resolution": {
+          "equals": "1080p"
+         },
+         "input_video": {
+          "equals": true
+         }
+        },
+        "price": 7
+       }
+      ]
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text",
@@ -439,27 +900,18 @@
      "image/webp",
      "image/bmp",
      "image/tiff",
-     "image/gif"
+     "image/gif",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/quicktime",
+     "audio/wav",
+     "audio/mpeg"
     ],
     "output": [
-     "video/mp4"
-    ]
-   },
-   "cost": {
-    "video": {
-     "output": {
-      "price": 1
-     }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "service_tier": {
-        "equals": "flex"
-       }
-      },
-      "factor": 0.5
-     }
+     "video/mp4",
+     "video/quicktime",
+     "audio"
     ]
    },
    "api": {
@@ -470,94 +922,29 @@
       "opencodeai": "@opencode/ai/providers/byteplus/videos"
      }
     }
-   }
+   },
+   "open_weights": false,
+   "last_updated": "2026-10-04"
   },
-  "glm-5-2-260617": {
-   "id": "glm-5-2-260617",
-   "name": "GLM-5.2",
+  "deepseek-v4-1-flash-261017": {
+   "id": "deepseek-v4-1-flash-261017",
+   "name": "DeepSeek V4.1 Flash 1017",
+   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
    "type": "chat",
-   "canonical_id": "zhipuai/glm-5.2",
-   "family": "glm",
-   "release_date": "2026-06-13",
-   "limit": {
-    "context": 1000000,
-    "output": 131072
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
-   "open_weights": true,
-   "last_updated": "2026-06-13",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.4,
-      "cache": {
-       "read": 0.26
-      }
-     },
-     "output": {
-      "price": 4.4
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ark.ap-southeast.bytepluses.com/api/v3",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "deepseek-v4-flash-260425": {
-   "id": "deepseek-v4-flash-260425",
-   "name": "DeepSeek V4 Flash",
-   "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4-flash",
    "family": "deepseek-flash",
-   "release_date": "2026-04-24",
+   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
+   "release_date": "2026-10-17",
    "limit": {
     "context": 1000000,
     "output": 384000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -569,127 +956,78 @@
       "high",
       "max"
      ]
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Fast DeepSeek V4 lane for economical reasoning, coding, and long-context work",
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-04-24",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.44,
+      "price": 0.15,
       "cache": {
-       "read": 0.014
+       "read": 0.003
       }
      },
      "output": {
-      "price": 1.32
+      "price": 0.6
      }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ark.ap-southeast.bytepluses.com/api/v3",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "utc_days": {
+        "in": [
+         "mon",
+         "tue",
+         "wed",
+         "thu",
+         "fri"
+        ]
+       },
+       "any": [
+        {
+         "all": [
+          {
+           "utc_hours": {
+            "gte": "01:00"
+           }
+          },
+          {
+           "utc_hours": {
+            "lt": "04:00"
+           }
+          }
+         ]
+        },
+        {
+         "all": [
+          {
+           "utc_hours": {
+            "gte": "06:00"
+           }
+          },
+          {
+           "utc_hours": {
+            "lt": "10:00"
+           }
+          }
+         ]
+        }
+       ]
+      },
+      "factor": 2
      }
-    }
-   }
-  },
-  "dola-seed-2-1-turbo-260628": {
-   "id": "dola-seed-2-1-turbo-260628",
-   "name": "Seed 2.1 Turbo",
-   "type": "chat",
-   "canonical_id": "bytedance-seed/seed-2.1-turbo",
-   "family": "seed",
-   "release_date": "2026-06-23",
-   "limit": {
-    "context": 256000,
-    "output": 256000
+    ]
    },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "minimal",
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Faster ByteDance Seed 2.1 model for multimodal reasoning and latency-sensitive agent workflows",
-   "open_weights": false,
-   "last_updated": "2026-06-23",
    "modalities": {
     "input": [
      "text",
      "image/jpeg",
      "image/png",
      "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/tiff",
-     "image/x-icon",
-     "image/x-icns",
-     "image/sgi",
-     "image/jp2",
-     "image/heic",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/quicktime"
+     "image/webp"
     ],
     "output": [
      "text"
     ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.5,
-      "cache": {
-       "read": 0.1
-      }
-     },
-     "output": {
-      "price": 2.5
-     }
-    }
    },
    "api": {
     "chat-completions": {
@@ -698,72 +1036,76 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
      "capabilities": {
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
      }
     }
-   }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-10-17"
   },
-  "deepseek-v4-pro-ga-260813": {
-   "id": "deepseek-v4-pro-ga-260813",
-   "name": "DeepSeek V4 Pro 0813",
+  "glm-5-3-flash-260828": {
+   "id": "glm-5-3-flash-260828",
+   "name": "GLM-5.3-Flash",
+   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
    "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4-pro-0813",
-   "family": "deepseek-thinking",
-   "release_date": "2026-08-13",
+   "family": "glm-flash",
+   "canonical_id": "zhipuai/glm-5.3-flash",
+   "release_date": "2026-08-26",
    "limit": {
     "context": 1000000,
-    "output": 384000
+    "output": 131072
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": true,
-     "toggle": true,
      "effort": [
-      "minimal",
       "low",
-      "medium",
-      "high"
+      "high",
+      "max"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "DeepSeek V4 Pro snapshot with million-token context and support for thinking and non-thinking modes",
-   "open_weights": true,
-   "last_updated": "2026-08-22",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 1.32,
+      "price": 0.15,
       "cache": {
-       "read": 0.044
+       "read": 0.03
       }
      },
      "output": {
-      "price": 3.96
+      "price": 0.5
      }
     }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "video/mp4",
+     "video/x-matroska",
+     "video/quicktime",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
    },
    "api": {
     "chat-completions": {
@@ -772,44 +1114,61 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
      "capabilities": {
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
      }
     }
-   }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-26"
   },
-  "dreamina-seedance-2-0-260128": {
-   "id": "dreamina-seedance-2-0-260128",
-   "name": "Seedance 2.0",
+  "dreamina-seedance-2-0-fast-260128": {
+   "id": "dreamina-seedance-2-0-fast-260128",
+   "name": "Seedance 2.0 Fast",
+   "description": "Faster, lower-cost Seedance 2.0 variant for text, image, video and audio references with synchronized sound.",
    "type": "video",
-   "canonical_id": "bytedance-seed/seedance-2.0",
    "family": "seed",
+   "canonical_id": "bytedance-seed/seedance-2.0-fast",
    "release_date": "2026-02-12",
    "limit": {
     "context": 0,
     "output": 0
    },
    "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": false
     },
     "reasoning": {
      "supported": false
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "ByteDance unified multimodal audio-video model supporting text, image, video and audio references, editing, extension and synchronized stereo sound.",
-   "open_weights": false,
-   "last_updated": "2026-10-04",
+   "cost": {
+    "video": {
+     "output": {
+      "price": 5.6,
+      "overrides": [
+       {
+        "when": {
+         "input_video": {
+          "equals": true
+         }
+        },
+        "price": 3.3
+       }
+      ]
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text",
@@ -830,6 +1189,43 @@
      "video/mp4",
      "audio"
     ]
+   },
+   "api": {
+    "videos": {
+     "base_url": "https://ark.ap-southeast.bytepluses.com/api/v3",
+     "sdk": {
+      "aisdk": "@ai-sdk/bytedance",
+      "opencodeai": "@opencode/ai/providers/byteplus/videos"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-02-12"
+  },
+  "dreamina-seedance-2-0-260128": {
+   "id": "dreamina-seedance-2-0-260128",
+   "name": "Seedance 2.0",
+   "description": "ByteDance unified multimodal audio-video model supporting text, image, video and audio references, editing, extension and synchronized stereo sound.",
+   "type": "video",
+   "family": "seed",
+   "canonical_id": "bytedance-seed/seedance-2.0",
+   "release_date": "2026-02-12",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
    },
    "cost": {
     "video": {
@@ -892,462 +1288,6 @@
      }
     }
    },
-   "api": {
-    "videos": {
-     "base_url": "https://ark.ap-southeast.bytepluses.com/api/v3",
-     "sdk": {
-      "aisdk": "@ai-sdk/bytedance",
-      "opencodeai": "@opencode/ai/providers/byteplus/videos"
-     }
-    }
-   }
-  },
-  "seedance-1-0-pro-250528": {
-   "id": "seedance-1-0-pro-250528",
-   "name": "Seedance 1.0 Pro",
-   "type": "video",
-   "canonical_id": "bytedance-seed/seedance-1.0-pro",
-   "family": "seed",
-   "release_date": "2025-06-11",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "service_tier": [
-     "flex"
-    ]
-   },
-   "description": "Seedance 1.0 large-parameter video model with multi-shot storytelling, from text, a first frame or first and last frames",
-   "open_weights": false,
-   "last_updated": "2025-06-11",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/webp",
-     "image/bmp",
-     "image/tiff",
-     "image/gif"
-    ],
-    "output": [
-     "video/mp4"
-    ]
-   },
-   "cost": {
-    "video": {
-     "output": {
-      "price": 2.5
-     }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "service_tier": {
-        "equals": "flex"
-       }
-      },
-      "factor": 0.5
-     }
-    ]
-   },
-   "api": {
-    "videos": {
-     "base_url": "https://ark.ap-southeast.bytepluses.com/api/v3",
-     "sdk": {
-      "aisdk": "@ai-sdk/bytedance",
-      "opencodeai": "@opencode/ai/providers/byteplus/videos"
-     }
-    }
-   }
-  },
-  "deepseek-v4-1-flash-261017": {
-   "id": "deepseek-v4-1-flash-261017",
-   "name": "DeepSeek V4.1 Flash 1017",
-   "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
-   "family": "deepseek-flash",
-   "release_date": "2026-10-17",
-   "limit": {
-    "context": 1000000,
-    "output": 384000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-10-17",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.15,
-      "cache": {
-       "read": 0.003
-      }
-     },
-     "output": {
-      "price": 0.6
-     }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "utc_days": {
-        "in": [
-         "mon",
-         "tue",
-         "wed",
-         "thu",
-         "fri"
-        ]
-       },
-       "any": [
-        {
-         "all": [
-          {
-           "utc_hours": {
-            "gte": "01:00"
-           }
-          },
-          {
-           "utc_hours": {
-            "lt": "04:00"
-           }
-          }
-         ]
-        },
-        {
-         "all": [
-          {
-           "utc_hours": {
-            "gte": "06:00"
-           }
-          },
-          {
-           "utc_hours": {
-            "lt": "10:00"
-           }
-          }
-         ]
-        }
-       ]
-      },
-      "factor": 2
-     }
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ark.ap-southeast.bytepluses.com/api/v3",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "seed-2-0-code-preview-260328": {
-   "id": "seed-2-0-code-preview-260328",
-   "name": "Seed 2.0 Code",
-   "type": "chat",
-   "canonical_id": "bytedance-seed/seed-2.0-code",
-   "family": "seed",
-   "release_date": "2026-02-14",
-   "limit": {
-    "context": 262144,
-    "output": 131072
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "minimal",
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "ByteDance Seed coding model for multimodal software engineering and long-running agents",
-   "open_weights": false,
-   "last_updated": "2026-02-14",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/tiff",
-     "image/x-icon",
-     "image/x-icns",
-     "image/sgi",
-     "image/jp2",
-     "image/heic",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/quicktime"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.5,
-      "cache": {
-       "read": 0.1
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 128000
-         }
-        },
-        "price": 1,
-        "cache": {
-         "read": 0.2
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 3,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 128000
-         }
-        },
-        "price": 6
-       }
-      ]
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ark.ap-southeast.bytepluses.com/api/v3",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "seed-2-0-pro-260328": {
-   "id": "seed-2-0-pro-260328",
-   "name": "Seed 2.0 Pro",
-   "type": "chat",
-   "canonical_id": "bytedance-seed/seed-2.0-pro",
-   "family": "seed",
-   "release_date": "2026-02-14",
-   "limit": {
-    "context": 256000,
-    "output": 128000
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "minimal",
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Flagship ByteDance Seed 2.0 model for complex multimodal reasoning and long-horizon agent workflows",
-   "open_weights": false,
-   "last_updated": "2026-02-14",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/tiff",
-     "image/x-icon",
-     "image/x-icns",
-     "image/sgi",
-     "image/jp2",
-     "image/heic",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/quicktime"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.5,
-      "cache": {
-       "read": 0.1
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 128000
-         }
-        },
-        "price": 1,
-        "cache": {
-         "read": 0.2
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 3,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 128000
-         }
-        },
-        "price": 6
-       }
-      ]
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ark.ap-southeast.bytepluses.com/api/v3",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "dreamina-seedance-2-5-260628": {
-   "id": "dreamina-seedance-2-5-260628",
-   "name": "Seedance 2.5",
-   "type": "video",
-   "canonical_id": "bytedance-seed/seedance-2.5",
-   "family": "seed",
-   "release_date": "2026-07-31",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "ByteDance multimodal audio-video model with up to 30-second single-pass generation, multi-round extension, reference inputs and timestamp-level editing.",
-   "open_weights": false,
-   "last_updated": "2026-10-04",
    "modalities": {
     "input": [
      "text",
@@ -1366,51 +1306,8 @@
     ],
     "output": [
      "video/mp4",
-     "video/quicktime",
      "audio"
     ]
-   },
-   "cost": {
-    "video": {
-     "output": {
-      "price": 10.7,
-      "overrides": [
-       {
-        "when": {
-         "resolution": {
-          "equals": "1080p"
-         }
-        },
-        "price": 11.7
-       },
-       {
-        "when": {
-         "resolution": {
-          "in": [
-           "480p",
-           "720p"
-          ]
-         },
-         "input_video": {
-          "equals": true
-         }
-        },
-        "price": 6.4
-       },
-       {
-        "when": {
-         "resolution": {
-          "equals": "1080p"
-         },
-         "input_video": {
-          "equals": true
-         }
-        },
-        "price": 7
-       }
-      ]
-     }
-    }
    },
    "api": {
     "videos": {
@@ -1420,20 +1317,103 @@
       "opencodeai": "@opencode/ai/providers/byteplus/videos"
      }
     }
-   }
+   },
+   "open_weights": false,
+   "last_updated": "2026-10-04"
+  },
+  "deepseek-v4-pro-ga-260813": {
+   "id": "deepseek-v4-pro-ga-260813",
+   "name": "DeepSeek V4 Pro 0813",
+   "description": "DeepSeek V4 Pro snapshot with million-token context and support for thinking and non-thinking modes",
+   "type": "chat",
+   "family": "deepseek-thinking",
+   "canonical_id": "deepseek/deepseek-v4-pro-0813",
+   "release_date": "2026-08-13",
+   "limit": {
+    "context": 1000000,
+    "output": 384000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.32,
+      "cache": {
+       "read": 0.044
+      }
+     },
+     "output": {
+      "price": 3.96
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ark.ap-southeast.bytepluses.com/api/v3",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-22"
   },
   "seed-2-0-mini-260428": {
    "id": "seed-2-0-mini-260428",
    "name": "Seed 2.0 Mini",
+   "description": "Lightweight ByteDance Seed 2.0 model for low-latency multimodal reasoning and high-volume tasks",
    "type": "chat",
-   "canonical_id": "bytedance-seed/seed-2.0-mini",
    "family": "seed",
+   "canonical_id": "bytedance-seed/seed-2.0-mini",
    "release_date": "2026-02-14",
    "limit": {
     "context": 256000,
     "output": 131072
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -1448,38 +1428,7 @@
       "xhigh",
       "max"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Lightweight ByteDance Seed 2.0 model for low-latency multimodal reasoning and high-volume tasks",
-   "open_weights": false,
-   "last_updated": "2026-02-14",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/tiff",
-     "image/x-icon",
-     "image/x-icns",
-     "image/sgi",
-     "image/jp2",
-     "image/heic",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/quicktime"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
@@ -1517,61 +1466,6 @@
      }
     }
    },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ark.ap-southeast.bytepluses.com/api/v3",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "seed-2-0-lite-260428": {
-   "id": "seed-2-0-lite-260428",
-   "name": "Seed 2.0 Lite",
-   "type": "chat",
-   "canonical_id": "bytedance-seed/seed-2.0-lite",
-   "family": "seed",
-   "release_date": "2026-02-14",
-   "limit": {
-    "context": 256000,
-    "output": 131072
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "minimal",
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Cost-efficient ByteDance Seed 2.0 model for production chat, analysis, and structured generation",
-   "open_weights": false,
-   "last_updated": "2026-02-14",
    "modalities": {
     "input": [
      "text",
@@ -1593,6 +1487,132 @@
     "output": [
      "text"
     ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ark.ap-southeast.bytepluses.com/api/v3",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-02-14"
+  },
+  "seedance-1-0-pro-250528": {
+   "id": "seedance-1-0-pro-250528",
+   "name": "Seedance 1.0 Pro",
+   "description": "Seedance 1.0 large-parameter video model with multi-shot storytelling, from text, a first frame or first and last frames",
+   "type": "video",
+   "family": "seed",
+   "canonical_id": "bytedance-seed/seedance-1.0-pro",
+   "release_date": "2025-06-11",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "service_tier": [
+     "flex"
+    ],
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": 0.5
+     }
+    ],
+    "video": {
+     "output": {
+      "price": 2.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp",
+     "image/bmp",
+     "image/tiff",
+     "image/gif"
+    ],
+    "output": [
+     "video/mp4"
+    ]
+   },
+   "api": {
+    "videos": {
+     "base_url": "https://ark.ap-southeast.bytepluses.com/api/v3",
+     "sdk": {
+      "aisdk": "@ai-sdk/bytedance",
+      "opencodeai": "@opencode/ai/providers/byteplus/videos"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-06-11"
+  },
+  "seed-2-0-lite-260428": {
+   "id": "seed-2-0-lite-260428",
+   "name": "Seed 2.0 Lite",
+   "description": "Cost-efficient ByteDance Seed 2.0 model for production chat, analysis, and structured generation",
+   "type": "chat",
+   "family": "seed",
+   "canonical_id": "bytedance-seed/seed-2.0-lite",
+   "release_date": "2026-02-14",
+   "limit": {
+    "context": 256000,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
    },
    "cost": {
     "text": {
@@ -1630,82 +1650,27 @@
      }
     }
    },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ark.ap-southeast.bytepluses.com/api/v3",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "glm-5-3-flash-260828": {
-   "id": "glm-5-3-flash-260828",
-   "name": "GLM-5.3-Flash",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-5.3-flash",
-   "family": "glm-flash",
-   "release_date": "2026-08-26",
-   "limit": {
-    "context": 1000000,
-    "output": 131072
-   },
-   "capabilities": {
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    },
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
-   "open_weights": true,
-   "last_updated": "2026-08-26",
    "modalities": {
     "input": [
      "text",
      "image/jpeg",
      "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/tiff",
+     "image/x-icon",
+     "image/x-icns",
+     "image/sgi",
+     "image/jp2",
+     "image/heic",
      "video/mp4",
-     "video/x-matroska",
-     "video/quicktime",
-     "application/pdf"
+     "video/x-msvideo",
+     "video/quicktime"
     ],
     "output": [
      "text"
     ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.15,
-      "cache": {
-       "read": 0.03
-      }
-     },
-     "output": {
-      "price": 0.5
-     }
-    }
    },
    "api": {
     "chat-completions": {
@@ -1714,73 +1679,110 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
      "capabilities": {
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
      }
     }
-   }
+   },
+   "open_weights": false,
+   "last_updated": "2026-02-14"
   },
-  "deepseek-v4-flash-ga-260731": {
-   "id": "deepseek-v4-flash-ga-260731",
-   "name": "DeepSeek V4 Flash 0731",
+  "seed-2-0-code-preview-260328": {
+   "id": "seed-2-0-code-preview-260328",
+   "name": "Seed 2.0 Code",
+   "description": "ByteDance Seed coding model for multimodal software engineering and long-running agents",
    "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4-flash-0731",
-   "family": "deepseek-flash",
-   "release_date": "2026-07-31",
+   "family": "seed",
+   "canonical_id": "bytedance-seed/seed-2.0-code",
+   "release_date": "2026-02-14",
    "limit": {
-    "context": 1000000,
-    "output": 384000
+    "context": 262144,
+    "output": 131072
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": true,
-     "toggle": true,
      "effort": [
+      "none",
       "minimal",
       "low",
       "medium",
-      "high"
+      "high",
+      "xhigh",
+      "max"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Official DeepSeek V4 Flash release with enhanced agentic capabilities and integrated DSpark speculative decoding",
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-07-31",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.44,
+      "price": 0.5,
       "cache": {
-       "read": 0.014
-      }
+       "read": 0.1
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 128000
+         }
+        },
+        "price": 1,
+        "cache": {
+         "read": 0.2
+        }
+       }
+      ]
      },
      "output": {
-      "price": 1.32
+      "price": 3,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 128000
+         }
+        },
+        "price": 6
+       }
+      ]
      }
     }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/tiff",
+     "image/x-icon",
+     "image/x-icns",
+     "image/sgi",
+     "image/jp2",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/quicktime"
+    ],
+    "output": [
+     "text"
+    ]
    },
    "api": {
     "chat-completions": {
@@ -1789,44 +1791,64 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
      "capabilities": {
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
      }
     }
-   }
+   },
+   "open_weights": false,
+   "last_updated": "2026-02-14"
   },
-  "dreamina-seedance-2-0-fast-260128": {
-   "id": "dreamina-seedance-2-0-fast-260128",
-   "name": "Seedance 2.0 Fast",
+  "seedance-1-0-pro-fast-251015": {
+   "id": "seedance-1-0-pro-fast-251015",
+   "name": "Seedance 1.0 Pro Fast",
+   "description": "Faster, lower-cost Seedance 1.0 Pro variant for text-to-video and first-frame image-to-video",
    "type": "video",
-   "canonical_id": "bytedance-seed/seedance-2.0-fast",
    "family": "seed",
-   "release_date": "2026-02-12",
+   "canonical_id": "bytedance-seed/seedance-1.0-pro-fast",
+   "release_date": "2025-10-24",
    "limit": {
     "context": 0,
     "output": 0
    },
    "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "service_tier": [
+     "flex"
+    ],
     "tools": {
      "supported": false
     },
     "reasoning": {
      "supported": false
-    },
-    "temperature": false,
-    "top_p": false,
-    "top_k": false,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "Faster, lower-cost Seedance 2.0 variant for text, image, video and audio references with synchronized sound.",
-   "open_weights": false,
-   "last_updated": "2026-02-12",
+   "cost": {
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": 0.5
+     }
+    ],
+    "video": {
+     "output": {
+      "price": 1
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text",
@@ -1835,35 +1857,11 @@
      "image/webp",
      "image/bmp",
      "image/tiff",
-     "image/gif",
-     "image/heic",
-     "image/heif",
-     "video/mp4",
-     "video/quicktime",
-     "audio/wav",
-     "audio/mpeg"
+     "image/gif"
     ],
     "output": [
-     "video/mp4",
-     "audio"
+     "video/mp4"
     ]
-   },
-   "cost": {
-    "video": {
-     "output": {
-      "price": 5.6,
-      "overrides": [
-       {
-        "when": {
-         "input_video": {
-          "equals": true
-         }
-        },
-        "price": 3.3
-       }
-      ]
-     }
-    }
    },
    "api": {
     "videos": {
@@ -1873,7 +1871,9 @@
       "opencodeai": "@opencode/ai/providers/byteplus/videos"
      }
     }
-   }
+   },
+   "open_weights": false,
+   "last_updated": "2025-10-24"
   }
  }
 }

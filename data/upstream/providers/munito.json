@@ -6,100 +6,14 @@
   "MUNITO_API_KEY"
  ],
  "models": {
-  "qwen/qwen3.8-27b": {
-   "id": "qwen/qwen3.8-27b",
-   "name": "Qwen3.8 27B",
+  "deepseek-ai/deepseek-v4-flash": {
+   "id": "deepseek-ai/deepseek-v4-flash",
+   "name": "DeepSeek V4 Flash 0731",
+   "description": "Official DeepSeek V4 Flash release with enhanced agentic capabilities and integrated DSpark speculative decoding",
    "type": "chat",
-   "canonical_id": "alibaba/qwen3.8-27b",
-   "family": "qwen",
-   "release_date": "2026-08-14",
-   "limit": {
-    "context": 262144,
-    "output": 235929
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "xhigh"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Dense 27B vision-language model for coding, agent tasks, and image and video understanding",
-   "open_weights": true,
-   "last_updated": "2026-08-14",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/webp",
-     "image/gif",
-     "image/bmp",
-     "image/tiff",
-     "image/avif",
-     "video/mp4",
-     "video/webm",
-     "video/quicktime",
-     "video/x-matroska",
-     "video/x-msvideo"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.18,
-      "cache": {
-       "read": 0.05
-      }
-     },
-     "output": {
-      "price": 2.4
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.munito.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "aleph-alpha/kolibri-1": {
-   "id": "aleph-alpha/kolibri-1",
-   "name": "Kolibri 1",
-   "type": "chat",
-   "canonical_id": "aleph-alpha/kolibri-1",
-   "release_date": "2026-10-03",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4-flash-0731",
+   "release_date": "2026-07-31",
    "limit": {
     "context": 1048576,
     "output": 943718
@@ -108,6 +22,12 @@
     "cache": {
      "implicit": true
     },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -115,129 +35,32 @@
      "supported": true,
      "effort": [
       "none",
-      "low",
-      "medium",
-      "high"
-     ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Aleph Alpha's German and English mixture-of-experts reasoning model (78B total, 3.46B active) for chat, RAG and agents",
-   "open_weights": true,
-   "knowledge": "2026-06-18",
-   "last_updated": "2026-10-03",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.13,
-      "cache": {
-       "read": 0.078
-      }
-     },
-     "output": {
-      "price": 0.51
-     }
-    }
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.munito.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   }
-  },
-  "zai-org/glm-5.3-flash": {
-   "id": "zai-org/glm-5.3-flash",
-   "name": "GLM-5.3-Flash",
-   "type": "chat",
-   "canonical_id": "zhipuai/glm-5.3-flash",
-   "family": "glm-flash",
-   "release_date": "2026-08-26",
-   "limit": {
-    "context": 1048576,
-    "output": 943718
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
       "low",
       "high",
       "max"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
-   "open_weights": true,
-   "last_updated": "2026-08-26",
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/webp",
-     "image/gif",
-     "image/bmp",
-     "image/tiff",
-     "image/avif",
-     "video/mp4",
-     "video/webm",
-     "video/quicktime",
-     "video/x-matroska",
-     "video/x-msvideo"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.13,
+      "price": 0.099,
       "cache": {
-       "read": 0.027
+       "read": 0.019
       }
      },
      "output": {
-      "price": 0.45
+      "price": 0.25
      }
     }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
    },
    "api": {
     "chat-completions": {
@@ -246,23 +69,27 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
      "capabilities": {
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
      }
     }
-   }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-07-31"
   },
   "deepseek-ai/deepseek-v4.1-flash-1017": {
    "id": "deepseek-ai/deepseek-v4.1-flash-1017",
    "name": "DeepSeek V4.1 Flash 1017",
+   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
    "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
    "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
    "status": "beta",
    "release_date": "2026-10-17",
    "limit": {
@@ -273,6 +100,12 @@
     "cache": {
      "implicit": true
     },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
@@ -284,18 +117,21 @@
       "high",
       "max"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
+    }
    },
-   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-10-17",
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.27,
+      "cache": {
+       "read": 0.0054
+      }
+     },
+     "output": {
+      "price": 1
+     }
+    }
+   },
    "modalities": {
     "input": [
      "text",
@@ -311,19 +147,6 @@
      "text"
     ]
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.27,
-      "cache": {
-       "read": 0.0054
-      }
-     },
-     "output": {
-      "price": 1
-     }
-    }
-   },
    "api": {
     "chat-completions": {
      "base_url": "https://api.munito.ai/inference/v1",
@@ -331,24 +154,28 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     },
      "capabilities": {
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
      }
     }
-   }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-10-17"
   },
-  "deepseek-ai/deepseek-v4-flash": {
-   "id": "deepseek-ai/deepseek-v4-flash",
-   "name": "DeepSeek V4 Flash 0731",
+  "zai-org/glm-5.3-flash": {
+   "id": "zai-org/glm-5.3-flash",
+   "name": "GLM-5.3-Flash",
+   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
    "type": "chat",
-   "canonical_id": "deepseek/deepseek-v4-flash-0731",
-   "family": "deepseek-flash",
-   "release_date": "2026-07-31",
+   "family": "glm-flash",
+   "canonical_id": "zhipuai/glm-5.3-flash",
+   "release_date": "2026-08-26",
    "limit": {
     "context": 1048576,
     "output": 943718
@@ -357,49 +184,56 @@
     "cache": {
      "implicit": true
     },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
      "supported": true,
      "effort": [
-      "none",
       "low",
       "high",
       "max"
      ]
-    },
-    "structured_output": true,
-    "temperature": true,
-    "top_p": true,
-    "top_k": true,
-    "system_updates": false,
-    "effort_updates": false
-   },
-   "description": "Official DeepSeek V4 Flash release with enhanced agentic capabilities and integrated DSpark speculative decoding",
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-07-31",
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
+    }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.099,
+      "price": 0.13,
       "cache": {
-       "read": 0.019
+       "read": 0.027
       }
      },
      "output": {
-      "price": 0.25
+      "price": 0.45
      }
     }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp",
+     "image/gif",
+     "image/bmp",
+     "image/tiff",
+     "image/avif",
+     "video/mp4",
+     "video/webm",
+     "video/quicktime",
+     "video/x-matroska",
+     "video/x-msvideo"
+    ],
+    "output": [
+     "text"
+    ]
    },
    "api": {
     "chat-completions": {
@@ -408,16 +242,182 @@
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
      "compatibility": {
       "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-26"
+  },
+  "qwen/qwen3.8-27b": {
+   "id": "qwen/qwen3.8-27b",
+   "name": "Qwen3.8 27B",
+   "description": "Dense 27B vision-language model for coding, agent tasks, and image and video understanding",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.8-27b",
+   "release_date": "2026-08-14",
+   "limit": {
+    "context": 262144,
+    "output": 235929
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.18,
+      "cache": {
+       "read": 0.05
+      }
+     },
+     "output": {
+      "price": 2.4
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp",
+     "image/gif",
+     "image/bmp",
+     "image/tiff",
+     "image/avif",
+     "video/mp4",
+     "video/webm",
+     "video/quicktime",
+     "video/x-matroska",
+     "video/x-msvideo"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.munito.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
      "capabilities": {
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
      }
     }
-   }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-14"
+  },
+  "aleph-alpha/kolibri-1": {
+   "id": "aleph-alpha/kolibri-1",
+   "name": "Kolibri 1",
+   "description": "Aleph Alpha's German and English mixture-of-experts reasoning model (78B total, 3.46B active) for chat, RAG and agents",
+   "type": "chat",
+   "canonical_id": "aleph-alpha/kolibri-1",
+   "release_date": "2026-10-03",
+   "limit": {
+    "context": 1048576,
+    "output": 943718
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.13,
+      "cache": {
+       "read": 0.078
+      }
+     },
+     "output": {
+      "price": 0.51
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.munito.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2026-06-18",
+   "last_updated": "2026-10-03"
   }
  }
 }
