@@ -173,9 +173,12 @@ What one item is:
 
 1. By profile: `short`, then `long`.
 2. In a profile: the documented items, then the measured ones.
-3. Documented: by `lifetime_s` ascending, then `implicit` before `explicit`.
-4. Measured: the setting that asked for no lifetime first, then by the seconds of `value`, then by `value` as text
-   (the order of today's summary lines); then by `client`, ascending.
+3. Documented: by `lifetime_s` ascending, then `implicit` before `explicit`, then by `documented_as` as text.
+4. Measured: the setting that asked for no lifetime first, then by the seconds of `value`, then by `value` as text;
+   then by `client`, ascending; then by `parameter`, null first.
+
+Every comparison of text here is in plain character (UTF-16 code unit) order, null first, never by the locale of
+the machine that builds; and no part of the order depends on the order of the input.
 
 ### 2.5 The record in full
 
@@ -424,7 +427,9 @@ The measured value is derived from the published checks. groundtruth's `all_warm
 
 The two are compared in the build instead (task 2): for a published run that has `all_warm_through_s` and whose
 control did not miss, the derived `safe` must equal it, with `null` read as 0. A difference is reported as an issue
-(`lifetime-differs`, a warning, with the run id); the derived value is published all the same. Today all 78 agree.
+(`lifetime-differs`, a warning, with the run id); the derived value is published all the same. A run that does not
+count (3.1) has no derived value; where its control did not miss and its `all_warm_through_s` is a number above 0,
+that is a difference too and is reported the same way, and the run still counts for no lifetime. Today all 78 agree.
 
 ## 4. The safe value
 
@@ -576,7 +581,9 @@ caching is unsupported and the other is not stated has `support: unknown` and ge
 ### 5.3 Text to seconds
 
 Only `durationSeconds` (`src/core/cache.ts`): a whole number and one unit of `ms`, `s`, `m`, `h`, `d` (`"5m"` → 300,
-`"1h"` → 3600). Every lifetime in today's catalog has that form (`5m`, `30m`, `1h`, `2h`, `12h`, `24h`).
+`"1h"` → 3600), and only where it comes to a whole number of seconds above 0: the record holds whole seconds, and a
+text of 0 seconds has no meaning (0 is only the "does not cache" item of 5.2). `"500ms"` or `"0s"` is treated as any
+other text that cannot be converted, below; nothing is rounded. Every lifetime in today's catalog has that form (`5m`, `30m`, `1h`, `2h`, `12h`, `24h`).
 
 Anything else (a range such as `5m-10m`, words) is not converted and is no item: a number is not made up from it.
 Today such a string is dropped silently by `cacheFacts`; from task 2 the build reports it (`unparsed-lifetime`, a
@@ -592,7 +599,8 @@ For an item of mode `<mode>`, with `P` = `capabilities.cache.<mode>.ttl`:
    `capabilities`, `capabilities.cache`, `capabilities.cache.<mode>`: `source` is `providers.dev` and `date` is the
    newest evidence date of those corrections.
 2. Else, if the entry's `origin` is `added`: `source` is `providers.dev` and `date` is the newest date of the
-   entry's evidence that is not of kind `listed`, or null.
+   entry's evidence that is not of kind `listed`, or null. That is the evidence published in
+   `providers_dev.evidence`: the entry's own, with that of the declarations made for it by name (step 6) merged in.
 3. Else: `source` is `models.dev` and `date` is the import date (`upstreamDate` of `resolve`), or null where the
    build has none.
 
@@ -657,8 +665,10 @@ After the work `providers_dev.cache` has four keys: `documented` (whether and ho
   that sending the option's value asks for. It is the label of a request value, in the record that says how to ask,
   not a statement about the entry's cache, and it has no item (decided, section 12). On the 636 options that carry
   it today, on 318 entries, it equals the documented lifetime of the option's profile in every case, and the build
-  keeps it so (task 2): a difference is reported (`retention-lifetime-differs`, a notice) and a person corrects one
-  of the two with an override. An option without `retention_s` states no lifetime: on Meta's seven API entries
+  keeps it so (task 2): a difference is reported (`retention-lifetime-differs`, a notice, target
+  `provider/model#request_controls.cache.retention`) and a person corrects one of the two with an override. An option
+  with `retention_s` whose profile has no documented lifetime is reported too; an option without a `profile` is not
+  compared. An option without `retention_s` states no lifetime: on Meta's seven API entries
   `"24h"` "asks for up to 24 hours. It is not a lifetime the cache is sure to have", so no 86,400 comes from its
   name.
 - `/api/v1/evaluations/cache` and `/api/v1/meta` are not touched.
@@ -1073,6 +1083,11 @@ All on 2026-11-15. "The owner" decided; "the chief" is the project's chief, who 
 | 20 | A filter and a sort on the value in `/api/v1/entries`: **open**, to be decided with the page design. | Deferred |
 | 21 | A cell of results by age shows a rounded hit percentage; the API and the hover text are exact. | Decided separately, outside this design |
 | 22 | The Muse Code subscription runs land on a subscription provider, `meta-subscription`, not on Meta's API entries. | The owner; done in `e6cd269` (groundtruth `60423f2`) |
+| 23 | 2026-11-15: the record holds whole seconds only. A documented text that does not come to a whole number of seconds above 0 (`500ms`, `0s`) makes no item and is reported as `unparsed-lifetime`; nothing is rounded (5.3). | The chief, after review T-14 |
+| 24 | 2026-11-15: the list is ordered in plain character order, never by the locale, and completely: documented items of one lifetime and mode by `documented_as`, measured items of one client and value by `parameter`, null first (2.4). | The chief, after review T-14 |
+| 25 | 2026-11-15: the date of a documented lifetime on an added entry is the newest non-`listed` evidence of the entry as published, the declarations made for it by name included (5.4). | The chief, after review T-14 |
+| 26 | 2026-11-15: a run that does not count, whose control did not miss and to which groundtruth gives an `all_warm_through_s` above 0, is reported as `lifetime-differs`; it still counts for no lifetime (3.6). | The chief, after review T-14 |
+| 27 | 2026-11-15: `retention-lifetime-differs` has the target `provider/model#request_controls.cache.retention`, is reported also where the option's profile has no documented lifetime, and skips an option without a `profile` (6.3). The same lifetime text twice in one mode makes two items, as written (2.3). | The chief, after review T-14 |
 
 Open: 12 (the exact test, pending the owner's look at the borderline cases) and 20.
 
