@@ -175,7 +175,8 @@ What one item is:
 2. In a profile: the documented items, then the measured ones.
 3. Documented: by `lifetime_s` ascending, then `implicit` before `explicit`, then by `documented_as` as text.
 4. Measured: the setting that asked for no lifetime first, then by the seconds of `value`, then by `value` as text;
-   then by `client`, ascending; then by `parameter`, null first.
+   then by `client`, ascending; then by `parameter`, null first. A `value` that does not convert to whole seconds
+   (5.3) sorts as 0 seconds, and then by its text.
 
 Every comparison of text here is in plain character (UTF-16 code unit) order, null first, never by the locale of
 the machine that builds; and no part of the order depends on the order of the input.
@@ -315,6 +316,9 @@ A run with `requires` counts like any other. A run with `lacks` is not published
 not `latest` is not published and does not count.
 
 ### 3.2 One evaluation
+
+A run has one check result per age. A measurements file in which a run holds the same `age_s` twice is wrong and is
+refused where it is read, by the sync and by the build, naming the run and the age; the last good copy stays.
 
 Take the evaluation's results in this order: the control (age 0) if it has one, then the timed results by `age_s`,
 ascending. Walk them:
@@ -560,7 +564,8 @@ The same rule puts an evaluation in a profile (`profileOf`), in seconds: one tha
 that asked for a lifetime is short when that lifetime, converted as in 5.3, equals the shortest lifetime the entry
 documents (the `lifetime_s` of its short documented items), and long in every other case, a value that does not
 convert included. A profile declared on the entry's retention option comes first. So a documented lifetime and an
-evaluation of the same setting land in the same profile, however either is written and in whatever order.
+evaluation of the same setting land in the same profile, however either is written and in whatever order. Where an
+entry's retention control lists the same value twice with different profiles, the first listed wins.
 
 `documented_s` of a profile is the lowest `lifetime_s` of its documented items: for `short` the shortest lifetime
 documented, for `long` the shortest of the longer ones. Section 4 says when it is the safe value.
@@ -1092,6 +1097,7 @@ All on 2026-11-15. "The owner" decided; "the chief" is the project's chief, who 
 | 27 | 2026-11-15: `retention-lifetime-differs` has the target `provider/model#request_controls.cache.retention`, is reported also where the option's profile has no documented lifetime, and skips an option without a `profile` (6.3). The same lifetime text twice in one mode makes two items, as written (2.3). | The chief, after review T-14 |
 | 28 | 2026-11-15: the profile of an evaluation is decided in seconds: no lifetime asked is short; a lifetime asked is short when, converted as in 5.3, it equals the shortest documented lifetime in whole seconds, and long otherwise, a value that does not convert included. A declared profile comes first. Nothing depends on the order or the writing of the texts (5.1). | The chief, after review T-19 |
 | 29 | 2026-11-15: one public client id has one label. Two clients of the labels file with the same `id` and different `label` are an error that fails the build and names both (2.3). | The chief, after review T-19 |
+| 30 | 2026-11-15: a run has one check result per age. A measurements file in which a run holds the same `age_s` twice is refused when read, by the sync and by the build, naming the run and the age; the checks are not added together (3.2). | The chief, after review T-21 |
 
 Open: 12 (the exact test, pending the owner's look at the borderline cases) and 20.
 
