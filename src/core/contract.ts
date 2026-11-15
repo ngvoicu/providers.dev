@@ -225,6 +225,7 @@ export const EntrySummarySchema = z
       .strictObject({ implicit: z.array(z.number()).nullable(), explicit: z.array(z.number()).nullable() })
       .describe("The documented lifetimes of each mode, in seconds, shortest first. Null = no lifetime is documented for that mode."),
     cache_retention: CacheRetentionSchema.shape.support.describe("Whether a request can ask for a cache lifetime: providers_dev.cache.retention.support of the full entry."),
+    cache_lifetime: CacheLifetimeRecordSchema.describe("Every cache lifetime of the entry, documented and measured, and the safe value of each retention profile: the same object as providers_dev.cache.lifetime of the full entry."),
     evaluation_count: z.int().min(0).describe("How many cache evaluations this entry has."),
     cache_results: z
       .array(CacheSummaryRowSchema)

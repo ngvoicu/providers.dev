@@ -40,7 +40,7 @@ export function summaryOf(more: Partial<Summary> = {}): Summary {
     ref: "p/m", provider: "p", model: "m", name: "M", type: null, family: null, canonical_id: null, status: null, release_date: null,
     access: "api", origin: "upstream", context: null, input: null, max_output: null,
     cache: "unknown", cache_modes: [], cache_mode_support: { implicit: "unknown", explicit: "unknown" }, cache_ttl_s: [], cache_ttl_by_mode_s: { implicit: null, explicit: null },
-    cache_retention: "unknown", evaluation_count: 0, cache_results: null,
+    cache_retention: "unknown", cache_lifetime: emptyCacheLifetime(), evaluation_count: 0, cache_results: null,
     price_in: null, price_out: null, price_from: null, pricing: pricingOf({}, "api", null, []), request_controls: controlsOf({}, NO_CACHE.retention, []),
     measured_input_accepted: null, measured_input_refused: null, measured_limit_count: 0, overridden_fields: [], verified: null, shard: 0,
     ...more,

@@ -85,6 +85,45 @@ describe("GET /api/v1/entries", () => {
     expect(catalog.providers["provider-02"]!.models["lab/model-4"]!.providers_dev).toMatchObject({ pricing: expected.pricing, request_controls: expected.request_controls });
   });
 
+  it("returns the same cache lifetime record on entry, provider, model and catalog routes", async () => {
+    for (const ref of ["provider-02/lab/model-4", "provider-02/lab/model-2", "provider-03/model-1"]) {
+      const detail = one(EntryDetailSchema).parse(await json(`/api/v1/entries/${ref}`));
+      const expected = detail.data.entry.providers_dev.cache.lifetime;
+      const { provider, model } = { provider: detail.data.summary.provider, model: detail.data.summary.model };
+      const collection = pageOf(EntrySummarySchema).parse(await json(`/api/v1/entries?provider=${provider}&limit=200`));
+      const full = one(ProviderDetailSchema).parse(await json(`/api/v1/providers/${provider}?view=full`));
+      const canonical = one(CanonicalModelDetailSchema).parse(await json(`/api/v1/models/${detail.data.summary.canonical_id}`));
+      const catalog = (await json<{ data: Catalog }>("/api/v1/catalog")).data;
+      for (const summary of [detail.data.summary, collection.data.find((entry) => entry.ref === ref)!, full.data.entries.find((entry) => entry.ref === ref)!, canonical.data.entries.find((entry) => entry.ref === ref)!]) {
+        expect(summary.cache_lifetime, ref).toEqual(expected);
+      }
+      expect(full.data.models?.[model]?.providers_dev.cache.lifetime).toEqual(expected);
+      expect((catalog[provider]!.models[model]!.providers_dev as unknown as ModelExtension).cache.lifetime).toEqual(expected);
+    }
+    // The fixture's three kinds: lifetimes documented (5m, 1h), documented as not caching, caching without a lifetime.
+    const lifetimes = (ref: string) => deps.index.entries.find((entry) => entry.ref === ref)!.cache_lifetime;
+    expect([lifetimes("provider-02/lab/model-4").short.safe_s, lifetimes("provider-02/lab/model-4").long.safe_s]).toEqual([300, 3600]);
+    expect([lifetimes("provider-02/lab/model-2").short.safe_s, lifetimes("provider-02/lab/model-2").short.basis]).toEqual([0, "documented"]);
+    expect([lifetimes("provider-03/model-1").short.safe_s, lifetimes("provider-03/model-1").short.basis]).toEqual([null, "none"]);
+  });
+
+  it("adds cache_lifetime to a summary and leaves every other key as it was", () => {
+    expect(Object.keys(deps.index.entries[0]!)).toEqual([
+      "ref", "provider", "model", "name", "type", "family", "canonical_id", "status", "release_date", "access", "origin", "context", "input", "max_output",
+      "cache", "cache_modes", "cache_mode_support", "cache_ttl_s", "cache_ttl_by_mode_s", "cache_retention", "cache_lifetime", "evaluation_count", "cache_results",
+      "price_in", "price_out", "price_from", "pricing", "request_controls", "measured_input_accepted", "measured_input_refused", "measured_limit_count", "overridden_fields", "verified", "shard",
+    ]);
+    // No other key of a summary depends on the lifetime record.
+    const exported = JSON.parse(readFileSync(join(published, "site", "api.json"), "utf8")) as Catalog;
+    for (const entry of deps.index.entries) {
+      const model = structuredClone(exported[entry.provider]!.models[entry.model]!);
+      delete (model.providers_dev as unknown as { cache: Partial<ModelExtension["cache"]> }).cache.lifetime;
+      const { cache_lifetime: _without, ...rest } = summarize(entry.provider, model, entry.shard);
+      const { cache_lifetime: _with, ...published } = entry;
+      expect(rest).toEqual(published);
+    }
+  });
+
   it("pages through every entry once, in a fixed order", async () => {
     const seen: string[] = [];
     let offset: number | null = 0;

@@ -1,6 +1,6 @@
 // The flat view of the catalog: one summary per provider-model entry.
 // The website tables, /api/v1/entries and the compact index all use these summaries, built once by buildIndex().
-import { cacheFacts, type CacheMode, type CacheRetention, type CacheSummaryRow, type CacheSupport, type Support } from "./cache.ts";
+import { cacheFacts, type CacheLifetimeRecord, type CacheMode, type CacheRetention, type CacheSummaryRow, type CacheSupport, type Support } from "./cache.ts";
 import { isObject, type JsonObject } from "./merge.ts";
 import type { Pricing, RequestControls } from "./policy-contract.ts";
 import { NS, type Access, type Catalog, type ModelExtension, type ProviderExtension } from "./schema.ts";
@@ -42,6 +42,8 @@ export interface Summary {
   cache_ttl_by_mode_s: Record<CacheMode, number[] | null>;
   /** Whether a request can ask for a cache lifetime on this entry: `providers_dev.cache.retention.support` of the full entry. */
   cache_retention: CacheRetention["support"];
+  /** Every cache lifetime of this entry and the safe value of each profile: the same object as `providers_dev.cache.lifetime` of the full entry. */
+  cache_lifetime: CacheLifetimeRecord;
   /** How many cache evaluations this entry has. */
   evaluation_count: number;
   /**
@@ -135,6 +137,7 @@ export function summarize(providerId: string, model: JsonObject, shard: number):
     max_output: count(limit.output),
     ...cacheFacts(extension.cache.documented),
     cache_retention: extension.cache.retention.support,
+    cache_lifetime: extension.cache.lifetime,
     evaluation_count: runs.length,
     cache_results: extension.cache.results,
     price_in: basePrice(extension.pricing, "input"),
