@@ -267,7 +267,8 @@ the entire index. Provider and model lists use API search and pagination, includ
 Cache evaluations are published as counts and percentages at exact ages, the control ("at once") first: each
 evaluation with its own results (`providers_dev.cache.evaluations` of an entry), and the evaluations of one client
 with one retention setting added up as the `results` of a measured item of the lifetime record below, short and long
-apart. A profile with no measured item was not evaluated, which is not 0 %. The sums are made once, in
+apart. A profile with no measured item has no lifetime measured, which is not 0 % (an evaluation whose control hit and
+that has no timed check counts for no lifetime). The sums are made once, in
 `src/core/cache.ts`, when the data is built.
 
 Every entry has one cache lifetime record (`providers_dev.cache.lifetime`, and `cache_lifetime` of a summary):

@@ -244,13 +244,13 @@ describe("the cache lifetimes on an entry page", () => {
   it("starts with the safe lifetime of short and long, its basis, source and date", () => {
     expect(text(tiles(page(CASES.opus)))).toContain("Cache lifetime, short 5 min documented models.dev · 2026-11-15 Cache lifetime, long 1 h documented models.dev · 2026-11-15 Measured 10 min");
     expect(text(tiles(page(CASES.flash)))).toContain("Cache lifetime, short 0 s measured providers.dev · 2026-11-04 Documented 5 min, contradicted Cache lifetime, long Unknown");
-    expect(text(tiles(page(CASES.unknown)))).toContain("Cache lifetime, short Unknown Not documented or evaluated Cache lifetime, long Unknown");
+    expect(text(tiles(page(CASES.unknown)))).toContain("Cache lifetime, short Unknown Not documented or measured Cache lifetime, long Unknown");
   });
 
   it("lists every documented and measured lifetime in one table, by retention, each with its basis, source and date", () => {
     const rows = bodies(page(CASES.opus));
     expect(rows.map((body) => body.split(":")[0])).toEqual(["profile", "item documented", "profile", "item documented", "item measured"]);
-    expect(rows[0]).toContain("Short retention Safe lifetime 5 min documented models.dev 2026-11-15 Documented 5 min Measured Not evaluated Inside the documented lifetime Not applicable");
+    expect(rows[0]).toContain("Short retention Safe lifetime 5 min documented models.dev 2026-11-15 Documented 5 min Measured Not measured Inside the documented lifetime Not applicable");
     expect(rows[1]).toBe("item documented: 5 min documented models.dev 2026-11-15 Manual explicit As documented: 5m Not applicable");
     expect(rows[3]).toBe("item documented: 1 h documented models.dev 2026-11-15 Manual explicit As documented: 1h Not applicable");
     // One client, its setting, its checks and ages, its results by age, then its two evaluations.
@@ -337,11 +337,11 @@ describe("the cache lifetimes on an entry page", () => {
   it("tells not known, does not cache and 0 s measured apart", () => {
     const unknown = bodies(page(CASES.unknown));
     expect(unknown).toEqual([
-      "profile: Short retention Safe lifetime Unknown Documented Not documented Measured Not evaluated Inside the documented lifetime Not applicable",
-      "profile: Long retention Safe lifetime Unknown Documented Not documented Measured Not evaluated Inside the documented lifetime Not applicable",
+      "profile: Short retention Safe lifetime Unknown Documented Not documented Measured Not measured Inside the documented lifetime Not applicable",
+      "profile: Long retention Safe lifetime Unknown Documented Not documented Measured Not measured Inside the documented lifetime Not applicable",
     ]);
     const none = bodies(page(CASES.none));
-    expect(none[0]).toContain("Short retention Safe lifetime None documented models.dev 2026-11-15 Documented None Measured Not evaluated");
+    expect(none[0]).toContain("Short retention Safe lifetime None documented models.dev 2026-11-15 Documented None Measured Not measured");
     expect(none[1]).toBe("item documented: None documented models.dev 2026-11-15 Documented as not caching Not applicable");
     expect(none[3]).toBe("item documented: None documented models.dev 2026-11-15 Documented as not caching Not applicable");
     expect(bodies(page(CASES.flash))[2]).toContain("0 s measured");

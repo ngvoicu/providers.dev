@@ -141,7 +141,7 @@ function safeSaid(profile: RetentionProfile, p: SafeLifetime): string {
   const name = `${PROFILE_WORD[profile]} retention`;
   if (p.safe_s === null || p.basis === "none") return `${name}: no lifetime is documented or measured.`;
   const documented = p.documented_s === null ? "none" : p.documented_s === 0 ? "0 s, does not cache" : seconds(p.documented_s);
-  const measured = p.measured_s === null ? "not evaluated" : `${seconds(p.measured_s)} (${plural(p.clients, "client")}, ${plural(p.evaluations, "evaluation")})`;
+  const measured = p.measured_s === null ? "not measured" : `${seconds(p.measured_s)} (${plural(p.clients, "client")}, ${plural(p.evaluations, "evaluation")})`;
   const inside = p.checks_inside === null || p.hits_inside === null ? "" : ` ${exact(p.hits_inside)} of ${exact(p.checks_inside)} checks hit inside the documented lifetime.`;
   return `${name}, safe lifetime: ${seconds(p.safe_s)}, ${p.basis}, ${p.source}${p.date ? `, ${p.date}` : ""}. Documented: ${documented}. Measured: ${measured}.${inside}`;
 }
@@ -463,7 +463,7 @@ function profileRow(profile: RetentionProfile, p: SafeLifetime, now: Date): stri
   return `<tbody class="profile"><tr><th scope="row" title="${PROFILE_TITLE[profile]}">${PROFILE_WORD[profile]} retention</th><td class="profile-facts" colspan="${1 + AGE_COLUMNS}"><dl>
 ${fact("Safe lifetime", `<span class="safe">${safe}</span>${verdict}`)}
 ${fact("Documented", p.documented_s === null ? '<span class="muted">Not documented</span>' : lifetimeText(p.documented_s, "documented"))}
-${fact("Measured", p.measured_s === null ? '<span class="muted">Not evaluated</span>' : `${lifetimeText(p.measured_s, "measured")} <span class="muted">· ${plural(p.clients, "client")}</span>`)}
+${fact("Measured", p.measured_s === null ? '<span class="muted">Not measured</span>' : `${lifetimeText(p.measured_s, "measured")} <span class="muted">· ${plural(p.clients, "client")}</span>`)}
 ${fact("Inside the documented lifetime", p.checks_inside === null || p.hits_inside === null ? NOT_APPLICABLE : `<span title="Checks at ages up to the documented lifetime, the control included, and how many were served from the cache.">${exact(p.hits_inside)} of ${exact(p.checks_inside)} checks hit</span>`)}
 </dl></td></tr></tbody>`;
 }
@@ -622,7 +622,7 @@ export function entryHtml(view: EntryView): string {
   const lifetimeTile = (profile: RetentionProfile): string => {
     const p = cache.lifetime[profile];
     const label = `Cache lifetime, ${profile}`;
-    if (p.safe_s === null || p.basis === "none" || p.source === null) return tile(label, '<span class="muted">Unknown</span>', "Not documented or evaluated");
+    if (p.safe_s === null || p.basis === "none" || p.source === null) return tile(label, '<span class="muted">Unknown</span>', "Not documented or measured");
     // The other of the two lifetimes it was chosen from, where there is one, read from `basis` as in the list; whether
     // the documented one is contradicted is `documented_status`.
     const other =
