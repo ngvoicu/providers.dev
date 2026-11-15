@@ -240,7 +240,7 @@ curl -H 'If-None-Match: "<dataset version>"' -i https://providers.dev/api/v1/cat
 ```ts
 const base = "https://providers.dev/api/v1";
 const page = await (await fetch(`${base}/entries?q=opus&cache=yes&limit=200`)).json();
-for (const entry of page.data) console.log(entry.ref, entry.context, entry.max_output, entry.cache_ttl_s, entry.cache_results);
+for (const entry of page.data) console.log(entry.ref, entry.context, entry.max_output, entry.cache_lifetime.short.safe_s, entry.cache_ttl_s, entry.cache_results);
 
 const { data } = await (await fetch(`${base}/entries/openrouter/anthropic/claude-opus-5.5`)).json();
 console.log(data.entry.limit, data.entry.providers_dev.cache.retention, data.entry.providers_dev.cache.evaluations);
@@ -265,6 +265,16 @@ the entire index. Provider and model lists use API search and pagination, includ
 Cache evaluations are published as counts and percentages at exact ages (`cache_results` of a summary,
 `providers_dev.cache` of an entry): one line per retention setting, short before long, the control ("at once") first.
 `null` means not evaluated, never 0 %. The sums are made once, in `src/core/cache.ts`, when the data is built.
+
+Every entry has one cache lifetime record (`providers_dev.cache.lifetime`, and `cache_lifetime` of a summary):
+`lifetimes`, one list of every lifetime known for the entry, documented by models.dev or providers.dev and measured
+per client and retention setting, each item with its source and date; and for the `short` and the `long` profile a
+safe value, `safe_s` in seconds, with its `basis`. The documented lifetime is the safe value unless an evaluation
+contradicts it (at an age up to it, fewer than half of that evaluation's checks hit), and then the measured one is;
+where nothing is documented, the measured one, the oldest age through which every check hit, lowest across clients.
+`documented_s` and `measured_s` are published beside it. `0` is a value (documented as not caching, or no age at
+which every check hit); `null` is not known. `cacheLifetime` in `src/core/cache.ts` works it out once, when the data
+is built; the rule in full is in `design/safe-cache-lifetime.md` and in the guide of the OpenAPI document.
 
 `providers_dev.cache.documented` publishes a support state and details for each cache mode. Its compact support
 states are also in `cache_mode_support` on summaries. Pages render these states directly: an absent mode remains

@@ -379,6 +379,23 @@ describe("HTTP behaviour", () => {
       expect(response.status, path).toBe(200);
     }
   });
+
+  it("describes the cache lifetime record: its components and a guide section", async () => {
+    const document = await json<{ info: { version: string }; "x-guide": { id: string; title: string; paragraphs: string[] }[]; components: { schemas: Record<string, { properties?: Record<string, unknown> }> } }>("/api/v1/openapi.json");
+    expect(document.info.version).toBe("1.3.0");
+    const schemas = document.components.schemas;
+    expect(Object.keys(schemas.CacheLifetime!.properties!)).toEqual(["short", "long", "lifetimes"]);
+    expect(Object.keys(schemas.SafeLifetime!.properties!)).toEqual(["safe_s", "basis", "source", "date", "documented_s", "measured_s", "clients", "evaluations", "checks", "hits", "checks_inside", "hits_inside", "tested_from_s", "first_miss_s"]);
+    expect(Object.keys(schemas.CacheLifetimeItem!.properties!)).toEqual([
+      "retention_profile", "basis", "source", "date", "lifetime_s", "mode", "documented_as", "client", "client_label", "parameter", "value", "evaluations", "evaluation_ids", "checks", "hits", "tested_from_s", "first_miss_s", "results",
+    ]);
+    expect(Object.keys(schemas.EntryCache!.properties!)).toContain("lifetime");
+    expect(Object.keys(schemas.EntrySummary!.properties!)).toContain("cache_lifetime");
+    const section = document["x-guide"].find((item) => item.id === "cache-lifetimes");
+    expect(section?.title).toBe("Cache lifetimes");
+    const text = section!.paragraphs.join(" ");
+    for (const words of ["lifetimes", "safe_s", "documented_s", "measured_s", "fewer than half", "hits_inside of checks_inside", "lowest over the clients", "null", "not a guarantee"]) expect(text).toContain(words);
+  });
 });
 
 describe("the contract", () => {
