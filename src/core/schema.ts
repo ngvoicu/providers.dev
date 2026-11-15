@@ -389,7 +389,7 @@ export interface Meta {
     cache_evaluations: number;
     limit_evaluations: number;
   };
-  /** The ages, in seconds, that every cache summary table has a column for, after the control at age 0. */
+  /** The ages, in seconds, that every table of cache results by age has a column for, after the control at age 0. */
   cache_ages_s: number[];
   upstream: Nulled<UpstreamMeta>;
   /** The results repository the evaluations come from. Null = the dataset has none. */

@@ -1,6 +1,6 @@
 // The flat view of the catalog: one summary per provider-model entry.
 // The website tables, /api/v1/entries and the compact index all use these summaries, built once by buildIndex().
-import { cacheFacts, type CacheLifetimeRecord, type CacheMode, type CacheRetention, type CacheSummaryRow, type CacheSupport, type Support } from "./cache.ts";
+import { cacheFacts, type CacheLifetimeRecord, type CacheMode, type CacheRetention, type CacheSupport, type Support } from "./cache.ts";
 import { isObject, type JsonObject } from "./merge.ts";
 import type { Pricing, RequestControls } from "./policy-contract.ts";
 import { NS, type Access, type Catalog, type ModelExtension, type ProviderExtension } from "./schema.ts";
@@ -36,21 +36,12 @@ export interface Summary {
   cache: CacheSupport;
   cache_modes: CacheMode[];
   cache_mode_support: Record<CacheMode, Support>;
-  /** Cache lifetimes the provider documents, in seconds, shortest first. */
-  cache_ttl_s: number[];
-  /** The documented lifetimes of each mode, in seconds. Null = no lifetime is documented for the mode. */
-  cache_ttl_by_mode_s: Record<CacheMode, number[] | null>;
   /** Whether a request can ask for a cache lifetime on this entry: `providers_dev.cache.retention.support` of the full entry. */
   cache_retention: CacheRetention["support"];
   /** Every cache lifetime of this entry and the safe value of each profile: the same object as `providers_dev.cache.lifetime` of the full entry. */
   cache_lifetime: CacheLifetimeRecord;
   /** How many cache evaluations this entry has. */
   evaluation_count: number;
-  /**
-   * The cache evaluations of this entry as one table: a line per retention setting (short first, then long), each with
-   * its results by exact age. The same object as `providers_dev.cache.results` of the full entry. Null = not evaluated.
-   */
-  cache_results: CacheSummaryRow[] | null;
   /** The base price of text input, in US dollars per million tokens, before any conditional rate. Null = unknown, or priced in another unit. */
   price_in: number | null;
   /** The same for output. */
@@ -139,7 +130,6 @@ export function summarize(providerId: string, model: JsonObject, shard: number):
     cache_retention: extension.cache.retention.support,
     cache_lifetime: extension.cache.lifetime,
     evaluation_count: runs.length,
-    cache_results: extension.cache.results,
     price_in: basePrice(extension.pricing, "input"),
     price_out: basePrice(extension.pricing, "output"),
     price_from: extension.pricing.billing === "reference" ? extension.pricing.reference_ref : null,

@@ -7,7 +7,6 @@ export const RetentionProfileSchema = z.enum(["short", "long"]).describe("short 
 
 export const CacheModeDocumentationSchema = z.strictObject({
   support: SupportSchema.describe("An absent mode is unknown. Only an explicit negative means unsupported."),
-  ttl: z.array(z.string()).nullable().describe("Documented lifetimes, as written in the source. Null = unknown; these are not necessarily request parameter values."),
   min_tokens: z.number().nullable().describe("Minimum prompt size in tokens. Null = unknown."),
   max_breakpoints: z.number().nullable().describe("Maximum cache markers. Null = unknown or not applicable to this mode."),
   targets: z.array(z.string()).nullable().describe("Parts of the request that can be cached. Null = unknown or not applicable."),

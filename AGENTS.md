@@ -62,9 +62,8 @@ The baseline is imported from models.dev; our additions, corrections and measure
   `description` of a model is in the API and not on the page.
 - Wording: the two sources are named `models.dev` and `providers.dev` (never "ours"). A cache run is an
   "evaluation". Pages use the full width of the home page (`.page`).
-- Cache summaries use the API's exact ages and counts, with separate short/long settings on every page. The hit
-  percentage is exact in the API and in the hover text; a cell of the results by age shows it rounded to a whole
-  number. Do not generate narrative lifetime verdicts. Individual evaluations are collapsed by default.
+- Results by age use the API's exact ages and counts, short and long apart, per client. A cell shows the hit
+  percentage rounded to a whole number; the exact percentage is in the API and in the hover text. Do not generate narrative lifetime verdicts. Individual evaluations are collapsed by default.
 - Cache lifetimes are worked out once, in `cacheLifetime` (`src/core/cache.ts`), into `providers_dev.cache.lifetime`
   (`cache_lifetime` of a summary). A lifetime providers.dev publishes of its own is an item of its `lifetimes` list and
   nowhere else. A page prints the profiles (`short`, `long`) and the items as they are: it converts no lifetime, takes

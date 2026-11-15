@@ -21,6 +21,7 @@ import {
   ProviderSchema,
   ProviderSummarySchema,
 } from "../src/core/contract.ts";
+import { lifetimeSeconds } from "../src/core/cache.ts";
 import { summarize, type Summary } from "../src/core/entries.ts";
 import { entryHref } from "../src/core/format.ts";
 import { ENDPOINTS, openapi } from "../src/core/openapi.ts";
@@ -110,7 +111,7 @@ describe("GET /api/v1/entries", () => {
   it("adds cache_lifetime to a summary and leaves every other key as it was", () => {
     expect(Object.keys(deps.index.entries[0]!)).toEqual([
       "ref", "provider", "model", "name", "type", "family", "canonical_id", "status", "release_date", "access", "origin", "context", "input", "max_output",
-      "cache", "cache_modes", "cache_mode_support", "cache_ttl_s", "cache_ttl_by_mode_s", "cache_retention", "cache_lifetime", "evaluation_count", "cache_results",
+      "cache", "cache_modes", "cache_mode_support", "cache_retention", "cache_lifetime", "evaluation_count",
       "price_in", "price_out", "price_from", "pricing", "request_controls", "measured_input_accepted", "measured_input_refused", "measured_limit_count", "overridden_fields", "verified", "shard",
     ]);
     // No other key of a summary depends on the lifetime record.
@@ -207,7 +208,7 @@ describe("GET /api/v1/entries", () => {
     expect((await page("unknown")).total).toBe(5);
     const explicit = await json<Page>("/api/v1/entries?provider=provider-00&cache_mode=explicit");
     expect(explicit.total).toBe(5);
-    expect(explicit.data[0]?.cache_ttl_s).toEqual([300, 3600]);
+    expect(explicit.data[0]?.cache_lifetime.lifetimes.map((item) => [item.mode, item.lifetime_s])).toEqual([["explicit", 300], ["explicit", 3600]]);
   });
 
   it("searches across ids and names, every word required", async () => {
@@ -382,15 +383,20 @@ describe("HTTP behaviour", () => {
 
   it("describes the cache lifetime record: its components and a guide section", async () => {
     const document = await json<{ info: { version: string }; "x-guide": { id: string; title: string; paragraphs: string[] }[]; components: { schemas: Record<string, { properties?: Record<string, unknown> }> } }>("/api/v1/openapi.json");
-    expect(document.info.version).toBe("1.3.0");
+    expect(document.info.version).toBe("2.0.0");
     const schemas = document.components.schemas;
     expect(Object.keys(schemas.CacheLifetime!.properties!)).toEqual(["short", "long", "lifetimes"]);
     expect(Object.keys(schemas.SafeLifetime!.properties!)).toEqual(["safe_s", "basis", "source", "date", "documented_s", "measured_s", "clients", "evaluations", "checks", "hits", "checks_inside", "hits_inside", "tested_from_s", "first_miss_s"]);
     expect(Object.keys(schemas.CacheLifetimeItem!.properties!)).toEqual([
       "retention_profile", "basis", "source", "date", "lifetime_s", "mode", "documented_as", "client", "client_label", "parameter", "value", "evaluations", "evaluation_ids", "checks", "hits", "tested_from_s", "first_miss_s", "results",
     ]);
-    expect(Object.keys(schemas.EntryCache!.properties!)).toContain("lifetime");
+    expect(Object.keys(schemas.EntryCache!.properties!)).toEqual(["documented", "retention", "lifetime", "evaluations"]);
     expect(Object.keys(schemas.EntrySummary!.properties!)).toContain("cache_lifetime");
+    // The fields folded into the record are gone from the contract (task 6).
+    expect(schemas).not.toHaveProperty("CacheSummaryRow");
+    expect(Object.keys(schemas.CacheModeDocumentation!.properties!)).toEqual(["support", "min_tokens", "max_breakpoints", "targets"]);
+    for (const key of ["cache_ttl_s", "cache_ttl_by_mode_s", "cache_results"]) expect(Object.keys(schemas.EntrySummary!.properties!)).not.toContain(key);
+    expect(JSON.stringify(document)).not.toMatch(/cache_results|cache_ttl_s|cache_ttl_by_mode_s|cache\.results/);
     const section = document["x-guide"].find((item) => item.id === "cache-lifetimes");
     expect(section?.title).toBe("Cache lifetimes");
     const text = section!.paragraphs.join(" ");
@@ -450,7 +456,6 @@ describe("the contract", () => {
     same(extensions.flatMap((extension) => extension.request_controls.items), "request controls");
     same(extensions.flatMap((extension) => extension.cache.evaluations), "cache evaluations");
     same(extensions.flatMap((extension) => extension.cache.evaluations.flatMap((evaluation) => evaluation.results)), "cache results");
-    same(extensions.flatMap((extension) => extension.cache.results ?? []), "cache summary lines");
     same(extensions.flatMap((extension) => extension.limits.measured), "limit evaluations");
     same(extensions.flatMap((extension) => extension.provenance), "corrections");
     same(extensions.flatMap((extension) => [...extension.evidence, ...extension.provenance.flatMap((change) => change.evidence)]), "evidence");
@@ -466,6 +471,53 @@ describe("the contract", () => {
       }),
     );
     expect(broken).toEqual([]);
+
+    // Nothing of the deleted fields is lost: every documented lifetime text and every counted result is in exactly one
+    // place of the record. Each text of capabilities.cache.<mode>.ttl (as published) that is a duration is the
+    // documented_as of one documented item of that mode, as many times as it is listed; each counted evaluation is
+    // named by exactly one measured item, and each result of it is added into that item's results and no other.
+    const lost: string[] = [];
+    const key = (result: { kind: string; age_s: number }): string => `${result.kind}:${result.age_s}`;
+    for (const [id, provider] of Object.entries(exported)) {
+      for (const [modelId, entry] of Object.entries(provider.models)) {
+        const ref = `${id}/${modelId}`;
+        const cache = (entry.providers_dev as unknown as ModelExtension).cache;
+        const capabilities = (entry as { capabilities?: { cache?: unknown } }).capabilities;
+        const imported = capabilities && typeof capabilities.cache === "object" && capabilities.cache !== null ? (capabilities.cache as Record<string, unknown>) : {};
+        for (const mode of ["implicit", "explicit"] as const) {
+          const detail = imported[mode] as { ttl?: unknown } | undefined;
+          const texts = (typeof detail === "object" && detail !== null && Array.isArray(detail.ttl) ? detail.ttl : []).filter((text): text is string => typeof text === "string" && lifetimeSeconds(text) !== undefined);
+          const items = cache.lifetime.lifetimes.filter((item) => item.basis === "documented" && item.mode === mode).map((item) => item.documented_as);
+          if (JSON.stringify([...texts].sort()) !== JSON.stringify([...items].sort())) lost.push(`${ref} ${mode}: ttl ${JSON.stringify(texts)}, items ${JSON.stringify(items)}`);
+        }
+        const measured = cache.lifetime.lifetimes.filter((item) => item.basis === "measured");
+        const sums = new Map<string, { hits: number; checks: number }>();
+        const add = (result: { kind: string; age_s: number; hits: number; checks: number }, sign: number): void => {
+          const sum = sums.get(key(result)) ?? { hits: 0, checks: 0 };
+          sums.set(key(result), { hits: sum.hits + sign * result.hits, checks: sum.checks + sign * result.checks });
+        };
+        for (const evaluation of cache.evaluations) {
+          const counted = evaluation.results.some((result) => result.kind === "timed") || evaluation.results.some((result) => result.kind === "control" && result.hits < result.checks);
+          const holders = measured.filter((item) => item.evaluation_ids.includes(evaluation.id));
+          if (holders.length !== (counted ? 1 : 0)) lost.push(`${ref} ${evaluation.id}: in ${holders.length} items`);
+          if (counted) for (const result of evaluation.results) add(result, 1);
+        }
+        for (const item of measured) {
+          const own = new Map<string, { hits: number; checks: number }>();
+          for (const evaluation of cache.evaluations.filter((run) => item.evaluation_ids.includes(run.id))) {
+            for (const result of evaluation.results) {
+              const sum = own.get(key(result)) ?? { hits: 0, checks: 0 };
+              own.set(key(result), { hits: sum.hits + result.hits, checks: sum.checks + result.checks });
+            }
+          }
+          const published = new Map((item.results ?? []).map((result) => [key(result), { hits: result.hits, checks: result.checks }]));
+          if (!isDeepStrictEqual(own, published)) lost.push(`${ref} item ${item.client} ${item.value}: results are not those of its evaluations`);
+          for (const result of item.results ?? []) add(result, -1);
+        }
+        if ([...sums.values()].some((sum) => sum.hits !== 0 || sum.checks !== 0)) lost.push(`${ref}: the items' results do not add up to the counted evaluations' results`);
+      }
+    }
+    expect(lost).toEqual([]);
 
     // The models.dev part of an entry nobody corrected is the import, unchanged.
     const upstream = loadUpstream(join(dir, ".."))!.catalog;

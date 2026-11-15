@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { pricingOf } from "../src/core/policies.ts";
-import { addResults, cacheResult, documentedCache, profileOf, retentionOf, summarizeCache, type CacheEvaluation } from "../src/core/cache.ts";
+import { addResults, cacheResult, documentedCache, profileOf, retentionOf } from "../src/core/cache.ts";
 import { importDate, shortAge } from "../src/core/format.ts";
 import type { JsonObject } from "../src/core/merge.ts";
 import type { MeasuredLimit } from "../src/core/schema.ts";
@@ -52,24 +52,6 @@ describe("measured input", () => {
 });
 
 describe("cache evaluations as the API publishes them", () => {
-  const evaluation = (id: string, results: [number, number, number][], sent: Partial<CacheEvaluation> = {}): CacheEvaluation => ({
-    id,
-    route: "r",
-    route_label: "R",
-    client: "direct",
-    client_label: "Direct",
-    date: "2026-11-10",
-    request_settings: {},
-    retention_profile: "short",
-    parameter: null,
-    value: null,
-    results: results.map(([age, hits, checks]) => cacheResult(age === 0 ? "control" : "timed", age, hits, checks)),
-    late_excluded: 0,
-    note: null,
-    source: `https://example.com/${id}`,
-    ...sent,
-  });
-
   it("gives every result its counts and its percentage, to two decimals", () => {
     expect(cacheResult("timed", 300, 2, 3)).toEqual({ kind: "timed", age_s: 300, hits: 2, checks: 3, hit_rate_pct: 66.67 });
     expect(cacheResult("control", 0, 3, 3).hit_rate_pct).toBe(100);
@@ -87,27 +69,6 @@ describe("cache evaluations as the API publishes them", () => {
       // 7.5 minutes stays 7.5 minutes; only the two checks at 10 minutes are added together.
       ["timed", 450, 3, 3, 100],
       ["timed", 600, 4, 6, 66.67],
-    ]);
-  });
-
-  it("makes one line per retention setting, short first, and null where a setting was not evaluated", () => {
-    expect(summarizeCache([])).toBeNull();
-    const onlyShort = summarizeCache([evaluation("a", [[0, 1, 1], [300, 3, 3]]), evaluation("b", [[0, 1, 1], [300, 0, 3]])])!;
-    expect(onlyShort.map((row) => [row.retention_profile, row.parameter, row.value, row.evaluations])).toEqual([
-      ["short", null, null, 2],
-      ["long", null, null, 0],
-    ]);
-    expect(onlyShort[0]!.results).toEqual([cacheResult("control", 0, 2, 2), cacheResult("timed", 300, 3, 6)]);
-    expect(onlyShort[0]!.evaluation_ids).toEqual(["a", "b"]);
-    // Not evaluated is null, not a row of zeros.
-    expect(onlyShort[1]).toMatchObject({ results: null, last_date: null, evaluation_ids: [] });
-
-    const long = { retention_profile: "long" as const, parameter: "cache_control.ttl" };
-    const both = summarizeCache([evaluation("d", [[3600, 0, 3]], { ...long, value: "24h" }), evaluation("c", [[3600, 3, 3]], { ...long, value: "1h", date: "2026-11-12" })])!;
-    expect(both.map((row) => [row.retention_profile, row.value, row.results === null ? null : row.results.length, row.last_date])).toEqual([
-      ["short", null, null, null],
-      ["long", "1h", 1, "2026-11-12"],
-      ["long", "24h", 1, "2026-11-10"],
     ]);
   });
 

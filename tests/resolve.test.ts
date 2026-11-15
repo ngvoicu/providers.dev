@@ -405,13 +405,13 @@ describe("resolve: measurements", () => {
         source: "https://github.com/example/probe/blob/main/results/run-1.json",
       }),
     ]);
-    // The summary table is made here, once: a short line with the result, and a long line that was not evaluated.
-    expect(ext(model).cache.results).toEqual([
-      expect.objectContaining({ retention_profile: "short", evaluations: 1, evaluation_ids: ["run-1"], results: [{ kind: "timed", age_s: 300, hits: 3, checks: 3, hit_rate_pct: 100 }] }),
-      expect.objectContaining({ retention_profile: "long", evaluations: 0, results: null }),
+    // The results by age are made here, once: a short measured item with the result, and nothing measured for long.
+    expect(ext(model).cache.lifetime.lifetimes).toEqual([
+      expect.objectContaining({ retention_profile: "short", basis: "measured", evaluations: 1, evaluation_ids: ["run-1"], results: [{ kind: "timed", age_s: 300, hits: 3, checks: 3, hit_rate_pct: 100 }] }),
     ]);
+    expect(ext(model).cache.lifetime.long.evaluations).toBe(0);
     // Every entry has the same cache record, also one nobody evaluated.
-    expect(ext(catalog.lab!.models["model-b"] ?? Object.values(catalog.lab!.models).find((item) => item.id !== "model-a")!).cache).toMatchObject({ results: null, evaluations: [] });
+    expect(ext(catalog.lab!.models["model-b"] ?? Object.values(catalog.lab!.models).find((item) => item.id !== "model-a")!).cache).toMatchObject({ lifetime: { lifetimes: [] }, evaluations: [] });
     expect(ext(model).verified).toBe("2026-11-05");
     expect(ext(model).provenance).toEqual([]);
   });
@@ -466,7 +466,7 @@ describe("resolve: measurements", () => {
     // The run that sent a lifetime is the long line, with the request field it stands for; the control comes first.
     expect(runs[1]).toMatchObject({ retention_profile: "long", parameter: "cache_control.ttl", value: "1h", request_settings: { ttl: "1h" } });
     expect(runs[1]!.results.map((item) => [item.kind, item.age_s])).toEqual([["control", 0], ["timed", 300]]);
-    expect(cache.results!.map((row) => [row.retention_profile, row.value, row.evaluations])).toEqual([["short", null, 1], ["long", "1h", 1]]);
+    expect(cache.lifetime.lifetimes.filter((item) => item.basis === "measured").map((item) => [item.retention_profile, item.value, item.evaluations])).toEqual([["short", null, 1], ["long", "1h", 1]]);
     // Sending the value and getting a cache hit cannot prove the parameter was recognized.
     expect(cache.retention).toMatchObject({ support: "unknown", parameter: null, accepted_values: null });
     expect(JSON.stringify(runs)).not.toMatch(/tool-x|ToolX/);
@@ -509,13 +509,9 @@ describe("resolve: measurements", () => {
       // The run on the login route has no result: it stays in the evaluations of the added entry and counts for no lifetime.
       expect(ext(catalog["lab-login"]!.models.a!).cache.evaluations.map((item) => item.id)).toEqual(["run-2"]);
       expect(ext(catalog["lab-login"]!.models.a!).cache.lifetime).toEqual(emptyCacheLifetime());
-      // The lifetime is a new key and changes nothing else: the other keys of the cache record, verified and origin are as they were.
+      // The cache record has four keys; verified and origin are as they were.
       const model = catalog.lab!.models["model-a"]!;
-      expect(Object.keys(ext(model).cache)).toEqual(["documented", "retention", "lifetime", "results", "evaluations"]);
-      expect(ext(model).cache.results).toEqual([
-        expect.objectContaining({ retention_profile: "short", evaluations: 1, evaluation_ids: ["run-1"] }),
-        expect.objectContaining({ retention_profile: "long", evaluations: 0, results: null }),
-      ]);
+      expect(Object.keys(ext(model).cache)).toEqual(["documented", "retention", "lifetime", "evaluations"]);
       expect(ext(model).verified).toBe("2026-11-05");
       expect(summarize("lab", model, 0).origin).toBe("modified");
       expect(issues.filter((issue) => ["lifetime-differs", "unparsed-lifetime", "retention-lifetime-differs"].includes(issue.code))).toEqual([]);

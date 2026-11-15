@@ -3,13 +3,12 @@
 import {
   cacheLifetime,
   cacheResult,
-  documentedCache,
+  documentedCaching,
   evaluationLifetime,
   lifetimeAsked,
   lifetimeSeconds,
   profileOf,
   retentionOf,
-  summarizeCache,
   type CacheEvaluation,
   type CacheMode,
   type CacheRetention,
@@ -355,8 +354,9 @@ export function resolve(input: ResolveInput): ResolveResult {
       const select = rule.select;
       if (!select || !rule.request_controls) continue;
       const documents = (model: PublishedModel): boolean => {
-        const mode = documentedCache(model).modes[select.cache_mode];
-        return mode.support === "supported" && (select.cache_ttl ?? []).every((ttl) => mode.ttl?.includes(ttl));
+        const caching = documentedCaching(model);
+        const texts = caching.ttl[select.cache_mode];
+        return caching.documented.modes[select.cache_mode].support === "supported" && (select.cache_ttl ?? []).every((ttl) => texts?.includes(ttl));
       };
       const matched = Object.entries(provider.models).filter(([id, model]) => (!select.models || select.models.includes(id)) && documents(model)).map(([, model]) => model);
       // A model the rule names and the selection does not reach is reported: gone from the catalog, or no longer documented so.
@@ -570,11 +570,12 @@ export function resolve(input: ResolveInput): ResolveResult {
     const provider = catalog[id] as PublishedProvider;
     for (const model of Object.values(provider.models)) {
       const extension = modelExt(model);
-      // Every entry gets the same cache record: what a request can ask for, the summary table, and the evaluations
+      // Every entry gets the same cache record: what a request can ask for, the lifetime record, and the evaluations
       // under it. The sums and percentages are made here, once; pages and API answers only pass them on.
       const own = (evaluations.get(model) ?? []).sort((a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id));
       const declaration = retentionDeclarations.get(model);
-      const documented = documentedCache(model);
+      const caching = documentedCaching(model);
+      const documented = caching.documented;
       const cacheSources = [
         ...(extension.origin === "added" ? extension.evidence ?? [] : []),
         ...(extension.provenance ?? []).filter((change) => change.path === "capabilities" || change.path === "capabilities.cache" || change.path.startsWith("capabilities.cache.")).flatMap((change) => change.evidence),
@@ -635,7 +636,7 @@ export function resolve(input: ResolveInput): ResolveResult {
       };
       const ref = `${id}/${model.id}`;
       for (const mode of ["implicit", "explicit"] as const) {
-        for (const text of documented.modes[mode].ttl ?? []) {
+        for (const text of caching.ttl[mode] ?? []) {
           if (lifetimeSeconds(text) !== undefined) continue;
           issues.push({
             level: "notice",
@@ -648,8 +649,7 @@ export function resolve(input: ResolveInput): ResolveResult {
       const cache: EntryCache = {
         documented,
         retention,
-        lifetime: cacheLifetime(documented, own, lifetimeSource),
-        results: summarizeCache(own),
+        lifetime: cacheLifetime(caching, own, lifetimeSource),
         evaluations: own,
       };
       // The lifetime an option of the retention control asks for is kept equal to the documented lifetime of its profile.

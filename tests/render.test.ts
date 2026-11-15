@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { cacheLifetime, cacheResult, documentedCache, type CacheEvaluation, type EntryCache, type RetentionProfile } from "../src/core/cache.ts";
+import { cacheLifetime, cacheResult, documentedCaching, type CacheEvaluation, type EntryCache, type RetentionProfile } from "../src/core/cache.ts";
 import { buildIndex, type Summary } from "../src/core/entries.ts";
 import type { Json, JsonObject } from "../src/core/merge.ts";
 import { entryHtml, rowHtml } from "../src/core/render.ts";
@@ -23,8 +23,8 @@ function run(id: string, client: string, profile: RetentionProfile, results: [nu
 
 /** The cache record of an entry as the build makes it: documented caching as models.dev writes it, and its evaluations. */
 function cacheOf(cache: Json | undefined, evaluations: CacheEvaluation[] = []): EntryCache {
-  const documented = documentedCache(cache === undefined ? {} : { capabilities: { cache } });
-  return { ...NO_CACHE, documented, lifetime: cacheLifetime(documented, evaluations, () => ({ source: "models.dev", date: "2026-11-15" })), results: null, evaluations };
+  const caching = documentedCaching(cache === undefined ? {} : { capabilities: { cache } });
+  return { ...NO_CACHE, documented: caching.documented, lifetime: cacheLifetime(caching, evaluations, () => ({ source: "models.dev", date: "2026-11-15" })), evaluations };
 }
 
 // The cases of the brief, as the dataset of 2026-11-15 has them (design/safe-cache-lifetime.md, section 10).
@@ -314,65 +314,26 @@ describe("the cache lifetimes on an entry page", () => {
   });
 });
 
-describe("the old cache fields", () => {
+describe("the deleted cache fields", () => {
   // `cache_ttl_s`, `cache_ttl_by_mode_s`, `cache_results`, `providers_dev.cache.results` and `documented.modes.<mode>.ttl`
-  // are to be deleted from the API. No renderer reads them: a page is the same with them removed, and with them set to
-  // values that disagree with the record.
+  // were folded into the lifetime record and deleted. The documented texts stay in `capabilities.cache`, as imported.
   const { catalog } = resolve({
     upstream: { lab: { id: "lab", name: "Lab", models: { m: UpstreamModel.parse({ id: "m", name: "M", capabilities: { cache: { explicit: { ttl: ["5m", "1h"] } } } }) } } },
     additions: [], overrides: [], routes: {}, access: { default: "api", default_basis: "fixture", patterns: [], providers: {} }, upstreamDate: "2026-11-15",
   });
   const index = buildIndex(catalog, "fixture", "2026-11-15T00:00:00Z", "2026-11-15T00:00:00Z");
-  const now = new Date("2026-11-15T00:00:00Z");
-  const model = structuredClone(catalog.lab!.models.m!) as JsonObject;
-  // The published entry, and an evaluation on it so that every old field has something in it.
+  const model = catalog.lab!.models.m!;
   const cache = (model[NS] as unknown as ModelExtension).cache;
-  cache.evaluations = [K1_BETA, K1_NOBETA];
-  cache.lifetime = cacheLifetime(cache.documented, cache.evaluations, () => ({ source: "models.dev", date: "2026-11-15" }));
-  const summary: Summary = { ...index.entries[0]!, cache_lifetime: cache.lifetime, evaluation_count: 2 };
 
-  type Fields = { summary: JsonObject; cache: JsonObject };
-  /** The summary and the entry with the five fields changed by `change`. */
-  const variant = (change: (fields: Fields) => void): { summary: Summary; model: JsonObject } => {
-    const copy = structuredClone(model);
-    const fields = { summary: structuredClone(summary) as unknown as JsonObject, cache: (copy[NS] as JsonObject).cache as JsonObject };
-    change(fields);
-    return { summary: fields.summary as unknown as Summary, model: copy };
-  };
-  const removed = variant(({ summary, cache }) => {
-    for (const key of ["cache_ttl_s", "cache_ttl_by_mode_s", "cache_results"]) delete summary[key];
-    delete cache.results;
-    for (const mode of Object.values((cache.documented as JsonObject).modes as JsonObject)) delete (mode as JsonObject).ttl;
-  });
-  const wrong = variant(({ summary, cache }) => {
-    summary.cache_ttl_s = [86400];
-    summary.cache_ttl_by_mode_s = { implicit: [86400], explicit: [86400] };
-    summary.cache_results = [{ retention_profile: "short", parameter: null, value: null, evaluations: 9, evaluation_ids: ["x"], last_date: "2020-01-01", results: [{ kind: "timed", age_s: 450, hits: 0, checks: 9, hit_rate_pct: 0 }] }];
-    cache.results = summary.cache_results;
-    for (const mode of Object.values((cache.documented as JsonObject).modes as JsonObject)) (mode as JsonObject).ttl = ["24h"];
-  });
-  // The raw record at the foot of the entry page is the API's answer printed as it is; everything else is rendered.
-  const rendered = (view: { summary: Summary; model: JsonObject }): string =>
-    entryHtml({ summary: view.summary, provider: index.providers[0]!, model: view.model, now, imported: "2026-11-15" }).replace(/<pre[\s\S]*?<\/pre>/g, "");
-
-  it("are in the published entry and summary today", () => {
-    expect(summary).toHaveProperty("cache_ttl_s", [300, 3600]);
-    expect(cache.documented.modes.explicit).toHaveProperty("ttl", ["5m", "1h"]);
+  it("are in neither the summary nor the entry", () => {
+    for (const key of ["cache_ttl_s", "cache_ttl_by_mode_s", "cache_results"]) expect(index.entries[0]).not.toHaveProperty(key);
+    expect(Object.keys(cache)).toEqual(["documented", "retention", "lifetime", "evaluations"]);
+    expect(Object.keys(cache.documented.modes.explicit)).toEqual(["support", "min_tokens", "max_breakpoints", "targets"]);
   });
 
-  it("are not read by the table row", () => {
-    const expected = rowHtml(summary, { now });
-    expect(rowHtml(removed.summary, { now })).toBe(expected);
-    expect(rowHtml(wrong.summary, { now })).toBe(expected);
-    expect(expected).toContain("1 h");
-  });
-
-  it("are not read by the entry page", () => {
-    const expected = rendered({ summary, model });
-    expect(rendered(removed)).toBe(expected);
-    expect(rendered(wrong)).toBe(expected);
-    expect(expected).not.toContain("2020-01-01");
-    expect(expected).not.toContain("0 of 9");
-    expect(expected).not.toContain("<code>24h</code>");
+  it("are read from the lifetime record, and from capabilities.cache as imported", () => {
+    expect(cache.lifetime.lifetimes.map((item) => [item.retention_profile, item.mode, item.documented_as, item.lifetime_s])).toEqual([["short", "explicit", "5m", 300], ["long", "explicit", "1h", 3600]]);
+    expect(model.capabilities).toEqual({ cache: { explicit: { ttl: ["5m", "1h"] } } });
+    expect(rowHtml(index.entries[0]!, { now: new Date("2026-11-15T00:00:00Z") })).toContain("1 h");
   });
 });

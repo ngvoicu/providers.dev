@@ -7,7 +7,7 @@
 // known is null and a list with nothing in it is empty; no key is left out. So none of these schemas has an optional
 // field. Only the models.dev part of an entry or a provider keeps models.dev's shape, where a field can be absent.
 import { z } from "zod";
-import type { CacheEvaluation, CacheLifetimeItem, CacheLifetimeRecord, CacheResult, CacheSummaryRow, EntryCache, SafeLifetime } from "./cache.ts";
+import type { CacheEvaluation, CacheLifetimeItem, CacheLifetimeRecord, CacheResult, EntryCache, SafeLifetime } from "./cache.ts";
 import { CacheDocumentationSchema, CacheModeDocumentationSchema, CacheRetentionSchema, RetentionProfileSchema, SupportSchema } from "./cache-contract.ts";
 import { ApiEndpointSchema, CapabilitiesSchema, CachePriceSchema, CostSchema, DocumentedCacheSchema, ModelMetadataShape, PriceConditionSchema, TextPriceSchema } from "./metadata-contract.ts";
 import { BillingUnitSchema, ConditionSchema, PolicyEvidenceSchema, PricingRuleSchema, PricingSchema, RequestBindingSchema, RequestControlSchema, RequestControlsSchema, RequestOptionSchema, RequestSettingSchema } from "./policy-contract.ts";
@@ -27,7 +27,7 @@ export const EvidenceSchema = z
   })
   .describe("A source for something providers.dev publishes.") satisfies z.ZodType<PublishedEvidence>;
 
-// ---- cache: results, summary lines, evaluations, retention
+// ---- cache: results, evaluations, the lifetime record, retention
 export { CacheRetentionSchema } from "./cache-contract.ts";
 
 export const CacheResultSchema = z
@@ -45,16 +45,6 @@ const retentionSetting = {
   parameter: z.string().nullable().describe("The request field that asked for the lifetime, for example cache_control.ttl or prompt_cache_retention. Null = no lifetime was asked for."),
   value: z.string().nullable().describe("The value sent in it, for example 1h. Null together with parameter."),
 };
-
-export const CacheSummaryRowSchema = z
-  .strictObject({
-    ...retentionSetting,
-    evaluations: z.int().min(0).describe("How many evaluations the line adds up. 0 = this retention setting was not evaluated."),
-    evaluation_ids: z.array(z.string()).describe("Their ids, as in the entry's evaluations and in /api/v1/evaluations/cache."),
-    last_date: date.nullable().describe("The date of the newest of them. Null when not evaluated."),
-    results: z.array(CacheResultSchema).nullable().describe("One result per exact age that was checked, the control first. Null = not evaluated, which is not 0 %."),
-  })
-  .describe("One line of an entry's cache summary: every evaluation with the same retention setting, added up age by age.") satisfies z.ZodType<CacheSummaryRow>;
 
 export const CacheEvaluationSchema = z
   .strictObject({
@@ -130,8 +120,7 @@ export const EntryCacheSchema = z
     documented: CacheDocumentationSchema,
     retention: CacheRetentionSchema,
     lifetime: CacheLifetimeRecordSchema,
-    results: z.array(CacheSummaryRowSchema).nullable().describe("The summary table: a line per retention setting, short before long. Null = no evaluation on this entry."),
-    evaluations: z.array(CacheEvaluationSchema).describe("The evaluations the summary adds up, newest first."),
+    evaluations: z.array(CacheEvaluationSchema).describe("Every published evaluation of the entry, each with its own results, newest first, then by id in plain character order. The measured items of lifetime name them by id."),
   })
   .describe("Documented caching, confirmed retention controls and evaluations, shared by the website and API.") satisfies z.ZodType<EntryCache>;
 
@@ -220,17 +209,9 @@ export const EntrySummarySchema = z
     cache: z.enum(["yes", "no", "unknown"]).describe("Prompt caching as documented. unknown = the source says nothing, which is not the same as no."),
     cache_modes: z.array(z.enum(["implicit", "explicit"])).describe("implicit = the provider caches on its own. explicit = the request marks what to cache."),
     cache_mode_support: z.strictObject({ implicit: SupportSchema, explicit: SupportSchema }).describe("Support for each mode, from providers_dev.cache.documented.modes. An omitted mode stays unknown."),
-    cache_ttl_s: z.array(z.number()).describe("Documented cache lifetimes in seconds, of every mode together, shortest first."),
-    cache_ttl_by_mode_s: z
-      .strictObject({ implicit: z.array(z.number()).nullable(), explicit: z.array(z.number()).nullable() })
-      .describe("The documented lifetimes of each mode, in seconds, shortest first. Null = no lifetime is documented for that mode."),
     cache_retention: CacheRetentionSchema.shape.support.describe("Whether a request can ask for a cache lifetime: providers_dev.cache.retention.support of the full entry."),
     cache_lifetime: CacheLifetimeRecordSchema.describe("Every cache lifetime of the entry, documented and measured, and the safe value of each retention profile: the same object as providers_dev.cache.lifetime of the full entry."),
     evaluation_count: z.int().min(0).describe("How many cache evaluations this entry has."),
-    cache_results: z
-      .array(CacheSummaryRowSchema)
-      .nullable()
-      .describe("The cache evaluations as one table: a line per retention setting, short before long, each with its results by exact age. Null = not evaluated. Every page of the website draws this object as it is."),
     price_in: z.number().nullable().describe("The base price of text input in US dollars per million tokens, before any conditional rate. On a subscription entry it is the API reference price named by price_from. Null = unknown, or priced in another unit."),
     price_out: z.number().nullable().describe("The same for output."),
     price_from: z.string().nullable().describe("On a subscription entry: the ref of the API entry whose list price this is. The entry itself is not paid per token. Null = the price is the entry's own."),
@@ -326,7 +307,7 @@ export const MetaSchema = z
       cache_evaluations: z.int(),
       limit_evaluations: z.int(),
     }),
-    cache_ages_s: z.array(z.int()).describe("The ages, in seconds, that every cache summary table has a column for, after the control at age 0. Results at other ages are in the data at their exact age."),
+    cache_ages_s: z.array(z.int()).describe("The ages, in seconds, that every table of cache results by age has a column for, after the control at age 0. Results at other ages are in the data at their exact age."),
     upstream: z
       .strictObject({
         source: z.string(),
@@ -423,7 +404,6 @@ export const COMPONENTS = {
   CacheLifetime: CacheLifetimeRecordSchema,
   SafeLifetime: SafeLifetimeSchema,
   CacheLifetimeItem: CacheLifetimeItemSchema,
-  CacheSummaryRow: CacheSummaryRowSchema,
   CacheResult: CacheResultSchema,
   CacheEvaluation: CacheEvaluationSchema,
   Capabilities: CapabilitiesSchema,

@@ -5,7 +5,7 @@ import {
   cacheLifetime,
   cacheResult,
   contradicts,
-  documentedCache,
+  documentedCaching,
   documentedItems,
   emptyCacheLifetime,
   evaluationLifetime,
@@ -86,7 +86,7 @@ const N1p = evaluation("devin-cache-investigation-2026-11-09/N1p", "agent+clipro
 
 const IMPORT = { source: "models.dev" as const, date: "2026-11-15" };
 const fromImport = (): { source: LifetimeSource; date: string | null } => IMPORT;
-const docs = (cache: unknown) => documentedCache({ capabilities: { cache } } as JsonObject);
+const docs = (cache: unknown) => documentedCaching({ capabilities: { cache } } as JsonObject);
 
 /** A documented item, every key written. */
 const documentedOf = (profile: RetentionProfile, lifetime: number, mode: CacheMode | null, text: string | null, from: { source: LifetimeSource; date: string | null } = IMPORT): CacheLifetimeItem => ({
@@ -205,9 +205,9 @@ describe("documentedItems (5)", () => {
   it("makes no item where a way of caching is supported without a lifetime, or nothing is said", () => {
     expect(documentedItems(docs({ implicit: true }), fromImport)).toEqual([]);
     expect(documentedItems(docs({ implicit: { min_tokens: 4096 } }), fromImport)).toEqual([]);
-    expect(documentedItems(documentedCache({}), fromImport)).toEqual([]);
+    expect(documentedItems(documentedCaching({}), fromImport)).toEqual([]);
     // One way unsupported and the other not stated is unknown, not \"does not cache\".
-    expect(docs({ explicit: false }).support).toBe("unknown");
+    expect(docs({ explicit: false }).documented.support).toBe("unknown");
     expect(documentedItems(docs({ explicit: false }), fromImport)).toEqual([]);
     // A lifetime of a way that is not supported is no item either.
     expect(documentedItems(docs({ implicit: false, explicit: { ttl: ["5m"] } }), fromImport)).toEqual([documentedOf("short", 300, "explicit", "5m")]);
@@ -257,7 +257,7 @@ describe("documentedItems (5)", () => {
 describe("cacheLifetime: the worked examples of section 10", () => {
   const check = (documented: ReturnType<typeof docs>, runs: CacheEvaluation[]) => {
     const record = cacheLifetime(documented, runs, fromImport);
-    expect(lifetimeRuleBreaks(record, runs, documented)).toEqual([]);
+    expect(lifetimeRuleBreaks(record, runs, documented.documented)).toEqual([]);
     return record;
   };
 
@@ -275,7 +275,7 @@ describe("cacheLifetime: the worked examples of section 10", () => {
   });
 
   it("2. meta-subscription/muse-wonder-1.0: one client never hit, 0 measured; long from one age", () => {
-    const record = check(documentedCache({}), [M2, H5, H6, L4]);
+    const record = check(documentedCaching({}), [M2, H5, H6, L4]);
     expect(record).toEqual({
       short: profileOf({ safe_s: 0, basis: "measured", source: "providers.dev", date: "2026-11-07", measured_s: 0, clients: 3, evaluations: 3, checks: 66, hits: 37, tested_from_s: 150, first_miss_s: 0 }),
       long: profileOf({ safe_s: 14400, basis: "measured", source: "providers.dev", date: "2026-11-10", measured_s: 14400, clients: 1, evaluations: 1, checks: 10, hits: 4, tested_from_s: 14400, first_miss_s: 43200 }),
@@ -316,7 +316,7 @@ describe("cacheLifetime: the worked examples of section 10", () => {
   it("4. meta-subscription/muse-ember-1.0: the long profile from a run that continues another", () => {
     const E1 = evaluation("ember-2026-11-10/E1", "agent+cliproxyapi", "2026-11-10", "c 1/1 · 300: 2/2 · 1800: 1/2 · 3600: 0/2 · 7200: 1/2");
     const M1 = evaluation("meta-24h-2026-11-10/M1", "agent+cliproxyapi", "2026-11-10", "c 1/1 · 300: 3/3 · 1800: 3/3 · 3600: 3/3 · 7200: 3/3 · 14400: 3/3 · 28800: 0/3 · 43200: 0/3 · 86400: 0/3", long24h);
-    const record = check(documentedCache({}), [E1, M1]);
+    const record = check(documentedCaching({}), [E1, M1]);
     expect(record.short).toEqual(profileOf({ safe_s: 300, basis: "measured", source: "providers.dev", date: "2026-11-10", measured_s: 300, clients: 1, evaluations: 1, checks: 9, hits: 5, tested_from_s: 300, first_miss_s: 1800 }));
     expect(record.long).toEqual(profileOf({ safe_s: 14400, basis: "measured", source: "providers.dev", date: "2026-11-10", measured_s: 14400, clients: 1, evaluations: 1, checks: 25, hits: 16, tested_from_s: 300, first_miss_s: 28800 }));
   });
@@ -347,7 +347,7 @@ describe("cacheLifetime: the worked examples of section 10", () => {
   });
 
   it("7. neither: nothing documented, or caching without a lifetime, and no evaluation", () => {
-    for (const documented of [documentedCache({}), docs({ implicit: { min_tokens: 4096 } }), docs({ implicit: true })]) {
+    for (const documented of [documentedCaching({}), docs({ implicit: { min_tokens: 4096 } }), docs({ implicit: true })]) {
       expect(check(documented, [])).toEqual({ short: NOTHING, long: NOTHING, lifetimes: [] });
       expect(cacheLifetime(documented, [], fromImport)).toEqual(emptyCacheLifetime());
     }
@@ -379,12 +379,12 @@ describe("cacheLifetime: the worked examples of section 10", () => {
   });
 
   it("10 and 11. devin: only a control that missed; a miss at the youngest age with hits after it", () => {
-    expect(check(documentedCache({}), [D6]).short).toEqual(profileOf({ safe_s: 0, basis: "measured", source: "providers.dev", date: "2026-11-04", measured_s: 0, clients: 1, evaluations: 1, checks: 1, hits: 0, first_miss_s: 0 }));
-    expect(check(documentedCache({}), [D9]).short).toEqual(profileOf({ safe_s: 0, basis: "measured", source: "providers.dev", date: "2026-11-04", measured_s: 0, clients: 1, evaluations: 1, checks: 16, hits: 5, tested_from_s: 150, first_miss_s: 150 }));
+    expect(check(documentedCaching({}), [D6]).short).toEqual(profileOf({ safe_s: 0, basis: "measured", source: "providers.dev", date: "2026-11-04", measured_s: 0, clients: 1, evaluations: 1, checks: 1, hits: 0, first_miss_s: 0 }));
+    expect(check(documentedCaching({}), [D9]).short).toEqual(profileOf({ safe_s: 0, basis: "measured", source: "providers.dev", date: "2026-11-04", measured_s: 0, clients: 1, evaluations: 1, checks: 16, hits: 5, tested_from_s: 150, first_miss_s: 150 }));
   });
 
   it("12. devin/nemotron-3-5-super: two request shapes per client", () => {
-    const record = check(documentedCache({}), [N1c, N1p, D11c, D11p]);
+    const record = check(documentedCaching({}), [N1c, N1p, D11c, D11p]);
     expect(record).toEqual({
       short: profileOf({ safe_s: 0, basis: "measured", source: "providers.dev", date: "2026-11-09", measured_s: 0, clients: 2, evaluations: 4, checks: 28, hits: 14, tested_from_s: 120, first_miss_s: 0 }),
       long: NOTHING,
@@ -432,12 +432,12 @@ describe("cacheLifetime: the rules", () => {
       ["long", "measured", "60m", "alpha"],
       ["long", "measured", "24h", "direct"],
     ]);
-    expect(lifetimeRuleBreaks(record, runs, documented)).toEqual([]);
+    expect(lifetimeRuleBreaks(record, runs, documented.documented)).toEqual([]);
   });
 
   it("makes two items of two settings in one profile, and the lowest of them is the profile's", () => {
     const runs = [twoMinutes("a", "direct", "c 1/1 · 3600: 3/3 · 7200: 0/3", long1h), twoMinutes("b", "direct", "c 1/1 · 3600: 3/3 · 43200: 3/3", long24h)];
-    const record = cacheLifetime(documentedCache({}), runs, fromImport);
+    const record = cacheLifetime(documentedCaching({}), runs, fromImport);
     expect(record.lifetimes.map((item) => [item.value, item.lifetime_s])).toEqual([["1h", 3600], ["24h", 43200]]);
     expect(record.long).toMatchObject({ safe_s: 3600, basis: "measured", measured_s: 3600, clients: 1, evaluations: 2 });
     expect(record.short).toEqual(NOTHING);
@@ -445,24 +445,24 @@ describe("cacheLifetime: the rules", () => {
 
   it("leaves an evaluation that does not count out of every item; it says nothing about how long", () => {
     const runs = [twoMinutes("control-only", "direct", "c 1/1"), twoMinutes("empty", "direct", ""), twoMinutes("timed", "other", "c 1/1 · 300: 3/3")];
-    const record = cacheLifetime(documentedCache({}), runs, fromImport);
+    const record = cacheLifetime(documentedCaching({}), runs, fromImport);
     expect(record.lifetimes.flatMap((item) => item.evaluation_ids)).toEqual(["timed"]);
     expect(record.short).toMatchObject({ safe_s: 300, clients: 1, evaluations: 1 });
-    expect(lifetimeRuleBreaks(record, runs, documentedCache({}))).toEqual([]);
+    expect(lifetimeRuleBreaks(record, runs, documentedCaching({}).documented)).toEqual([]);
     // With only such evaluations, the profile is not measured.
-    expect(cacheLifetime(documentedCache({}), runs.slice(0, 2), fromImport)).toEqual(emptyCacheLifetime());
+    expect(cacheLifetime(documentedCaching({}), runs.slice(0, 2), fromImport)).toEqual(emptyCacheLifetime());
   });
 
   it("combines two evaluations of one client with different ages by the minimum, and adds their results up", () => {
     const early = twoMinutes("early", "direct", "c 1/1 · 120: 3/3");
     const late = twoMinutes("late", "direct", "c 1/1 · 300: 3/3 · 900: 3/3 · 1800: 1/3");
-    const record = cacheLifetime(documentedCache({}), [early, late], fromImport);
+    const record = cacheLifetime(documentedCaching({}), [early, late], fromImport);
     expect(record.lifetimes).toEqual([
       measuredOf({ client: "direct", date: "2026-11-01", lifetime_s: 120, evaluation_ids: ["early", "late"], checks: 14, hits: 12, tested_from_s: 120, first_miss_s: 1800, results: results("c 2/2 · 120: 3/3 · 300: 3/3 · 900: 3/3 · 1800: 1/3") }),
     ]);
     // Walked over the sums, the item would give 900; the value is the minimum of the evaluations, 120.
     expect(record.short).toMatchObject({ safe_s: 120, measured_s: 120, first_miss_s: 1800, tested_from_s: 120 });
-    expect(lifetimeRuleBreaks(record, [early, late], documentedCache({}))).toEqual([]);
+    expect(lifetimeRuleBreaks(record, [early, late], documentedCaching({}).documented)).toEqual([]);
   });
 
   it("is contradicted by one evaluation of a client, though the item's sum is exactly half", () => {
@@ -472,7 +472,7 @@ describe("cacheLifetime: the rules", () => {
     const record = cacheLifetime(documented, [hits, misses], fromImport);
     expect(record.lifetimes[1]!.results).toEqual(results("c 2/2 · 150: 3/6 · 300: 3/6"));
     expect(record.short).toEqual({ safe_s: 0, basis: "measured", source: "providers.dev", date: "2026-11-01", documented_s: 300, measured_s: 0, clients: 1, evaluations: 2, checks: 14, hits: 8, checks_inside: 14, hits_inside: 8, tested_from_s: 150, first_miss_s: 150 });
-    expect(lifetimeRuleBreaks(record, [hits, misses], documented)).toEqual([]);
+    expect(lifetimeRuleBreaks(record, [hits, misses], documented.documented)).toEqual([]);
   });
 
   it("is not raised by hits beyond the documented lifetime", () => {
@@ -480,7 +480,7 @@ describe("cacheLifetime: the rules", () => {
     const documented = docs({ explicit: { ttl: ["5m"] } });
     const record = cacheLifetime(documented, [run], fromImport);
     expect(record.short).toMatchObject({ safe_s: 300, basis: "documented", source: "models.dev", documented_s: 300, measured_s: 7200, checks_inside: 4, hits_inside: 4 });
-    expect(lifetimeRuleBreaks(record, [run], documented)).toEqual([]);
+    expect(lifetimeRuleBreaks(record, [run], documented.documented)).toEqual([]);
   });
 
   it("keeps an entry documented as not caching at 0, documented, with what was measured beside it", () => {
@@ -490,7 +490,7 @@ describe("cacheLifetime: the rules", () => {
     expect(record.short).toEqual({ safe_s: 0, basis: "documented", source: "models.dev", date: "2026-11-15", documented_s: 0, measured_s: 600, clients: 1, evaluations: 1, checks: 7, hits: 7, checks_inside: 1, hits_inside: 1, tested_from_s: 300, first_miss_s: null });
     expect(record.long).toEqual(profileOf({ safe_s: 0, basis: "documented", source: "models.dev", date: "2026-11-15", documented_s: 0 }));
     expect(record.lifetimes.map((item) => [item.retention_profile, item.basis, item.lifetime_s])).toEqual([["short", "documented", 0], ["short", "measured", 600], ["long", "documented", 0]]);
-    expect(lifetimeRuleBreaks(record, [run], documented)).toEqual([]);
+    expect(lifetimeRuleBreaks(record, [run], documented.documented)).toEqual([]);
   });
 
   it("takes the source and date of the documented item the safe value is", () => {
@@ -498,13 +498,13 @@ describe("cacheLifetime: the rules", () => {
     const documented = docs({ implicit: { ttl: ["5m"] }, explicit: { ttl: ["5m"] } });
     const record = cacheLifetime(documented, [], sourceOf);
     expect(record.short).toMatchObject({ safe_s: 300, basis: "documented", source: "providers.dev", date: "2026-11-02" });
-    expect(lifetimeRuleBreaks(record, [], documented)).toEqual([]);
+    expect(lifetimeRuleBreaks(record, [], documented.documented)).toEqual([]);
   });
 
   it("counts a timed result with a single check like any other", () => {
     const single = twoMinutes("single", "direct", "c 1/1 · 150: 1/1 · 300: 1/1 · 600: 0/1");
     expect(evaluationLifetime(single)).toEqual({ safe_s: 300, first_miss_s: 600, tested_from_s: 150 });
-    const record = cacheLifetime(documentedCache({}), [single], fromImport);
+    const record = cacheLifetime(documentedCaching({}), [single], fromImport);
     expect(record.short).toMatchObject({ safe_s: 300, measured_s: 300, checks: 4, hits: 3, tested_from_s: 150, first_miss_s: 600 });
     expect(record.lifetimes[0]!.results).toEqual(results("c 1/1 · 150: 1/1 · 300: 1/1 · 600: 0/1"));
     // A single timed check that missed inside the documented lifetime contradicts it.
@@ -516,13 +516,13 @@ describe("cacheLifetime: the rules", () => {
   it("makes one item per parameter: the same client and value sent in two request fields are two items", () => {
     const ttl = twoMinutes("by-ttl", "direct", "c 1/1 · 3600: 3/3", long1h);
     const retention = twoMinutes("by-retention", "direct", "c 1/1 · 1800: 3/3 · 3600: 0/3", { retention_profile: "long", parameter: "prompt_cache_retention", value: "1h" });
-    const record = cacheLifetime(documentedCache({}), [ttl, retention], fromImport);
+    const record = cacheLifetime(documentedCaching({}), [ttl, retention], fromImport);
     expect(record.lifetimes.map((item) => [item.parameter, item.value, item.client, item.evaluation_ids, item.lifetime_s])).toEqual([
       ["cache_control.ttl", "1h", "direct", ["by-ttl"], 3600],
       ["prompt_cache_retention", "1h", "direct", ["by-retention"], 1800],
     ]);
     expect(record.long).toMatchObject({ safe_s: 1800, clients: 1, evaluations: 2 });
-    expect(lifetimeRuleBreaks(record, [ttl, retention], documentedCache({}))).toEqual([]);
+    expect(lifetimeRuleBreaks(record, [ttl, retention], documentedCaching({}).documented)).toEqual([]);
   });
 
   it("orders the list in plain character order, whatever the locale, and whatever the order of the input", () => {
@@ -563,7 +563,7 @@ describe("cacheLifetime: the rules", () => {
   it("finds a broken rule", () => {
     const record = cacheLifetime(docs({ explicit: { ttl: ["5m"] } }), [R5], fromImport);
     const wrong = { ...record, short: { ...record.short, safe_s: 300, basis: "documented" as const, source: "models.dev" as const, date: "2026-11-15" } };
-    expect(lifetimeRuleBreaks(wrong, [R5], docs({ explicit: { ttl: ["5m"] } }))).toContain("short 4.1 rule");
-    expect(lifetimeRuleBreaks(record, [R5, D6], docs({ explicit: { ttl: ["5m"] } }))).toContain("11 cpa-8.0.53/D6");
+    expect(lifetimeRuleBreaks(wrong, [R5], docs({ explicit: { ttl: ["5m"] } }).documented)).toContain("short 4.1 rule");
+    expect(lifetimeRuleBreaks(record, [R5, D6], docs({ explicit: { ttl: ["5m"] } }).documented)).toContain("11 cpa-8.0.53/D6");
   });
 });

@@ -10,7 +10,7 @@ import type { MeasuredLimit, Meta, ModelExtension, UpstreamCatalog } from "../sr
 import { ROOT } from "../scripts/lib/files.ts";
 
 /** The cache record of an entry nothing is known about. */
-export const NO_CACHE: EntryCache = { documented: documentedCache({}), retention: { support: "unknown", parameter: null, accepted_values: null, default: null, profiles: [], conditions: [], evidence: [] }, lifetime: emptyCacheLifetime(), results: null, evaluations: [] };
+export const NO_CACHE: EntryCache = { documented: documentedCache({}), retention: { support: "unknown", parameter: null, accepted_values: null, default: null, profiles: [], conditions: [], evidence: [] }, lifetime: emptyCacheLifetime(), evaluations: [] };
 
 /** A complete providers_dev record, as published: every key is there. */
 export function extensionOf(more: Partial<ModelExtension> = {}): ModelExtension {
@@ -39,8 +39,8 @@ export function summaryOf(more: Partial<Summary> = {}): Summary {
   return {
     ref: "p/m", provider: "p", model: "m", name: "M", type: null, family: null, canonical_id: null, status: null, release_date: null,
     access: "api", origin: "upstream", context: null, input: null, max_output: null,
-    cache: "unknown", cache_modes: [], cache_mode_support: { implicit: "unknown", explicit: "unknown" }, cache_ttl_s: [], cache_ttl_by_mode_s: { implicit: null, explicit: null },
-    cache_retention: "unknown", cache_lifetime: emptyCacheLifetime(), evaluation_count: 0, cache_results: null,
+    cache: "unknown", cache_modes: [], cache_mode_support: { implicit: "unknown", explicit: "unknown" },
+    cache_retention: "unknown", cache_lifetime: emptyCacheLifetime(), evaluation_count: 0,
     price_in: null, price_out: null, price_from: null, pricing: pricingOf({}, "api", null, []), request_controls: controlsOf({}, NO_CACHE.retention, []),
     measured_input_accepted: null, measured_input_refused: null, measured_limit_count: 0, overridden_fields: [], verified: null, shard: 0,
     ...more,

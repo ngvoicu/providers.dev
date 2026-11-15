@@ -5,7 +5,7 @@
 import { isObject, type Json, type JsonObject } from "./merge.ts";
 
 /**
- * The ages every summary table has a column for, in seconds since the prompt was cached: the ladder every
+ * The ages every table of results by age has a column for, in seconds since the prompt was cached: the ladder every
  * evaluation follows (2.5, 5 and 7.5 minutes, then on to 2 hours; 4, 8, 12 and 24 hours where the cache lasts).
  * The control ("at once", age 0) comes before them. Results at other ages are published too, at their exact age.
  */
@@ -17,7 +17,6 @@ export type Support = "supported" | "unsupported" | "unknown";
 
 export interface CacheModeDocumentation {
   support: Support;
-  ttl: string[] | null;
   min_tokens: number | null;
   max_breakpoints: number | null;
   targets: string[] | null;
@@ -27,6 +26,16 @@ export interface CacheModeDocumentation {
 export interface CacheDocumentation {
   support: Support;
   modes: Record<CacheMode, CacheModeDocumentation>;
+}
+
+/**
+ * Build only, never published: the documented caching of an entry with the lifetime texts of each mode, as
+ * `capabilities.cache.<mode>.ttl` has them (null = no list). The texts are published as the documented items of the
+ * lifetime record, and as imported in `capabilities.cache`; nowhere else.
+ */
+export interface DocumentedCaching {
+  documented: CacheDocumentation;
+  ttl: Record<CacheMode, string[] | null>;
 }
 /** short = the cache a request gets without asking for a lifetime, or with the shortest one; long = a longer lifetime it asked for. */
 export type RetentionProfile = "short" | "long";
@@ -43,23 +52,6 @@ export interface CacheResult {
   checks: number;
   /** hits / checks, in percent, two decimals. */
   hit_rate_pct: number;
-}
-
-/** One line of an entry's summary table: every evaluation that used the same retention setting, added up by exact age. */
-export interface CacheSummaryRow {
-  retention_profile: RetentionProfile;
-  /** The request field that asked for the lifetime, for example `cache_control.ttl`. Null = no lifetime was asked for. */
-  parameter: string | null;
-  /** The value sent in it, for example `1h`. Null with `parameter`. */
-  value: string | null;
-  /** How many evaluations the line adds up. 0 = this setting was not evaluated. */
-  evaluations: number;
-  /** Their ids, as in `evaluations[].id` of the entry and in /api/v1/evaluations/cache. */
-  evaluation_ids: string[];
-  /** The date of the newest of them. Null when not evaluated. */
-  last_date: string | null;
-  /** Null = not evaluated. That is not 0 %. */
-  results: CacheResult[] | null;
 }
 
 export interface CacheEvaluation {
@@ -113,8 +105,6 @@ export interface EntryCache {
   retention: CacheRetention;
   /** Every lifetime known for the entry, documented or measured, and the safe value of each retention profile. */
   lifetime: CacheLifetimeRecord;
-  /** The summary table. Null = no evaluation on this entry. */
-  results: CacheSummaryRow[] | null;
   evaluations: CacheEvaluation[];
 }
 
@@ -189,10 +179,19 @@ export interface CacheFacts {
   cache: CacheSupport;
   cache_modes: CacheMode[];
   cache_mode_support: Record<CacheMode, Support>;
-  /** Cache lifetimes the provider documents, in seconds, shortest first. */
-  cache_ttl_s: number[];
-  /** The documented lifetimes of each mode, in seconds, shortest first. Null = no lifetime is documented for the mode. */
-  cache_ttl_by_mode_s: Record<CacheMode, number[] | null>;
+}
+
+/** The lifetime texts of a mode of `capabilities.cache`, strings only. Null = no list. */
+function ttlTexts(model: JsonObject, mode: CacheMode): string[] | null {
+  const capabilities = isObject(model.capabilities) ? model.capabilities : {};
+  const value = isObject(capabilities.cache) ? capabilities.cache[mode] : undefined;
+  const ttl = isObject(value) ? value.ttl : undefined;
+  return Array.isArray(ttl) ? ttl.filter((item): item is string => typeof item === "string") : null;
+}
+
+/** The documented caching of an entry with its lifetime texts, for the build (`DocumentedCaching`). */
+export function documentedCaching(model: JsonObject): DocumentedCaching {
+  return { documented: documentedCache(model), ttl: { implicit: ttlTexts(model, "implicit"), explicit: ttlTexts(model, "explicit") } };
 }
 
 /** Missing fields stay unknown, including a mode omitted from an otherwise populated cache object. */
@@ -205,7 +204,6 @@ export function documentedCache(model: JsonObject): CacheDocumentation {
     const detail = isObject(value) ? value : {};
     return {
       support,
-      ttl: Array.isArray(detail.ttl) ? detail.ttl.filter((item): item is string => typeof item === "string") : null,
       min_tokens: typeof detail.min_tokens === "number" ? detail.min_tokens : null,
       max_breakpoints: typeof detail.max_breakpoints === "number" ? detail.max_breakpoints : null,
       targets: Array.isArray(detail.targets) ? detail.targets.filter((item): item is string => typeof item === "string") : null,
@@ -218,29 +216,10 @@ export function documentedCache(model: JsonObject): CacheDocumentation {
 
 /** The compact API fields are a projection of the full entry's published documentation. */
 export function cacheFacts(documented: CacheDocumentation): CacheFacts {
-  const modes: CacheMode[] = [];
-  const ttl = new Set<number>();
-  const byMode: Record<CacheMode, number[] | null> = { implicit: null, explicit: null };
-  for (const mode of ["implicit", "explicit"] as const) {
-    const value = documented.modes[mode];
-    if (value.support !== "supported") continue;
-    modes.push(mode);
-    if (value.ttl) {
-      const own = new Set<number>();
-      for (const item of value.ttl) {
-        const seconds = durationSeconds(item);
-        if (seconds !== undefined) own.add(seconds);
-      }
-      for (const seconds of own) ttl.add(seconds);
-      if (own.size > 0) byMode[mode] = [...own].sort((a, b) => a - b);
-    }
-  }
   return {
     cache: documented.support === "supported" ? "yes" : documented.support === "unsupported" ? "no" : "unknown",
-    cache_modes: modes,
+    cache_modes: (["implicit", "explicit"] as const).filter((mode) => documented.modes[mode].support === "supported"),
     cache_mode_support: { implicit: documented.modes.implicit.support, explicit: documented.modes.explicit.support },
-    cache_ttl_s: [...ttl].sort((a, b) => a - b),
-    cache_ttl_by_mode_s: byMode,
   };
 }
 
@@ -248,12 +227,11 @@ export function cacheFacts(documented: CacheDocumentation): CacheFacts {
  * The documented lifetimes of an entry in whole seconds (`lifetimeSeconds`), one per text of a supported mode's `ttl`
  * that converts, with the mode and the text. The one place the record reads documented lifetimes from.
  */
-function documentedSeconds(documented: CacheDocumentation): { mode: CacheMode; text: string; seconds: number }[] {
+function documentedSeconds(caching: DocumentedCaching): { mode: CacheMode; text: string; seconds: number }[] {
   const found: { mode: CacheMode; text: string; seconds: number }[] = [];
   for (const mode of ["implicit", "explicit"] as const) {
-    const value = documented.modes[mode];
-    if (value.support !== "supported" || !value.ttl) continue;
-    for (const text of value.ttl) {
+    if (caching.documented.modes[mode].support !== "supported") continue;
+    for (const text of caching.ttl[mode] ?? []) {
       const seconds = lifetimeSeconds(text);
       if (seconds !== undefined) found.push({ mode, text, seconds });
     }
@@ -262,8 +240,8 @@ function documentedSeconds(documented: CacheDocumentation): { mode: CacheMode; t
 }
 
 /** The shortest documented lifetime of an entry in whole seconds: what its short documented items carry. Null = none. */
-function shortestDocumentedS(documented: CacheDocumentation): number | null {
-  const found = documentedSeconds(documented);
+function shortestDocumentedS(caching: DocumentedCaching): number | null {
+  const found = documentedSeconds(caching);
   return found.length > 0 ? Math.min(...found.map((item) => item.seconds)) : null;
 }
 
@@ -293,7 +271,7 @@ export function lifetimeAsked(settings: JsonObject | undefined): { parameter: st
 export function profileOf(value: string | null, model: JsonObject): RetentionProfile {
   if (value === null) return "short";
   const asked = lifetimeSeconds(value);
-  return asked !== undefined && asked === shortestDocumentedS(documentedCache(model)) ? "short" : "long";
+  return asked !== undefined && asked === shortestDocumentedS(documentedCaching(model)) ? "short" : "long";
 }
 
 /** hits of checks as one result. The percentage is worked out here and nowhere else. */
@@ -316,44 +294,6 @@ export function addResults(lists: readonly (readonly CacheResult[])[]): CacheRes
   return [...sums.values()]
     .sort((a, b) => (a.kind === b.kind ? a.age_s - b.age_s : a.kind === "control" ? -1 : 1))
     .map((sum) => cacheResult(sum.kind, sum.age_s, sum.hits, sum.checks));
-}
-
-const emptyRow = (profile: RetentionProfile): CacheSummaryRow => ({
-  retention_profile: profile,
-  parameter: null,
-  value: null,
-  evaluations: 0,
-  evaluation_ids: [],
-  last_date: null,
-  results: null,
-});
-
-/**
- * The summary table of an entry: one line per retention setting, short before long. An entry with evaluations always
- * has a short line and at least one long line; a setting nobody evaluated has `results: null`. Null = no evaluation at all.
- */
-export function summarizeCache(evaluations: readonly CacheEvaluation[]): CacheSummaryRow[] | null {
-  if (evaluations.length === 0) return null;
-  const groups = new Map<string, CacheEvaluation[]>();
-  for (const evaluation of evaluations) {
-    const key = JSON.stringify([evaluation.retention_profile, evaluation.parameter, evaluation.value]);
-    groups.set(key, [...(groups.get(key) ?? []), evaluation]);
-  }
-  const rows = [...groups.values()].map((members): CacheSummaryRow => {
-    const first = members[0] as CacheEvaluation;
-    return {
-      retention_profile: first.retention_profile,
-      parameter: first.parameter,
-      value: first.value,
-      evaluations: members.length,
-      evaluation_ids: members.map((member) => member.id).sort(),
-      last_date: members.map((member) => member.date).sort().at(-1) ?? null,
-      results: addResults(members.map((member) => member.results)),
-    };
-  });
-  for (const profile of RETENTION_PROFILES) if (!rows.some((row) => row.retention_profile === profile)) rows.push(emptyRow(profile));
-  const rank = (row: CacheSummaryRow): number => (row.retention_profile === "short" ? 0 : 1) * 2 + (row.value === null ? 0 : 1);
-  return rows.sort((a, b) => rank(a) - rank(b) || (durationSeconds(a.value) ?? 0) - (durationSeconds(b.value) ?? 0) || String(a.value).localeCompare(String(b.value)));
 }
 
 // ---- The cache lifetime record: every lifetime of an entry in one list, and the safe value of each profile.
@@ -426,13 +366,13 @@ const documentedItem = (profile: RetentionProfile, lifetime: number, mode: Cache
  * caching, one item of 0 seconds per profile. `sourceOf` names the source and date of a mode's lifetimes (null = the
  * "does not cache" item). Ordered by profile, then seconds, implicit before explicit, then the text in character order.
  */
-export function documentedItems(documented: CacheDocumentation, sourceOf: (mode: CacheMode | null) => { source: LifetimeSource; date: string | null }): CacheLifetimeItem[] {
-  if (documented.support === "unsupported") {
+export function documentedItems(caching: DocumentedCaching, sourceOf: (mode: CacheMode | null) => { source: LifetimeSource; date: string | null }): CacheLifetimeItem[] {
+  if (caching.documented.support === "unsupported") {
     const from = sourceOf(null);
     return RETENTION_PROFILES.map((profile) => documentedItem(profile, 0, null, null, from));
   }
-  const found = documentedSeconds(documented);
-  const shortest = shortestDocumentedS(documented);
+  const found = documentedSeconds(caching);
+  const shortest = shortestDocumentedS(caching);
   if (shortest === null) return [];
   const sources = new Map<CacheMode, { source: LifetimeSource; date: string | null }>();
   const from = (mode: CacheMode) => sources.get(mode) ?? sources.set(mode, sourceOf(mode)).get(mode)!;
@@ -452,7 +392,7 @@ export function lifetimeSeconds(text: string): number | undefined {
 }
 
 /** Plain character (UTF-16 code unit) order, null first: the same on every machine, whatever its locale. */
-const byCharacters = (a: string | null, b: string | null): number => (a === b ? 0 : a === null ? -1 : b === null ? 1 : a < b ? -1 : 1);
+export const byCharacters = (a: string | null, b: string | null): number => (a === b ? 0 : a === null ? -1 : b === null ? 1 : a < b ? -1 : 1);
 
 const profileRank = (profile: RetentionProfile): number => (profile === "short" ? 0 : 1);
 const modeRank = (mode: CacheMode | null): number => (mode === "implicit" ? 0 : 1);
@@ -520,7 +460,7 @@ function measuredItem(members: readonly { evaluation: CacheEvaluation; lifetime:
  * evaluation of the profile contradicts it (`contradicts`), else the measured one (the lowest over the clients), else null.
  */
 export function cacheLifetime(
-  documented: CacheDocumentation,
+  caching: DocumentedCaching,
   evaluations: readonly CacheEvaluation[],
   sourceOf: (mode: CacheMode | null) => { source: LifetimeSource; date: string | null },
 ): CacheLifetimeRecord {
@@ -543,7 +483,7 @@ export function cacheLifetime(
       byCharacters(a.client, b.client) ||
       byCharacters(a.parameter, b.parameter),
   );
-  const docs = documentedItems(documented, sourceOf);
+  const docs = documentedItems(caching, sourceOf);
   const lifetimes = RETENTION_PROFILES.flatMap((profile) => [...docs, ...measured].filter((item) => item.retention_profile === profile));
 
   const safe = (profile: RetentionProfile): SafeLifetime => {

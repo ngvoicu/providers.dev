@@ -106,7 +106,7 @@ export function openapi(): Record<string, unknown> {
     openapi: "3.1.0",
     info: {
       title: "providers.dev API",
-      version: "1.3.0",
+      version: "2.0.0",
       description:
         "Read-only data about AI models as each provider and access method exposes them: limits, prices, prompt caching, and what providers.dev measured. " +
         "The baseline is imported from models.dev (MIT); everything providers.dev adds is under the `providers_dev` key. No key is needed.",
@@ -147,9 +147,9 @@ export function openapi(): Record<string, unknown> {
         "The record states what the documentation says and what evaluations found on their dates, through the clients named. It is not a guarantee of how long a provider keeps a prompt. Every value is worked out once, when the data is built; the website prints it as published.",
       ] },
       { id: "cache", title: "Cache evaluations", paragraphs: [
-        "cache_results on a summary equals providers_dev.cache.results on the full entry. It contains separate short and long rows with parameter, value and results. Null results mean not evaluated, never a zero hit rate.",
+        "Results by age are published in two places: on each evaluation (providers_dev.cache.evaluations of the full entry, and /evaluations/cache), and on each measured item of the lifetime record (results of an item in cache_lifetime.lifetimes, the same object as providers_dev.cache.lifetime.lifetimes), where the evaluations of one client with one retention setting are added up age by age. Short and long are separate items, and so is each client. A profile with no measured item was not evaluated: its evaluations count is 0, never a zero hit rate. Results added up over different clients are not published.",
         "Each result records kind, exact age_s, hits, checks and hit_rate_pct. kind: control at age_s: 0 means the immediate resend. A check at 450 seconds remains 7.5 minutes. /meta lists shared display ages; other measured ages remain in results. Missing ages were not checked.",
-        "Each row identifies its evaluations. /evaluations/cache and the full entry retain the client, route, date, request settings and raw evidence. Results describe that access method and date, not a guaranteed cache lifetime.",
+        "Each measured item names its evaluations in evaluation_ids. /evaluations/cache and the full entry retain the client, route, date, request settings and raw evidence. Results describe that access method and date, not a guaranteed cache lifetime.",
       ] },
       { id: "caching", title: "Versions and caching", paragraphs: [
         "X-Dataset-Version identifies the catalog and summaries. X-Dataset-Generated-At identifies publication time. Each response has an opaque ETag; reuse it only for the same URL. A 304 has no body. Fresh responses can be cached for 300 seconds with stale-while-revalidate for 3600 seconds.",

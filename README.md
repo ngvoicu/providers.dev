@@ -11,7 +11,9 @@ The baseline is imported daily from [models.dev](https://models.dev) (MIT). On t
   Google Antigravity);
 - **corrections** to single fields, each with a reason and a source;
 - **evaluations** of cache lifetimes and limits from [groundtruth](https://github.com/ngvoicu/groundtruth),
-  shown next to the documented values, never instead of them.
+  shown next to the documented values, each with its source and date. A measured value takes the place of a
+  documented one in one figure only, the safe cache lifetime, and only where a measurement clearly contradicts the
+  documentation; the documented lifetime stays listed beside it.
 
 It publishes metadata only. There is no chat and no inference proxy. List prices per token are shown as models.dev
 records them; a subscription entry shows the API list price of the same model, marked as an API price. Subscription
@@ -240,7 +242,7 @@ curl -H 'If-None-Match: "<dataset version>"' -i https://providers.dev/api/v1/cat
 ```ts
 const base = "https://providers.dev/api/v1";
 const page = await (await fetch(`${base}/entries?q=opus&cache=yes&limit=200`)).json();
-for (const entry of page.data) console.log(entry.ref, entry.context, entry.max_output, entry.cache_lifetime.short.safe_s, entry.cache_ttl_s, entry.cache_results);
+for (const entry of page.data) console.log(entry.ref, entry.context, entry.max_output, entry.cache_lifetime.short.safe_s, entry.cache_lifetime.lifetimes);
 
 const { data } = await (await fetch(`${base}/entries/openrouter/anthropic/claude-opus-5.5`)).json();
 console.log(data.entry.limit, data.entry.providers_dev.cache.retention, data.entry.providers_dev.cache.evaluations);
@@ -262,9 +264,11 @@ external callers. The page layer has no index, catalog or filesystem access. Fil
 the API; the website formats its response. The homepage sends searches to `/api/v1/entries` instead of downloading
 the entire index. Provider and model lists use API search and pagination, including without JavaScript.
 
-Cache evaluations are published as counts and percentages at exact ages (`cache_results` of a summary,
-`providers_dev.cache` of an entry): one line per retention setting, short before long, the control ("at once") first.
-`null` means not evaluated, never 0 %. The sums are made once, in `src/core/cache.ts`, when the data is built.
+Cache evaluations are published as counts and percentages at exact ages, the control ("at once") first: each
+evaluation with its own results (`providers_dev.cache.evaluations` of an entry), and the evaluations of one client
+with one retention setting added up as the `results` of a measured item of the lifetime record below, short and long
+apart. A profile with no measured item was not evaluated, which is not 0 %. The sums are made once, in
+`src/core/cache.ts`, when the data is built.
 
 Every entry has one cache lifetime record (`providers_dev.cache.lifetime`, and `cache_lifetime` of a summary):
 `lifetimes`, one list of every lifetime known for the entry, documented by models.dev or providers.dev and measured
