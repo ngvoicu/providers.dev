@@ -608,7 +608,7 @@
   table.facts.conditional tbody td {
     border-bottom: 0;
   }
-  table.facts.conditional tbody tr.group:not(:first-child) > * {
+  table.facts.conditional tbody + tbody > tr.group > * {
     border-top: 1px solid var(--line);
   }
   table.facts.conditional tbody tr:not(.group):not(.empty-row) > td {
@@ -1286,6 +1286,367 @@
     padding: 3rem 1rem;
     text-align: center;
     color: var(--muted);
+  }
+
+  /* The contents of a document, under its title where there is no room beside the text */
+  .toc.toc-inline {
+    position: static;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+    column-gap: 1rem;
+    margin-top: 1.5rem;
+    padding: 0.8rem 1rem 0.7rem;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--bg-subtle);
+  }
+  .toc.toc-inline p {
+    grid-column: 1 / -1;
+  }
+  /* The ages over a row's cache cells: shown only where the table is stacked and its column head is out of sight */
+  .heat-strip.strip-head.in-row {
+    display: none;
+  }
+
+  /* Narrow screens. A table that does not fit is stacked: each row becomes a block, and each cell is set under the name
+     of its column. Most tables fit a tablet and are stacked on a phone only (stack-phone, below 640 px); the wide ones
+     are stacked below 1024 px (stack-tablet). The two blocks of rules are the same but for the class and the width. */
+  @media (max-width: 1023.98px) {
+    table.stack-tablet,
+    table.stack-tablet > :is(thead, tbody),
+    table.stack-tablet > thead > tr {
+      display: block;
+    }
+    table.stack-tablet > thead th {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+      border: 0;
+    }
+    table.stack-tablet > tbody > tr {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: 0.5rem 1rem;
+      padding: 0.8rem 0.9rem;
+      border-bottom: 1px solid var(--line);
+    }
+    table.stack-tablet > tbody:last-child > tr:last-child {
+      border-bottom: 0;
+    }
+    table.stack-tablet > tbody > tr > :is(th, td) {
+      display: block;
+      flex: 1 1 8rem;
+      min-width: 0;
+      width: auto;
+      padding: 0;
+      border: 0;
+      text-align: left;
+      white-space: normal;
+    }
+    table.stack-tablet > tbody > tr > :is(th, [colspan], .span-row) {
+      flex-basis: 100%;
+    }
+    table.stack-tablet > tbody > tr > td.num {
+      text-align: left;
+    }
+    table.stack-tablet > tbody > tr > [data-label]::before {
+      content: attr(data-label);
+      display: block;
+      margin-bottom: 0.1rem;
+      color: var(--muted);
+      font-family: var(--font-sans);
+      font-size: 0.74rem;
+      font-weight: 450;
+      letter-spacing: 0;
+      line-height: 1.35;
+      white-space: normal;
+    }
+  }
+  @media (max-width: 639.98px) {
+    table.stack-phone,
+    table.stack-phone > :is(thead, tbody),
+    table.stack-phone > thead > tr {
+      display: block;
+    }
+    table.stack-phone > thead th {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+      border: 0;
+    }
+    table.stack-phone > tbody > tr {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: 0.5rem 1rem;
+      padding: 0.8rem 0.9rem;
+      border-bottom: 1px solid var(--line);
+    }
+    table.stack-phone > tbody:last-child > tr:last-child {
+      border-bottom: 0;
+    }
+    table.stack-phone > tbody > tr > :is(th, td) {
+      display: block;
+      flex: 1 1 8rem;
+      min-width: 0;
+      width: auto;
+      padding: 0;
+      border: 0;
+      text-align: left;
+      white-space: normal;
+    }
+    table.stack-phone > tbody > tr > :is(th, [colspan], .span-row) {
+      flex-basis: 100%;
+    }
+    table.stack-phone > tbody > tr > td.num {
+      text-align: left;
+    }
+    table.stack-phone > tbody > tr > [data-label]::before {
+      content: attr(data-label);
+      display: block;
+      margin-bottom: 0.1rem;
+      color: var(--muted);
+      font-family: var(--font-sans);
+      font-size: 0.74rem;
+      font-weight: 450;
+      letter-spacing: 0;
+      line-height: 1.35;
+      white-space: normal;
+    }
+  }
+
+  /* The entry table (catalog, provider, model) as a list of entries: the name, then each value under its column's name */
+  @media (max-width: 1023.98px) {
+    table.entries.stack-tablet > tbody > tr > .provider-col,
+    table.entries.stack-tablet > tbody > tr > .cache-col {
+      flex: 2 1 14rem;
+    }
+    table.entries.stack-tablet > tbody > tr > .num,
+    table.entries.stack-tablet > tbody > tr > .wide-only {
+      flex: 1 1 5.5rem;
+    }
+    /* The price is the widest of the numbers; a price per unit other than tokens may take two lines */
+    table.entries.stack-tablet > tbody > tr > .mid-only {
+      flex: 1.5 1 8.5rem;
+    }
+    table.entries.stack-tablet .price {
+      white-space: normal;
+    }
+    table.entries.stack-tablet > tbody > tr > .source-col {
+      flex: 2 1 12rem;
+    }
+    table.entries.stack-tablet > tbody > tr > .strip-col {
+      flex-basis: 100%;
+    }
+    /* The dates of the sources, given up where the table is tight, have room again */
+    table.entries.stack-tablet .sources {
+      grid-template-columns: max-content max-content;
+    }
+    table.entries.stack-tablet .sources > :is(.date, .stale, span:empty) {
+      display: block;
+    }
+    /* Sorting: the column heads that sort stay, as a line of buttons over the list */
+    table.entries.stack-tablet > thead:has(button) {
+      border-bottom: 1px solid var(--line);
+      background: var(--bg-subtle);
+    }
+    table.entries.stack-tablet > thead:has(button) > tr {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.6rem 0.9rem;
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+    table.entries.stack-tablet > thead:has(button) > tr::before {
+      content: "Sort by";
+      margin-right: 0.2rem;
+    }
+    table.entries.stack-tablet > thead th:has(button) {
+      position: static;
+      display: block;
+      width: auto;
+      height: auto;
+      margin: 0;
+      padding: 0;
+      overflow: visible;
+      clip-path: none;
+      background: none;
+    }
+    table.entries.stack-tablet > thead th button {
+      padding: 0.15rem 0.6rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--bg);
+    }
+    table.entries.stack-tablet > thead th[aria-sort] button {
+      border-color: var(--line-strong);
+    }
+
+    /* A row's cache cells, with the ages over them. Where the cell is narrow, the setting sits over its cells and the
+       cells shrink with the width, down to a floor. */
+    table.stack-tablet > tbody > tr > td.strip-col {
+      container-type: inline-size;
+    }
+    table.stack-tablet .heat-strip.strip-head.in-row {
+      display: grid;
+      margin: 0.1rem 0 2px;
+    }
+    table.stack-tablet td.strip-col a.heat-strip {
+      display: grid;
+    }
+
+    /* Cache results by age: the setting or the evaluation, then one cell per age, each with its age over it */
+    table.heat.stack-tablet > tbody > tr {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(3.3rem, 1fr));
+      gap: 0.55rem 0.3rem;
+    }
+    table.heat.stack-tablet > tbody > tr > :is(th, td:not(.heat)) {
+      grid-column: 1 / -1;
+    }
+    table.heat.stack-tablet > tbody > tr > th {
+      position: static;
+      background: none;
+    }
+    table.heat.stack-tablet > tbody > tr > td.heat {
+      width: auto;
+      padding: 0;
+    }
+    table.heat.stack-tablet > tbody > tr > td.heat::before {
+      text-align: center;
+      font-size: 0.7rem;
+    }
+    table.heat.stack-tablet > thead th.age {
+      padding: 0;
+    }
+    /* Code and JSON wrap instead of running off the side */
+    pre {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+    /* The first line of the head says what the cells are: it stays, as a line over the rows */
+    table.heat.stack-tablet > thead th.span {
+      position: static;
+      display: block;
+      width: auto;
+      height: auto;
+      margin: 0;
+      padding: 0.55rem 0.9rem;
+      overflow: visible;
+      clip-path: none;
+      white-space: normal;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+    }
+  }
+  @container (max-width: 29.5rem) {
+    .heat-strip {
+      grid-template-columns: minmax(0, 1fr);
+      row-gap: 2px;
+    }
+    .heat-strip.strip-head > span:first-child {
+      display: none;
+    }
+    .strip {
+      --cell: clamp(0.9rem, (100cqi - 0.15rem - 19px) / 19, 1.2rem);
+      grid-template-columns: var(--cell) 0.15rem repeat(18, var(--cell));
+      gap: 1px;
+    }
+    .strip > span {
+      font-size: min(0.66rem, var(--cell) * 0.55);
+    }
+    /* The ages take turns on two lines, so that each has the width of two cells */
+    .strip-head .strip {
+      align-items: start;
+    }
+    .strip-head .strip > span {
+      display: flex;
+      justify-content: center;
+      white-space: nowrap;
+    }
+    .strip-head .strip > span:nth-child(even) {
+      padding-top: 0.6rem;
+    }
+  }
+
+  @media (max-width: 639.98px) {
+    /* The header scrolls away with the page: with the links on two lines it would take a sixth of the screen */
+    .site-header {
+      position: static;
+    }
+    html {
+      scroll-padding-top: 1rem;
+    }
+    .nav a {
+      padding-inline: 0.4rem;
+      text-align: center;
+    }
+    /* Two columns, a name and its value: side by side, the value on a line of its own when it is long */
+    table.pairs.stack-phone > tbody > tr {
+      gap: 0.3rem 1rem;
+    }
+    table.pairs.stack-phone > tbody > tr > th {
+      flex: 1 1 auto;
+    }
+    table.pairs.stack-phone > tbody > tr > td {
+      flex: 0 1 auto;
+      margin-left: auto;
+    }
+    table.pairs.stack-phone > tbody > tr > td.num {
+      text-align: right;
+      white-space: normal;
+    }
+    /* Request controls: support and default side by side, then the field, the values and the conditions */
+    table.controls.stack-phone > tbody > tr > th {
+      order: -2;
+    }
+    table.controls.stack-phone > tbody > tr > td:not(.span-row) {
+      order: -1;
+    }
+    /* Conditional rates: one block per condition, its charges and rates under it, then what it applies to */
+    table.facts.conditional.stack-phone > tbody {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 0.25rem 1rem;
+      padding: 0.8rem 0.9rem;
+      border-bottom: 1px solid var(--line);
+    }
+    table.facts.conditional.stack-phone > tbody:last-child {
+      border-bottom: 0;
+    }
+    table.facts.conditional.stack-phone > tbody > tr {
+      display: contents;
+    }
+    table.facts.conditional.stack-phone > tbody > tr > :is(th, td) {
+      padding: 0;
+      border: 0;
+    }
+    table.facts.conditional.stack-phone > tbody > tr > :is(th, .applies, [colspan]) {
+      grid-column: 1 / -1;
+    }
+    table.facts.conditional.stack-phone > tbody > tr > th {
+      margin-bottom: 0.2rem;
+    }
+    table.facts.conditional.stack-phone > tbody > tr > .applies {
+      order: 1;
+      margin-top: 0.35rem;
+    }
+    table.facts.conditional.stack-phone > tbody > tr > td.num {
+      text-align: right;
+    }
   }
 }
 

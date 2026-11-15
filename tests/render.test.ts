@@ -119,8 +119,19 @@ describe("the entry page", () => {
     expect(pages.login).toContain("<strong>Off-peak hours</strong>");
     expect(pages.login).toContain("API list prices of");
   });
+
+  it("keeps a condition, its charges and what it applies to in one row group", () => {
+    const table = pages.full.slice(pages.full.indexOf('<table class="facts conditional'), pages.full.indexOf("</table>", pages.full.indexOf('<table class="facts conditional')));
+    // Two conditions in the fixture: the context above 200,000 tokens, and the hours from 16:00.
+    expect(count(table, "<tbody>")).toBe(2);
+    expect(count(table, '<th scope="rowgroup"')).toBe(2);
+    expect(count(table, '<td class="applies"')).toBe(2);
+    for (const group of table.split("<tbody>").slice(1)) expect(count(group, '<th scope="rowgroup"')).toBe(1);
+  });
 });
 
+/** The lines of a row's cache cell: the strips inside the link, not the ages written over them. */
+const lines = (html: string): number => count(html.slice(html.indexOf('<a class="plain heat-strip"')), 'class="strip"');
 const cells = (html: string): number => ["skip", "all", "most", "few", "none"].reduce((sum, name) => sum + count(html, `class="${name}"`) + count(html, `class="${name} control"`), 0);
 
 describe("the cache summary in a table row", () => {
@@ -129,7 +140,7 @@ describe("the cache summary in a table row", () => {
       evaluation_count: 2,
       cache_results: [line("short", [[0, 1, 1], [150, 3, 3], [450, 2, 3], [600, 0, 3]]), line("long", [[0, 1, 1], [3600, 1, 3]], { parameter: "cache_control.ttl", value: "1h" })],
     });
-    expect(count(html, 'class="strip"')).toBe(2);
+    expect(lines(html)).toBe(2);
     expect(cells(html)).toBe(2 * (CACHE_AGES_S.length + 1));
     expect(html).toContain(">Short</span>");
     expect(html).toContain("Long <b>1h</b>");
@@ -142,13 +153,26 @@ describe("the cache summary in a table row", () => {
 
   it("says Not evaluated where there is no measurement, never 0", () => {
     const shortOnly = row({ evaluation_count: 1, cache_results: [line("short", [[300, 3, 3]]), line("long", null)] });
-    expect(count(shortOnly, 'class="strip"')).toBe(1);
+    expect(lines(shortOnly)).toBe(1);
     expect(count(shortOnly, ">Not evaluated</span>")).toBe(1);
     const never = row({});
     expect(never).toContain("Not evaluated");
     expect(never).not.toContain('class="strip"');
     // An entry that does not cache cannot be asked for a longer lifetime: the long line says so.
     expect(row({ evaluation_count: 1, cache_retention: "unsupported", cache_results: [line("short", [[300, 0, 3]]), line("long", null)] })).toContain(">Unsupported</span>");
+  });
+
+  it("carries the ages over its cells, for where the table is stacked and its head is out of sight", () => {
+    const html = row({ evaluation_count: 1, cache_results: [line("short", [[300, 3, 3]]), line("long", null)] });
+    expect(count(html, 'class="heat-strip strip-head in-row" aria-hidden="true"')).toBe(1);
+    expect(html.indexOf("strip-head in-row")).toBeLessThan(html.indexOf('<a class="plain heat-strip"'));
+    expect(row({})).not.toContain("strip-head");
+  });
+
+  it("names the column of every cell, for where the table is stacked", () => {
+    const html = row({ evaluation_count: 1, cache_results: [line("short", [[300, 3, 3]]), line("long", null)] });
+    for (const label of ["Provider", "Context", "Max output", "Price in / out", "Released", "Cache, documented", "Cache, measured · % by age", "Source"]) expect(html).toContain(`data-label="${label}"`);
+    expect(count(rowHtml(summaryOf({}), { now: new Date("2026-11-13T00:00:00Z"), hideProvider: true }), 'data-label="Provider"')).toBe(0);
   });
 
   it("says whose price a subscription entry shows", () => {

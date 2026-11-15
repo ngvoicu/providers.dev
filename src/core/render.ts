@@ -110,8 +110,12 @@ const said = (result: CacheResult): string => `${result.kind === "control" ? "At
 const COLUMNS: { kind: CacheResult["kind"]; age_s: number }[] = [{ kind: "control", age_s: 0 }, ...CACHE_AGES_S.map((age) => ({ kind: "timed" as const, age_s: age }))];
 const inColumn = (results: readonly CacheResult[], column: (typeof COLUMNS)[number]): CacheResult | undefined =>
   results.find((result) => result.kind === column.kind && result.age_s === column.age_s);
+const stripHead = (where: "column" | "row"): string =>
+  `<span class="heat-strip strip-head${where === "row" ? " in-row" : ""}" aria-hidden="true"><span></span><span class="strip">${COLUMNS.map((column) => `<span${column.kind === "control" ? ' class="control"' : ""}>${column.kind === "control" ? "once" : columnLabel(column.age_s)}</span>`).join("")}</span></span>`;
 /** The ages of the strip, written once in the column head so that every row lines up under them. */
-export const STRIP_HEAD = `<span class="heat-strip strip-head" aria-hidden="true"><span></span><span class="strip">${COLUMNS.map((column) => `<span${column.kind === "control" ? ' class="control"' : ""}>${column.kind === "control" ? "once" : columnLabel(column.age_s)}</span>`).join("")}</span></span>`;
+export const STRIP_HEAD = stripHead("column");
+/** The same ages inside a row, shown only where the table is stacked and the column head is out of sight. */
+export const STRIP_HEAD_IN_ROW = stripHead("row");
 
 /** "Short" or "Long 1h": the retention profile, and the value the requests asked for. */
 function retentionWord(row: Pick<CacheSummaryRow, "retention_profile" | "value">): string {
@@ -153,7 +157,7 @@ export function evaluationStrip(evaluation: Pick<CacheSummaryRow, "retention_pro
 /** The summary of an entry's cache evaluations for a table cell. The same lines and columns for every entry. */
 function measuredCell(entry: Summary, href: string): string {
   if (!entry.cache_results) return '<span class="muted" title="No cache evaluation on this entry.">Not evaluated</span>';
-  return `<a class="plain heat-strip" href="${e(href)}#cache" aria-label="Cache evaluations by age. Open the entry for each one.">${entry.cache_results.map((row) => strip(row, entry.cache_retention)).join("")}</a>`;
+  return `${STRIP_HEAD_IN_ROW}<a class="plain heat-strip" href="${e(href)}#cache" aria-label="Cache evaluations by age. Open the entry for each one.">${entry.cache_results.map((row) => strip(row, entry.cache_retention)).join("")}</a>`;
 }
 
 export interface RowOptions {
@@ -164,6 +168,9 @@ export interface RowOptions {
   hideProvider?: boolean;
   providerNames?: Record<string, string>;
 }
+
+/** The column names of the entry table. Where the table is stacked, each cell repeats its column's name. */
+const COLUMN = { provider: "Provider", context: "Context", max_output: "Max output", price: "Price in / out", released: "Released", cache: "Cache, documented", measured: "Cache, measured", source: "Source" } as const;
 
 export function tableHead(options: { hideProvider?: boolean; sortable?: boolean; sort?: string; order?: string }): string {
   const column = (key: string | null, label: string, title: string, className = ""): string => {
@@ -176,14 +183,14 @@ export function tableHead(options: { hideProvider?: boolean; sortable?: boolean;
   };
   return `<tr>
 ${column("name", "Model", "The model's name and its id at this provider.")}
-${options.hideProvider ? "" : column("provider", "Provider", "Who serves it, and how it is reached.")}
-${column("context", "Context", "Exposed context window in tokens (limit.context): what this provider accepts for the model.", "num")}
-${column("max_output", "Max output", "Largest single response in tokens (limit.output). A maximum, not a default.", "num")}
-${column("price_in", "Price in / out", "Base list price in US dollars per million tokens, input then output, as models.dev records it. Conditional rates marks an entry whose price changes with context size, service tier, region, date or the time of day: open the entry for those. A subscription is not paid per token: it shows the API list price of the same model, marked API price, or In plan where the catalog has no API entry of that model.", "num mid-only")}
-${column("release_date", "Released", "When the model was released, as models.dev records it. It is the model's date: the same at every provider.", "wide-only")}
-${column(null, "Cache, documented", "Prompt caching as the source documents it: mode and lifetimes.")}
-<th scope="col" class="strip-col"><span title="providers.dev evaluations, all clients together. Each cell is an age since the prompt was cached, starting with the prompt sent again at once; the number is the share of re-sends at that age that were served from the cache, in percent. Short: the requests asked for no lifetime. Long: they asked for a longer one, and the value is shown. Hover a cell for the counts.">Cache, measured <span class="muted">% by age</span></span>${STRIP_HEAD}</th>
-${column("verified", "Source", "Where the entry comes from, with a date per source: the import from models.dev, and the newest providers.dev evidence.")}
+${options.hideProvider ? "" : column("provider", COLUMN.provider, "Who serves it, and how it is reached.")}
+${column("context", COLUMN.context, "Exposed context window in tokens (limit.context): what this provider accepts for the model.", "num")}
+${column("max_output", COLUMN.max_output, "Largest single response in tokens (limit.output). A maximum, not a default.", "num")}
+${column("price_in", COLUMN.price, "Base list price in US dollars per million tokens, input then output, as models.dev records it. Conditional rates marks an entry whose price changes with context size, service tier, region, date or the time of day: open the entry for those. A subscription is not paid per token: it shows the API list price of the same model, marked API price, or In plan where the catalog has no API entry of that model.", "num mid-only")}
+${column("release_date", COLUMN.released, "When the model was released, as models.dev records it. It is the model's date: the same at every provider.", "wide-only")}
+${column(null, COLUMN.cache, "Prompt caching as the source documents it: mode and lifetimes.")}
+<th scope="col" class="strip-col"><span title="providers.dev evaluations, all clients together. Each cell is an age since the prompt was cached, starting with the prompt sent again at once; the number is the share of re-sends at that age that were served from the cache, in percent. Short: the requests asked for no lifetime. Long: they asked for a longer one, and the value is shown. Hover a cell for the counts.">${COLUMN.measured} <span class="muted">% by age</span></span>${STRIP_HEAD}</th>
+${column("verified", COLUMN.source, "Where the entry comes from, with a date per source: the import from models.dev, and the newest providers.dev evidence.")}
 </tr>`;
 }
 
@@ -194,14 +201,14 @@ export function rowHtml(entry: Summary, options: RowOptions): string {
   const status = entry.status ? ` <span class="badge">${e(entry.status)}</span>` : "";
   return `<tr>
 <th scope="row"><a href="${e(href)}">${e(entry.name)}</a>${status}<div class="id"><code>${e(entry.model)}</code>${copyButton(entry.ref, "entry id")}</div></th>
-${options.hideProvider ? "" : `<td><a class="plain" href="/providers/${e(entry.provider)}/">${e(provider)}</a>${access}</td>`}
-<td class="num">${contextCell(entry, href)}</td>
-<td class="num">${tokens(entry.max_output)}</td>
-<td class="num mid-only">${priceCell(entry)}</td>
-<td class="wide-only">${entry.release_date ? `<span class="muted date">${e(entry.release_date)}</span>` : UNKNOWN}</td>
-<td>${cacheCell(entry)}</td>
-<td>${measuredCell(entry, href)}</td>
-<td class="nowrap">${sourcesHtml(entry, options)}</td>
+${options.hideProvider ? "" : `<td class="provider-col" data-label="${COLUMN.provider}"><a class="plain" href="/providers/${e(entry.provider)}/">${e(provider)}</a>${access}</td>`}
+<td class="num" data-label="${COLUMN.context}">${contextCell(entry, href)}</td>
+<td class="num" data-label="${COLUMN.max_output}">${tokens(entry.max_output)}</td>
+<td class="num mid-only" data-label="${COLUMN.price}">${priceCell(entry)}</td>
+<td class="wide-only" data-label="${COLUMN.released}">${entry.release_date ? `<span class="muted date">${e(entry.release_date)}</span>` : UNKNOWN}</td>
+<td class="cache-col" data-label="${COLUMN.cache}">${cacheCell(entry)}</td>
+<td class="strip-col" data-label="${COLUMN.measured} · % by age">${measuredCell(entry, href)}</td>
+<td class="nowrap source-col" data-label="${COLUMN.source}">${sourcesHtml(entry, options)}</td>
 </tr>`;
 }
 
@@ -310,7 +317,8 @@ function priceSection(summary: Summary): string {
       const label = period ? `<strong>${PERIOD_LABEL[period]}</strong><div class="hint">${e(first.when ? conditionText(first.when) : "")}</div>` : e(first.when ? conditionText(first.when) : "Always");
       const applies = members.every((rule) => rule.applies_to === first.applies_to) && first.applies_to ? APPLIES_TO[first.applies_to] : UNKNOWN;
       const span = lines.length > 1 ? ` rowspan="${lines.length}"` : "";
-      return lines.map((line, at) => `<tr${at === 0 ? ' class="group"' : ""}>${at === 0 ? `<th scope="rowgroup"${span}>${label}</th>` : ""}<td>${e(meterLabel(line.meter))}</td><td class="num">${line.rate}</td>${at === 0 ? `<td${span}>${applies}</td>` : ""}</tr>`).join("");
+      // One row group per condition: where the table is stacked, the condition, its charges and what it applies to stay together.
+      return `<tbody>${lines.map((line, at) => `<tr${at === 0 ? ' class="group"' : ""}>${at === 0 ? `<th scope="rowgroup"${span}>${label}</th>` : ""}<td>${e(meterLabel(line.meter))}</td><td class="num">${line.rate}</td>${at === 0 ? `<td class="applies"${span} data-label="Applies to">${applies}</td>` : ""}</tr>`).join("")}</tbody>`;
     })
     .join("");
   const none = pricing.coverage === "complete" ? "No conditional rates." : pricing.billing === "not_applicable" ? "Not applicable: the entry has no price per token." : "No conditional rates recorded.";
@@ -320,9 +328,9 @@ function priceSection(summary: Summary): string {
       ? `<p class="hint">${e(LISTED_PRICE)}</p>`
       : "";
   const source = pricing.evidence.map((item) => `<a href="${e(item.url)}" rel="noopener">${e(shortUrl(item.url))}</a>${item.date ? ` <span class="date">${e(item.date)}</span>` : ""}`).join(" · ");
-  return `${note}<div class="scroll"><table class="facts"><thead><tr><th scope="col">Base charge</th><th scope="col" class="num">Rate</th></tr></thead><tbody>${rows}</tbody></table></div>
+  return `${note}<div class="scroll"><table class="facts pairs stack-phone"><thead><tr><th scope="col">Base charge</th><th scope="col" class="num">Rate</th></tr></thead><tbody>${rows}</tbody></table></div>
 <h3>Conditional rates</h3>
-<div class="scroll"><table class="facts conditional"><thead><tr><th scope="col">Condition</th><th scope="col">Charge</th><th scope="col" class="num">Rate</th><th scope="col">Applies to</th></tr></thead><tbody>${changes || `<tr class="empty-row"><td colspan="4" class="muted">${none}</td></tr>`}</tbody></table></div>
+<div class="scroll"><table class="facts conditional stack-phone"><thead><tr><th scope="col">Condition</th><th scope="col">Charge</th><th scope="col" class="num">Rate</th><th scope="col">Applies to</th></tr></thead>${changes || `<tbody><tr class="empty-row"><td colspan="4" class="muted">${none}</td></tr></tbody>`}</table></div>
 <p class="hint">Source: ${source || (pricing.billing === "not_applicable" ? NOT_APPLICABLE : UNKNOWN)}</p>
 <details><summary>Other prices in the source, not shown above (${pricing.unparsed.length})</summary>${pricing.unparsed.length ? `<pre>${e(JSON.stringify(pricing.unparsed, null, 2))}</pre>` : `<p class="muted mt-3">${NONE}</p>`}</details>`;
 }
@@ -363,17 +371,21 @@ function sourceOf(path: string, provenance: Provenance[], origin: ModelExtension
 function fact(label: string, hint: string, value: string, source: string): string {
   // An unknown value has no source to name, unless it was published as unknown on purpose.
   if ((value === UNKNOWN || value === IN_PLAN) && !source.includes("Corrected")) source = DASH;
-  return `<tr><th scope="row">${label}<div class="hint">${hint}</div></th><td class="num">${value}</td><td>${source}</td></tr>`;
+  return `<tr><th scope="row">${label}<div class="hint">${hint}</div></th><td class="num" data-label="Value">${value}</td><td data-label="Source">${source}</td></tr>`;
 }
 
 /** One cell of a full-size table: the hit rate in percent with the counts under it, or the counts alone for one evaluation. */
+/** A column's heading in the full-size tables, also repeated by each of its cells where the table is stacked. */
+const heatLabel = (column: (typeof COLUMNS)[number]): string => (column.kind === "control" ? "At once" : shortAge(column.age_s));
+
 function heatCell(result: CacheResult | undefined, column: (typeof COLUMNS)[number], counts: boolean): string {
-  if (!result) return `<td class="heat"><span class="skip" title="${column.kind === "control" ? "At once" : `After ${ageText(column.age_s)}`}: not checked">·</span></td>`;
+  const label = ` data-label="${heatLabel(column)}"`;
+  if (!result) return `<td class="heat"${label}><span class="skip" title="${column.kind === "control" ? "At once" : `After ${ageText(column.age_s)}`}: not checked">·</span></td>`;
   const inner = counts ? `${result.hits}/${result.checks}` : `${Math.round(result.hit_rate_pct)}<small>${result.hits}/${result.checks}</small>`;
-  return `<td class="heat"><span class="${level(result)}" title="${e(said(result))}">${inner}</span></td>`;
+  return `<td class="heat"${label}><span class="${level(result)}" title="${e(said(result))}">${inner}</span></td>`;
 }
 
-const HEAT_HEAD = `<th scope="col" class="age" title="${CONTROL_TITLE}">At once</th>${CACHE_AGES_S.map((age) => `<th scope="col" class="age">${shortAge(age)}</th>`).join("")}`;
+const HEAT_HEAD = COLUMNS.map((column) => `<th scope="col" class="age"${column.kind === "control" ? ` title="${CONTROL_TITLE}"` : ""}>${heatLabel(column)}</th>`).join("");
 
 /** Results at ages without a column, in words. Nothing an evaluation checked is left out of the page. */
 function otherAges(results: readonly CacheResult[], counts: boolean): string {
@@ -408,15 +420,15 @@ function cacheMeasured(cache: EntryCache, now: Date): string {
       return `<tr>
 <th scope="row">${e(run.route_label)} ${dateTag(run.date, now)}<div class="hint">${e(run.client_label)}${settings ? ` · ${e(settings)}` : ""}</div><div class="hint">${run.retention_profile === "short" ? "Short" : "Long"} retention${run.parameter && run.value ? `: <code>${e(run.parameter)}=${e(run.value)}</code>` : ""}${other ? ` · ${e(other)}` : ""}</div>${run.note ? `<div class="hint">${e(run.note)}</div>` : ""}</th>
 ${COLUMNS.map((column) => heatCell(inColumn(run.results, column), column, true)).join("")}
-<td class="nowrap"><a href="${e(run.source)}" rel="noopener">Raw result</a></td>
+<td class="nowrap" data-label="Evidence"><a href="${e(run.source)}" rel="noopener">Raw result</a></td>
 </tr>`;
     })
     .join("");
   return `<p class="hint">Cache hits by age: percentage, with hits/checks below. Rows are grouped by requested retention. <a href="/docs/methodology/#evaluations">Methodology</a></p>
-<div class="scroll mt-3"><table class="facts heat summary"><thead><tr><th scope="col" rowspan="2">Retention</th><th scope="colgroup" colspan="${columns}" class="span">Time since the prompt was cached · served from the cache, in percent</th></tr><tr>${HEAT_HEAD}</tr></thead><tbody>${summary}</tbody></table></div>
+<div class="scroll mt-3"><table class="facts heat summary stack-tablet"><thead><tr><th scope="col" rowspan="2">Retention</th><th scope="colgroup" colspan="${columns}" class="span">Time since the prompt was cached · served from the cache, in percent</th></tr><tr>${HEAT_HEAD}</tr></thead><tbody>${summary}</tbody></table></div>
 <p class="legend"><span><span class="heat-key all">100</span> All served from the cache</span><span><span class="heat-key most">67</span> Half or more</span><span><span class="heat-key few">33</span> Fewer</span><span><span class="heat-key none">0</span> None</span><span><span class="heat-key skip">·</span> Not checked at that age</span></p>
 <details class="evaluations"><summary>Individual evaluations (${cache.evaluations.length})</summary>
-<div class="scroll mt-3"><table class="facts heat"><thead><tr><th scope="col" rowspan="2">Evaluation</th><th scope="colgroup" colspan="${columns}" class="span">Time since the prompt was cached · re-sends served from the cache, of those made</th><th scope="col" rowspan="2">Evidence</th></tr><tr>${HEAT_HEAD}</tr></thead><tbody>${evaluations || `<tr class="empty-row"><td colspan="${columns + 2}" class="muted">No evaluations on this entry.</td></tr>`}</tbody></table></div>
+<div class="scroll mt-3"><table class="facts heat stack-tablet"><thead><tr><th scope="col" rowspan="2">Evaluation</th><th scope="colgroup" colspan="${columns}" class="span">Time since the prompt was cached · re-sends served from the cache, of those made</th><th scope="col" rowspan="2">Evidence</th></tr><tr>${HEAT_HEAD}</tr></thead><tbody>${evaluations || `<tr class="empty-row"><td colspan="${columns + 2}" class="muted">No evaluations on this entry.</td></tr>`}</tbody></table></div>
 </details>`;
 }
 
@@ -446,17 +458,22 @@ function requestControlTable(controls: RequestControl[]): string {
       return `<div>${name}${value}${sent ? `<div class="hint"><code>${e(sent)}</code></div>` : ""}${option.when ? `<div class="hint">${e(conditionText(option.when))}</div>` : ""}</div>`;
     }).join("") || absent;
     const conditions = [control.when ? conditionText(control.when) : "", ...control.conditions].filter(Boolean).map(e).join("<br>") || (control.support === "unknown" ? UNKNOWN : "None recorded");
-    return `<tr><th scope="row">${e(CONTROL_LABEL[control.id] ?? control.id)}</th><td>${support}</td><td>${bindings}</td><td>${options}</td><td>${control.default === null ? absent : control.default.value === null ? "The field left out" : `<code>${e(jsonText(control.default.value))}</code>`}</td><td>${conditions}</td></tr>`;
+    return `<tr><th scope="row">${e(CONTROL_LABEL[control.id] ?? control.id)}</th><td data-label="Support">${support}</td><td class="span-row" data-label="Request field">${bindings}</td><td class="span-row" data-label="Accepted values">${options}</td><td data-label="Default">${control.default === null ? absent : control.default.value === null ? "The field left out" : `<code>${e(jsonText(control.default.value))}</code>`}</td><td class="span-row" data-label="Conditions">${conditions}</td></tr>`;
   }).join("");
   const sources = controls.flatMap((control) => control.evidence).filter((item, at, all) => all.findIndex((other) => other.url === item.url && other.date === item.date) === at);
   const source = sources.map((item) => `<a href="${e(item.url)}" rel="noopener" title="${e(item.note)}">${e(shortUrl(item.url))}</a>${item.date ? ` <span class="date">${e(item.date)}</span>` : ""}`).join(" · ");
-  return `<div class="scroll"><table class="facts"><thead><tr><th scope="col">Control</th><th scope="col">Support</th><th scope="col">Request field</th><th scope="col">Accepted values</th><th scope="col">Default</th><th scope="col">Conditions</th></tr></thead><tbody>${rows}</tbody></table></div>
+  return `<div class="scroll"><table class="facts controls stack-phone"><thead><tr><th scope="col">Control</th><th scope="col">Support</th><th scope="col">Request field</th><th scope="col">Accepted values</th><th scope="col">Default</th><th scope="col">Conditions</th></tr></thead><tbody>${rows}</tbody></table></div>
 <p class="hint">Source: ${source || UNKNOWN}</p>`;
 }
 
 function measuredLimitRows(limits: MeasuredLimit[]): string {
-  const cell = (value: number | null): string => `<td class="num">${value === null ? UNKNOWN : exact(value)}</td>`;
-  return limits.map((limit) => `<tr><td>${limit.date ? `<span class="muted date">${e(limit.date)}</span>` : UNKNOWN}</td><td>${e(limit.route_label)}<div class="hint">${e(limit.client_label)}</div></td>${cell(limit.context)}${cell(limit.input_accepted)}${cell(limit.input_refused)}${cell(limit.output)}${cell(limit.output_accepted)}<td><a href="${e(limit.source)}" rel="noopener">Raw result</a></td></tr>`).join("");
+  const cell = (value: number | null, label: string): string => `<td class="num" data-label="${label}">${value === null ? UNKNOWN : exact(value)}</td>`;
+  return limits
+    .map(
+      (limit) =>
+        `<tr><td data-label="Date">${limit.date ? `<span class="muted date">${e(limit.date)}</span>` : UNKNOWN}</td><td class="span-row" data-label="Measured through">${e(limit.route_label)}<div class="hint">${e(limit.client_label)}</div></td>${cell(limit.context, "Context")}${cell(limit.input_accepted, "Input accepted")}${cell(limit.input_refused, "Input refused")}${cell(limit.output, "Output limit")}${cell(limit.output_accepted, "Requested output accepted")}<td data-label="Evidence"><a href="${e(limit.source)}" rel="noopener">Raw result</a></td></tr>`,
+    )
+    .join("");
 }
 
 /** Documented caching. Every entry has the same table: one row for each way of caching, supported or not. */
@@ -469,14 +486,14 @@ function cacheDocumented(documented: CacheDocumentation, source: string): string
     const blank = detail.support === "unsupported" ? NOT_APPLICABLE : UNKNOWN;
     return `<tr>
 <th scope="row">${CACHE_MODE_WORD[mode]} <span class="chip">${mode}</span></th>
-<td>${state}</td>
-<td>${supported ? ttl : blank}</td>
-<td class="num">${supported ? (detail.min_tokens === null ? UNKNOWN : exact(detail.min_tokens)) : blank}</td>
-<td class="num">${supported && mode === "explicit" ? (detail.max_breakpoints === null ? UNKNOWN : exact(detail.max_breakpoints)) : supported ? NOT_APPLICABLE : blank}</td>
-<td>${supported && mode === "explicit" ? (detail.targets === null ? UNKNOWN : e(detail.targets.join(", "))) : supported ? NOT_APPLICABLE : blank}</td>
+<td data-label="Supported">${state}</td>
+<td data-label="Lifetimes">${supported ? ttl : blank}</td>
+<td class="num" data-label="Min. tokens">${supported ? (detail.min_tokens === null ? UNKNOWN : exact(detail.min_tokens)) : blank}</td>
+<td class="num" data-label="Breakpoints">${supported && mode === "explicit" ? (detail.max_breakpoints === null ? UNKNOWN : exact(detail.max_breakpoints)) : supported ? NOT_APPLICABLE : blank}</td>
+<td data-label="Targets">${supported && mode === "explicit" ? (detail.targets === null ? UNKNOWN : e(detail.targets.join(", "))) : supported ? NOT_APPLICABLE : blank}</td>
 </tr>`;
   });
-  return `<div class="scroll"><table class="facts"><thead><tr><th scope="col">Mode</th><th scope="col">Supported</th><th scope="col">Lifetimes</th><th scope="col" class="num">Min. tokens</th><th scope="col" class="num">Breakpoints</th><th scope="col">Targets</th></tr></thead><tbody>${rows.join("")}</tbody></table></div>
+  return `<div class="scroll"><table class="facts stack-phone"><thead><tr><th scope="col">Mode</th><th scope="col">Supported</th><th scope="col">Lifetimes</th><th scope="col" class="num">Min. tokens</th><th scope="col" class="num">Breakpoints</th><th scope="col">Targets</th></tr></thead><tbody>${rows.join("")}</tbody></table></div>
 <p class="hint">Source: ${source} · <a href="/docs/methodology/#caching">Cache modes</a></p>`;
 }
 
@@ -537,7 +554,7 @@ export function entryHtml(view: EntryView): string {
 <section aria-labelledby="limits">
   <h2 id="limits">Limits</h2>
   <h3>Documented</h3>
-  <div class="scroll"><table class="facts">
+  <div class="scroll"><table class="facts stack-phone">
     <thead><tr><th scope="col">Limit</th><th scope="col" class="num">Value</th><th scope="col">Source</th></tr></thead>
     <tbody>
       ${fact("Context window", "<code>limit.context</code>: what this provider accepts for the model, input and output together.", number(limit.context), sourceOf("limit.context", provenance, extension.origin, fromMeasurement))}
@@ -546,7 +563,7 @@ export function entryHtml(view: EntryView): string {
     </tbody>
   </table></div>
   <h3>Measured <span class="hint">tokens</span></h3>
-  <div class="scroll"><table class="facts"><thead><tr><th scope="col">Date</th><th scope="col">Measured through</th><th scope="col" class="num">Context</th><th scope="col" class="num">Input accepted</th><th scope="col" class="num">Input refused</th><th scope="col" class="num">Output limit</th><th scope="col" class="num">Requested output accepted</th><th scope="col">Evidence</th></tr></thead><tbody>${
+  <div class="scroll"><table class="facts stack-tablet"><thead><tr><th scope="col">Date</th><th scope="col">Measured through</th><th scope="col" class="num">Context</th><th scope="col" class="num">Input accepted</th><th scope="col" class="num">Input refused</th><th scope="col" class="num">Output limit</th><th scope="col" class="num">Requested output accepted</th><th scope="col">Evidence</th></tr></thead><tbody>${
     measuredLimits.length > 0 ? measuredLimitRows(measuredLimits) : '<tr class="empty-row"><td colspan="8" class="muted">No limits were measured on this entry.</td></tr>'
   }</tbody></table></div>
 </section>
@@ -570,7 +587,7 @@ export function entryHtml(view: EntryView): string {
 
 <section aria-labelledby="provenance">
   <h2 id="provenance">Provenance</h2>
-  <div class="scroll"><table class="facts">
+  <div class="scroll"><table class="facts pairs stack-phone">
     <thead><tr><th scope="col">Provenance</th><th scope="col">Value</th></tr></thead>
     <tbody>
       <tr><th scope="row">Source</th><td>${sourcesHtml(summary, view, true)}</td></tr>
