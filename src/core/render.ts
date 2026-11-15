@@ -1,6 +1,18 @@
 // HTML for the entry table and the entry detail view. The same functions render server responses and
 // re-render in the browser, so a row looks and reads the same wherever it appears.
-import { CACHE_AGES_S, settingsText, type CacheDocumentation, type CacheResult, type CacheSummaryRow, type EntryCache } from "./cache.ts";
+import {
+  CACHE_AGES_S,
+  RETENTION_PROFILES,
+  settingsText,
+  type CacheDocumentation,
+  type CacheEvaluation,
+  type CacheLifetimeItem,
+  type CacheResult,
+  type EntryCache,
+  type LifetimeSource,
+  type RetentionProfile,
+  type SafeLifetime,
+} from "./cache.ts";
 import type { ProviderSummary, Summary } from "./entries.ts";
 import { conditionText } from "./conditions.ts";
 import type { PricingRule, RequestControl } from "./policy-contract.ts";
@@ -66,24 +78,6 @@ const CACHE_MODE_TITLE = {
   explicit: "Manual (explicit): nothing is cached unless the request marks what to cache. The mark also picks the lifetime.",
 } as const;
 
-function cacheCell(entry: Pick<Summary, "cache" | "cache_modes" | "cache_ttl_by_mode_s">): string {
-  if (entry.cache === "unknown") return UNKNOWN;
-  if (entry.cache === "no") return '<span title="The source says this entry does not cache prompts.">None</span>';
-  // One line per way of caching: the word, then a box with its documented lifetimes. Every word has its box, so that a value
-  // is never read as belonging to the line above or below; where the source gives no lifetime the box says so.
-  const lines = entry.cache_modes
-    .map((mode) => {
-      const ttl = entry.cache_ttl_by_mode_s[mode] ?? [];
-      const box =
-        ttl.length > 0
-          ? `<span class="cache-box" title="How long this cache lasts, as documented.">${ttl.map(duration).join(", ")}</span>`
-          : '<span class="cache-box none" title="The source gives no lifetime for this way of caching. Unknown is not the same as short.">Unknown</span>';
-      return `<span class="cache-mode" title="${e(CACHE_MODE_TITLE[mode])}">${CACHE_MODE_WORD[mode]}</span>${box}`;
-    })
-    .join("");
-  return lines ? `<span class="cache">${lines}</span>` : UNKNOWN;
-}
-
 /** The documented window. Where there is none, the largest input an evaluation saw accepted, said as what it is. */
 function contextCell(entry: Summary, href: string): string {
   const accepted = entry.measured_input_accepted;
@@ -95,14 +89,90 @@ function contextCell(entry: Summary, href: string): string {
   return `<a class="plain limit-measured" href="${e(href)}#limits" title="${e(title)}"><span class="limit-value">≥ ${floor}</span><span class="limit-note">input</span></a>`;
 }
 
-// ---- cache evaluations: one summary table, the same on every page
-// Everything shown comes from `cache_results` as the API publishes it: the lines, the ages, the counts and the
-// percentages. This file lays them out; it adds nothing up.
+// ---- cache lifetimes: `cache_lifetime` of a summary and `providers_dev.cache.lifetime` of an entry, as the API
+// publishes them. Per retention profile the safe value, then every lifetime of the entry in one list, documented and
+// measured alike, each with its source and date. This file picks no value and compares none: which value is the safe
+// one is `basis`, and the results by age are the items' and the evaluations' own.
 
-const columnLabel = (seconds: number): string => (seconds < 3600 ? `${seconds / 60}m` : seconds % 3600 === 0 ? `${seconds / 3600}h` : `${seconds / 60}m`); // 150 -> "2.5m", 4500 -> "75m"
+const PROFILE_WORD = { short: "Short", long: "Long" } as const;
+const PROFILE_TITLE = {
+  short: "Short retention: the cache a request gets without asking for a lifetime, or with the provider's shortest setting.",
+  long: "Long retention: the cache a request gets when it asks for a longer lifetime.",
+} as const;
+const BASIS_TITLE = {
+  documented: "Documented: a lifetime the source documents for this entry.",
+  measured: "Measured by providers.dev: the oldest age through which every check hit.",
+} as const;
+
+/** A span of time, as a lifetime or an age: "2.5 min", "1 h 15 min", "24 h" (never "1 d": caches are counted in hours). */
+const span = (seconds: number): string => (seconds > 0 && seconds % 86400 === 0 ? shortAge(seconds) : duration(seconds));
+/** An age as a column heading or in a sentence: "at once" for the control, then "2.5 min", "1 h 15 min", "24 h". */
+const ageText = (seconds: number): string => (seconds === 0 ? "at once" : span(seconds));
+const seconds = (value: number): string => `${exact(value)} s`;
+
+/**
+ * A lifetime as a page prints it, the exact seconds in its title. 0 is two statements, told apart by the basis:
+ * documented, the source says the entry does not cache ("None"); measured, no tested age at which every check hit ("0 s").
+ */
+function lifetimeText(value: number, basis: "documented" | "measured"): string {
+  if (value === 0 && basis === "documented") return '<span title="Documented: the source says this entry does not cache prompts.">None</span>';
+  if (value === 0) return '<span title="Measured: 0 s. No tested age at which every check hit.">0 s</span>';
+  return `<span title="${seconds(value)}">${span(value)}</span>`;
+}
+
+/** Documented or measured, in words, on every value: no legend needed. */
+function basisTag(basis: "documented" | "measured"): string {
+  return `<span class="basis ${basis}" title="${BASIS_TITLE[basis]}">${basis}</span>`;
+}
+
+/** Who a lifetime is from, and its date. A providers.dev date is marked stale after 90 days, like all our evidence. */
+function lifetimeSource(source: LifetimeSource, date: string | null, basis: "documented" | "measured", now: Date): string {
+  const name =
+    source === "models.dev"
+      ? `<span class="origin upstream" title="${e(ORIGIN_TITLE.upstream)}">models.dev</span>`
+      : `<span class="origin added" title="${basis === "measured" ? "Measured by providers.dev." : "Documented, with a providers.dev correction or on an entry providers.dev added."}">providers.dev</span>`;
+  const title = basis === "measured" ? "The date of the newest evaluation." : source === "models.dev" ? "Imported from models.dev on this date." : "The date of the newest providers.dev evidence.";
+  const when = date === null ? '<span class="muted date">Date unknown</span>' : source === "providers.dev" && isStale(date, now) ? `<span class="stale" title="${title} More than 90 days ago.">${e(date)} · stale</span>` : `<span class="muted date" title="${title}">${e(date)}</span>`;
+  return `<span class="life-source">${name}${when}</span>`;
+}
+
+/** The safe lifetime of a profile and what it was chosen from, in one plain sentence for a tooltip. */
+function safeSaid(profile: RetentionProfile, p: SafeLifetime): string {
+  const name = `${PROFILE_WORD[profile]} retention`;
+  if (p.safe_s === null || p.basis === "none") return `${name}: no lifetime is documented or measured.`;
+  const documented = p.documented_s === null ? "none" : p.documented_s === 0 ? "0 s, does not cache" : seconds(p.documented_s);
+  const measured = p.measured_s === null ? "not evaluated" : `${seconds(p.measured_s)} (${plural(p.clients, "client")}, ${plural(p.evaluations, "evaluation")})`;
+  const inside = p.checks_inside === null || p.hits_inside === null ? "" : ` ${exact(p.hits_inside)} of ${exact(p.checks_inside)} checks hit inside the documented lifetime.`;
+  return `${name}, safe lifetime: ${seconds(p.safe_s)}, ${p.basis}, ${p.source}${p.date ? `, ${p.date}` : ""}. Documented: ${documented}. Measured: ${measured}.${inside}`;
+}
+
+/**
+ * One line of the list cell: the profile, the safe value and its basis, and beside it the other of the two lifetimes
+ * it was chosen from where there is one. Which is the other is read from `basis`; nothing is compared.
+ */
+function lifetimeLine(profile: RetentionProfile, p: SafeLifetime): string {
+  const name = `<span class="life-profile">${PROFILE_WORD[profile]}</span>`;
+  if (p.safe_s === null || p.basis === "none") return `${name}<span class="life-value unknown" title="${e(safeSaid(profile, p))}">Unknown</span><span></span>`;
+  const other =
+    p.basis === "documented"
+      ? p.measured_s === null ? "" : `<span class="life-other">measured ${span(p.measured_s)}</span>`
+      : p.documented_s === null ? "" : `<span class="life-other contradicted">documented ${p.documented_s === 0 ? "None" : span(p.documented_s)}</span>`;
+  const value = p.safe_s === 0 ? (p.basis === "documented" ? "None" : "0 s") : span(p.safe_s);
+  return `${name}<span class="life-value" title="${e(safeSaid(profile, p))}">${value}</span><span class="life-basis">${basisTag(p.basis)}${other}</span>`;
+}
+
+/** The cache lifetime of an entry in a table row: short and long, each on its line, the same two lines for every entry. */
+function lifetimeCell(entry: Pick<Summary, "cache_lifetime">, href: string): string {
+  const record = entry.cache_lifetime;
+  return `<a class="plain lifes" href="${e(href)}#cache" aria-label="Cache lifetimes. Open the entry for every lifetime and its source.">${lifetimeLine("short", record.short)}${lifetimeLine("long", record.long)}</a>`;
+}
+
+// ---- results by age: the cells of an item, of an evaluation, and of the evidence page's list of evaluations.
+// The ages, counts and percentages are the API's; a cell rounds the percentage to a whole number and the hover text
+// has the exact one with the counts.
+
+const columnLabel = (value: number): string => (value < 3600 ? `${value / 60}m` : value % 3600 === 0 ? `${value / 3600}h` : `${value / 60}m`); // 150 -> "2.5m", 4500 -> "75m"
 const CONTROL_TITLE = "At once: the prompt sent again immediately. It shows that the prompt was cached at all.";
-/** An age as a column heading or in a sentence: "2.5 min", "1 h 15", "24 h" (never "1 d": the columns count in hours). */
-const ageText = (seconds: number): string => (seconds === 0 ? "at once" : seconds % 86400 === 0 ? shortAge(seconds) : duration(seconds));
 const level = (result: CacheResult): string => (result.hit_rate_pct === 100 ? "all" : result.hit_rate_pct === 0 ? "none" : result.hit_rate_pct >= 50 ? "most" : "few");
 const said = (result: CacheResult): string => `${result.kind === "control" ? "At once" : `After ${ageText(result.age_s)}`}: ${result.hits} of ${result.checks} re-sends served from the cache (${result.hit_rate_pct}%)`;
 
@@ -117,47 +187,30 @@ export const STRIP_HEAD = stripHead("column");
 /** The same ages inside a row, shown only where the table is stacked and the column head is out of sight. */
 export const STRIP_HEAD_IN_ROW = stripHead("row");
 
+/** What an evaluation's requests asked for: the retention profile, and the request field and value where one was sent. */
+type RetentionSetting = Pick<CacheEvaluation, "retention_profile" | "parameter" | "value">;
+
 /** "Short" or "Long 1h": the retention profile, and the value the requests asked for. */
-function retentionWord(row: Pick<CacheSummaryRow, "retention_profile" | "value">): string {
-  return `${row.retention_profile === "short" ? "Short" : "Long"}${row.value ? ` <b>${e(row.value)}</b>` : ""}`;
+function retentionWord(setting: RetentionSetting): string {
+  return `${PROFILE_WORD[setting.retention_profile]}${setting.value ? ` <b>${e(setting.value)}</b>` : ""}`;
 }
 
-/** What a line's requests sent, in one sentence. */
-function retentionSaid(row: Pick<CacheSummaryRow, "retention_profile" | "parameter" | "value">): string {
-  if (row.parameter && row.value) return `${row.retention_profile === "short" ? "Short" : "Long"} retention: the requests sent ${row.parameter}=${row.value}.`;
-  return row.retention_profile === "short" ? "Short retention: the requests asked for no lifetime, so this is the provider's default cache." : "Long retention: a request that asks for a longer lifetime.";
+/** What an evaluation's requests sent, in one sentence. */
+function retentionSaid(setting: RetentionSetting): string {
+  if (setting.parameter && setting.value) return `${PROFILE_WORD[setting.retention_profile]} retention: the requests sent ${setting.parameter}=${setting.value}.`;
+  return setting.retention_profile === "short" ? "Short retention: the requests asked for no lifetime, so this is the provider's default cache." : "Long retention: a request that asks for a longer lifetime.";
 }
 
-/** Why a line has no results: nobody evaluated it, or the entry cannot do it. */
-function notEvaluated(row: CacheSummaryRow, support: Summary["cache_retention"]): string {
-  if (row.retention_profile === "long" && support === "unsupported") return '<span class="muted" title="The source says this entry does not cache prompts, so there is no lifetime to ask for.">Unsupported</span>';
-  return `<span class="muted" title="${row.retention_profile === "long" ? "No evaluation on this entry asked for a longer lifetime. Not evaluated is not the same as unsupported." : "No evaluation on this entry left the lifetime to the provider."}">Not evaluated</span>`;
-}
-
-/** One line of the catalog's summary: the retention setting, then one cell per column with the hit rate in percent. */
-function strip(row: CacheSummaryRow, support: Summary["cache_retention"]): string {
-  const count = row.evaluations > 0 ? ` ${plural(row.evaluations, "evaluation")}, the newest on ${row.last_date}.` : "";
-  const label = `<span class="strip-label${row.results ? "" : " none"}" title="${e(retentionSaid(row) + count)}">${retentionWord(row)}</span>`;
-  if (!row.results) return `${label}<span class="strip-none">${notEvaluated(row, support)}</span>`;
-  const results = row.results;
+/** One evaluation as a line of small cells, one per column, with the hit rate in percent (the evidence page). */
+export function evaluationStrip(evaluation: RetentionSetting & { results: readonly CacheResult[]; date: string }): string {
+  const label = `<span class="strip-label" title="${e(`${retentionSaid(evaluation)} Evaluated on ${evaluation.date}.`)}">${retentionWord(evaluation)}</span>`;
   const cells = COLUMNS.map((column) => {
-    const result = inColumn(results, column);
+    const result = inColumn(evaluation.results, column);
     const control = column.kind === "control" ? " control" : "";
     if (!result) return `<span class="skip${control}" title="${column.kind === "control" ? "At once" : `After ${ageText(column.age_s)}`}: not checked"></span>`;
     return `<span class="${level(result)}${control}" title="${e(said(result))}">${Math.round(result.hit_rate_pct)}</span>`;
   }).join("");
-  return `${label}<span class="strip">${cells}</span>`;
-}
-
-/** One evaluation as a line of the same cells (the evidence page). */
-export function evaluationStrip(evaluation: Pick<CacheSummaryRow, "retention_profile" | "parameter" | "value"> & { results: CacheResult[]; date: string }): string {
-  return `<span class="heat-strip">${strip({ ...evaluation, evaluations: 1, evaluation_ids: [], last_date: evaluation.date, results: evaluation.results }, "unknown")}</span>`;
-}
-
-/** The summary of an entry's cache evaluations for a table cell. The same lines and columns for every entry. */
-function measuredCell(entry: Summary, href: string): string {
-  if (!entry.cache_results) return '<span class="muted" title="No cache evaluation on this entry.">Not evaluated</span>';
-  return `${STRIP_HEAD_IN_ROW}<a class="plain heat-strip" href="${e(href)}#cache" aria-label="Cache evaluations by age. Open the entry for each one.">${entry.cache_results.map((row) => strip(row, entry.cache_retention)).join("")}</a>`;
+  return `<span class="heat-strip">${label}<span class="strip">${cells}</span></span>`;
 }
 
 export interface RowOptions {
@@ -170,7 +223,7 @@ export interface RowOptions {
 }
 
 /** The column names of the entry table. Where the table is stacked, each cell repeats its column's name. */
-const COLUMN = { provider: "Provider", context: "Context", max_output: "Max output", price: "Price in / out", released: "Released", cache: "Cache, documented", measured: "Cache, measured", source: "Source" } as const;
+const COLUMN = { provider: "Provider", context: "Context", max_output: "Max output", price: "Price in / out", released: "Released", lifetime: "Cache lifetime", source: "Source" } as const;
 
 export function tableHead(options: { hideProvider?: boolean; sortable?: boolean; sort?: string; order?: string }): string {
   const column = (key: string | null, label: string, title: string, className = ""): string => {
@@ -188,9 +241,8 @@ ${column("context", COLUMN.context, "Exposed context window in tokens (limit.con
 ${column("max_output", COLUMN.max_output, "Largest single response in tokens (limit.output). A maximum, not a default.", "num")}
 ${column("price_in", COLUMN.price, "Base list price in US dollars per million tokens, input then output, as models.dev records it. Conditional rates marks an entry whose price changes with context size, service tier, region, date or the time of day: open the entry for those. A subscription is not paid per token: it shows the API list price of the same model, marked API price, or In plan where the catalog has no API entry of that model.", "num mid-only")}
 ${column("release_date", COLUMN.released, "When the model was released, as models.dev records it. It is the model's date: the same at every provider.", "wide-only")}
-${column(null, COLUMN.cache, "Prompt caching as the source documents it: mode and lifetimes.")}
-<th scope="col" class="strip-col"><span title="providers.dev evaluations, all clients together. Each cell is an age since the prompt was cached, starting with the prompt sent again at once; the number is the share of re-sends at that age that were served from the cache, in percent. Short: the requests asked for no lifetime. Long: they asked for a longer one, and the value is shown. Hover a cell for the counts.">${COLUMN.measured} <span class="muted">% by age</span></span>${STRIP_HEAD}</th>
-${column("verified", COLUMN.source, "Where the entry comes from, with a date per source: the import from models.dev, and the newest providers.dev evidence.")}
+${column(null, COLUMN.lifetime, "How long a cached prompt can be relied on (cache_lifetime): for short retention, what a request gets without asking for a lifetime; for long, what it gets when it asks for a longer one. Each value says whether it is documented or measured by providers.dev, and names the other of the two where there is one. Hover a value for its source and date; the entry's page lists every lifetime.", "life-col")}
+${column("verified", COLUMN.source,"Where the entry comes from, with a date per source: the import from models.dev, and the newest providers.dev evidence.")}
 </tr>`;
 }
 
@@ -206,8 +258,7 @@ ${options.hideProvider ? "" : `<td class="provider-col" data-label="${COLUMN.pro
 <td class="num" data-label="${COLUMN.max_output}">${tokens(entry.max_output)}</td>
 <td class="num mid-only" data-label="${COLUMN.price}">${priceCell(entry)}</td>
 <td class="wide-only" data-label="${COLUMN.released}">${entry.release_date ? `<span class="muted date">${e(entry.release_date)}</span>` : UNKNOWN}</td>
-<td class="cache-col" data-label="${COLUMN.cache}">${cacheCell(entry)}</td>
-<td class="strip-col" data-label="${COLUMN.measured} · % by age">${measuredCell(entry, href)}</td>
+<td class="life-col" data-label="${COLUMN.lifetime}">${lifetimeCell(entry, href)}</td>
 <td class="nowrap source-col" data-label="${COLUMN.source}">${sourcesHtml(entry, options)}</td>
 </tr>`;
 }
@@ -374,62 +425,107 @@ function fact(label: string, hint: string, value: string, source: string): strin
   return `<tr><th scope="row">${label}<div class="hint">${hint}</div></th><td class="num" data-label="Value">${value}</td><td data-label="Source">${source}</td></tr>`;
 }
 
-/** One cell of a full-size table: the hit rate in percent with the counts under it, or the counts alone for one evaluation. */
-/** A column's heading in the full-size tables, also repeated by each of its cells where the table is stacked. */
+/** A column's heading in the table of lifetimes, also repeated by each of its cells where the table is stacked. */
 const heatLabel = (column: (typeof COLUMNS)[number]): string => (column.kind === "control" ? "At once" : shortAge(column.age_s));
 
-function heatCell(result: CacheResult | undefined, column: (typeof COLUMNS)[number], counts: boolean): string {
+/** One cell of results by age: the hit rate in percent, rounded, with hits/checks under it; the exact rate is in the title. */
+function heatCell(result: CacheResult | undefined, column: (typeof COLUMNS)[number]): string {
   const label = ` data-label="${heatLabel(column)}"`;
-  if (!result) return `<td class="heat"${label}><span class="skip" title="${column.kind === "control" ? "At once" : `After ${ageText(column.age_s)}`}: not checked">·</span></td>`;
-  const inner = counts ? `${result.hits}/${result.checks}` : `${Math.round(result.hit_rate_pct)}<small>${result.hits}/${result.checks}</small>`;
-  return `<td class="heat"${label}><span class="${level(result)}" title="${e(said(result))}">${inner}</span></td>`;
+  if (!result) return `<td class="heat unchecked"${label}><span class="skip" title="${column.kind === "control" ? "At once" : `After ${ageText(column.age_s)}`}: not checked">·</span></td>`;
+  return `<td class="heat"${label}><span class="${level(result)}" title="${e(said(result))}">${Math.round(result.hit_rate_pct)}<small>${result.hits}/${result.checks}</small></span></td>`;
 }
 
 const HEAT_HEAD = COLUMNS.map((column) => `<th scope="col" class="age"${column.kind === "control" ? ` title="${CONTROL_TITLE}"` : ""}>${heatLabel(column)}</th>`).join("");
+const AGE_COLUMNS = COLUMNS.length;
 
 /** Results at ages without a column, in words. Nothing an evaluation checked is left out of the page. */
-function otherAges(results: readonly CacheResult[], counts: boolean): string {
+function otherAges(results: readonly CacheResult[]): string {
   const others = results.filter((result) => !COLUMNS.some((column) => column.kind === result.kind && column.age_s === result.age_s));
   if (others.length === 0) return "";
-  return `Also checked: ${others.map((result) => `${ageText(result.age_s)} ${counts ? "" : `${Math.round(result.hit_rate_pct)}% `}(${result.hits}/${result.checks})`).join(", ")}`;
+  return `Also checked: ${others.map((result) => `${ageText(result.age_s)} ${Math.round(result.hit_rate_pct)}% (${result.hits}/${result.checks})`).join(", ")}`;
+}
+
+/** The safe lifetime of a profile, then the two lifetimes it was chosen from and how many checks hit inside the documented one. */
+function profileRow(profile: RetentionProfile, p: SafeLifetime, now: Date): string {
+  const safe =
+    p.safe_s === null || p.basis === "none" || p.source === null
+      ? UNKNOWN
+      : `<span class="life-value">${lifetimeText(p.safe_s, p.basis)}</span>${basisTag(p.basis)}${lifetimeSource(p.source, p.date, p.basis, now)}`;
+  // The case, read from the three keys the API names for it: a measured safe value beside a documented lifetime replaced
+  // a contradicted one; a documented safe value beside a measured lifetime was not contradicted.
+  const verdict =
+    p.basis === "measured" && p.documented_s !== null
+      ? '<span class="case contradicted" title="An evaluation contradicts the documented lifetime: the safe value is the measured one. The documented lifetime stays in the list.">Documentation contradicted</span>'
+      : p.basis === "documented" && p.measured_s !== null
+        ? '<span class="case" title="No evaluation contradicts the documented lifetime: the safe value is the documented one. Not contradicted is not confirmed.">Documentation not contradicted</span>'
+        : "";
+  const fact = (label: string, value: string): string => `<div><dt>${label}</dt><dd>${value}</dd></div>`;
+  return `<tbody class="profile"><tr><th scope="row" title="${PROFILE_TITLE[profile]}">${PROFILE_WORD[profile]} retention</th><td class="profile-facts" colspan="${1 + AGE_COLUMNS}"><dl>
+${fact("Safe lifetime", `<span class="safe">${safe}</span>${verdict}`)}
+${fact("Documented", p.documented_s === null ? '<span class="muted">Not documented</span>' : lifetimeText(p.documented_s, "documented"))}
+${fact("Measured", p.measured_s === null ? '<span class="muted">Not evaluated</span>' : `${lifetimeText(p.measured_s, "measured")} <span class="muted">· ${plural(p.clients, "client")}</span>`)}
+${fact("Inside the documented lifetime", p.checks_inside === null || p.hits_inside === null ? NOT_APPLICABLE : `<span title="Checks at ages up to the documented lifetime, the control included, and how many were served from the cache.">${exact(p.hits_inside)} of ${exact(p.checks_inside)} checks hit</span>`)}
+</dl></td></tr></tbody>`;
+}
+
+/** The value of an item, its basis, its source and its date: the first cell of every lifetime. */
+function lifetimeHead(item: CacheLifetimeItem, now: Date): string {
+  return `<td class="life" data-label="Lifetime"><span class="life-value">${lifetimeText(item.lifetime_s, item.basis)}</span>${basisTag(item.basis)}${lifetimeSource(item.source, item.date, item.basis, now)}</td>`;
+}
+
+/** The note of an evaluation, where it has one, named by the evaluation where the note could be read as another's. */
+const runNote = (run: CacheEvaluation, named: boolean): string => (run.note ? `<p class="run-note"><b>Note${named ? ` <code>${e(run.id)}</code>` : ""}</b> ${e(run.note)}</p>` : "");
+
+/**
+ * One evaluation under its measured lifetime: the run, its settings, the raw result, and its own results by age. Its note
+ * is on the lifetime's row, in sight before the evaluations are opened; an evaluation in no lifetime carries its own.
+ */
+function runRow(run: CacheEvaluation, now: Date, withNote = false): string {
+  const settings = settingsText(run.request_settings);
+  const other = otherAges(run.results);
+  const date = isStale(run.date, now) ? `<span class="stale" title="Evaluated more than 90 days ago.">${e(run.date)} · stale</span>` : `<span class="muted date" title="The date of this evaluation.">${e(run.date)}</span>`;
+  return `<tr class="run"><td class="run-head" colspan="2">${withNote ? runNote(run, false) : ""}<code>${e(run.id)}</code> ${date}<div class="hint">${e(run.route_label)}${settings ? ` · <code>${e(settings)}</code>` : ""}${other ? ` · ${e(other)}` : ""}</div><a href="${e(run.source)}" rel="noopener">Raw result</a></td>${COLUMNS.map((column) => heatCell(inColumn(run.results, column), column)).join("")}</tr>`;
 }
 
 /**
- * The cache evaluations of one entry: the summary table (the same lines and columns as in the catalog, with the counts
- * under each percentage), then every evaluation under it. Every entry has both, also where nothing was evaluated.
+ * One lifetime of the list, in the same columns whatever its basis. A documented one names the way of caching it is
+ * documented for and the text as documented; a measured one names its client and setting, its checks and results by
+ * age, the notes of its evaluations, and opens onto each evaluation.
  */
-function cacheMeasured(cache: EntryCache, now: Date): string {
-  const columns = COLUMNS.length;
-  const rows: CacheSummaryRow[] = cache.results ?? [
-    { retention_profile: "short", parameter: null, value: null, evaluations: 0, evaluation_ids: [], last_date: null, results: null },
-    { retention_profile: "long", parameter: null, value: null, evaluations: 0, evaluation_ids: [], last_date: null, results: null },
-  ];
-  const summary = rows
-    .map((row) => {
-      const sent = row.parameter && row.value ? `<code>${e(row.parameter)}=${e(row.value)}</code>` : row.retention_profile === "short" ? "No lifetime asked for" : "A longer lifetime asked for";
-      const head = `<th scope="row">${row.retention_profile === "short" ? "Short" : "Long"}<div class="hint">${sent}${row.evaluations > 0 ? ` · ${plural(row.evaluations, "evaluation")}` : ""}</div>${row.results && otherAges(row.results, false) ? `<div class="hint">${e(otherAges(row.results, false))}</div>` : ""}</th>`;
-      if (!row.results) return `<tr>${head}<td class="heat-none" colspan="${columns}">${notEvaluated(row, cache.retention.support)}</td></tr>`;
-      const results = row.results;
-      return `<tr>${head}${COLUMNS.map((column) => heatCell(inColumn(results, column), column, false)).join("")}</tr>`;
-    })
-    .join("");
-  const evaluations = cache.evaluations
-    .map((run) => {
-      const settings = settingsText(run.request_settings);
-      const other = otherAges(run.results, true);
-      return `<tr>
-<th scope="row">${e(run.route_label)} ${dateTag(run.date, now)}<div class="hint">${e(run.client_label)}${settings ? ` · ${e(settings)}` : ""}</div><div class="hint">${run.retention_profile === "short" ? "Short" : "Long"} retention${run.parameter && run.value ? `: <code>${e(run.parameter)}=${e(run.value)}</code>` : ""}${other ? ` · ${e(other)}` : ""}</div>${run.note ? `<div class="hint">${e(run.note)}</div>` : ""}</th>
-${COLUMNS.map((column) => heatCell(inColumn(run.results, column), column, true)).join("")}
-<td class="nowrap" data-label="Evidence"><a href="${e(run.source)}" rel="noopener">Raw result</a></td>
-</tr>`;
-    })
-    .join("");
-  return `<p class="hint">Cache hits by age: percentage, with hits/checks below. Rows are grouped by requested retention. <a href="/docs/methodology/#evaluations">Methodology</a></p>
-<div class="scroll mt-3"><table class="facts heat summary stack-tablet"><thead><tr><th scope="col" rowspan="2">Retention</th><th scope="colgroup" colspan="${columns}" class="span">Time since the prompt was cached · served from the cache, in percent</th></tr><tr>${HEAT_HEAD}</tr></thead><tbody>${summary}</tbody></table></div>
-<p class="legend"><span><span class="heat-key all">100</span> All served from the cache</span><span><span class="heat-key most">67</span> Half or more</span><span><span class="heat-key few">33</span> Fewer</span><span><span class="heat-key none">0</span> None</span><span><span class="heat-key skip">·</span> Not checked at that age</span></p>
-<details class="evaluations"><summary>Individual evaluations (${cache.evaluations.length})</summary>
-<div class="scroll mt-3"><table class="facts heat stack-tablet"><thead><tr><th scope="col" rowspan="2">Evaluation</th><th scope="colgroup" colspan="${columns}" class="span">Time since the prompt was cached · re-sends served from the cache, of those made</th><th scope="col" rowspan="2">Evidence</th></tr><tr>${HEAT_HEAD}</tr></thead><tbody>${evaluations || `<tr class="empty-row"><td colspan="${columns + 2}" class="muted">No evaluations on this entry.</td></tr>`}</tbody></table></div>
-</details>`;
+function itemRows(item: CacheLifetimeItem, evaluations: readonly CacheEvaluation[], now: Date): string {
+  if (item.basis === "documented") {
+    const what =
+      item.mode === null
+        ? "Documented as not caching"
+        : `<span title="${e(CACHE_MODE_TITLE[item.mode])}">${CACHE_MODE_WORD[item.mode]}</span> <span class="chip">${item.mode}</span><div class="hint">As documented: <code>${e(item.documented_as ?? "")}</code></div>`;
+    return `<tbody class="item documented"><tr>${lifetimeHead(item, now)}<td class="through" data-label="Documented for">${what}</td><td class="heat-none" colspan="${AGE_COLUMNS}" data-label="Results by age"><span class="muted" title="A documented lifetime has no results by age.">Not applicable</span></td></tr></tbody>`;
+  }
+  const runs = item.evaluation_ids.flatMap((id) => evaluations.filter((run) => run.id === id));
+  const setting = item.parameter && item.value ? `Sent <code>${e(item.parameter)}=${e(item.value)}</code>` : "No lifetime asked for";
+  const checks = `<span title="Re-sends served from the cache, of those made, the control included.">${exact(item.hits)} of ${exact(item.checks)} checks hit</span>`;
+  const ages = `${item.tested_from_s === null ? "No timed check" : `Tested from ${span(item.tested_from_s)}`} · ${item.first_miss_s === null ? "No miss" : `First miss ${ageText(item.first_miss_s)}`}`;
+  const other = item.results ? otherAges(item.results) : "";
+  const notes = runs.map((run) => runNote(run, runs.length > 1)).join("");
+  const what = `<strong class="client">${e(item.client_label ?? item.client ?? "")}</strong><div class="hint">${setting} · ${checks}</div><div class="hint">${ages}${other ? ` · ${e(other)}` : ""}</div>${notes}<details class="runs"><summary>${plural(item.evaluations, "evaluation")}</summary></details>`;
+  const results = item.results ?? [];
+  return `<tbody class="item measured"><tr>${lifetimeHead(item, now)}<td class="through" data-label="Measured through">${what}</td>${COLUMNS.map((column) => heatCell(inColumn(results, column), column)).join("")}</tr>${runs.map((run) => runRow(run, now)).join("")}</tbody>`;
+}
+
+/**
+ * Every lifetime of an entry, one table for all: per retention profile the safe value and what it was chosen from, then
+ * each documented and each measured lifetime as the API lists them, in its order. Both profiles on every entry.
+ */
+function lifetimesTable(cache: EntryCache, now: Date): string {
+  const record = cache.lifetime;
+  const body = RETENTION_PROFILES.map((profile) => profileRow(profile, record[profile], now) + record.lifetimes.filter((item) => item.retention_profile === profile).map((item) => itemRows(item, cache.evaluations, now)).join("")).join("");
+  // An evaluation that is in no lifetime (no timed result, and a control that hit) is still on the page.
+  const named = new Set(record.lifetimes.flatMap((item) => item.evaluation_ids));
+  const others = cache.evaluations.filter((run) => !named.has(run.id));
+  const rest = others.length
+    ? `<tbody class="profile"><tr><th scope="row">Other evaluations</th><td class="profile-facts" colspan="${1 + AGE_COLUMNS}"><span class="muted">In no lifetime</span></td></tr></tbody><tbody class="item others">${others.map((run) => runRow(run, now, true)).join("")}</tbody>`
+    : "";
+  return `<div class="scroll"><table class="facts heat lifetimes stack-tablet"><caption class="sr-only">Every cache lifetime of this entry, by retention</caption><thead><tr><th scope="col" rowspan="2">Lifetime</th><th scope="col" rowspan="2">Documented for, or measured through</th><th scope="colgroup" colspan="${AGE_COLUMNS}" class="span">Time since the prompt was cached · served from the cache, in percent, with hits/checks</th></tr><tr>${HEAT_HEAD}</tr></thead>${body}${rest}</table></div>
+<p class="legend"><span><span class="heat-key all">100</span> All served from the cache</span><span><span class="heat-key most">67</span> Half or more</span><span><span class="heat-key few">33</span> Fewer</span><span><span class="heat-key none">0</span> None</span><span><span class="heat-key skip">·</span> Not checked at that age</span><span><a href="/docs/methodology/#evaluations">Methodology</a></span></p>`;
 }
 
 /** A JSON Pointer into the request body as the field a developer writes: /cache_control/ttl -> cache_control.ttl. */
@@ -476,24 +572,25 @@ function measuredLimitRows(limits: MeasuredLimit[]): string {
     .join("");
 }
 
-/** Documented caching. Every entry has the same table: one row for each way of caching, supported or not. */
+/**
+ * The ways of caching the source documents. Every entry has the same table: one row for each way, supported or not.
+ * Their lifetimes are items of the list of lifetimes, each with its way of caching.
+ */
 function cacheDocumented(documented: CacheDocumentation, source: string): string {
   const rows = (["implicit", "explicit"] as const).map((mode) => {
     const detail = documented.modes[mode];
     const state = { supported: "Supported", unsupported: '<span class="muted">Unsupported</span>', unknown: UNKNOWN }[detail.support];
     const supported = detail.support === "supported";
-    const ttl = detail.ttl === null ? UNKNOWN : detail.ttl.length > 0 ? detail.ttl.map((item) => `<span class="chip">${e(item)}</span>`).join(" ") : "None listed";
     const blank = detail.support === "unsupported" ? NOT_APPLICABLE : UNKNOWN;
     return `<tr>
 <th scope="row">${CACHE_MODE_WORD[mode]} <span class="chip">${mode}</span></th>
 <td data-label="Supported">${state}</td>
-<td data-label="Lifetimes">${supported ? ttl : blank}</td>
 <td class="num" data-label="Min. tokens">${supported ? (detail.min_tokens === null ? UNKNOWN : exact(detail.min_tokens)) : blank}</td>
 <td class="num" data-label="Breakpoints">${supported && mode === "explicit" ? (detail.max_breakpoints === null ? UNKNOWN : exact(detail.max_breakpoints)) : supported ? NOT_APPLICABLE : blank}</td>
 <td data-label="Targets">${supported && mode === "explicit" ? (detail.targets === null ? UNKNOWN : e(detail.targets.join(", "))) : supported ? NOT_APPLICABLE : blank}</td>
 </tr>`;
   });
-  return `<div class="scroll"><table class="facts stack-phone"><thead><tr><th scope="col">Mode</th><th scope="col">Supported</th><th scope="col">Lifetimes</th><th scope="col" class="num">Min. tokens</th><th scope="col" class="num">Breakpoints</th><th scope="col">Targets</th></tr></thead><tbody>${rows.join("")}</tbody></table></div>
+  return `<div class="scroll"><table class="facts stack-phone"><thead><tr><th scope="col">Mode</th><th scope="col">Supported</th><th scope="col" class="num">Min. tokens</th><th scope="col" class="num">Breakpoints</th><th scope="col">Targets</th></tr></thead><tbody>${rows.join("")}</tbody></table></div>
 <p class="hint">Source: ${source} · <a href="/docs/methodology/#caching">Cache modes</a></p>`;
 }
 
@@ -521,15 +618,18 @@ export function entryHtml(view: EntryView): string {
   const number = (value: Json | undefined): string => (typeof value === "number" ? `${exact(value)} <span class="muted">tokens</span>` : UNKNOWN);
   const big = (value: Json | undefined): string => (typeof value === "number" ? `${exact(value)} <span class="unit">tokens</span>` : '<span class="muted">Unknown</span>');
   const api = `/api/v1${entryHref(summary.ref)}`;
-  const newest = (cache.results ?? []).map((row) => row.last_date).filter((date): date is string => date !== null).sort().at(-1);
-  const measuredValue = summary.evaluation_count === 0 ? '<span class="muted">Not evaluated</span>' : plural(summary.evaluation_count, "evaluation");
-  const measuredFoot = summary.evaluation_count === 0 ? "No evaluations on this entry" : `The newest on ${newest}`;
-  const cacheTile =
-    summary.cache === "unknown"
-      ? '<span class="muted">Unknown</span>'
-      : summary.cache === "no"
-        ? "None"
-        : `${summary.cache_modes.map((mode, at) => (at === 0 ? CACHE_MODE_WORD[mode] : CACHE_MODE_WORD[mode].toLowerCase())).join(" + ")}${summary.cache_ttl_s.length > 0 ? ` <span class="unit">${summary.cache_ttl_s.map(duration).join(", ")}</span>` : ""}`;
+  // The safe lifetime of each profile, at the top of the page: the value, its basis, and whose it is as of when.
+  const lifetimeTile = (profile: RetentionProfile): string => {
+    const p = cache.lifetime[profile];
+    const label = `Cache lifetime, ${profile}`;
+    if (p.safe_s === null || p.basis === "none" || p.source === null) return tile(label, '<span class="muted">Unknown</span>', "Not documented or evaluated");
+    // The other of the two lifetimes it was chosen from, where there is one, read from `basis` as in the list.
+    const other =
+      p.basis === "documented"
+        ? p.measured_s === null ? "" : `<div>Measured ${p.measured_s === 0 ? "0 s" : span(p.measured_s)}</div>`
+        : p.documented_s === null ? "" : `<div class="contradicted">Documented ${p.documented_s === 0 ? "None" : span(p.documented_s)}, contradicted</div>`;
+    return tile(label, `<span title="${e(safeSaid(profile, p))}">${lifetimeText(p.safe_s, p.basis)}</span>${basisTag(p.basis)}`, `${e(p.source)}${p.date ? ` · ${e(p.date)}` : ""}${other}`);
+  };
 
   return `
 <header class="entry-head">
@@ -547,8 +647,8 @@ export function entryHtml(view: EntryView): string {
 <div class="tiles mt-6">
   ${tile("Context window", big(limit.context), "Exposed by this provider")}
   ${tile("Maximum output", big(limit.output), "Per response; not a default")}
-  ${tile("Prompt cache, documented", cacheTile, summary.cache === "unknown" ? "The source does not say" : "As documented", true)}
-  ${tile("Prompt cache, measured", measuredValue, measuredFoot, true)}
+  ${lifetimeTile("short")}
+  ${lifetimeTile("long")}
 </div>
 
 <section aria-labelledby="limits">
@@ -577,12 +677,12 @@ export function entryHtml(view: EntryView): string {
 
 <section aria-labelledby="cache">
   <h2 id="cache">Prompt caching</h2>
-  <h3>Documented</h3>
+  <h3>Lifetimes</h3>
+  ${lifetimesTable(cache, now)}
+  <h3>Cache modes</h3>
   ${cacheDocumented(cache.documented, sourceOf("capabilities.cache", provenance, extension.origin))}
   <h3>Retention</h3>
   ${requestControlTable(summary.request_controls.items.filter((control) => control.id === "cache.retention"))}
-  <h3>Measured</h3>
-  ${cacheMeasured(cache, now)}
 </section>
 
 <section aria-labelledby="provenance">

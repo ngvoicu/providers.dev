@@ -54,13 +54,6 @@ export function isStale(date: string | null | undefined, now: Date): boolean {
   return now.getTime() - new Date(`${date}T00:00:00Z`).getTime() > STALE_AFTER_DAYS * 86400 * 1000;
 }
 
-export function cacheLabel(entry: Pick<Summary, "cache" | "cache_modes" | "cache_ttl_s">): string {
-  if (entry.cache === "no") return "None";
-  if (entry.cache === "unknown") return "Unknown";
-  const ttl = entry.cache_ttl_s.length > 0 ? ` · ${entry.cache_ttl_s.map(duration).join(", ")}` : "";
-  return `${entry.cache_modes.join(" + ")}${ttl}`;
-}
-
 export function plural(count: number, word: string): string {
   return `${exact(count)} ${word}${count === 1 ? "" : "s"}`;
 }

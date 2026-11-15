@@ -163,7 +163,7 @@
 @layer components {
   .page {
     width: 100%;
-    /* wide enough for the catalog with every column: the cache summary alone has nineteen cells */
+    /* wide enough for the catalog with every column, and for an entry's cache lifetimes: nineteen ages in a row */
     max-width: 100rem;
     margin-inline: auto;
     padding-inline: 1rem;
@@ -520,6 +520,14 @@
     font-size: 0.78rem;
     color: var(--muted);
   }
+  .tile .value .basis {
+    margin-left: 0.5rem;
+    vertical-align: 0.2em;
+    letter-spacing: 0;
+  }
+  .tile .foot .contradicted {
+    color: var(--warn);
+  }
 
   /* Tables */
   .scroll {
@@ -849,8 +857,8 @@
   td.heat .skip {
     border-color: transparent;
   }
-  /* The summary table: the percentage, and the counts it comes from under it */
-  table.heat.summary td.heat span {
+  /* The table of lifetimes: the percentage, and the counts it comes from under it */
+  table.heat.lifetimes td.heat span {
     padding: 0.3rem 0;
     font-size: 0.86rem;
   }
@@ -863,14 +871,6 @@
   table.heat td.heat-none {
     font-size: 0.88rem;
     vertical-align: middle;
-  }
-  details.evaluations {
-    margin-top: 1.1rem;
-  }
-  details.evaluations > summary {
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 0.95rem;
   }
   .legend {
     display: flex;
@@ -935,8 +935,7 @@
     opacity: 1;
   }
 
-  /* The catalog's cache cell: how it caches, then for how long, each on one line */
-  /* Documented caching: one line per way of caching, the word and then its lifetimes in a box */
+  /* Documented caching in words: the methodology's examples of a way of caching and its lifetimes in a box */
   .cache {
     display: inline-grid;
     grid-template-columns: auto auto;
@@ -965,7 +964,7 @@
     font-size: 0.84rem;
   }
 
-  /* Cache evaluations in the catalog: one row of cells per entry, one cell per age, the same ages in every row */
+  /* Cache evaluations on the evidence page: one row of cells per evaluation, one cell per age, the same ages in every row */
   .strip {
     display: grid;
     /* the control ("at once"), a little apart, then the eighteen ages */
@@ -1049,6 +1048,250 @@
   }
   .strip-label.none {
     color: var(--muted);
+  }
+
+  /* Cache lifetimes. Every value says whether it is documented or measured, in a word with the colour of its kind. */
+  .basis {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.74rem;
+    font-weight: 500;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+  .basis::before {
+    content: "";
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 50%;
+    background: currentColor;
+  }
+  .basis.documented {
+    color: var(--documented);
+  }
+  .basis.measured {
+    color: var(--measured);
+  }
+  .life-value {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .life-value.unknown {
+    color: var(--muted);
+  }
+  .life-source {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.2rem 0.45rem;
+  }
+  /* In a list: short and long, each on its line: the profile, the safe value, its basis, the other value beside it */
+  .lifes {
+    display: inline-grid;
+    grid-template-columns: auto auto minmax(0, auto);
+    align-items: baseline;
+    gap: 0.3rem 0.55rem;
+    line-height: 1.35;
+    text-decoration: none;
+  }
+  .lifes:hover {
+    text-decoration: none;
+  }
+  .lifes .life-profile {
+    color: var(--muted);
+    font-size: 0.78rem;
+  }
+  .lifes .life-value {
+    font-family: var(--font-mono);
+    font-size: 0.84rem;
+  }
+  .lifes .life-value.unknown {
+    font-family: var(--font-sans);
+    font-size: 0.86rem;
+  }
+  .lifes .life-basis {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.1rem 0.45rem;
+  }
+  .life-other {
+    color: var(--muted);
+    font-size: 0.74rem;
+    white-space: nowrap;
+  }
+  .life-other.contradicted {
+    color: var(--warn);
+  }
+  a.lifes:hover .life-value {
+    color: var(--link);
+  }
+  /* On an entry's page: one table of every lifetime. Each retention starts with its safe value and what it was chosen
+     from; under it each lifetime, documented or measured, in the same columns. */
+  table.lifetimes td.life {
+    min-width: 9.5rem;
+  }
+  table.lifetimes td.life > * {
+    display: flex;
+  }
+  table.lifetimes td.life .life-value {
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  table.lifetimes td.life .life-source {
+    margin-top: 0.3rem;
+  }
+  table.lifetimes td.through {
+    min-width: 15rem;
+    max-width: 26rem;
+    vertical-align: top;
+  }
+  table.lifetimes td.life {
+    vertical-align: top;
+  }
+  /* Between a tablet and a wide screen the nineteen ages take a little less room each */
+  @media (min-width: 1024px) and (max-width: 1279.98px) {
+    table.lifetimes td.life {
+      min-width: 8rem;
+      padding-right: 0.5rem;
+    }
+    table.lifetimes td.through {
+      min-width: 11.5rem;
+      padding-right: 0.5rem;
+    }
+    table.lifetimes td.heat {
+      width: 2.3rem;
+    }
+    table.lifetimes td.heat span {
+      min-width: 2.1rem;
+      font-size: 0.76rem;
+    }
+    table.lifetimes thead th.age {
+      font-size: 0.7rem;
+      line-height: 1.2;
+      white-space: normal;
+    }
+  }
+  table.lifetimes .client {
+    font-weight: 500;
+  }
+  table.lifetimes tbody.profile > tr > * {
+    background: var(--bg-subtle);
+    border-top: 2px solid var(--line);
+    padding-top: 0.7rem;
+    padding-bottom: 0.7rem;
+  }
+  table.lifetimes tbody.profile > tr > th {
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  table.lifetimes tbody.profile:first-of-type > tr > * {
+    border-top: 0;
+  }
+  .profile-facts dl {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 2.2rem;
+  }
+  .profile-facts dt {
+    color: var(--muted);
+    font-size: 0.74rem;
+  }
+  .profile-facts dd {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.3rem 0.6rem;
+    font-size: 0.9rem;
+  }
+  .profile-facts .safe {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.3rem 0.6rem;
+  }
+  .profile-facts .safe .life-value {
+    font-size: 1.05rem;
+    font-weight: 620;
+    letter-spacing: -0.01em;
+  }
+  .case {
+    font-size: 0.74rem;
+    line-height: 1.6;
+    padding: 0 0.5rem;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    color: var(--fg-soft);
+    white-space: nowrap;
+  }
+  .case.contradicted {
+    color: var(--warn);
+    background: var(--warn-bg);
+    border-color: transparent;
+  }
+  /* The note of an evaluation, in sight with the lifetime it belongs to */
+  .run-note {
+    margin-top: 0.4rem;
+    padding: 0.3rem 0.55rem;
+    border-left: 2px solid var(--line-strong);
+    background: var(--bg-subtle);
+    color: var(--fg-soft);
+    font-size: 0.8rem;
+    line-height: 1.45;
+  }
+  .run-note b {
+    font-weight: 600;
+    margin-right: 0.2rem;
+  }
+  /* A measured lifetime opens onto its evaluations: rows of their own under it, in the same columns */
+  details.runs {
+    margin-top: 0.35rem;
+  }
+  details.runs > summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.8rem;
+    color: var(--link);
+    list-style: none;
+  }
+  details.runs > summary::-webkit-details-marker {
+    display: none;
+  }
+  details.runs > summary::before {
+    content: "▸";
+    font-size: 0.7rem;
+  }
+  details.runs[open] > summary::before {
+    content: "▾";
+  }
+  table.lifetimes > tbody.measured:not(:has(details.runs[open])) > tr.run {
+    display: none;
+  }
+  table.lifetimes tr.run > * {
+    background: var(--bg-subtle);
+    border-bottom: 1px dashed var(--line);
+    font-size: 0.85rem;
+  }
+  /* A line between two lifetimes; a dashed one between a lifetime and its evaluations */
+  @media (min-width: 1024px) {
+    table.lifetimes tbody.item + tbody.item > tr:first-child > * {
+      border-top: 1px solid var(--line);
+    }
+    table.lifetimes tbody.item:has(details.runs[open]) > tr:first-child > * {
+      border-bottom: 1px dashed var(--line);
+    }
+  }
+  table.lifetimes td.heat-none {
+    vertical-align: middle;
+    font-size: 0.82rem;
+  }
+  table.lifetimes tr.run > td.run-head {
+    padding-left: 1.6rem;
+  }
+  table.lifetimes tr.run code {
+    font-size: 0.78rem;
   }
 
   /* Labels */
@@ -1429,7 +1672,7 @@
   /* The entry table (catalog, provider, model) as a list of entries: the name, then each value under its column's name */
   @media (max-width: 1023.98px) {
     table.entries.stack-tablet > tbody > tr > .provider-col,
-    table.entries.stack-tablet > tbody > tr > .cache-col {
+    table.entries.stack-tablet > tbody > tr > .life-col {
       flex: 2 1 14rem;
     }
     table.entries.stack-tablet > tbody > tr > .num,
@@ -1531,6 +1774,44 @@
     }
     table.heat.stack-tablet > thead th.age {
       padding: 0;
+    }
+    /* Lifetimes: each retention and each lifetime a block; of the ages only those checked, each under its own name */
+    table.lifetimes.stack-tablet > tbody > tr > td.heat.unchecked {
+      display: none;
+    }
+    table.lifetimes.stack-tablet > tbody.profile > tr,
+    table.lifetimes.stack-tablet > tbody > tr.run {
+      background: var(--bg-subtle);
+    }
+    table.lifetimes.stack-tablet > tbody.profile > tr {
+      border-top: 2px solid var(--line);
+    }
+    table.lifetimes.stack-tablet > tbody.profile:first-of-type > tr {
+      border-top: 0;
+    }
+    table.lifetimes.stack-tablet > tbody > tr > * {
+      padding: 0;
+      border: 0;
+      background: none;
+    }
+    table.lifetimes.stack-tablet > tbody > tr.run {
+      padding-left: 1.6rem;
+      border-bottom: 1px dashed var(--line);
+    }
+    table.lifetimes.stack-tablet td.through {
+      max-width: none;
+    }
+    table.lifetimes.stack-tablet td.life {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.2rem 0.7rem;
+    }
+    table.lifetimes.stack-tablet td.life::before {
+      flex-basis: 100%;
+    }
+    table.lifetimes.stack-tablet td.life .life-source {
+      margin-top: 0;
     }
     /* Code and JSON wrap instead of running off the side */
     pre {

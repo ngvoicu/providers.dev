@@ -82,6 +82,42 @@ describe("API response boundary", () => {
     expect(html).toContain("Published 2030-01-02 03:04 UTC");
   });
 
+  it("prints cache lifetimes from cache_lifetime, and reads none of the old cache fields", async () => {
+    // The fields that go when the merged record is the only one: a page answered without them is the same page.
+    const strip = (value: unknown): void => {
+      if (Array.isArray(value)) return value.forEach(strip);
+      if (!value || typeof value !== "object") return;
+      const object = value as Record<string, unknown>;
+      for (const key of ["cache_ttl_s", "cache_ttl_by_mode_s", "cache_results"]) delete object[key];
+      if (object.documented && object.retention && object.lifetime) delete object.results;
+      if (object.support && "min_tokens" in object) delete object.ttl;
+      Object.values(object).forEach(strip);
+    };
+    const stripped = async (path: string): Promise<Response> => {
+      const response = await api(path);
+      const body = await response.json() as unknown;
+      strip(body);
+      return Response.json(body, { status: response.status });
+    };
+    // Documented lifetimes, caching with no lifetime, does not cache, nothing known; and the lists.
+    const paths = ["/?provider=provider-02&limit=8", "/providers/provider-02/", "/models/lab/model-4/", "/entries/provider-02/lab/model-4", "/entries/provider-02/model-1", "/entries/provider-02/lab/model-2", "/entries/provider-02/model-3"];
+    for (const path of paths) {
+      const response = await page(path);
+      expect(response.status, path).toBe(200);
+      const html = await response.text();
+      // The raw record at the foot of an entry page is the API's answer as it is.
+      expect((await (await page(path, stripped)).text()).replace(/<pre[\s\S]*?<\/pre>/g, ""), path).toBe(html.replace(/<pre[\s\S]*?<\/pre>/g, ""));
+      expect(html, path).not.toContain("Cache, measured");
+    }
+    // model-4 documents 5m and 1h: two documented lifetimes, models.dev, on the date of the import.
+    const entry = await (await page("/entries/provider-02/lab/model-4")).text();
+    expect(entry).toContain("<h3>Lifetimes</h3>");
+    expect(entry.match(/<tbody class="item documented">/g)).toHaveLength(2);
+    expect(entry).toContain('<th scope="row" title="Short retention: the cache a request gets without asking for a lifetime, or with the provider\'s shortest setting.">Short retention</th>');
+    const catalog = await (await page("/?provider=provider-02&limit=8")).text();
+    expect(catalog).toContain('<td class="life-col" data-label="Cache lifetime"><a class="plain lifes" href="/entries/provider-02/lab/model-4#cache"');
+  });
+
   it("renders the requested homepage filters and page before JavaScript runs", async () => {
     const path = "/?provider=provider-02&limit=2&offset=2&sort=model";
     const html = await (await page(path)).text();
