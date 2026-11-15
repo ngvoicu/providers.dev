@@ -6,17 +6,177 @@
   "NVIDIA_API_KEY"
  ],
  "models": {
-  "nvidia/llama-nemotron-embed-vl-1b-v2": {
-   "id": "nvidia/llama-nemotron-embed-vl-1b-v2",
-   "name": "llama-nemotron-embed-vl-1b-v2",
-   "description": "Embedding model for semantic search, retrieval, clustering, and ranking pipelines",
-   "type": "embedding",
-   "family": "nemotron",
-   "canonical_id": "nvidia/llama-nemotron-embed-vl-1b-v2",
-   "release_date": "2025-12-18",
+  "black-forest-labs/flux.1-dev": {
+   "id": "black-forest-labs/flux.1-dev",
+   "name": "FLUX.1-dev",
+   "description": "Open-weight FLUX.1 text-to-image model for high-quality guidance-distilled generation",
+   "type": "image",
+   "family": "flux",
+   "canonical_id": "black-forest-labs/flux-1-dev",
+   "release_date": "2024-08-01",
    "limit": {
-    "context": 8192,
-    "output": 2048
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "image/jpeg"
+    ]
+   },
+   "api": {
+    "images": {
+     "base_url": "https://ai.api.nvidia.com/v1/genai/black-forest-labs/flux.1-dev",
+     "sdk": {}
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-08",
+   "last_updated": "2024-08-01"
+  },
+  "black-forest-labs/flux_1-kontext-dev": {
+   "id": "black-forest-labs/flux_1-kontext-dev",
+   "name": "FLUX.1-Kontext-dev",
+   "description": "Open-weight FLUX.1 Kontext model for instruction-based image editing",
+   "type": "image",
+   "family": "flux",
+   "canonical_id": "black-forest-labs/flux-1-kontext-dev",
+   "release_date": "2025-05-29",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "image"
+    ]
+   },
+   "api": {
+    "images": {
+     "base_url": "https://ai.api.nvidia.com/v1/genai/black-forest-labs/flux.1-kontext-dev",
+     "sdk": {}
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-05-29"
+  },
+  "black-forest-labs/flux_1-schnell": {
+   "id": "black-forest-labs/flux_1-schnell",
+   "name": "FLUX.1-schnell",
+   "description": "Fast few-step FLUX.1 text-to-image model under Apache 2.0",
+   "type": "image",
+   "family": "flux",
+   "canonical_id": "black-forest-labs/flux-1-schnell",
+   "release_date": "2024-08-01",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "image"
+    ]
+   },
+   "api": {
+    "images": {
+     "base_url": "https://ai.api.nvidia.com/v1/genai/black-forest-labs/flux.1-schnell",
+     "sdk": {}
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-07",
+   "last_updated": "2024-08-01"
+  },
+  "black-forest-labs/flux_2-klein-4b": {
+   "id": "black-forest-labs/flux_2-klein-4b",
+   "name": "FLUX.2 Klein 4B",
+   "description": "Fast 4B open-weight image generation and editing model",
+   "type": "image",
+   "family": "flux",
+   "canonical_id": "black-forest-labs/flux-2-klein-4b",
+   "release_date": "2026-01-15",
+   "limit": {
+    "context": 0,
+    "output": 0
    },
    "capabilities": {
     "temperature": false,
@@ -45,42 +205,43 @@
     "input": [
      "text",
      "image/png",
-     "image/jpeg"
+     "image/jpeg",
+     "image/webp"
     ],
     "output": [
-     "embedding"
+     "image/jpeg",
+     "image/png",
+     "image/webp"
     ]
    },
    "api": {
-    "embeddings": {
-     "base_url": "https://integrate.api.nvidia.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
-     }
+    "images": {
+     "base_url": "https://ai.api.nvidia.com/v1/genai/black-forest-labs/flux.2-klein-4b",
+     "sdk": {}
     }
    },
    "open_weights": true,
-   "last_updated": "2025-12-18"
+   "knowledge": "2025-06",
+   "last_updated": "2026-01-15"
   },
-  "nvidia/nemotron-3-ultra-550b-a55b": {
-   "id": "nvidia/nemotron-3-ultra-550b-a55b",
-   "name": "Nemotron 3 Ultra 550B A55B",
-   "description": "Largest Nemotron 3 model for maximum open-weight reasoning and agent accuracy",
+  "deepseek-ai/deepseek-v4.1-flash": {
+   "id": "deepseek-ai/deepseek-v4.1-flash",
+   "name": "DeepSeek V4.1 Flash",
+   "description": "DeepSeek V4.1 Flash model for reasoning and agentic coding",
    "type": "chat",
-   "family": "nemotron",
-   "canonical_id": "nvidia/nemotron-3-ultra-550b-a55b",
-   "release_date": "2026-06-04",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4.1-flash",
+   "release_date": "2026-09-10",
    "limit": {
     "context": 1000000,
-    "output": 65536
+    "output": 384000
    },
    "capabilities": {
     "temperature": true,
     "top_k": true,
     "top_p": true,
     "structured_output": true,
-    "system_updates": true,
+    "system_updates": false,
     "effort_updates": false,
     "tools": {
      "supported": true
@@ -89,1483 +250,6 @@
      "supported": true,
      "effort": [
       "none",
-      "medium",
-      "high"
-     ],
-     "budget": {
-      "min": -1,
-      "max": 32768
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://integrate.api.nvidia.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-09",
-   "last_updated": "2026-06-04"
-  },
-  "nvidia/cosmos-reason2-8b": {
-   "id": "nvidia/cosmos-reason2-8b",
-   "name": "Cosmos Reason2 8B",
-   "description": "Vision language model for physical-world understanding with structured reasoning on video and images",
-   "type": "chat",
-   "status": "deprecated",
-   "release_date": "2025-12-01",
-   "limit": {
-    "context": 131072,
-    "output": 16384
-   },
-   "capabilities": {
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "video"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://integrate.api.nvidia.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-12-01"
-  },
-  "nvidia/usdvalidate": {
-   "id": "nvidia/usdvalidate",
-   "name": "usdvalidate",
-   "description": "Nemotron model for efficient reasoning, coding, and specialized AI agents",
-   "type": "chat",
-   "status": "deprecated",
-   "release_date": "2024-07-24",
-   "limit": {
-    "context": 0,
-    "output": 4096
-   },
-   "capabilities": {
-    "temperature": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://integrate.api.nvidia.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-01-08"
-  },
-  "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning": {
-   "id": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
-   "name": "Nemotron 3 Nano Omni",
-   "description": "Open Nemotron omni model combining reasoning with text, vision, and audio",
-   "type": "chat",
-   "family": "nemotron",
-   "canonical_id": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
-   "release_date": "2026-04-28",
-   "limit": {
-    "context": 256000,
-    "output": 65536
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": true,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "budget": {
-      "min": -1,
-      "max": 32768
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "video/mp4",
-     "audio/wav",
-     "audio/mpeg"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://integrate.api.nvidia.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-04-28"
-  },
-  "nvidia/active-speaker-detection": {
-   "id": "nvidia/active-speaker-detection",
-   "name": "Active Speaker Detection",
-   "description": "Detects and tracks which person is speaking across video frames",
-   "type": "chat",
-   "release_date": "2026-04-16",
-   "limit": {
-    "context": 0,
-    "output": 4096
-   },
-   "capabilities": {
-    "temperature": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "video"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://integrate.api.nvidia.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-04-16"
-  },
-  "nvidia/llama-3.1-nemotron-70b-instruct": {
-   "id": "nvidia/llama-3.1-nemotron-70b-instruct",
-   "name": "Llama 3.1 Nemotron 70B Instruct",
-   "description": "Nemotron model for efficient reasoning, coding, and specialized AI agents",
-   "type": "chat",
-   "family": "nemotron",
-   "canonical_id": "nvidia/llama-3.1-nemotron-70b-instruct",
-   "status": "deprecated",
-   "release_date": "2025-04-15",
-   "limit": {
-    "context": 128000,
-    "output": 8192
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://integrate.api.nvidia.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-04-15"
-  },
-  "nvidia/nemotron-3.5-lightning-30b-a3b": {
-   "id": "nvidia/nemotron-3.5-lightning-30b-a3b",
-   "name": "Nemotron 3.5 Lightning 30B A3B",
-   "description": "Fast NVIDIA Nemotron MoE for reliable agentic tasks across enterprise workloads",
-   "type": "chat",
-   "family": "nemotron",
-   "canonical_id": "nvidia/nemotron-3.5-lightning",
-   "release_date": "2026-08-11",
-   "limit": {
-    "context": 262144,
-    "output": 262144
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": true,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://integrate.api.nvidia.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-09",
-   "last_updated": "2026-08-11"
-  },
-  "nvidia/llama-3.1-nemotron-safety-guard-8b-v3": {
-   "id": "nvidia/llama-3.1-nemotron-safety-guard-8b-v3",
-   "name": "llama-3.1-nemotron-safety-guard-8b-v3",
-   "description": "Safety model for policy screening, moderation, and risk-aware routing workflows",
-   "type": "chat",
-   "family": "nemotron",
-   "canonical_id": "nvidia/llama-3.1-nemotron-safety-guard-8b-v3",
-   "release_date": "2025-10-28",
-   "limit": {
-    "context": 128000,
-    "output": 4096
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://integrate.api.nvidia.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-10-28"
-  },
-  "nvidia/synthetic-video-detector": {
-   "id": "nvidia/synthetic-video-detector",
-   "name": "synthetic-video-detector",
-   "description": "Detects AI-generated (synthetic) video",
-   "type": "chat",
-   "release_date": "2026-04-16",
-   "limit": {
-    "context": 0,
-    "output": 4096
-   },
-   "capabilities": {
-    "temperature": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "video/mp4"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://integrate.api.nvidia.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-04-16"
-  },
-  "nvidia/nemotron-voicechat": {
-   "id": "nvidia/nemotron-voicechat",
-   "name": "nemotron-voicechat",
-   "description": "Nemotron multimodal model for visual reasoning and agentic AI workflows",
-   "type": "chat",
-   "family": "nemotron",
-   "canonical_id": "nvidia/nemotron-voicechat",
-   "release_date": "2026-03-16",
-   "limit": {
-    "context": 128000,
-    "output": 8192
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "audio/wav"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://integrate.api.nvidia.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-03-16"
-  },
-  "nvidia/bevformer": {
-   "id": "nvidia/bevformer",
-   "name": "bevformer",
-   "description": "Multi-frame bird's-eye-view 3D perception transformer for autonomous driving",
-   "type": "chat",
-   "release_date": "2025-03-18",
-   "limit": {
-    "context": 128000,
-    "output": 8192
-   },
-   "capabilities": {
-    "temperature": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "video"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://integrate.api.nvidia.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-07-20"
-  },
-  "nvidia/studiovoice": {
-   "id": "nvidia/studiovoice",
-   "name": "studiovoice",
-   "description": "Enhances noisy or reverberant speech recordings to studio-quality speech",
-   "type": "chat",
-   "release_date": "2024-10-03",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "audio"
-    ],
-    "output": [
-     "audio"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://integrate.api.nvidia.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-06-13"
-  },
-  "nvidia/riva-translate-4b-instruct-v1.1": {
-   "id": "nvidia/riva-translate-4b-instruct-v1.1",
-   "name": "riva-translate-4b-instruct-v1_1",
-   "description": "Translation model for multilingual conversion, localization, and cross-language workflows",
-   "type": "chat",
-   "status": "deprecated",
-   "release_date": "2025-12-12",
-   "limit": {
-    "context": 128000,
-    "output": 4096
-   },
-   "capabilities": {
-    "temperature": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://integrate.api.nvidia.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-12-12"
-  },
-  "nvidia/usdcode": {
-   "id": "nvidia/usdcode",
-   "name": "usdcode",
-   "description": "Nemotron model for efficient reasoning, coding, and specialized AI agents",
-   "type": "chat",
-   "status": "deprecated",
-   "release_date": "2026-01-01",
-   "limit": {
-    "context": 128000,
-    "output": 4096
-   },
-   "capabilities": {
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://integrate.api.nvidia.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-01-01"
-  },
-  "nvidia/nemotron-3.5-content-safety": {
-   "id": "nvidia/nemotron-3.5-content-safety",
-   "name": "Nemotron 3.5 Content Safety",
-   "description": "Safety model for policy screening, moderation, and risk-aware routing workflows",
-   "type": "chat",
-   "family": "nemotron",
-   "canonical_id": "nvidia/nemotron-3.5-content-safety",
-   "release_date": "2026-06-02",
-   "limit": {
-    "context": 128000,
-    "output": 8192
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/gif",
-     "image/jpeg",
-     "image/png"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://integrate.api.nvidia.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-06-02"
-  },
-  "nvidia/magpie-tts-zeroshot": {
-   "id": "nvidia/magpie-tts-zeroshot",
-   "name": "magpie-tts-zeroshot",
-   "description": "Expressive text-to-speech that clones a voice from a short audio sample",
-   "type": "speech",
-   "release_date": "2025-05-22",
-   "limit": {
-    "context": 0,
-    "output": 4096
-   },
-   "capabilities": {
-    "temperature": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "audio/wav"
-    ],
-    "output": [
-     "audio/wav"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://integrate.api.nvidia.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-06-12"
-  },
-  "nvidia/rerank-qa-mistral-4b": {
-   "id": "nvidia/rerank-qa-mistral-4b",
-   "name": "rerank-qa-mistral-4b",
-   "description": "Reranking model for improving retrieval quality in search and recommendation systems",
-   "type": "reranking",
-   "status": "deprecated",
-   "release_date": "2024-03-17",
-   "limit": {
-    "context": 128000,
-    "output": 4096
-   },
-   "capabilities": {
-    "temperature": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "reranking"
-    ]
-   },
-   "api": {
-    "rerank": {
-     "base_url": "https://ai.api.nvidia.com/v1/retrieval/nvidia/reranking",
-     "sdk": {}
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-01-17"
-  },
-  "nvidia/llama-nemotron-rerank-vl-1b-v2": {
-   "id": "nvidia/llama-nemotron-rerank-vl-1b-v2",
-   "name": "llama-nemotron-rerank-vl-1b-v2",
-   "description": "Reranking model for improving retrieval quality in search and recommendation systems",
-   "type": "reranking",
-   "family": "nemotron",
-   "canonical_id": "nvidia/llama-nemotron-rerank-vl-1b-v2",
-   "release_date": "2025-12-18",
-   "limit": {
-    "context": 10240,
-    "output": 4096
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/gif",
-     "image/bmp",
-     "image/tiff"
-    ],
-    "output": [
-     "reranking"
-    ]
-   },
-   "api": {
-    "rerank": {
-     "base_url": "https://ai.api.nvidia.com/v1/retrieval/nvidia/llama-nemotron-rerank-vl-1b-v2/reranking",
-     "sdk": {}
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-12-18"
-  },
-  "nvidia/nemotron-3.5-super-vl-120b-a12b": {
-   "id": "nvidia/nemotron-3.5-super-vl-120b-a12b",
-   "name": "Nemotron 3.5 Super VL 120B A12B",
-   "description": "NVIDIA vision-language reasoning model for text, image, and video understanding and agentic tool use",
-   "type": "chat",
-   "family": "nemotron",
-   "canonical_id": "nvidia/nemotron-3.5-super-vl-120b-a12b",
-   "release_date": "2026-10-15",
-   "limit": {
-    "context": 1048576,
-    "output": 8192
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": true,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "video/mp4"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://integrate.api.nvidia.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-10-15"
-  },
-  "nvidia/sparsedrive": {
-   "id": "nvidia/sparsedrive",
-   "name": "sparsedrive",
-   "description": "End-to-end autonomous driving stack for perception, prediction, and planning",
-   "type": "chat",
-   "release_date": "2025-03-18",
-   "limit": {
-    "context": 128000,
-    "output": 8192
-   },
-   "capabilities": {
-    "temperature": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "video"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://integrate.api.nvidia.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-07-20"
-  },
-  "nvidia/nemotron-3.5-embed-1b": {
-   "id": "nvidia/nemotron-3.5-embed-1b",
-   "name": "Nemotron 3.5 Embed 1B",
-   "description": "Multimodal multilingual embedding model for text and document-image retrieval",
-   "type": "embedding",
-   "family": "nemotron",
-   "canonical_id": "nvidia/nemotron-3.5-embed-1b",
-   "release_date": "2026-10-20",
-   "limit": {
-    "context": 32768,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg"
-    ],
-    "output": [
-     "embedding"
-    ]
-   },
-   "api": {
-    "embeddings": {
-     "base_url": "https://integrate.api.nvidia.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-10-20"
-  },
-  "nvidia/llama-3.1-nemotron-ultra-253b-v1": {
-   "id": "nvidia/llama-3.1-nemotron-ultra-253b-v1",
-   "name": "Llama 3.1 Nemotron Ultra 253B",
-   "description": "Flagship Nemotron model for high-throughput reasoning and complex agents",
-   "type": "chat",
-   "family": "nemotron",
-   "canonical_id": "nvidia/llama-3.1-nemotron-ultra-253b",
-   "status": "deprecated",
-   "release_date": "2025-04-07",
-   "limit": {
-    "context": 128000,
-    "output": 16384
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://integrate.api.nvidia.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-04-07"
-  },
-  "nvidia/nemotron-3-embed-1b": {
-   "id": "nvidia/nemotron-3-embed-1b",
-   "name": "Nemotron 3 Embed 1B",
-   "description": "Open text embedding model for retrieval, RAG, and code search",
-   "type": "embedding",
-   "family": "nemotron",
-   "canonical_id": "nvidia/nemotron-3-embed-1b",
-   "release_date": "2026-07-16",
-   "limit": {
-    "context": 32768,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "embedding"
-    ]
-   },
-   "api": {
-    "embeddings": {
-     "base_url": "https://integrate.api.nvidia.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-07-16"
-  },
-  "nvidia/streampetr": {
-   "id": "nvidia/streampetr",
-   "name": "streampetr",
-   "description": "Temporal 3D object detection model for autonomous driving",
-   "type": "chat",
-   "release_date": "2025-11-13",
-   "limit": {
-    "context": 128000,
-    "output": 8192
-   },
-   "capabilities": {
-    "temperature": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "video"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://integrate.api.nvidia.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-11-13"
-  },
-  "nvidia/nemotron-3.5-embed-8b": {
-   "id": "nvidia/nemotron-3.5-embed-8b",
-   "name": "Nemotron 3.5 Embed 8B",
-   "description": "Multimodal multilingual embedding model for text and document-image retrieval",
-   "type": "embedding",
-   "family": "nemotron",
-   "canonical_id": "nvidia/nemotron-3.5-embed-8b",
-   "release_date": "2026-10-19",
-   "limit": {
-    "context": 32768,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg"
-    ],
-    "output": [
-     "embedding"
-    ]
-   },
-   "api": {
-    "embeddings": {
-     "base_url": "https://integrate.api.nvidia.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-10-19"
-  },
-  "nvidia/cosmos-transfer2_5-2b": {
-   "id": "nvidia/cosmos-transfer2_5-2b",
-   "name": "cosmos-transfer2.5-2b",
-   "description": "Generates physics-aware video world states from text and spatial control videos",
-   "type": "video",
-   "release_date": "2026-02-26",
-   "limit": {
-    "context": 0,
-    "output": 4096
-   },
-   "capabilities": {
-    "temperature": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image",
-     "video/mp4"
-    ],
-    "output": [
-     "video/mp4"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://integrate.api.nvidia.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-02-26"
-  },
-  "moonshotai/kimi-k3": {
-   "id": "moonshotai/kimi-k3",
-   "name": "Kimi K3",
-   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
-   "type": "chat",
-   "family": "kimi-k3",
-   "canonical_id": "moonshotai/kimi-k3",
-   "status": "deprecated",
-   "release_date": "2026-07-16",
-   "limit": {
-    "context": 1048576,
-    "output": 1048576
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
       "low",
       "high",
       "max"
@@ -1588,19 +272,7 @@
      "image/jpeg",
      "image/png",
      "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/heic",
-     "image/heif",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp"
+     "image/webp"
     ],
     "output": [
      "text"
@@ -1624,334 +296,8 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2026-07-16"
-  },
-  "moonshotai/kimi-k2.6": {
-   "id": "moonshotai/kimi-k2.6",
-   "name": "Kimi K2.6",
-   "description": "Multimodal Kimi workhorse for agent loops, coding tasks, and visual context",
-   "type": "chat",
-   "family": "kimi-k2",
-   "canonical_id": "moonshotai/kimi-k2.6",
-   "status": "deprecated",
-   "release_date": "2026-04-20",
-   "limit": {
-    "context": 262144,
-    "output": 262144
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "minimal",
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/heic",
-     "image/heif",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://integrate.api.nvidia.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-04-20"
-  },
-  "poolside/laguna-xs-2.1": {
-   "id": "poolside/laguna-xs-2.1",
-   "name": "Laguna XS 2.1",
-   "description": "Agentic coding model from Poolside in the XS size class for local deployment",
-   "type": "chat",
-   "family": "laguna",
-   "canonical_id": "poolside/laguna-xs-2.1",
-   "release_date": "2026-07-02",
-   "limit": {
-    "context": 262144,
-    "output": 16384
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": true,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://integrate.api.nvidia.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-07-02"
-  },
-  "qwen/qwen-image-edit": {
-   "id": "qwen/qwen-image-edit",
-   "name": "Qwen Image Edit",
-   "description": "Image editing model with multilingual text editing and subject consistency",
-   "type": "image",
-   "family": "qwen",
-   "release_date": "2025-08-19",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png"
-    ],
-    "output": [
-     "image/jpeg"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://integrate.api.nvidia.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2025-08-19"
-  },
-  "qwen/qwen-image": {
-   "id": "qwen/qwen-image",
-   "name": "Qwen Image",
-   "description": "Text-to-image foundation model with multilingual text rendering",
-   "type": "image",
-   "family": "qwen",
-   "release_date": "2025-08-07",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "image/jpeg"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://integrate.api.nvidia.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2025-08-07"
-  },
-  "google/gemma-4-31b-it": {
-   "id": "google/gemma-4-31b-it",
-   "name": "Gemma-4-31B-IT",
-   "description": "Largest Gemma 4 instruction model for open, self-hosted chat and reasoning",
-   "type": "chat",
-   "family": "gemma",
-   "canonical_id": "google/gemma-4-31b-it",
-   "release_date": "2026-04-02",
-   "limit": {
-    "context": 256000,
-    "output": 16384
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "video/mp4",
-     "video/webm"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://integrate.api.nvidia.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-04-02"
+   "knowledge": "2025-05",
+   "last_updated": "2026-09-10"
   },
   "google/diffusiongemma-26b-a4b-it": {
    "id": "google/diffusiongemma-26b-a4b-it",
@@ -2026,6 +372,73 @@
    "knowledge": "2025-01",
    "last_updated": "2026-07-15"
   },
+  "google/gemma-3-12b-it": {
+   "id": "google/gemma-3-12b-it",
+   "name": "Gemma 3 12B IT",
+   "description": "Open multimodal Gemma instruction model for multilingual text generation and image understanding",
+   "type": "chat",
+   "family": "gemma",
+   "canonical_id": "google/gemma-3-12b-it",
+   "status": "deprecated",
+   "release_date": "2025-03-12",
+   "limit": {
+    "context": 131072,
+    "output": 16384
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://integrate.api.nvidia.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-08",
+   "last_updated": "2025-03-12"
+  },
   "google/gemma-3-4b-it": {
    "id": "google/gemma-3-4b-it",
    "name": "Gemma 3 4B IT",
@@ -2093,6 +506,73 @@
    "knowledge": "2024-08",
    "last_updated": "2025-03-12"
   },
+  "google/gemma-4-31b-it": {
+   "id": "google/gemma-4-31b-it",
+   "name": "Gemma-4-31B-IT",
+   "description": "Largest Gemma 4 instruction model for open, self-hosted chat and reasoning",
+   "type": "chat",
+   "family": "gemma",
+   "canonical_id": "google/gemma-4-31b-it",
+   "release_date": "2026-04-02",
+   "limit": {
+    "context": 256000,
+    "output": 16384
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "video/mp4",
+     "video/webm"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://integrate.api.nvidia.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-01",
+   "last_updated": "2026-04-02"
+  },
   "google/google-paligemma": {
    "id": "google/google-paligemma",
    "name": "paligemma",
@@ -2145,18 +625,80 @@
    "open_weights": true,
    "last_updated": "2024-08-26"
   },
-  "google/gemma-3-12b-it": {
-   "id": "google/gemma-3-12b-it",
-   "name": "Gemma 3 12B IT",
-   "description": "Open multimodal Gemma instruction model for multilingual text generation and image understanding",
+  "meta/llama-3.2-11b-vision-instruct": {
+   "id": "meta/llama-3.2-11b-vision-instruct",
+   "name": "Llama 3.2 11b Vision Instruct",
+   "description": "Open multimodal Llama model for image understanding, captioning, and visual QA",
    "type": "chat",
-   "family": "gemma",
-   "canonical_id": "google/gemma-3-12b-it",
-   "status": "deprecated",
-   "release_date": "2025-03-12",
+   "family": "llama",
+   "canonical_id": "meta/llama-3.2-11b-vision-instruct",
+   "release_date": "2024-09-25",
    "limit": {
-    "context": 131072,
-    "output": 16384
+    "context": 128000,
+    "output": 4096
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://integrate.api.nvidia.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2023-12",
+   "last_updated": "2024-09-25"
+  },
+  "meta/llama-3.2-90b-vision-instruct": {
+   "id": "meta/llama-3.2-90b-vision-instruct",
+   "name": "Llama-3.2-90B-Vision-Instruct",
+   "description": "Large open multimodal Llama model for image reasoning, document QA, and captioning",
+   "type": "chat",
+   "family": "llama",
+   "canonical_id": "meta/llama-3.2-90b-vision-instruct",
+   "release_date": "2024-09-25",
+   "limit": {
+    "context": 128000,
+    "output": 8192
    },
    "capabilities": {
     "temperature": true,
@@ -2184,11 +726,7 @@
    "modalities": {
     "input": [
      "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif"
+     "image"
     ],
     "output": [
      "text"
@@ -2209,8 +747,140 @@
     }
    },
    "open_weights": true,
-   "knowledge": "2024-08",
-   "last_updated": "2025-03-12"
+   "knowledge": "2023-12",
+   "last_updated": "2024-09-25"
+  },
+  "meta/llama-guard-4-12b": {
+   "id": "meta/llama-guard-4-12b",
+   "name": "Llama Guard 4 12B",
+   "description": "Multimodal Llama 4-based safety classifier for moderating prompts and responses",
+   "type": "chat",
+   "family": "llama",
+   "canonical_id": "meta/llama-guard-4-12b",
+   "release_date": "2025-04-29",
+   "limit": {
+    "context": 163840,
+    "output": 16384
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://integrate.api.nvidia.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-04-29"
+  },
+  "meta/muse-glimmer-30b": {
+   "id": "meta/muse-glimmer-30b",
+   "name": "Muse Glimmer 30B",
+   "description": "Muse Glimmer is a 30-billion-parameter open-weight multimodal model from Meta Superintelligence Labs, distilled from Muse Spark for always-on local agents, tool use, coding, and image understanding.",
+   "type": "chat",
+   "family": "muse",
+   "canonical_id": "meta/muse-glimmer-30b",
+   "release_date": "2026-08-10",
+   "limit": {
+    "context": 131072,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://integrate.api.nvidia.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2026-01-04",
+   "last_updated": "2026-08-10"
   },
   "minimaxai/minimax-m3.1-flash": {
    "id": "minimaxai/minimax-m3.1-flash",
@@ -2290,210 +960,6 @@
    },
    "open_weights": true,
    "last_updated": "2026-10-19"
-  },
-  "stepfun-ai/step-5-preview": {
-   "id": "stepfun-ai/step-5-preview",
-   "name": "Step 5 Preview",
-   "description": "StepFun's next-generation flagship base model for coding and professional knowledge work, with native text, image, and video input and a 1M-token context window",
-   "type": "chat",
-   "canonical_id": "stepfun/step-5-preview",
-   "release_date": "2026-09-16",
-   "limit": {
-    "context": 1048576,
-    "input": 1048576,
-    "output": 1048576
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "minimal",
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://integrate.api.nvidia.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-09-20"
-  },
-  "openai/whisper-large-v3": {
-   "id": "openai/whisper-large-v3",
-   "name": "Whisper Large v3",
-   "description": "Open Whisper checkpoint for robust multilingual transcription and captioning",
-   "type": "transcription",
-   "family": "whisper",
-   "canonical_id": "openai/whisper-large-v3",
-   "release_date": "2023-11-06",
-   "limit": {
-    "context": 448,
-    "output": 448
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "audio/flac",
-     "audio/mpeg",
-     "audio/mp4",
-     "audio/ogg",
-     "audio/wav",
-     "audio/webm"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://integrate.api.nvidia.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2023-09",
-   "last_updated": "2023-11-06"
-  },
-  "openai/gpt-oss-20b": {
-   "id": "openai/gpt-oss-20b",
-   "name": "GPT OSS 20B",
-   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
-   "type": "chat",
-   "family": "gpt-oss",
-   "canonical_id": "openai/gpt-oss-20b",
-   "release_date": "2025-08-05",
-   "limit": {
-    "context": 131072,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://integrate.api.nvidia.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2024-06",
-   "last_updated": "2025-08-05"
   },
   "mistralai/magistral-small-2506": {
    "id": "mistralai/magistral-small-2506",
@@ -2678,14 +1144,1255 @@
    "knowledge": "2025-03-31",
    "last_updated": "2025-05-07"
   },
-  "meta/llama-3.2-90b-vision-instruct": {
-   "id": "meta/llama-3.2-90b-vision-instruct",
-   "name": "Llama-3.2-90B-Vision-Instruct",
-   "description": "Large open multimodal Llama model for image reasoning, document QA, and captioning",
+  "moonshotai/kimi-k2.6": {
+   "id": "moonshotai/kimi-k2.6",
+   "name": "Kimi K2.6",
+   "description": "Multimodal Kimi workhorse for agent loops, coding tasks, and visual context",
    "type": "chat",
-   "family": "llama",
-   "canonical_id": "meta/llama-3.2-90b-vision-instruct",
-   "release_date": "2024-09-25",
+   "family": "kimi-k2",
+   "canonical_id": "moonshotai/kimi-k2.6",
+   "status": "deprecated",
+   "release_date": "2026-04-20",
+   "limit": {
+    "context": 262144,
+    "output": 262144
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://integrate.api.nvidia.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-01",
+   "last_updated": "2026-04-20"
+  },
+  "moonshotai/kimi-k3": {
+   "id": "moonshotai/kimi-k3",
+   "name": "Kimi K3",
+   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
+   "type": "chat",
+   "family": "kimi-k3",
+   "canonical_id": "moonshotai/kimi-k3",
+   "status": "deprecated",
+   "release_date": "2026-07-16",
+   "limit": {
+    "context": 1048576,
+    "output": 1048576
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://integrate.api.nvidia.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-07-16"
+  },
+  "nvidia/active-speaker-detection": {
+   "id": "nvidia/active-speaker-detection",
+   "name": "Active Speaker Detection",
+   "description": "Detects and tracks which person is speaking across video frames",
+   "type": "chat",
+   "release_date": "2026-04-16",
+   "limit": {
+    "context": 0,
+    "output": 4096
+   },
+   "capabilities": {
+    "temperature": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "video"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://integrate.api.nvidia.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-04-16"
+  },
+  "nvidia/bevformer": {
+   "id": "nvidia/bevformer",
+   "name": "bevformer",
+   "description": "Multi-frame bird's-eye-view 3D perception transformer for autonomous driving",
+   "type": "chat",
+   "release_date": "2025-03-18",
+   "limit": {
+    "context": 128000,
+    "output": 8192
+   },
+   "capabilities": {
+    "temperature": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "video"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://integrate.api.nvidia.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-07-20"
+  },
+  "nvidia/cosmos-reason2-8b": {
+   "id": "nvidia/cosmos-reason2-8b",
+   "name": "Cosmos Reason2 8B",
+   "description": "Vision language model for physical-world understanding with structured reasoning on video and images",
+   "type": "chat",
+   "status": "deprecated",
+   "release_date": "2025-12-01",
+   "limit": {
+    "context": 131072,
+    "output": 16384
+   },
+   "capabilities": {
+    "temperature": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "video"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://integrate.api.nvidia.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-12-01"
+  },
+  "nvidia/cosmos-transfer2_5-2b": {
+   "id": "nvidia/cosmos-transfer2_5-2b",
+   "name": "cosmos-transfer2.5-2b",
+   "description": "Generates physics-aware video world states from text and spatial control videos",
+   "type": "video",
+   "release_date": "2026-02-26",
+   "limit": {
+    "context": 0,
+    "output": 4096
+   },
+   "capabilities": {
+    "temperature": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image",
+     "video/mp4"
+    ],
+    "output": [
+     "video/mp4"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://integrate.api.nvidia.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-02-26"
+  },
+  "nvidia/llama-3.1-nemotron-70b-instruct": {
+   "id": "nvidia/llama-3.1-nemotron-70b-instruct",
+   "name": "Llama 3.1 Nemotron 70B Instruct",
+   "description": "Nemotron model for efficient reasoning, coding, and specialized AI agents",
+   "type": "chat",
+   "family": "nemotron",
+   "canonical_id": "nvidia/llama-3.1-nemotron-70b-instruct",
+   "status": "deprecated",
+   "release_date": "2025-04-15",
+   "limit": {
+    "context": 128000,
+    "output": 8192
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://integrate.api.nvidia.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-04-15"
+  },
+  "nvidia/llama-3.1-nemotron-safety-guard-8b-v3": {
+   "id": "nvidia/llama-3.1-nemotron-safety-guard-8b-v3",
+   "name": "llama-3.1-nemotron-safety-guard-8b-v3",
+   "description": "Safety model for policy screening, moderation, and risk-aware routing workflows",
+   "type": "chat",
+   "family": "nemotron",
+   "canonical_id": "nvidia/llama-3.1-nemotron-safety-guard-8b-v3",
+   "release_date": "2025-10-28",
+   "limit": {
+    "context": 128000,
+    "output": 4096
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://integrate.api.nvidia.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-10-28"
+  },
+  "nvidia/llama-3.1-nemotron-ultra-253b-v1": {
+   "id": "nvidia/llama-3.1-nemotron-ultra-253b-v1",
+   "name": "Llama 3.1 Nemotron Ultra 253B",
+   "description": "Flagship Nemotron model for high-throughput reasoning and complex agents",
+   "type": "chat",
+   "family": "nemotron",
+   "canonical_id": "nvidia/llama-3.1-nemotron-ultra-253b",
+   "status": "deprecated",
+   "release_date": "2025-04-07",
+   "limit": {
+    "context": 128000,
+    "output": 16384
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://integrate.api.nvidia.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-04-07"
+  },
+  "nvidia/llama-nemotron-embed-vl-1b-v2": {
+   "id": "nvidia/llama-nemotron-embed-vl-1b-v2",
+   "name": "llama-nemotron-embed-vl-1b-v2",
+   "description": "Embedding model for semantic search, retrieval, clustering, and ranking pipelines",
+   "type": "embedding",
+   "family": "nemotron",
+   "canonical_id": "nvidia/llama-nemotron-embed-vl-1b-v2",
+   "release_date": "2025-12-18",
+   "limit": {
+    "context": 8192,
+    "output": 2048
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "api": {
+    "embeddings": {
+     "base_url": "https://integrate.api.nvidia.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-12-18"
+  },
+  "nvidia/llama-nemotron-rerank-vl-1b-v2": {
+   "id": "nvidia/llama-nemotron-rerank-vl-1b-v2",
+   "name": "llama-nemotron-rerank-vl-1b-v2",
+   "description": "Reranking model for improving retrieval quality in search and recommendation systems",
+   "type": "reranking",
+   "family": "nemotron",
+   "canonical_id": "nvidia/llama-nemotron-rerank-vl-1b-v2",
+   "release_date": "2025-12-18",
+   "limit": {
+    "context": 10240,
+    "output": 4096
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/gif",
+     "image/bmp",
+     "image/tiff"
+    ],
+    "output": [
+     "reranking"
+    ]
+   },
+   "api": {
+    "rerank": {
+     "base_url": "https://ai.api.nvidia.com/v1/retrieval/nvidia/llama-nemotron-rerank-vl-1b-v2/reranking",
+     "sdk": {}
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-12-18"
+  },
+  "nvidia/magpie-tts-zeroshot": {
+   "id": "nvidia/magpie-tts-zeroshot",
+   "name": "magpie-tts-zeroshot",
+   "description": "Expressive text-to-speech that clones a voice from a short audio sample",
+   "type": "speech",
+   "release_date": "2025-05-22",
+   "limit": {
+    "context": 0,
+    "output": 4096
+   },
+   "capabilities": {
+    "temperature": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "audio/wav"
+    ],
+    "output": [
+     "audio/wav"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://integrate.api.nvidia.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-06-12"
+  },
+  "nvidia/nemotron-3-embed-1b": {
+   "id": "nvidia/nemotron-3-embed-1b",
+   "name": "Nemotron 3 Embed 1B",
+   "description": "Open text embedding model for retrieval, RAG, and code search",
+   "type": "embedding",
+   "family": "nemotron",
+   "canonical_id": "nvidia/nemotron-3-embed-1b",
+   "release_date": "2026-07-16",
+   "limit": {
+    "context": 32768,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "api": {
+    "embeddings": {
+     "base_url": "https://integrate.api.nvidia.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-07-16"
+  },
+  "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning": {
+   "id": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+   "name": "Nemotron 3 Nano Omni",
+   "description": "Open Nemotron omni model combining reasoning with text, vision, and audio",
+   "type": "chat",
+   "family": "nemotron",
+   "canonical_id": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+   "release_date": "2026-04-28",
+   "limit": {
+    "context": 256000,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": true,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "budget": {
+      "min": -1,
+      "max": 32768
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "video/mp4",
+     "audio/wav",
+     "audio/mpeg"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://integrate.api.nvidia.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-04-28"
+  },
+  "nvidia/nemotron-3-ultra-550b-a55b": {
+   "id": "nvidia/nemotron-3-ultra-550b-a55b",
+   "name": "Nemotron 3 Ultra 550B A55B",
+   "description": "Largest Nemotron 3 model for maximum open-weight reasoning and agent accuracy",
+   "type": "chat",
+   "family": "nemotron",
+   "canonical_id": "nvidia/nemotron-3-ultra-550b-a55b",
+   "release_date": "2026-06-04",
+   "limit": {
+    "context": 1000000,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": true,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "medium",
+      "high"
+     ],
+     "budget": {
+      "min": -1,
+      "max": 32768
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://integrate.api.nvidia.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-09",
+   "last_updated": "2026-06-04"
+  },
+  "nvidia/nemotron-3.5-content-safety": {
+   "id": "nvidia/nemotron-3.5-content-safety",
+   "name": "Nemotron 3.5 Content Safety",
+   "description": "Safety model for policy screening, moderation, and risk-aware routing workflows",
+   "type": "chat",
+   "family": "nemotron",
+   "canonical_id": "nvidia/nemotron-3.5-content-safety",
+   "release_date": "2026-06-02",
+   "limit": {
+    "context": 128000,
+    "output": 8192
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/gif",
+     "image/jpeg",
+     "image/png"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://integrate.api.nvidia.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-06-02"
+  },
+  "nvidia/nemotron-3.5-embed-1b": {
+   "id": "nvidia/nemotron-3.5-embed-1b",
+   "name": "Nemotron 3.5 Embed 1B",
+   "description": "Multimodal multilingual embedding model for text and document-image retrieval",
+   "type": "embedding",
+   "family": "nemotron",
+   "canonical_id": "nvidia/nemotron-3.5-embed-1b",
+   "release_date": "2026-10-20",
+   "limit": {
+    "context": 32768,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "api": {
+    "embeddings": {
+     "base_url": "https://integrate.api.nvidia.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-10-20"
+  },
+  "nvidia/nemotron-3.5-embed-8b": {
+   "id": "nvidia/nemotron-3.5-embed-8b",
+   "name": "Nemotron 3.5 Embed 8B",
+   "description": "Multimodal multilingual embedding model for text and document-image retrieval",
+   "type": "embedding",
+   "family": "nemotron",
+   "canonical_id": "nvidia/nemotron-3.5-embed-8b",
+   "release_date": "2026-10-19",
+   "limit": {
+    "context": 32768,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "api": {
+    "embeddings": {
+     "base_url": "https://integrate.api.nvidia.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-10-19"
+  },
+  "nvidia/nemotron-3.5-lightning-30b-a3b": {
+   "id": "nvidia/nemotron-3.5-lightning-30b-a3b",
+   "name": "Nemotron 3.5 Lightning 30B A3B",
+   "description": "Fast NVIDIA Nemotron MoE for reliable agentic tasks across enterprise workloads",
+   "type": "chat",
+   "family": "nemotron",
+   "canonical_id": "nvidia/nemotron-3.5-lightning",
+   "release_date": "2026-08-11",
+   "limit": {
+    "context": 262144,
+    "output": 262144
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": true,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://integrate.api.nvidia.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-09",
+   "last_updated": "2026-08-11"
+  },
+  "nvidia/nemotron-3.5-super-vl-120b-a12b": {
+   "id": "nvidia/nemotron-3.5-super-vl-120b-a12b",
+   "name": "Nemotron 3.5 Super VL 120B A12B",
+   "description": "NVIDIA vision-language reasoning model for text, image, and video understanding and agentic tool use",
+   "type": "chat",
+   "family": "nemotron",
+   "canonical_id": "nvidia/nemotron-3.5-super-vl-120b-a12b",
+   "release_date": "2026-10-15",
+   "limit": {
+    "context": 1048576,
+    "output": 8192
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": true,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "video/mp4"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://integrate.api.nvidia.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-10-15"
+  },
+  "nvidia/nemotron-voicechat": {
+   "id": "nvidia/nemotron-voicechat",
+   "name": "nemotron-voicechat",
+   "description": "Nemotron multimodal model for visual reasoning and agentic AI workflows",
+   "type": "chat",
+   "family": "nemotron",
+   "canonical_id": "nvidia/nemotron-voicechat",
+   "release_date": "2026-03-16",
    "limit": {
     "context": 128000,
     "output": 8192
@@ -2716,7 +2423,7 @@
    "modalities": {
     "input": [
      "text",
-     "image"
+     "audio/wav"
     ],
     "output": [
      "text"
@@ -2737,17 +2444,425 @@
     }
    },
    "open_weights": true,
-   "knowledge": "2023-12",
-   "last_updated": "2024-09-25"
+   "last_updated": "2026-03-16"
   },
-  "meta/muse-glimmer-30b": {
-   "id": "meta/muse-glimmer-30b",
-   "name": "Muse Glimmer 30B",
-   "description": "Muse Glimmer is a 30-billion-parameter open-weight multimodal model from Meta Superintelligence Labs, distilled from Muse Spark for always-on local agents, tool use, coding, and image understanding.",
+  "nvidia/rerank-qa-mistral-4b": {
+   "id": "nvidia/rerank-qa-mistral-4b",
+   "name": "rerank-qa-mistral-4b",
+   "description": "Reranking model for improving retrieval quality in search and recommendation systems",
+   "type": "reranking",
+   "status": "deprecated",
+   "release_date": "2024-03-17",
+   "limit": {
+    "context": 128000,
+    "output": 4096
+   },
+   "capabilities": {
+    "temperature": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "reranking"
+    ]
+   },
+   "api": {
+    "rerank": {
+     "base_url": "https://ai.api.nvidia.com/v1/retrieval/nvidia/reranking",
+     "sdk": {}
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-01-17"
+  },
+  "nvidia/riva-translate-4b-instruct-v1.1": {
+   "id": "nvidia/riva-translate-4b-instruct-v1.1",
+   "name": "riva-translate-4b-instruct-v1_1",
+   "description": "Translation model for multilingual conversion, localization, and cross-language workflows",
    "type": "chat",
-   "family": "muse",
-   "canonical_id": "meta/muse-glimmer-30b",
-   "release_date": "2026-08-10",
+   "status": "deprecated",
+   "release_date": "2025-12-12",
+   "limit": {
+    "context": 128000,
+    "output": 4096
+   },
+   "capabilities": {
+    "temperature": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://integrate.api.nvidia.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-12-12"
+  },
+  "nvidia/sparsedrive": {
+   "id": "nvidia/sparsedrive",
+   "name": "sparsedrive",
+   "description": "End-to-end autonomous driving stack for perception, prediction, and planning",
+   "type": "chat",
+   "release_date": "2025-03-18",
+   "limit": {
+    "context": 128000,
+    "output": 8192
+   },
+   "capabilities": {
+    "temperature": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "video"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://integrate.api.nvidia.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-07-20"
+  },
+  "nvidia/streampetr": {
+   "id": "nvidia/streampetr",
+   "name": "streampetr",
+   "description": "Temporal 3D object detection model for autonomous driving",
+   "type": "chat",
+   "release_date": "2025-11-13",
+   "limit": {
+    "context": 128000,
+    "output": 8192
+   },
+   "capabilities": {
+    "temperature": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "video"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://integrate.api.nvidia.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-11-13"
+  },
+  "nvidia/studiovoice": {
+   "id": "nvidia/studiovoice",
+   "name": "studiovoice",
+   "description": "Enhances noisy or reverberant speech recordings to studio-quality speech",
+   "type": "chat",
+   "release_date": "2024-10-03",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "audio"
+    ],
+    "output": [
+     "audio"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://integrate.api.nvidia.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-06-13"
+  },
+  "nvidia/synthetic-video-detector": {
+   "id": "nvidia/synthetic-video-detector",
+   "name": "synthetic-video-detector",
+   "description": "Detects AI-generated (synthetic) video",
+   "type": "chat",
+   "release_date": "2026-04-16",
+   "limit": {
+    "context": 0,
+    "output": 4096
+   },
+   "capabilities": {
+    "temperature": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "video/mp4"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://integrate.api.nvidia.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-04-16"
+  },
+  "nvidia/usdcode": {
+   "id": "nvidia/usdcode",
+   "name": "usdcode",
+   "description": "Nemotron model for efficient reasoning, coding, and specialized AI agents",
+   "type": "chat",
+   "status": "deprecated",
+   "release_date": "2026-01-01",
+   "limit": {
+    "context": 128000,
+    "output": 4096
+   },
+   "capabilities": {
+    "temperature": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://integrate.api.nvidia.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-01-01"
+  },
+  "nvidia/usdvalidate": {
+   "id": "nvidia/usdvalidate",
+   "name": "usdvalidate",
+   "description": "Nemotron model for efficient reasoning, coding, and specialized AI agents",
+   "type": "chat",
+   "status": "deprecated",
+   "release_date": "2024-07-24",
+   "limit": {
+    "context": 0,
+    "output": 4096
+   },
+   "capabilities": {
+    "temperature": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://integrate.api.nvidia.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-01-08"
+  },
+  "openai/gpt-oss-20b": {
+   "id": "openai/gpt-oss-20b",
+   "name": "GPT OSS 20B",
+   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
+   "type": "chat",
+   "family": "gpt-oss",
+   "canonical_id": "openai/gpt-oss-20b",
+   "release_date": "2025-08-05",
    "limit": {
     "context": 131072,
     "output": 131072
@@ -2765,12 +2880,9 @@
     "reasoning": {
      "supported": true,
      "effort": [
-      "none",
-      "minimal",
       "low",
       "medium",
-      "high",
-      "max"
+      "high"
      ]
     }
    },
@@ -2786,10 +2898,7 @@
    },
    "modalities": {
     "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp"
+     "text"
     ],
     "output": [
      "text"
@@ -2806,37 +2915,33 @@
       "tools": {
        "updates": false
       }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
      }
     }
    },
    "open_weights": true,
-   "knowledge": "2026-01-04",
-   "last_updated": "2026-08-10"
+   "knowledge": "2024-06",
+   "last_updated": "2025-08-05"
   },
-  "meta/llama-3.2-11b-vision-instruct": {
-   "id": "meta/llama-3.2-11b-vision-instruct",
-   "name": "Llama 3.2 11b Vision Instruct",
-   "description": "Open multimodal Llama model for image understanding, captioning, and visual QA",
-   "type": "chat",
-   "family": "llama",
-   "canonical_id": "meta/llama-3.2-11b-vision-instruct",
-   "release_date": "2024-09-25",
+  "openai/whisper-large-v3": {
+   "id": "openai/whisper-large-v3",
+   "name": "Whisper Large v3",
+   "description": "Open Whisper checkpoint for robust multilingual transcription and captioning",
+   "type": "transcription",
+   "family": "whisper",
+   "canonical_id": "openai/whisper-large-v3",
+   "release_date": "2023-11-06",
    "limit": {
-    "context": 128000,
-    "output": 4096
+    "context": 448,
+    "output": 448
    },
    "capabilities": {
     "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
+    "top_k": false,
+    "top_p": false,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
-     "supported": true
+     "supported": false
     },
     "reasoning": {
      "supported": false
@@ -2854,8 +2959,12 @@
    },
    "modalities": {
     "input": [
-     "text",
-     "image"
+     "audio/flac",
+     "audio/mpeg",
+     "audio/mp4",
+     "audio/ogg",
+     "audio/wav",
+     "audio/webm"
     ],
     "output": [
      "text"
@@ -2867,34 +2976,141 @@
      "sdk": {
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
      }
     }
    },
    "open_weights": true,
-   "knowledge": "2023-12",
-   "last_updated": "2024-09-25"
+   "knowledge": "2023-09",
+   "last_updated": "2023-11-06"
   },
-  "meta/llama-guard-4-12b": {
-   "id": "meta/llama-guard-4-12b",
-   "name": "Llama Guard 4 12B",
-   "description": "Multimodal Llama 4-based safety classifier for moderating prompts and responses",
+  "poolside/laguna-xs-2.1": {
+   "id": "poolside/laguna-xs-2.1",
+   "name": "Laguna XS 2.1",
+   "description": "Agentic coding model from Poolside in the XS size class for local deployment",
    "type": "chat",
-   "family": "llama",
-   "canonical_id": "meta/llama-guard-4-12b",
-   "release_date": "2025-04-29",
+   "family": "laguna",
+   "canonical_id": "poolside/laguna-xs-2.1",
+   "release_date": "2026-07-02",
    "limit": {
-    "context": 163840,
+    "context": 262144,
     "output": 16384
    },
    "capabilities": {
     "temperature": true,
     "top_k": true,
     "top_p": true,
+    "structured_output": false,
+    "system_updates": true,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://integrate.api.nvidia.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-07-02"
+  },
+  "qwen/qwen-image": {
+   "id": "qwen/qwen-image",
+   "name": "Qwen Image",
+   "description": "Text-to-image foundation model with multilingual text rendering",
+   "type": "image",
+   "family": "qwen",
+   "release_date": "2025-08-07",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "image/jpeg"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://integrate.api.nvidia.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-08-07"
+  },
+  "qwen/qwen-image-edit": {
+   "id": "qwen/qwen-image-edit",
+   "name": "Qwen Image Edit",
+   "description": "Image editing model with multilingual text editing and subject consistency",
+   "type": "image",
+   "family": "qwen",
+   "release_date": "2025-08-19",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "structured_output": false,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -2917,10 +3133,11 @@
    "modalities": {
     "input": [
      "text",
-     "image"
+     "image/jpeg",
+     "image/png"
     ],
     "output": [
-     "text"
+     "image/jpeg"
     ]
    },
    "api": {
@@ -2932,26 +3149,26 @@
      }
     }
    },
-   "open_weights": true,
-   "last_updated": "2025-04-29"
+   "open_weights": false,
+   "last_updated": "2025-08-19"
   },
-  "deepseek-ai/deepseek-v4.1-flash": {
-   "id": "deepseek-ai/deepseek-v4.1-flash",
-   "name": "DeepSeek V4.1 Flash",
-   "description": "DeepSeek V4.1 Flash model for reasoning and agentic coding",
+  "stepfun-ai/step-5-preview": {
+   "id": "stepfun-ai/step-5-preview",
+   "name": "Step 5 Preview",
+   "description": "StepFun's next-generation flagship base model for coding and professional knowledge work, with native text, image, and video input and a 1M-token context window",
    "type": "chat",
-   "family": "deepseek-flash",
-   "canonical_id": "deepseek/deepseek-v4.1-flash",
-   "release_date": "2026-09-10",
+   "canonical_id": "stepfun/step-5-preview",
+   "release_date": "2026-09-16",
    "limit": {
-    "context": 1000000,
-    "output": 384000
+    "context": 1048576,
+    "input": 1048576,
+    "output": 1048576
    },
    "capabilities": {
     "temperature": true,
     "top_k": true,
     "top_p": true,
-    "structured_output": true,
+    "structured_output": false,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -2961,8 +3178,11 @@
      "supported": true,
      "effort": [
       "none",
+      "minimal",
       "low",
+      "medium",
       "high",
+      "xhigh",
       "max"
      ]
     }
@@ -2982,7 +3202,6 @@
      "text",
      "image/jpeg",
      "image/png",
-     "image/gif",
      "image/webp"
     ],
     "output": [
@@ -3007,8 +3226,77 @@
     }
    },
    "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-09-10"
+   "last_updated": "2026-09-20"
+  },
+  "z-ai/glm-5.3": {
+   "id": "z-ai/glm-5.3",
+   "name": "GLM-5.3",
+   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.3",
+   "status": "deprecated",
+   "release_date": "2026-08-14",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": true,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://integrate.api.nvidia.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-14"
   },
   "z-ai/glm-5.3-flash": {
    "id": "z-ai/glm-5.3-flash",
@@ -3081,294 +3369,6 @@
    },
    "open_weights": true,
    "last_updated": "2026-08-26"
-  },
-  "z-ai/glm-5.3": {
-   "id": "z-ai/glm-5.3",
-   "name": "GLM-5.3",
-   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
-   "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-5.3",
-   "status": "deprecated",
-   "release_date": "2026-08-14",
-   "limit": {
-    "context": 1000000,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": true,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://integrate.api.nvidia.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-08-14"
-  },
-  "black-forest-labs/flux_1-kontext-dev": {
-   "id": "black-forest-labs/flux_1-kontext-dev",
-   "name": "FLUX.1-Kontext-dev",
-   "description": "Open-weight FLUX.1 Kontext model for instruction-based image editing",
-   "type": "image",
-   "family": "flux",
-   "canonical_id": "black-forest-labs/flux-1-kontext-dev",
-   "release_date": "2025-05-29",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image"
-    ],
-    "output": [
-     "image"
-    ]
-   },
-   "api": {
-    "images": {
-     "base_url": "https://ai.api.nvidia.com/v1/genai/black-forest-labs/flux.1-kontext-dev",
-     "sdk": {}
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-05-29"
-  },
-  "black-forest-labs/flux_2-klein-4b": {
-   "id": "black-forest-labs/flux_2-klein-4b",
-   "name": "FLUX.2 Klein 4B",
-   "description": "Fast 4B open-weight image generation and editing model",
-   "type": "image",
-   "family": "flux",
-   "canonical_id": "black-forest-labs/flux-2-klein-4b",
-   "release_date": "2026-01-15",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp"
-    ],
-    "output": [
-     "image/jpeg",
-     "image/png",
-     "image/webp"
-    ]
-   },
-   "api": {
-    "images": {
-     "base_url": "https://ai.api.nvidia.com/v1/genai/black-forest-labs/flux.2-klein-4b",
-     "sdk": {}
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-06",
-   "last_updated": "2026-01-15"
-  },
-  "black-forest-labs/flux.1-dev": {
-   "id": "black-forest-labs/flux.1-dev",
-   "name": "FLUX.1-dev",
-   "description": "Open-weight FLUX.1 text-to-image model for high-quality guidance-distilled generation",
-   "type": "image",
-   "family": "flux",
-   "canonical_id": "black-forest-labs/flux-1-dev",
-   "release_date": "2024-08-01",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "image/jpeg"
-    ]
-   },
-   "api": {
-    "images": {
-     "base_url": "https://ai.api.nvidia.com/v1/genai/black-forest-labs/flux.1-dev",
-     "sdk": {}
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2024-08",
-   "last_updated": "2024-08-01"
-  },
-  "black-forest-labs/flux_1-schnell": {
-   "id": "black-forest-labs/flux_1-schnell",
-   "name": "FLUX.1-schnell",
-   "description": "Fast few-step FLUX.1 text-to-image model under Apache 2.0",
-   "type": "image",
-   "family": "flux",
-   "canonical_id": "black-forest-labs/flux-1-schnell",
-   "release_date": "2024-08-01",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "image"
-    ]
-   },
-   "api": {
-    "images": {
-     "base_url": "https://ai.api.nvidia.com/v1/genai/black-forest-labs/flux.1-schnell",
-     "sdk": {}
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2024-07",
-   "last_updated": "2024-08-01"
   }
  }
 }

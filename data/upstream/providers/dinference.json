@@ -6,130 +6,6 @@
   "DINFERENCE_API_KEY"
  ],
  "models": {
-  "minimax-m2.5": {
-   "id": "minimax-m2.5",
-   "name": "MiniMax-M2.5",
-   "description": "Prior MiniMax coding model for agent workflows, office edits, and automation",
-   "type": "chat",
-   "family": "minimax",
-   "canonical_id": "minimax/MiniMax-M2.5",
-   "status": "deprecated",
-   "release_date": "2026-02-12",
-   "limit": {
-    "context": 200000,
-    "output": 32000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.22
-     },
-     "output": {
-      "price": 0.88
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.dinference.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-02-12"
-  },
-  "glm-5": {
-   "id": "glm-5",
-   "name": "GLM-5",
-   "description": "General GLM flagship for coding, analysis, and tool-heavy engineering workflows",
-   "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-5",
-   "release_date": "2026-02-12",
-   "limit": {
-    "context": 200000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.75
-     },
-     "output": {
-      "price": 2.4
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.dinference.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-02-12"
-  },
   "glm-4.7": {
    "id": "glm-4.7",
    "name": "GLM-4.7",
@@ -194,17 +70,17 @@
    "knowledge": "2025-04",
    "last_updated": "2025-12-22"
   },
-  "gpt-oss-120b": {
-   "id": "gpt-oss-120b",
-   "name": "GPT OSS 120B",
-   "description": "Open-weight GPT model for self-hosted reasoning and instruction-following workloads",
+  "glm-5": {
+   "id": "glm-5",
+   "name": "GLM-5",
+   "description": "General GLM flagship for coding, analysis, and tool-heavy engineering workflows",
    "type": "chat",
-   "family": "gpt-oss",
-   "canonical_id": "openai/gpt-oss-120b",
-   "release_date": "2025-08-05",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5",
+   "release_date": "2026-02-12",
    "limit": {
-    "context": 131072,
-    "output": 131072
+    "context": 200000,
+    "output": 128000
    },
    "capabilities": {
     "temperature": true,
@@ -216,16 +92,16 @@
      "supported": true
     },
     "reasoning": {
-     "supported": false
+     "supported": true
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.0675
+      "price": 0.75
      },
      "output": {
-      "price": 0.27
+      "price": 2.4
      }
     }
    },
@@ -248,12 +124,14 @@
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
      }
     }
    },
    "open_weights": true,
-   "knowledge": "2024-06",
-   "last_updated": "2025-08-05"
+   "last_updated": "2026-02-12"
   },
   "glm-5.1": {
    "id": "glm-5.1",
@@ -384,6 +262,128 @@
    },
    "open_weights": true,
    "last_updated": "2026-06-13"
+  },
+  "gpt-oss-120b": {
+   "id": "gpt-oss-120b",
+   "name": "GPT OSS 120B",
+   "description": "Open-weight GPT model for self-hosted reasoning and instruction-following workloads",
+   "type": "chat",
+   "family": "gpt-oss",
+   "canonical_id": "openai/gpt-oss-120b",
+   "release_date": "2025-08-05",
+   "limit": {
+    "context": 131072,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.0675
+     },
+     "output": {
+      "price": 0.27
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.dinference.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-06",
+   "last_updated": "2025-08-05"
+  },
+  "minimax-m2.5": {
+   "id": "minimax-m2.5",
+   "name": "MiniMax-M2.5",
+   "description": "Prior MiniMax coding model for agent workflows, office edits, and automation",
+   "type": "chat",
+   "family": "minimax",
+   "canonical_id": "minimax/MiniMax-M2.5",
+   "status": "deprecated",
+   "release_date": "2026-02-12",
+   "limit": {
+    "context": 200000,
+    "output": 32000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.22
+     },
+     "output": {
+      "price": 0.88
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.dinference.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-02-12"
   }
  }
 }

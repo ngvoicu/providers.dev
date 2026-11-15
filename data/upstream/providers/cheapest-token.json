@@ -6,218 +6,14 @@
   "CHEAPEST_TOKEN_API_KEY"
  ],
  "models": {
-  "gpt-5.6-terra": {
-   "id": "gpt-5.6-terra",
-   "name": "GPT-5.6 Terra",
-   "description": "Balanced GPT-5.6 model for capable, cost-efficient everyday work",
+  "deepseek-v4-pro-0813": {
+   "id": "deepseek-v4-pro-0813",
+   "name": "DeepSeek V4 Pro 0813",
+   "description": "DeepSeek V4 Pro snapshot with million-token context and support for thinking and non-thinking modes",
    "type": "chat",
-   "family": "gpt-terra",
-   "canonical_id": "openai/gpt-5.6-terra",
-   "release_date": "2026-07-09",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "xhigh"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2,
-      "cache": {
-       "read": 0.2,
-       "write": 2.5
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 4,
-        "cache": {
-         "read": 0.4,
-         "write": 5
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 10.2,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 15.3
-       }
-      ]
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cheapest-token.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "freeform": [
-        "text",
-        "lark",
-        "regex"
-       ],
-       "strict": true,
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-02-16",
-   "last_updated": "2026-07-09"
-  },
-  "grok-4.7": {
-   "id": "grok-4.7",
-   "name": "Grok 4.7",
-   "description": "xAI's frontier model for long-running agents, coding, knowledge work, and visual projects",
-   "type": "chat",
-   "family": "grok",
-   "canonical_id": "xai/grok-4.7",
-   "release_date": "2026-09-21",
-   "limit": {
-    "context": 500000,
-    "output": 500000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2,
-      "cache": {
-       "read": 0.5
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 200000
-         }
-        },
-        "price": 4,
-        "cache": {
-         "read": 1
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 4.5,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 200000
-         }
-        },
-        "price": 9
-       }
-      ]
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cheapest-token.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-05",
-   "last_updated": "2026-09-21"
-  },
-  "nemotron-3.5-super-vl": {
-   "id": "nemotron-3.5-super-vl",
-   "name": "NVIDIA Nemotron 3.5 Super VL",
-   "description": "NVIDIA vision-language reasoning model for text, image, and video understanding and agentic tool use",
-   "type": "chat",
-   "family": "nemotron",
-   "canonical_id": "nvidia/nemotron-3.5-super-vl-120b-a12b",
-   "release_date": "2026-10-15",
+   "family": "deepseek-thinking",
+   "canonical_id": "deepseek/deepseek-v4-pro-0813",
+   "release_date": "2026-08-13",
    "limit": {
     "context": 1048576,
     "output": 1048576
@@ -233,27 +29,30 @@
     },
     "reasoning": {
      "supported": true,
-     "toggle": true
+     "effort": [
+      "none",
+      "low",
+      "high",
+      "max"
+     ]
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.3,
+      "price": 1.32,
       "cache": {
-       "read": 0.06
+       "read": 0.04
       }
      },
      "output": {
-      "price": 0.65
+      "price": 3.56
      }
     }
    },
    "modalities": {
     "input": [
-     "text",
-     "image/jpeg",
-     "image/png"
+     "text"
     ],
     "output": [
      "text"
@@ -274,24 +73,23 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2026-10-15"
+   "last_updated": "2026-08-22"
   },
-  "gpt-6.1-terra": {
-   "id": "gpt-6.1-terra",
-   "name": "GPT-6.1 Terra",
-   "description": "Fast, efficient model for visual reasoning, precise computer use, and clear, natural writing.",
+  "deepseek-v4.1-flash-1017": {
+   "id": "deepseek-v4.1-flash-1017",
+   "name": "DeepSeek V4.1 Flash 1017",
+   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
    "type": "chat",
-   "family": "gpt-terra",
-   "canonical_id": "openai/gpt-6.1-terra",
-   "release_date": "2026-10-26",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
+   "release_date": "2026-10-17",
    "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
+    "context": 1048576,
+    "output": 1048576
    },
    "capabilities": {
     "temperature": true,
-    "top_k": false,
+    "top_k": true,
     "top_p": true,
     "system_updates": false,
     "effort_updates": false,
@@ -301,49 +99,23 @@
     "reasoning": {
      "supported": true,
      "effort": [
-      "none",
       "low",
-      "medium",
       "high",
-      "xhigh"
+      "xhigh",
+      "max"
      ]
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 1,
+      "price": 0.3,
       "cache": {
-       "read": 0.05,
-       "write": 1.25
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 2,
-        "cache": {
-         "read": 0.1,
-         "write": 2.5
-        }
-       }
-      ]
+       "read": 0.006
+      }
      },
      "output": {
-      "price": 4,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 6
-       }
-      ]
+      "price": 1.2
      }
     }
    },
@@ -353,8 +125,7 @@
      "image/jpeg",
      "image/png",
      "image/gif",
-     "image/webp",
-     "application/pdf"
+     "image/webp"
     ],
     "output": [
      "text"
@@ -369,26 +140,152 @@
      },
      "capabilities": {
       "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "freeform": [
-        "text",
-        "lark",
-        "regex"
-       ],
-       "strict": true,
        "updates": false
       }
      }
     }
    },
-   "open_weights": false,
-   "knowledge": "2026-06-01",
-   "last_updated": "2026-10-26"
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-10-17"
+  },
+  "glm-5.3": {
+   "id": "glm-5.3",
+   "name": "GLM5.3",
+   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.3",
+   "release_date": "2026-08-14",
+   "limit": {
+    "context": 1048576,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.4,
+      "cache": {
+       "read": 0.26
+      }
+     },
+     "output": {
+      "price": 3.96
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cheapest-token.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-14"
+  },
+  "glm-5.3-flash": {
+   "id": "glm-5.3-flash",
+   "name": "GLM5.3 Flash",
+   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
+   "type": "chat",
+   "family": "glm-flash",
+   "canonical_id": "zhipuai/glm-5.3-flash",
+   "release_date": "2026-08-26",
+   "limit": {
+    "context": 1048576,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.15,
+      "cache": {
+       "read": 0.03
+      }
+     },
+     "output": {
+      "price": 0.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cheapest-token.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-26"
   },
   "gpt-5.5": {
    "id": "gpt-5.5",
@@ -501,367 +398,6 @@
    "open_weights": false,
    "knowledge": "2025-12-01",
    "last_updated": "2026-04-23"
-  },
-  "qwen3.8-max": {
-   "id": "qwen3.8-max",
-   "name": "Qwen3.8-Max",
-   "description": "2.4-trillion-parameter MoE flagship for coding, professional work, multimodal understanding, and long-horizon agentic workflows",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3.8-max",
-   "release_date": "2026-08-03",
-   "limit": {
-    "context": 1000000,
-    "output": 262144
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2,
-      "cache": {
-       "read": 0.2
-      }
-     },
-     "output": {
-      "price": 4.5
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/x-matroska",
-     "video/quicktime",
-     "video/x-flv",
-     "video/x-ms-wmv"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cheapest-token.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-08-03"
-  },
-  "grok-4.6": {
-   "id": "grok-4.6",
-   "name": "Grok 4.6",
-   "description": "xAI's frontier model for long-running agents, coding, knowledge work, and visual projects",
-   "type": "chat",
-   "family": "grok",
-   "canonical_id": "xai/grok-4.6",
-   "release_date": "2026-08-12",
-   "limit": {
-    "context": 200000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2,
-      "cache": {
-       "read": 0.5
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 200000
-         }
-        },
-        "price": 4,
-        "cache": {
-         "read": 1
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 4.5,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 200000
-         }
-        },
-        "price": 9
-       }
-      ]
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cheapest-token.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-02-01",
-   "last_updated": "2026-08-12"
-  },
-  "gpt-6-luna": {
-   "id": "gpt-6-luna",
-   "name": "GPT-6 Luna",
-   "description": "OpenAI's most efficient model for focused, high-volume tasks",
-   "type": "chat",
-   "family": "gpt-luna",
-   "canonical_id": "openai/gpt-6-luna",
-   "release_date": "2026-09-22",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "xhigh"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.1,
-      "cache": {
-       "read": 0.01,
-       "write": 0.125
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 0.2,
-        "cache": {
-         "read": 0.02,
-         "write": 0.25
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 0.5,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 0.75
-       }
-      ]
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cheapest-token.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "freeform": [
-        "text",
-        "lark",
-        "regex"
-       ],
-       "strict": true,
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-05-18",
-   "last_updated": "2026-09-22"
-  },
-  "kimi-k3": {
-   "id": "kimi-k3",
-   "name": "Kimi K3",
-   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
-   "type": "chat",
-   "family": "kimi-k3",
-   "canonical_id": "moonshotai/kimi-k3",
-   "release_date": "2026-07-16",
-   "limit": {
-    "context": 1048576,
-    "output": 1048576
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 4,
-      "cache": {
-       "read": 1
-      }
-     },
-     "output": {
-      "price": 12
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/heic",
-     "image/heif"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cheapest-token.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-07-16"
   },
   "gpt-5.6-luna": {
    "id": "gpt-5.6-luna",
@@ -977,17 +513,18 @@
    "knowledge": "2026-02-16",
    "last_updated": "2026-07-09"
   },
-  "minimax-m3.1-flash": {
-   "id": "minimax-m3.1-flash",
-   "name": "MiniMax M3.1-Flash",
-   "description": "Frontier multimodal coding model with 1M context window and tunable thinking depth",
+  "gpt-5.6-sol": {
+   "id": "gpt-5.6-sol",
+   "name": "GPT-5.6 Sol",
+   "description": "Frontier GPT-5.6 model for complex professional work, coding, and agentic workflows",
    "type": "chat",
-   "family": "minimax",
-   "canonical_id": "minimax/MiniMax-M3.1-Flash",
-   "release_date": "2026-10-19",
+   "family": "gpt-sol",
+   "canonical_id": "openai/gpt-5.6-sol",
+   "release_date": "2026-07-09",
    "limit": {
-    "context": 1048576,
-    "output": 1048576
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
    },
    "capabilities": {
     "temperature": true,
@@ -1001,24 +538,49 @@
     "reasoning": {
      "supported": true,
      "effort": [
+      "none",
       "low",
       "medium",
       "high",
-      "xhigh",
-      "max"
+      "xhigh"
      ]
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.15,
+      "price": 4,
       "cache": {
-       "read": 0.01
-      }
+       "read": 0.4,
+       "write": 5
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 8,
+        "cache": {
+         "read": 0.8,
+         "write": 10
+        }
+       }
+      ]
      },
      "output": {
-      "price": 0.6
+      "price": 16,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 24
+       }
+      ]
      }
     }
    },
@@ -1028,7 +590,8 @@
      "image/jpeg",
      "image/png",
      "image/gif",
-     "image/webp"
+     "image/webp",
+     "application/pdf"
     ],
     "output": [
      "text"
@@ -1043,13 +606,140 @@
      },
      "capabilities": {
       "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "freeform": [
+        "text",
+        "lark",
+        "regex"
+       ],
+       "strict": true,
        "updates": false
       }
      }
     }
    },
-   "open_weights": true,
-   "last_updated": "2026-10-19"
+   "open_weights": false,
+   "knowledge": "2026-02-16",
+   "last_updated": "2026-07-09"
+  },
+  "gpt-5.6-terra": {
+   "id": "gpt-5.6-terra",
+   "name": "GPT-5.6 Terra",
+   "description": "Balanced GPT-5.6 model for capable, cost-efficient everyday work",
+   "type": "chat",
+   "family": "gpt-terra",
+   "canonical_id": "openai/gpt-5.6-terra",
+   "release_date": "2026-07-09",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.2,
+       "write": 2.5
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 4,
+        "cache": {
+         "read": 0.4,
+         "write": 5
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 10.2,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 15.3
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cheapest-token.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "freeform": [
+        "text",
+        "lark",
+        "regex"
+       ],
+       "strict": true,
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-02-16",
+   "last_updated": "2026-07-09"
   },
   "gpt-6-astra": {
    "id": "gpt-6-astra",
@@ -1164,21 +854,22 @@
    "knowledge": "2026-04-30",
    "last_updated": "2026-09-04"
   },
-  "glm-5.3-flash": {
-   "id": "glm-5.3-flash",
-   "name": "GLM5.3 Flash",
-   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
+  "gpt-6-luna": {
+   "id": "gpt-6-luna",
+   "name": "GPT-6 Luna",
+   "description": "OpenAI's most efficient model for focused, high-volume tasks",
    "type": "chat",
-   "family": "glm-flash",
-   "canonical_id": "zhipuai/glm-5.3-flash",
-   "release_date": "2026-08-26",
+   "family": "gpt-luna",
+   "canonical_id": "openai/gpt-6-luna",
+   "release_date": "2026-09-22",
    "limit": {
-    "context": 1048576,
-    "output": 131072
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
    },
    "capabilities": {
     "temperature": true,
-    "top_k": true,
+    "top_k": false,
     "top_p": true,
     "system_updates": false,
     "effort_updates": false,
@@ -1188,30 +879,60 @@
     "reasoning": {
      "supported": true,
      "effort": [
+      "none",
       "low",
       "medium",
       "high",
-      "xhigh",
-      "max"
+      "xhigh"
      ]
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.15,
+      "price": 0.1,
       "cache": {
-       "read": 0.03
-      }
+       "read": 0.01,
+       "write": 0.125
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 0.2,
+        "cache": {
+         "read": 0.02,
+         "write": 0.25
+        }
+       }
+      ]
      },
      "output": {
-      "price": 0.5
+      "price": 0.5,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 0.75
+       }
+      ]
      }
     }
    },
    "modalities": {
     "input": [
-     "text"
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
     ],
     "output": [
      "text"
@@ -1226,13 +947,26 @@
      },
      "capabilities": {
       "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "freeform": [
+        "text",
+        "lark",
+        "regex"
+       ],
+       "strict": true,
        "updates": false
       }
      }
     }
    },
-   "open_weights": true,
-   "last_updated": "2026-08-26"
+   "open_weights": false,
+   "knowledge": "2026-05-18",
+   "last_updated": "2026-09-22"
   },
   "gpt-6-sol": {
    "id": "gpt-6-sol",
@@ -1461,82 +1195,14 @@
    "knowledge": "2026-04-30",
    "last_updated": "2026-09-29"
   },
-  "glm-5.3": {
-   "id": "glm-5.3",
-   "name": "GLM5.3",
-   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
+  "gpt-6.1-terra": {
+   "id": "gpt-6.1-terra",
+   "name": "GPT-6.1 Terra",
+   "description": "Fast, efficient model for visual reasoning, precise computer use, and clear, natural writing.",
    "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-5.3",
-   "release_date": "2026-08-14",
-   "limit": {
-    "context": 1048576,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.4,
-      "cache": {
-       "read": 0.26
-      }
-     },
-     "output": {
-      "price": 3.96
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cheapest-token.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-08-14"
-  },
-  "gpt-5.6-sol": {
-   "id": "gpt-5.6-sol",
-   "name": "GPT-5.6 Sol",
-   "description": "Frontier GPT-5.6 model for complex professional work, coding, and agentic workflows",
-   "type": "chat",
-   "family": "gpt-sol",
-   "canonical_id": "openai/gpt-5.6-sol",
-   "release_date": "2026-07-09",
+   "family": "gpt-terra",
+   "canonical_id": "openai/gpt-6.1-terra",
+   "release_date": "2026-10-26",
    "limit": {
     "context": 1050000,
     "input": 922000,
@@ -1565,10 +1231,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 4,
+      "price": 1,
       "cache": {
-       "read": 0.4,
-       "write": 5
+       "read": 0.05,
+       "write": 1.25
       },
       "overrides": [
        {
@@ -1577,16 +1243,16 @@
           "gt": 272000
          }
         },
-        "price": 8,
+        "price": 2,
         "cache": {
-         "read": 0.8,
-         "write": 10
+         "read": 0.1,
+         "write": 2.5
         }
        }
       ]
      },
      "output": {
-      "price": 16,
+      "price": 4,
       "overrides": [
        {
         "when": {
@@ -1594,7 +1260,7 @@
           "gt": 272000
          }
         },
-        "price": 24
+        "price": 6
        }
       ]
      }
@@ -1640,25 +1306,204 @@
     }
    },
    "open_weights": false,
-   "knowledge": "2026-02-16",
-   "last_updated": "2026-07-09"
+   "knowledge": "2026-06-01",
+   "last_updated": "2026-10-26"
   },
-  "deepseek-v4-pro-0813": {
-   "id": "deepseek-v4-pro-0813",
-   "name": "DeepSeek V4 Pro 0813",
-   "description": "DeepSeek V4 Pro snapshot with million-token context and support for thinking and non-thinking modes",
+  "grok-4.6": {
+   "id": "grok-4.6",
+   "name": "Grok 4.6",
+   "description": "xAI's frontier model for long-running agents, coding, knowledge work, and visual projects",
    "type": "chat",
-   "family": "deepseek-thinking",
-   "canonical_id": "deepseek/deepseek-v4-pro-0813",
-   "release_date": "2026-08-13",
+   "family": "grok",
+   "canonical_id": "xai/grok-4.6",
+   "release_date": "2026-08-12",
    "limit": {
-    "context": 1048576,
-    "output": 1048576
+    "context": 200000,
+    "output": 128000
    },
    "capabilities": {
     "temperature": true,
     "top_k": true,
     "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.5
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 200000
+         }
+        },
+        "price": 4,
+        "cache": {
+         "read": 1
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 4.5,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 200000
+         }
+        },
+        "price": 9
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cheapest-token.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-02-01",
+   "last_updated": "2026-08-12"
+  },
+  "grok-4.7": {
+   "id": "grok-4.7",
+   "name": "Grok 4.7",
+   "description": "xAI's frontier model for long-running agents, coding, knowledge work, and visual projects",
+   "type": "chat",
+   "family": "grok",
+   "canonical_id": "xai/grok-4.7",
+   "release_date": "2026-09-21",
+   "limit": {
+    "context": 500000,
+    "output": 500000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.5
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 200000
+         }
+        },
+        "price": 4,
+        "cache": {
+         "read": 1
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 4.5,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 200000
+         }
+        },
+        "price": 9
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cheapest-token.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-05",
+   "last_updated": "2026-09-21"
+  },
+  "kimi-k3": {
+   "id": "kimi-k3",
+   "name": "Kimi K3",
+   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
+   "type": "chat",
+   "family": "kimi-k3",
+   "canonical_id": "moonshotai/kimi-k3",
+   "release_date": "2026-07-16",
+   "limit": {
+    "context": 1048576,
+    "output": 1048576
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -1677,19 +1522,26 @@
    "cost": {
     "text": {
      "input": {
-      "price": 1.32,
+      "price": 4,
       "cache": {
-       "read": 0.04
+       "read": 1
       }
      },
      "output": {
-      "price": 3.56
+      "price": 12
      }
     }
    },
    "modalities": {
     "input": [
-     "text"
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/heic",
+     "image/heif"
     ],
     "output": [
      "text"
@@ -1710,23 +1562,23 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2026-08-22"
+   "last_updated": "2026-07-16"
   },
-  "deepseek-v4.1-flash-1017": {
-   "id": "deepseek-v4.1-flash-1017",
-   "name": "DeepSeek V4.1 Flash 1017",
-   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
+  "minimax-m3.1-flash": {
+   "id": "minimax-m3.1-flash",
+   "name": "MiniMax M3.1-Flash",
+   "description": "Frontier multimodal coding model with 1M context window and tunable thinking depth",
    "type": "chat",
-   "family": "deepseek-flash",
-   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
-   "release_date": "2026-10-17",
+   "family": "minimax",
+   "canonical_id": "minimax/MiniMax-M3.1-Flash",
+   "release_date": "2026-10-19",
    "limit": {
     "context": 1048576,
     "output": 1048576
    },
    "capabilities": {
     "temperature": true,
-    "top_k": true,
+    "top_k": false,
     "top_p": true,
     "system_updates": false,
     "effort_updates": false,
@@ -1737,6 +1589,7 @@
      "supported": true,
      "effort": [
       "low",
+      "medium",
       "high",
       "xhigh",
       "max"
@@ -1746,13 +1599,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.3,
+      "price": 0.15,
       "cache": {
-       "read": 0.006
+       "read": 0.01
       }
      },
      "output": {
-      "price": 1.2
+      "price": 0.6
      }
     }
    },
@@ -1783,8 +1636,155 @@
     }
    },
    "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-10-17"
+   "last_updated": "2026-10-19"
+  },
+  "nemotron-3.5-super-vl": {
+   "id": "nemotron-3.5-super-vl",
+   "name": "NVIDIA Nemotron 3.5 Super VL",
+   "description": "NVIDIA vision-language reasoning model for text, image, and video understanding and agentic tool use",
+   "type": "chat",
+   "family": "nemotron",
+   "canonical_id": "nvidia/nemotron-3.5-super-vl-120b-a12b",
+   "release_date": "2026-10-15",
+   "limit": {
+    "context": 1048576,
+    "output": 1048576
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.3,
+      "cache": {
+       "read": 0.06
+      }
+     },
+     "output": {
+      "price": 0.65
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cheapest-token.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-10-15"
+  },
+  "qwen3.8-max": {
+   "id": "qwen3.8-max",
+   "name": "Qwen3.8-Max",
+   "description": "2.4-trillion-parameter MoE flagship for coding, professional work, multimodal understanding, and long-horizon agentic workflows",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.8-max",
+   "release_date": "2026-08-03",
+   "limit": {
+    "context": 1000000,
+    "output": 262144
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.2
+      }
+     },
+     "output": {
+      "price": 4.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/x-matroska",
+     "video/quicktime",
+     "video/x-flv",
+     "video/x-ms-wmv"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cheapest-token.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-08-03"
   }
  }
 }

@@ -6,6 +6,81 @@
   "BEE_API_KEY"
  ],
  "models": {
+  "bee-brood": {
+   "id": "bee-brood",
+   "name": "Bee Brood 1.0",
+   "description": "Production multimodal reasoning for image and video analysis, tool-enabled workflows, and multi-step planning at controlled cost.",
+   "type": "chat",
+   "release_date": "2026-07-10",
+   "limit": {
+    "context": 262144,
+    "output": 16384
+   },
+   "capabilities": {
+    "temperature": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.6,
+      "cache": {
+       "read": 0.06,
+       "write": 0.72
+      }
+     },
+     "output": {
+      "price": 2.4
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "video/mp4",
+     "video/webm",
+     "audio/wav",
+     "audio/mpeg"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.bee.heossi.com/bee",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-09-28"
+  },
   "bee-buzz": {
    "id": "bee-buzz",
    "name": "Bee Buzz 1.0",
@@ -46,6 +121,147 @@
      },
      "output": {
       "price": 10
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "video/mp4",
+     "video/webm",
+     "audio/wav",
+     "audio/mpeg"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.bee.heossi.com/bee",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-09-28"
+  },
+  "bee-cell": {
+   "id": "bee-cell",
+   "name": "Bee Cell 1.0",
+   "description": "Fast hosted AI for chat, coding help, document question answering, image understanding, and lightweight technical reasoning.",
+   "type": "chat",
+   "release_date": "2026-07-10",
+   "limit": {
+    "context": 131072,
+    "output": 8192
+   },
+   "capabilities": {
+    "temperature": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.3,
+      "cache": {
+       "read": 0.03,
+       "write": 0.36
+      }
+     },
+     "output": {
+      "price": 1.2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "audio/wav",
+     "audio/mpeg"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.bee.heossi.com/bee",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-09-28"
+  },
+  "bee-comb": {
+   "id": "bee-comb",
+   "name": "Bee Comb 2.0",
+   "description": "Stronger local/workstation AI for coding, architecture, security reasoning, larger RAG, and domain-specific workflows. The default workhorse for engineers and dev teams.",
+   "type": "chat",
+   "release_date": "2026-07-10",
+   "limit": {
+    "context": 262144,
+    "output": 16384
+   },
+   "capabilities": {
+    "temperature": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.25,
+      "cache": {
+       "read": 0.125,
+       "write": 1.5
+      }
+     },
+     "output": {
+      "price": 5
      }
     }
    },
@@ -156,147 +372,6 @@
    "open_weights": false,
    "last_updated": "2026-09-28"
   },
-  "bee-cell": {
-   "id": "bee-cell",
-   "name": "Bee Cell 1.0",
-   "description": "Fast hosted AI for chat, coding help, document question answering, image understanding, and lightweight technical reasoning.",
-   "type": "chat",
-   "release_date": "2026-07-10",
-   "limit": {
-    "context": 131072,
-    "output": 8192
-   },
-   "capabilities": {
-    "temperature": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.3,
-      "cache": {
-       "read": 0.03,
-       "write": 0.36
-      }
-     },
-     "output": {
-      "price": 1.2
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "audio/wav",
-     "audio/mpeg"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.bee.heossi.com/bee",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-09-28"
-  },
-  "bee-brood": {
-   "id": "bee-brood",
-   "name": "Bee Brood 1.0",
-   "description": "Production multimodal reasoning for image and video analysis, tool-enabled workflows, and multi-step planning at controlled cost.",
-   "type": "chat",
-   "release_date": "2026-07-10",
-   "limit": {
-    "context": 262144,
-    "output": 16384
-   },
-   "capabilities": {
-    "temperature": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.6,
-      "cache": {
-       "read": 0.06,
-       "write": 0.72
-      }
-     },
-     "output": {
-      "price": 2.4
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "video/mp4",
-     "video/webm",
-     "audio/wav",
-     "audio/mpeg"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.bee.heossi.com/bee",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-09-28"
-  },
   "bee-swarm": {
    "id": "bee-swarm",
    "name": "Bee Swarm 1.0",
@@ -356,81 +431,6 @@
      "sdk": {
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-09-28"
-  },
-  "bee-comb": {
-   "id": "bee-comb",
-   "name": "Bee Comb 2.0",
-   "description": "Stronger local/workstation AI for coding, architecture, security reasoning, larger RAG, and domain-specific workflows. The default workhorse for engineers and dev teams.",
-   "type": "chat",
-   "release_date": "2026-07-10",
-   "limit": {
-    "context": 262144,
-    "output": 16384
-   },
-   "capabilities": {
-    "temperature": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.25,
-      "cache": {
-       "read": 0.125,
-       "write": 1.5
-      }
-     },
-     "output": {
-      "price": 5
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "video/mp4",
-     "video/webm",
-     "audio/wav",
-     "audio/mpeg"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.bee.heossi.com/bee",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
      }
     }
    },

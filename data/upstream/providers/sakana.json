@@ -6,73 +6,6 @@
   "SAKANA_API_KEY"
  ],
  "models": {
-  "sakana-namazu": {
-   "id": "sakana-namazu",
-   "name": "Sakana Namazu",
-   "description": "Japanese-specialized reasoning model based on Kimi K2.6 and tuned for Japanese language, culture, and business workflows",
-   "type": "chat",
-   "family": "sakana-namazu",
-   "canonical_id": "sakana/sakana-namazu",
-   "release_date": "2026-08-03",
-   "limit": {
-    "context": 262144,
-    "output": 65536
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.95,
-      "cache": {
-       "read": 0.15
-      }
-     },
-     "output": {
-      "price": 4
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.sakana.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-08-03"
-  },
   "fugu": {
    "id": "fugu",
    "name": "Fugu",
@@ -101,6 +34,98 @@
       "high",
       "xhigh"
      ]
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.sakana.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-06-15"
+  },
+  "fugu-ultra": {
+   "id": "fugu-ultra",
+   "name": "Fugu Ultra",
+   "description": "Quality-first multi-agent model for hard research, analysis, and competitions",
+   "type": "chat",
+   "family": "fugu",
+   "canonical_id": "sakana/fugu-ultra",
+   "release_date": "2026-06-15",
+   "limit": {
+    "context": 1000000,
+    "output": 1000000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 10,
+        "cache": {
+         "read": 1
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 30,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 45
+       }
+      ]
+     }
     }
    },
    "modalities": {
@@ -221,22 +246,22 @@
    "open_weights": false,
    "last_updated": "2026-06-15"
   },
-  "fugu-ultra": {
-   "id": "fugu-ultra",
-   "name": "Fugu Ultra",
-   "description": "Quality-first multi-agent model for hard research, analysis, and competitions",
+  "sakana-namazu": {
+   "id": "sakana-namazu",
+   "name": "Sakana Namazu",
+   "description": "Japanese-specialized reasoning model based on Kimi K2.6 and tuned for Japanese language, culture, and business workflows",
    "type": "chat",
-   "family": "fugu",
-   "canonical_id": "sakana/fugu-ultra",
-   "release_date": "2026-06-15",
+   "family": "sakana-namazu",
+   "canonical_id": "sakana/sakana-namazu",
+   "release_date": "2026-08-03",
    "limit": {
-    "context": 1000000,
-    "output": 1000000
+    "context": 262144,
+    "output": 65536
    },
    "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -245,63 +270,38 @@
     },
     "reasoning": {
      "supported": true,
-     "effort": [
-      "high",
-      "xhigh"
-     ]
+     "toggle": true
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 5,
+      "price": 0.95,
       "cache": {
-       "read": 0.5
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 10,
-        "cache": {
-         "read": 1
-        }
-       }
-      ]
+       "read": 0.15
+      }
      },
      "output": {
-      "price": 30,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 45
-       }
-      ]
+      "price": 4
      }
     }
    },
    "modalities": {
     "input": [
      "text",
-     "image"
+     "image",
+     "application/pdf"
     ],
     "output": [
      "text"
     ]
    },
    "api": {
-    "responses": {
+    "chat-completions": {
      "base_url": "https://api.sakana.ai/v1",
      "sdk": {
       "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
      },
      "capabilities": {
       "tools": {
@@ -311,7 +311,7 @@
     }
    },
    "open_weights": false,
-   "last_updated": "2026-06-15"
+   "last_updated": "2026-08-03"
   }
  }
 }

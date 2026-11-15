@@ -6,16 +6,77 @@
   "AMD_API_KEY"
  ],
  "models": {
-  "MiniCPM-V-4.7-35B-A3B": {
-   "id": "MiniCPM-V-4.7-35B-A3B",
-   "name": "MiniCPM-V 4.7 35B-A3B",
-   "description": "First MoE MiniCPM-V model for single-image, multi-image and video understanding",
-   "type": "chat",
-   "canonical_id": "openbmb/minicpm-v-4.7-35b-a3b",
-   "release_date": "2026-10-07",
+  "Clef": {
+   "id": "Clef",
+   "name": "Clef",
+   "description": "Cloudflare's open-weight decision model that returns probabilities for typed choice, score and yes/no questions about text or images",
+   "type": "decision",
+   "canonical_id": "cloudflare/clef",
+   "release_date": "2026-10-01",
    "limit": {
-    "context": 262144,
-    "output": 262144
+    "context": 65536
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "systemone": {
+     "base_url": "https://developer.amd.com.cn/radeon/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/typesafe-ai",
+      "opencodeai": "@opencode/ai/providers/typesafe-ai/decisions"
+     },
+     "compatibility": {
+      "media_input": "root"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-10-01"
+  },
+  "DeepSeek-V4-Flash": {
+   "id": "DeepSeek-V4-Flash",
+   "name": "DeepSeek V4 Flash 0731",
+   "description": "Official DeepSeek V4 Flash release with enhanced agentic capabilities and integrated DSpark speculative decoding",
+   "type": "chat",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4-flash-0731",
+   "release_date": "2026-07-31",
+   "limit": {
+    "context": 1048576,
+    "output": 384000
    },
    "capabilities": {
     "temperature": true,
@@ -28,7 +89,16 @@
      "supported": true
     },
     "reasoning": {
-     "supported": true
+     "supported": true,
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
     }
    },
    "cost": {
@@ -46,8 +116,7 @@
    },
    "modalities": {
     "input": [
-     "text",
-     "image"
+     "text"
     ],
     "output": [
      "text"
@@ -68,7 +137,8 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2026-10-07"
+   "knowledge": "2025-05",
+   "last_updated": "2026-07-31"
   },
   "DeepSeek-V4-Flash-Vision-Exp": {
    "id": "DeepSeek-V4-Flash-Vision-Exp",
@@ -148,140 +218,6 @@
    "open_weights": true,
    "last_updated": "2026-09-01"
   },
-  "DeepSeek-V4-Flash": {
-   "id": "DeepSeek-V4-Flash",
-   "name": "DeepSeek V4 Flash 0731",
-   "description": "Official DeepSeek V4 Flash release with enhanced agentic capabilities and integrated DSpark speculative decoding",
-   "type": "chat",
-   "family": "deepseek-flash",
-   "canonical_id": "deepseek/deepseek-v4-flash-0731",
-   "release_date": "2026-07-31",
-   "limit": {
-    "context": 1048576,
-    "output": 384000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "minimal",
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://developer.amd.com.cn/radeon/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-07-31"
-  },
-  "Clef": {
-   "id": "Clef",
-   "name": "Clef",
-   "description": "Cloudflare's open-weight decision model that returns probabilities for typed choice, score and yes/no questions about text or images",
-   "type": "decision",
-   "canonical_id": "cloudflare/clef",
-   "release_date": "2026-10-01",
-   "limit": {
-    "context": 65536
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "systemone": {
-     "base_url": "https://developer.amd.com.cn/radeon/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/typesafe-ai",
-      "opencodeai": "@opencode/ai/providers/typesafe-ai/decisions"
-     },
-     "compatibility": {
-      "media_input": "root"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-10-01"
-  },
   "DeepSeek-V4.1-Flash": {
    "id": "DeepSeek-V4.1-Flash",
    "name": "DeepSeek V4.1 Flash",
@@ -360,6 +296,75 @@
    "knowledge": "2025-05",
    "last_updated": "2026-10-17"
   },
+  "GLM-5.3-Flash": {
+   "id": "GLM-5.3-Flash",
+   "name": "GLM-5.3-Flash",
+   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
+   "type": "chat",
+   "family": "glm-flash",
+   "canonical_id": "zhipuai/glm-5.3-flash",
+   "release_date": "2026-08-26",
+   "limit": {
+    "context": 262144,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://developer.amd.com.cn/radeon/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-26"
+  },
   "Gemma-4-31B-IT": {
    "id": "Gemma-4-31B-IT",
    "name": "Gemma 4 31B IT",
@@ -430,190 +435,6 @@
    "knowledge": "2025-01",
    "last_updated": "2026-04-02"
   },
-  "MiniCPM5-2B": {
-   "id": "MiniCPM5-2B",
-   "name": "MiniCPM5-2B",
-   "description": "Dense 2B-class open-source model for on-device and resource-constrained use, with native long-context support, tool calling, and agentic tasks",
-   "type": "chat",
-   "canonical_id": "openbmb/minicpm5-2b",
-   "release_date": "2026-09-06",
-   "limit": {
-    "context": 131072,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://developer.amd.com.cn/radeon/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-09-12"
-  },
-  "d3": {
-   "id": "d3",
-   "name": "d3",
-   "description": "vLLM Semantic Router 27B decision model that answers typed choice, yes/no and score questions about text, images or video with probabilities",
-   "type": "decision",
-   "canonical_id": "vllm-sr/d3",
-   "release_date": "2026-10-10",
-   "limit": {
-    "context": 32768
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image",
-     "video"
-    ],
-    "output": [
-     "decision"
-    ]
-   },
-   "api": {
-    "systemone": {
-     "base_url": "https://developer.amd.com.cn/radeon/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/typesafe-ai",
-      "opencodeai": "@opencode/ai/providers/typesafe-ai/decisions"
-     },
-     "compatibility": {
-      "media_input": "root"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-10-10"
-  },
-  "MiniCPM-V-4.7-1B": {
-   "id": "MiniCPM-V-4.7-1B",
-   "name": "MiniCPM-V 4.7 1B",
-   "description": "Compact MiniCPM-V model for single-image, multi-image and video understanding",
-   "type": "chat",
-   "canonical_id": "openbmb/minicpm-v-4.7-1b",
-   "release_date": "2026-10-06",
-   "limit": {
-    "context": 262144,
-    "output": 262144
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://developer.amd.com.cn/radeon/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-10-06"
-  },
   "MiMo-V2.6-Flash": {
    "id": "MiMo-V2.6-Flash",
    "name": "MiMo-V2.6-Flash",
@@ -682,6 +503,248 @@
    },
    "open_weights": true,
    "last_updated": "2026-09-22"
+  },
+  "MiniCPM-V-4.7-1B": {
+   "id": "MiniCPM-V-4.7-1B",
+   "name": "MiniCPM-V 4.7 1B",
+   "description": "Compact MiniCPM-V model for single-image, multi-image and video understanding",
+   "type": "chat",
+   "canonical_id": "openbmb/minicpm-v-4.7-1b",
+   "release_date": "2026-10-06",
+   "limit": {
+    "context": 262144,
+    "output": 262144
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://developer.amd.com.cn/radeon/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-10-06"
+  },
+  "MiniCPM-V-4.7-35B-A3B": {
+   "id": "MiniCPM-V-4.7-35B-A3B",
+   "name": "MiniCPM-V 4.7 35B-A3B",
+   "description": "First MoE MiniCPM-V model for single-image, multi-image and video understanding",
+   "type": "chat",
+   "canonical_id": "openbmb/minicpm-v-4.7-35b-a3b",
+   "release_date": "2026-10-07",
+   "limit": {
+    "context": 262144,
+    "output": 262144
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://developer.amd.com.cn/radeon/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-10-07"
+  },
+  "MiniCPM5-2B": {
+   "id": "MiniCPM5-2B",
+   "name": "MiniCPM5-2B",
+   "description": "Dense 2B-class open-source model for on-device and resource-constrained use, with native long-context support, tool calling, and agentic tasks",
+   "type": "chat",
+   "canonical_id": "openbmb/minicpm5-2b",
+   "release_date": "2026-09-06",
+   "limit": {
+    "context": 131072,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://developer.amd.com.cn/radeon/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-09-12"
+  },
+  "OmniVoice": {
+   "id": "OmniVoice",
+   "name": "OmniVoice",
+   "description": "Massively multilingual zero-shot text-to-speech model with preset, described or cloned voices",
+   "type": "speech",
+   "canonical_id": "k2-fsa/omnivoice",
+   "release_date": "2026-03-30",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "unit": "character"
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "audio"
+    ]
+   },
+   "api": {
+    "speech": {
+     "base_url": "https://developer.amd.com.cn/radeon/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/protocols/openai-speech"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-03-30"
   },
   "Qwen3.8-27B": {
    "id": "Qwen3.8-27B",
@@ -756,58 +819,6 @@
    },
    "open_weights": true,
    "last_updated": "2026-08-14"
-  },
-  "OmniVoice": {
-   "id": "OmniVoice",
-   "name": "OmniVoice",
-   "description": "Massively multilingual zero-shot text-to-speech model with preset, described or cloned voices",
-   "type": "speech",
-   "canonical_id": "k2-fsa/omnivoice",
-   "release_date": "2026-03-30",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "unit": "character"
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "audio"
-    ]
-   },
-   "api": {
-    "speech": {
-     "base_url": "https://developer.amd.com.cn/radeon/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/protocols/openai-speech"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-03-30"
   },
   "Qwen3.8-Flash-Next": {
    "id": "Qwen3.8-Flash-Next",
@@ -888,44 +899,33 @@
    "open_weights": true,
    "last_updated": "2026-08-27"
   },
-  "GLM-5.3-Flash": {
-   "id": "GLM-5.3-Flash",
-   "name": "GLM-5.3-Flash",
-   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
-   "type": "chat",
-   "family": "glm-flash",
-   "canonical_id": "zhipuai/glm-5.3-flash",
-   "release_date": "2026-08-26",
+  "d3": {
+   "id": "d3",
+   "name": "d3",
+   "description": "vLLM Semantic Router 27B decision model that answers typed choice, yes/no and score questions about text, images or video with probabilities",
+   "type": "decision",
+   "canonical_id": "vllm-sr/d3",
+   "release_date": "2026-10-10",
    "limit": {
-    "context": 262144,
-    "output": 131072
+    "context": 32768
    },
    "capabilities": {
-    "temperature": true,
+    "temperature": false,
     "top_k": false,
-    "top_p": true,
-    "structured_output": true,
+    "top_p": false,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
-     "supported": true
+     "supported": false
     },
     "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
+     "supported": false
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0,
-      "cache": {
-       "read": 0
-      }
+      "price": 0
      },
      "output": {
       "price": 0
@@ -934,28 +934,28 @@
    },
    "modalities": {
     "input": [
-     "text"
+     "text",
+     "image",
+     "video"
     ],
     "output": [
-     "text"
+     "decision"
     ]
    },
    "api": {
-    "chat-completions": {
+    "systemone": {
      "base_url": "https://developer.amd.com.cn/radeon/api/v1",
      "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
+      "aisdk": "@ai-sdk/typesafe-ai",
+      "opencodeai": "@opencode/ai/providers/typesafe-ai/decisions"
      },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
+     "compatibility": {
+      "media_input": "root"
      }
     }
    },
    "open_weights": true,
-   "last_updated": "2026-08-26"
+   "last_updated": "2026-10-10"
   },
   "d3-flash": {
    "id": "d3-flash",

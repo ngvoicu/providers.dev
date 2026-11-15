@@ -147,35 +147,44 @@
    "open_weights": true,
    "last_updated": "2026-04-23"
   },
-  "mimo-v2.5-tts-voiceclone": {
-   "id": "mimo-v2.5-tts-voiceclone",
-   "name": "MiMo-V2.5-TTS-VoiceClone",
-   "description": "Speech generation model for controllable voice, narration, and audio delivery",
-   "type": "speech",
+  "mimo-v2.5-pro": {
+   "id": "mimo-v2.5-pro",
+   "name": "MiMo-V2.5-Pro",
+   "description": "Stronger MiMo Pro tier for multimodal reasoning and coding-agent execution",
+   "type": "chat",
    "family": "mimo",
-   "canonical_id": "xiaomi/mimo-v2.5-tts-voiceclone",
+   "canonical_id": "xiaomi/mimo-v2.5-pro",
+   "status": "deprecated",
    "release_date": "2026-04-22",
    "limit": {
-    "context": 8192,
-    "output": 8192
+    "context": 1048576,
+    "output": 131072
    },
    "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
-     "supported": false
+     "supported": true
     },
     "reasoning": {
-     "supported": false
+     "supported": true,
+     "toggle": true,
+     "default": {
+      "type": "toggle",
+      "value": true
+     }
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0
+      "price": 0,
+      "cache": {
+       "read": 0
+      }
      },
      "output": {
       "price": 0
@@ -187,9 +196,7 @@
      "text"
     ],
     "output": [
-     "audio/wav",
-     "audio/mpeg",
-     "audio/pcm"
+     "text"
     ]
    },
    "api": {
@@ -198,10 +205,19 @@
      "sdk": {
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
      }
     }
    },
-   "open_weights": false,
+   "open_weights": true,
+   "knowledge": "2024-12",
    "last_updated": "2026-04-22"
   },
   "mimo-v2.5-tts": {
@@ -261,48 +277,35 @@
    "open_weights": false,
    "last_updated": "2026-04-22"
   },
-  "mimo-v2.6-pro": {
-   "id": "mimo-v2.6-pro",
-   "name": "MiMo-V2.6-Pro",
-   "description": "Stronger MiMo Pro tier for multimodal reasoning and coding-agent execution",
-   "type": "chat",
+  "mimo-v2.5-tts-voiceclone": {
+   "id": "mimo-v2.5-tts-voiceclone",
+   "name": "MiMo-V2.5-TTS-VoiceClone",
+   "description": "Speech generation model for controllable voice, narration, and audio delivery",
+   "type": "speech",
    "family": "mimo",
-   "canonical_id": "xiaomi/mimo-v2.6-pro",
-   "release_date": "2026-09-22",
+   "canonical_id": "xiaomi/mimo-v2.5-tts-voiceclone",
+   "release_date": "2026-04-22",
    "limit": {
-    "context": 1048576,
-    "output": 131072
+    "context": 8192,
+    "output": 8192
    },
    "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
+    "temperature": false,
     "top_k": false,
-    "top_p": true,
-    "structured_output": true,
-    "stream_usage": true,
+    "top_p": false,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
-     "supported": true
+     "supported": false
     },
     "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "default": {
-      "type": "toggle",
-      "value": true
-     }
+     "supported": false
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0,
-      "cache": {
-       "read": 0
-      }
+      "price": 0
      },
      "output": {
       "price": 0
@@ -311,24 +314,12 @@
    },
    "modalities": {
     "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "audio/mpeg",
-     "audio/wav",
-     "audio/flac",
-     "audio/mp4",
-     "audio/ogg",
-     "video/mp4",
-     "video/quicktime",
-     "video/x-msvideo",
-     "video/x-ms-wmv"
+     "text"
     ],
     "output": [
-     "text"
+     "audio/wav",
+     "audio/mpeg",
+     "audio/pcm"
     ]
    },
    "api": {
@@ -337,55 +328,68 @@
      "sdk": {
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "strict": true,
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    },
-    "responses": {
-     "base_url": "https://token-plan-cn.xiaomimimo.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "strict": true,
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://token-plan-cn.xiaomimimo.com/anthropic/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto"
-       ],
-       "strict": true,
-       "updates": false
-      }
      }
     }
    },
-   "open_weights": true,
-   "last_updated": "2026-09-22"
+   "open_weights": false,
+   "last_updated": "2026-04-22"
+  },
+  "mimo-v2.5-tts-voicedesign": {
+   "id": "mimo-v2.5-tts-voicedesign",
+   "name": "MiMo-V2.5-TTS-VoiceDesign",
+   "description": "Speech generation model for controllable voice, narration, and audio delivery",
+   "type": "speech",
+   "family": "mimo",
+   "canonical_id": "xiaomi/mimo-v2.5-tts-voicedesign",
+   "release_date": "2026-04-22",
+   "limit": {
+    "context": 8192,
+    "output": 8192
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "audio/wav",
+     "audio/mpeg",
+     "audio/pcm"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://token-plan-cn.xiaomimimo.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-04-22"
   },
   "mimo-v2.6-flash": {
    "id": "mimo-v2.6-flash",
@@ -513,80 +517,27 @@
    "open_weights": true,
    "last_updated": "2026-09-22"
   },
-  "mimo-v2.5-tts-voicedesign": {
-   "id": "mimo-v2.5-tts-voicedesign",
-   "name": "MiMo-V2.5-TTS-VoiceDesign",
-   "description": "Speech generation model for controllable voice, narration, and audio delivery",
-   "type": "speech",
-   "family": "mimo",
-   "canonical_id": "xiaomi/mimo-v2.5-tts-voicedesign",
-   "release_date": "2026-04-22",
-   "limit": {
-    "context": 8192,
-    "output": 8192
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "audio/wav",
-     "audio/mpeg",
-     "audio/pcm"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://token-plan-cn.xiaomimimo.com/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-04-22"
-  },
-  "mimo-v2.5-pro": {
-   "id": "mimo-v2.5-pro",
-   "name": "MiMo-V2.5-Pro",
+  "mimo-v2.6-pro": {
+   "id": "mimo-v2.6-pro",
+   "name": "MiMo-V2.6-Pro",
    "description": "Stronger MiMo Pro tier for multimodal reasoning and coding-agent execution",
    "type": "chat",
    "family": "mimo",
-   "canonical_id": "xiaomi/mimo-v2.5-pro",
-   "status": "deprecated",
-   "release_date": "2026-04-22",
+   "canonical_id": "xiaomi/mimo-v2.6-pro",
+   "release_date": "2026-09-22",
    "limit": {
     "context": 1048576,
     "output": 131072
    },
    "capabilities": {
+    "cache": {
+     "implicit": true
+    },
     "temperature": true,
-    "top_k": true,
+    "top_k": false,
     "top_p": true,
+    "structured_output": true,
+    "stream_usage": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -616,7 +567,21 @@
    },
    "modalities": {
     "input": [
-     "text"
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "audio/mpeg",
+     "audio/wav",
+     "audio/flac",
+     "audio/mp4",
+     "audio/ogg",
+     "video/mp4",
+     "video/quicktime",
+     "video/x-msvideo",
+     "video/x-ms-wmv"
     ],
     "output": [
      "text"
@@ -631,17 +596,52 @@
      },
      "capabilities": {
       "tools": {
+       "choice": [
+        "auto"
+       ],
+       "strict": true,
        "updates": false
       }
      },
      "compatibility": {
       "reasoning_field": "reasoning_content"
      }
+    },
+    "responses": {
+     "base_url": "https://token-plan-cn.xiaomimimo.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "strict": true,
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://token-plan-cn.xiaomimimo.com/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "strict": true,
+       "updates": false
+      }
+     }
     }
    },
    "open_weights": true,
-   "knowledge": "2024-12",
-   "last_updated": "2026-04-22"
+   "last_updated": "2026-09-22"
   }
  }
 }

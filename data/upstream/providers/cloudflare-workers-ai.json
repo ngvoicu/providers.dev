@@ -7,929 +7,6 @@
   "CLOUDFLARE_API_KEY"
  ],
  "models": {
-  "@cf/nvidia/nemotron-3-120b-a12b": {
-   "id": "@cf/nvidia/nemotron-3-120b-a12b",
-   "name": "Nemotron 3 Super 120B",
-   "description": "Nemotron middle tier for collaborative agents and high-volume reasoning workloads",
-   "type": "chat",
-   "family": "nemotron",
-   "canonical_id": "nvidia/nemotron-3-super-120b-a12b",
-   "status": "deprecated",
-   "release_date": "2026-03-11",
-   "limit": {
-    "context": 256000,
-    "output": 256000
-   },
-   "capabilities": {
-    "cache": false,
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": true,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.5
-     },
-     "output": {
-      "price": 1.5
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-06",
-   "last_updated": "2026-03-11"
-  },
-  "@cf/moonshotai/kimi-k2.7-code": {
-   "id": "@cf/moonshotai/kimi-k2.7-code",
-   "name": "Kimi K2.7 Code",
-   "description": "Coding-focused Kimi model, stronger on long-horizon repo work with less overthinking",
-   "type": "chat",
-   "family": "kimi-k2",
-   "canonical_id": "moonshotai/kimi-k2.7-code",
-   "status": "deprecated",
-   "release_date": "2026-06-12",
-   "limit": {
-    "context": 262144,
-    "output": 262144
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": true,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.95,
-      "cache": {
-       "read": 0.19
-      }
-     },
-     "output": {
-      "price": 4
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-06-12"
-  },
-  "@cf/moonshotai/kimi-k2.6": {
-   "id": "@cf/moonshotai/kimi-k2.6",
-   "name": "Kimi K2.6",
-   "description": "Multimodal Kimi workhorse for agent loops, coding tasks, and visual context",
-   "type": "chat",
-   "family": "kimi-k2",
-   "canonical_id": "moonshotai/kimi-k2.6",
-   "status": "deprecated",
-   "release_date": "2026-04-20",
-   "limit": {
-    "context": 262144,
-    "output": 256000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": true,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.95,
-      "cache": {
-       "read": 0.16
-      }
-     },
-     "output": {
-      "price": 4
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-04-20"
-  },
-  "@cf/thinkingmachines/inkling-2-small": {
-   "id": "@cf/thinkingmachines/inkling-2-small",
-   "name": "Inkling 2 Small",
-   "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
-   "type": "chat",
-   "release_date": "2026-11-09",
-   "limit": {
-    "context": 1048576,
-    "output": 1048576
-   },
-   "capabilities": {
-    "temperature": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "minimal",
-      "low",
-      "medium",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.3,
-      "cache": {
-       "read": 0.1
-      }
-     },
-     "output": {
-      "price": 1
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-11-09"
-  },
-  "@cf/qwen/qwen3.8-27b": {
-   "id": "@cf/qwen/qwen3.8-27b",
-   "name": "Qwen3.8 27B",
-   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3.8-27b",
-   "release_date": "2026-08-14",
-   "limit": {
-    "context": 262144,
-    "output": 262144
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "medium",
-      "xhigh"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.45,
-      "cache": {
-       "read": 0.05
-      }
-     },
-     "output": {
-      "price": 3.2
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-08-14"
-  },
-  "@cf/qwen/qwen2.5-coder-32b-instruct": {
-   "id": "@cf/qwen/qwen2.5-coder-32b-instruct",
-   "name": "Qwen2.5 Coder 32B Instruct",
-   "description": "Qwen coding model for software agents, repository edits, and code reasoning",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen2.5-coder-32b-instruct",
-   "release_date": "2024-11-12",
-   "limit": {
-    "context": 32768,
-    "output": 32768
-   },
-   "capabilities": {
-    "cache": false,
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": true,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.66
-     },
-     "output": {
-      "price": 1
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2024-11-12"
-  },
-  "@cf/qwen/qwen3-embedding-0.6b": {
-   "id": "@cf/qwen/qwen3-embedding-0.6b",
-   "name": "Qwen3 Embedding 0.6B",
-   "description": "Compact multilingual text embedding model for retrieval, code search, classification, and clustering",
-   "type": "embedding",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3-embedding-0.6b",
-   "release_date": "2025-06-05",
-   "limit": {
-    "context": 8192,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.0118
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "embedding"
-    ]
-   },
-   "api": {
-    "embeddings": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-06-05"
-  },
-  "@cf/qwen/qwq-32b": {
-   "id": "@cf/qwen/qwq-32b",
-   "name": "Qwq 32B",
-   "description": "Qwen reasoning model for deliberate problem solving, math, and coding",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwq-32b",
-   "status": "deprecated",
-   "release_date": "2025-03-05",
-   "limit": {
-    "context": 24000,
-    "output": 24000
-   },
-   "capabilities": {
-    "cache": false,
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": true,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.66
-     },
-     "output": {
-      "price": 1
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2024-04",
-   "last_updated": "2025-03-05"
-  },
-  "@cf/qwen/qwen3-30b-a3b-fp8": {
-   "id": "@cf/qwen/qwen3-30b-a3b-fp8",
-   "name": "Qwen3 30B A3b fp8",
-   "description": "Qwen instruction model for multilingual chat, reasoning, and tool use",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3-30b-a3b",
-   "status": "deprecated",
-   "release_date": "2025-04-28",
-   "limit": {
-    "context": 32768,
-    "output": 32768
-   },
-   "capabilities": {
-    "cache": false,
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": true,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.0509
-     },
-     "output": {
-      "price": 0.335
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-04-28"
-  },
-  "@cf/google/gemma-4-26b-a4b-it": {
-   "id": "@cf/google/gemma-4-26b-a4b-it",
-   "name": "Gemma 4 26B A4B IT",
-   "description": "Open Gemma instruction model for efficient chat and self-hosted deployments",
-   "type": "chat",
-   "family": "gemma",
-   "canonical_id": "google/gemma-4-26b-a4b-it",
-   "release_date": "2026-04-02",
-   "limit": {
-    "context": 256000,
-    "output": 16384
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.1,
-      "cache": {
-       "read": 0.05
-      }
-     },
-     "output": {
-      "price": 0.3
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-04-02"
-  },
-  "@cf/openai/gpt-oss-120b": {
-   "id": "@cf/openai/gpt-oss-120b",
-   "name": "GPT OSS 120B",
-   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
-   "type": "chat",
-   "family": "gpt-oss",
-   "canonical_id": "openai/gpt-oss-120b",
-   "release_date": "2025-08-05",
-   "limit": {
-    "context": 128000,
-    "output": 16384
-   },
-   "capabilities": {
-    "cache": false,
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.35
-     },
-     "output": {
-      "price": 0.75
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2024-06",
-   "last_updated": "2025-08-05"
-  },
-  "@cf/openai/gpt-oss-20b": {
-   "id": "@cf/openai/gpt-oss-20b",
-   "name": "GPT OSS 20B",
-   "description": "Open-weight GPT model for self-hosted reasoning and instruction-following workloads",
-   "type": "chat",
-   "family": "gpt-oss",
-   "canonical_id": "openai/gpt-oss-20b",
-   "release_date": "2025-08-05",
-   "limit": {
-    "context": 128000,
-    "output": 16384
-   },
-   "capabilities": {
-    "cache": false,
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.2
-     },
-     "output": {
-      "price": 0.3
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2024-06",
-   "last_updated": "2025-08-05"
-  },
-  "@cf/pfnet/plamo-embedding-1b": {
-   "id": "@cf/pfnet/plamo-embedding-1b",
-   "name": "PLaMo Embedding 1B",
-   "description": "Japanese text embedding model from Preferred Networks producing 2048-dimensional vectors",
-   "type": "embedding",
-   "family": "plamo",
-   "canonical_id": "pfnet/plamo-embedding-1b",
-   "release_date": "2025-04-11",
-   "limit": {
-    "context": 4096,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.0186
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "embedding"
-    ]
-   },
-   "api": {
-    "embeddings": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-04-11"
-  },
   "@cf/aisingapore/gemma-sea-lion-v4-27b-it": {
    "id": "@cf/aisingapore/gemma-sea-lion-v4-27b-it",
    "name": "Gemma Sea Lion V4 27B It",
@@ -986,73 +63,6 @@
    },
    "open_weights": true,
    "last_updated": "2025-09-23"
-  },
-  "@cf/mistralai/mistral-small-3.1-24b-instruct": {
-   "id": "@cf/mistralai/mistral-small-3.1-24b-instruct",
-   "name": "Mistral Small 3.1 24B Instruct",
-   "description": "Efficient Mistral model for fast chat, extraction, and production assistants",
-   "type": "chat",
-   "family": "mistral-small",
-   "canonical_id": "mistral/mistral-small-3-1-24b-instruct-2503",
-   "release_date": "2025-03-17",
-   "limit": {
-    "context": 128000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": false,
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.351
-     },
-     "output": {
-      "price": 0.555
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/gif"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2024-06",
-   "last_updated": "2025-03-17"
   },
   "@cf/baai/bge-base-en-v1.5": {
    "id": "@cf/baai/bge-base-en-v1.5",
@@ -1274,6 +284,203 @@
    "open_weights": true,
    "last_updated": "2023-09-12"
   },
+  "@cf/black-forest-labs/flux-1-schnell": {
+   "id": "@cf/black-forest-labs/flux-1-schnell",
+   "name": "FLUX.1 [schnell]",
+   "description": "Fast few-step FLUX.1 text-to-image model under Apache 2.0",
+   "type": "image",
+   "family": "flux",
+   "canonical_id": "black-forest-labs/flux-1-schnell",
+   "release_date": "2024-08-01",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "image/jpeg"
+    ]
+   },
+   "api": {
+    "workers-ai-run": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
+     "sdk": {
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai/images"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2024-08-01"
+  },
+  "@cf/black-forest-labs/flux-2-dev": {
+   "id": "@cf/black-forest-labs/flux-2-dev",
+   "name": "FLUX.2 [dev]",
+   "description": "Open-weight 32B FLUX.2 image generation and multi-reference editing model",
+   "type": "image",
+   "family": "flux",
+   "canonical_id": "black-forest-labs/flux-2-dev",
+   "release_date": "2025-11-25",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp"
+    ],
+    "output": [
+     "image/jpeg"
+    ]
+   },
+   "api": {
+    "workers-ai-run": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
+     "sdk": {
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai/images"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-11-25"
+  },
+  "@cf/black-forest-labs/flux-2-klein-4b": {
+   "id": "@cf/black-forest-labs/flux-2-klein-4b",
+   "name": "FLUX.2 [klein] 4B",
+   "description": "Fast 4B open-weight image generation and editing model",
+   "type": "image",
+   "family": "flux",
+   "canonical_id": "black-forest-labs/flux-2-klein-4b",
+   "release_date": "2026-01-15",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "image": {
+     "input": {
+      "unit": "megapixel",
+      "price": 0.000225
+     },
+     "output": {
+      "unit": "megapixel",
+      "price": 0.001095
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp"
+    ],
+    "output": [
+     "image/jpeg"
+    ]
+   },
+   "api": {
+    "workers-ai-run": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
+     "sdk": {
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai/images"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-01-15"
+  },
+  "@cf/black-forest-labs/flux-2-klein-9b": {
+   "id": "@cf/black-forest-labs/flux-2-klein-9b",
+   "name": "FLUX.2 [klein] 9B",
+   "description": "Fast 9B open-weight image generation and multi-reference editing model",
+   "type": "image",
+   "family": "flux",
+   "canonical_id": "black-forest-labs/flux-2-klein-9b",
+   "release_date": "2026-01-15",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp"
+    ],
+    "output": [
+     "image/jpeg"
+    ]
+   },
+   "api": {
+    "workers-ai-run": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
+     "sdk": {
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai/images"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-01-15"
+  },
   "@cf/bytedance/stable-diffusion-xl-lightning": {
    "id": "@cf/bytedance/stable-diffusion-xl-lightning",
    "name": "SDXL-Lightning",
@@ -1327,28 +534,23 @@
    "open_weights": true,
    "last_updated": "2024-02-21"
   },
-  "@cf/ibm-granite/granite-4.0-h-micro": {
-   "id": "@cf/ibm-granite/granite-4.0-h-micro",
-   "name": "Granite 4.0 H Micro",
-   "description": "Efficient model for low-latency assistance, extraction, and routine automation",
-   "type": "chat",
-   "family": "granite",
-   "canonical_id": "ibm/granite-4-h-micro",
-   "release_date": "2025-10-02",
+  "@cf/cloudflare/clairic": {
+   "id": "@cf/cloudflare/clairic",
+   "name": "Clairic",
+   "description": "Multimodal model for analyzing text, images, documents, and rich media",
+   "type": "extraction",
+   "release_date": "2026-10-14",
    "limit": {
-    "context": 131000,
-    "output": 131000
+    "context": 65536,
+    "output": 65536
    },
    "capabilities": {
-    "cache": false,
     "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": true,
+    "structured_output": true,
+    "system_updates": false,
     "effort_updates": false,
     "tools": {
-     "supported": true
+     "supported": false
     },
     "reasoning": {
      "supported": false
@@ -1357,62 +559,11 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.017
+      "price": 0.1
      },
      "output": {
-      "price": 0.112
+      "price": 0
      }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-10-02"
-  },
-  "@cf/lykon/dreamshaper-8-lcm": {
-   "id": "@cf/lykon/dreamshaper-8-lcm",
-   "name": "DreamShaper 8 LCM",
-   "description": "Latent-consistency distilled DreamShaper 8 Stable Diffusion fine-tune for fast photorealistic images",
-   "type": "image",
-   "family": "stable-diffusion",
-   "canonical_id": "lykon/dreamshaper-8-lcm",
-   "status": "deprecated",
-   "release_date": "2023-12-06",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
     }
    },
    "modalities": {
@@ -1423,39 +574,85 @@
      "image/webp"
     ],
     "output": [
-     "image/png"
+     "text"
+    ]
+   },
+   "api": {
+    "workers-ai-run": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
+     "sdk": {}
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-10-14"
+  },
+  "@cf/cloudflare/clef": {
+   "id": "@cf/cloudflare/clef",
+   "name": "Clef",
+   "description": "Multimodal decision model for typed questions over text, structured state, and images",
+   "type": "decision",
+   "release_date": "2026-09-29",
+   "limit": {
+    "context": 65536,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.24
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp"
+    ],
+    "output": [
+     "text"
     ]
    },
    "api": {
     "workers-ai-run": {
      "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
      "sdk": {
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai/images"
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai/decisions"
      }
     }
    },
    "open_weights": true,
-   "last_updated": "2023-12-06"
+   "last_updated": "2026-09-29"
   },
-  "@cf/meta/llama-3.2-1b-instruct": {
-   "id": "@cf/meta/llama-3.2-1b-instruct",
-   "name": "Llama 3.2 1B Instruct",
-   "description": "Open Llama instruction model for multilingual chat, reasoning, and coding",
-   "type": "chat",
-   "family": "llama",
-   "canonical_id": "meta/llama-3.2-1b",
-   "status": "deprecated",
-   "release_date": "2024-09-25",
+  "@cf/cloudflare/clef-flash": {
+   "id": "@cf/cloudflare/clef-flash",
+   "name": "Clef Flash",
+   "description": "Fast multimodal decision model for typed questions over text, structured state, and images",
+   "type": "decision",
+   "release_date": "2026-09-29",
    "limit": {
-    "context": 60000,
-    "output": 60000
+    "context": 24576,
+    "output": 24576
    },
    "capabilities": {
-    "cache": false,
     "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -1468,375 +665,18 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.027
+      "price": 0.038
      },
      "output": {
-      "price": 0.201
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2023-12",
-   "last_updated": "2024-09-25"
-  },
-  "@cf/meta/llama-3.2-11b-vision-instruct": {
-   "id": "@cf/meta/llama-3.2-11b-vision-instruct",
-   "name": "Llama 3.2 11B Vision Instruct",
-   "description": "Open Llama multimodal model for image understanding and text reasoning",
-   "type": "chat",
-   "family": "llama",
-   "canonical_id": "meta/llama-3.2-11b-vision-instruct",
-   "release_date": "2024-09-25",
-   "limit": {
-    "context": 128000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": false,
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.0485
-     },
-     "output": {
-      "price": 0.676
+      "price": 0
      }
     }
    },
    "modalities": {
     "input": [
      "text",
-     "image"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2023-12",
-   "last_updated": "2024-09-25"
-  },
-  "@cf/meta/llama-3.1-8b-instruct-fp8": {
-   "id": "@cf/meta/llama-3.1-8b-instruct-fp8",
-   "name": "Llama 3.1 8B Instruct fp8",
-   "description": "Open Llama instruction model for multilingual chat, reasoning, and coding",
-   "type": "chat",
-   "family": "llama",
-   "canonical_id": "meta/llama-3.1-8b-instruct",
-   "status": "deprecated",
-   "release_date": "2024-07-23",
-   "limit": {
-    "context": 32000,
-    "output": 32000
-   },
-   "capabilities": {
-    "cache": false,
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.152
-     },
-     "output": {
-      "price": 0.287
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2023-12",
-   "last_updated": "2024-07-23"
-  },
-  "@cf/meta/llama-3.3-70b-instruct-fp8-fast": {
-   "id": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-   "name": "Llama 3.3 70B Instruct fp8 Fast",
-   "description": "Popular open Llama workhorse for multilingual chat, coding, and self-hosting",
-   "type": "chat",
-   "family": "llama",
-   "canonical_id": "meta/llama-3.3-70b-instruct",
-   "release_date": "2024-12-06",
-   "limit": {
-    "context": 24000,
-    "output": 24000
-   },
-   "capabilities": {
-    "cache": false,
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": true,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.293
-     },
-     "output": {
-      "price": 2.253
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2023-12",
-   "last_updated": "2024-12-06"
-  },
-  "@cf/meta/llama-3.2-3b-instruct": {
-   "id": "@cf/meta/llama-3.2-3b-instruct",
-   "name": "Llama 3.2 3B Instruct",
-   "description": "Open Llama instruction model for multilingual chat, reasoning, and coding",
-   "type": "chat",
-   "family": "llama",
-   "canonical_id": "meta/llama-3.2-3b",
-   "status": "deprecated",
-   "release_date": "2024-09-25",
-   "limit": {
-    "context": 80000,
-    "output": 80000
-   },
-   "capabilities": {
-    "cache": false,
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": true,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.0509
-     },
-     "output": {
-      "price": 0.335
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2023-12",
-   "last_updated": "2024-09-25"
-  },
-  "@cf/meta/llama-guard-3-8b": {
-   "id": "@cf/meta/llama-guard-3-8b",
-   "name": "Llama Guard 3 8B",
-   "description": "Safety model for policy screening, moderation, and risk-aware routing workflows",
-   "type": "chat",
-   "family": "llama",
-   "canonical_id": "meta/llama-guard-3-8b",
-   "release_date": "2024-07-23",
-   "limit": {
-    "context": 131072,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": false,
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.484
-     },
-     "output": {
-      "price": 0.03
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2023-12",
-   "last_updated": "2024-07-23"
-  },
-  "@cf/meta/llama-4-scout-17b-16e-instruct": {
-   "id": "@cf/meta/llama-4-scout-17b-16e-instruct",
-   "name": "Llama 4 Scout 17B 16E Instruct",
-   "description": "Open Llama with long-context vision for efficient multimodal agents",
-   "type": "chat",
-   "family": "llama",
-   "canonical_id": "meta/llama-4-scout-17b-instruct",
-   "release_date": "2025-04-05",
-   "limit": {
-    "context": 131000,
-    "output": 16384
-   },
-   "capabilities": {
-    "cache": false,
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": true,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.27
-     },
-     "output": {
-      "price": 0.85
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
      "image/png",
-     "image/gif",
+     "image/jpeg",
      "image/webp"
     ],
     "output": [
@@ -1844,22 +684,15 @@
     ]
    },
    "api": {
-    "chat-completions": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+    "workers-ai-run": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
      "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai/decisions"
      }
     }
    },
    "open_weights": true,
-   "knowledge": "2024-08",
-   "last_updated": "2025-04-05"
+   "last_updated": "2026-09-29"
   },
   "@cf/cloudflare/clef-omni": {
    "id": "@cf/cloudflare/clef-omni",
@@ -1918,166 +751,6 @@
    },
    "open_weights": true,
    "last_updated": "2026-10-09"
-  },
-  "@cf/cloudflare/clef-flash": {
-   "id": "@cf/cloudflare/clef-flash",
-   "name": "Clef Flash",
-   "description": "Fast multimodal decision model for typed questions over text, structured state, and images",
-   "type": "decision",
-   "release_date": "2026-09-29",
-   "limit": {
-    "context": 24576,
-    "output": 24576
-   },
-   "capabilities": {
-    "temperature": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.038
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "workers-ai-run": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
-     "sdk": {
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai/decisions"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-09-29"
-  },
-  "@cf/cloudflare/clef": {
-   "id": "@cf/cloudflare/clef",
-   "name": "Clef",
-   "description": "Multimodal decision model for typed questions over text, structured state, and images",
-   "type": "decision",
-   "release_date": "2026-09-29",
-   "limit": {
-    "context": 65536,
-    "output": 65536
-   },
-   "capabilities": {
-    "temperature": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.24
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "workers-ai-run": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
-     "sdk": {
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai/decisions"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-09-29"
-  },
-  "@cf/cloudflare/clairic": {
-   "id": "@cf/cloudflare/clairic",
-   "name": "Clairic",
-   "description": "Multimodal model for analyzing text, images, documents, and rich media",
-   "type": "extraction",
-   "release_date": "2026-10-14",
-   "limit": {
-    "context": 65536,
-    "output": 65536
-   },
-   "capabilities": {
-    "temperature": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.1
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "workers-ai-run": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
-     "sdk": {}
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-10-14"
   },
   "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b": {
    "id": "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
@@ -2383,25 +1056,27 @@
    "knowledge": "2025-05",
    "last_updated": "2026-10-17"
   },
-  "@cf/zai-org/glm-4.7-flash": {
-   "id": "@cf/zai-org/glm-4.7-flash",
-   "name": "GLM-4.7-Flash",
-   "description": "Efficient GLM model for fast reasoning, coding, and agent workflows",
+  "@cf/google/gemma-4-26b-a4b-it": {
+   "id": "@cf/google/gemma-4-26b-a4b-it",
+   "name": "Gemma 4 26B A4B IT",
+   "description": "Open Gemma instruction model for efficient chat and self-hosted deployments",
    "type": "chat",
-   "family": "glm-flash",
-   "canonical_id": "zhipuai/glm-4.7-flash",
-   "release_date": "2026-01-19",
+   "family": "gemma",
+   "canonical_id": "google/gemma-4-26b-a4b-it",
+   "release_date": "2026-04-02",
    "limit": {
-    "context": 131072,
-    "output": 131072
+    "context": 256000,
+    "output": 16384
    },
    "capabilities": {
-    "cache": false,
+    "cache": {
+     "implicit": true
+    },
     "temperature": true,
     "top_k": true,
     "top_p": true,
     "structured_output": true,
-    "system_updates": true,
+    "system_updates": false,
     "effort_updates": false,
     "tools": {
      "supported": true
@@ -2414,103 +1089,24 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.0605
-     },
-     "output": {
-      "price": 0.4
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2026-01-19"
-  },
-  "@cf/zai-org/glm-5.3-flash": {
-   "id": "@cf/zai-org/glm-5.3-flash",
-   "name": "Glm 5.3 Flash",
-   "description": "GLM vision model for visual reasoning, documents, and multimodal agents",
-   "type": "chat",
-   "family": "glm-flash",
-   "canonical_id": "zhipuai/glm-5.3-flash",
-   "status": "deprecated",
-   "release_date": "2026-08-26",
-   "limit": {
-    "context": 1048576,
-    "output": 1048576
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": true,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.15,
+      "price": 0.1,
       "cache": {
-       "read": 0.03
+       "read": 0.05
       }
      },
      "output": {
-      "price": 0.5
+      "price": 0.3
      }
     }
    },
    "modalities": {
     "input": [
      "text",
-     "image/jpeg",
      "image/png",
-     "image/gif",
-     "image/webp"
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif"
     ],
     "output": [
      "text"
@@ -2537,52 +1133,42 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2026-08-26"
+   "last_updated": "2026-04-02"
   },
-  "@cf/zai-org/glm-5.3": {
-   "id": "@cf/zai-org/glm-5.3",
-   "name": "Glm 5.3",
-   "description": "Flagship GLM model for hybrid reasoning, coding, and agentic engineering",
+  "@cf/ibm-granite/granite-4.0-h-micro": {
+   "id": "@cf/ibm-granite/granite-4.0-h-micro",
+   "name": "Granite 4.0 H Micro",
+   "description": "Efficient model for low-latency assistance, extraction, and routine automation",
    "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-5.3",
-   "release_date": "2026-08-14",
+   "family": "granite",
+   "canonical_id": "ibm/granite-4-h-micro",
+   "release_date": "2025-10-02",
    "limit": {
-    "context": 1048576,
-    "output": 1048576
+    "context": 131000,
+    "output": 131000
    },
    "capabilities": {
-    "cache": {
-     "implicit": true
-    },
+    "cache": false,
     "temperature": true,
     "top_k": true,
     "top_p": true,
-    "structured_output": true,
+    "structured_output": false,
     "system_updates": true,
     "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
+     "supported": false
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 1.4,
-      "cache": {
-       "read": 0.26
-      }
+      "price": 0.017
      },
      "output": {
-      "price": 4.4
+      "price": 0.112
      }
     }
    },
@@ -2603,98 +1189,13 @@
      },
      "capabilities": {
       "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
        "updates": false
       }
      }
     }
    },
    "open_weights": true,
-   "last_updated": "2026-08-14"
-  },
-  "@cf/zai-org/glm-5.2": {
-   "id": "@cf/zai-org/glm-5.2",
-   "name": "Glm 5.2",
-   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
-   "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-5.2",
-   "status": "deprecated",
-   "release_date": "2026-06-13",
-   "limit": {
-    "context": 262144,
-    "output": 256000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": true,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.4,
-      "cache": {
-       "read": 0.26
-      }
-     },
-     "output": {
-      "price": 4.4
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-06-13"
+   "last_updated": "2025-10-02"
   },
   "@cf/leonardo/lucid-origin": {
    "id": "@cf/leonardo/lucid-origin",
@@ -2784,6 +1285,1314 @@
    "open_weights": false,
    "last_updated": "2024-12-18"
   },
+  "@cf/lykon/dreamshaper-8-lcm": {
+   "id": "@cf/lykon/dreamshaper-8-lcm",
+   "name": "DreamShaper 8 LCM",
+   "description": "Latent-consistency distilled DreamShaper 8 Stable Diffusion fine-tune for fast photorealistic images",
+   "type": "image",
+   "family": "stable-diffusion",
+   "canonical_id": "lykon/dreamshaper-8-lcm",
+   "status": "deprecated",
+   "release_date": "2023-12-06",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp"
+    ],
+    "output": [
+     "image/png"
+    ]
+   },
+   "api": {
+    "workers-ai-run": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
+     "sdk": {
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai/images"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2023-12-06"
+  },
+  "@cf/meta/llama-3.1-8b-instruct-fp8": {
+   "id": "@cf/meta/llama-3.1-8b-instruct-fp8",
+   "name": "Llama 3.1 8B Instruct fp8",
+   "description": "Open Llama instruction model for multilingual chat, reasoning, and coding",
+   "type": "chat",
+   "family": "llama",
+   "canonical_id": "meta/llama-3.1-8b-instruct",
+   "status": "deprecated",
+   "release_date": "2024-07-23",
+   "limit": {
+    "context": 32000,
+    "output": 32000
+   },
+   "capabilities": {
+    "cache": false,
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.152
+     },
+     "output": {
+      "price": 0.287
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2023-12",
+   "last_updated": "2024-07-23"
+  },
+  "@cf/meta/llama-3.2-11b-vision-instruct": {
+   "id": "@cf/meta/llama-3.2-11b-vision-instruct",
+   "name": "Llama 3.2 11B Vision Instruct",
+   "description": "Open Llama multimodal model for image understanding and text reasoning",
+   "type": "chat",
+   "family": "llama",
+   "canonical_id": "meta/llama-3.2-11b-vision-instruct",
+   "release_date": "2024-09-25",
+   "limit": {
+    "context": 128000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": false,
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.0485
+     },
+     "output": {
+      "price": 0.676
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2023-12",
+   "last_updated": "2024-09-25"
+  },
+  "@cf/meta/llama-3.2-1b-instruct": {
+   "id": "@cf/meta/llama-3.2-1b-instruct",
+   "name": "Llama 3.2 1B Instruct",
+   "description": "Open Llama instruction model for multilingual chat, reasoning, and coding",
+   "type": "chat",
+   "family": "llama",
+   "canonical_id": "meta/llama-3.2-1b",
+   "status": "deprecated",
+   "release_date": "2024-09-25",
+   "limit": {
+    "context": 60000,
+    "output": 60000
+   },
+   "capabilities": {
+    "cache": false,
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.027
+     },
+     "output": {
+      "price": 0.201
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2023-12",
+   "last_updated": "2024-09-25"
+  },
+  "@cf/meta/llama-3.2-3b-instruct": {
+   "id": "@cf/meta/llama-3.2-3b-instruct",
+   "name": "Llama 3.2 3B Instruct",
+   "description": "Open Llama instruction model for multilingual chat, reasoning, and coding",
+   "type": "chat",
+   "family": "llama",
+   "canonical_id": "meta/llama-3.2-3b",
+   "status": "deprecated",
+   "release_date": "2024-09-25",
+   "limit": {
+    "context": 80000,
+    "output": 80000
+   },
+   "capabilities": {
+    "cache": false,
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": true,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.0509
+     },
+     "output": {
+      "price": 0.335
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2023-12",
+   "last_updated": "2024-09-25"
+  },
+  "@cf/meta/llama-3.3-70b-instruct-fp8-fast": {
+   "id": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+   "name": "Llama 3.3 70B Instruct fp8 Fast",
+   "description": "Popular open Llama workhorse for multilingual chat, coding, and self-hosting",
+   "type": "chat",
+   "family": "llama",
+   "canonical_id": "meta/llama-3.3-70b-instruct",
+   "release_date": "2024-12-06",
+   "limit": {
+    "context": 24000,
+    "output": 24000
+   },
+   "capabilities": {
+    "cache": false,
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": true,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.293
+     },
+     "output": {
+      "price": 2.253
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2023-12",
+   "last_updated": "2024-12-06"
+  },
+  "@cf/meta/llama-4-scout-17b-16e-instruct": {
+   "id": "@cf/meta/llama-4-scout-17b-16e-instruct",
+   "name": "Llama 4 Scout 17B 16E Instruct",
+   "description": "Open Llama with long-context vision for efficient multimodal agents",
+   "type": "chat",
+   "family": "llama",
+   "canonical_id": "meta/llama-4-scout-17b-instruct",
+   "release_date": "2025-04-05",
+   "limit": {
+    "context": 131000,
+    "output": 16384
+   },
+   "capabilities": {
+    "cache": false,
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": true,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.27
+     },
+     "output": {
+      "price": 0.85
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-08",
+   "last_updated": "2025-04-05"
+  },
+  "@cf/meta/llama-guard-3-8b": {
+   "id": "@cf/meta/llama-guard-3-8b",
+   "name": "Llama Guard 3 8B",
+   "description": "Safety model for policy screening, moderation, and risk-aware routing workflows",
+   "type": "chat",
+   "family": "llama",
+   "canonical_id": "meta/llama-guard-3-8b",
+   "release_date": "2024-07-23",
+   "limit": {
+    "context": 131072,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": false,
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.484
+     },
+     "output": {
+      "price": 0.03
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2023-12",
+   "last_updated": "2024-07-23"
+  },
+  "@cf/mistralai/mistral-small-3.1-24b-instruct": {
+   "id": "@cf/mistralai/mistral-small-3.1-24b-instruct",
+   "name": "Mistral Small 3.1 24B Instruct",
+   "description": "Efficient Mistral model for fast chat, extraction, and production assistants",
+   "type": "chat",
+   "family": "mistral-small",
+   "canonical_id": "mistral/mistral-small-3-1-24b-instruct-2503",
+   "release_date": "2025-03-17",
+   "limit": {
+    "context": 128000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": false,
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.351
+     },
+     "output": {
+      "price": 0.555
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/gif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-06",
+   "last_updated": "2025-03-17"
+  },
+  "@cf/moonshotai/kimi-k2.6": {
+   "id": "@cf/moonshotai/kimi-k2.6",
+   "name": "Kimi K2.6",
+   "description": "Multimodal Kimi workhorse for agent loops, coding tasks, and visual context",
+   "type": "chat",
+   "family": "kimi-k2",
+   "canonical_id": "moonshotai/kimi-k2.6",
+   "status": "deprecated",
+   "release_date": "2026-04-20",
+   "limit": {
+    "context": 262144,
+    "output": 256000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": true,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.95,
+      "cache": {
+       "read": 0.16
+      }
+     },
+     "output": {
+      "price": 4
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-01",
+   "last_updated": "2026-04-20"
+  },
+  "@cf/moonshotai/kimi-k2.7-code": {
+   "id": "@cf/moonshotai/kimi-k2.7-code",
+   "name": "Kimi K2.7 Code",
+   "description": "Coding-focused Kimi model, stronger on long-horizon repo work with less overthinking",
+   "type": "chat",
+   "family": "kimi-k2",
+   "canonical_id": "moonshotai/kimi-k2.7-code",
+   "status": "deprecated",
+   "release_date": "2026-06-12",
+   "limit": {
+    "context": 262144,
+    "output": 262144
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": true,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.95,
+      "cache": {
+       "read": 0.19
+      }
+     },
+     "output": {
+      "price": 4
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-01",
+   "last_updated": "2026-06-12"
+  },
+  "@cf/nvidia/nemotron-3-120b-a12b": {
+   "id": "@cf/nvidia/nemotron-3-120b-a12b",
+   "name": "Nemotron 3 Super 120B",
+   "description": "Nemotron middle tier for collaborative agents and high-volume reasoning workloads",
+   "type": "chat",
+   "family": "nemotron",
+   "canonical_id": "nvidia/nemotron-3-super-120b-a12b",
+   "status": "deprecated",
+   "release_date": "2026-03-11",
+   "limit": {
+    "context": 256000,
+    "output": 256000
+   },
+   "capabilities": {
+    "cache": false,
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": true,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.5
+     },
+     "output": {
+      "price": 1.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-06",
+   "last_updated": "2026-03-11"
+  },
+  "@cf/openai/gpt-oss-120b": {
+   "id": "@cf/openai/gpt-oss-120b",
+   "name": "GPT OSS 120B",
+   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
+   "type": "chat",
+   "family": "gpt-oss",
+   "canonical_id": "openai/gpt-oss-120b",
+   "release_date": "2025-08-05",
+   "limit": {
+    "context": 128000,
+    "output": 16384
+   },
+   "capabilities": {
+    "cache": false,
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.35
+     },
+     "output": {
+      "price": 0.75
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-06",
+   "last_updated": "2025-08-05"
+  },
+  "@cf/openai/gpt-oss-20b": {
+   "id": "@cf/openai/gpt-oss-20b",
+   "name": "GPT OSS 20B",
+   "description": "Open-weight GPT model for self-hosted reasoning and instruction-following workloads",
+   "type": "chat",
+   "family": "gpt-oss",
+   "canonical_id": "openai/gpt-oss-20b",
+   "release_date": "2025-08-05",
+   "limit": {
+    "context": 128000,
+    "output": 16384
+   },
+   "capabilities": {
+    "cache": false,
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.2
+     },
+     "output": {
+      "price": 0.3
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-06",
+   "last_updated": "2025-08-05"
+  },
+  "@cf/pfnet/plamo-embedding-1b": {
+   "id": "@cf/pfnet/plamo-embedding-1b",
+   "name": "PLaMo Embedding 1B",
+   "description": "Japanese text embedding model from Preferred Networks producing 2048-dimensional vectors",
+   "type": "embedding",
+   "family": "plamo",
+   "canonical_id": "pfnet/plamo-embedding-1b",
+   "release_date": "2025-04-11",
+   "limit": {
+    "context": 4096,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.0186
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "api": {
+    "embeddings": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-04-11"
+  },
+  "@cf/qwen/qwen2.5-coder-32b-instruct": {
+   "id": "@cf/qwen/qwen2.5-coder-32b-instruct",
+   "name": "Qwen2.5 Coder 32B Instruct",
+   "description": "Qwen coding model for software agents, repository edits, and code reasoning",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen2.5-coder-32b-instruct",
+   "release_date": "2024-11-12",
+   "limit": {
+    "context": 32768,
+    "output": 32768
+   },
+   "capabilities": {
+    "cache": false,
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": true,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.66
+     },
+     "output": {
+      "price": 1
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2024-11-12"
+  },
+  "@cf/qwen/qwen3-30b-a3b-fp8": {
+   "id": "@cf/qwen/qwen3-30b-a3b-fp8",
+   "name": "Qwen3 30B A3b fp8",
+   "description": "Qwen instruction model for multilingual chat, reasoning, and tool use",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3-30b-a3b",
+   "status": "deprecated",
+   "release_date": "2025-04-28",
+   "limit": {
+    "context": 32768,
+    "output": 32768
+   },
+   "capabilities": {
+    "cache": false,
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": true,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.0509
+     },
+     "output": {
+      "price": 0.335
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-04-28"
+  },
+  "@cf/qwen/qwen3-embedding-0.6b": {
+   "id": "@cf/qwen/qwen3-embedding-0.6b",
+   "name": "Qwen3 Embedding 0.6B",
+   "description": "Compact multilingual text embedding model for retrieval, code search, classification, and clustering",
+   "type": "embedding",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3-embedding-0.6b",
+   "release_date": "2025-06-05",
+   "limit": {
+    "context": 8192,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.0118
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "api": {
+    "embeddings": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-06-05"
+  },
+  "@cf/qwen/qwen3.8-27b": {
+   "id": "@cf/qwen/qwen3.8-27b",
+   "name": "Qwen3.8 27B",
+   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.8-27b",
+   "release_date": "2026-08-14",
+   "limit": {
+    "context": 262144,
+    "output": 262144
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "medium",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.45,
+      "cache": {
+       "read": 0.05
+      }
+     },
+     "output": {
+      "price": 3.2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-14"
+  },
+  "@cf/qwen/qwq-32b": {
+   "id": "@cf/qwen/qwq-32b",
+   "name": "Qwq 32B",
+   "description": "Qwen reasoning model for deliberate problem solving, math, and coding",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwq-32b",
+   "status": "deprecated",
+   "release_date": "2025-03-05",
+   "limit": {
+    "context": 24000,
+    "output": 24000
+   },
+   "capabilities": {
+    "cache": false,
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": true,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.66
+     },
+     "output": {
+      "price": 1
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-04",
+   "last_updated": "2025-03-05"
+  },
   "@cf/stabilityai/stable-diffusion-xl-base-1.0": {
    "id": "@cf/stabilityai/stable-diffusion-xl-base-1.0",
    "name": "Stable Diffusion XL Base 1.0",
@@ -2837,135 +2646,117 @@
    "open_weights": true,
    "last_updated": "2023-07-26"
   },
-  "@cf/black-forest-labs/flux-2-klein-4b": {
-   "id": "@cf/black-forest-labs/flux-2-klein-4b",
-   "name": "FLUX.2 [klein] 4B",
-   "description": "Fast 4B open-weight image generation and editing model",
-   "type": "image",
-   "family": "flux",
-   "canonical_id": "black-forest-labs/flux-2-klein-4b",
-   "release_date": "2026-01-15",
+  "@cf/thinkingmachines/inkling-2-small": {
+   "id": "@cf/thinkingmachines/inkling-2-small",
+   "name": "Inkling 2 Small",
+   "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
+   "type": "chat",
+   "release_date": "2026-11-09",
    "limit": {
-    "context": 0,
-    "output": 0
+    "context": 1048576,
+    "output": 1048576
    },
    "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
+    "temperature": true,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
-     "supported": false
+     "supported": true
     },
     "reasoning": {
-     "supported": false
+     "supported": true,
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high",
+      "max"
+     ]
     }
    },
    "cost": {
-    "image": {
+    "text": {
      "input": {
-      "unit": "megapixel",
-      "price": 0.000225
+      "price": 0.3,
+      "cache": {
+       "read": 0.1
+      }
      },
      "output": {
-      "unit": "megapixel",
-      "price": 0.001095
+      "price": 1
      }
     }
    },
    "modalities": {
     "input": [
      "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp"
+     "image"
     ],
     "output": [
-     "image/jpeg"
+     "text"
     ]
    },
    "api": {
-    "workers-ai-run": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
+    "chat-completions": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
      "sdk": {
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai/images"
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
      }
     }
    },
    "open_weights": true,
-   "last_updated": "2026-01-15"
+   "last_updated": "2026-11-09"
   },
-  "@cf/black-forest-labs/flux-2-dev": {
-   "id": "@cf/black-forest-labs/flux-2-dev",
-   "name": "FLUX.2 [dev]",
-   "description": "Open-weight 32B FLUX.2 image generation and multi-reference editing model",
-   "type": "image",
-   "family": "flux",
-   "canonical_id": "black-forest-labs/flux-2-dev",
-   "release_date": "2025-11-25",
+  "@cf/zai-org/glm-4.7-flash": {
+   "id": "@cf/zai-org/glm-4.7-flash",
+   "name": "GLM-4.7-Flash",
+   "description": "Efficient GLM model for fast reasoning, coding, and agent workflows",
+   "type": "chat",
+   "family": "glm-flash",
+   "canonical_id": "zhipuai/glm-4.7-flash",
+   "release_date": "2026-01-19",
    "limit": {
-    "context": 0,
-    "output": 0
+    "context": 131072,
+    "output": 131072
    },
    "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
+    "cache": false,
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": true,
     "effort_updates": false,
     "tools": {
-     "supported": false
+     "supported": true
     },
     "reasoning": {
-     "supported": false
+     "supported": true,
+     "toggle": true
     }
    },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp"
-    ],
-    "output": [
-     "image/jpeg"
-    ]
-   },
-   "api": {
-    "workers-ai-run": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
-     "sdk": {
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai/images"
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.0605
+     },
+     "output": {
+      "price": 0.4
      }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-11-25"
-  },
-  "@cf/black-forest-labs/flux-1-schnell": {
-   "id": "@cf/black-forest-labs/flux-1-schnell",
-   "name": "FLUX.1 [schnell]",
-   "description": "Fast few-step FLUX.1 text-to-image model under Apache 2.0",
-   "type": "image",
-   "family": "flux",
-   "canonical_id": "black-forest-labs/flux-1-schnell",
-   "release_date": "2024-08-01",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
     }
    },
    "modalities": {
@@ -2973,66 +2764,275 @@
      "text"
     ],
     "output": [
-     "image/jpeg"
+     "text"
     ]
    },
    "api": {
-    "workers-ai-run": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
+    "chat-completions": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
      "sdk": {
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai/images"
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
      }
     }
    },
    "open_weights": true,
-   "last_updated": "2024-08-01"
+   "knowledge": "2025-04",
+   "last_updated": "2026-01-19"
   },
-  "@cf/black-forest-labs/flux-2-klein-9b": {
-   "id": "@cf/black-forest-labs/flux-2-klein-9b",
-   "name": "FLUX.2 [klein] 9B",
-   "description": "Fast 9B open-weight image generation and multi-reference editing model",
-   "type": "image",
-   "family": "flux",
-   "canonical_id": "black-forest-labs/flux-2-klein-9b",
-   "release_date": "2026-01-15",
+  "@cf/zai-org/glm-5.2": {
+   "id": "@cf/zai-org/glm-5.2",
+   "name": "Glm 5.2",
+   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.2",
+   "status": "deprecated",
+   "release_date": "2026-06-13",
    "limit": {
-    "context": 0,
-    "output": 0
+    "context": 262144,
+    "output": 256000
    },
    "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": true,
     "effort_updates": false,
     "tools": {
-     "supported": false
+     "supported": true
     },
     "reasoning": {
-     "supported": false
+     "supported": true,
+     "effort": [
+      "none",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.4,
+      "cache": {
+       "read": 0.26
+      }
+     },
+     "output": {
+      "price": 4.4
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-06-13"
+  },
+  "@cf/zai-org/glm-5.3": {
+   "id": "@cf/zai-org/glm-5.3",
+   "name": "Glm 5.3",
+   "description": "Flagship GLM model for hybrid reasoning, coding, and agentic engineering",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.3",
+   "release_date": "2026-08-14",
+   "limit": {
+    "context": 1048576,
+    "output": 1048576
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": true,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.4,
+      "cache": {
+       "read": 0.26
+      }
+     },
+     "output": {
+      "price": 4.4
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-14"
+  },
+  "@cf/zai-org/glm-5.3-flash": {
+   "id": "@cf/zai-org/glm-5.3-flash",
+   "name": "Glm 5.3 Flash",
+   "description": "GLM vision model for visual reasoning, documents, and multimodal agents",
+   "type": "chat",
+   "family": "glm-flash",
+   "canonical_id": "zhipuai/glm-5.3-flash",
+   "status": "deprecated",
+   "release_date": "2026-08-26",
+   "limit": {
+    "context": 1048576,
+    "output": 1048576
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": true,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.15,
+      "cache": {
+       "read": 0.03
+      }
+     },
+     "output": {
+      "price": 0.5
+     }
     }
    },
    "modalities": {
     "input": [
      "text",
-     "image/png",
      "image/jpeg",
+     "image/png",
+     "image/gif",
      "image/webp"
     ],
     "output": [
-     "image/jpeg"
+     "text"
     ]
    },
    "api": {
-    "workers-ai-run": {
-     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run",
+    "chat-completions": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
      "sdk": {
-      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai/images"
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/cloudflare-workers-ai"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
      }
     }
    },
    "open_weights": true,
-   "last_updated": "2026-01-15"
+   "last_updated": "2026-08-26"
   }
  }
 }

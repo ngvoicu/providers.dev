@@ -6,6 +6,90 @@
   "CEREBRAS_API_KEY"
  ],
  "models": {
+  "gpt-oss-120b": {
+   "id": "gpt-oss-120b",
+   "name": "GPT OSS 120B",
+   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
+   "type": "chat",
+   "family": "gpt-oss",
+   "canonical_id": "openai/gpt-oss-120b",
+   "release_date": "2025-08-05",
+   "limit": {
+    "context": 131072,
+    "output": 40960
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": {
+      "ttl": [
+       "5m"
+      ],
+      "min_tokens": 128
+     }
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "prompt_cache_key": true,
+    "stream_usage": true,
+    "system_updates": true,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ],
+     "default": {
+      "type": "effort",
+      "value": "medium"
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.35,
+      "cache": {
+       "read": 0.35
+      }
+     },
+     "output": {
+      "price": 0.75
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cerebras.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/cerebras",
+      "opencodeai": "@opencode/ai/providers/cerebras"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-06",
+   "last_updated": "2025-08-05"
+  },
   "qwen-3.8-27b": {
    "id": "qwen-3.8-27b",
    "name": "Qwen3.8 27B",
@@ -91,90 +175,6 @@
    },
    "open_weights": true,
    "last_updated": "2026-08-14"
-  },
-  "gpt-oss-120b": {
-   "id": "gpt-oss-120b",
-   "name": "GPT OSS 120B",
-   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
-   "type": "chat",
-   "family": "gpt-oss",
-   "canonical_id": "openai/gpt-oss-120b",
-   "release_date": "2025-08-05",
-   "limit": {
-    "context": 131072,
-    "output": 40960
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": {
-      "ttl": [
-       "5m"
-      ],
-      "min_tokens": 128
-     }
-    },
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": true,
-    "prompt_cache_key": true,
-    "stream_usage": true,
-    "system_updates": true,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ],
-     "default": {
-      "type": "effort",
-      "value": "medium"
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.35,
-      "cache": {
-       "read": 0.35
-      }
-     },
-     "output": {
-      "price": 0.75
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.cerebras.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/cerebras",
-      "opencodeai": "@opencode/ai/providers/cerebras"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2024-06",
-   "last_updated": "2025-08-05"
   }
  }
 }

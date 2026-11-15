@@ -6,14 +6,14 @@
   "DEEPSEEK_API_KEY"
  ],
  "models": {
-  "deepseek-v4-pro": {
-   "id": "deepseek-v4-pro",
-   "name": "DeepSeek V4 Pro",
-   "description": "DeepSeek V4 Pro snapshot with million-token context and support for thinking and non-thinking modes",
+  "deepseek-flash": {
+   "id": "deepseek-flash",
+   "name": "DeepSeek V4.1 Flash 1017",
+   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
    "type": "chat",
-   "family": "deepseek-thinking",
-   "canonical_id": "deepseek/deepseek-v4-pro-0813",
-   "release_date": "2026-08-13",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
+   "release_date": "2026-10-17",
    "limit": {
     "context": 1048576,
     "output": 393216
@@ -49,14 +49,14 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.66,
+      "price": 0.15,
       "cache": {
-       "read": 0.022
+       "read": 0.003
       }
      },
      "output": {
-      "price": 1.98,
-      "reasoning": 1.98
+      "price": 0.6,
+      "reasoning": 0.6
      }
     },
     "multipliers": [
@@ -113,7 +113,11 @@
    },
    "modalities": {
     "input": [
-     "text"
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
     ],
     "output": [
      "text"
@@ -127,6 +131,7 @@
       "opencodeai": "@opencode/ai/providers/deepseek"
      },
      "capabilities": {
+      "system_updates": true,
       "tools": {
        "choice": [
         "auto",
@@ -162,7 +167,8 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2026-08-22"
+   "knowledge": "2025-05",
+   "last_updated": "2026-10-17"
   },
   "deepseek-v4-flash": {
    "id": "deepseek-v4-flash",
@@ -494,14 +500,14 @@
    "knowledge": "2025-05",
    "last_updated": "2026-10-17"
   },
-  "deepseek-flash": {
-   "id": "deepseek-flash",
-   "name": "DeepSeek V4.1 Flash 1017",
-   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
+  "deepseek-v4-pro": {
+   "id": "deepseek-v4-pro",
+   "name": "DeepSeek V4 Pro",
+   "description": "DeepSeek V4 Pro snapshot with million-token context and support for thinking and non-thinking modes",
    "type": "chat",
-   "family": "deepseek-flash",
-   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
-   "release_date": "2026-10-17",
+   "family": "deepseek-thinking",
+   "canonical_id": "deepseek/deepseek-v4-pro-0813",
+   "release_date": "2026-08-13",
    "limit": {
     "context": 1048576,
     "output": 393216
@@ -537,14 +543,14 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.15,
+      "price": 0.66,
       "cache": {
-       "read": 0.003
+       "read": 0.022
       }
      },
      "output": {
-      "price": 0.6,
-      "reasoning": 0.6
+      "price": 1.98,
+      "reasoning": 1.98
      }
     },
     "multipliers": [
@@ -601,11 +607,7 @@
    },
    "modalities": {
     "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
+     "text"
     ],
     "output": [
      "text"
@@ -619,7 +621,6 @@
       "opencodeai": "@opencode/ai/providers/deepseek"
      },
      "capabilities": {
-      "system_updates": true,
       "tools": {
        "choice": [
         "auto",
@@ -655,8 +656,7 @@
     }
    },
    "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-10-17"
+   "last_updated": "2026-08-22"
   }
  }
 }

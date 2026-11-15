@@ -6,44 +6,39 @@
   "OCI_GENAI_API_KEY"
  ],
  "models": {
-  "openai.gpt-oss-20b": {
-   "id": "openai.gpt-oss-20b",
-   "name": "GPT OSS 20B",
-   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
+  "meta.llama-3.3-70b-instruct": {
+   "id": "meta.llama-3.3-70b-instruct",
+   "name": "Llama-3.3-70B-Instruct",
+   "description": "Popular open Llama workhorse for multilingual chat, coding, and self-hosting",
    "type": "chat",
-   "family": "gpt-oss",
-   "canonical_id": "openai/gpt-oss-20b",
-   "release_date": "2025-08-05",
+   "family": "llama",
+   "canonical_id": "meta/llama-3.3-70b-instruct",
+   "status": "deprecated",
+   "release_date": "2024-12-06",
    "limit": {
     "context": 128000,
-    "output": 16384
+    "output": 4096
    },
    "capabilities": {
     "temperature": true,
     "top_k": true,
     "top_p": true,
-    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
-     "supported": true
+     "supported": false
     },
     "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
+     "supported": false
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.07
+      "price": 0.72
      },
      "output": {
-      "price": 0.3
+      "price": 0.72
      }
     }
    },
@@ -61,20 +56,12 @@
      "sdk": {
       "aisdk": "@ai-sdk/openai-compatible",
       "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
      }
     }
    },
    "open_weights": true,
-   "knowledge": "2024-06",
-   "last_updated": "2025-08-05"
+   "knowledge": "2023-12",
+   "last_updated": "2024-12-06"
   },
   "meta.llama-4-maverick-17b-128e-instruct-fp8": {
    "id": "meta.llama-4-maverick-17b-128e-instruct-fp8",
@@ -196,63 +183,6 @@
    "knowledge": "2024-08",
    "last_updated": "2025-04-05"
   },
-  "meta.llama-3.3-70b-instruct": {
-   "id": "meta.llama-3.3-70b-instruct",
-   "name": "Llama-3.3-70B-Instruct",
-   "description": "Popular open Llama workhorse for multilingual chat, coding, and self-hosting",
-   "type": "chat",
-   "family": "llama",
-   "canonical_id": "meta/llama-3.3-70b-instruct",
-   "status": "deprecated",
-   "release_date": "2024-12-06",
-   "limit": {
-    "context": 128000,
-    "output": 4096
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.72
-     },
-     "output": {
-      "price": 0.72
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://inference.generativeai.us-chicago-1.oci.oraclecloud.com/openai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2023-12",
-   "last_updated": "2024-12-06"
-  },
   "openai.gpt-oss-120b": {
    "id": "openai.gpt-oss-120b",
    "name": "GPT OSS 120B",
@@ -323,6 +253,76 @@
    "knowledge": "2024-06",
    "last_updated": "2025-08-05"
   },
+  "openai.gpt-oss-20b": {
+   "id": "openai.gpt-oss-20b",
+   "name": "GPT OSS 20B",
+   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
+   "type": "chat",
+   "family": "gpt-oss",
+   "canonical_id": "openai/gpt-oss-20b",
+   "release_date": "2025-08-05",
+   "limit": {
+    "context": 128000,
+    "output": 16384
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.07
+     },
+     "output": {
+      "price": 0.3
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://inference.generativeai.us-chicago-1.oci.oraclecloud.com/openai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-06",
+   "last_updated": "2025-08-05"
+  },
   "xai.grok-4.20-non-reasoning": {
    "id": "xai.grok-4.20-non-reasoning",
    "name": "Grok 4.20 (Non-Reasoning)",
@@ -347,6 +347,95 @@
     },
     "reasoning": {
      "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.25,
+      "cache": {
+       "read": 0.2
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 200000
+         }
+        },
+        "price": 2.5,
+        "cache": {
+         "read": 0.4
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 2.5,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 200000
+         }
+        },
+        "price": 5
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://inference.generativeai.us-chicago-1.oci.oraclecloud.com/openai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-03-09"
+  },
+  "xai.grok-4.20-reasoning": {
+   "id": "xai.grok-4.20-reasoning",
+   "name": "Grok 4.20 (Reasoning)",
+   "description": "Reasoning Grok for document-heavy analysis and long-horizon tool use",
+   "type": "chat",
+   "family": "grok",
+   "canonical_id": "xai/grok-4.20-0309-reasoning",
+   "release_date": "2026-03-09",
+   "limit": {
+    "context": 1000000,
+    "output": 30000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
     }
    },
    "cost": {
@@ -506,95 +595,6 @@
    },
    "open_weights": false,
    "last_updated": "2026-04-17"
-  },
-  "xai.grok-4.20-reasoning": {
-   "id": "xai.grok-4.20-reasoning",
-   "name": "Grok 4.20 (Reasoning)",
-   "description": "Reasoning Grok for document-heavy analysis and long-horizon tool use",
-   "type": "chat",
-   "family": "grok",
-   "canonical_id": "xai/grok-4.20-0309-reasoning",
-   "release_date": "2026-03-09",
-   "limit": {
-    "context": 1000000,
-    "output": 30000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.25,
-      "cache": {
-       "read": 0.2
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 200000
-         }
-        },
-        "price": 2.5,
-        "cache": {
-         "read": 0.4
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 2.5,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 200000
-         }
-        },
-        "price": 5
-       }
-      ]
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://inference.generativeai.us-chicago-1.oci.oraclecloud.com/openai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-03-09"
   },
   "xai.grok-4.6": {
    "id": "xai.grok-4.6",

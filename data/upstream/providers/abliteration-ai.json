@@ -6,20 +6,20 @@
   "ABLIT_KEY"
  ],
  "models": {
-  "abliterated-model-large-v2": {
-   "id": "abliterated-model-large-v2",
-   "name": "Abliterated Model Large V2",
-   "description": "GLM-5.3 model abliterated and finetuned for cyber, ML red teaming, and agent testing",
+  "abliterated-model": {
+   "id": "abliterated-model",
+   "name": "Abliterated Model",
+   "description": "Multimodal model for analyzing text, images, documents, and rich media",
    "type": "chat",
-   "release_date": "2026-08-29",
+   "release_date": "2026-01-06",
    "limit": {
-    "context": 1000000,
-    "input": 1000000,
-    "output": 999990
+    "context": 150000,
+    "input": 150000,
+    "output": 8192
    },
    "capabilities": {
     "temperature": true,
-    "structured_output": true,
+    "structured_output": false,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -27,9 +27,14 @@
     },
     "reasoning": {
      "supported": true,
+     "toggle": true,
      "effort": [
+      "none",
+      "minimal",
       "low",
+      "medium",
       "high",
+      "xhigh",
       "max"
      ]
     }
@@ -37,19 +42,23 @@
    "cost": {
     "text": {
      "input": {
-      "price": 5,
+      "price": 3,
       "cache": {
-       "read": 0.5
+       "read": 0.3
       }
      },
      "output": {
-      "price": 5
+      "price": 3
      }
     }
    },
    "modalities": {
     "input": [
-     "text"
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/gif"
     ],
     "output": [
      "text"
@@ -69,8 +78,8 @@
      }
     }
    },
-   "open_weights": false,
-   "last_updated": "2026-08-31"
+   "open_weights": true,
+   "last_updated": "2026-07-28"
   },
   "abliterated-model-large": {
    "id": "abliterated-model-large",
@@ -210,20 +219,20 @@
    "open_weights": false,
    "last_updated": "2026-10-24"
   },
-  "abliterated-model": {
-   "id": "abliterated-model",
-   "name": "Abliterated Model",
-   "description": "Multimodal model for analyzing text, images, documents, and rich media",
+  "abliterated-model-large-v2": {
+   "id": "abliterated-model-large-v2",
+   "name": "Abliterated Model Large V2",
+   "description": "GLM-5.3 model abliterated and finetuned for cyber, ML red teaming, and agent testing",
    "type": "chat",
-   "release_date": "2026-01-06",
+   "release_date": "2026-08-29",
    "limit": {
-    "context": 150000,
-    "input": 150000,
-    "output": 8192
+    "context": 1000000,
+    "input": 1000000,
+    "output": 999990
    },
    "capabilities": {
     "temperature": true,
-    "structured_output": false,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -231,14 +240,9 @@
     },
     "reasoning": {
      "supported": true,
-     "toggle": true,
      "effort": [
-      "none",
-      "minimal",
       "low",
-      "medium",
       "high",
-      "xhigh",
       "max"
      ]
     }
@@ -246,23 +250,19 @@
    "cost": {
     "text": {
      "input": {
-      "price": 3,
+      "price": 5,
       "cache": {
-       "read": 0.3
+       "read": 0.5
       }
      },
      "output": {
-      "price": 3
+      "price": 5
      }
     }
    },
    "modalities": {
     "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/gif"
+     "text"
     ],
     "output": [
      "text"
@@ -282,8 +282,8 @@
      }
     }
    },
-   "open_weights": true,
-   "last_updated": "2026-07-28"
+   "open_weights": false,
+   "last_updated": "2026-08-31"
   }
  }
 }

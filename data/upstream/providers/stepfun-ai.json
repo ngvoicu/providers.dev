@@ -6,165 +6,6 @@
   "STEPFUN_API_KEY"
  ],
  "models": {
-  "stepaudio-2.5-asr": {
-   "id": "stepaudio-2.5-asr",
-   "name": "StepAudio 2.5 ASR",
-   "description": "Speech transcription model for accurate audio-to-text and captioning workflows",
-   "type": "transcription",
-   "family": "step",
-   "release_date": "2026-04-24",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "audio": {
-     "input": {
-      "unit": "minute",
-      "price": 0.00036667
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "audio/ogg",
-     "audio/mpeg",
-     "audio/wav",
-     "audio/pcm",
-     "audio/mp4"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "transcriptions": {
-     "base_url": "https://api.stepfun.ai/v1",
-     "sdk": {}
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-07-02"
-  },
-  "step-tts-2": {
-   "id": "step-tts-2",
-   "name": "Step TTS 2",
-   "description": "Speech generation model for controllable voice, narration, and audio delivery",
-   "type": "speech",
-   "family": "step",
-   "release_date": "2026-03-01",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 40,
-      "unit": "character"
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "audio/wav",
-     "audio/mpeg",
-     "audio/flac",
-     "audio/opus",
-     "audio/pcm"
-    ]
-   },
-   "api": {
-    "speech": {
-     "base_url": "https://api.stepfun.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/protocols/openai-speech"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-07-02"
-  },
-  "stepaudio-2.5-tts": {
-   "id": "stepaudio-2.5-tts",
-   "name": "StepAudio 2.5 TTS",
-   "description": "Speech generation model for controllable voice, narration, and audio delivery",
-   "type": "speech",
-   "family": "step",
-   "release_date": "2026-04-16",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 85,
-      "unit": "character"
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "audio/wav",
-     "audio/mpeg",
-     "audio/flac",
-     "audio/opus",
-     "audio/pcm"
-    ]
-   },
-   "api": {
-    "speech": {
-     "base_url": "https://api.stepfun.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/protocols/openai-speech"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-07-02"
-  },
   "step-3.5-flash": {
    "id": "step-3.5-flash",
    "name": "Step 3.5 Flash",
@@ -255,6 +96,97 @@
    "open_weights": true,
    "knowledge": "2025-01",
    "last_updated": "2026-02-13"
+  },
+  "step-3.5-flash-2603": {
+   "id": "step-3.5-flash-2603",
+   "name": "Step 3.5 Flash 2603",
+   "description": "StepFun flash model for efficient multimodal reasoning, coding, and tool use",
+   "type": "chat",
+   "family": "step",
+   "canonical_id": "stepfun/step-3.5-flash-2603",
+   "release_date": "2026-04-02",
+   "limit": {
+    "context": 256000,
+    "input": 256000,
+    "output": 256000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": {
+      "min_tokens": 256
+     }
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1,
+      "cache": {
+       "read": 0.02
+      }
+     },
+     "output": {
+      "price": 0.3
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.stepfun.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "messages": {
+     "base_url": "https://api.stepfun.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-01",
+   "last_updated": "2026-04-02"
   },
   "step-3.7-flash": {
    "id": "step-3.7-flash",
@@ -475,52 +407,33 @@
    "open_weights": true,
    "last_updated": "2026-09-20"
   },
-  "step-3.5-flash-2603": {
-   "id": "step-3.5-flash-2603",
-   "name": "Step 3.5 Flash 2603",
-   "description": "StepFun flash model for efficient multimodal reasoning, coding, and tool use",
-   "type": "chat",
+  "step-tts-2": {
+   "id": "step-tts-2",
+   "name": "Step TTS 2",
+   "description": "Speech generation model for controllable voice, narration, and audio delivery",
+   "type": "speech",
    "family": "step",
-   "canonical_id": "stepfun/step-3.5-flash-2603",
-   "release_date": "2026-04-02",
+   "release_date": "2026-03-01",
    "limit": {
-    "context": 256000,
-    "input": 256000,
-    "output": 256000
+    "context": 0,
+    "output": 0
    },
    "capabilities": {
-    "cache": {
-     "implicit": {
-      "min_tokens": 256
-     }
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
+    "temperature": false,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
-     "supported": true
+     "supported": false
     },
     "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high"
-     ]
+     "supported": false
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.1,
-      "cache": {
-       "read": 0.02
-      }
-     },
-     "output": {
-      "price": 0.3
+      "price": 40,
+      "unit": "character"
      }
     }
    },
@@ -529,42 +442,129 @@
      "text"
     ],
     "output": [
+     "audio/wav",
+     "audio/mpeg",
+     "audio/flac",
+     "audio/opus",
+     "audio/pcm"
+    ]
+   },
+   "api": {
+    "speech": {
+     "base_url": "https://api.stepfun.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/protocols/openai-speech"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-07-02"
+  },
+  "stepaudio-2.5-asr": {
+   "id": "stepaudio-2.5-asr",
+   "name": "StepAudio 2.5 ASR",
+   "description": "Speech transcription model for accurate audio-to-text and captioning workflows",
+   "type": "transcription",
+   "family": "step",
+   "release_date": "2026-04-24",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "audio": {
+     "input": {
+      "unit": "minute",
+      "price": 0.00036667
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "audio/ogg",
+     "audio/mpeg",
+     "audio/wav",
+     "audio/pcm",
+     "audio/mp4"
+    ],
+    "output": [
      "text"
     ]
    },
    "api": {
-    "chat-completions": {
+    "transcriptions": {
      "base_url": "https://api.stepfun.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens",
-      "reasoning_field": "reasoning_content"
-     }
+     "sdk": {}
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-07-02"
+  },
+  "stepaudio-2.5-tts": {
+   "id": "stepaudio-2.5-tts",
+   "name": "StepAudio 2.5 TTS",
+   "description": "Speech generation model for controllable voice, narration, and audio delivery",
+   "type": "speech",
+   "family": "step",
+   "release_date": "2026-04-16",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
     },
-    "messages": {
-     "base_url": "https://api.stepfun.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 85,
+      "unit": "character"
      }
     }
    },
-   "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-04-02"
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "audio/wav",
+     "audio/mpeg",
+     "audio/flac",
+     "audio/opus",
+     "audio/pcm"
+    ]
+   },
+   "api": {
+    "speech": {
+     "base_url": "https://api.stepfun.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/protocols/openai-speech"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-07-02"
   }
  }
 }

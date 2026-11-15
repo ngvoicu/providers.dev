@@ -6,79 +6,17 @@
   "INCEPTION_API_KEY"
  ],
  "models": {
-  "mercury-decide": {
-   "id": "mercury-decide",
-   "name": "Mercury Decide",
-   "description": "Inception's diffusion decision model that returns probabilities for typed yes/no, choice and score questions about text or images",
-   "type": "decision",
-   "family": "mercury",
-   "canonical_id": "inception/mercury-decide",
-   "release_date": "2026-09-30",
-   "limit": {
-    "context": 65536,
-    "output": 50000
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.02
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/gif"
-    ],
-    "output": [
-     "decision"
-    ]
-   },
-   "api": {
-    "systemone": {
-     "base_url": "https://api.inceptionlabs.ai/v1",
-     "path": "/decisions",
-     "sdk": {
-      "aisdk": "@openrouter/ai-sdk-provider"
-     },
-     "compatibility": {
-      "media_input": "state"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-09-30"
-  },
-  "mercury-3": {
-   "id": "mercury-3",
-   "name": "Mercury 3",
-   "description": "Inception's diffusion reasoning model for chat, multi-step problem solving, and tool use",
+  "mercury-2": {
+   "id": "mercury-2",
+   "name": "Mercury 2",
+   "description": "Reasoning model for deliberate analysis, multi-step problem solving, and tool use",
    "type": "chat",
    "family": "mercury",
-   "canonical_id": "inception/mercury-3",
-   "release_date": "2026-10-16",
+   "canonical_id": "inception/mercury-2",
+   "release_date": "2026-02-24",
    "limit": {
-    "context": 1000000,
-    "output": 131072
+    "context": 128000,
+    "output": 50000
    },
    "capabilities": {
     "cache": {
@@ -103,20 +41,20 @@
      ],
      "default": {
       "type": "effort",
-      "value": "low"
+      "value": "medium"
      }
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.1,
+      "price": 0.25,
       "cache": {
-       "read": 0.01
+       "read": 0.025
       }
      },
      "output": {
-      "price": 0.35
+      "price": 0.75
      }
     }
    },
@@ -149,7 +87,8 @@
     }
    },
    "open_weights": false,
-   "last_updated": "2026-10-20"
+   "knowledge": "2025-01-01",
+   "last_updated": "2026-02-24"
   },
   "mercury-2.5": {
    "id": "mercury-2.5",
@@ -235,6 +174,151 @@
    "knowledge": "2025-11-01",
    "last_updated": "2026-09-08"
   },
+  "mercury-3": {
+   "id": "mercury-3",
+   "name": "Mercury 3",
+   "description": "Inception's diffusion reasoning model for chat, multi-step problem solving, and tool use",
+   "type": "chat",
+   "family": "mercury",
+   "canonical_id": "inception/mercury-3",
+   "release_date": "2026-10-16",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "stream_usage": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ],
+     "default": {
+      "type": "effort",
+      "value": "low"
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1,
+      "cache": {
+       "read": 0.01
+      }
+     },
+     "output": {
+      "price": 0.35
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.inceptionlabs.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-10-20"
+  },
+  "mercury-decide": {
+   "id": "mercury-decide",
+   "name": "Mercury Decide",
+   "description": "Inception's diffusion decision model that returns probabilities for typed yes/no, choice and score questions about text or images",
+   "type": "decision",
+   "family": "mercury",
+   "canonical_id": "inception/mercury-decide",
+   "release_date": "2026-09-30",
+   "limit": {
+    "context": 65536,
+    "output": 50000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.02
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/gif"
+    ],
+    "output": [
+     "decision"
+    ]
+   },
+   "api": {
+    "systemone": {
+     "base_url": "https://api.inceptionlabs.ai/v1",
+     "path": "/decisions",
+     "sdk": {
+      "aisdk": "@openrouter/ai-sdk-provider"
+     },
+     "compatibility": {
+      "media_input": "state"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-09-30"
+  },
   "mercury-edit-2": {
    "id": "mercury-edit-2",
    "name": "Mercury Edit 2",
@@ -296,90 +380,6 @@
    },
    "open_weights": false,
    "last_updated": "2026-03-30"
-  },
-  "mercury-2": {
-   "id": "mercury-2",
-   "name": "Mercury 2",
-   "description": "Reasoning model for deliberate analysis, multi-step problem solving, and tool use",
-   "type": "chat",
-   "family": "mercury",
-   "canonical_id": "inception/mercury-2",
-   "release_date": "2026-02-24",
-   "limit": {
-    "context": 128000,
-    "output": 50000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "stream_usage": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ],
-     "default": {
-      "type": "effort",
-      "value": "medium"
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.25,
-      "cache": {
-       "read": 0.025
-      }
-     },
-     "output": {
-      "price": 0.75
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.inceptionlabs.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-01-01",
-   "last_updated": "2026-02-24"
   }
  }
 }

@@ -6,165 +6,6 @@
   "WAFER_API_KEY"
  ],
  "models": {
-  "GLM-5.3": {
-   "id": "GLM-5.3",
-   "name": "GLM-5.3",
-   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
-   "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-5.3",
-   "release_date": "2026-08-14",
-   "limit": {
-    "context": 1048576,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ],
-     "default": {
-      "type": "effort",
-      "value": "low"
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.2,
-      "cache": {
-       "read": 0.18
-      }
-     },
-     "output": {
-      "price": 1.8
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://pass.wafer.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-08-14"
-  },
-  "GLM-5.2": {
-   "id": "GLM-5.2",
-   "name": "GLM-5.2",
-   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
-   "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-5.2",
-   "release_date": "2026-06-13",
-   "limit": {
-    "context": 1048576,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": false,
-    "top_k": true,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "high",
-      "max"
-     ],
-     "default": {
-      "type": "effort",
-      "value": "low"
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.19,
-      "cache": {
-       "read": 0.18
-      }
-     },
-     "output": {
-      "price": 4.4
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://pass.wafer.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-06-13"
-  },
   "DeepSeek-V4-Flash-0423": {
    "id": "DeepSeek-V4-Flash-0423",
    "name": "DeepSeek V4 Flash 0423",
@@ -245,6 +86,167 @@
    "open_weights": true,
    "knowledge": "2025-05",
    "last_updated": "2026-04-23"
+  },
+  "DeepSeek-V4-Flash-0731-Fast": {
+   "id": "DeepSeek-V4-Flash-0731-Fast",
+   "name": "DeepSeek V4 Flash 0731 Fast",
+   "description": "Official DeepSeek V4 Flash release with enhanced agentic capabilities and integrated DSpark speculative decoding",
+   "type": "chat",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4-flash-0731",
+   "release_date": "2026-07-31",
+   "limit": {
+    "context": 1048576,
+    "output": 384000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "high",
+      "max"
+     ],
+     "default": {
+      "type": "effort",
+      "value": "low"
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.13,
+      "cache": {
+       "read": 0.028
+      }
+     },
+     "output": {
+      "price": 0.23
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://pass.wafer.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-07-31"
+  },
+  "DeepSeek-V4-Pro": {
+   "id": "DeepSeek-V4-Pro",
+   "name": "DeepSeek V4 Pro 0813",
+   "description": "DeepSeek V4 Pro snapshot with million-token context and support for thinking and non-thinking modes",
+   "type": "chat",
+   "family": "deepseek-thinking",
+   "canonical_id": "deepseek/deepseek-v4-pro-0813",
+   "release_date": "2026-08-13",
+   "limit": {
+    "context": 1048576,
+    "output": 384000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "high",
+      "max"
+     ],
+     "default": {
+      "type": "effort",
+      "value": "none"
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.28,
+      "cache": {
+       "read": 0.044
+      }
+     },
+     "output": {
+      "price": 3.96
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://pass.wafer.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-22"
   },
   "DeepSeek-V4.1-Flash": {
    "id": "DeepSeek-V4.1-Flash",
@@ -329,167 +331,6 @@
    "knowledge": "2025-05",
    "last_updated": "2026-09-10"
   },
-  "Kimi-K3.1-Pro": {
-   "id": "Kimi-K3.1-Pro",
-   "name": "Kimi K3.1 Pro",
-   "description": "Multimodal Kimi model with 1M context and per-request reasoning (off by default on Wafer) for coding, 3D creation, financial research, and agentic work",
-   "type": "chat",
-   "family": "kimi-k3",
-   "canonical_id": "moonshotai/kimi-k3.1-pro",
-   "release_date": "2026-10-23",
-   "limit": {
-    "context": 1048576,
-    "output": 1048576
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "high",
-      "max"
-     ],
-     "default": {
-      "type": "effort",
-      "value": "none"
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2,
-      "cache": {
-       "read": 0.2
-      }
-     },
-     "output": {
-      "price": 10
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://pass.wafer.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-10-23"
-  },
-  "DeepSeek-V4-Pro": {
-   "id": "DeepSeek-V4-Pro",
-   "name": "DeepSeek V4 Pro 0813",
-   "description": "DeepSeek V4 Pro snapshot with million-token context and support for thinking and non-thinking modes",
-   "type": "chat",
-   "family": "deepseek-thinking",
-   "canonical_id": "deepseek/deepseek-v4-pro-0813",
-   "release_date": "2026-08-13",
-   "limit": {
-    "context": 1048576,
-    "output": 384000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "high",
-      "max"
-     ],
-     "default": {
-      "type": "effort",
-      "value": "none"
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.28,
-      "cache": {
-       "read": 0.044
-      }
-     },
-     "output": {
-      "price": 3.96
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://pass.wafer.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-08-22"
-  },
   "DeepSeek-V4.1-Flash-1017": {
    "id": "DeepSeek-V4.1-Flash-1017",
    "name": "DeepSeek V4.1 Flash 1017",
@@ -573,25 +414,25 @@
    "knowledge": "2025-05",
    "last_updated": "2026-10-17"
   },
-  "DeepSeek-V4-Flash-0731-Fast": {
-   "id": "DeepSeek-V4-Flash-0731-Fast",
-   "name": "DeepSeek V4 Flash 0731 Fast",
-   "description": "Official DeepSeek V4 Flash release with enhanced agentic capabilities and integrated DSpark speculative decoding",
+  "GLM-5.2": {
+   "id": "GLM-5.2",
+   "name": "GLM-5.2",
+   "description": "Open flagship GLM for long-horizon coding agents and million-token context work",
    "type": "chat",
-   "family": "deepseek-flash",
-   "canonical_id": "deepseek/deepseek-v4-flash-0731",
-   "release_date": "2026-07-31",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.2",
+   "release_date": "2026-06-13",
    "limit": {
     "context": 1048576,
-    "output": 384000
+    "output": 131072
    },
    "capabilities": {
     "cache": {
      "implicit": true
     },
-    "temperature": true,
+    "temperature": false,
     "top_k": true,
-    "top_p": true,
+    "top_p": false,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -615,13 +456,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.13,
+      "price": 0.19,
       "cache": {
-       "read": 0.028
+       "read": 0.18
       }
      },
      "output": {
-      "price": 0.23
+      "price": 4.4
      }
     }
    },
@@ -651,20 +492,19 @@
     }
    },
    "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-07-31"
+   "last_updated": "2026-06-13"
   },
-  "Qwen3.8-27B": {
-   "id": "Qwen3.8-27B",
-   "name": "Qwen3.8 27B",
-   "description": "Dense 27B vision-language model for coding, agent tasks, and image understanding",
+  "GLM-5.3": {
+   "id": "GLM-5.3",
+   "name": "GLM-5.3",
+   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
    "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3.8-27b",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.3",
    "release_date": "2026-08-14",
    "limit": {
-    "context": 262144,
-    "output": 32768
+    "context": 1048576,
+    "output": 131072
    },
    "capabilities": {
     "cache": {
@@ -682,27 +522,105 @@
     "reasoning": {
      "supported": true,
      "effort": [
-      "none",
       "low",
-      "medium",
-      "xhigh"
+      "high",
+      "max"
      ],
      "default": {
       "type": "effort",
-      "value": "xhigh"
+      "value": "low"
      }
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.06,
+      "price": 0.2,
       "cache": {
-       "read": 0.05
+       "read": 0.18
       }
      },
      "output": {
-      "price": 2.3
+      "price": 1.8
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://pass.wafer.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-14"
+  },
+  "GLM-5.3-Flash": {
+   "id": "GLM-5.3-Flash",
+   "name": "GLM-5.3-Flash",
+   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
+   "type": "chat",
+   "family": "glm-flash",
+   "canonical_id": "zhipuai/glm-5.3-flash",
+   "release_date": "2026-08-26",
+   "limit": {
+    "context": 1048576,
+    "output": 196608
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ],
+     "default": {
+      "type": "effort",
+      "value": "low"
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.05,
+      "cache": {
+       "read": 0.03
+      }
+     },
+     "output": {
+      "price": 0.2
      }
     }
    },
@@ -734,7 +652,7 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2026-08-14"
+   "last_updated": "2026-08-26"
   },
   "Kimi-K3": {
    "id": "Kimi-K3",
@@ -817,17 +735,17 @@
    "open_weights": true,
    "last_updated": "2026-07-16"
   },
-  "GLM-5.3-Flash": {
-   "id": "GLM-5.3-Flash",
-   "name": "GLM-5.3-Flash",
-   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
+  "Kimi-K3.1-Pro": {
+   "id": "Kimi-K3.1-Pro",
+   "name": "Kimi K3.1 Pro",
+   "description": "Multimodal Kimi model with 1M context and per-request reasoning (off by default on Wafer) for coding, 3D creation, financial research, and agentic work",
    "type": "chat",
-   "family": "glm-flash",
-   "canonical_id": "zhipuai/glm-5.3-flash",
-   "release_date": "2026-08-26",
+   "family": "kimi-k3",
+   "canonical_id": "moonshotai/kimi-k3.1-pro",
+   "release_date": "2026-10-23",
    "limit": {
     "context": 1048576,
-    "output": 196608
+    "output": 1048576
    },
    "capabilities": {
     "cache": {
@@ -845,26 +763,26 @@
     "reasoning": {
      "supported": true,
      "effort": [
-      "low",
+      "none",
       "high",
       "max"
      ],
      "default": {
       "type": "effort",
-      "value": "low"
+      "value": "none"
      }
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.05,
+      "price": 2,
       "cache": {
-       "read": 0.03
+       "read": 0.2
       }
      },
      "output": {
-      "price": 0.2
+      "price": 10
      }
     }
    },
@@ -896,7 +814,89 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2026-08-26"
+   "last_updated": "2026-10-23"
+  },
+  "Qwen3.8-27B": {
+   "id": "Qwen3.8-27B",
+   "name": "Qwen3.8 27B",
+   "description": "Dense 27B vision-language model for coding, agent tasks, and image understanding",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.8-27b",
+   "release_date": "2026-08-14",
+   "limit": {
+    "context": 262144,
+    "output": 32768
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "xhigh"
+     ],
+     "default": {
+      "type": "effort",
+      "value": "xhigh"
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.06,
+      "cache": {
+       "read": 0.05
+      }
+     },
+     "output": {
+      "price": 2.3
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://pass.wafer.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-14"
   }
  }
 }

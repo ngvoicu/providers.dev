@@ -6,16 +6,16 @@
   "SUPERBOT_API_KEY"
  ],
  "models": {
-  "superbot-fast": {
-   "id": "superbot-fast",
-   "name": "superbot-fast",
-   "description": "Quick and cheap, for small jobs. Reasoning effort low or none, a 500k-token window.",
+  "superbot": {
+   "id": "superbot",
+   "name": "superbot",
+   "description": "Your Superbot agent. Reasoning effort from none to max, a 1M-token window.",
    "type": "chat",
    "family": "deepseek-flash",
    "canonical_id": "deepseek/deepseek-v4.1-flash",
    "release_date": "2026-09-10",
    "limit": {
-    "context": 500000,
+    "context": 1000000,
     "output": 131072
    },
    "capabilities": {
@@ -38,11 +38,13 @@
      "supported": true,
      "effort": [
       "none",
-      "low"
+      "low",
+      "high",
+      "max"
      ],
      "default": {
       "type": "effort",
-      "value": "low"
+      "value": "high"
      }
     }
    },
@@ -119,16 +121,16 @@
     }
    }
   },
-  "superbot": {
-   "id": "superbot",
-   "name": "superbot",
-   "description": "Your Superbot agent. Reasoning effort from none to max, a 1M-token window.",
+  "superbot-fast": {
+   "id": "superbot-fast",
+   "name": "superbot-fast",
+   "description": "Quick and cheap, for small jobs. Reasoning effort low or none, a 500k-token window.",
    "type": "chat",
    "family": "deepseek-flash",
    "canonical_id": "deepseek/deepseek-v4.1-flash",
    "release_date": "2026-09-10",
    "limit": {
-    "context": 1000000,
+    "context": 500000,
     "output": 131072
    },
    "capabilities": {
@@ -151,13 +153,11 @@
      "supported": true,
      "effort": [
       "none",
-      "low",
-      "high",
-      "max"
+      "low"
      ],
      "default": {
       "type": "effort",
-      "value": "high"
+      "value": "low"
      }
     }
    },

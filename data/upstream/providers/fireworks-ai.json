@@ -6,20 +6,19 @@
   "FIREWORKS_API_KEY"
  ],
  "models": {
-  "accounts/fireworks/models/rune": {
-   "id": "accounts/fireworks/models/rune",
-   "name": "Rune 26B-A4B",
-   "description": "Open-weight System One decision model on Gemma 4 26B-A4B that answers up to 256 typed questions about a document with calibrated probabilities in one pass",
-   "type": "decision",
-   "canonical_id": "surogate/rune-26b-a4b",
-   "release_date": "2026-09-21",
+  "BAAI/bge-base-en-v1.5": {
+   "id": "BAAI/bge-base-en-v1.5",
+   "name": "BGE Base EN v1.5",
+   "description": "English text embedding model for retrieval and semantic search",
+   "type": "embedding",
+   "family": "bge",
+   "canonical_id": "baai/bge-base-en-v1.5",
+   "release_date": "2023-09-12",
    "limit": {
-    "context": 262144
+    "context": 512,
+    "output": 0
    },
    "capabilities": {
-    "cache": {
-     "implicit": true
-    },
     "temperature": false,
     "top_k": false,
     "top_p": false,
@@ -35,10 +34,7 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.042,
-      "cache": {
-       "read": 0.0084
-      }
+      "price": 0.008
      },
      "output": {
       "price": 0
@@ -50,276 +46,129 @@
      "text"
     ],
     "output": [
-     "decision"
+     "embedding"
     ]
    },
    "api": {
-    "systemone": {
-     "base_url": "https://api.fireworks.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/typesafe-ai",
-      "opencodeai": "@opencode/ai/providers/typesafe-ai/decisions"
-     }
-    },
-    "responses": {
-     "base_url": "https://api.fireworks.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     }
-    },
-    "messages": {
-     "base_url": "https://api.fireworks.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-09-21"
-  },
-  "accounts/fireworks/models/deepseek-v4p1-flash-1017": {
-   "id": "accounts/fireworks/models/deepseek-v4p1-flash-1017",
-   "name": "DeepSeek V4.1 Flash 1017",
-   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
-   "type": "chat",
-   "family": "deepseek-flash",
-   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
-   "release_date": "2026-10-17",
-   "limit": {
-    "context": 1000000,
-    "output": 384000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": true,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.3,
-      "cache": {
-       "read": 0.006
-      }
-     },
-     "output": {
-      "price": 1.2
-     }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "service_tier": {
-        "equals": "priority"
-       }
-      },
-      "factor": 1.25
-     }
-    ]
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
+    "embeddings": {
      "base_url": "https://api.fireworks.ai/inference/v1",
      "sdk": {
       "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/fireworks"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    },
-    "responses": {
-     "base_url": "https://api.fireworks.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.fireworks.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
+      "opencodeai": "@opencode/ai/providers/fireworks/embeddings"
      }
     }
    },
    "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-10-17",
-   "experimental": {
-    "modes": {
-     "priority": {
-      "body": {
-       "service_tier": "priority"
-      }
-     }
-    }
-   }
+   "last_updated": "2023-09-12"
   },
-  "accounts/fireworks/models/minimax-m3": {
-   "id": "accounts/fireworks/models/minimax-m3",
-   "name": "MiniMax-M3",
-   "description": "Fireworks text-only MiniMax coding model for long-context reasoning and agent tasks",
-   "type": "chat",
-   "family": "minimax",
-   "canonical_id": "minimax/MiniMax-M3",
-   "release_date": "2026-06-01",
+  "BAAI/bge-small-en-v1.5": {
+   "id": "BAAI/bge-small-en-v1.5",
+   "name": "BGE Small EN v1.5",
+   "description": "Small English text embedding model producing 384-dimensional vectors",
+   "type": "embedding",
+   "family": "bge",
+   "canonical_id": "baai/bge-small-en-v1.5",
+   "release_date": "2023-09-12",
    "limit": {
-    "context": 512000,
-    "output": 512000
+    "context": 512,
+    "output": 0
    },
    "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
+    "temperature": false,
     "top_k": false,
-    "top_p": true,
-    "structured_output": true,
+    "top_p": false,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
-     "supported": true
+     "supported": false
     },
     "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
+     "supported": false
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.3,
-      "cache": {
-       "read": 0.06
-      }
+      "price": 0.008
      },
      "output": {
-      "price": 1.2
+      "price": 0
      }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "service_tier": {
-        "equals": "priority"
-       }
-      },
-      "factor": 1.5
-     }
-    ]
+    }
    },
    "modalities": {
     "input": [
      "text"
     ],
     "output": [
-     "text"
+     "embedding"
     ]
    },
    "api": {
-    "chat-completions": {
+    "embeddings": {
      "base_url": "https://api.fireworks.ai/inference/v1",
      "sdk": {
       "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/fireworks"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    },
-    "responses": {
-     "base_url": "https://api.fireworks.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.fireworks.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
+      "opencodeai": "@opencode/ai/providers/fireworks/embeddings"
      }
     }
    },
    "open_weights": true,
-   "last_updated": "2026-06-01",
-   "experimental": {
-    "modes": {
-     "priority": {
-      "body": {
-       "service_tier": "priority"
-      }
+   "last_updated": "2023-09-12"
+  },
+  "WhereIsAI/UAE-Large-V1": {
+   "id": "WhereIsAI/UAE-Large-V1",
+   "name": "UAE Large V1",
+   "description": "English text embedding model trained with angle-optimized contrastive learning",
+   "type": "embedding",
+   "canonical_id": "whereisai/uae-large-v1",
+   "release_date": "2023-12-04",
+   "limit": {
+    "context": 512,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.016
+     },
+     "output": {
+      "price": 0
      }
     }
-   }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "api": {
+    "embeddings": {
+     "base_url": "https://api.fireworks.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/fireworks/embeddings"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2023-12-04"
   },
   "accounts/fireworks/models/deepseek-v4p1-flash": {
    "id": "accounts/fireworks/models/deepseek-v4p1-flash",
@@ -445,6 +294,354 @@
     }
    }
   },
+  "accounts/fireworks/models/deepseek-v4p1-flash-1017": {
+   "id": "accounts/fireworks/models/deepseek-v4p1-flash-1017",
+   "name": "DeepSeek V4.1 Flash 1017",
+   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
+   "type": "chat",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
+   "release_date": "2026-10-17",
+   "limit": {
+    "context": 1000000,
+    "output": 384000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": true,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.3,
+      "cache": {
+       "read": 0.006
+      }
+     },
+     "output": {
+      "price": 1.2
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": 1.25
+     }
+    ]
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.fireworks.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/fireworks"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "responses": {
+     "base_url": "https://api.fireworks.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://api.fireworks.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-10-17",
+   "experimental": {
+    "modes": {
+     "priority": {
+      "body": {
+       "service_tier": "priority"
+      }
+     }
+    }
+   }
+  },
+  "accounts/fireworks/models/ember-1": {
+   "id": "accounts/fireworks/models/ember-1",
+   "name": "Ember-1",
+   "description": "Specialized model from Fireworks built on Kimi K3, producing shorter reasoning traces with approximately 40% fewer tokens while maintaining comparable quality",
+   "type": "chat",
+   "canonical_id": "fireworks/ember-1",
+   "release_date": "2026-09-22",
+   "limit": {
+    "context": 1048576,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": true,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 3,
+      "cache": {
+       "read": 0.3
+      }
+     },
+     "output": {
+      "price": 15
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/gif",
+     "image/bmp",
+     "image/tiff",
+     "image/x-portable-pixmap"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.fireworks.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/fireworks"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "responses": {
+     "base_url": "https://api.fireworks.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://api.fireworks.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-09-22"
+  },
+  "accounts/fireworks/models/glm-5p3": {
+   "id": "accounts/fireworks/models/glm-5p3",
+   "name": "GLM 5.3",
+   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.3",
+   "release_date": "2026-08-14",
+   "limit": {
+    "context": 1048573,
+    "output": 262144
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": true,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.4,
+      "cache": {
+       "read": 0.26
+      }
+     },
+     "output": {
+      "price": 4.4
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": 1.25
+     }
+    ]
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.fireworks.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/fireworks"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "responses": {
+     "base_url": "https://api.fireworks.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://api.fireworks.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-14",
+   "experimental": {
+    "modes": {
+     "priority": {
+      "body": {
+       "service_tier": "priority"
+      }
+     }
+    }
+   }
+  },
   "accounts/fireworks/models/glm-5p3-flash": {
    "id": "accounts/fireworks/models/glm-5p3-flash",
    "name": "GLM 5.3 Flash",
@@ -555,252 +752,6 @@
    },
    "open_weights": true,
    "last_updated": "2026-08-26",
-   "experimental": {
-    "modes": {
-     "priority": {
-      "body": {
-       "service_tier": "priority"
-      }
-     }
-    }
-   }
-  },
-  "accounts/fireworks/models/qwen3p8-max": {
-   "id": "accounts/fireworks/models/qwen3p8-max",
-   "name": "Qwen3.8 Max",
-   "description": "2.4-trillion-parameter MoE flagship for coding, professional work, multimodal understanding, and long-horizon agentic workflows",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3.8-max",
-   "release_date": "2026-08-03",
-   "limit": {
-    "context": 262144,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "xhigh"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2,
-      "cache": {
-       "read": 0.25
-      }
-     },
-     "output": {
-      "price": 6
-     }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "service_tier": {
-        "equals": "priority"
-       }
-      },
-      "factor": 1.5
-     }
-    ]
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.fireworks.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/fireworks"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://api.fireworks.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.fireworks.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-08-03",
-   "experimental": {
-    "modes": {
-     "priority": {
-      "body": {
-       "service_tier": "priority"
-      }
-     }
-    }
-   }
-  },
-  "accounts/fireworks/models/kimi-k3p1-pro": {
-   "id": "accounts/fireworks/models/kimi-k3p1-pro",
-   "name": "Kimi K3.1 Pro",
-   "description": "Multimodal Kimi model with a 1M-token context window and always-on reasoning, for coding, 3D creation and financial research",
-   "type": "chat",
-   "family": "kimi-k3",
-   "canonical_id": "moonshotai/kimi-k3.1-pro",
-   "release_date": "2026-10-23",
-   "limit": {
-    "context": 1048576,
-    "output": 1048576
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2,
-      "cache": {
-       "read": 0.2
-      }
-     },
-     "output": {
-      "price": 10
-     }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "service_tier": {
-        "equals": "priority"
-       }
-      },
-      "factor": 1.5
-     }
-    ]
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.fireworks.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/fireworks"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    },
-    "responses": {
-     "base_url": "https://api.fireworks.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.fireworks.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-10-23",
    "experimental": {
     "modes": {
      "priority": {
@@ -937,244 +888,27 @@
     }
    }
   },
-  "accounts/fireworks/models/qwen3p8-2p4t-a95b": {
-   "id": "accounts/fireworks/models/qwen3p8-2p4t-a95b",
-   "name": "Qwen3.8 2.4T A95B",
-   "description": "Open-weight sparse MoE (2.4T total, 95B active), the open-weight twin of Qwen3.8 Max for coding, research, complex reasoning, and agentic workflows",
+  "accounts/fireworks/models/kimi-k3p1-pro": {
+   "id": "accounts/fireworks/models/kimi-k3p1-pro",
+   "name": "Kimi K3.1 Pro",
+   "description": "Multimodal Kimi model with a 1M-token context window and always-on reasoning, for coding, 3D creation and financial research",
    "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3.8-2.4t-a95b",
-   "release_date": "2026-08-12",
-   "limit": {
-    "context": 262144,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "xhigh"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2,
-      "cache": {
-       "read": 0.25
-      }
-     },
-     "output": {
-      "price": 6
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.fireworks.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/fireworks"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    },
-    "responses": {
-     "base_url": "https://api.fireworks.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.fireworks.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-08-12"
-  },
-  "accounts/fireworks/models/glm-5p3": {
-   "id": "accounts/fireworks/models/glm-5p3",
-   "name": "GLM 5.3",
-   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
-   "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-5.3",
-   "release_date": "2026-08-14",
-   "limit": {
-    "context": 1048573,
-    "output": 262144
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": true,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.4,
-      "cache": {
-       "read": 0.26
-      }
-     },
-     "output": {
-      "price": 4.4
-     }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "service_tier": {
-        "equals": "priority"
-       }
-      },
-      "factor": 1.25
-     }
-    ]
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.fireworks.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/fireworks"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    },
-    "responses": {
-     "base_url": "https://api.fireworks.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.fireworks.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-08-14",
-   "experimental": {
-    "modes": {
-     "priority": {
-      "body": {
-       "service_tier": "priority"
-      }
-     }
-    }
-   }
-  },
-  "accounts/fireworks/models/ember-1": {
-   "id": "accounts/fireworks/models/ember-1",
-   "name": "Ember-1",
-   "description": "Specialized model from Fireworks built on Kimi K3, producing shorter reasoning traces with approximately 40% fewer tokens while maintaining comparable quality",
-   "type": "chat",
-   "canonical_id": "fireworks/ember-1",
-   "release_date": "2026-09-22",
+   "family": "kimi-k3",
+   "canonical_id": "moonshotai/kimi-k3.1-pro",
+   "release_date": "2026-10-23",
    "limit": {
     "context": 1048576,
-    "output": 131072
+    "output": 1048576
    },
    "capabilities": {
     "cache": {
      "implicit": true
     },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
     "structured_output": true,
-    "system_updates": true,
+    "system_updates": false,
     "effort_updates": false,
     "tools": {
      "supported": true
@@ -1193,25 +927,34 @@
    "cost": {
     "text": {
      "input": {
-      "price": 3,
+      "price": 2,
       "cache": {
-       "read": 0.3
+       "read": 0.2
       }
      },
      "output": {
-      "price": 15
+      "price": 10
      }
-    }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": 1.5
+     }
+    ]
    },
    "modalities": {
     "input": [
      "text",
-     "image/png",
      "image/jpeg",
+     "image/png",
      "image/gif",
-     "image/bmp",
-     "image/tiff",
-     "image/x-portable-pixmap"
+     "image/webp",
+     "image/bmp"
     ],
     "output": [
      "text"
@@ -1258,30 +1001,39 @@
      }
     }
    },
-   "open_weights": false,
-   "last_updated": "2026-09-22"
+   "open_weights": true,
+   "last_updated": "2026-10-23",
+   "experimental": {
+    "modes": {
+     "priority": {
+      "body": {
+       "service_tier": "priority"
+      }
+     }
+    }
+   }
   },
-  "accounts/fireworks/models/muse-spark-open": {
-   "id": "accounts/fireworks/models/muse-spark-open",
-   "name": "Muse Spark Open",
-   "description": "Muse Spark Open is an 816B total / 42B active open-weight multimodal reasoning model from Meta for coding and long-horizon agentic work, with 1M-token context.",
+  "accounts/fireworks/models/minimax-m3": {
+   "id": "accounts/fireworks/models/minimax-m3",
+   "name": "MiniMax-M3",
+   "description": "Fireworks text-only MiniMax coding model for long-context reasoning and agent tasks",
    "type": "chat",
-   "family": "muse",
-   "canonical_id": "meta/muse-spark-open",
-   "release_date": "2026-10-15",
+   "family": "minimax",
+   "canonical_id": "minimax/MiniMax-M3",
+   "release_date": "2026-06-01",
    "limit": {
-    "context": 1048576,
-    "output": 131072
+    "context": 512000,
+    "output": 512000
    },
    "capabilities": {
     "cache": {
      "implicit": true
     },
     "temperature": true,
-    "top_k": true,
+    "top_k": false,
     "top_p": true,
     "structured_output": true,
-    "system_updates": true,
+    "system_updates": false,
     "effort_updates": false,
     "tools": {
      "supported": true
@@ -1291,21 +1043,20 @@
      "effort": [
       "low",
       "medium",
-      "high",
-      "xhigh"
+      "high"
      ]
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 1.25,
+      "price": 0.3,
       "cache": {
-       "read": 0.15
+       "read": 0.06
       }
      },
      "output": {
-      "price": 4.25
+      "price": 1.2
      }
     },
     "multipliers": [
@@ -1321,15 +1072,7 @@
    },
    "modalities": {
     "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/gif",
-     "image/bmp",
-     "image/tiff",
-     "image/x-portable-pixmap",
-     "image/webp",
-     "image/avif"
+     "text"
     ],
     "output": [
      "text"
@@ -1346,6 +1089,9 @@
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
      }
     },
     "responses": {
@@ -1374,8 +1120,7 @@
     }
    },
    "open_weights": true,
-   "knowledge": "2026-01-04",
-   "last_updated": "2026-10-15",
+   "last_updated": "2026-06-01",
    "experimental": {
     "modes": {
      "priority": {
@@ -1510,6 +1255,131 @@
     }
    }
   },
+  "accounts/fireworks/models/muse-spark-open": {
+   "id": "accounts/fireworks/models/muse-spark-open",
+   "name": "Muse Spark Open",
+   "description": "Muse Spark Open is an 816B total / 42B active open-weight multimodal reasoning model from Meta for coding and long-horizon agentic work, with 1M-token context.",
+   "type": "chat",
+   "family": "muse",
+   "canonical_id": "meta/muse-spark-open",
+   "release_date": "2026-10-15",
+   "limit": {
+    "context": 1048576,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": true,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.25,
+      "cache": {
+       "read": 0.15
+      }
+     },
+     "output": {
+      "price": 4.25
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": 1.5
+     }
+    ]
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/gif",
+     "image/bmp",
+     "image/tiff",
+     "image/x-portable-pixmap",
+     "image/webp",
+     "image/avif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.fireworks.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/fireworks"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://api.fireworks.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://api.fireworks.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2026-01-04",
+   "last_updated": "2026-10-15",
+   "experimental": {
+    "modes": {
+     "priority": {
+      "body": {
+       "service_tier": "priority"
+      }
+     }
+    }
+   }
+  },
   "accounts/fireworks/models/qwen3-embedding-8b": {
    "id": "accounts/fireworks/models/qwen3-embedding-8b",
    "name": "Qwen3 Embedding 8B",
@@ -1565,17 +1435,17 @@
    "open_weights": true,
    "last_updated": "2025-06-05"
   },
-  "accounts/fireworks/routers/deepseek-v4p1-flash-1017-ultrafast": {
-   "id": "accounts/fireworks/routers/deepseek-v4p1-flash-1017-ultrafast",
-   "name": "DeepSeek V4.1 Flash 1017 Ultra-fast",
-   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
+  "accounts/fireworks/models/qwen3p8-2p4t-a95b": {
+   "id": "accounts/fireworks/models/qwen3p8-2p4t-a95b",
+   "name": "Qwen3.8 2.4T A95B",
+   "description": "Open-weight sparse MoE (2.4T total, 95B active), the open-weight twin of Qwen3.8 Max for coding, research, complex reasoning, and agentic workflows",
    "type": "chat",
-   "family": "deepseek-flash",
-   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
-   "release_date": "2026-10-17",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.8-2.4t-a95b",
+   "release_date": "2026-08-12",
    "limit": {
-    "context": 1000000,
-    "output": 384000
+    "context": 262144,
+    "output": 131072
    },
    "capabilities": {
     "cache": {
@@ -1585,232 +1455,31 @@
     "top_k": true,
     "top_p": true,
     "structured_output": true,
-    "system_updates": true,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2.4,
-      "cache": {
-       "read": 0.048
-      }
-     },
-     "output": {
-      "price": 9.6
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.fireworks.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/fireworks"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    },
-    "responses": {
-     "base_url": "https://api.fireworks.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.fireworks.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-10-17"
-  },
-  "accounts/fireworks/routers/deepseek-v4p1-flash-1017-spot": {
-   "id": "accounts/fireworks/routers/deepseek-v4p1-flash-1017-spot",
-   "name": "DeepSeek V4.1 Flash 1017 Spot",
-   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
-   "type": "chat",
-   "family": "deepseek-flash",
-   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
-   "release_date": "2026-10-17",
-   "limit": {
-    "context": 1000000,
-    "output": 384000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": true,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.21,
-      "cache": {
-       "read": 0.0042
-      }
-     },
-     "output": {
-      "price": 0.84
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.fireworks.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/fireworks"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    },
-    "responses": {
-     "base_url": "https://api.fireworks.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.fireworks.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-10-17"
-  },
-  "accounts/fireworks/routers/rune": {
-   "id": "accounts/fireworks/routers/rune",
-   "name": "Rune 26B-A4B",
-   "description": "Open-weight System One decision model on Gemma 4 26B-A4B that answers up to 256 typed questions about a document with calibrated probabilities in one pass",
-   "type": "decision",
-   "canonical_id": "surogate/rune-26b-a4b",
-   "release_date": "2026-09-21",
-   "limit": {
-    "context": 262144
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
-     "supported": false
+     "supported": true
     },
     "reasoning": {
-     "supported": false
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "xhigh"
+     ]
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.042,
+      "price": 2,
       "cache": {
-       "read": 0.0084
+       "read": 0.25
       }
      },
      "output": {
-      "price": 0
+      "price": 6
      }
     }
    },
@@ -1819,15 +1488,23 @@
      "text"
     ],
     "output": [
-     "decision"
+     "text"
     ]
    },
    "api": {
-    "systemone": {
+    "chat-completions": {
      "base_url": "https://api.fireworks.ai/inference/v1",
      "sdk": {
-      "aisdk": "@ai-sdk/typesafe-ai",
-      "opencodeai": "@opencode/ai/providers/typesafe-ai/decisions"
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/fireworks"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
      }
     },
     "responses": {
@@ -1835,6 +1512,11 @@
      "sdk": {
       "aisdk": "@ai-sdk/openai",
       "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
      }
     },
     "messages": {
@@ -1842,15 +1524,20 @@
      "sdk": {
       "aisdk": "@ai-sdk/anthropic",
       "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
      }
     }
    },
    "open_weights": true,
-   "last_updated": "2026-09-21"
+   "last_updated": "2026-08-12"
   },
-  "accounts/fireworks/routers/qwen-max-latest": {
-   "id": "accounts/fireworks/routers/qwen-max-latest",
-   "name": "Qwen Max Latest (Qwen3.8 Max)",
+  "accounts/fireworks/models/qwen3p8-max": {
+   "id": "accounts/fireworks/models/qwen3p8-max",
+   "name": "Qwen3.8 Max",
    "description": "2.4-trillion-parameter MoE flagship for coding, professional work, multimodal understanding, and long-horizon agentic workflows",
    "type": "chat",
    "family": "qwen",
@@ -1969,17 +1656,15 @@
     }
    }
   },
-  "accounts/fireworks/routers/kimi-latest": {
-   "id": "accounts/fireworks/routers/kimi-latest",
-   "name": "Kimi Latest",
-   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
-   "type": "chat",
-   "family": "kimi-k3",
-   "canonical_id": "moonshotai/kimi-k3",
-   "release_date": "2026-07-16",
+  "accounts/fireworks/models/rune": {
+   "id": "accounts/fireworks/models/rune",
+   "name": "Rune 26B-A4B",
+   "description": "Open-weight System One decision model on Gemma 4 26B-A4B that answers up to 256 typed questions about a document with calibrated probabilities in one pass",
+   "type": "decision",
+   "canonical_id": "surogate/rune-26b-a4b",
+   "release_date": "2026-09-21",
    "limit": {
-    "context": 1048576,
-    "output": 1048576
+    "context": 262144
    },
    "capabilities": {
     "cache": {
@@ -1988,8 +1673,83 @@
     "temperature": false,
     "top_k": false,
     "top_p": false,
-    "structured_output": true,
     "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.042,
+      "cache": {
+       "read": 0.0084
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "decision"
+    ]
+   },
+   "api": {
+    "systemone": {
+     "base_url": "https://api.fireworks.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/typesafe-ai",
+      "opencodeai": "@opencode/ai/providers/typesafe-ai/decisions"
+     }
+    },
+    "responses": {
+     "base_url": "https://api.fireworks.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     }
+    },
+    "messages": {
+     "base_url": "https://api.fireworks.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-09-21"
+  },
+  "accounts/fireworks/routers/deepseek-flash-latest": {
+   "id": "accounts/fireworks/routers/deepseek-flash-latest",
+   "name": "DeepSeek Flash Latest",
+   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
+   "type": "chat",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
+   "release_date": "2026-10-17",
+   "limit": {
+    "context": 1000000,
+    "output": 384000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": true,
     "effort_updates": false,
     "tools": {
      "supported": true
@@ -1999,7 +1759,6 @@
      "toggle": true,
      "effort": [
       "low",
-      "medium",
       "high",
       "max"
      ]
@@ -2008,13 +1767,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 3,
+      "price": 0.3,
       "cache": {
-       "read": 0.3
+       "read": 0.006
       }
      },
      "output": {
-      "price": 15
+      "price": 1.2
      }
     },
     "multipliers": [
@@ -2034,8 +1793,7 @@
      "image/jpeg",
      "image/png",
      "image/gif",
-     "image/webp",
-     "image/bmp"
+     "image/webp"
     ],
     "output": [
      "text"
@@ -2049,7 +1807,6 @@
       "opencodeai": "@opencode/ai/providers/fireworks"
      },
      "capabilities": {
-      "system_updates": true,
       "tools": {
        "updates": false
       }
@@ -2084,7 +1841,8 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2026-07-16",
+   "knowledge": "2025-05",
+   "last_updated": "2026-10-17",
    "experimental": {
     "modes": {
      "priority": {
@@ -2094,6 +1852,321 @@
      }
     }
    }
+  },
+  "accounts/fireworks/routers/deepseek-v4p1-flash-1017-spot": {
+   "id": "accounts/fireworks/routers/deepseek-v4p1-flash-1017-spot",
+   "name": "DeepSeek V4.1 Flash 1017 Spot",
+   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
+   "type": "chat",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
+   "release_date": "2026-10-17",
+   "limit": {
+    "context": 1000000,
+    "output": 384000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": true,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.21,
+      "cache": {
+       "read": 0.0042
+      }
+     },
+     "output": {
+      "price": 0.84
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.fireworks.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/fireworks"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "responses": {
+     "base_url": "https://api.fireworks.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://api.fireworks.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-10-17"
+  },
+  "accounts/fireworks/routers/deepseek-v4p1-flash-1017-ultrafast": {
+   "id": "accounts/fireworks/routers/deepseek-v4p1-flash-1017-ultrafast",
+   "name": "DeepSeek V4.1 Flash 1017 Ultra-fast",
+   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
+   "type": "chat",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
+   "release_date": "2026-10-17",
+   "limit": {
+    "context": 1000000,
+    "output": 384000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": true,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2.4,
+      "cache": {
+       "read": 0.048
+      }
+     },
+     "output": {
+      "price": 9.6
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.fireworks.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/fireworks"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "responses": {
+     "base_url": "https://api.fireworks.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://api.fireworks.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-10-17"
+  },
+  "accounts/fireworks/routers/deepseek-v4p1-flash-spot": {
+   "id": "accounts/fireworks/routers/deepseek-v4p1-flash-spot",
+   "name": "DeepSeek V4.1 Flash Spot",
+   "description": "DeepSeek V4.1 Flash model for reasoning and agentic coding",
+   "type": "chat",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4.1-flash",
+   "release_date": "2026-09-10",
+   "limit": {
+    "context": 1000000,
+    "output": 384000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": true,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.21,
+      "cache": {
+       "read": 0.0042
+      }
+     },
+     "output": {
+      "price": 0.84
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.fireworks.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/fireworks"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "responses": {
+     "base_url": "https://api.fireworks.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://api.fireworks.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-09-10"
   },
   "accounts/fireworks/routers/glm-5p3-fast": {
    "id": "accounts/fireworks/routers/glm-5p3-fast",
@@ -2193,113 +2266,6 @@
    },
    "open_weights": true,
    "last_updated": "2026-08-14"
-  },
-  "accounts/fireworks/routers/kimi-k3-spot": {
-   "id": "accounts/fireworks/routers/kimi-k3-spot",
-   "name": "Kimi K3 Spot",
-   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
-   "type": "chat",
-   "family": "kimi-k3",
-   "canonical_id": "moonshotai/kimi-k3",
-   "release_date": "2026-07-16",
-   "limit": {
-    "context": 1048576,
-    "output": 1048576
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2.1,
-      "cache": {
-       "read": 0.21
-      }
-     },
-     "output": {
-      "price": 10.5
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.fireworks.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/fireworks"
-     },
-     "capabilities": {
-      "system_updates": true,
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    },
-    "responses": {
-     "base_url": "https://api.fireworks.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.fireworks.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-07-16"
   },
   "accounts/fireworks/routers/glm-5p3-spot": {
    "id": "accounts/fireworks/routers/glm-5p3-spot",
@@ -2619,344 +2585,6 @@
     }
    }
   },
-  "accounts/fireworks/routers/kimi-k3-fast": {
-   "id": "accounts/fireworks/routers/kimi-k3-fast",
-   "name": "Kimi K3 Fast",
-   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
-   "type": "chat",
-   "family": "kimi-k3",
-   "canonical_id": "moonshotai/kimi-k3",
-   "release_date": "2026-07-16",
-   "limit": {
-    "context": 1048576,
-    "output": 1048576
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 4.5,
-      "cache": {
-       "read": 0.45
-      }
-     },
-     "output": {
-      "price": 22.5
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.fireworks.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/fireworks"
-     },
-     "capabilities": {
-      "system_updates": true,
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    },
-    "responses": {
-     "base_url": "https://api.fireworks.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.fireworks.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-07-16"
-  },
-  "accounts/fireworks/routers/kimi-fast-latest": {
-   "id": "accounts/fireworks/routers/kimi-fast-latest",
-   "name": "Kimi Fast Latest",
-   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
-   "type": "chat",
-   "family": "kimi-k3",
-   "canonical_id": "moonshotai/kimi-k3",
-   "release_date": "2026-07-16",
-   "limit": {
-    "context": 1048576,
-    "output": 1048576
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 4.5,
-      "cache": {
-       "read": 0.45
-      }
-     },
-     "output": {
-      "price": 22.5
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.fireworks.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/fireworks"
-     },
-     "capabilities": {
-      "system_updates": true,
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    },
-    "responses": {
-     "base_url": "https://api.fireworks.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.fireworks.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-07-16"
-  },
-  "accounts/fireworks/routers/deepseek-flash-latest": {
-   "id": "accounts/fireworks/routers/deepseek-flash-latest",
-   "name": "DeepSeek Flash Latest",
-   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
-   "type": "chat",
-   "family": "deepseek-flash",
-   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
-   "release_date": "2026-10-17",
-   "limit": {
-    "context": 1000000,
-    "output": 384000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": true,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.3,
-      "cache": {
-       "read": 0.006
-      }
-     },
-     "output": {
-      "price": 1.2
-     }
-    },
-    "multipliers": [
-     {
-      "when": {
-       "service_tier": {
-        "equals": "priority"
-       }
-      },
-      "factor": 1.25
-     }
-    ]
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.fireworks.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/fireworks"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    },
-    "responses": {
-     "base_url": "https://api.fireworks.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://api.fireworks.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-10-17",
-   "experimental": {
-    "modes": {
-     "priority": {
-      "body": {
-       "service_tier": "priority"
-      }
-     }
-    }
-   }
-  },
   "accounts/fireworks/routers/glm-latest": {
    "id": "accounts/fireworks/routers/glm-latest",
    "name": "GLM Latest",
@@ -3075,27 +2703,27 @@
     }
    }
   },
-  "accounts/fireworks/routers/deepseek-v4p1-flash-spot": {
-   "id": "accounts/fireworks/routers/deepseek-v4p1-flash-spot",
-   "name": "DeepSeek V4.1 Flash Spot",
-   "description": "DeepSeek V4.1 Flash model for reasoning and agentic coding",
+  "accounts/fireworks/routers/kimi-fast-latest": {
+   "id": "accounts/fireworks/routers/kimi-fast-latest",
+   "name": "Kimi Fast Latest",
+   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
    "type": "chat",
-   "family": "deepseek-flash",
-   "canonical_id": "deepseek/deepseek-v4.1-flash",
-   "release_date": "2026-09-10",
+   "family": "kimi-k3",
+   "canonical_id": "moonshotai/kimi-k3",
+   "release_date": "2026-07-16",
    "limit": {
-    "context": 1000000,
-    "output": 384000
+    "context": 1048576,
+    "output": 1048576
    },
    "capabilities": {
     "cache": {
      "implicit": true
     },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
     "structured_output": true,
-    "system_updates": true,
+    "system_updates": false,
     "effort_updates": false,
     "tools": {
      "supported": true
@@ -3105,6 +2733,7 @@
      "toggle": true,
      "effort": [
       "low",
+      "medium",
       "high",
       "max"
      ]
@@ -3113,13 +2742,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.21,
+      "price": 4.5,
       "cache": {
-       "read": 0.0042
+       "read": 0.45
       }
      },
      "output": {
-      "price": 0.84
+      "price": 22.5
      }
     }
    },
@@ -3129,7 +2758,8 @@
      "image/jpeg",
      "image/png",
      "image/gif",
-     "image/webp"
+     "image/webp",
+     "image/bmp"
     ],
     "output": [
      "text"
@@ -3143,6 +2773,7 @@
       "opencodeai": "@opencode/ai/providers/fireworks"
      },
      "capabilities": {
+      "system_updates": true,
       "tools": {
        "updates": false
       }
@@ -3177,8 +2808,347 @@
     }
    },
    "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-09-10"
+   "last_updated": "2026-07-16"
+  },
+  "accounts/fireworks/routers/kimi-k3-fast": {
+   "id": "accounts/fireworks/routers/kimi-k3-fast",
+   "name": "Kimi K3 Fast",
+   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
+   "type": "chat",
+   "family": "kimi-k3",
+   "canonical_id": "moonshotai/kimi-k3",
+   "release_date": "2026-07-16",
+   "limit": {
+    "context": 1048576,
+    "output": 1048576
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 4.5,
+      "cache": {
+       "read": 0.45
+      }
+     },
+     "output": {
+      "price": 22.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.fireworks.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/fireworks"
+     },
+     "capabilities": {
+      "system_updates": true,
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "responses": {
+     "base_url": "https://api.fireworks.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://api.fireworks.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-07-16"
+  },
+  "accounts/fireworks/routers/kimi-k3-spot": {
+   "id": "accounts/fireworks/routers/kimi-k3-spot",
+   "name": "Kimi K3 Spot",
+   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
+   "type": "chat",
+   "family": "kimi-k3",
+   "canonical_id": "moonshotai/kimi-k3",
+   "release_date": "2026-07-16",
+   "limit": {
+    "context": 1048576,
+    "output": 1048576
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2.1,
+      "cache": {
+       "read": 0.21
+      }
+     },
+     "output": {
+      "price": 10.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.fireworks.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/fireworks"
+     },
+     "capabilities": {
+      "system_updates": true,
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "responses": {
+     "base_url": "https://api.fireworks.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://api.fireworks.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-07-16"
+  },
+  "accounts/fireworks/routers/kimi-latest": {
+   "id": "accounts/fireworks/routers/kimi-latest",
+   "name": "Kimi Latest",
+   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
+   "type": "chat",
+   "family": "kimi-k3",
+   "canonical_id": "moonshotai/kimi-k3",
+   "release_date": "2026-07-16",
+   "limit": {
+    "context": 1048576,
+    "output": 1048576
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 3,
+      "cache": {
+       "read": 0.3
+      }
+     },
+     "output": {
+      "price": 15
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": 1.25
+     }
+    ]
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.fireworks.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/fireworks"
+     },
+     "capabilities": {
+      "system_updates": true,
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "responses": {
+     "base_url": "https://api.fireworks.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://api.fireworks.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-07-16",
+   "experimental": {
+    "modes": {
+     "priority": {
+      "body": {
+       "service_tier": "priority"
+      }
+     }
+    }
+   }
   },
   "accounts/fireworks/routers/minimax-latest": {
    "id": "accounts/fireworks/routers/minimax-latest",
@@ -3298,72 +3268,141 @@
     }
    }
   },
-  "WhereIsAI/UAE-Large-V1": {
-   "id": "WhereIsAI/UAE-Large-V1",
-   "name": "UAE Large V1",
-   "description": "English text embedding model trained with angle-optimized contrastive learning",
-   "type": "embedding",
-   "canonical_id": "whereisai/uae-large-v1",
-   "release_date": "2023-12-04",
+  "accounts/fireworks/routers/qwen-max-latest": {
+   "id": "accounts/fireworks/routers/qwen-max-latest",
+   "name": "Qwen Max Latest (Qwen3.8 Max)",
+   "description": "2.4-trillion-parameter MoE flagship for coding, professional work, multimodal understanding, and long-horizon agentic workflows",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.8-max",
+   "release_date": "2026-08-03",
    "limit": {
-    "context": 512,
-    "output": 0
+    "context": 262144,
+    "output": 131072
    },
    "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
-     "supported": false
+     "supported": true
     },
     "reasoning": {
-     "supported": false
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "xhigh"
+     ]
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.016
+      "price": 2,
+      "cache": {
+       "read": 0.25
+      }
      },
      "output": {
-      "price": 0
+      "price": 6
      }
-    }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": 1.5
+     }
+    ]
    },
    "modalities": {
     "input": [
-     "text"
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp"
     ],
     "output": [
-     "embedding"
+     "text"
     ]
    },
    "api": {
-    "embeddings": {
+    "chat-completions": {
      "base_url": "https://api.fireworks.ai/inference/v1",
      "sdk": {
       "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/fireworks/embeddings"
+      "opencodeai": "@opencode/ai/providers/fireworks"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://api.fireworks.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://api.fireworks.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
      }
     }
    },
-   "open_weights": true,
-   "last_updated": "2023-12-04"
+   "open_weights": false,
+   "last_updated": "2026-08-03",
+   "experimental": {
+    "modes": {
+     "priority": {
+      "body": {
+       "service_tier": "priority"
+      }
+     }
+    }
+   }
   },
-  "nomic-ai/nomic-embed-text-v1.5": {
-   "id": "nomic-ai/nomic-embed-text-v1.5",
-   "name": "Nomic Embed Text v1.5",
-   "description": "Long-context open text embedding model with resizable output dimensions",
-   "type": "embedding",
-   "canonical_id": "nomic-ai/nomic-embed-text-v1.5",
-   "release_date": "2024-02-10",
+  "accounts/fireworks/routers/rune": {
+   "id": "accounts/fireworks/routers/rune",
+   "name": "Rune 26B-A4B",
+   "description": "Open-weight System One decision model on Gemma 4 26B-A4B that answers up to 256 typed questions about a document with calibrated probabilities in one pass",
+   "type": "decision",
+   "canonical_id": "surogate/rune-26b-a4b",
+   "release_date": "2026-09-21",
    "limit": {
-    "context": 8192,
-    "output": 0
+    "context": 262144
    },
    "capabilities": {
+    "cache": {
+     "implicit": true
+    },
     "temperature": false,
     "top_k": false,
     "top_p": false,
@@ -3379,7 +3418,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.008
+      "price": 0.042,
+      "cache": {
+       "read": 0.0084
+      }
      },
      "output": {
       "price": 0
@@ -3391,74 +3433,34 @@
      "text"
     ],
     "output": [
-     "embedding"
+     "decision"
     ]
    },
    "api": {
-    "embeddings": {
+    "systemone": {
      "base_url": "https://api.fireworks.ai/inference/v1",
      "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/fireworks/embeddings"
+      "aisdk": "@ai-sdk/typesafe-ai",
+      "opencodeai": "@opencode/ai/providers/typesafe-ai/decisions"
      }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2024-02-10"
-  },
-  "nomic-ai/nomic-embed-text-v1": {
-   "id": "nomic-ai/nomic-embed-text-v1",
-   "name": "Nomic Embed Text v1",
-   "description": "Long-context open text embedding model for retrieval and semantic similarity",
-   "type": "embedding",
-   "canonical_id": "nomic-ai/nomic-embed-text-v1",
-   "release_date": "2024-01-31",
-   "limit": {
-    "context": 8192,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
     },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.008
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "embedding"
-    ]
-   },
-   "api": {
-    "embeddings": {
+    "responses": {
      "base_url": "https://api.fireworks.ai/inference/v1",
      "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/fireworks/embeddings"
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     }
+    },
+    "messages": {
+     "base_url": "https://api.fireworks.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
      }
     }
    },
    "open_weights": true,
-   "last_updated": "2024-01-31"
+   "last_updated": "2026-09-21"
   },
   "mixedbread-ai/mxbai-embed-large-v1": {
    "id": "mixedbread-ai/mxbai-embed-large-v1",
@@ -3514,15 +3516,15 @@
    "open_weights": true,
    "last_updated": "2024-03-07"
   },
-  "thenlper/gte-large": {
-   "id": "thenlper/gte-large",
-   "name": "GTE Large",
-   "description": "English text embedding model producing 1024-dimensional vectors",
+  "nomic-ai/nomic-embed-text-v1": {
+   "id": "nomic-ai/nomic-embed-text-v1",
+   "name": "Nomic Embed Text v1",
+   "description": "Long-context open text embedding model for retrieval and semantic similarity",
    "type": "embedding",
-   "canonical_id": "thenlper/gte-large",
-   "release_date": "2023-07",
+   "canonical_id": "nomic-ai/nomic-embed-text-v1",
+   "release_date": "2024-01-31",
    "limit": {
-    "context": 512,
+    "context": 8192,
     "output": 0
    },
    "capabilities": {
@@ -3541,7 +3543,7 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.016
+      "price": 0.008
      },
      "output": {
       "price": 0
@@ -3566,7 +3568,61 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2023-07"
+   "last_updated": "2024-01-31"
+  },
+  "nomic-ai/nomic-embed-text-v1.5": {
+   "id": "nomic-ai/nomic-embed-text-v1.5",
+   "name": "Nomic Embed Text v1.5",
+   "description": "Long-context open text embedding model with resizable output dimensions",
+   "type": "embedding",
+   "canonical_id": "nomic-ai/nomic-embed-text-v1.5",
+   "release_date": "2024-02-10",
+   "limit": {
+    "context": 8192,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.008
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "api": {
+    "embeddings": {
+     "base_url": "https://api.fireworks.ai/inference/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/fireworks/embeddings"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2024-02-10"
   },
   "thenlper/gte-base": {
    "id": "thenlper/gte-base",
@@ -3622,14 +3678,13 @@
    "open_weights": true,
    "last_updated": "2023-07"
   },
-  "BAAI/bge-base-en-v1.5": {
-   "id": "BAAI/bge-base-en-v1.5",
-   "name": "BGE Base EN v1.5",
-   "description": "English text embedding model for retrieval and semantic search",
+  "thenlper/gte-large": {
+   "id": "thenlper/gte-large",
+   "name": "GTE Large",
+   "description": "English text embedding model producing 1024-dimensional vectors",
    "type": "embedding",
-   "family": "bge",
-   "canonical_id": "baai/bge-base-en-v1.5",
-   "release_date": "2023-09-12",
+   "canonical_id": "thenlper/gte-large",
+   "release_date": "2023-07",
    "limit": {
     "context": 512,
     "output": 0
@@ -3650,7 +3705,7 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.008
+      "price": 0.016
      },
      "output": {
       "price": 0
@@ -3675,62 +3730,7 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2023-09-12"
-  },
-  "BAAI/bge-small-en-v1.5": {
-   "id": "BAAI/bge-small-en-v1.5",
-   "name": "BGE Small EN v1.5",
-   "description": "Small English text embedding model producing 384-dimensional vectors",
-   "type": "embedding",
-   "family": "bge",
-   "canonical_id": "baai/bge-small-en-v1.5",
-   "release_date": "2023-09-12",
-   "limit": {
-    "context": 512,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.008
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "embedding"
-    ]
-   },
-   "api": {
-    "embeddings": {
-     "base_url": "https://api.fireworks.ai/inference/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/fireworks/embeddings"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2023-09-12"
+   "last_updated": "2023-07"
   }
  }
 }

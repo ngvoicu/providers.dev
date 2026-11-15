@@ -6,8 +6,8 @@
   "INFERENCE_COOP_API_KEY"
  ],
  "models": {
-  "tinfoil/deepseek-v4-1-flash": {
-   "id": "tinfoil/deepseek-v4-1-flash",
+  "greenpt/deepseek-v4.1-flash": {
+   "id": "greenpt/deepseek-v4.1-flash",
    "name": "DeepSeek V4.1 Flash",
    "description": "DeepSeek V4.1 Flash model for reasoning and agentic coding",
    "type": "chat",
@@ -15,13 +15,10 @@
    "canonical_id": "deepseek/deepseek-v4.1-flash",
    "release_date": "2026-09-10",
    "limit": {
-    "context": 1048576,
+    "context": 1000000,
     "output": 384000
    },
    "capabilities": {
-    "cache": {
-     "implicit": true
-    },
     "temperature": true,
     "top_k": true,
     "top_p": true,
@@ -38,22 +35,20 @@
       "minimal",
       "low",
       "medium",
-      "high",
-      "xhigh",
-      "max"
+      "high"
      ]
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.65,
+      "price": 0.22,
       "cache": {
-       "read": 0.13
+       "read": 0.011
       }
      },
      "output": {
-      "price": 1.45
+      "price": 1.1
      }
     }
    },
@@ -87,16 +82,16 @@
    "knowledge": "2025-05",
    "last_updated": "2026-09-10"
   },
-  "tinfoil/gpt-oss-120b": {
-   "id": "tinfoil/gpt-oss-120b",
-   "name": "GPT OSS 120B",
-   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
+  "greenpt/glm-5.3": {
+   "id": "greenpt/glm-5.3",
+   "name": "GLM-5.3",
+   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
    "type": "chat",
-   "family": "gpt-oss",
-   "canonical_id": "openai/gpt-oss-120b",
-   "release_date": "2025-08-05",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.3",
+   "release_date": "2026-08-14",
    "limit": {
-    "context": 131072,
+    "context": 1000000,
     "output": 131072
    },
    "capabilities": {
@@ -112,6 +107,8 @@
     "reasoning": {
      "supported": true,
      "effort": [
+      "none",
+      "minimal",
       "low",
       "medium",
       "high"
@@ -121,83 +118,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.15
-     },
-     "output": {
-      "price": 0.6
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://gateway.inference.coop/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2024-06",
-   "last_updated": "2025-08-05"
-  },
-  "tinfoil/glm-5.3": {
-   "id": "tinfoil/glm-5.3",
-   "name": "GLM-5.3",
-   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
-   "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-5.3",
-   "release_date": "2026-08-14",
-   "limit": {
-    "context": 1048576,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.8,
+      "price": 1.1,
       "cache": {
-       "read": 0.45
+       "read": 0.275
       }
      },
      "output": {
-      "price": 5.75
+      "price": 4.4
      }
     }
    },
@@ -226,72 +153,23 @@
    "open_weights": true,
    "last_updated": "2026-08-14"
   },
-  "tinfoil/whisper-large-v3-turbo": {
-   "id": "tinfoil/whisper-large-v3-turbo",
-   "name": "Whisper Large v3 Turbo",
-   "description": "Speech transcription model for accurate audio-to-text and captioning workflows",
-   "type": "transcription",
-   "family": "whisper",
-   "canonical_id": "openai/whisper-large-v3-turbo",
-   "release_date": "2024-10-01",
-   "limit": {
-    "context": 448,
-    "output": 448
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "modalities": {
-    "input": [
-     "audio/flac",
-     "audio/mpeg",
-     "audio/mp4",
-     "audio/ogg",
-     "audio/wav",
-     "audio/webm"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "transcriptions": {
-     "base_url": "https://gateway.inference.coop/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/protocols/openai-transcription"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2024-10-01"
-  },
-  "regolo/qwen3.5-122b": {
-   "id": "regolo/qwen3.5-122b",
-   "name": "Qwen3.5-122B",
-   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
+  "greenpt/glm-5.3-flash": {
+   "id": "greenpt/glm-5.3-flash",
+   "name": "GLM-5.3-Flash",
+   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
    "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3.5-122b-a10b",
-   "release_date": "2026-02-23",
+   "family": "glm-flash",
+   "canonical_id": "zhipuai/glm-5.3-flash",
+   "release_date": "2026-08-26",
    "limit": {
-    "context": 262144,
-    "output": 16384
+    "context": 1000000,
+    "output": 131072
    },
    "capabilities": {
     "temperature": true,
     "top_k": true,
     "top_p": true,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -299,28 +177,31 @@
     },
     "reasoning": {
      "supported": true,
-     "toggle": true
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.7
+      "price": 0.11,
+      "cache": {
+       "read": 0.022
+      }
      },
      "output": {
-      "price": 3.94
+      "price": 0.44
      }
     }
    },
    "modalities": {
     "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic"
+     "text"
     ],
     "output": [
      "text"
@@ -341,7 +222,7 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2026-02-23"
+   "last_updated": "2026-08-26"
   },
   "regolo/apertus-70b": {
    "id": "regolo/apertus-70b",
@@ -460,23 +341,22 @@
    "open_weights": true,
    "last_updated": "2025-08-19"
   },
-  "greenpt/glm-5.3-flash": {
-   "id": "greenpt/glm-5.3-flash",
-   "name": "GLM-5.3-Flash",
-   "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
+  "regolo/qwen3.5-122b": {
+   "id": "regolo/qwen3.5-122b",
+   "name": "Qwen3.5-122B",
+   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
    "type": "chat",
-   "family": "glm-flash",
-   "canonical_id": "zhipuai/glm-5.3-flash",
-   "release_date": "2026-08-26",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.5-122b-a10b",
+   "release_date": "2026-02-23",
    "limit": {
-    "context": 1000000,
-    "output": 131072
+    "context": 262144,
+    "output": 16384
    },
    "capabilities": {
     "temperature": true,
     "top_k": true,
     "top_p": true,
-    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -484,31 +364,28 @@
     },
     "reasoning": {
      "supported": true,
-     "effort": [
-      "none",
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
+     "toggle": true
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.11,
-      "cache": {
-       "read": 0.022
-      }
+      "price": 0.7
      },
      "output": {
-      "price": 0.44
+      "price": 3.94
      }
     }
    },
    "modalities": {
     "input": [
-     "text"
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic"
     ],
     "output": [
      "text"
@@ -529,81 +406,10 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2026-08-26"
+   "last_updated": "2026-02-23"
   },
-  "greenpt/glm-5.3": {
-   "id": "greenpt/glm-5.3",
-   "name": "GLM-5.3",
-   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
-   "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-5.3",
-   "release_date": "2026-08-14",
-   "limit": {
-    "context": 1000000,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "minimal",
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.1,
-      "cache": {
-       "read": 0.275
-      }
-     },
-     "output": {
-      "price": 4.4
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://gateway.inference.coop/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-08-14"
-  },
-  "greenpt/deepseek-v4.1-flash": {
-   "id": "greenpt/deepseek-v4.1-flash",
+  "tinfoil/deepseek-v4-1-flash": {
+   "id": "tinfoil/deepseek-v4-1-flash",
    "name": "DeepSeek V4.1 Flash",
    "description": "DeepSeek V4.1 Flash model for reasoning and agentic coding",
    "type": "chat",
@@ -611,10 +417,13 @@
    "canonical_id": "deepseek/deepseek-v4.1-flash",
    "release_date": "2026-09-10",
    "limit": {
-    "context": 1000000,
+    "context": 1048576,
     "output": 384000
    },
    "capabilities": {
+    "cache": {
+     "implicit": true
+    },
     "temperature": true,
     "top_k": true,
     "top_p": true,
@@ -631,20 +440,22 @@
       "minimal",
       "low",
       "medium",
-      "high"
+      "high",
+      "xhigh",
+      "max"
      ]
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.22,
+      "price": 0.65,
       "cache": {
-       "read": 0.011
+       "read": 0.13
       }
      },
      "output": {
-      "price": 1.1
+      "price": 1.45
      }
     }
    },
@@ -677,6 +488,195 @@
    "open_weights": true,
    "knowledge": "2025-05",
    "last_updated": "2026-09-10"
+  },
+  "tinfoil/glm-5.3": {
+   "id": "tinfoil/glm-5.3",
+   "name": "GLM-5.3",
+   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.3",
+   "release_date": "2026-08-14",
+   "limit": {
+    "context": 1048576,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.8,
+      "cache": {
+       "read": 0.45
+      }
+     },
+     "output": {
+      "price": 5.75
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://gateway.inference.coop/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-14"
+  },
+  "tinfoil/gpt-oss-120b": {
+   "id": "tinfoil/gpt-oss-120b",
+   "name": "GPT OSS 120B",
+   "description": "Open GPT reasoning model for self-hosted agents and controllable deployments",
+   "type": "chat",
+   "family": "gpt-oss",
+   "canonical_id": "openai/gpt-oss-120b",
+   "release_date": "2025-08-05",
+   "limit": {
+    "context": 131072,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.15
+     },
+     "output": {
+      "price": 0.6
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://gateway.inference.coop/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-06",
+   "last_updated": "2025-08-05"
+  },
+  "tinfoil/whisper-large-v3-turbo": {
+   "id": "tinfoil/whisper-large-v3-turbo",
+   "name": "Whisper Large v3 Turbo",
+   "description": "Speech transcription model for accurate audio-to-text and captioning workflows",
+   "type": "transcription",
+   "family": "whisper",
+   "canonical_id": "openai/whisper-large-v3-turbo",
+   "release_date": "2024-10-01",
+   "limit": {
+    "context": 448,
+    "output": 448
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "modalities": {
+    "input": [
+     "audio/flac",
+     "audio/mpeg",
+     "audio/mp4",
+     "audio/ogg",
+     "audio/wav",
+     "audio/webm"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "transcriptions": {
+     "base_url": "https://gateway.inference.coop/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/protocols/openai-transcription"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2024-10-01"
   }
  }
 }

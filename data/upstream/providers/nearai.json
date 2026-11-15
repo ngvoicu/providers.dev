@@ -6,14 +6,415 @@
   "NEARAI_API_KEY"
  ],
  "models": {
-  "anthropic/claude-opus-4-7": {
-   "id": "anthropic/claude-opus-4-7",
-   "name": "Claude Opus 4.7",
-   "description": "Stronger Opus tier for advanced software work and high-stakes reasoning",
+  "Qwen/Qwen3-Embedding-0.6B": {
+   "id": "Qwen/Qwen3-Embedding-0.6B",
+   "name": "Qwen3 Embedding 0.6B",
+   "description": "Embedding model for semantic search, retrieval, clustering, and ranking pipelines",
+   "type": "embedding",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3-embedding-0.6b",
+   "release_date": "2025-06-05",
+   "limit": {
+    "context": 32768,
+    "output": 1024
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.01
+     },
+     "output": {
+      "price": 0.01
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "api": {
+    "embeddings": {
+     "base_url": "https://cloud-api.near.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-06-05"
+  },
+  "Qwen/Qwen3-Reranker-0.6B": {
+   "id": "Qwen/Qwen3-Reranker-0.6B",
+   "name": "Qwen3 Reranker 0.6B",
+   "description": "Reranking model for improving retrieval quality in search and recommendation systems",
+   "type": "reranking",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3-reranker-0.6b",
+   "release_date": "2025-06-05",
+   "limit": {
+    "context": 40960,
+    "output": 1024
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.01
+     },
+     "output": {
+      "price": 0.01
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "reranking"
+    ]
+   },
+   "api": {
+    "rerank": {
+     "base_url": "https://cloud-api.near.ai/v1",
+     "sdk": {}
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-06-05"
+  },
+  "Qwen/Qwen3-VL-30B-A3B-Instruct": {
+   "id": "Qwen/Qwen3-VL-30B-A3B-Instruct",
+   "name": "Qwen3-VL 30B-A3B Instruct",
+   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
    "type": "chat",
-   "family": "claude-opus",
-   "canonical_id": "anthropic/claude-opus-4-7",
-   "release_date": "2026-04-16",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3-vl-30b-a3b-instruct",
+   "release_date": "2025-10-04",
+   "limit": {
+    "context": 16384,
+    "output": 8192
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.15,
+      "cache": {
+       "read": 0.03
+      }
+     },
+     "output": {
+      "price": 0.55
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://cloud-api.near.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-10-04"
+  },
+  "Qwen/Qwen3.6-35B-A3B-FP8": {
+   "id": "Qwen/Qwen3.6-35B-A3B-FP8",
+   "name": "Qwen 3.6 35B A3B FP8",
+   "description": "Open multimodal Qwen MoE for local agents that need vision, audio, and code",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.6-35b-a3b",
+   "release_date": "2026-04-17",
+   "limit": {
+    "context": 262144,
+    "output": 8192
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.17,
+      "cache": {
+       "read": 0.056
+      }
+     },
+     "output": {
+      "price": 1.1
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://cloud-api.near.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-04-17"
+  },
+  "Qwen/Qwen3.8-27B": {
+   "id": "Qwen/Qwen3.8-27B",
+   "name": "Qwen3.8 27B",
+   "description": "Dense 27B vision-language model for coding, agent tasks, and image and video understanding",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.8-27b",
+   "release_date": "2026-08-14",
+   "limit": {
+    "context": 262144,
+    "output": 32768
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.04,
+      "cache": {
+       "read": 0.018
+      }
+     },
+     "output": {
+      "price": 1.35
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://cloud-api.near.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-14"
+  },
+  "Qwen/Qwen3.8-27B-abliterated": {
+   "id": "Qwen/Qwen3.8-27B-abliterated",
+   "name": "Qwen3.8 27B Abliterated",
+   "description": "NEAR AI's refusal-removed Qwen3.8 27B for security research, with vision, reasoning and tool use inside a private TEE",
+   "type": "chat",
+   "family": "qwen",
+   "release_date": "2026-10-29",
+   "limit": {
+    "context": 262144,
+    "output": 32768
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.04,
+      "cache": {
+       "read": 0.018
+      }
+     },
+     "output": {
+      "price": 1.35
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://cloud-api.near.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-10-29"
+  },
+  "anthropic/claude-fable-5": {
+   "id": "anthropic/claude-fable-5",
+   "name": "Claude Fable 5",
+   "description": "Claude model for creative writing, analysis, and controlled agent workflows",
+   "type": "chat",
+   "family": "claude-fable",
+   "canonical_id": "anthropic/claude-fable-5",
+   "release_date": "2026-06-09",
    "limit": {
     "context": 1000000,
     "output": 128000
@@ -28,21 +429,19 @@
      "supported": true
     },
     "reasoning": {
-     "supported": true,
-     "toggle": true
+     "supported": true
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 5,
+      "price": 10,
       "cache": {
-       "read": 0.5,
-       "write": 6.25
+       "read": 1
       }
      },
      "output": {
-      "price": 25
+      "price": 50
      }
     }
    },
@@ -52,8 +451,7 @@
      "image/jpeg",
      "image/png",
      "image/gif",
-     "image/webp",
-     "application/pdf"
+     "image/webp"
     ],
     "output": [
      "text"
@@ -75,7 +473,7 @@
    },
    "open_weights": false,
    "knowledge": "2026-01-31",
-   "last_updated": "2026-04-16"
+   "last_updated": "2026-06-09"
   },
   "anthropic/claude-fable-5-1": {
    "id": "anthropic/claude-fable-5-1",
@@ -149,74 +547,6 @@
    "knowledge": "2026-06",
    "last_updated": "2026-09-01"
   },
-  "anthropic/claude-opus-5": {
-   "id": "anthropic/claude-opus-5",
-   "name": "Claude Opus 5",
-   "description": "Strongest Claude Opus model for coding, agents, and professional work",
-   "type": "chat",
-   "family": "claude-opus",
-   "canonical_id": "anthropic/claude-opus-5",
-   "release_date": "2026-07-24",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 5,
-      "cache": {
-       "read": 0.5
-      }
-     },
-     "output": {
-      "price": 25
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://cloud-api.near.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-05",
-   "last_updated": "2026-07-24"
-  },
   "anthropic/claude-fable-5-2": {
    "id": "anthropic/claude-fable-5-2",
    "name": "Claude Fable 5.2",
@@ -289,88 +619,14 @@
    "knowledge": "2026-06",
    "last_updated": "2026-11-09"
   },
-  "anthropic/claude-sonnet-4-6": {
-   "id": "anthropic/claude-sonnet-4-6",
-   "name": "Claude Sonnet 4.6",
-   "description": "Claude workhorse for coding agents, careful analysis, and production cost control",
+  "anthropic/claude-haiku-4-5": {
+   "id": "anthropic/claude-haiku-4-5",
+   "name": "Claude Haiku 4.5 (latest)",
+   "description": "Fast Claude lane for lightweight agents, office tasks, and responsive chat",
    "type": "chat",
-   "family": "claude-sonnet",
-   "canonical_id": "anthropic/claude-sonnet-4-6",
-   "release_date": "2026-02-17",
-   "limit": {
-    "context": 1000000,
-    "output": 64000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "budget": {
-      "min": 1024
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 3,
-      "cache": {
-       "read": 0.3,
-       "write": 3.75
-      }
-     },
-     "output": {
-      "price": 15
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://cloud-api.near.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2026-03-13"
-  },
-  "anthropic/claude-sonnet-4-5": {
-   "id": "anthropic/claude-sonnet-4-5",
-   "name": "Claude Sonnet 4.5 (latest)",
-   "description": "Balanced Claude model for coding, analysis, agent workflows, and cost control",
-   "type": "chat",
-   "family": "claude-sonnet",
-   "canonical_id": "anthropic/claude-sonnet-4-5",
-   "release_date": "2025-09-29",
+   "family": "claude-haiku",
+   "canonical_id": "anthropic/claude-haiku-4-5",
+   "release_date": "2025-10-15",
    "limit": {
     "context": 200000,
     "output": 64000
@@ -395,14 +651,14 @@
    "cost": {
     "text": {
      "input": {
-      "price": 3,
+      "price": 1,
       "cache": {
-       "read": 0.3,
-       "write": 3.75
+       "read": 0.1,
+       "write": 1.25
       }
      },
      "output": {
-      "price": 15
+      "price": 5
      }
     }
    },
@@ -434,8 +690,8 @@
     }
    },
    "open_weights": false,
-   "knowledge": "2025-07-31",
-   "last_updated": "2025-09-29"
+   "knowledge": "2025-02-28",
+   "last_updated": "2025-10-15"
   },
   "anthropic/claude-haiku-5-5": {
    "id": "anthropic/claude-haiku-5-5",
@@ -539,160 +795,6 @@
    "knowledge": "2026-06",
    "last_updated": "2026-10-07"
   },
-  "anthropic/claude-sonnet-5-5": {
-   "id": "anthropic/claude-sonnet-5-5",
-   "name": "Claude Sonnet 5.5",
-   "description": "Fast Claude model for everyday coding, agents, and knowledge work",
-   "type": "chat",
-   "family": "claude-sonnet",
-   "canonical_id": "anthropic/claude-sonnet-5-5",
-   "release_date": "2026-09-28",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2,
-      "cache": {
-       "read": 0.1
-      }
-     },
-     "output": {
-      "price": 10
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://cloud-api.near.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-06",
-   "last_updated": "2026-09-28"
-  },
-  "anthropic/claude-haiku-4-5": {
-   "id": "anthropic/claude-haiku-4-5",
-   "name": "Claude Haiku 4.5 (latest)",
-   "description": "Fast Claude lane for lightweight agents, office tasks, and responsive chat",
-   "type": "chat",
-   "family": "claude-haiku",
-   "canonical_id": "anthropic/claude-haiku-4-5",
-   "release_date": "2025-10-15",
-   "limit": {
-    "context": 200000,
-    "output": 64000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "budget": {
-      "min": 1024
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1,
-      "cache": {
-       "read": 0.1,
-       "write": 1.25
-      }
-     },
-     "output": {
-      "price": 5
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://cloud-api.near.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-02-28",
-   "last_updated": "2025-10-15"
-  },
   "anthropic/claude-opus-4-6": {
    "id": "anthropic/claude-opus-4-6",
    "name": "Claude Opus 4.6",
@@ -766,6 +868,213 @@
    "open_weights": false,
    "knowledge": "2025-05-31",
    "last_updated": "2026-03-13"
+  },
+  "anthropic/claude-opus-4-7": {
+   "id": "anthropic/claude-opus-4-7",
+   "name": "Claude Opus 4.7",
+   "description": "Stronger Opus tier for advanced software work and high-stakes reasoning",
+   "type": "chat",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-4-7",
+   "release_date": "2026-04-16",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5,
+       "write": 6.25
+      }
+     },
+     "output": {
+      "price": 25
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://cloud-api.near.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-01-31",
+   "last_updated": "2026-04-16"
+  },
+  "anthropic/claude-opus-4-8": {
+   "id": "anthropic/claude-opus-4-8",
+   "name": "Claude Opus 4.8",
+   "description": "Top Claude Opus tier for the hardest reasoning, coding, and long-horizon agents",
+   "type": "chat",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-4-8",
+   "release_date": "2026-05-28",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5
+      }
+     },
+     "output": {
+      "price": 25
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://cloud-api.near.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-01",
+   "last_updated": "2026-05-28"
+  },
+  "anthropic/claude-opus-5": {
+   "id": "anthropic/claude-opus-5",
+   "name": "Claude Opus 5",
+   "description": "Strongest Claude Opus model for coding, agents, and professional work",
+   "type": "chat",
+   "family": "claude-opus",
+   "canonical_id": "anthropic/claude-opus-5",
+   "release_date": "2026-07-24",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5
+      }
+     },
+     "output": {
+      "price": 25
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://cloud-api.near.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-05",
+   "last_updated": "2026-07-24"
   },
   "anthropic/claude-opus-5-5": {
    "id": "anthropic/claude-opus-5-5",
@@ -847,6 +1156,154 @@
    "knowledge": "2026-06",
    "last_updated": "2026-09-22"
   },
+  "anthropic/claude-sonnet-4-5": {
+   "id": "anthropic/claude-sonnet-4-5",
+   "name": "Claude Sonnet 4.5 (latest)",
+   "description": "Balanced Claude model for coding, analysis, agent workflows, and cost control",
+   "type": "chat",
+   "family": "claude-sonnet",
+   "canonical_id": "anthropic/claude-sonnet-4-5",
+   "release_date": "2025-09-29",
+   "limit": {
+    "context": 200000,
+    "output": 64000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "budget": {
+      "min": 1024
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 3,
+      "cache": {
+       "read": 0.3,
+       "write": 3.75
+      }
+     },
+     "output": {
+      "price": 15
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://cloud-api.near.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-07-31",
+   "last_updated": "2025-09-29"
+  },
+  "anthropic/claude-sonnet-4-6": {
+   "id": "anthropic/claude-sonnet-4-6",
+   "name": "Claude Sonnet 4.6",
+   "description": "Claude workhorse for coding agents, careful analysis, and production cost control",
+   "type": "chat",
+   "family": "claude-sonnet",
+   "canonical_id": "anthropic/claude-sonnet-4-6",
+   "release_date": "2026-02-17",
+   "limit": {
+    "context": 1000000,
+    "output": 64000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "budget": {
+      "min": 1024
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 3,
+      "cache": {
+       "read": 0.3,
+       "write": 3.75
+      }
+     },
+     "output": {
+      "price": 15
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://cloud-api.near.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-03-13"
+  },
   "anthropic/claude-sonnet-5": {
    "id": "anthropic/claude-sonnet-5",
    "name": "Claude Sonnet 5",
@@ -915,14 +1372,14 @@
    "knowledge": "2026-01-31",
    "last_updated": "2026-06-30"
   },
-  "anthropic/claude-opus-4-8": {
-   "id": "anthropic/claude-opus-4-8",
-   "name": "Claude Opus 4.8",
-   "description": "Top Claude Opus tier for the hardest reasoning, coding, and long-horizon agents",
+  "anthropic/claude-sonnet-5-5": {
+   "id": "anthropic/claude-sonnet-5-5",
+   "name": "Claude Sonnet 5.5",
+   "description": "Fast Claude model for everyday coding, agents, and knowledge work",
    "type": "chat",
-   "family": "claude-opus",
-   "canonical_id": "anthropic/claude-opus-4-8",
-   "release_date": "2026-05-28",
+   "family": "claude-sonnet",
+   "canonical_id": "anthropic/claude-sonnet-5-5",
+   "release_date": "2026-09-28",
    "limit": {
     "context": 1000000,
     "output": 128000
@@ -937,19 +1394,26 @@
      "supported": true
     },
     "reasoning": {
-     "supported": true
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 5,
+      "price": 2,
       "cache": {
-       "read": 0.5
+       "read": 0.1
       }
      },
      "output": {
-      "price": 25
+      "price": 10
      }
     }
    },
@@ -959,7 +1423,8 @@
      "image/jpeg",
      "image/png",
      "image/gif",
-     "image/webp"
+     "image/webp",
+     "application/pdf"
     ],
     "output": [
      "text"
@@ -974,26 +1439,30 @@
      },
      "capabilities": {
       "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
        "updates": false
       }
      }
     }
    },
    "open_weights": false,
-   "knowledge": "2026-01",
-   "last_updated": "2026-05-28"
+   "knowledge": "2026-06",
+   "last_updated": "2026-09-28"
   },
-  "anthropic/claude-fable-5": {
-   "id": "anthropic/claude-fable-5",
-   "name": "Claude Fable 5",
-   "description": "Claude model for creative writing, analysis, and controlled agent workflows",
-   "type": "chat",
-   "family": "claude-fable",
-   "canonical_id": "anthropic/claude-fable-5",
-   "release_date": "2026-06-09",
+  "black-forest-labs/FLUX.2-klein-4B": {
+   "id": "black-forest-labs/FLUX.2-klein-4B",
+   "name": "FLUX.2 Klein 4B",
+   "description": "Image model for prompt-driven generation, editing, and visual design workflows",
+   "type": "image",
+   "family": "flux",
+   "canonical_id": "black-forest-labs/flux-2-klein-4b",
+   "release_date": "2026-01-15",
    "limit": {
-    "context": 1000000,
-    "output": 128000
+    "context": 0,
+    "output": 0
    },
    "capabilities": {
     "temperature": false,
@@ -1002,72 +1471,64 @@
     "system_updates": false,
     "effort_updates": false,
     "tools": {
-     "supported": true
+     "supported": false
     },
     "reasoning": {
-     "supported": true
+     "supported": false
     }
    },
    "cost": {
-    "text": {
-     "input": {
-      "price": 10,
-      "cache": {
-       "read": 1
-      }
-     },
+    "image": {
      "output": {
-      "price": 50
+      "unit": "image",
+      "price": 0.012
      }
     }
    },
    "modalities": {
     "input": [
      "text",
-     "image/jpeg",
      "image/png",
-     "image/gif",
+     "image/jpeg",
      "image/webp"
     ],
     "output": [
-     "text"
+     "image/jpeg",
+     "image/png",
+     "image/webp"
     ]
    },
    "api": {
-    "chat-completions": {
+    "images": {
      "base_url": "https://cloud-api.near.ai/v1",
      "sdk": {
       "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
+      "opencodeai": "@opencode/ai/providers/openai-compatible/images"
      }
     }
    },
-   "open_weights": false,
-   "knowledge": "2026-01-31",
-   "last_updated": "2026-06-09"
+   "open_weights": true,
+   "last_updated": "2026-01-15"
   },
-  "moonshotai/kimi-k3": {
-   "id": "moonshotai/kimi-k3",
-   "name": "Kimi K3",
-   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
+  "deepseek-ai/DeepSeek-V4.1-Flash-1017": {
+   "id": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
+   "name": "DeepSeek V4.1 Flash 1017",
+   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
    "type": "chat",
-   "family": "kimi-k3",
-   "canonical_id": "moonshotai/kimi-k3",
-   "release_date": "2026-07-16",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
+   "release_date": "2026-10-17",
    "limit": {
-    "context": 1048576,
-    "output": 1048576
+    "context": 1000000,
+    "output": 384000
    },
    "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -1086,13 +1547,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 3.3,
+      "price": 0.3,
       "cache": {
-       "read": 0.33
+       "read": 0.006
       }
      },
      "output": {
-      "price": 16.5
+      "price": 1.2
      }
     }
    },
@@ -1122,19 +1583,94 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2026-07-16"
+   "knowledge": "2025-05",
+   "last_updated": "2026-10-17"
   },
-  "moonshotai/kimi-k2.6": {
-   "id": "moonshotai/kimi-k2.6",
-   "name": "Kimi K2.6",
-   "description": "Multimodal Kimi workhorse for agent loops, coding tasks, and visual context",
+  "deepseek-ai/DeepSeek-V4.1-Flash-1017-abliterated": {
+   "id": "deepseek-ai/DeepSeek-V4.1-Flash-1017-abliterated",
+   "name": "DeepSeek V4.1 Flash 1017 Abliterated",
+   "description": "NEAR AI's refusal-removed DeepSeek V4.1 Flash 1017 for security research, with text-only reasoning and tool use inside a private TEE",
    "type": "chat",
-   "family": "kimi-k2",
-   "canonical_id": "moonshotai/kimi-k2.6",
-   "release_date": "2026-04-20",
+   "family": "deepseek-flash",
+   "release_date": "2026-10-29",
    "limit": {
-    "context": 262144,
-    "output": 262144
+    "context": 1048576,
+    "output": 384000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.3,
+      "cache": {
+       "read": 0.006
+      }
+     },
+     "output": {
+      "price": 1.2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://cloud-api.near.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-10-29"
+  },
+  "deepseek/deepseek-v3.2": {
+   "id": "deepseek/deepseek-v3.2",
+   "name": "DeepSeek V3.2",
+   "description": "Hybrid-reasoning DeepSeek model with thinking and non-thinking modes, sparse attention, and tool-use",
+   "type": "chat",
+   "family": "deepseek",
+   "canonical_id": "deepseek/deepseek-v3.2",
+   "release_date": "2025-12-01",
+   "limit": {
+    "context": 128000,
+    "output": 64000
    },
    "capabilities": {
     "temperature": true,
@@ -1154,13 +1690,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.81,
+      "price": 1.1,
       "cache": {
-       "read": 0.41
+       "read": 0.55
       }
      },
      "output": {
-      "price": 3.85
+      "price": 1.1
      }
     }
    },
@@ -1190,25 +1726,26 @@
     }
    },
    "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-04-20"
+   "knowledge": "2024-07",
+   "last_updated": "2025-12-01"
   },
-  "moonshotai/kimi-k3.1-pro": {
-   "id": "moonshotai/kimi-k3.1-pro",
-   "name": "Kimi K3.1 Pro",
-   "description": "Multimodal Kimi model with a 1M-token context window and always-on reasoning, for coding, 3D creation and financial research",
+  "deepseek/deepseek-v4.1-flash-1017": {
+   "id": "deepseek/deepseek-v4.1-flash-1017",
+   "name": "DeepSeek V4.1 Flash 1017",
+   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
    "type": "chat",
-   "family": "kimi-k3",
-   "canonical_id": "moonshotai/kimi-k3.1-pro",
-   "release_date": "2026-10-23",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
+   "release_date": "2026-10-17",
    "limit": {
-    "context": 1048576,
-    "output": 1048576
+    "context": 1000000,
+    "output": 384000
    },
    "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -1216,27 +1753,24 @@
     },
     "reasoning": {
      "supported": true,
+     "toggle": true,
      "effort": [
       "low",
       "high",
       "max"
-     ],
-     "default": {
-      "type": "effort",
-      "value": "max"
-     }
+     ]
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 2,
+      "price": 0.3,
       "cache": {
-       "read": 0.2
+       "read": 0.006
       }
      },
      "output": {
-      "price": 10
+      "price": 1.2
      }
     }
    },
@@ -1246,10 +1780,7 @@
      "image/jpeg",
      "image/png",
      "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/heic",
-     "image/heif"
+     "image/webp"
     ],
     "output": [
      "text"
@@ -1266,259 +1797,12 @@
       "tools": {
        "updates": false
       }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
      }
     }
    },
    "open_weights": true,
-   "last_updated": "2026-10-23"
-  },
-  "qwen/qwen3.7-max": {
-   "id": "qwen/qwen3.7-max",
-   "name": "Qwen3.7 Max",
-   "description": "Qwen frontier model tuned for agent frameworks, coding assistants, and long tasks",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3.7-max",
-   "release_date": "2026-05-21",
-   "limit": {
-    "context": 1000000,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2.8
-     },
-     "output": {
-      "price": 7.5
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://cloud-api.near.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-05-21"
-  },
-  "google/gemini-2.5-pro": {
-   "id": "google/gemini-2.5-pro",
-   "name": "Gemini 2.5 Pro",
-   "description": "Google's proven reasoning model for coding, math, and multimodal analysis",
-   "type": "chat",
-   "family": "gemini-pro",
-   "canonical_id": "google/gemini-2.5-pro",
-   "release_date": "2025-06-17",
-   "limit": {
-    "context": 1048576,
-    "output": 65536
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.25,
-      "cache": {
-       "read": 0.125
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 200000
-         }
-        },
-        "price": 2.5,
-        "cache": {
-         "read": 0.25
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 10,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 200000
-         }
-        },
-        "price": 15
-       }
-      ]
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "audio/wav",
-     "audio/mp3",
-     "audio/aiff",
-     "audio/aac",
-     "audio/ogg",
-     "audio/flac",
-     "audio/mpeg",
-     "audio/m4a",
-     "audio/l16",
-     "audio/opus",
-     "audio/alaw",
-     "audio/mulaw",
-     "audio/webm",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://cloud-api.near.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-01",
-   "last_updated": "2025-06-17"
-  },
-  "google/gemini-3.8-flash": {
-   "id": "google/gemini-3.8-flash",
-   "name": "Gemini 3.8 Flash",
-   "description": "Google's most intelligent Flash model, engineered for long-horizon software engineering, autonomous agents, and complex enterprise workflows",
-   "type": "chat",
-   "family": "gemini-flash",
-   "canonical_id": "google/gemini-3.8-flash",
-   "release_date": "2026-09-02",
-   "limit": {
-    "context": 1048576,
-    "output": 65536
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.75,
-      "cache": {
-       "read": 0.075
-      }
-     },
-     "output": {
-      "price": 3.75
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://cloud-api.near.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-09-02"
+   "knowledge": "2025-05",
+   "last_updated": "2026-10-17"
   },
   "google/gemini-2.5-flash": {
    "id": "google/gemini-2.5-flash",
@@ -1618,104 +1902,6 @@
    "knowledge": "2025-01",
    "last_updated": "2025-06-17"
   },
-  "google/gemini-3.5-flash": {
-   "id": "google/gemini-3.5-flash",
-   "name": "Gemini 3.5 Flash",
-   "description": "Fast Gemini model balancing multimodal reasoning, tool use, and cost",
-   "type": "chat",
-   "family": "gemini-flash",
-   "canonical_id": "google/gemini-3.5-flash",
-   "release_date": "2026-05-19",
-   "limit": {
-    "context": 1048576,
-    "output": 65536
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.5,
-      "cache": {
-       "read": 0.15
-      }
-     },
-     "output": {
-      "price": 9
-     }
-    },
-    "audio": {
-     "input": {
-      "price": 1.5
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp",
-     "audio/wav",
-     "audio/mp3",
-     "audio/aiff",
-     "audio/aac",
-     "audio/ogg",
-     "audio/flac",
-     "audio/mpeg",
-     "audio/m4a",
-     "audio/l16",
-     "audio/opus",
-     "audio/alaw",
-     "audio/mulaw",
-     "audio/webm",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://cloud-api.near.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-01",
-   "last_updated": "2026-05-19"
-  },
   "google/gemini-2.5-flash-lite": {
    "id": "google/gemini-2.5-flash-lite",
    "name": "Gemini 2.5 Flash-Lite",
@@ -1757,6 +1943,122 @@
     "audio": {
      "input": {
       "price": 0.3
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://cloud-api.near.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2025-06-17"
+  },
+  "google/gemini-2.5-pro": {
+   "id": "google/gemini-2.5-pro",
+   "name": "Gemini 2.5 Pro",
+   "description": "Google's proven reasoning model for coding, math, and multimodal analysis",
+   "type": "chat",
+   "family": "gemini-pro",
+   "canonical_id": "google/gemini-2.5-pro",
+   "release_date": "2025-06-17",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.25,
+      "cache": {
+       "read": 0.125
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 200000
+         }
+        },
+        "price": 2.5,
+        "cache": {
+         "read": 0.25
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 10,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 200000
+         }
+        },
+        "price": 15
+       }
+      ]
      }
     }
    },
@@ -1912,73 +2214,17 @@
    "knowledge": "2025-01",
    "last_updated": "2026-05-07"
   },
-  "typesafe/jev-1.13": {
-   "id": "typesafe/jev-1.13",
-   "name": "Jev 1.13",
-   "description": "System One model for fast, typed probabilistic decisions over text or structured state",
-   "type": "decision",
-   "canonical_id": "typesafe/jev-1.13.0",
-   "release_date": "2026-09-15",
-   "limit": {
-    "context": 64000
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.042,
-      "cache": {
-       "read": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "decision"
-    ]
-   },
-   "api": {
-    "systemone": {
-     "base_url": "https://cloud-api.near.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/typesafe-ai",
-      "opencodeai": "@opencode/ai/providers/typesafe-ai/decisions"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-09-15"
-  },
-  "x-ai/grok-4.7": {
-   "id": "x-ai/grok-4.7",
-   "name": "Grok 4.7",
-   "description": "xAI's frontier model for long-running agents, coding, knowledge work, and visual projects",
+  "google/gemini-3.5-flash": {
+   "id": "google/gemini-3.5-flash",
+   "name": "Gemini 3.5 Flash",
+   "description": "Fast Gemini model balancing multimodal reasoning, tool use, and cost",
    "type": "chat",
-   "family": "grok",
-   "canonical_id": "xai/grok-4.7",
-   "release_date": "2026-09-21",
+   "family": "gemini-flash",
+   "canonical_id": "google/gemini-3.5-flash",
+   "release_date": "2026-05-19",
    "limit": {
-    "context": 500000,
-    "output": 500000
+    "context": 1048576,
+    "output": 65536
    },
    "capabilities": {
     "temperature": true,
@@ -1991,33 +2237,57 @@
      "supported": true
     },
     "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh"
-     ]
+     "supported": true
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 2,
+      "price": 1.5,
       "cache": {
-       "read": 0.5
+       "read": 0.15
       }
      },
      "output": {
-      "price": 6
+      "price": 9
+     }
+    },
+    "audio": {
+     "input": {
+      "price": 1.5
      }
     }
    },
    "modalities": {
     "input": [
      "text",
-     "image/jpeg",
      "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
      "application/pdf"
     ],
     "output": [
@@ -2039,20 +2309,142 @@
     }
    },
    "open_weights": false,
-   "knowledge": "2026-05",
-   "last_updated": "2026-09-21"
+   "knowledge": "2025-01",
+   "last_updated": "2026-05-19"
   },
-  "x-ai/grok-4.6": {
-   "id": "x-ai/grok-4.6",
-   "name": "Grok 4.6",
-   "description": "xAI's frontier model for long-running agents, coding, knowledge work, and visual projects",
+  "google/gemini-3.8-flash": {
+   "id": "google/gemini-3.8-flash",
+   "name": "Gemini 3.8 Flash",
+   "description": "Google's most intelligent Flash model, engineered for long-horizon software engineering, autonomous agents, and complex enterprise workflows",
    "type": "chat",
-   "family": "grok",
-   "canonical_id": "xai/grok-4.6",
-   "release_date": "2026-08-12",
+   "family": "gemini-flash",
+   "canonical_id": "google/gemini-3.8-flash",
+   "release_date": "2026-09-02",
    "limit": {
-    "context": 500000,
-    "output": 500000
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.75,
+      "cache": {
+       "read": 0.075
+      }
+     },
+     "output": {
+      "price": 3.75
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://cloud-api.near.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-09-02"
+  },
+  "levanto/sage-2": {
+   "id": "levanto/sage-2",
+   "name": "Levanto Sage 2",
+   "description": "Decision model that answers typed yes/no, choice, scale, sort and tag questions with calibrated probabilities, with streaming decisions and extraction",
+   "type": "decision",
+   "canonical_id": "levanto/levanto-sage-2",
+   "release_date": "2026-11-02",
+   "limit": {
+    "context": 32768
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.07
+     },
+     "output": {
+      "price": 2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "decision"
+    ]
+   },
+   "api": {
+    "systemone": {
+     "base_url": "https://cloud-api.near.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/typesafe-ai",
+      "opencodeai": "@opencode/ai/providers/typesafe-ai/decisions"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-02"
+  },
+  "moonshotai/kimi-k2.6": {
+   "id": "moonshotai/kimi-k2.6",
+   "name": "Kimi K2.6",
+   "description": "Multimodal Kimi workhorse for agent loops, coding tasks, and visual context",
+   "type": "chat",
+   "family": "kimi-k2",
+   "canonical_id": "moonshotai/kimi-k2.6",
+   "release_date": "2026-04-20",
+   "limit": {
+    "context": 262144,
+    "output": 262144
    },
    "capabilities": {
     "temperature": true,
@@ -2066,24 +2458,19 @@
     },
     "reasoning": {
      "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh"
-     ]
+     "toggle": true
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 2,
+      "price": 0.81,
       "cache": {
-       "read": 0.5
+       "read": 0.41
       }
      },
      "output": {
-      "price": 6
+      "price": 3.85
      }
     }
    },
@@ -2106,33 +2493,192 @@
       "tools": {
        "updates": false
       }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
      }
     }
    },
-   "open_weights": false,
-   "knowledge": "2026-02-01",
-   "last_updated": "2026-08-12"
+   "open_weights": true,
+   "knowledge": "2025-01",
+   "last_updated": "2026-04-20"
   },
-  "openai/whisper-large-v3": {
-   "id": "openai/whisper-large-v3",
-   "name": "Whisper Large v3",
-   "description": "Speech transcription model for accurate audio-to-text and captioning workflows",
-   "type": "transcription",
-   "family": "whisper",
-   "canonical_id": "openai/whisper-large-v3",
-   "release_date": "2023-11-06",
+  "moonshotai/kimi-k3": {
+   "id": "moonshotai/kimi-k3",
+   "name": "Kimi K3",
+   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
+   "type": "chat",
+   "family": "kimi-k3",
+   "canonical_id": "moonshotai/kimi-k3",
+   "release_date": "2026-07-16",
    "limit": {
-    "context": 448,
-    "output": 448
+    "context": 1048576,
+    "output": 1048576
    },
    "capabilities": {
-    "temperature": true,
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 3.3,
+      "cache": {
+       "read": 0.33
+      }
+     },
+     "output": {
+      "price": 16.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://cloud-api.near.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-07-16"
+  },
+  "moonshotai/kimi-k3.1-pro": {
+   "id": "moonshotai/kimi-k3.1-pro",
+   "name": "Kimi K3.1 Pro",
+   "description": "Multimodal Kimi model with a 1M-token context window and always-on reasoning, for coding, 3D creation and financial research",
+   "type": "chat",
+   "family": "kimi-k3",
+   "canonical_id": "moonshotai/kimi-k3.1-pro",
+   "release_date": "2026-10-23",
+   "limit": {
+    "context": 1048576,
+    "output": 1048576
+   },
+   "capabilities": {
+    "temperature": false,
     "top_k": false,
     "top_p": false,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
-     "supported": false
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ],
+     "default": {
+      "type": "effort",
+      "value": "max"
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.2
+      }
+     },
+     "output": {
+      "price": 10
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/heic",
+     "image/heif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://cloud-api.near.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-10-23"
+  },
+  "openai/gpt-4.1": {
+   "id": "openai/gpt-4.1",
+   "name": "GPT-4.1",
+   "description": "Long-lived GPT workhorse for coding, instruction following, and production apps",
+   "type": "chat",
+   "family": "gpt",
+   "canonical_id": "openai/gpt-4.1",
+   "release_date": "2025-04-14",
+   "limit": {
+    "context": 1047576,
+    "output": 32768
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
     },
     "reasoning": {
      "supported": false
@@ -2141,44 +2687,124 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.01
+      "price": 2,
+      "cache": {
+       "read": 0.5
+      }
      },
      "output": {
-      "price": 0.01
+      "price": 8
      }
     }
    },
    "modalities": {
     "input": [
-     "audio/flac",
-     "audio/mpeg",
-     "audio/mp4",
-     "audio/ogg",
-     "audio/wav",
-     "audio/webm"
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
     ],
     "output": [
      "text"
     ]
    },
    "api": {
-    "transcriptions": {
+    "chat-completions": {
      "base_url": "https://cloud-api.near.ai/v1",
      "sdk": {
-      "opencodeai": "@opencode/ai/protocols/openai-transcription"
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
      }
     }
    },
-   "open_weights": true,
-   "last_updated": "2023-11-06"
+   "open_weights": false,
+   "knowledge": "2024-04",
+   "last_updated": "2025-04-14"
   },
-  "openai/gpt-5-nano": {
-   "id": "openai/gpt-5-nano",
-   "name": "GPT-5 Nano",
-   "description": "Tiny GPT-5 lane for routing, extraction, classification, and bulk jobs",
+  "openai/gpt-4.1-mini": {
+   "id": "openai/gpt-4.1-mini",
+   "name": "GPT-4.1 mini",
+   "description": "Affordable GPT-4.1 lane for fast coding help and structured extraction",
    "type": "chat",
-   "family": "gpt-nano",
-   "canonical_id": "openai/gpt-5-nano",
+   "family": "gpt-mini",
+   "canonical_id": "openai/gpt-4.1-mini",
+   "release_date": "2025-04-14",
+   "limit": {
+    "context": 1047576,
+    "output": 32768
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.4,
+      "cache": {
+       "read": 0.1
+      }
+     },
+     "output": {
+      "price": 1.6
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://cloud-api.near.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2024-04",
+   "last_updated": "2025-04-14"
+  },
+  "openai/gpt-5": {
+   "id": "openai/gpt-5",
+   "name": "GPT-5",
+   "description": "Original GPT-5 workhorse for reasoning, coding, writing, and tool workflows",
+   "type": "chat",
+   "family": "gpt",
+   "canonical_id": "openai/gpt-5",
    "release_date": "2025-08-07",
    "limit": {
     "context": 400000,
@@ -2208,13 +2834,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.05,
+      "price": 1.25,
       "cache": {
-       "read": 0.005
+       "read": 0.125
       }
      },
      "output": {
-      "price": 0.4
+      "price": 10
      }
     }
    },
@@ -2245,7 +2871,7 @@
     }
    },
    "open_weights": false,
-   "knowledge": "2024-05-30",
+   "knowledge": "2024-09-30",
    "last_updated": "2025-08-07"
   },
   "openai/gpt-5-mini": {
@@ -2291,6 +2917,82 @@
      },
      "output": {
       "price": 2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://cloud-api.near.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2024-05-30",
+   "last_updated": "2025-08-07"
+  },
+  "openai/gpt-5-nano": {
+   "id": "openai/gpt-5-nano",
+   "name": "GPT-5 Nano",
+   "description": "Tiny GPT-5 lane for routing, extraction, classification, and bulk jobs",
+   "type": "chat",
+   "family": "gpt-nano",
+   "canonical_id": "openai/gpt-5-nano",
+   "release_date": "2025-08-07",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.05,
+      "cache": {
+       "read": 0.005
+      }
+     },
+     "output": {
+      "price": 0.4
      }
     }
    },
@@ -2400,107 +3102,6 @@
    "knowledge": "2024-09-30",
    "last_updated": "2025-11-13"
   },
-  "openai/gpt-5.5": {
-   "id": "openai/gpt-5.5",
-   "name": "GPT-5.5",
-   "description": "Default frontier GPT for coding, computer use, research, and knowledge work",
-   "type": "chat",
-   "family": "gpt",
-   "canonical_id": "openai/gpt-5.5",
-   "release_date": "2026-04-23",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "xhigh"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 5,
-      "cache": {
-       "read": 0.5
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 10,
-        "cache": {
-         "read": 1
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 30,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 272000
-         }
-        },
-        "price": 45
-       }
-      ]
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://cloud-api.near.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-12-01",
-   "last_updated": "2026-04-23"
-  },
   "openai/gpt-5.2": {
    "id": "openai/gpt-5.2",
    "name": "GPT-5.2",
@@ -2577,467 +3178,6 @@
    "open_weights": false,
    "knowledge": "2025-08-31",
    "last_updated": "2025-12-11"
-  },
-  "openai/gpt-6-luna": {
-   "id": "openai/gpt-6-luna",
-   "name": "GPT-6 Luna",
-   "description": "OpenAI's most efficient model for focused, high-volume tasks",
-   "type": "chat",
-   "family": "gpt-luna",
-   "canonical_id": "openai/gpt-6-luna",
-   "release_date": "2026-09-22",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.1,
-      "cache": {
-       "read": 0.01
-      }
-     },
-     "output": {
-      "price": 0.5
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://cloud-api.near.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-05-18",
-   "last_updated": "2026-09-22"
-  },
-  "openai/gpt-5.4-mini": {
-   "id": "openai/gpt-5.4-mini",
-   "name": "GPT-5.4 mini",
-   "description": "Strong small GPT for coding subagents, quick tool use, and high-volume work",
-   "type": "chat",
-   "family": "gpt-mini",
-   "canonical_id": "openai/gpt-5.4-mini",
-   "release_date": "2026-03-17",
-   "limit": {
-    "context": 400000,
-    "input": 272000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "xhigh"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.75,
-      "cache": {
-       "read": 0.075
-      }
-     },
-     "output": {
-      "price": 4.5
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://cloud-api.near.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2026-03-17"
-  },
-  "openai/o4-mini": {
-   "id": "openai/o4-mini",
-   "name": "o4-mini",
-   "description": "Fast o-series model for compact reasoning, coding, and tool use",
-   "type": "chat",
-   "family": "o-mini",
-   "canonical_id": "openai/o4-mini",
-   "release_date": "2025-04-16",
-   "limit": {
-    "context": 200000,
-    "output": 100000
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.1,
-      "cache": {
-       "read": 0.275
-      }
-     },
-     "output": {
-      "price": 4.4
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://cloud-api.near.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2024-05",
-   "last_updated": "2025-04-16"
-  },
-  "openai/gpt-5.6-luna": {
-   "id": "openai/gpt-5.6-luna",
-   "name": "GPT-5.6 Luna",
-   "description": "Cost-efficient GPT-5.6 model for fast, high-volume workloads",
-   "type": "chat",
-   "family": "gpt-luna",
-   "canonical_id": "openai/gpt-5.6-luna",
-   "release_date": "2026-07-09",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.2,
-      "cache": {
-       "read": 0.02
-      }
-     },
-     "output": {
-      "price": 1.2
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://cloud-api.near.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-02-16",
-   "last_updated": "2026-07-09"
-  },
-  "openai/gpt-5.4-nano": {
-   "id": "openai/gpt-5.4-nano",
-   "name": "GPT-5.4 nano",
-   "description": "Cheapest GPT-5.4 lane for simple routing, extraction, and bulk automation",
-   "type": "chat",
-   "family": "gpt-nano",
-   "canonical_id": "openai/gpt-5.4-nano",
-   "release_date": "2026-03-17",
-   "limit": {
-    "context": 400000,
-    "input": 272000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "xhigh"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.2,
-      "cache": {
-       "read": 0.02
-      }
-     },
-     "output": {
-      "price": 1.25
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://cloud-api.near.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-08-31",
-   "last_updated": "2026-03-17"
-  },
-  "openai/gpt-6-astra": {
-   "id": "openai/gpt-6-astra",
-   "name": "GPT-6 Astra",
-   "description": "GPT-6 Astra is OpenAI's most capable model for complex reasoning, coding, computer use, research, and document creation.",
-   "type": "chat",
-   "family": "gpt-astra",
-   "canonical_id": "openai/gpt-6-astra",
-   "release_date": "2026-09-04",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 10,
-      "cache": {
-       "read": 1
-      }
-     },
-     "output": {
-      "price": 50
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://cloud-api.near.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-04-30",
-   "last_updated": "2026-09-04"
   },
   "openai/gpt-5.4": {
    "id": "openai/gpt-5.4",
@@ -3140,22 +3280,23 @@
    "knowledge": "2025-08-31",
    "last_updated": "2026-03-05"
   },
-  "openai/o3": {
-   "id": "openai/o3",
-   "name": "o3",
-   "description": "Deliberate o-series reasoner for hard math, coding, and multi-step analysis",
+  "openai/gpt-5.4-mini": {
+   "id": "openai/gpt-5.4-mini",
+   "name": "GPT-5.4 mini",
+   "description": "Strong small GPT for coding subagents, quick tool use, and high-volume work",
    "type": "chat",
-   "family": "o",
-   "canonical_id": "openai/o3",
-   "release_date": "2025-04-16",
+   "family": "gpt-mini",
+   "canonical_id": "openai/gpt-5.4-mini",
+   "release_date": "2026-03-17",
    "limit": {
-    "context": 200000,
-    "output": 100000
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
    },
    "capabilities": {
-    "temperature": false,
+    "temperature": true,
     "top_k": false,
-    "top_p": false,
+    "top_p": true,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -3165,22 +3306,201 @@
     "reasoning": {
      "supported": true,
      "effort": [
+      "none",
       "low",
       "medium",
-      "high"
+      "high",
+      "xhigh"
      ]
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 2,
+      "price": 0.75,
       "cache": {
-       "read": 0.5
+       "read": 0.075
       }
      },
      "output": {
-      "price": 8
+      "price": 4.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://cloud-api.near.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-03-17"
+  },
+  "openai/gpt-5.4-nano": {
+   "id": "openai/gpt-5.4-nano",
+   "name": "GPT-5.4 nano",
+   "description": "Cheapest GPT-5.4 lane for simple routing, extraction, and bulk automation",
+   "type": "chat",
+   "family": "gpt-nano",
+   "canonical_id": "openai/gpt-5.4-nano",
+   "release_date": "2026-03-17",
+   "limit": {
+    "context": 400000,
+    "input": 272000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.2,
+      "cache": {
+       "read": 0.02
+      }
+     },
+     "output": {
+      "price": 1.25
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://cloud-api.near.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-08-31",
+   "last_updated": "2026-03-17"
+  },
+  "openai/gpt-5.5": {
+   "id": "openai/gpt-5.5",
+   "name": "GPT-5.5",
+   "description": "Default frontier GPT for coding, computer use, research, and knowledge work",
+   "type": "chat",
+   "family": "gpt",
+   "canonical_id": "openai/gpt-5.5",
+   "release_date": "2026-04-23",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 0.5
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 10,
+        "cache": {
+         "read": 1
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 30,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 45
+       }
+      ]
      }
     }
    },
@@ -3212,8 +3532,319 @@
     }
    },
    "open_weights": false,
-   "knowledge": "2024-05",
-   "last_updated": "2025-04-16"
+   "knowledge": "2025-12-01",
+   "last_updated": "2026-04-23"
+  },
+  "openai/gpt-5.6-luna": {
+   "id": "openai/gpt-5.6-luna",
+   "name": "GPT-5.6 Luna",
+   "description": "Cost-efficient GPT-5.6 model for fast, high-volume workloads",
+   "type": "chat",
+   "family": "gpt-luna",
+   "canonical_id": "openai/gpt-5.6-luna",
+   "release_date": "2026-07-09",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.2,
+      "cache": {
+       "read": 0.02
+      }
+     },
+     "output": {
+      "price": 1.2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://cloud-api.near.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-02-16",
+   "last_updated": "2026-07-09"
+  },
+  "openai/gpt-5.6-sol": {
+   "id": "openai/gpt-5.6-sol",
+   "name": "GPT-5.6 Sol",
+   "description": "Frontier GPT-5.6 model for complex professional work, coding, and agentic workflows",
+   "type": "chat",
+   "family": "gpt-sol",
+   "canonical_id": "openai/gpt-5.6-sol",
+   "release_date": "2026-07-09",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 4,
+      "cache": {
+       "read": 0.4
+      }
+     },
+     "output": {
+      "price": 20
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://cloud-api.near.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-02-16",
+   "last_updated": "2026-07-09"
+  },
+  "openai/gpt-6-astra": {
+   "id": "openai/gpt-6-astra",
+   "name": "GPT-6 Astra",
+   "description": "GPT-6 Astra is OpenAI's most capable model for complex reasoning, coding, computer use, research, and document creation.",
+   "type": "chat",
+   "family": "gpt-astra",
+   "canonical_id": "openai/gpt-6-astra",
+   "release_date": "2026-09-04",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 10,
+      "cache": {
+       "read": 1
+      }
+     },
+     "output": {
+      "price": 50
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://cloud-api.near.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-04-30",
+   "last_updated": "2026-09-04"
+  },
+  "openai/gpt-6-luna": {
+   "id": "openai/gpt-6-luna",
+   "name": "GPT-6 Luna",
+   "description": "OpenAI's most efficient model for focused, high-volume tasks",
+   "type": "chat",
+   "family": "gpt-luna",
+   "canonical_id": "openai/gpt-6-luna",
+   "release_date": "2026-09-22",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1,
+      "cache": {
+       "read": 0.01
+      }
+     },
+     "output": {
+      "price": 0.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://cloud-api.near.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-05-18",
+   "last_updated": "2026-09-22"
   },
   "openai/gpt-6-sol": {
    "id": "openai/gpt-6-sol",
@@ -3370,18 +4001,17 @@
    "knowledge": "2026-04-30",
    "last_updated": "2026-09-29"
   },
-  "openai/gpt-5": {
-   "id": "openai/gpt-5",
-   "name": "GPT-5",
-   "description": "Original GPT-5 workhorse for reasoning, coding, writing, and tool workflows",
+  "openai/o3": {
+   "id": "openai/o3",
+   "name": "o3",
+   "description": "Deliberate o-series reasoner for hard math, coding, and multi-step analysis",
    "type": "chat",
-   "family": "gpt",
-   "canonical_id": "openai/gpt-5",
-   "release_date": "2025-08-07",
+   "family": "o",
+   "canonical_id": "openai/o3",
+   "release_date": "2025-04-16",
    "limit": {
-    "context": 400000,
-    "input": 272000,
-    "output": 128000
+    "context": 200000,
+    "output": 100000
    },
    "capabilities": {
     "temperature": false,
@@ -3396,80 +4026,10 @@
     "reasoning": {
      "supported": true,
      "effort": [
-      "minimal",
       "low",
       "medium",
       "high"
      ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.25,
-      "cache": {
-       "read": 0.125
-      }
-     },
-     "output": {
-      "price": 10
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://cloud-api.near.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2024-09-30",
-   "last_updated": "2025-08-07"
-  },
-  "openai/gpt-4.1": {
-   "id": "openai/gpt-4.1",
-   "name": "GPT-4.1",
-   "description": "Long-lived GPT workhorse for coding, instruction following, and production apps",
-   "type": "chat",
-   "family": "gpt",
-   "canonical_id": "openai/gpt-4.1",
-   "release_date": "2025-04-14",
-   "limit": {
-    "context": 1047576,
-    "output": 32768
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
     }
    },
    "cost": {
@@ -3513,156 +4073,8 @@
     }
    },
    "open_weights": false,
-   "knowledge": "2024-04",
-   "last_updated": "2025-04-14"
-  },
-  "openai/gpt-4.1-mini": {
-   "id": "openai/gpt-4.1-mini",
-   "name": "GPT-4.1 mini",
-   "description": "Affordable GPT-4.1 lane for fast coding help and structured extraction",
-   "type": "chat",
-   "family": "gpt-mini",
-   "canonical_id": "openai/gpt-4.1-mini",
-   "release_date": "2025-04-14",
-   "limit": {
-    "context": 1047576,
-    "output": 32768
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.4,
-      "cache": {
-       "read": 0.1
-      }
-     },
-     "output": {
-      "price": 1.6
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://cloud-api.near.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2024-04",
-   "last_updated": "2025-04-14"
-  },
-  "openai/gpt-5.6-sol": {
-   "id": "openai/gpt-5.6-sol",
-   "name": "GPT-5.6 Sol",
-   "description": "Frontier GPT-5.6 model for complex professional work, coding, and agentic workflows",
-   "type": "chat",
-   "family": "gpt-sol",
-   "canonical_id": "openai/gpt-5.6-sol",
-   "release_date": "2026-07-09",
-   "limit": {
-    "context": 1050000,
-    "input": 922000,
-    "output": 128000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 4,
-      "cache": {
-       "read": 0.4
-      }
-     },
-     "output": {
-      "price": 20
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://cloud-api.near.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-02-16",
-   "last_updated": "2026-07-09"
+   "knowledge": "2024-05",
+   "last_updated": "2025-04-16"
   },
   "openai/o3-mini": {
    "id": "openai/o3-mini",
@@ -3734,22 +4146,22 @@
    "knowledge": "2024-05",
    "last_updated": "2025-01-29"
   },
-  "deepseek/deepseek-v3.2": {
-   "id": "deepseek/deepseek-v3.2",
-   "name": "DeepSeek V3.2",
-   "description": "Hybrid-reasoning DeepSeek model with thinking and non-thinking modes, sparse attention, and tool-use",
+  "openai/o4-mini": {
+   "id": "openai/o4-mini",
+   "name": "o4-mini",
+   "description": "Fast o-series model for compact reasoning, coding, and tool use",
    "type": "chat",
-   "family": "deepseek",
-   "canonical_id": "deepseek/deepseek-v3.2",
-   "release_date": "2025-12-01",
+   "family": "o-mini",
+   "canonical_id": "openai/o4-mini",
+   "release_date": "2025-04-16",
    "limit": {
-    "context": 128000,
-    "output": 64000
+    "context": 200000,
+    "output": 100000
    },
    "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -3758,7 +4170,11 @@
     },
     "reasoning": {
      "supported": true,
-     "toggle": true
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
     }
    },
    "cost": {
@@ -3766,85 +4182,11 @@
      "input": {
       "price": 1.1,
       "cache": {
-       "read": 0.55
+       "read": 0.275
       }
      },
      "output": {
-      "price": 1.1
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://cloud-api.near.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2024-07",
-   "last_updated": "2025-12-01"
-  },
-  "deepseek/deepseek-v4.1-flash-1017": {
-   "id": "deepseek/deepseek-v4.1-flash-1017",
-   "name": "DeepSeek V4.1 Flash 1017",
-   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
-   "type": "chat",
-   "family": "deepseek-flash",
-   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
-   "release_date": "2026-10-17",
-   "limit": {
-    "context": 1000000,
-    "output": 384000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.3,
-      "cache": {
-       "read": 0.006
-      }
-     },
-     "output": {
-      "price": 1.2
+      "price": 4.4
      }
     }
    },
@@ -3874,19 +4216,138 @@
      }
     }
    },
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-10-17"
+   "open_weights": false,
+   "knowledge": "2024-05",
+   "last_updated": "2025-04-16"
   },
-  "levanto/sage-2": {
-   "id": "levanto/sage-2",
-   "name": "Levanto Sage 2",
-   "description": "Decision model that answers typed yes/no, choice, scale, sort and tag questions with calibrated probabilities, with streaming decisions and extraction",
-   "type": "decision",
-   "canonical_id": "levanto/levanto-sage-2",
-   "release_date": "2026-11-02",
+  "openai/whisper-large-v3": {
+   "id": "openai/whisper-large-v3",
+   "name": "Whisper Large v3",
+   "description": "Speech transcription model for accurate audio-to-text and captioning workflows",
+   "type": "transcription",
+   "family": "whisper",
+   "canonical_id": "openai/whisper-large-v3",
+   "release_date": "2023-11-06",
    "limit": {
-    "context": 32768
+    "context": 448,
+    "output": 448
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.01
+     },
+     "output": {
+      "price": 0.01
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "audio/flac",
+     "audio/mpeg",
+     "audio/mp4",
+     "audio/ogg",
+     "audio/wav",
+     "audio/webm"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "transcriptions": {
+     "base_url": "https://cloud-api.near.ai/v1",
+     "sdk": {
+      "opencodeai": "@opencode/ai/protocols/openai-transcription"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2023-11-06"
+  },
+  "qwen/qwen3.7-max": {
+   "id": "qwen/qwen3.7-max",
+   "name": "Qwen3.7 Max",
+   "description": "Qwen frontier model tuned for agent frameworks, coding assistants, and long tasks",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.7-max",
+   "release_date": "2026-05-21",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2.8
+     },
+     "output": {
+      "price": 7.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://cloud-api.near.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-05-21"
+  },
+  "typesafe/jev-1.13": {
+   "id": "typesafe/jev-1.13",
+   "name": "Jev 1.13",
+   "description": "System One model for fast, typed probabilistic decisions over text or structured state",
+   "type": "decision",
+   "canonical_id": "typesafe/jev-1.13.0",
+   "release_date": "2026-09-15",
+   "limit": {
+    "context": 64000
    },
    "capabilities": {
     "temperature": false,
@@ -3904,10 +4365,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.07
+      "price": 0.042,
+      "cache": {
+       "read": 0
+      }
      },
      "output": {
-      "price": 2
+      "price": 0
      }
     }
    },
@@ -3929,26 +4393,25 @@
     }
    },
    "open_weights": false,
-   "last_updated": "2026-11-02"
+   "last_updated": "2026-09-15"
   },
-  "deepseek-ai/DeepSeek-V4.1-Flash-1017-abliterated": {
-   "id": "deepseek-ai/DeepSeek-V4.1-Flash-1017-abliterated",
-   "name": "DeepSeek V4.1 Flash 1017 Abliterated",
-   "description": "NEAR AI's refusal-removed DeepSeek V4.1 Flash 1017 for security research, with text-only reasoning and tool use inside a private TEE",
+  "x-ai/grok-4.6": {
+   "id": "x-ai/grok-4.6",
+   "name": "Grok 4.6",
+   "description": "xAI's frontier model for long-running agents, coding, knowledge work, and visual projects",
    "type": "chat",
-   "family": "deepseek-flash",
-   "release_date": "2026-10-29",
+   "family": "grok",
+   "canonical_id": "xai/grok-4.6",
+   "release_date": "2026-08-12",
    "limit": {
-    "context": 1048576,
-    "output": 384000
+    "context": 500000,
+    "output": 500000
    },
    "capabilities": {
-    "cache": {
-     "implicit": true
-    },
     "temperature": true,
     "top_k": true,
     "top_p": true,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -3956,24 +4419,24 @@
     },
     "reasoning": {
      "supported": true,
-     "toggle": true,
      "effort": [
       "low",
+      "medium",
       "high",
-      "max"
+      "xhigh"
      ]
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.3,
+      "price": 2,
       "cache": {
-       "read": 0.006
+       "read": 0.5
       }
      },
      "output": {
-      "price": 1.2
+      "price": 6
      }
     }
    },
@@ -3996,34 +4459,30 @@
       "tools": {
        "updates": false
       }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
      }
     }
    },
    "open_weights": false,
-   "last_updated": "2026-10-29"
+   "knowledge": "2026-02-01",
+   "last_updated": "2026-08-12"
   },
-  "deepseek-ai/DeepSeek-V4.1-Flash-1017": {
-   "id": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
-   "name": "DeepSeek V4.1 Flash 1017",
-   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
+  "x-ai/grok-4.7": {
+   "id": "x-ai/grok-4.7",
+   "name": "Grok 4.7",
+   "description": "xAI's frontier model for long-running agents, coding, knowledge work, and visual projects",
    "type": "chat",
-   "family": "deepseek-flash",
-   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
-   "release_date": "2026-10-17",
+   "family": "grok",
+   "canonical_id": "xai/grok-4.7",
+   "release_date": "2026-09-21",
    "limit": {
-    "context": 1000000,
-    "output": 384000
+    "context": 500000,
+    "output": 500000
    },
    "capabilities": {
-    "cache": {
-     "implicit": true
-    },
     "temperature": true,
     "top_k": true,
     "top_p": true,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -4031,107 +4490,33 @@
     },
     "reasoning": {
      "supported": true,
-     "toggle": true,
      "effort": [
       "low",
+      "medium",
       "high",
-      "max"
+      "xhigh"
      ]
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.3,
+      "price": 2,
       "cache": {
-       "read": 0.006
+       "read": 0.5
       }
      },
      "output": {
-      "price": 1.2
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://cloud-api.near.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-10-17"
-  },
-  "Qwen/Qwen3-VL-30B-A3B-Instruct": {
-   "id": "Qwen/Qwen3-VL-30B-A3B-Instruct",
-   "name": "Qwen3-VL 30B-A3B Instruct",
-   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3-vl-30b-a3b-instruct",
-   "release_date": "2025-10-04",
-   "limit": {
-    "context": 16384,
-    "output": 8192
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.15,
-      "cache": {
-       "read": 0.03
-      }
-     },
-     "output": {
-      "price": 0.55
+      "price": 6
      }
     }
    },
    "modalities": {
     "input": [
      "text",
-     "image/bmp",
      "image/jpeg",
      "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic"
+     "application/pdf"
     ],
     "output": [
      "text"
@@ -4148,274 +4533,24 @@
       "tools": {
        "updates": false
       }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-10-04"
-  },
-  "Qwen/Qwen3-Embedding-0.6B": {
-   "id": "Qwen/Qwen3-Embedding-0.6B",
-   "name": "Qwen3 Embedding 0.6B",
-   "description": "Embedding model for semantic search, retrieval, clustering, and ranking pipelines",
-   "type": "embedding",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3-embedding-0.6b",
-   "release_date": "2025-06-05",
-   "limit": {
-    "context": 32768,
-    "output": 1024
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.01
-     },
-     "output": {
-      "price": 0.01
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "embedding"
-    ]
-   },
-   "api": {
-    "embeddings": {
-     "base_url": "https://cloud-api.near.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/embeddings"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-06-05"
-  },
-  "Qwen/Qwen3.8-27B-abliterated": {
-   "id": "Qwen/Qwen3.8-27B-abliterated",
-   "name": "Qwen3.8 27B Abliterated",
-   "description": "NEAR AI's refusal-removed Qwen3.8 27B for security research, with vision, reasoning and tool use inside a private TEE",
-   "type": "chat",
-   "family": "qwen",
-   "release_date": "2026-10-29",
-   "limit": {
-    "context": 262144,
-    "output": 32768
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.04,
-      "cache": {
-       "read": 0.018
-      }
-     },
-     "output": {
-      "price": 1.35
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://cloud-api.near.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
      }
     }
    },
    "open_weights": false,
-   "last_updated": "2026-10-29"
+   "knowledge": "2026-05",
+   "last_updated": "2026-09-21"
   },
-  "Qwen/Qwen3-Reranker-0.6B": {
-   "id": "Qwen/Qwen3-Reranker-0.6B",
-   "name": "Qwen3 Reranker 0.6B",
-   "description": "Reranking model for improving retrieval quality in search and recommendation systems",
-   "type": "reranking",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3-reranker-0.6b",
-   "release_date": "2025-06-05",
-   "limit": {
-    "context": 40960,
-    "output": 1024
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.01
-     },
-     "output": {
-      "price": 0.01
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "reranking"
-    ]
-   },
-   "api": {
-    "rerank": {
-     "base_url": "https://cloud-api.near.ai/v1",
-     "sdk": {}
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-06-05"
-  },
-  "Qwen/Qwen3.6-35B-A3B-FP8": {
-   "id": "Qwen/Qwen3.6-35B-A3B-FP8",
-   "name": "Qwen 3.6 35B A3B FP8",
-   "description": "Open multimodal Qwen MoE for local agents that need vision, audio, and code",
+  "z-ai/glm-5.3": {
+   "id": "z-ai/glm-5.3",
+   "name": "GLM-5.3",
+   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
    "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3.6-35b-a3b",
-   "release_date": "2026-04-17",
-   "limit": {
-    "context": 262144,
-    "output": 8192
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.17,
-      "cache": {
-       "read": 0.056
-      }
-     },
-     "output": {
-      "price": 1.1
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://cloud-api.near.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-04-17"
-  },
-  "Qwen/Qwen3.8-27B": {
-   "id": "Qwen/Qwen3.8-27B",
-   "name": "Qwen3.8 27B",
-   "description": "Dense 27B vision-language model for coding, agent tasks, and image and video understanding",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3.8-27b",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.3",
    "release_date": "2026-08-14",
    "limit": {
-    "context": 262144,
-    "output": 32768
+    "context": 1000000,
+    "output": 131072
    },
    "capabilities": {
     "cache": {
@@ -4432,31 +4567,30 @@
     },
     "reasoning": {
      "supported": true,
-     "toggle": true
+     "toggle": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.04,
+      "price": 1.8,
       "cache": {
-       "read": 0.018
+       "read": 0.45
       }
      },
      "output": {
-      "price": 1.35
+      "price": 5.75
      }
     }
    },
    "modalities": {
     "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic"
+     "text"
     ],
     "output": [
      "text"
@@ -4559,140 +4693,6 @@
    },
    "open_weights": true,
    "last_updated": "2026-08-26"
-  },
-  "z-ai/glm-5.3": {
-   "id": "z-ai/glm-5.3",
-   "name": "GLM-5.3",
-   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
-   "type": "chat",
-   "family": "glm",
-   "canonical_id": "zhipuai/glm-5.3",
-   "release_date": "2026-08-14",
-   "limit": {
-    "context": 1000000,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.8,
-      "cache": {
-       "read": 0.45
-      }
-     },
-     "output": {
-      "price": 5.75
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://cloud-api.near.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-08-14"
-  },
-  "black-forest-labs/FLUX.2-klein-4B": {
-   "id": "black-forest-labs/FLUX.2-klein-4B",
-   "name": "FLUX.2 Klein 4B",
-   "description": "Image model for prompt-driven generation, editing, and visual design workflows",
-   "type": "image",
-   "family": "flux",
-   "canonical_id": "black-forest-labs/flux-2-klein-4b",
-   "release_date": "2026-01-15",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "image": {
-     "output": {
-      "unit": "image",
-      "price": 0.012
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp"
-    ],
-    "output": [
-     "image/jpeg",
-     "image/png",
-     "image/webp"
-    ]
-   },
-   "api": {
-    "images": {
-     "base_url": "https://cloud-api.near.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/images"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-01-15"
   }
  }
 }
