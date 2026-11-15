@@ -321,7 +321,10 @@ export interface Issue {
     | "unmapped-route"
     | "unmapped-client"
     | "invalid-authored"
-    | "reserved-field";
+    | "reserved-field"
+    | "lifetime-differs"
+    | "unparsed-lifetime"
+    | "retention-lifetime-differs";
   target: string;
   message: string;
 }

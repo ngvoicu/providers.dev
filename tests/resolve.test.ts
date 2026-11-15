@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { emptyCacheLifetime } from "../src/core/cache.ts";
 import { clone } from "../src/core/merge.ts";
 import { summarize } from "../src/core/entries.ts";
 import { resolve, type ResolveInput } from "../src/core/resolve.ts";
@@ -476,5 +477,163 @@ describe("resolve: measurements", () => {
     delete gone.lab!.models["model-a"];
     const { issues } = resolve({ ...input([], { observed, routes, labels: directLabel, additions: [login] }), upstream: gone });
     expect(issues).toContainEqual(expect.objectContaining({ code: "orphan-observation", target: "lab/model-a" }));
+  });
+
+  describe("the cache lifetime record", () => {
+    const documentedUpstream = (): UpstreamCatalog => {
+      const catalog = upstream();
+      catalog.lab!.models["model-a"]!.capabilities = { cache: { explicit: { ttl: ["5m", "1h"] } } };
+      catalog.lab!.models["model-b"]!.capabilities = { cache: false };
+      catalog.lab!.models["model-c"] = { id: "model-c", name: "Model C", capabilities: { cache: { implicit: { ttl: ["30m"] } } } };
+      return catalog;
+    };
+    const run = (id: string, checks: { age_s: number; warm: number; total: number }[], more: Partial<ObservedFile["cache"][number]> = {}) => ({
+      id, route: "lab-api", client: "direct", model: "model-a", models_dev: "lab/model-a", date: "2026-11-07", source: `results/${id}.json`, control: { warm: 1, total: 1 }, checks, latest: true, ...more,
+    });
+
+    it("gives the measured entry a measured item and its two profiles, and the others the empty record", () => {
+      const { catalog, issues } = resolve(input([], { observed, routes, labels: directLabel, additions: [login], upstreamDate: "2026-11-15" }));
+      const lifetime = ext(catalog.lab!.models["model-a"]!).cache.lifetime;
+      expect(lifetime.lifetimes).toEqual([
+        {
+          retention_profile: "short", basis: "measured", source: "providers.dev", date: "2026-11-05", lifetime_s: 300, mode: null, documented_as: null,
+          client: "direct", client_label: "Straight to the provider", parameter: null, value: null, evaluations: 1, evaluation_ids: ["run-1"], checks: 3, hits: 3,
+          tested_from_s: 300, first_miss_s: null, results: [{ kind: "timed", age_s: 300, hits: 3, checks: 3, hit_rate_pct: 100 }],
+        },
+      ]);
+      expect(lifetime.short).toEqual({ safe_s: 300, basis: "measured", source: "providers.dev", date: "2026-11-05", documented_s: null, measured_s: 300, clients: 1, evaluations: 1, checks: 3, hits: 3, checks_inside: null, hits_inside: null, tested_from_s: 300, first_miss_s: null });
+      expect(lifetime.long).toEqual(emptyCacheLifetime().long);
+      // Nobody evaluated it and nothing is documented: the record of an entry nothing is known about.
+      expect(ext(catalog.lab!.models["model-b"]!).cache.lifetime).toEqual(emptyCacheLifetime());
+      // The run on the login route has no result: it stays in the evaluations of the added entry and counts for no lifetime.
+      expect(ext(catalog["lab-login"]!.models.a!).cache.evaluations.map((item) => item.id)).toEqual(["run-2"]);
+      expect(ext(catalog["lab-login"]!.models.a!).cache.lifetime).toEqual(emptyCacheLifetime());
+      // The lifetime is a new key and changes nothing else: the other keys of the cache record, verified and origin are as they were.
+      const model = catalog.lab!.models["model-a"]!;
+      expect(Object.keys(ext(model).cache)).toEqual(["documented", "retention", "lifetime", "results", "evaluations"]);
+      expect(ext(model).cache.results).toEqual([
+        expect.objectContaining({ retention_profile: "short", evaluations: 1, evaluation_ids: ["run-1"] }),
+        expect.objectContaining({ retention_profile: "long", evaluations: 0, results: null }),
+      ]);
+      expect(ext(model).verified).toBe("2026-11-05");
+      expect(summarize("lab", model, 0).origin).toBe("modified");
+      expect(issues.filter((issue) => ["lifetime-differs", "unparsed-lifetime", "retention-lifetime-differs"].includes(issue.code))).toEqual([]);
+    });
+
+    it("names models.dev and the import date on a documented lifetime, and makes two items of 0 for an entry that does not cache", () => {
+      const { catalog, issues } = resolve(input([], { upstream: documentedUpstream(), upstreamDate: "2026-11-15" }));
+      const a = catalog.lab!.models["model-a"]!;
+      const lifetime = ext(a).cache.lifetime;
+      expect(lifetime.lifetimes.map((item) => [item.retention_profile, item.basis, item.source, item.date, item.lifetime_s, item.mode, item.documented_as])).toEqual([
+        ["short", "documented", "models.dev", "2026-11-15", 300, "explicit", "5m"],
+        ["long", "documented", "models.dev", "2026-11-15", 3600, "explicit", "1h"],
+      ]);
+      expect(lifetime.short).toMatchObject({ safe_s: 300, basis: "documented", source: "models.dev", date: "2026-11-15" });
+      expect(lifetime.long).toMatchObject({ safe_s: 3600, basis: "documented", source: "models.dev", date: "2026-11-15" });
+      // A documented lifetime is not providers.dev's evidence: the entry stays as imported.
+      expect(summarize("lab", a, 0)).toMatchObject({ origin: "upstream", verified: null });
+      const b = ext(catalog.lab!.models["model-b"]!).cache.lifetime;
+      expect(b.lifetimes.map((item) => [item.retention_profile, item.lifetime_s, item.mode, item.documented_as, item.source])).toEqual([["short", 0, null, null, "models.dev"], ["long", 0, null, null, "models.dev"]]);
+      expect([b.short.safe_s, b.short.basis, b.long.safe_s, b.long.basis]).toEqual([0, "documented", 0, "documented"]);
+      expect(issues).toEqual([]);
+    });
+
+    it("names providers.dev and the evidence date where a correction sets the lifetime or the cache", () => {
+      const corrections: OverrideFile = {
+        provider: "lab",
+        rules: [
+          { models: ["model-a"], set: { capabilities: { cache: { explicit: { ttl: ["5m", "2h"] } } } }, reason: "documented lifetimes", evidence: [{ kind: "documented", url: "https://example.com/cache", date: "2026-11-09" }] },
+          { models: ["model-c"], set: { capabilities: { cache: false } }, reason: "does not cache", evidence: [{ kind: "documented", url: "https://example.com/none", date: "2026-11-10" }] },
+        ],
+      };
+      const { catalog } = resolve(input([corrections], { upstream: documentedUpstream(), upstreamDate: "2026-11-15" }));
+      expect(ext(catalog.lab!.models["model-a"]!).provenance.map((change) => change.path)).toEqual(["capabilities.cache.explicit.ttl"]);
+      expect(ext(catalog.lab!.models["model-a"]!).cache.lifetime.lifetimes.map((item) => [item.lifetime_s, item.source, item.date])).toEqual([[300, "providers.dev", "2026-11-09"], [7200, "providers.dev", "2026-11-09"]]);
+      expect(ext(catalog.lab!.models["model-a"]!).cache.lifetime.long).toMatchObject({ safe_s: 7200, basis: "documented", source: "providers.dev", date: "2026-11-09" });
+      const c = ext(catalog.lab!.models["model-c"]!).cache.lifetime;
+      expect(c.lifetimes.map((item) => [item.retention_profile, item.lifetime_s, item.source, item.date])).toEqual([["short", 0, "providers.dev", "2026-11-10"], ["long", 0, "providers.dev", "2026-11-10"]]);
+      // A correction of another field of the cache does not move the source of the lifetimes.
+      const minTokens: OverrideFile = { provider: "lab", rules: [{ models: ["model-a"], set: { capabilities: { cache: { explicit: { min_tokens: 2048 } } } }, reason: "minimum", evidence }] };
+      const other = resolve(input([minTokens], { upstream: documentedUpstream(), upstreamDate: "2026-11-15" }));
+      expect(ext(other.catalog.lab!.models["model-a"]!).cache.lifetime.lifetimes.map((item) => item.source)).toEqual(["models.dev", "models.dev"]);
+    });
+
+    it("names providers.dev on an added entry that documents a lifetime, and gives none to one that names an upstream entry", () => {
+      const added: AuthoredProvider = {
+        id: "lab-login", name: "Lab login", access: "subscription", access_basis: "a login", evidence,
+        models: [
+          { id: "own", fields: { capabilities: { cache: { implicit: { ttl: ["1h"] } } } }, evidence: [{ kind: "documented", url: "https://example.com/login", date: "2026-11-12" }, { kind: "listed", url: "https://example.com/list", date: "2026-11-14" }] },
+          { id: "named", inherits: "lab/model-a", evidence },
+        ],
+      };
+      const { catalog } = resolve(input([], { upstream: documentedUpstream(), additions: [added], upstreamDate: "2026-11-15" }));
+      const own = ext(catalog["lab-login"]!.models.own!).cache.lifetime;
+      expect(own.lifetimes.map((item) => [item.retention_profile, item.lifetime_s, item.mode, item.source, item.date])).toEqual([["short", 3600, "implicit", "providers.dev", "2026-11-12"]]);
+      expect(own.short).toMatchObject({ safe_s: 3600, basis: "documented", source: "providers.dev", date: "2026-11-12" });
+      // lab/model-a documents 5m and 1h; the added entry takes its identity only, never its cache behaviour.
+      expect(ext(catalog["lab-login"]!.models.named!).cache.lifetime).toEqual(emptyCacheLifetime());
+    });
+
+    it("leaves a run marked as lacking, or one that is not the latest, out of every item", () => {
+      const runs: ObservedFile = {
+        ...observed,
+        cache: [run("kept", [{ age_s: 300, warm: 3, total: 3 }]), run("lacking", [{ age_s: 150, warm: 0, total: 3 }], { lacks: "patch" }), run("older", [{ age_s: 150, warm: 0, total: 3 }], { latest: false })],
+      };
+      const { catalog } = resolve(input([], { observed: runs, routes, labels: directLabel, additions: [login] }));
+      const lifetime = ext(catalog.lab!.models["model-a"]!).cache.lifetime;
+      expect(lifetime.lifetimes.flatMap((item) => item.evaluation_ids)).toEqual(["kept"]);
+      expect(lifetime.short).toMatchObject({ safe_s: 300, evaluations: 1 });
+    });
+
+    it("reports a lifetime that differs from groundtruth's reading of the same run", () => {
+      const runs: ObservedFile = {
+        ...observed,
+        cache: [
+          run("agrees", [{ age_s: 300, warm: 3, total: 3 }, { age_s: 600, warm: 1, total: 3 }], { all_warm_through_s: 300 }),
+          run("differs", [{ age_s: 300, warm: 3, total: 3 }, { age_s: 600, warm: 3, total: 3 }], { all_warm_through_s: 300 }),
+          run("null-is-0", [{ age_s: 300, warm: 2, total: 3 }], { all_warm_through_s: null }),
+          run("null-differs", [{ age_s: 300, warm: 3, total: 3 }], { all_warm_through_s: null }),
+          // groundtruth's reading ignores the control: a run whose control missed is not compared.
+          run("cold-control", [{ age_s: 300, warm: 3, total: 3 }], { all_warm_through_s: 300, control: { warm: 0, total: 1 } }),
+          run("no-reading", [{ age_s: 300, warm: 3, total: 3 }]),
+        ],
+      };
+      const { catalog, issues } = resolve(input([], { observed: runs, routes, labels: directLabel, additions: [login] }));
+      expect(issues.filter((issue) => issue.code === "lifetime-differs")).toEqual([
+        expect.objectContaining({ level: "warning", target: "differs" }),
+        expect.objectContaining({ level: "warning", target: "null-differs" }),
+      ]);
+      // The value derived from the checks is published all the same.
+      expect(ext(catalog.lab!.models["model-a"]!).cache.lifetime.lifetimes[0]!.evaluation_ids).toContain("differs");
+    });
+
+    it("reports a documented lifetime that is not a duration, and does not make an item of it", () => {
+      const catalog = documentedUpstream();
+      catalog.lab!.models["model-c"]!.capabilities = { cache: { implicit: { ttl: ["5m-10m", "1h"] }, explicit: { ttl: ["about an hour"] } } };
+      const result = resolve(input([], { upstream: catalog }));
+      expect(result.issues).toEqual([
+        expect.objectContaining({ level: "notice", code: "unparsed-lifetime", target: "lab/model-c#capabilities.cache.implicit.ttl" }),
+        expect.objectContaining({ level: "notice", code: "unparsed-lifetime", target: "lab/model-c#capabilities.cache.explicit.ttl" }),
+      ]);
+      expect(ext(result.catalog.lab!.models["model-c"]!).cache.lifetime.lifetimes.map((item) => item.documented_as)).toEqual(["1h"]);
+    });
+
+    it("reports a retention option whose lifetime is not the documented lifetime of its profile", () => {
+      const source = { kind: "documented" as const, url: "https://example.com/api-reference", date: "2026-11-14", note: "The reference names the field and its values." };
+      const control = (longSeconds: number) => ({
+        id: "cache.retention", support: "supported", when: null,
+        bindings: [{ location: "body", path: "/cache_control/ttl", scope: "content_block" }],
+        options: [
+          { value: null, attributes: { retention_s: 300, profile: "short" }, settings: null, when: null },
+          { value: "1h", attributes: { retention_s: longSeconds, profile: "long" }, settings: null, when: null },
+        ],
+        default: { value: "5m" }, conditions: [], evidence: [source],
+      });
+      const file = (longSeconds: number) => OverrideFileSchema.parse({ provider: "lab", rules: [{ models: ["model-a"], request_controls: [control(longSeconds)], reason: "The provider documents the field", evidence }] });
+      expect(resolve(input([file(3600)], { upstream: documentedUpstream() })).issues).toEqual([]);
+      expect(resolve(input([file(7200)], { upstream: documentedUpstream() })).issues).toEqual([
+        expect.objectContaining({ level: "notice", code: "retention-lifetime-differs", target: "lab/model-a#request_controls.cache.retention" }),
+      ]);
+    });
   });
 });

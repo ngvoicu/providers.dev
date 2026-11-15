@@ -1,6 +1,22 @@
 // resolve(): upstream snapshot + our additions + our overrides + our measurements -> the published catalog.
 // Pure: no files, no network, no clock. The same inputs always give the same output.
-import { cacheResult, documentedCache, lifetimeAsked, profileOf, retentionOf, summarizeCache, type CacheEvaluation, type CacheRetention, type EntryCache, type RetentionEvidence } from "./cache.ts";
+import {
+  cacheLifetime,
+  cacheResult,
+  documentedCache,
+  durationSeconds,
+  evaluationLifetime,
+  lifetimeAsked,
+  profileOf,
+  retentionOf,
+  summarizeCache,
+  type CacheEvaluation,
+  type CacheMode,
+  type CacheRetention,
+  type EntryCache,
+  type LifetimeSource,
+  type RetentionEvidence,
+} from "./cache.ts";
 import { clone, isObject, mergePatch, type Change, type Json, type JsonObject } from "./merge.ts";
 import { controlsOf, pricingOf, retentionFromControl } from "./policies.ts";
 import {
@@ -458,6 +474,18 @@ export function resolve(input: ResolveInput): ResolveResult {
         source: sourceUrl(run.source),
       };
       (evaluations.get(model) ?? evaluations.set(model, []).get(model)!).push(evaluation);
+      // The lifetime is derived from the published checks. Where groundtruth gives its own reading of the same run,
+      // and the control did not miss (groundtruth's reading ignores the control), the two must agree.
+      const derived = evaluationLifetime(evaluation);
+      const controlMissed = run.control !== undefined && run.control.total > 0 && run.control.warm < run.control.total;
+      if (derived && !controlMissed && run.all_warm_through_s !== undefined && derived.safe_s !== (run.all_warm_through_s ?? 0)) {
+        issues.push({
+          level: "warning",
+          code: "lifetime-differs",
+          target: run.id,
+          message: `The checks of ${run.id} give a lifetime of ${derived.safe_s} s; groundtruth's all_warm_through_s is ${run.all_warm_through_s ?? "null"}. The value derived from the checks is published.`,
+        });
+      }
     }
 
     for (const limit of observed.limits) {
@@ -548,7 +576,38 @@ export function resolve(input: ResolveInput): ResolveResult {
       ];
       const cacheEvidence: RetentionEvidence[] = cacheSources.flatMap((source) => source.kind === "listed" ? [] : [{ ...source, kind: source.kind, note: source.note ?? "Source for this entry's cache capabilities." }]);
       if (extension.origin === "upstream") cacheEvidence.unshift({ kind: "documented", url: "https://models.dev", date: input.upstreamDate ?? null, note: "Cache capabilities imported from models.dev; any corrections are recorded in provenance." });
-      const cache: EntryCache = { documented, retention: retentionOf(documented, cacheEvidence, declaration), results: summarizeCache(own), evaluations: own };
+      // Where a documented lifetime comes from: a providers.dev correction of the cache capabilities, an entry
+      // providers.dev added, or the models.dev import. Null = the "does not cache" item.
+      const lifetimeSource = (mode: CacheMode | null): { source: LifetimeSource; date: string | null } => {
+        const field = mode ? `capabilities.cache.${mode}.ttl` : null;
+        const corrections = (extension.provenance ?? []).filter((change) =>
+          field
+            ? change.path === field || change.path.startsWith(`${field}.`) || ["capabilities", "capabilities.cache", `capabilities.cache.${mode}`].includes(change.path)
+            : change.path === "capabilities" || change.path === "capabilities.cache" || change.path.startsWith("capabilities.cache."),
+        );
+        if (corrections.length > 0) return { source: "providers.dev", date: newestDate(corrections.flatMap((change) => change.evidence.map((source) => source.date))) ?? null };
+        if (extension.origin === "added") return { source: "providers.dev", date: newestDate((extension.evidence ?? []).filter((source) => source.kind !== "listed").map((source) => source.date)) ?? null };
+        return { source: "models.dev", date: input.upstreamDate ?? null };
+      };
+      const ref = `${id}/${model.id}`;
+      for (const mode of ["implicit", "explicit"] as const) {
+        for (const text of documented.modes[mode].ttl ?? []) {
+          if (durationSeconds(text) !== undefined) continue;
+          issues.push({
+            level: "notice",
+            code: "unparsed-lifetime",
+            target: `${ref}#capabilities.cache.${mode}.ttl`,
+            message: `"${text}" in capabilities.cache.${mode}.ttl of ${ref} is not a duration of one number and one unit. It is published as imported and is no documented lifetime.`,
+          });
+        }
+      }
+      const cache: EntryCache = {
+        documented,
+        retention: retentionOf(documented, cacheEvidence, declaration),
+        lifetime: cacheLifetime(documented, own, lifetimeSource),
+        results: summarizeCache(own),
+        evaluations: own,
+      };
       /** Where a field of `owner` comes from: the models.dev import, or providers.dev's own sources for it. */
       const sourcesOf = (owner: PublishedModel, field: string, imported: string): RetentionEvidence[] => {
         const ownerExtension = modelExt(owner);
@@ -574,6 +633,22 @@ export function resolve(input: ResolveInput): ResolveResult {
         : "The cost models.dev records for this entry. Rules are in the order models.dev applies them: base prices, overrides in their order, then multipliers.";
       const pricing = pricingOf(priced, extension.access, reference, sourcesOf(priced, "cost", priceNote), priceDeclaration);
       const requestControls = controlsOf(model, cache.retention, sourcesOf(model, "capabilities", "Imported capabilities; corrections are recorded in providers_dev.provenance."), controlDeclarations.get(model));
+      // The lifetime an option of the retention control asks for is kept equal to the documented lifetime of its profile.
+      for (const control of requestControls.items.filter((item) => item.id === "cache.retention")) {
+        for (const option of control.options ?? []) {
+          const asked = option.attributes?.retention_s;
+          const profile = option.attributes?.profile;
+          if (typeof asked !== "number" || (profile !== "short" && profile !== "long")) continue;
+          const documentedS = cache.lifetime[profile].documented_s;
+          if (asked === documentedS) continue;
+          issues.push({
+            level: "notice",
+            code: "retention-lifetime-differs",
+            target: `${ref}#request_controls.cache.retention`,
+            message: `The ${profile} option ${JSON.stringify(option.value)} of the cache.retention control of ${ref} has retention_s ${asked}; the documented ${profile} lifetime is ${documentedS ?? "not documented"}. Correct one of the two with an override.`,
+          });
+        }
+      }
       // A declaration made for this entry by name is evidence about the entry. One that reached it through a
       // provider-wide selection is not: its source stays with the control.
       const wide = providerWide.get(model);

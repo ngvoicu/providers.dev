@@ -111,6 +111,8 @@ export interface CacheRetention {
 export interface EntryCache {
   documented: CacheDocumentation;
   retention: CacheRetention;
+  /** Every lifetime known for the entry, documented or measured, and the safe value of each retention profile. */
+  lifetime: CacheLifetimeRecord;
   /** The summary table. Null = no evaluation on this entry. */
   results: CacheSummaryRow[] | null;
   evaluations: CacheEvaluation[];

@@ -7,7 +7,7 @@
 // known is null and a list with nothing in it is empty; no key is left out. So none of these schemas has an optional
 // field. Only the models.dev part of an entry or a provider keeps models.dev's shape, where a field can be absent.
 import { z } from "zod";
-import type { CacheEvaluation, CacheResult, CacheSummaryRow, EntryCache } from "./cache.ts";
+import type { CacheEvaluation, CacheLifetimeItem, CacheLifetimeRecord, CacheResult, CacheSummaryRow, EntryCache, SafeLifetime } from "./cache.ts";
 import { CacheDocumentationSchema, CacheModeDocumentationSchema, CacheRetentionSchema, RetentionProfileSchema, SupportSchema } from "./cache-contract.ts";
 import { ApiEndpointSchema, CapabilitiesSchema, CachePriceSchema, CostSchema, DocumentedCacheSchema, ModelMetadataShape, PriceConditionSchema, TextPriceSchema } from "./metadata-contract.ts";
 import { BillingUnitSchema, ConditionSchema, PolicyEvidenceSchema, PricingRuleSchema, PricingSchema, RequestBindingSchema, RequestControlSchema, RequestControlsSchema, RequestOptionSchema, RequestSettingSchema } from "./policy-contract.ts";
@@ -73,10 +73,63 @@ export const CacheEvaluationSchema = z
   })
   .describe("One cache evaluation: a fresh prompt cached once, then sent again at once and at set ages.") satisfies z.ZodType<CacheEvaluation>;
 
+const lifetimeSource = z.enum(["providers.dev", "models.dev"]);
+
+export const CacheLifetimeItemSchema = z
+  .strictObject({
+    retention_profile: RetentionProfileSchema.describe("Documented: short for the shortest lifetime the entry documents, long for every other. Measured: the profile of its evaluations."),
+    basis: z.enum(["measured", "documented"]).describe("documented = a lifetime the source documents. measured = what the evaluations of one client with one retention setting showed. Says which of the keys below apply."),
+    source: lifetimeSource.describe("Documented: models.dev, or providers.dev where the lifetime is a providers.dev correction or the entry is one providers.dev added. Measured: always providers.dev."),
+    date: date.nullable().describe("Documented: the import date for models.dev, the newest evidence date for providers.dev. Measured: the newest of its evaluations. Null = the source has no date."),
+    lifetime_s: z.int().min(0).describe("Documented: the lifetime in seconds; 0 on the item that says the entry does not cache. Measured: the oldest tested age through which every check of every one of its evaluations hit; 0 = no such age."),
+    mode: z.enum(["implicit", "explicit"]).nullable().describe("Documented: the way of caching the lifetime is documented for. Null on the item that says the entry does not cache, and on a measured item."),
+    documented_as: z.string().nullable().describe("Documented: the lifetime as the source writes it, for example 5m. Null on the item that says the entry does not cache, and on a measured item."),
+    client: z.string().nullable().describe("Measured: the public id of the client the requests went through, as on the evaluations. Null on a documented item."),
+    client_label: z.string().nullable().describe("Measured: its public label. Null on a documented item."),
+    parameter: z.string().nullable().describe("Measured: the request field that asked for the lifetime, as on the evaluations. Null = no lifetime was asked for, and on a documented item."),
+    value: z.string().nullable().describe("Measured: the value sent in it. Null together with parameter."),
+    evaluations: z.int().min(0).describe("Measured: how many evaluations the item is made from, at least 1. 0 on a documented item."),
+    evaluation_ids: z.array(z.string()).describe("Measured: their ids, sorted, as in the entry's evaluations and in /api/v1/evaluations/cache. Empty on a documented item."),
+    checks: z.int().min(0).describe("Measured: re-sends made in them, the control included. 0 on a documented item."),
+    hits: z.int().min(0).describe("Measured: how many of those were served from the cache. 0 on a documented item."),
+    tested_from_s: z.int().min(0).nullable().describe("Measured: the youngest timed age any of them checked; no younger age was checked. Null = none made a timed check, and on a documented item."),
+    first_miss_s: z.int().min(0).nullable().describe("Measured: the youngest age at which any of them had a check that missed; 0 = the immediate re-send. Null = no miss, and on a documented item."),
+    results: z.array(CacheResultSchema).nullable().describe("Measured: the results of its evaluations added up by exact age, the control first. lifetime_s is read from each evaluation on its own and the lowest taken, so on an item of several evaluations it can be below what these sums show. Null on a documented item."),
+  })
+  .describe("One lifetime of an entry: documented by a source, or measured for one client with one retention setting. One shape for both; the keys of the other kind are null, 0 or empty.") satisfies z.ZodType<CacheLifetimeItem>;
+
+export const SafeLifetimeSchema = z
+  .strictObject({
+    safe_s: z.int().min(0).nullable().describe("Seconds a cached prompt can be relied on: documented_s, unless an evaluation of the profile contradicts it (at an age up to documented_s, fewer than half of its checks hit), and then measured_s; measured_s where nothing is documented. Never above documented_s. 0 = no cache to rely on (basis says whether documented or measured). Null = not known."),
+    basis: z.enum(["measured", "documented", "none"]).describe("documented: safe_s is documented_s. measured: safe_s is measured_s. none: exactly when safe_s is null."),
+    source: lifetimeSource.nullable().describe("Who the value is from. measured: always providers.dev. documented: the source of the documented item it is taken from. Null with none."),
+    date: date.nullable().describe("measured: the newest evaluation counted. documented: the date of the documented item it is taken from. Null with none, and where the source has no date."),
+    documented_s: z.int().min(0).nullable().describe("The documented lifetime of the profile: the lowest lifetime_s of its documented items. 0 = the provider documents that it does not cache. Null = none is documented."),
+    measured_s: z.int().min(0).nullable().describe("The measured lifetime of the profile: the lowest lifetime_s of its measured items, the oldest age through which every check hit in every client. 0 = no such age. Null = not measured."),
+    clients: z.int().min(0).describe("How many clients were measured. 0 = not measured."),
+    evaluations: z.int().min(0).describe("How many evaluations were counted. 0 = not measured."),
+    checks: z.int().min(0).describe("Re-sends made in them, the control included."),
+    hits: z.int().min(0).describe("How many of those were served from the cache."),
+    checks_inside: z.int().min(0).nullable().describe("Of checks, those at an age up to and including documented_s, the control included. Null where the profile is not both documented and measured."),
+    hits_inside: z.int().min(0).nullable().describe("How many of checks_inside were served from the cache. Null with checks_inside."),
+    tested_from_s: z.int().min(0).nullable().describe("The youngest age, after the control, that any counted evaluation checked. No age below it was checked. Null = not measured, or no timed check was made."),
+    first_miss_s: z.int().min(0).nullable().describe("The youngest age at which any check of a counted evaluation missed. 0 = the immediate re-send missed. Null = not measured, or no check missed."),
+  })
+  .describe("The safe lifetime of an entry for one retention profile, with the documented and the measured lifetime it was chosen from and what was measured.") satisfies z.ZodType<SafeLifetime>;
+
+export const CacheLifetimeRecordSchema = z
+  .strictObject({
+    short: SafeLifetimeSchema.describe("The short profile: no lifetime asked for, or the shortest documented one."),
+    long: SafeLifetimeSchema.describe("The long profile: a longer lifetime asked for."),
+    lifetimes: z.array(CacheLifetimeItemSchema).describe("Every lifetime known for the entry: short, then long; in each, the documented items by seconds, implicit before explicit, then the measured ones, the setting that asked for no lifetime first, then by seconds and value, then by client. Empty = none is known."),
+  })
+  .describe("Every cache lifetime of an entry in one list, and the safe value of each retention profile. Worked out once when the data is built. What the documentation says and what evaluations found on their dates, not a guarantee.") satisfies z.ZodType<CacheLifetimeRecord>;
+
 export const EntryCacheSchema = z
   .strictObject({
     documented: CacheDocumentationSchema,
     retention: CacheRetentionSchema,
+    lifetime: CacheLifetimeRecordSchema,
     results: z.array(CacheSummaryRowSchema).nullable().describe("The summary table: a line per retention setting, short before long. Null = no evaluation on this entry."),
     evaluations: z.array(CacheEvaluationSchema).describe("The evaluations the summary adds up, newest first."),
   })
@@ -366,6 +419,9 @@ export const COMPONENTS = {
   CacheDocumentation: CacheDocumentationSchema,
   CacheModeDocumentation: CacheModeDocumentationSchema,
   CacheRetention: CacheRetentionSchema,
+  CacheLifetime: CacheLifetimeRecordSchema,
+  SafeLifetime: SafeLifetimeSchema,
+  CacheLifetimeItem: CacheLifetimeItemSchema,
   CacheSummaryRow: CacheSummaryRowSchema,
   CacheResult: CacheResultSchema,
   CacheEvaluation: CacheEvaluationSchema,

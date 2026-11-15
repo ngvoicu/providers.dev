@@ -1,8 +1,9 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { isDeepStrictEqual } from "node:util";
 import { beforeAll, describe, expect, it } from "vitest";
 import { publish } from "../scripts/lib/publish.ts";
-import { sync } from "../scripts/lib/sync.ts";
+import { loadUpstream, sync } from "../scripts/lib/sync.ts";
 import type { z } from "zod";
 import { handleApi, modelsFor, type ApiDeps } from "../src/core/api.ts";
 import { snapshotAsset } from "../src/core/assets.ts";
@@ -28,7 +29,7 @@ import { MARK } from "../src/core/page-shell.ts";
 import { CACHE_EVALUATION_PARAMS, LIMIT_EVALUATION_PARAMS, PARAMS, parseQuery, runQuery } from "../src/core/query.ts";
 import { canonicalModels, listEvaluations, withoutEntries } from "../src/core/resources.ts";
 import type { Catalog, ModelExtension } from "../src/core/schema.ts";
-import { depsFrom, fetchReturning, fixtureUpstream, ROOT, summaryOf, tempDataDir, writeAuthored } from "./helpers.ts";
+import { depsFrom, fetchReturning, fixtureUpstream, lifetimeRuleBreaks, ROOT, summaryOf, tempDataDir, writeAuthored } from "./helpers.ts";
 
 let deps: ApiDeps;
 let published: string;
@@ -385,6 +386,9 @@ describe("the contract", () => {
     same(extensions.map((extension) => extension.limits), "limits");
     same(extensions.map((extension) => extension.cache), "cache");
     same(extensions.map((extension) => extension.cache.retention), "cache.retention");
+    same(extensions.map((extension) => extension.cache.lifetime), "cache.lifetime");
+    same(extensions.flatMap((extension) => [extension.cache.lifetime.short, extension.cache.lifetime.long]), "cache.lifetime.short and long");
+    same(extensions.flatMap((extension) => extension.cache.lifetime.lifetimes), "cache.lifetime.lifetimes");
     same(extensions.map((extension) => extension.pricing), "pricing");
     same(extensions.flatMap((extension) => extension.pricing.rules ?? []), "pricing rules");
     same(extensions.flatMap((extension) => extension.request_controls.items), "request controls");
@@ -396,6 +400,32 @@ describe("the contract", () => {
     same(extensions.flatMap((extension) => [...extension.evidence, ...extension.provenance.flatMap((change) => change.evidence)]), "evidence");
     for (const list of ["cache", "limits"]) same(((await ask(`/api/v1/evaluations/${list}?limit=200`)) as { data: object[] }).data, `the list of ${list} evaluations`);
     same(modelsFor(local.index).map(withoutEntries), "canonical models");
+
+    // The cache lifetime record of every entry keeps the rules of section 2.6 of design/safe-cache-lifetime.md, and its
+    // safe value is the documented lifetime exactly where no counted evaluation contradicts it, redone from evaluations[].
+    const broken = Object.entries(exported).flatMap(([id, provider]) =>
+      Object.entries(provider.models).flatMap(([modelId, entry]) => {
+        const cache = (entry.providers_dev as unknown as ModelExtension).cache;
+        return lifetimeRuleBreaks(cache.lifetime, cache.evaluations, cache.documented).map((rule) => `${id}/${modelId}: ${rule}`);
+      }),
+    );
+    expect(broken).toEqual([]);
+
+    // The models.dev part of an entry nobody corrected is the import, unchanged.
+    const upstream = loadUpstream(join(dir, ".."))!.catalog;
+    const changed: string[] = [];
+    let compared = 0;
+    for (const [id, provider] of Object.entries(exported)) {
+      for (const [modelId, entry] of Object.entries(provider.models)) {
+        const extension = entry.providers_dev as unknown as ModelExtension;
+        if (extension.origin !== "upstream" || extension.provenance.length > 0) continue;
+        const { providers_dev: _ours, ...imported } = entry;
+        compared += 1;
+        if (!isDeepStrictEqual(imported, upstream[id]?.models[modelId])) changed.push(`${id}/${modelId}`);
+      }
+    }
+    expect(compared).toBeGreaterThan(0);
+    expect(changed).toEqual([]);
   };
 
   it("holds for every answer of the fixture", async () => {
