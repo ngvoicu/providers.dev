@@ -6,6 +6,7 @@ import type { ApiDeps } from "../src/core/api.ts";
 import { addResults, documentedCache, emptyCacheLifetime, RETENTION_PROFILES, type CacheDocumentation, type CacheEvaluation, type CacheLifetimeRecord, type CacheResult, type EntryCache } from "../src/core/cache.ts";
 import type { Index, Summary } from "../src/core/entries.ts";
 import { controlsOf, pricingOf } from "../src/core/policies.ts";
+import type { InputWindow } from "../src/core/limits.ts";
 import type { MeasuredLimit, Meta, ModelExtension, UpstreamCatalog } from "../src/core/schema.ts";
 import { ROOT } from "../scripts/lib/files.ts";
 
@@ -130,6 +131,90 @@ export function lifetimeRuleBreaks(record: CacheLifetimeRecord, evaluations: rea
   for (const profile of RETENTION_PROFILES) {
     const zero = record.lifetimes.filter((item) => item.retention_profile === profile && item.basis === "documented" && item.lifetime_s === 0 && item.mode === null && item.documented_as === null).length;
     fail(`${profile} 12 does not cache`, zero === (documented.support === "unsupported" ? 1 : 0));
+  }
+  return broken;
+}
+
+/**
+ * What always holds for the input window record of an entry (section 2.6 of design/usable-input-window.md), checked
+ * from the record and the entry's own published `limit`, `limits.from_measurement` and `limits.measured`. Written
+ * apart from `inputWindow`: the documented input (3.1), what each evaluation gives (3.3) and the test for
+ * "contradicted" (4.2) are redone here. Returns the rules that fail, empty when all hold.
+ */
+export function inputWindowRuleBreaks(
+  record: InputWindow,
+  limit: unknown,
+  fromMeasurement: readonly string[],
+  measured: readonly (Omit<MeasuredLimit, "input_read"> & { input_read?: number | null })[],
+): string[] {
+  const broken: string[] = [];
+  const fail = (rule: string, holds: boolean): void => {
+    if (!holds) broken.push(rule);
+  };
+  const r = record;
+  // 3.1, redone.
+  const object = typeof limit === "object" && limit !== null && !Array.isArray(limit) ? (limit as Record<string, unknown>) : {};
+  const above0 = (value: unknown): value is number => typeof value === "number" && value > 0;
+  const documented = above0(object.input) ? { tokens: object.input, field: "limit.input" } : above0(object.context) && !fromMeasurement.includes("context") ? { tokens: object.context, field: "limit.context" } : null;
+  // 3.3, redone: what each evaluation gives, or null where it does not count.
+  const gives = (e: (typeof measured)[number]): { tokens: number; bound: string; kind: string } | null => {
+    const v = e.input_read ?? null;
+    if (e.context !== null && (e.input_refused === null || e.input_refused > e.context)) return { tokens: e.context, bound: "limit", kind: "window" };
+    if (e.input_accepted !== null && e.input_refused !== null) return { tokens: e.input_accepted, bound: "at_least", kind: "bracket" };
+    if (v !== null && e.input_refused === null) return { tokens: v, bound: "at_least", kind: "accepted" };
+    return null;
+  };
+  const counted = measured.filter((e) => gives(e) !== null);
+  const none = r.basis === "none";
+  fail("1 none", [r.tokens === null, r.bound === null && r.scope === null && r.source === null, r.documented_tokens === null && r.measured_tokens === null].every((value) => value === none));
+  if (r.basis === "documented") {
+    fail("2 documented", r.tokens === r.documented_tokens && r.bound === "limit" && r.source === r.documented_source && r.date === r.documented_date && r.scope === (r.documented_field === "limit.input" ? "input" : "window"));
+  }
+  if (r.basis === "measured") {
+    fail("3 measured", r.tokens === r.measured_tokens && r.bound === r.measured_bound && r.source === "providers.dev" && r.date === r.measured_date && r.scope === (r.measured_kind === "window" ? "window" : "input"));
+  }
+  fail("4 documented null", (r.documented_tokens === null) === (r.documented_field === null) && (r.documented_tokens === null) === (r.documented_source === null));
+  fail("4 documented value", r.documented_tokens === (documented?.tokens ?? null) && r.documented_field === (documented?.field ?? null));
+  const first = r.measurements[0];
+  const empty = r.measured_tokens === null;
+  fail("5 measured null", [r.measurements.length === 0, r.evaluations === 0, r.clients === 0, r.measured_bound === null && r.measured_kind === null && r.measured_refused === null && r.measured_date === null].every((value) => value === empty));
+  if (first) {
+    fail("5 first", r.measured_tokens === first.tokens && r.measured_bound === first.bound && r.measured_kind === first.kind && r.measured_date === first.date && r.measured_refused === (first.kind === "bracket" ? first.refused : null));
+    fail("5 lowest", r.measurements.every((item) => item.tokens >= first.tokens));
+  }
+  fail("5 counts", r.evaluations === r.measurements.length && r.clients === new Set(r.measurements.map((item) => item.client)).size);
+  // 6: one item per counted evaluation, and the item is what the evaluation gives.
+  const unused = [...r.measurements];
+  for (const e of counted) {
+    const g = gives(e)!;
+    const at = unused.findIndex((item) => item.client === e.client && item.route === e.route && item.date === e.date && item.source === e.source && item.tokens === g.tokens && item.bound === g.bound && item.kind === g.kind && item.accepted === e.input_accepted && item.refused === e.input_refused && item.named === e.context && item.read === (e.input_read ?? null) && item.client_label === e.client_label && item.route_label === e.route_label);
+    fail(`6 item of ${e.client} ${e.route} ${e.date}`, at >= 0);
+    if (at >= 0) unused.splice(at, 1);
+  }
+  fail("6 no other item", unused.length === 0);
+  const both = r.documented_tokens !== null && r.measured_tokens !== null;
+  fail("7 status set", (r.documented_status !== null) === both);
+  if (both) {
+    fail("7 status and basis", (r.documented_status === "contradicted") === (r.basis === "measured") && (r.documented_status === "not_contradicted") === (r.basis === "documented"));
+    // 4.2, redone from measurements.
+    const D = r.documented_tokens!;
+    const contradicted = r.measurements.some(
+      (item) =>
+        (item.named !== null && item.named < D) ||
+        (item.kind === "window" && r.documented_field === "limit.context" && item.named !== D) ||
+        (item.kind === "bracket" && item.refused !== null && item.refused * 100 <= D * 99) ||
+        (item.kind !== "window" && item.tokens * 100 >= D * 101),
+    );
+    fail("7 rule", r.documented_status === (contradicted ? "contradicted" : "not_contradicted"));
+  }
+  if (r.documented_tokens !== null && r.measured_tokens === null) fail("8 documented only", r.basis === "documented");
+  if (r.documented_tokens === null && r.measured_tokens !== null) fail("8 measured only", r.basis === "measured");
+  for (const item of r.measurements) {
+    const where = `9 ${item.client} ${item.route}`;
+    if (item.accepted !== null && item.refused !== null) fail(`${where} accepted below refused`, item.accepted < item.refused);
+    if (item.accepted !== null && item.named !== null) fail(`${where} accepted within named`, item.accepted <= item.named);
+    if (item.read !== null && item.accepted !== null) fail(`${where} read within accepted`, item.read <= item.accepted);
+    fail(`${where} kind`, item.kind === "window" ? item.tokens === item.named && item.bound === "limit" : item.kind === "bracket" ? item.tokens === item.accepted && item.bound === "at_least" : item.tokens === item.read && item.bound === "at_least");
   }
   return broken;
 }
