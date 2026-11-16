@@ -1,10 +1,17 @@
 // Presentation only: all descriptions, fields and examples come from the served OpenAPI JSON.
-import { escapeHtml as e, exact } from "./format.ts";
+import { escapeHtml as e, exact, shortAge } from "./format.ts";
 import type { Documentation } from "./resources.ts";
 import type { Meta } from "./schema.ts";
 
 /** The fields of /api/v1/meta that authored text can name in a slot. */
-const META_SLOTS = { stale_after_days: (meta: Meta) => exact(meta.stale_after_days) } as const;
+const META_SLOTS = {
+  stale_after_days: (meta: Meta) => exact(meta.stale_after_days),
+  // Each age as the column heads of the results by age write it ("2.5 min", "1 h 15"), in the published order.
+  cache_ages_s: (meta: Meta) => wordList(meta.cache_ages_s.map(shortAge)),
+} as const;
+
+/** "a", "a and b", "a, b and c". */
+const wordList = (items: readonly string[]): string => (items.length < 2 ? items.join("") : `${items.slice(0, -1).join(", ")} and ${items.at(-1)}`);
 
 /**
  * Authored text is compiled with the templates and holds no published value: where it states one, it names the field

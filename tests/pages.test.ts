@@ -178,6 +178,30 @@ describe("API response boundary", () => {
     expect(published).toContain("<span>2.5m</span>");
   });
 
+  it("takes the ages of cache evaluations in the methodology from the published meta, as the column heads write them", async () => {
+    const slot = '<span data-meta="cache_ages_s"><code>cache_ages_s</code></span>';
+    const withAges = (ages: number[] | null) => async (path: string): Promise<Response> => {
+      if (path === "/api/v1/meta" && ages) {
+        const answer = await (await api(path)).json() as { meta: unknown; data: { cache_ages_s: number[] } };
+        return Response.json({ ...answer, data: { ...answer.data, cache_ages_s: ages } });
+      }
+      if (path === "/api/v1/docs/methodology") {
+        const answer = await (await api(path)).json() as { meta: unknown; data: { body_html: string } };
+        return Response.json({ ...answer, data: { ...answer.data, body_html: `<p>Then checked at ${slot}, the later ages where the cache lasts.</p>` } });
+      }
+      return api(path);
+    };
+    // As published: the ladder of the build, the same ages as the columns of the results by age.
+    const published = await (await page("/docs/methodology/", withAges(null))).text();
+    expect(published).toContain('Then checked at <span data-meta="cache_ages_s">2.5 min, 5 min, 7.5 min, 10 min, 15 min, 20 min, 25 min, 30 min, 40 min, 50 min, 1 h, 1 h 15, 1 h 30, 2 h, 4 h, 8 h, 12 h and 24 h</span>, the later ages where the cache lasts.');
+    // A publication with other ages: the page lists those, and none of the build's.
+    const other = await (await page("/docs/methodology/", withAges([600, 3900]))).text();
+    expect(other).toContain('Then checked at <span data-meta="cache_ages_s">10 min and 1 h 5</span>, the later ages where the cache lasts.');
+    expect(other).not.toContain("2.5 min");
+    const one = await (await page("/docs/methodology/", withAges([300]))).text();
+    expect(one).toContain('Then checked at <span data-meta="cache_ages_s">5 min</span>, the later ages');
+  });
+
   it("fails visibly on API errors and does not substitute stale or private data", async () => {
     const response = await page("/providers/", async (path) => path === "/api/v1/meta" ? api(path) : new Response(null, { status: 503 }));
     expect(response.status).toBe(503);
