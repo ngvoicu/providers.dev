@@ -9,7 +9,7 @@ import type { JsonObject } from "./merge.ts";
 import { fillShell, PAGE_SHELL } from "./page-shell.ts";
 import { parseQuery, serializeQuery, SITE_DEFAULT } from "./query.ts";
 import { entryHtml } from "./render.ts";
-import type { CanonicalModel, CanonicalModelDetail, Correction, CacheEvaluationRecord, Documentation, Facets, LimitEvaluationRecord } from "./resources.ts";
+import { DOCUMENTS, type CanonicalModel, type CanonicalModelDetail, type Correction, type CacheEvaluationRecord, type Documentation, type Facets, type LimitEvaluationRecord } from "./resources.ts";
 import type { Meta } from "./schema.ts";
 
 export interface PageDeps {
@@ -92,7 +92,7 @@ export async function handlePage(request: Request, deps: PageDeps): Promise<Resp
       view = { title: "Evidence", description: "Corrections and evaluations with sources and dates.", html: evidenceHtml(meta, corrections, added, cache, measured, url, today) };
     } else if (path === "/docs/api") {
       view = { title: "API", description: "The providers.dev API: endpoints, parameters, response schemas and examples.", html: openapiHtml(await read<OpenApiDocument>("/api/v1/openapi.json")) };
-    } else if (path === "/docs/methodology" || path === "/docs/licensing") {
+    } else if (path.startsWith("/docs/") && (DOCUMENTS as readonly string[]).includes(path.slice("/docs/".length))) {
       const document = await one<Documentation>(`/api/v1${path}`);
       view = { title: document.title, description: document.description, html: documentHtml(fillMetaSlots(document, meta)) };
     } else throw new ApiError(404);
@@ -106,7 +106,7 @@ export async function handlePage(request: Request, deps: PageDeps): Promise<Resp
   const nav = [["/", "Catalog"], ["/providers/", "Providers"], ["/models/", "Models"], ["/evidence/", "Evidence"], ["/docs/api/", "API"], ["/docs/methodology/", "Methodology"]];
   const html = fillShell(await shell.text(), {
     title: e(view.title), description: e(view.description), canonical: e(new URL(view.canonical ?? url.pathname, deps.site).toString()), html: view.html,
-    nav: nav.map(([href, label]) => `<a href="${href}"${href === "/" ? path === "/" || path.startsWith("/entr") ? ' aria-current="page"' : "" : `${path}/`.startsWith(href!) || (path === "/docs/licensing" && label === "Methodology") ? ' aria-current="page"' : ""}>${label}</a>`).join(""),
+    nav: nav.map(([href, label]) => `<a href="${href}"${href === "/" ? path === "/" || path.startsWith("/entr") ? ' aria-current="page"' : "" : `${path}/`.startsWith(href!) || ((path === "/docs/licensing" || path === "/docs/contributing") && label === "Methodology") ? ' aria-current="page"' : ""}>${label}</a>`).join(""),
     dataset: meta ? `<li>Version <code>${e(meta.dataset_version)}</code></li><li>Published ${e(meta.generated_at.slice(0, 10))} ${e(meta.generated_at.slice(11, 16))} UTC</li><li>models.dev imported ${e(meta.upstream.fetched_at.slice(0, 10))}${meta.upstream.commit ? ` (<a href="https://github.com/anomalyco/models.dev/commit/${e(meta.upstream.commit)}"><code>${e(meta.upstream.commit.slice(0, 7))}</code></a>)` : ""}</li>${meta.sync.last_attempt_ok === false ? '<li class="stale">The last import failed. This is the last good snapshot.</li>' : ""}` : '<li>Metadata unavailable</li>',
   });
   const etag = await representationTag(html);

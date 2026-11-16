@@ -306,7 +306,7 @@ export function depsFrom(publishedDir: string): ApiDeps {
     index,
     meta,
     async asset(path) {
-      if (/^\/reference-content\/docs\/(methodology|licensing)\.json$/.test(path)) {
+      if (/^\/reference-content\/docs\/(methodology|licensing|contributing)\.json$/.test(path)) {
         return new Response(JSON.stringify({ title: "Reference fixture", description: "Reference", lead: "Reference", toc: [], body_html: "<p>Reference fixture</p>" }));
       }
       const file = join(publishedDir, "site", path);

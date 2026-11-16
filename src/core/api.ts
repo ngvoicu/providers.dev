@@ -19,7 +19,7 @@ import {
   utcToday,
   type ParamDoc,
 } from "./query.ts";
-import { canonicalModels, facets, page, withoutEntries, type CanonicalModelDetail, type Correction, type Documentation, type EvaluationRecord } from "./resources.ts";
+import { canonicalModels, DOCUMENTS, facets, page, withoutEntries, type CanonicalModelDetail, type Correction, type Documentation, type EvaluationRecord } from "./resources.ts";
 import type { Meta } from "./schema.ts";
 
 export interface ApiDeps {
@@ -156,7 +156,7 @@ export async function handleApi(request: Request, deps: ApiDeps): Promise<Respon
   if (document !== null) {
     const values = params([]);
     if (values instanceof Response) return values;
-    if (document !== "methodology" && document !== "licensing") return fail(meta, 404, "not_found", "No such reference document.");
+    if (!(DOCUMENTS as readonly string[]).includes(document)) return fail(meta, 404, "not_found", "No such reference document.");
     const asset = await deps.asset(`/reference-content/docs/${document}.json`);
     if (!asset) return missing(`the ${document} document`);
     return one(await asset.json() as Documentation);

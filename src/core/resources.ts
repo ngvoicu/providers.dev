@@ -41,6 +41,9 @@ export function listCorrections(catalog: Catalog, index: Index): Correction[] {
   return [...groups.values()];
 }
 
+/** The authored reference documents: `/docs/{name}/` on the site and `/api/v1/docs/{name}` in the API. */
+export const DOCUMENTS = ["methodology", "licensing", "contributing"] as const;
+
 /** Authored reference text, published through the API along with the machine-readable contract. */
 export interface Documentation {
   title: string;

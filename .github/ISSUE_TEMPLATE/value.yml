@@ -1,0 +1,89 @@
+name: A value is wrong or missing
+description: A correction, a missing provider or model, or a request for a measurement. A link to the source is required.
+title: "[value] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A value is published with its source. Give a link to the provider's own page or model list, the sentence quoted, and the day you read it; or a measurement with its raw result files.
+        providers.dev takes no payment for listing, correcting or measuring an entry. How contributions work: https://providers.dev/docs/contributing/
+  - type: dropdown
+    id: request
+    attributes:
+      label: What this is
+      options:
+        - A value is wrong
+        - A value, a model or a provider is missing
+        - I am asking for a measurement
+    validations:
+      required: true
+  - type: input
+    id: provider
+    attributes:
+      label: Provider
+      placeholder: openrouter
+    validations:
+      required: true
+  - type: dropdown
+    id: access
+    attributes:
+      label: Access method
+      description: An API key and a subscription login are different entries. A value is never copied from one to the other.
+      options:
+        - API key
+        - Subscription
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: model
+    attributes:
+      label: Model
+      description: The model id at this provider, as on the entry's page.
+      placeholder: deepseek/deepseek-v4-pro
+  - type: dropdown
+    id: field
+    attributes:
+      label: Which field
+      multiple: true
+      options:
+        - Context
+        - Input window
+        - Output limit
+        - Cache lifetime
+        - Price
+        - Other
+  - type: input
+    id: shown
+    attributes:
+      label: What the site shows
+      placeholder: Unknown
+  - type: input
+    id: expected
+    attributes:
+      label: What it should show
+      placeholder: 1,000,000 tokens
+  - type: input
+    id: source
+    attributes:
+      label: Source link
+      description: The provider's own page or model list that says so, or the raw result of a measurement. For a request for a measurement, the provider's page about the model.
+      placeholder: https://
+    validations:
+      required: true
+  - type: textarea
+    id: quote
+    attributes:
+      label: The sentence quoted, or what was measured
+      description: The provider's sentence as written. For a measurement, the tool, the client, the requests sent and the result.
+  - type: input
+    id: date
+    attributes:
+      label: Date read
+      description: The day you read the page or ran the measurement (YYYY-MM-DD).
+      placeholder: "2026-11-16"
+  - type: textarea
+    id: access-available
+    attributes:
+      label: For a request for a measurement, what access exists
+      description: An API key, a subscription, or access a provider offers for the measurement. Never paste a key or a password here.

@@ -1,0 +1,27 @@
+name: Check
+
+# Every pull request: build from the snapshot in the repository and run the checks.
+# No import, no deploy, no secrets, read-only token.
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Build the dataset and the site
+        run: npm run build
+      - name: Lint, type-check and test
+        run: npm run check

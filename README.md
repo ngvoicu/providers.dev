@@ -513,7 +513,7 @@ and model has an extra `providers_dev` key, and entries we add can lack fields t
 ## Deploying to Cloudflare
 
 The Worker (`wrangler.jsonc`) serves the API and renders every public HTML route from API responses. Astro
-compiles one shared shell with CSS and scripts, plus authored methodology/licensing documents. It does not
+compiles one shared shell with CSS and scripts, plus authored methodology, licensing and contributing documents. It does not
 enumerate entries, providers or models. `/docs/api/` renders the actual `/api/v1/openapi.json` response, including
 its guide, parameters, schemas and examples. Authored text is also public through `/api/v1/docs/{document}`.
 
@@ -552,6 +552,14 @@ No model/provider HTML files are generated or maintained individually.
 their entry references. Evidence pages use those responses and independently paginated cache/limit evaluations.
 The scheduled workflow currently runs the full build on clean CI checkouts; local data refreshes can reuse built
 templates. Production still needs a publication/deployment step; editing a local source file does not update it.
+
+## Contributing
+
+Anyone can propose a correction, a missing provider or model, a measurement or a request for one, with its evidence.
+providers.dev takes no payment for listing, correcting or measuring an entry. How it works, and what each kind of
+contribution needs: [providers.dev/docs/contributing](https://providers.dev/docs/contributing/) (the same text is
+`src/pages/reference-content/docs/contributing.astro`); the essentials are in [`CONTRIBUTING.md`](./CONTRIBUTING.md).
+A pull request writes the change as in [Authoring](#authoring); `.github/workflows/check.yml` builds and checks it.
 
 ## Licensing
 

@@ -1,0 +1,147 @@
+---
+import Doc from "../../../layouts/Doc.astro";
+
+const repository = "https://github.com/ngvoicu/providers.dev";
+const issueForm = `${repository}/issues/new?template=value.yml`;
+const authoring = `${repository}/blob/main/README.md#authoring`;
+const groundtruth = "https://github.com/ngvoicu/groundtruth";
+---
+
+<Doc
+  title="Contributing"
+  description="How to propose a correction, a missing provider or model, a measurement or a request for one to providers.dev, and the evidence each needs."
+  lead="Anyone can propose a value to providers.dev, providers included. Every value needs evidence: a link to the provider's own page and the day it was read, or a measurement with its raw results."
+  toc={[
+    { id: "no-payment", label: "No payment" },
+    { id: "what", label: "What can be contributed" },
+    { id: "evidence", label: "Evidence" },
+    { id: "ways-in", label: "Two ways in" },
+    { id: "measure", label: "Measure it yourself" },
+    { id: "not-accepted", label: "What is not accepted" },
+    { id: "after", label: "What happens to a request" },
+  ]}
+>
+  <div class="prose">
+    <h2 id="no-payment">No payment</h2>
+    <p>
+      No money decides a value. providers.dev takes no payment for listing, correcting or measuring an entry. A provider may supply documentation, or access for a measurement; the
+      result is published whatever it shows.
+    </p>
+
+    <h2 id="what">What can be contributed</h2>
+    <ul>
+      <li>
+        <strong>A correction.</strong> A value on the site is wrong for a provider and access method. It needs a link to the provider's own page that gives the right value, the
+        sentence quoted, and the day it was read. A wrong value that came from models.dev is corrected here, by a correction with its evidence; the imported copy of models.dev is
+        never edited.
+      </li>
+      <li>
+        <strong>A missing provider or model.</strong> It needs a link to the provider's own page or model list that shows it, and the access method it is reached with. Only the
+        values that have evidence for that access method are filled in. The rest stays <em>Unknown</em>.
+      </li>
+      <li>
+        <strong>A measurement.</strong> A cache evaluation or a limit evaluation taken with groundtruth, with its raw result files. See <a href="#measure">Measure it yourself</a>.
+      </li>
+      <li>
+        <strong>A request for a measurement.</strong> It names the provider, the access method, the model and what to measure, and says what access exists: an API key, a
+        subscription, or access a provider offers for the measurement.
+      </li>
+    </ul>
+    <p>
+      A value belongs to one provider and one access method. An API key and a subscription login are different entries, even for the same model at the same provider, and a value
+      is never copied from one to the other.
+    </p>
+
+    <h2 id="evidence">Evidence</h2>
+    <p>
+      Every value providers.dev adds or corrects carries at least one item of evidence: its kind, a link and a date, and a note with the sentence quoted or what was run. The build
+      fails without it. There are three kinds.
+    </p>
+    <ul>
+      <li>
+        <span class="badge documented">documented</span> <strong>The provider says so.</strong> Anyone may propose a correction or an addition with a link to the provider's own page
+        that says so, the sentence quoted, and the day it was read. It is published as documented, with that link and date.
+        <br />Example: OpenRouter's guide to prompt caching says "Prompt caching with DeepSeek is automated and does not require any additional configuration." The DeepSeek entries at
+        OpenRouter are corrected to automatic caching, with the link{" "}
+        <code>https://openrouter.ai/docs/guides/best-practices/prompt-caching#deepseek</code>, the date 2026-11-13 and that sentence.
+      </li>
+      <li>
+        <span class="badge measured">measured</span> <strong>Requests were sent.</strong> A measured value is never accepted as a claim. It is a measurement with its raw result
+        files: the link is the raw result, the date the day of the run, and the note says what was run.
+        <br />Example: a cache evaluation of <code>meta/muse-wonder</code>, sent straight to OpenRouter on 2026-11-04. The note says "Direct to OpenRouter, Responses API with a
+        prompt_cache_key; 20 of 27 later re-sends were served from the cache, the oldest at 25 minutes." The link is the result file in the groundtruth repository,{" "}
+        <code>results/openrouter-direct/R10-2026-11-04T19-00-07.json</code>.
+      </li>
+      <li>
+        <span class="badge listed">listed</span> <strong>The provider's own model list reports it.</strong> The list is the answer of the provider's models endpoint, or its page
+        that lists its models. The link is that list and the date the day it was read.
+        <br />Example: a provider serves a model that the catalog does not have. Its models endpoint lists the model with a context window of 200,000 tokens. The model is added
+        with that figure, the link to the list and the day it was read.
+      </li>
+    </ul>
+    <p>
+      A documented value and a measured one are both published, each with its source and date. How they are shown side by side is in the <a href="/docs/methodology/#kinds">methodology</a>.
+    </p>
+
+    <h2 id="ways-in">Two ways in</h2>
+    <h3>The issue form, for anyone</h3>
+    <p>
+      Open an issue with the form <a href={issueForm}>A value is wrong or missing</a>. It asks for the provider, the access method, the model, the field, what the site shows, what it
+      should show, the source link, the sentence quoted or what was measured, and the date it was read. The source link is required. To ask for a measurement, choose{" "}
+      <em>I am asking for a measurement</em> in the same form and say what access exists. A fault in the site itself goes in a blank issue.
+    </p>
+    <h3>A pull request, to write the change yourself</h3>
+    <ul>
+      <li>One change per pull request.</li>
+      <li>
+        A correction goes in <code>data/authored/overrides/&lt;provider&gt;.yaml</code>. An added provider, or a model added to it, goes in{" "}
+        <code>data/authored/providers/&lt;provider&gt;.yaml</code>. The format is in the <a href={authoring}>Authoring</a> section of the README.
+      </li>
+      <li>
+        Nothing under <code>data/upstream/</code>, <code>data/sources/</code> or <code>data/published/</code> is edited by hand. The import and the build write them.
+      </li>
+      <li>
+        <code>npm run build &amp;&amp; npm run check</code> must pass. The build fails when a correction, an added provider or an added model has no evidence. Every pull request is
+        checked with the same two commands.
+      </li>
+    </ul>
+    <p>The repository is <a href={repository}>github.com/ngvoicu/providers.dev</a>.</p>
+
+    <h2 id="measure">Measure it yourself</h2>
+    <p>
+      <a href={groundtruth}>groundtruth</a> is the tool providers.dev measures with. It is public, under the MIT License. It runs against a provider's API with the contributor's own
+      key, and records cache evaluations and limit evaluations with their raw results.
+    </p>
+    <p>
+      A measurement is proposed to the groundtruth repository, with its raw result files. providers.dev imports groundtruth's results file, <code>observed.json</code>. A
+      measurement accepted there is published here on the entry it was taken on, with its access method, client, date and a link to its raw result.
+    </p>
+    <p>A measurement has limits:</p>
+    <ul>
+      <li>Small samples. A few requests at each age or size, on some days.</li>
+      <li>One account per route. Another plan, region or account can have another limit or another cache.</li>
+      <li>Dated. A provider can change a limit or its cache the next day. A measurement goes stale as all providers.dev evidence does.</li>
+    </ul>
+    <p>
+      How an evaluation is made and read is in the methodology: <a href="/docs/methodology/#evaluations">cache evaluations</a> and the <a href="/docs/methodology/#input-window">input
+      window</a>.
+    </p>
+
+    <h2 id="not-accepted">What is not accepted</h2>
+    <ul>
+      <li>A value with no source.</li>
+      <li>A measured value without its raw results.</li>
+      <li>A value copied from another access method.</li>
+      <li>A paid listing or a paid correction.</li>
+    </ul>
+
+    <h2 id="after">What happens to a request</h2>
+    <p>
+      providers.dev has one maintainer. No response time is promised. A request with a link to the provider's page is quick to check. A measurement waits for quota and time.
+    </p>
+    <p>
+      An accepted value is published with its evidence, under the project's licence, the MIT License, like everything else providers.dev adds. See the{" "}
+      <a href="/docs/licensing/">licensing</a> page.
+    </p>
+  </div>
+</Doc>

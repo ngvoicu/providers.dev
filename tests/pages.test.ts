@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { beforeAll, describe, expect, it } from "vitest";
+import { parse } from "yaml";
 import { publish } from "../scripts/lib/publish.ts";
 import { stageSnapshot } from "../scripts/lib/stage.ts";
 import { sync } from "../scripts/lib/sync.ts";
@@ -9,7 +10,9 @@ import { CorrectionSchema, DocumentationSchema, FacetsSchema, one, pageOf } from
 import { fillShell, MARK } from "../src/core/page-shell.ts";
 import { emptyInputWindow } from "../src/core/limits.ts";
 import { handlePage, type PageDeps } from "../src/core/pages.ts";
+import { openapi } from "../src/core/openapi.ts";
 import { PARAMS } from "../src/core/query.ts";
+import { DOCUMENTS } from "../src/core/resources.ts";
 import { readSnapshot, type AssetBinding } from "../src/core/snapshot.ts";
 import worker from "../worker/index.ts";
 import { depsFrom, fetchReturning, fixtureUpstream, ROOT, tempDataDir, writeAuthored } from "./helpers.ts";
@@ -41,6 +44,7 @@ describe("API response boundary", () => {
     expect(corrections.data[0]?.change.value).toBe(5000000);
     expect((await (await api("/api/v1/providers?q=Provider%202&limit=200")).json() as { data: { id: string }[] }).data.every((item) => item.id.includes("2"))).toBe(true);
     one(DocumentationSchema).parse(await (await api("/api/v1/docs/methodology")).json());
+    one(DocumentationSchema).parse(await (await api("/api/v1/docs/contributing")).json());
     expect((await api("/api/v1/docs/missing")).status).toBe(404);
     expect((await api("/api/v1/corrections?limit=0")).status).toBe(400);
   });
@@ -57,6 +61,7 @@ describe("API response boundary", () => {
       ["/docs/api/", "/api/v1/openapi.json"],
       ["/docs/methodology/", "/api/v1/docs/methodology"],
       ["/docs/licensing/", "/api/v1/docs/licensing"],
+      ["/docs/contributing/", "/api/v1/docs/contributing"],
     ];
     for (const [path, endpoint] of routes) {
       const calls: string[] = [];
@@ -149,6 +154,86 @@ describe("API response boundary", () => {
       "A window a route names is its total.", "not contradicted is not confirmed",
     ]) expect(source, words).toContain(words);
     expect(source).not.toContain("limit-value");
+  });
+
+  it("serves the three reference documents, and only those, in the API, the OpenAPI document and on the site", async () => {
+    expect([...DOCUMENTS]).toEqual(["methodology", "licensing", "contributing"]);
+    for (const name of DOCUMENTS) {
+      expect((await api(`/api/v1/docs/${name}`)).status, name).toBe(200);
+      const response = await page(`/docs/${name}/`);
+      expect(response.status, name).toBe(200);
+      // A reference document sits under Methodology in the main navigation; no item of its own.
+      const nav = (await response.text()).match(/<nav>(.*?)<\/nav>/)![1]!;
+      expect(nav).toContain('<a href="/docs/methodology/" aria-current="page">Methodology</a>');
+      expect(nav).not.toContain("Contributing");
+    }
+    for (const name of ["api", "contributors", "CONTRIBUTING"]) expect((await api(`/api/v1/docs/${name}`)).status, name).toBe(404);
+    expect((await page("/docs/contributors/")).status).toBe(404);
+    const operation = (openapi() as unknown as { paths: Record<string, { get: { description: string; parameters: { name: string; description: string }[] } }> }).paths["/api/v1/docs/{document}"]!.get;
+    expect(operation.parameters.find((param) => param.name === "document")!.description).toBe("methodology, licensing or contributing.");
+    expect(operation.description).toContain("The methodology, licensing and contributing text");
+  });
+
+  it("says on the contributing page how to contribute, with the owner's decisions as written", () => {
+    const source = readFileSync(join(ROOT, "src", "pages", "reference-content", "docs", "contributing.astro"), "utf8").replace(/\s+/g, " ");
+    for (const words of [
+      "providers.dev takes no payment for listing, correcting or measuring an entry. A provider may supply documentation, or access for a measurement; the result is published whatever it shows.",
+      "Anyone may propose a correction or an addition with a link to the provider's own page that says so, the sentence quoted, and the day it was read. It is published as documented, with that link and date.",
+      "A measured value is never accepted as a claim.", "An API key and a subscription login are different entries", "is never copied from one to the other",
+      "the imported copy of models.dev is never edited",
+      '<span class="badge documented">documented</span>', '<span class="badge measured">measured</span>', '<span class="badge listed">listed</span>',
+      '"https://github.com/ngvoicu/providers.dev"', "${repository}/issues/new?template=value.yml", "${repository}/blob/main/README.md#authoring", '"https://github.com/ngvoicu/groundtruth"',
+      "<code>observed.json</code>", "One change per pull request.", "<code>npm run build &amp;&amp; npm run check</code> must pass.", "The build fails when",
+      "with the contributor's own key", "Small samples.", "One account per route.", "Dated.",
+      "A value with no source.", "A measured value without its raw results.", "A value copied from another access method.", "A paid listing or a paid correction.",
+      "providers.dev has one maintainer. No response time is promised. A request with a link to the provider's page is quick to check. A measurement waits for quota and time.",
+      '<a href="/docs/licensing/">licensing</a>', "<em>I am asking for a measurement</em>", "blank issue",
+    ]) expect(source, words).toContain(words);
+    // Astro drops a line break before a tag: a word at the end of a line and a tag at the start of the next would run together.
+    const raw = readFileSync(join(ROOT, "src", "pages", "reference-content", "docs", "contributing.astro"), "utf8");
+    expect(raw).not.toMatch(/[\w,.;:)]\n\s*<(a|code|em|strong|span)\b/);
+    // The worked examples are entries of data/authored, as written there.
+    const openrouter = readFileSync(join(ROOT, "data", "authored", "overrides", "openrouter.yaml"), "utf8");
+    for (const words of ["https://openrouter.ai/docs/guides/best-practices/prompt-caching#deepseek", "Prompt caching with DeepSeek is automated and does not require any additional configuration.", "results/openrouter-direct/R10-2026-11-04T19-00-07.json", "20 of 27 later re-sends were served from the cache, the oldest at 25 minutes."]) {
+      expect(openrouter, words).toContain(words);
+      expect(source, words).toContain(words);
+    }
+  });
+
+  it("links the contributing page from the methodology, the footer and the evidence page, and states the same independence on the methodology", async () => {
+    const methodology = readFileSync(join(ROOT, "src", "pages", "reference-content", "docs", "methodology.astro"), "utf8").replace(/\s+/g, " ");
+    expect(methodology).toContain("providers.dev takes no payment for listing, correcting or measuring an entry. A provider may supply documentation, or access for a measurement; the result is published whatever it shows.");
+    expect(methodology.match(/<a href="\/docs\/contributing\/">contributing<\/a>/g)).toHaveLength(2);
+    const layout = readFileSync(join(ROOT, "src", "layouts", "Base.astro"), "utf8");
+    expect(layout).toMatch(/<li><a href="\/docs\/licensing\/">Licensing and attribution<\/a><\/li>\s*<li><a href="\/docs\/contributing\/">Contributing<\/a><\/li>/);
+    const evidence = await (await page("/evidence/")).text();
+    expect(evidence).toContain('To propose a correction or ask for an evaluation, see <a href="/docs/contributing/">Contributing</a>.');
+  });
+
+  it("has a contributing file, one issue form and a pull request check that imports, deploys and writes nothing", () => {
+    const contributing = readFileSync(join(ROOT, "CONTRIBUTING.md"), "utf8");
+    expect(contributing).toContain("https://providers.dev/docs/contributing/");
+    expect(contributing).toContain("(./README.md#authoring)");
+    expect(readFileSync(join(ROOT, "README.md"), "utf8")).toMatch(/## Contributing\n[^#]*https:\/\/providers\.dev\/docs\/contributing\//);
+
+    const form = parse(readFileSync(join(ROOT, ".github", "ISSUE_TEMPLATE", "value.yml"), "utf8")) as { name: string; body: { type: string; id?: string; attributes: { label?: string; options?: string[] }; validations?: { required: boolean } }[] };
+    expect(form.name).toBe("A value is wrong or missing");
+    const field = (id: string) => form.body.find((item) => item.id === id)!;
+    expect(form.body.filter((item) => item.id).map((item) => item.id)).toEqual(["request", "provider", "access", "model", "field", "shown", "expected", "source", "quote", "date", "access-available"]);
+    expect(field("source").validations?.required).toBe(true);
+    expect(field("request").attributes.options).toContain("I am asking for a measurement");
+    expect(field("access").attributes.options).toEqual(["API key", "Subscription", "Other"]);
+    expect(field("field").attributes.options).toEqual(["Context", "Input window", "Output limit", "Cache lifetime", "Price", "Other"]);
+    // Blank issues stay possible: no configuration turns them off.
+    expect(existsSync(join(ROOT, ".github", "ISSUE_TEMPLATE", "config.yml"))).toBe(false);
+
+    const text = readFileSync(join(ROOT, ".github", "workflows", "check.yml"), "utf8");
+    const workflow = parse(text) as { on: Record<string, unknown>; permissions: Record<string, string>; jobs: Record<string, { steps: { run?: string; uses?: string }[] }> };
+    expect(Object.keys(workflow.on)).toEqual(["pull_request"]);
+    expect(workflow.permissions).toEqual({ contents: "read" });
+    const runs = Object.values(workflow.jobs).flatMap((job) => job.steps.flatMap((step) => step.run ? [step.run] : []));
+    expect(runs).toEqual(["npm ci", "npm run build", "npm run check"]);
+    expect(text).not.toMatch(/pull_request_target|secrets\.|npm run sync|wrangler|deploy:|git push/);
   });
 
   it("renders the requested homepage filters and page before JavaScript runs", async () => {
