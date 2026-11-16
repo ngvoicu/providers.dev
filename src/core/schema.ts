@@ -8,7 +8,6 @@ import { ModelMetadataShape } from "./metadata-contract.ts";
 import { PricingDeclarationSchema, RequestControlDeclarationsSchema, type Pricing, type RequestControls } from "./policy-contract.ts";
 import type { Change, Json, JsonObject } from "./merge.ts";
 
-export const SCHEMA_VERSION = 1;
 export const UPSTREAM_SCHEMA = "models.dev v2 (experimental)";
 /** Everything we add to a provider or model lives under this one key. */
 export const NS = "providers_dev";
@@ -517,7 +516,6 @@ export interface Exclusion {
 
 export interface Meta {
   api_version: "v1";
-  schema_version: number;
   upstream_schema: string;
   dataset_version: string;
   generated_at: string;

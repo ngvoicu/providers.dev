@@ -345,7 +345,6 @@ const issue = z.looseObject({ level: z.enum(["error", "warning", "notice"]), cod
 export const MetaSchema = z
   .looseObject({
     api_version: z.literal("v1"),
-    schema_version: z.int(),
     upstream_schema: z.string(),
     dataset_version: z.string().describe("A hash of the catalog and summaries. It changes when their data changes. ETags identify each response representation separately."),
     generated_at: z.iso.datetime(),

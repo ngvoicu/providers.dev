@@ -17,7 +17,6 @@ import {
   ObservedFile,
   OverrideFile,
   RouteMap,
-  SCHEMA_VERSION,
   UPSTREAM_SCHEMA,
   type Catalog,
   type Issue,
@@ -134,7 +133,6 @@ export function publish(input: PublishOptions): PublishReport {
 
   const meta: Meta = {
     api_version: "v1",
-    schema_version: SCHEMA_VERSION,
     upstream_schema: UPSTREAM_SCHEMA,
     dataset_version: datasetVersion,
     generated_at: generatedAt,

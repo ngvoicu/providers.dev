@@ -427,6 +427,9 @@ describe("lookups", () => {
     const meta = answer.data;
     expect(meta.dataset_version).toBe(catalog.meta.dataset_version);
     expect(meta.counts.entries).toBe(601);
+    // No schema_version: an integer that was always 1 and that no client could act on, removed before 1.0.0.
+    expect(Object.keys(meta).slice(0, 3)).toEqual(["api_version", "upstream_schema", "dataset_version"]);
+    expect(meta).not.toHaveProperty("schema_version");
     expect(meta.counts.models).toBe(20);
     expect(meta.cache_ages_s.slice(0, 4)).toEqual([150, 300, 450, 600]);
     // The age after which providers.dev evidence is shown as stale: published once, read by every page.
