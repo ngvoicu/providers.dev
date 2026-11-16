@@ -12,8 +12,8 @@ The baseline is imported daily from [models.dev](https://models.dev) (MIT). On t
 - **corrections** to single fields, each with a reason and a source;
 - **evaluations** of cache lifetimes and limits from [groundtruth](https://github.com/ngvoicu/groundtruth),
   shown next to the documented values, each with its source and date. A measured value takes the place of a
-  documented one in one figure only, the safe cache lifetime, and only where a measurement clearly contradicts the
-  documentation; the documented lifetime stays listed beside it.
+  documented one in two figures only, the safe cache lifetime and the input window, and only where a measurement
+  clearly contradicts the documentation; the documented value stays beside it (and `limit` stays as imported).
 
 It publishes metadata only. There is no chat and no inference proxy. List prices per token are shown as models.dev
 records them; a subscription entry shows the API list price of the same model, marked as an API price. Subscription
@@ -321,10 +321,10 @@ curl -H 'If-None-Match: "<dataset version>"' -i https://providers.dev/api/v1/cat
 ```ts
 const base = "https://providers.dev/api/v1";
 const page = await (await fetch(`${base}/entries?q=opus&cache=yes&limit=200`)).json();
-for (const entry of page.data) console.log(entry.ref, entry.context, entry.max_output, entry.cache_lifetime.short.safe_s, entry.cache_lifetime.lifetimes);
+for (const entry of page.data) console.log(entry.ref, entry.context, entry.input_window.tokens, entry.input_window.bound, entry.max_output, entry.cache_lifetime.short.safe_s, entry.cache_lifetime.lifetimes);
 
 const { data } = await (await fetch(`${base}/entries/openrouter/anthropic/claude-opus-5.5`)).json();
-console.log(data.entry.limit, data.entry.providers_dev.cache.retention, data.entry.providers_dev.cache.evaluations);
+console.log(data.entry.limit, data.entry.providers_dev.limits.input_window, data.entry.providers_dev.cache.retention, data.entry.providers_dev.cache.evaluations);
 ```
 
 ### One contract
@@ -363,6 +363,22 @@ is built; the rule in full is in `design/safe-cache-lifetime.md` and in the guid
 `/api/v1/entries` sorts by the safe values with `sort=cache_short` or `sort=cache_long` (`null` last in either order,
 `0` a value), and `lifetime_basis=documented` or `measured` keeps the entries whose short or long safe value has that
 basis.
+
+Every entry has one input window record (`providers_dev.limits.input_window`, and `input_window` of a summary):
+`tokens`, the most input a request can carry on the entry, in tokens as the provider counts them, the client's own
+prompt included, with its `basis`, `bound` and `scope`. The documented input (`limit.input` above 0, else
+`limit.context` above 0 that is not a measured value) is the value unless a limit evaluation of the entry clearly
+contradicts it (a window named below it, or other than a documented window; an input refused at or below 99 % of it;
+one accepted, below a refusal or read to the end, at or above 101 % of it), and then the measured one is; where
+nothing is documented, the measured one: the window the route names (`bound: "limit"`), else the largest input seen
+accepted (`bound: "at_least"`), lowest across clients. `null` is not known, and there is no `0`: a window of 0 is
+"none stated". `documented_tokens` and `measured_tokens` are published beside it, with `documented_status` where
+both exist, and every counted evaluation is an item of `measurements`. `inputWindow` in `src/core/limits.ts` works it
+out once, when the data is built; the rule in full is in `design/usable-input-window.md` and in the guide of the
+OpenAPI document. `limit` stays as imported, and `context`, `input`, `max_output` and the `measured_*` keys of a
+summary keep their meaning. A limits row of the measurements file may carry `date` and `input_read` (the largest input
+the reply showed was read to the end); a file with two rows for one route, client and model, or a row whose numbers
+contradict each other, is refused when read and the last good copy stays.
 
 The safe value, like every figure the site shows, is worked out once, when the data is built, and published in the
 API. A page never works anything out: it prints fields of the API, formatted. The site never shows anything that is

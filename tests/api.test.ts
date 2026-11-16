@@ -492,7 +492,7 @@ describe("HTTP behaviour", () => {
 
   it("describes the cache lifetime record: its components and a guide section", async () => {
     const document = await json<{ info: { version: string }; "x-guide": { id: string; title: string; paragraphs: string[] }[]; components: { schemas: Record<string, { properties?: Record<string, unknown> }> } }>("/api/v1/openapi.json");
-    expect(document.info.version).toBe("2.0.0");
+    expect(document.info.version).toBe("2.1.0");
     const schemas = document.components.schemas;
     expect(Object.keys(schemas.CacheLifetime!.properties!)).toEqual(["short", "long", "lifetimes"]);
     expect(Object.keys(schemas.SafeLifetime!.properties!)).toEqual(["safe_s", "basis", "source", "date", "documented_s", "measured_s", "documented_status", "clients", "evaluations", "checks", "hits", "checks_inside", "hits_inside", "tested_from_s", "first_miss_s"]);
@@ -515,6 +515,29 @@ describe("HTTP behaviour", () => {
     expect(status.required).toContain("documented_status");
     expect(JSON.stringify(status.properties.documented_status)).toMatch(/"contradicted","not_contradicted"/);
     expect(JSON.stringify(status.properties.documented_status)).toMatch(/null/);
+  });
+});
+
+describe("the input window in the OpenAPI document", () => {
+  it("has the two components, the key on the entry and the summary, input_read on an evaluation, and a guide section after Unknown values", async () => {
+    const document = await json<{ info: { version: string }; "x-guide": { id: string; title: string; paragraphs: string[] }[]; components: { schemas: Record<string, { properties?: Record<string, unknown>; required?: string[] }> } }>("/api/v1/openapi.json");
+    expect(document.info.version).toBe("2.1.0");
+    const schemas = document.components.schemas;
+    expect(Object.keys(schemas.InputWindow!.properties!)).toEqual([
+      "tokens", "basis", "bound", "scope", "source", "date", "documented_tokens", "documented_field", "documented_source", "documented_date", "documented_status",
+      "measured_tokens", "measured_bound", "measured_kind", "measured_refused", "measured_date", "clients", "evaluations", "measurements",
+    ]);
+    expect(schemas.InputWindow!.required).toEqual(Object.keys(schemas.InputWindow!.properties!));
+    expect(Object.keys(schemas.InputWindowMeasurement!.properties!)).toEqual(["client", "client_label", "route", "route_label", "date", "tokens", "bound", "kind", "accepted", "refused", "named", "read", "source"]);
+    expect(Object.keys(schemas.EntrySummary!.properties!)).toContain("input_window");
+    expect(Object.keys(schemas.MeasuredLimit!.properties!)).toContain("input_read");
+    expect(JSON.stringify(schemas.EntryExtension)).toContain("input_window");
+    const ids = document["x-guide"].map((item) => item.id);
+    expect(ids.indexOf("input-window")).toBe(ids.indexOf("unknown") + 1);
+    const section = document["x-guide"].find((item) => item.id === "input-window")!;
+    expect(section.title).toBe("Input window");
+    const text = section.paragraphs.join(" ");
+    for (const words of ["providers_dev.limits.input_window", "never 0", "system prompt", "99 %", "101 %", "912,780", "931,220", "lowest", "at_least", "measured_refused", "scope", "limit.input", "limit.context", "from_measurement", "none stated", "window", "bracket", "input_read", "limit-not-counted", "measured_input_accepted", "not contradicted is not confirmed", "probe's count"]) expect(text).toContain(words);
   });
 });
 

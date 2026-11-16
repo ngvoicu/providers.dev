@@ -82,6 +82,15 @@ The baseline is imported from models.dev; our additions, corrections and measure
   at which every check hit), told apart by `basis`; `null` is unknown. A measured safe value replaces a contradicted
   documented one only in `safe_s`: the documented item stays in the list, and `capabilities.cache` stays as imported.
   The safe value is a published number made by a published rule, not a verdict a page writes.
+- The input window is worked out once, in `inputWindow` (`src/core/limits.ts`), into
+  `providers_dev.limits.input_window` (`input_window` of a summary): the documented input unless a limit evaluation
+  clearly contradicts it, else the measured value, lowest across clients, else `null`. A page prints the record and
+  its `measurements` as they are: it compares nothing, takes no minimum, applies no margin and picks no source;
+  "at least" comes from `bound`, the documented or measured tag from `basis`. `limit` of an imported entry stays
+  models.dev's, and no limit is taken from another entry (an added entry's `inherited.from` gives it none). `null` is
+  unknown and there is no `0`: a window of 0 is "none stated". The rule "A measurement never replaces a documented
+  value on an upstream entry" holds: `limit` is untouched, and the documented value stays in the record beside the
+  measured one. Vendors' own model lists are not values of an entry; they stay in evaluation notes.
 - The safe value, like every figure the site shows, is worked out once, when the data is built, and published in the
   API. A page never works anything out: it prints fields of the API, formatted. The site never shows anything that is
   not from the API. One exception, the only thing a page works out: it marks providers.dev evidence stale by comparing
