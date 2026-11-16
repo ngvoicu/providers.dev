@@ -218,6 +218,11 @@ export function releaseRuleVerdict(releaseDate: unknown, rule: Pick<ReleaseExclu
   return (rule.from === undefined || day >= rule.from) && (rule.before === undefined || day < rule.before) ? "out" : "kept";
 }
 
+/** The day a limits row was measured: its `date`, else the date in the folder name of its `source`. */
+function limitDate(limit: { date?: string | null; source: string }): string | undefined {
+  return limit.date ?? /(\d{4}-\d{2}-\d{2})/.exec(limit.source)?.[1];
+}
+
 function newestDate(dates: (string | undefined)[]): string | undefined {
   return dates.filter((date): date is string => Boolean(date)).sort().at(-1);
 }
@@ -350,7 +355,7 @@ export function resolve(input: ResolveInput): ResolveResult {
     }
     for (const limit of observed.limits) {
       if (limit.models_dev) continue;
-      const date = /(\d{4}-\d{2}-\d{2})/.exec(limit.source)?.[1];
+      const date = limitDate(limit);
       if (date) ensureMeasuredModel(limit.route, limit.model, limit.base_model, { kind: "measured", url: sourceUrl(limit.source), date });
     }
   }
@@ -641,7 +646,7 @@ export function resolve(input: ResolveInput): ResolveResult {
         orphan(ref, limit.route);
         continue;
       }
-      const date = /(\d{4}-\d{2}-\d{2})/.exec(limit.source)?.[1];
+      const date = limitDate(limit);
       const limitNote = publicNote(limit.note);
       const tokens = (value: number | null | undefined): number | null => (typeof value === "number" ? value : null);
       const measured: MeasuredLimit = {
@@ -652,6 +657,7 @@ export function resolve(input: ResolveInput): ResolveResult {
         output: tokens(limit.output),
         input_accepted: tokens(limit.input_accepted),
         input_refused: tokens(limit.input_refused),
+        input_read: tokens(limit.input_read),
         output_accepted: tokens(limit.output_accepted),
         note: limitNote ?? null,
         date: date ?? null,

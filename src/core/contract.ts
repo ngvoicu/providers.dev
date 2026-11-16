@@ -136,9 +136,10 @@ export const MeasuredLimitSchema = z
     output: z.number().nullable().describe("Tokens: the largest response found. Null = not measured."),
     input_accepted: z.number().nullable().describe("Tokens: the largest input seen accepted. The real limit is at least this. Null = not measured."),
     input_refused: z.number().nullable().describe("Tokens: the smallest input seen refused. The real limit is below this. Null = not measured."),
+    input_read: z.number().nullable().describe("Tokens: the largest input for which the reply showed the route read it to the end (a word before the filler and one after it, both returned). Never above input_accepted. Null = not checked."),
     output_accepted: z.number().nullable().describe("Tokens: the largest requested output seen accepted. Null = not measured."),
     note: z.string().nullable().describe("Null = no note."),
-    date: date.nullable().describe("Null = the result carries no date."),
+    date: date.nullable().describe("The day the requests were sent: the evaluation's own date, else the date in the name of its results folder. Null = the result carries no date."),
     source: z.url(),
   })
   .describe("One limit evaluation. Every evaluation has every field; what it did not measure is null.") satisfies z.ZodType<MeasuredLimit>;

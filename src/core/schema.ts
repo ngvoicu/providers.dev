@@ -291,20 +291,47 @@ export const ObservedRun = z.looseObject({
   });
 export type ObservedRun = z.infer<typeof ObservedRun>;
 
-export const ObservedLimit = z.looseObject({
-  route: z.string(),
-  client: z.string(),
-  model: z.string(),
-  models_dev: z.string().nullable().optional(),
-  base_model: z.string().nullable().optional(),
-  context: z.number().nullable().optional(),
-  output: z.number().nullable().optional(),
-  input_accepted: z.number().optional(),
-  input_refused: z.number().optional(),
-  output_accepted: z.number().optional(),
-  note: z.string().optional(),
-  source: z.string(),
-});
+/** How a limits row is named in a refusal: its route, client and model, the three that make it one row. */
+const limitRow = (row: { route: string; client: string; model: string }): string => `The limits row of route "${row.route}", client "${row.client}", model "${row.model}"`;
+
+export const ObservedLimit = z
+  .looseObject({
+    route: z.string(),
+    client: z.string(),
+    model: z.string(),
+    models_dev: z.string().nullable().optional(),
+    base_model: z.string().nullable().optional(),
+    context: z.number().nullable().optional(),
+    output: z.number().nullable().optional(),
+    input_accepted: z.number().optional(),
+    input_refused: z.number().optional(),
+    /** The largest input for which the reply showed it was read to the end. Absent or null = not checked. */
+    input_read: z.number().nullable().optional(),
+    output_accepted: z.number().optional(),
+    note: z.string().optional(),
+    /** The day the requests were sent. Absent = read from the folder name in `source`. */
+    date: isoDate.nullable().optional(),
+    source: z.string(),
+  })
+  // A row that contradicts itself is refused rather than read one way or another (design/usable-input-window.md, 6).
+  .superRefine((row, ctx) => {
+    const accepted = row.input_accepted;
+    const refused = row.input_refused;
+    const named = row.context ?? undefined;
+    const read = row.input_read ?? undefined;
+    if (accepted !== undefined && refused !== undefined && !(accepted < refused)) {
+      ctx.addIssue({ code: "custom", path: ["input_accepted"], message: `${limitRow(row)} has input_accepted ${accepted}, not below its input_refused ${refused}. An input accepted is below one refused.` });
+    }
+    if (accepted !== undefined && named !== undefined && accepted > named) {
+      ctx.addIssue({ code: "custom", path: ["input_accepted"], message: `${limitRow(row)} has input_accepted ${accepted}, above its context ${named}. An input accepted fits in the window the route names.` });
+    }
+    if (read !== undefined && accepted === undefined) {
+      ctx.addIssue({ code: "custom", path: ["input_read"], message: `${limitRow(row)} has input_read ${read} and no input_accepted. An input read to the end was accepted.` });
+    }
+    if (read !== undefined && accepted !== undefined && read > accepted) {
+      ctx.addIssue({ code: "custom", path: ["input_read"], message: `${limitRow(row)} has input_read ${read}, above its input_accepted ${accepted}. An input read to the end was accepted.` });
+    }
+  });
 export type ObservedLimit = z.infer<typeof ObservedLimit>;
 
 export const ObservedKnown = z.looseObject({
@@ -317,15 +344,26 @@ export const ObservedKnown = z.looseObject({
   when: z.record(z.string(), z.json()).optional(),
 });
 
-export const ObservedFile = z.looseObject({
-  schema: z.number(),
-  repository: z.url(),
-  routes: z.record(z.string(), z.string()),
-  clients: z.record(z.string(), z.string()),
-  cache: z.array(ObservedRun),
-  limits: z.array(ObservedLimit).default([]),
-  known: z.array(ObservedKnown).default([]),
-});
+export const ObservedFile = z
+  .looseObject({
+    schema: z.number(),
+    repository: z.url(),
+    routes: z.record(z.string(), z.string()),
+    clients: z.record(z.string(), z.string()),
+    cache: z.array(ObservedRun),
+    limits: z.array(ObservedLimit).default([]),
+    known: z.array(ObservedKnown).default([]),
+  })
+  // One limits row per route, client and model: a new measurement of the same three replaces the row. A file with
+  // two is refused rather than read in an order-dependent way, as a run with two checks at one age is.
+  .superRefine((file, ctx) => {
+    const seen = new Set<string>();
+    for (const [index, row] of file.limits.entries()) {
+      const key = JSON.stringify([row.route, row.client, row.model]);
+      if (seen.has(key)) ctx.addIssue({ code: "custom", path: ["limits", index], message: `${limitRow(row)} is in the file twice. There is one limits row per route, client and model.` });
+      seen.add(key);
+    }
+  });
 export type ObservedFile = z.infer<typeof ObservedFile>;
 
 export interface SourceMeta {
@@ -378,6 +416,8 @@ export interface MeasuredLimit {
   output: number | null;
   input_accepted: number | null;
   input_refused: number | null;
+  /** The largest input for which the reply showed it was read to the end. Null = not checked. */
+  input_read: number | null;
   output_accepted: number | null;
   note: string | null;
   date: string | null;

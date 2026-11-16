@@ -32,7 +32,7 @@ export function extensionOf(more: Partial<ModelExtension> = {}): ModelExtension 
 
 /** A complete limit evaluation: what it did not measure is null. */
 export function limitOf(more: Partial<MeasuredLimit> = {}): MeasuredLimit {
-  return { route: "r", route_label: "R", client: "direct", client_label: "Direct", context: null, output: null, input_accepted: null, input_refused: null, output_accepted: null, note: null, date: null, source: "https://example.com/result", ...more };
+  return { route: "r", route_label: "R", client: "direct", client_label: "Direct", context: null, output: null, input_accepted: null, input_refused: null, input_read: null, output_accepted: null, note: null, date: null, source: "https://example.com/result", ...more };
 }
 
 /** A complete entry summary with nothing known. */

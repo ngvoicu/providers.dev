@@ -1,4 +1,5 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { stringify } from "yaml";
 import { join } from "node:path";
 import { isDeepStrictEqual } from "node:util";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -14,6 +15,7 @@ import {
   EntrySummarySchema,
   CacheEvaluationRecordSchema,
   LimitEvaluationRecordSchema,
+  MeasuredLimitSchema,
   MetaSchema,
   one,
   pageOf,
@@ -39,11 +41,33 @@ beforeAll(async () => {
   const dataDir = tempDataDir();
   await sync({ dataDir, fetch: fetchReturning(JSON.stringify(fixtureUpstream())) });
   writeAuthored(dataDir);
+  writeFixtureLimits(dataDir);
   const report = publish({ dataDir, rootDir: ROOT });
   expect(report.errors).toEqual([]);
   published = join(dataDir, "published");
   deps = depsFrom(published);
 });
+
+/**
+ * Limit evaluations for the fixture, all on the one added entry (added-login/lab/model-2, whose provider file states
+ * limit.context 900,000), so that no other entry and no count of the fixture changes: a window named equal to the
+ * documented one, with a date of its own; a bracket from a folder date, well under it; an accepted size read to the
+ * end; and an accepted size with nothing else, which does not count.
+ */
+function writeFixtureLimits(dataDir: string): void {
+  const row = { route: "login", model: "lab/model-2", models_dev: "added-login/lab/model-2", source: "results/limits-2026-11-09/limits.jsonl" };
+  mkdirSync(join(dataDir, "sources"), { recursive: true });
+  writeFileSync(join(dataDir, "sources", "observed.json"), JSON.stringify({
+    schema: 1, repository: "https://github.com/example/probe", routes: { login: "The added login" }, clients: {}, cache: [],
+    limits: [
+      { ...row, client: "direct", context: 900000, date: "2026-11-10" },
+      { ...row, client: "proxy", input_accepted: 850000, input_refused: 880000 },
+      { ...row, client: "agent", input_accepted: 600000, input_read: 600000, date: "2026-11-11" },
+      { ...row, client: "cli", input_accepted: 990000, note: "answered; not checked that it was read" },
+    ],
+  }));
+  writeFileSync(join(dataDir, "authored", "measurement-labels.yaml"), stringify({ clients: Object.fromEntries(["direct", "proxy", "agent", "cli"].map((id) => [id, { id, label: `Client ${id}` }])) }));
+}
 
 const get = (path: string, init?: RequestInit): Promise<Response> => handleApi(new Request(`https://providers.dev${path}`, init), deps);
 const json = async <T = Record<string, unknown>>(path: string): Promise<T> => (await get(path)).json() as Promise<T>;
@@ -355,7 +379,8 @@ describe("lookups", () => {
     expect(model.data.reference_ref).toBeNull();
     expect(model.data.entries[0]?.ref).toBe("added-login/lab/model-2");
 
-    for (const list of ["cache", "limits"]) expect(await json<Page>(`/api/v1/evaluations/${list}`)).toMatchObject({ total: 0, limit: 50, offset: 0, next_offset: null, data: [] });
+    expect(await json<Page>("/api/v1/evaluations/cache")).toMatchObject({ total: 0, limit: 50, offset: 0, next_offset: null, data: [] });
+    expect(await json<Page>("/api/v1/evaluations/limits")).toMatchObject({ total: 4, limit: 50, offset: 0, next_offset: null });
   });
 
   it("serves the catalog and the metadata", async () => {
@@ -513,6 +538,15 @@ describe("the contract", () => {
     same(extensions.flatMap((extension) => extension.cache.evaluations), "cache evaluations");
     same(extensions.flatMap((extension) => extension.cache.evaluations.flatMap((evaluation) => evaluation.results)), "cache results");
     same(extensions.flatMap((extension) => extension.limits.measured), "limit evaluations");
+    // Every limit evaluation has every key of the contract, input_read among them, on the entry and in the list.
+    const limitKeys = Object.keys(MeasuredLimitSchema.shape);
+    expect(limitKeys).toContain("input_read");
+    const measuredLimits = extensions.flatMap((extension) => extension.limits.measured);
+    expect(measuredLimits.length).toBeGreaterThan(0);
+    for (const item of measuredLimits) expect(Object.keys(item)).toEqual(limitKeys);
+    const limitList = ((await ask("/api/v1/evaluations/limits?limit=200")) as { total: number; data: object[] });
+    expect(limitList.total).toBe(measuredLimits.length);
+    for (const item of limitList.data) expect(Object.keys(item)).toEqual(["kind", "entry_ref", "entry_name", "access", ...limitKeys]);
     same(extensions.flatMap((extension) => extension.provenance), "corrections");
     same(extensions.flatMap((extension) => [...extension.evidence, ...extension.provenance.flatMap((change) => change.evidence)]), "evidence");
     for (const list of ["cache", "limits"]) same(((await ask(`/api/v1/evaluations/${list}?limit=200`)) as { data: object[] }).data, `the list of ${list} evaluations`);

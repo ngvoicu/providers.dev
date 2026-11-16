@@ -447,6 +447,33 @@ describe("resolve: measurements", () => {
     expect(ext(imported).limits.measured[0]).toMatchObject({ context: 150000, output: null, input_accepted: null, input_refused: null, output_accepted: null, note: null });
   });
 
+  it("publishes the date of a limits row, else the date of its folder, and input_read, null where absent", () => {
+    const rows: ObservedFile = {
+      ...observed,
+      limits: [
+        // Today's shape: no date, no input_read.
+        { route: "lab-api", client: "direct", model: "model-a", models_dev: "lab/model-a", input_accepted: 150000, input_refused: 160000, source: "results/limits-2026-11-08/l.jsonl" },
+        // The new shape: its own date, and an input read to the end.
+        { route: "lab-api", client: "tool-x", model: "model-a", models_dev: "lab/model-a", input_accepted: 120000, input_read: 110000, date: "2026-11-12", source: "results/limits-2026-11-08/l.jsonl" },
+        // A date of its own on a row whose folder has none; null is the same as absent.
+        { route: "lab-api", client: "other-tool", model: "model-b", models_dev: "lab/model-b", context: 100000, input_read: null, date: "2026-11-14", source: "results/limits/l.jsonl" },
+        { route: "lab-api", client: "direct", model: "model-b", models_dev: "lab/model-b", context: 100000, date: null, source: "results/limits/l.jsonl" },
+        // On a route upstream does not list: the entry is created with the row's own date as its evidence date.
+        { route: "lab-login", client: "direct", model: "c", base_model: "lab/model-a", input_accepted: 900000, input_refused: 910000, date: "2026-11-12", source: "results/limits-2026-11-08/l.jsonl" },
+      ],
+    };
+    const labels = { clients: { direct: { id: "direct", label: "Direct" }, "tool-x": { id: "tool-x", label: "Tool X" }, "other-tool": { id: "other-tool", label: "Other tool" } }, omit_note_parts_mentioning: [] };
+    const { catalog } = resolve(input([], { observed: rows, routes, labels, additions: [login] }));
+    const measured = (ref: [string, string]) => ext(catalog[ref[0]]!.models[ref[1]]!).limits.measured.map((item) => [item.client, item.date, item.input_accepted, item.input_read]);
+    expect(measured(["lab", "model-a"])).toEqual([["direct", "2026-11-08", 150000, null], ["tool-x", "2026-11-12", 120000, 110000]]);
+    expect(measured(["lab", "model-b"])).toEqual([["other-tool", "2026-11-14", null, null], ["direct", null, null, null]]);
+    expect(measured(["lab-login", "c"])).toEqual([["direct", "2026-11-12", 900000, null]]);
+    expect(ext(catalog["lab-login"]!.models.c!).evidence.map((item) => item.date)).toEqual(["2026-11-12"]);
+    // Every limit evaluation has the same keys, input_read among them.
+    const keys = new Set(Object.values(catalog).flatMap((provider) => Object.values(provider.models).flatMap((model) => ext(model).limits.measured.map((item) => Object.keys(item).join(",")))));
+    expect([...keys]).toEqual(["route,route_label,client,client_label,context,output,input_accepted,input_refused,input_read,output_accepted,note,date,source"]);
+  });
+
   it("names clients by their public label, drops note parts on the omit list and skips runs marked as lacking", () => {
     const labelled: ObservedFile = {
       ...observed,

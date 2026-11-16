@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { publish } from "../scripts/lib/publish.ts";
 import { MetaSchema } from "../src/core/contract.ts";
+import { ObservedFile } from "../src/core/schema.ts";
 import { loadUpstream, sync, SyncBusyError } from "../scripts/lib/sync.ts";
 import { stringify } from "yaml";
 import { fetchReturning, fixtureUpstream, ROOT, tempDataDir, writeAuthored } from "./helpers.ts";
@@ -16,6 +17,24 @@ const observedWith = (ages: number[]): string =>
     cache: [{ id: "probe/R1", route: "provider-00", client: "direct", model: "model-1", date: "2026-11-12", source: "results/r1.json", latest: true, control: { warm: 1, total: 1 }, checks: ages.map((age_s, index) => ({ age_s, warm: index === 0 ? 1 : 0, total: 1 })) }],
   });
 const REPEATED_AGE = /Run "probe\/R1" has two checks at age 150 s\. A run has one check result per age\./;
+
+/** A measurements file with one good cache run and these `limits` rows. */
+const observedWithLimits = (limits: object[]): string => JSON.stringify({ ...JSON.parse(observedWith([150, 300])), limits });
+const LIMIT_ROW = { route: "devin", client: "cliproxyapi", model: "gpt-6-1-sol", base_model: "openai/gpt-6.1-sol", models_dev: null, source: "results/limits-2026-11-08/limits.jsonl" };
+const ROW_NAME = 'The limits row of route "devin", client "cliproxyapi", model "gpt-6-1-sol"';
+/** The four rows the design refuses (section 6), each with the words of its refusal; a good row beside each. */
+const REFUSED_LIMITS: [string, object[], RegExp][] = [
+  ["two rows with the same route, client and model", [{ ...LIMIT_ROW, input_accepted: 915390, input_refused: 925000 }, { ...LIMIT_ROW, input_accepted: 900000, input_refused: 925000, date: "2026-11-12" }], /is in the file twice\. There is one limits row per route, client and model\./],
+  ["an input accepted that is not below the input refused", [{ ...LIMIT_ROW, input_accepted: 925000, input_refused: 925000 }], /has input_accepted 925000, not below its input_refused 925000\./],
+  ["an input accepted above the window the route names", [{ ...LIMIT_ROW, context: 1000000, input_accepted: 1000001 }], /has input_accepted 1000001, above its context 1000000\./],
+  ["an input read above the input accepted", [{ ...LIMIT_ROW, input_accepted: 250000, input_read: 250001 }], /has input_read 250001, above its input_accepted 250000\./],
+  ["an input read with no input accepted", [{ ...LIMIT_ROW, input_read: 250000 }], /has input_read 250000 and no input_accepted\./],
+];
+const GOOD_LIMITS = [
+  { ...LIMIT_ROW, input_accepted: 915390, input_refused: 925000 },
+  { ...LIMIT_ROW, client: "direct", context: 1000000, input_accepted: 1000000, input_read: 1000000, date: "2026-11-12" },
+  { ...LIMIT_ROW, client: "codex-cli", input_accepted: 250000, input_read: null, date: null },
+];
 
 /** models.dev as in the fixture, and the measurements file with `body`. */
 const fetchWithObserved = (body: string): typeof fetch => {
@@ -127,6 +146,31 @@ describe("sync", () => {
     expect(JSON.parse(readFileSync(join(dataDir, "sync-status.json"), "utf8"))).toMatchObject({ last_attempt_ok: false, measurements: "failed", last_error: expect.stringMatching(REPEATED_AGE) });
   });
 
+  it.each(REFUSED_LIMITS)("refuses a measurements file with %s, names the row, and keeps the last good copy", async (_name, limits, words) => {
+    const dataDir = tempDataDir();
+    const first = await sync({ dataDir, fetch: fetchWithObserved(observedWithLimits(GOOD_LIMITS)), now: () => new Date("2026-11-13T00:00:00Z") });
+    expect([first.ok, first.measurements.status]).toEqual([true, "updated"]);
+    const kept = readFileSync(join(dataDir, "sources", "observed.json"), "utf8");
+    const keptMeta = readFileSync(join(dataDir, "sources", "observed.meta.json"), "utf8");
+
+    const second = await sync({ dataDir, fetch: fetchWithObserved(observedWithLimits([...GOOD_LIMITS.slice(1), ...limits])), force: true, now: () => new Date("2026-11-14T00:00:00Z") });
+    expect([second.ok, second.measurements.status]).toEqual([false, "failed"]);
+    expect(second.measurements.error).toMatch(/^the measurements file does not match the expected structure: /);
+    expect(second.measurements.error).toContain(ROW_NAME);
+    expect(second.measurements.error).toMatch(words);
+    expect(readFileSync(join(dataDir, "sources", "observed.json"), "utf8")).toBe(kept);
+    expect(readFileSync(join(dataDir, "sources", "observed.meta.json"), "utf8")).toBe(keptMeta);
+  });
+
+  it("reads today's measurements file, whose limits rows have no date and no input_read, without error", () => {
+    const path = join(ROOT, "data", "sources", "observed.json");
+    if (!existsSync(path)) return;
+    const checked = ObservedFile.safeParse(JSON.parse(readFileSync(path, "utf8")));
+    expect(checked.success ? [] : checked.error.issues.slice(0, 3).map((issue) => issue.message)).toEqual([]);
+    // The new keys are optional, and a row of either shape is read.
+    expect(ObservedFile.safeParse(JSON.parse(observedWithLimits(GOOD_LIMITS))).success).toBe(true);
+  });
+
   it("refuses to run while another sync holds the lock", async () => {
     const dataDir = await firstImport();
     writeFileSync(join(dataDir, ".sync.lock"), "1");
@@ -216,6 +260,21 @@ describe("publish", () => {
     const report = publish({ dataDir, rootDir: ROOT });
     expect(report.ok).toBe(false);
     expect(report.errors).toEqual([expect.stringMatching(new RegExp(`observed\\.json: ${REPEATED_AGE.source}$`))]);
+    expect(readFileSync(join(dataDir, "published", "site", "data", "meta.json"), "utf8")).toBe(before);
+  });
+
+  it.each(REFUSED_LIMITS)("fails the build on a measurements file with %s, names the row, and keeps the last published dataset", async (_name, limits, words) => {
+    const dataDir = await firstImport();
+    writeAuthored(dataDir);
+    mkdirSync(join(dataDir, "sources"), { recursive: true });
+    writeFileSync(join(dataDir, "sources", "observed.json"), observedWithLimits(GOOD_LIMITS));
+    expect(publish({ dataDir, rootDir: ROOT }).errors).toEqual([]);
+    const before = readFileSync(join(dataDir, "published", "site", "data", "meta.json"), "utf8");
+
+    writeFileSync(join(dataDir, "sources", "observed.json"), observedWithLimits([...GOOD_LIMITS.slice(1), ...limits]));
+    const report = publish({ dataDir, rootDir: ROOT });
+    expect(report.ok).toBe(false);
+    expect(report.errors).toEqual([expect.stringMatching(new RegExp(`observed\\.json: ${ROW_NAME.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")} ${words.source}`))]);
     expect(readFileSync(join(dataDir, "published", "site", "data", "meta.json"), "utf8")).toBe(before);
   });
 
