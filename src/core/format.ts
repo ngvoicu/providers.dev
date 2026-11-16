@@ -10,7 +10,6 @@ export function exact(value: number): string {
   return value.toLocaleString("en-US");
 }
 
-/** 1048576 -> "1.05M", 128000 -> "128K". Always pair it with the exact number. */
 /** A price in US dollars: `$10`, `$12.50`, `$0.075`. */
 export function usd(value: number): string {
   // A price per second or per image can be a small fraction of a cent: show what it is, not a rounded zero.
@@ -19,6 +18,7 @@ export function usd(value: number): string {
   return `$${text}`;
 }
 
+/** 1048576 -> "1.05M", 128000 -> "128K". Always pair it with the exact number. */
 export function compactTokens(value: number): string {
   if (value >= 1_000_000) return `${trim(value / 1_000_000)}M`;
   if (value >= 1_000) return `${trim(value / 1_000)}K`;
@@ -27,6 +27,22 @@ export function compactTokens(value: number): string {
 
 function trim(value: number): string {
   return value >= 100 ? String(Math.round(value)) : String(Number(value.toFixed(2)));
+}
+
+/**
+ * The compact number of a lower bound ("at least"), rounded down and never up, so that it stays true:
+ * 1047604 -> "1.04M" (not "1.05M"), 915011 -> "915K", 999999 -> "999K". Always pair it with the exact number.
+ */
+export function compactTokensDown(value: number): string {
+  if (value >= 1_000_000) return `${floorTrim(value, 1_000_000)}M`;
+  if (value >= 1_000) return `${floorTrim(value, 1_000)}K`;
+  return String(Math.floor(value));
+}
+
+/** In whole units from 100 up, else in hundredths of a unit; counted in whole tokens, so no fraction rounds up. */
+function floorTrim(value: number, unit: number): string {
+  if (value >= 100 * unit) return String(Math.floor(value / unit));
+  return String(Math.floor((Math.floor(value) * 100) / unit) / 100);
 }
 
 /** 300 -> "5 min", 3600 -> "1 h", 450 -> "7.5 min". */

@@ -7,6 +7,7 @@ import { sync } from "../scripts/lib/sync.ts";
 import { handleApi, type ApiDeps } from "../src/core/api.ts";
 import { CorrectionSchema, DocumentationSchema, FacetsSchema, one, pageOf } from "../src/core/contract.ts";
 import { fillShell, MARK } from "../src/core/page-shell.ts";
+import { emptyInputWindow } from "../src/core/limits.ts";
 import { handlePage, type PageDeps } from "../src/core/pages.ts";
 import { PARAMS } from "../src/core/query.ts";
 import { readSnapshot, type AssetBinding } from "../src/core/snapshot.ts";
@@ -99,6 +100,55 @@ describe("API response boundary", () => {
     expect(entry).toContain('<th scope="row" title="Short retention: the cache a request gets without asking for a lifetime, or with the provider\'s shortest setting.">Short retention</th>');
     const catalog = await (await page("/?provider=provider-02&limit=8")).text();
     expect(catalog).toContain('<td class="life-col" data-label="Cache lifetime"><a class="plain lifes" href="/entries/provider-02/lab/model-4#cache"');
+  });
+
+  it("prints the input window from input_window of the API's answer, on the lists and on the entry page", async () => {
+    // A record that is in no entry of the fixture: whatever the pages print of it, they read from the answer.
+    const record = {
+      ...emptyInputWindow(), tokens: 1047604, basis: "measured", bound: "at_least", scope: "input", source: "providers.dev", date: "2026-11-10",
+      measured_tokens: 1047604, measured_bound: "at_least", measured_kind: "bracket", measured_refused: 1050000, measured_date: "2026-11-10", clients: 1, evaluations: 1,
+      measurements: [{ client: "cliproxyapi", client_label: "Requests sent through CLIProxyAPI", route: "login", route_label: "A login", date: "2026-11-10", tokens: 1047604, bound: "at_least", kind: "bracket", accepted: 1047604, refused: 1050000, named: null, read: null, source: "https://example.com/limits.jsonl" }],
+    };
+    type Answer = { data: unknown };
+    const swapped = async (path: string): Promise<Response> => {
+      const response = await api(path);
+      if (!/^\/api\/v1\/(entries|providers\/|models\/)/.test(path)) return response;
+      const answer = await response.json() as Answer;
+      const swap = (value: unknown): unknown => {
+        if (Array.isArray(value)) return value.map(swap);
+        if (value === null || typeof value !== "object") return value;
+        return Object.fromEntries(Object.entries(value).map(([key, inner]) => [key, key === "input_window" ? record : swap(inner)]));
+      };
+      return Response.json({ ...answer, data: swap(answer.data) });
+    };
+    for (const path of ["/?provider=provider-02&limit=8", "/providers/provider-02/", "/models/lab/model-4/"]) {
+      const html = await (await page(path, swapped)).text();
+      expect(html, path).toContain('<span class="window-value">≥ 1.04M</span><span class="basis measured">measured</span>');
+      // As published, the fixture's own record: documented from models.dev.
+      const published = await (await page(path)).text();
+      expect(published, path).not.toContain("≥ 1.04M");
+      expect(published, path).toContain('<span class="basis documented">documented</span>');
+    }
+    const entry = await (await page("/entries/provider-02/lab/model-4", swapped)).text();
+    expect(entry).toContain('<span class="window-value"><span class="bound">at least</span> 1,047,604 <span class="muted">tokens</span></span>');
+    expect(entry).toContain("1,047,604 accepted · 1,050,000 refused");
+    expect(entry).toContain('<a href="https://example.com/limits.jsonl" rel="noopener">Raw result</a>');
+    const published = await (await page("/entries/provider-02/lab/model-4")).text();
+    expect(published).toContain('<h3 id="input-window">Input window</h3>');
+    expect(published).not.toContain("1,047,604");
+  });
+
+  it("says in the methodology how the input window is worked out and what it does not say", () => {
+    const source = readFileSync(join(ROOT, "src", "pages", "reference-content", "docs", "methodology.astro"), "utf8").replace(/\s+/g, " ");
+    for (const words of [
+      '{ id: "input-window", label: "Input window" }', '<h2 id="input-window">Input window</h2>', "<code>providers_dev.limits.input_window</code>", "the client's own system prompt and tool definitions included",
+      "in two figures only, the safe cache lifetime and the input window", "it is what the route accepts, the client's own prompt and tools included, not what is left after them",
+      "at or below 99 %", "at or above 101 %", "the lowest decides", "<code>bound: at_least</code>", "rounded down, never up",
+      "<em>Documentation contradicted</em>", "<em>Documentation not contradicted</em>", "<code>limit.context</code> and nothing else",
+      "One account per route.", "goes stale as all providers.dev evidence does", "A refused size is the probe's count, not the provider's.",
+      "A window a route names is its total.", "not contradicted is not confirmed",
+    ]) expect(source, words).toContain(words);
+    expect(source).not.toContain("limit-value");
   });
 
   it("renders the requested homepage filters and page before JavaScript runs", async () => {

@@ -15,8 +15,10 @@ import {
 import type { ProviderSummary, Summary } from "./entries.ts";
 import { conditionText } from "./conditions.ts";
 import type { PricingRule, RequestControl } from "./policy-contract.ts";
+import type { InputWindow, InputWindowMeasurement } from "./limits.ts";
 import {
   compactTokens,
+  compactTokensDown,
   duration,
   entryHref,
   escapeHtml as e,
@@ -78,15 +80,65 @@ const CACHE_MODE_TITLE = {
   explicit: "Manual (explicit): nothing is cached unless the request marks what to cache. The mark also picks the lifetime.",
 } as const;
 
-/** The documented window. Where there is none, the largest input an evaluation saw accepted, said as what it is. */
-function contextCell(entry: Summary, href: string): string {
-  const accepted = entry.measured_input_accepted;
-  if (entry.context !== null || accepted === null) return tokens(entry.context);
-  // Rounded down: "at least" must stay true.
-  const floor = compactTokens(Math.floor(accepted / 1000) * 1000);
-  const refused = entry.measured_input_refused;
-  const title = `Measured, not documented: no window is documented for this entry. An evaluation saw an input of ${exact(accepted)} tokens accepted${refused === null ? "" : ` and one of ${exact(refused)} refused`}. Input only: the output comes on top.`;
-  return `<a class="plain limit-measured" href="${e(href)}#limits" title="${e(title)}"><span class="limit-value">≥ ${floor}</span><span class="limit-note">input</span></a>`;
+// ---- the input window: `input_window` of a summary and `providers_dev.limits.input_window` of an entry, as the API
+// publishes them. This file compares nothing, takes no minimum, applies no margin and picks no source: which value is
+// the published one is `basis`, whether it is a lower bound is `bound` ("at least", "≥"), what the rule found of the
+// documentation is `documented_status`, and what a measurement is, is its `kind`.
+
+const SCOPE_WORD = { input: "Input alone", window: "Input and output together" } as const;
+const SCOPE_TITLE = {
+  input: "A figure for the input alone: the response is not counted against it.",
+  window: "A context window: input and output together. The response is counted against the same figure.",
+} as const;
+const WINDOW_BASIS_TITLE = {
+  documented: "Documented: the input limit or context window the source documents for this entry.",
+  measured: "Measured by providers.dev on this access.",
+} as const;
+/** What a measured value is, by its `kind`, in a sentence. */
+const MEASURED_SAID = { window: "the window the route named", bracket: "the largest input seen accepted", accepted: "the largest input seen accepted and read to the end, nothing refused" } as const;
+
+/** "at least " where the record says the value is a lower bound, and only there. */
+const atLeast = (bound: InputWindow["bound"]): string => (bound === "at_least" ? "at least " : "");
+
+/** What one measurement saw, in its own numbers, by its `kind`. */
+function measurementSaid(item: InputWindowMeasurement): string {
+  const parts =
+    item.kind === "window"
+      ? ["Window named by the route", item.accepted === null ? "" : `an input of ${exact(item.accepted)} accepted`]
+      : item.kind === "bracket"
+        ? [item.accepted === null ? "" : `${exact(item.accepted)} accepted`, item.refused === null ? "" : `${exact(item.refused)} refused`]
+        : [item.accepted === null ? "Accepted" : `${exact(item.accepted)} accepted`, "read to the end", "nothing refused"];
+  // A read check is printed wherever one was made; on an `accepted` measurement it is the value itself.
+  if (item.read !== null && item.kind !== "accepted") parts.push(`${exact(item.read)} read to the end`);
+  if (item.read !== null && item.kind === "accepted") parts[1] = `${exact(item.read)} read to the end`;
+  return parts.filter(Boolean).join(" · ");
+}
+
+/** The input window of an entry and what it rests on, in plain sentences for a tooltip. All of it is the record's. */
+function windowSaid(w: InputWindow): string {
+  if (w.tokens === null || w.basis === "none") return "Input window: unknown. Nothing documented or measured.";
+  const head = `Input window: ${atLeast(w.bound)}${exact(w.tokens)} tokens${w.scope ? `, ${SCOPE_WORD[w.scope].toLowerCase()}` : ""}.`;
+  const basis =
+    w.basis === "documented"
+      ? `Documented${w.documented_field ? ` in ${w.documented_field}` : ""}, ${w.source ?? "source unknown"}${w.date ? `, ${w.date}` : ""}.`
+      : `Measured by providers.dev${w.date ? `, ${w.date}` : ""}${w.measured_kind === null ? "" : `: ${MEASURED_SAID[w.measured_kind]}`}${w.measured_refused === null ? "" : `; ${exact(w.measured_refused)} tokens refused`}.`;
+  const other =
+    w.basis === "documented"
+      ? w.measured_tokens === null ? "Not measured." : `Measured: ${atLeast(w.measured_bound)}${exact(w.measured_tokens)} tokens${w.measured_kind === "window" ? ", a window named by the route" : ""} (${plural(w.clients, "client")}, ${plural(w.evaluations, "evaluation")}).`
+      : w.documented_tokens === null ? "Not documented." : `Documented: ${exact(w.documented_tokens)} tokens${w.documented_field ? ` in ${w.documented_field}` : ""}, ${w.documented_source ?? "source unknown"}.`;
+  const status = w.documented_status === "contradicted" ? " Documentation contradicted." : w.documented_status === "not_contradicted" ? " Documentation not contradicted." : "";
+  return `${head} ${basis} ${other}${status}`;
+}
+
+/**
+ * The input window in a table row: the compact number, "≥" before it and rounded down where the record says it is a
+ * lower bound, and its basis in a word under it. The rest is in the hover text and on the entry's page.
+ */
+function windowCell(entry: Pick<Summary, "input_window">, href: string): string {
+  const w = entry.input_window;
+  if (w.tokens === null || w.basis === "none") return `<span class="unknown" title="${e(windowSaid(w))}">Unknown</span>`;
+  const value = w.bound === "at_least" ? `≥ ${compactTokensDown(w.tokens)}` : compactTokens(w.tokens);
+  return `<a class="plain window" href="${e(href)}#input-window" title="${e(windowSaid(w))}"><span class="window-value">${value}</span>${basisTag(w.basis, null)}</a>`;
 }
 
 // ---- cache lifetimes: `cache_lifetime` of a summary and `providers_dev.cache.lifetime` of an entry, as the API
@@ -120,20 +172,30 @@ function lifetimeText(value: number, basis: "documented" | "measured"): string {
   return `<span title="${seconds(value)}">${span(value)}</span>`;
 }
 
-/** Documented or measured, in words, on every value: no legend needed. */
-function basisTag(basis: "documented" | "measured"): string {
-  return `<span class="basis ${basis}" title="${BASIS_TITLE[basis]}">${basis}</span>`;
+/** Documented or measured, in words, on every value: no legend needed. `null` leaves the title to what holds the tag. */
+function basisTag(basis: "documented" | "measured", title: string | null = BASIS_TITLE[basis]): string {
+  return `<span class="basis ${basis}"${title === null ? "" : ` title="${e(title)}"`}>${basis}</span>`;
 }
 
-/** Who a lifetime is from, and its date. A providers.dev date is marked stale like all our evidence, after the published `stale_after_days`. */
-function lifetimeSource(source: LifetimeSource, date: string | null, basis: "documented" | "measured", today: Today): string {
+/**
+ * Who a value is from, and its date. A providers.dev date is marked stale like all our evidence, after the published
+ * `stale_after_days`. `dateTitle` says what the date is where it is not the newest evaluation's or evidence's.
+ */
+function lifetimeSource(source: LifetimeSource, date: string | null, basis: "documented" | "measured", today: Today, dateTitle?: string): string {
   const name =
     source === "models.dev"
       ? `<span class="origin upstream" title="${e(ORIGIN_TITLE.upstream)}">models.dev</span>`
       : `<span class="origin added" title="${basis === "measured" ? "Measured by providers.dev." : "Documented, with a providers.dev correction or on an entry providers.dev added."}">providers.dev</span>`;
-  const title = basis === "measured" ? "The date of the newest evaluation." : source === "models.dev" ? "Imported from models.dev on this date." : "The date of the newest providers.dev evidence.";
-  const when = date === null ? '<span class="muted date">Date unknown</span>' : source === "providers.dev" && isStale(date, today) ? `<span class="stale" title="${title} More than ${plural(today.stale_after_days, "day")} ago.">${e(date)} · stale</span>` : `<span class="muted date" title="${title}">${e(date)}</span>`;
-  return `<span class="life-source">${name}${when}</span>`;
+  const title = dateTitle ?? (basis === "measured" ? "The date of the newest evaluation." : source === "models.dev" ? "Imported from models.dev on this date." : "The date of the newest providers.dev evidence.");
+  return `<span class="life-source">${name}${dateText(date, source === "providers.dev", title, today)}</span>`;
+}
+
+/** A date with what it is in its title; a providers.dev date is marked stale after the published `stale_after_days`. */
+function dateText(date: string | null, ours: boolean, title: string, today: Today): string {
+  if (date === null) return '<span class="muted date">Date unknown</span>';
+  return ours && isStale(date, today)
+    ? `<span class="stale" title="${e(title)} More than ${plural(today.stale_after_days, "day")} ago.">${e(date)} · stale</span>`
+    : `<span class="muted date" title="${e(title)}">${e(date)}</span>`;
 }
 
 /** The safe lifetime of a profile and what it was chosen from, in one plain sentence for a tooltip. */
@@ -236,7 +298,7 @@ export interface RowOptions {
 }
 
 /** The column names of the entry table. Where the table is stacked, each cell repeats its column's name. */
-const COLUMN = { provider: "Provider", context: "Context", max_output: "Max output", price: "Price in / out", released: "Released", lifetime: "Cache lifetime", source: "Source" } as const;
+const COLUMN = { provider: "Provider", input_window: "Input window", context: "Context", max_output:"Max output", price: "Price in / out", released: "Released", lifetime: "Cache lifetime", source: "Source" } as const;
 
 export function tableHead(options: { hideProvider?: boolean; sortable?: boolean; sort?: string; order?: string }): string {
   const column = (key: string | null, label: string, title: string, className = ""): string => {
@@ -250,6 +312,7 @@ export function tableHead(options: { hideProvider?: boolean; sortable?: boolean;
   return `<tr>
 ${column("name", "Model", "The model's name and its id at this provider.")}
 ${options.hideProvider ? "" : column("provider", COLUMN.provider, "Who serves it, and how it is reached.")}
+${column(null, COLUMN.input_window, "The most input one request can carry on this entry, in tokens (input_window). Each value says whether it is documented or measured by providers.dev; ≥ marks a lower bound, the largest input seen accepted. Hover a value for what it rests on; the entry's page has the documented and measured figures side by side.", "num window-col")}
 ${column("context", COLUMN.context, "Exposed context window in tokens (limit.context): what this provider accepts for the model.", "num")}
 ${column("max_output", COLUMN.max_output, "Largest single response in tokens (limit.output). A maximum, not a default.", "num")}
 ${column("price_in", COLUMN.price, "Base list price in US dollars per million tokens, input then output, as models.dev records it. Conditional rates marks an entry whose price changes with context size, service tier, region, date or the time of day: open the entry for those. A subscription is not paid per token: it shows the API list price of the same model, marked API price, or In plan where the catalog has no API entry of that model.", "num mid-only")}
@@ -267,7 +330,8 @@ export function rowHtml(entry: Summary, options: RowOptions): string {
   return `<tr>
 <th scope="row"><a href="${e(href)}">${e(entry.name)}</a>${status}<div class="id"><code>${e(entry.model)}</code>${copyButton(entry.ref, "entry id")}</div></th>
 ${options.hideProvider ? "" : `<td class="provider-col" data-label="${COLUMN.provider}"><a class="plain" href="/providers/${e(entry.provider)}/">${e(provider)}</a>${access}</td>`}
-<td class="num" data-label="${COLUMN.context}">${contextCell(entry, href)}</td>
+<td class="num window-col" data-label="${COLUMN.input_window}">${windowCell(entry, href)}</td>
+<td class="num" data-label="${COLUMN.context}">${tokens(entry.context)}</td>
 <td class="num" data-label="${COLUMN.max_output}">${tokens(entry.max_output)}</td>
 <td class="num mid-only" data-label="${COLUMN.price}">${priceCell(entry)}</td>
 <td class="wide-only" data-label="${COLUMN.released}">${entry.release_date ? `<span class="muted date">${e(entry.release_date)}</span>` : UNKNOWN}</td>
@@ -580,6 +644,65 @@ function requestControlTable(controls: RequestControl[]): string {
 <p class="hint">Source: ${source || UNKNOWN}</p>`;
 }
 
+const WINDOW_CASE = {
+  contradicted: '<span class="case contradicted" title="A limit evaluation clearly contradicts the documented figure: the input window is the measured one. The documented figure stays here, beside it.">Documentation contradicted</span>',
+  not_contradicted: '<span class="case" title="No limit evaluation contradicts the documented figure: the input window is the documented one. Not contradicted is not confirmed.">Documentation not contradicted</span>',
+} as const;
+
+/** The date of a value of the input window, said for what it is. */
+function windowDateTitle(basis: "documented" | "measured", source: LifetimeSource): string {
+  if (basis === "measured") return "The date of the evaluation that gives this value.";
+  return source === "models.dev" ? "Imported from models.dev on this date." : "The date of the newest providers.dev evidence for the documented figure.";
+}
+
+/** A value of the input window: "at least" where its bound says so, the exact tokens. */
+const windowTokens = (value: number, bound: InputWindow["bound"]): string =>
+  `<span class="window-value">${bound === "at_least" ? '<span class="bound">at least</span> ' : ""}${exact(value)} <span class="muted">tokens</span></span>`;
+
+/**
+ * The input window of an entry, in the columns of the other limit tables and the same three rows on every entry: the
+ * published value with its basis, scope, source and date; the documented figure with what the rule found of it; and
+ * one line per measurement, each with its client, date and raw result. Printed as the record has it.
+ */
+function inputWindowTable(w: InputWindow, today: Today): string {
+  const row = (label: string, hint: string, rest: string, span = 1): string =>
+    `<th scope="row"${span > 1 ? ` rowspan="${span}"` : ""}>${label}<div class="hint">${hint}</div></th>${rest}`;
+  const valueCell = (html: string): string => `<td class="num" data-label="Value">${html}</td>`;
+  const sourceCell = (html: string): string => `<td data-label="Source">${html}</td>`;
+
+  const published =
+    w.tokens === null || w.basis === "none" || w.source === null
+      ? valueCell(UNKNOWN) + sourceCell(DASH)
+      : valueCell(`${windowTokens(w.tokens, w.bound)}<span class="window-what">${basisTag(w.basis, WINDOW_BASIS_TITLE[w.basis])}${w.scope ? `<span title="${SCOPE_TITLE[w.scope]}">${SCOPE_WORD[w.scope]}</span>` : ""}</span>`) +
+        sourceCell(lifetimeSource(w.source, w.date, w.basis, today, windowDateTitle(w.basis, w.source)));
+
+  const documented =
+    w.documented_tokens === null || w.documented_source === null
+      ? valueCell('<span class="muted">Not documented</span>') + sourceCell(DASH)
+      : valueCell(`${windowTokens(w.documented_tokens, "limit")}<span class="window-what">${w.documented_field ? `<code>${e(w.documented_field)}</code>` : ""}${w.documented_status ? WINDOW_CASE[w.documented_status] : ""}</span>`) +
+        sourceCell(lifetimeSource(w.documented_source, w.documented_date, "documented", today, windowDateTitle("documented", w.documented_source)));
+
+  const measuredHint = "What each limit evaluation that counts gives, one line per evaluation.";
+  const measured =
+    w.measurements.length === 0
+      ? [`<tr>${row("Measured", measuredHint, valueCell('<span class="muted">Not measured</span>') + sourceCell(DASH))}</tr>`]
+      : w.measurements.map((item, at) => {
+          const value = valueCell(`${windowTokens(item.tokens, item.bound)}<div class="hint">${e(measurementSaid(item))}</div>`);
+          const source = sourceCell(`<span class="client">${e(item.client_label)}</span><div class="hint">${dateText(item.date, true, "The date of this evaluation.", today)} · <a href="${e(item.source)}" rel="noopener">Raw result</a></div>`);
+          return `<tr${at > 0 ? ' class="more"' : ""}>${at === 0 ? row("Measured", measuredHint, value + source, w.measurements.length) : value + source}</tr>`;
+        });
+
+  return `<div class="scroll"><table class="facts limit-facts window-table stack-phone">
+    <thead><tr><th scope="col">Limit</th><th scope="col" class="num">Value</th><th scope="col">Source</th></tr></thead>
+    <tbody>
+      <tr class="published">${row("Input window", "<code>input_window</code>: the most input one request can carry on this entry, in tokens as the provider counts them.", published)}</tr>
+      <tr>${row("Documented", "The figure the source documents, and the field it is in.", documented)}</tr>
+      ${measured.join("")}
+    </tbody>
+  </table></div>
+<p class="hint"><a href="/docs/methodology/#input-window">How the input window is worked out, and what it does not say</a></p>`;
+}
+
 function measuredLimitRows(limits: MeasuredLimit[]): string {
   const cell = (value: number | null, label: string): string => `<td class="num" data-label="${label}">${value === null ? UNKNOWN : exact(value)}</td>`;
   return limits
@@ -655,6 +778,20 @@ export function entryHtml(view: EntryView): string {
             : `<div>Documented ${p.documented_s === 0 ? "None" : span(p.documented_s)}</div>`;
     return tile(label, `<span title="${e(safeSaid(profile, p))}">${lifetimeText(p.safe_s, p.basis)}</span>${basisTag(p.basis)}`, `${e(p.source)}${p.date ? ` · ${e(p.date)}` : ""}${other}`);
   };
+  // The input window, first: the value, "at least" where its bound says so, its basis, source and date, what kind of
+  // figure it is, and the other of the two figures under it, as the cache tiles have it.
+  const inputWindow = extension.limits.input_window;
+  const windowTile = (): string => {
+    const w = inputWindow;
+    if (w.tokens === null || w.basis === "none" || w.source === null) return tile("Input window", '<span class="muted">Unknown</span>', "Not documented or measured");
+    const contradicted = w.documented_status === "contradicted";
+    const other =
+      w.basis === "documented"
+        ? w.measured_tokens === null ? "" : `<div>Measured ${atLeast(w.measured_bound)}${exact(w.measured_tokens)}${w.measured_kind === "window" ? ", window named" : ""}</div>`
+        : w.documented_tokens === null ? "" : `<div${contradicted ? ' class="contradicted"' : ""}>Documented ${exact(w.documented_tokens)}${contradicted ? ", contradicted" : ""}</div>`;
+    const value = `<span title="${e(windowSaid(w))}">${w.bound === "at_least" ? '<span class="unit">at least</span> ' : ""}${exact(w.tokens)} <span class="unit">tokens</span></span>${basisTag(w.basis, WINDOW_BASIS_TITLE[w.basis])}`;
+    return tile("Input window", value, `${e(w.source)}${w.date ? ` · ${e(w.date)}` : ""}${w.scope ? `<div>${SCOPE_WORD[w.scope]}</div>` : ""}${other}`);
+  };
 
   return `
 <header class="entry-head">
@@ -669,7 +806,8 @@ export function entryHtml(view: EntryView): string {
   }</p>
 </header>
 
-<div class="tiles mt-6">
+<div class="tiles tiles-entry mt-6">
+  ${windowTile()}
   ${tile("Context window", big(limit.context), "Exposed by this provider")}
   ${tile("Maximum output", big(limit.output), "Per response; not a default")}
   ${lifetimeTile("short")}
@@ -678,8 +816,10 @@ export function entryHtml(view: EntryView): string {
 
 <section aria-labelledby="limits">
   <h2 id="limits">Limits</h2>
+  <h3 id="input-window">Input window</h3>
+  ${inputWindowTable(inputWindow, today)}
   <h3>Documented</h3>
-  <div class="scroll"><table class="facts stack-phone">
+  <div class="scroll"><table class="facts limit-facts stack-phone">
     <thead><tr><th scope="col">Limit</th><th scope="col" class="num">Value</th><th scope="col">Source</th></tr></thead>
     <tbody>
       ${fact("Context window", "<code>limit.context</code>: what this provider accepts for the model, input and output together.", number(limit.context), sourceOf("limit.context", provenance, extension.origin, fromMeasurement))}

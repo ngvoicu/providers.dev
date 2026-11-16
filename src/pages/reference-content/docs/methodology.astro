@@ -11,6 +11,7 @@ import { IDENTITY_FIELDS } from "../../../core/resolve.ts";
     { id: "kinds", label: "Kinds of value" },
     { id: "unknown", label: "Unknown values" },
     { id: "limits", label: "Limits" },
+    { id: "input-window", label: "Input window" },
     { id: "prices", label: "Prices" },
     { id: "access", label: "Access methods" },
     { id: "merge", label: "Merge rules" },
@@ -31,9 +32,10 @@ import { IDENTITY_FIELDS } from "../../../core/resolve.ts";
     </ul>
     <p>
       A documented value and a measured one are both shown, each with its source and date. A provider documenting a 30-minute cache and an evaluation that found the cache gone after
-      15 minutes are two different facts, and both stay published. A measured value takes the place of a documented one in one figure only, the safe cache lifetime, and only where a
-      measurement clearly contradicts the documentation (see <a href="#lifetimes">Cache lifetimes</a>); the documented lifetime stays listed beside it. The other exception is an added
-      entry, where no documented limit exists: there a measured limit is published as the limit and labelled as measured.
+      15 minutes are two different facts, and both stay published. A measured value takes the place of a documented one in two figures only, the safe cache lifetime and the input
+      window, and only where a measurement clearly contradicts the documentation (see <a href="#lifetimes">Cache lifetimes</a> and <a href="#input-window">Input window</a>); the
+      documented figure stays beside it, and a documented limit stays in <code>limit</code> as imported. The other exception is an added entry, where no documented limit exists: there
+      a measured limit is published as the limit and labelled as measured.
     </p>
 
     <h2 id="unknown">Unknown values</h2>
@@ -59,13 +61,73 @@ import { IDENTITY_FIELDS } from "../../../core/resolve.ts";
       <li><strong>Context window</strong> (<code>limit.context</code>): what this provider and access method accepts for the model. It can be lower than the model's window at its lab; model pages show them side by side.</li>
       <li><strong>Largest input</strong> (<code>limit.input</code>): stated where the input limit is lower than the window.</li>
       <li><strong>Maximum output</strong> (<code>limit.output</code>): the most one response can hold. It is not the default a provider applies when none is requested.</li>
-      <li><strong>Usable context</strong>: the window minus the system prompt and tool definitions of the client in use. That overhead varies, so no usable figure is published.</li>
+      <li>
+        <strong>Input window</strong> (<code>input_window</code>): the most input one request can carry on this provider and access method, in tokens as the provider counts them. One
+        figure per entry, documented or measured, worked out once when the data is built (see <a href="#input-window">Input window</a>).
+      </li>
+      <li>
+        <strong>Usable context</strong>: the window minus the system prompt and tool definitions of the client in use. That overhead varies, so no usable figure is published. The input
+        window is not that: it is what the route accepts, the client's own prompt and tools included, not what is left after them.
+      </li>
       <li><strong>Compaction threshold</strong>: a setting of an agent or client. It is not a provider limit and is not published as one.</li>
       <li>
-        <strong>Measured input</strong>: where no window is documented and an evaluation found the input limit, the catalog shows it as <span class="limit-value">≥ 915K</span> input: the
-        largest input the evaluation saw accepted, rounded down. The entry page gives both ends, the largest accepted and the smallest refused. It is an input limit, not a window: the output
-        comes on top. A window listed by a client (a default the client works with) is not taken as the limit.
+        <strong>Measured input</strong>: a limit evaluation sends requests of several input sizes on one access method. It records the largest input accepted, the smallest refused, and
+        the window the route names where its answer names one; the entry page lists each evaluation with these numbers. In the catalog, <strong>≥</strong> before an input window marks a
+        lower bound (<code>bound: at_least</code> in the API): the largest input seen accepted, rounded down, never up. A window listed by a client (a default the client works with) is not
+        taken as the limit.
       </li>
+    </ul>
+
+    <h2 id="input-window">Input window</h2>
+    <p>
+      Every entry has one input window: the most input one request can carry on that provider and access method, in tokens as the provider counts them, the client's own system
+      prompt and tool definitions included. It is worked out once, when the data is built, from the entry's own documented limits and its limit evaluations, and published in the API
+      (<code>providers_dev.limits.input_window</code>, and <code>input_window</code> of a summary). The pages print it.
+    </p>
+    <ul>
+      <li>
+        <strong>Documented.</strong> Where the entry documents an input limit (<code>limit.input</code>), that is the input window. Where it documents only a context window
+        (<code>limit.context</code>), the window is, and the response is counted against the same figure. A 0 means none stated and is skipped. A window written onto an added entry from
+        a measurement is a measurement, not documentation. Nothing is taken from another entry, not even from the API entry of the same model.
+      </li>
+      <li>
+        <strong>Contradicted.</strong> A measurement contradicts the documented figure when the route names a window below it, or names another window than a documented context
+        window; when an input at or below 99 % of it was refused; or when an input at or above 101 % of it was accepted, below a refusal or read to the end. A window the route names is
+        exact. The 1 % margin is for sizes: a refused size is the probe's own count, and routes add tokens of their own. Then the measured value is the input window, and the documented
+        figure stays beside it.
+      </li>
+      <li>
+        <strong>Measured.</strong> Where nothing is documented, or the documentation is contradicted, the input window is the measured one: the window the route names, or else the
+        largest input it was seen to accept, below a refusal or read to the end. That one is a lower bound, shown as <em>at least</em>, and as ≥ in the catalog. Where several clients
+        were measured, the lowest decides; each client's value is listed.
+      </li>
+      <li>
+        An input accepted with nothing refused, no window named and no check that the reply read it to the end gives no value: a route can answer a request without reading all of it.
+      </li>
+      <li>Where nothing is documented or measured, the input window is not known and is shown as <em>Unknown</em>, never as 0.</li>
+    </ul>
+    <p>
+      On an entry's page the <em>Input window</em> table gives the value with its basis (documented or measured), what kind of figure it is (input alone, or input and output
+      together), its source and date. Under it, the documented figure and the field it is in, with what the rule found of it, published as <code>documented_status</code>:
+      <code>contradicted</code> says <em>Documentation contradicted</em>, <code>not_contradicted</code> says <em>Documentation not contradicted</em>, which is not the same as
+      confirmed. Then each measurement on its own line, with its client, date and raw result. The catalog, a provider's page and a model's page show the value in an
+      <em>Input window</em> column with its basis under it; the <em>Context</em> column shows <code>limit.context</code> and nothing else.
+    </p>
+    <p>The input window has limits:</p>
+    <ul>
+      <li>One account per route. Another plan, region or account can have another limit.</li>
+      <li>Dated. A provider can change a limit the next day. The date is on every value, and a measured one goes stale as all providers.dev evidence does.</li>
+      <li>
+        A few requests. A walk costs quota for each request that is answered, so it stops early: the real limit lies between the accepted size and the refused one, and an
+        <em>at least</em> value is a lower bound by as much as that gap.
+      </li>
+      <li>Where no refusal was seen, nothing shows where the limit is, only that it is not below the value.</li>
+      <li>A refused size is the probe's count, not the provider's.</li>
+      <li>
+        Requests were short questions with filler text and a reply of a few tokens. A window that input and output share has less room for input when a long reply is asked for.
+      </li>
+      <li>A window a route names is its total. A cap on the input inside it shows only as a refusal.</li>
+      <li>The documented figure is models.dev's unless marked otherwise, and not contradicted is not confirmed.</li>
     </ul>
 
     <h2 id="prices">Prices</h2>
@@ -256,7 +318,7 @@ import { IDENTITY_FIELDS } from "../../../core/resolve.ts";
 
     <h2 id="stale">Dates and staleness</h2>
     <p>
-      Every correction and evaluation has a date. Providers change cache behaviour without notice, so providers.dev evidence (a correction, an evaluation, a measured lifetime)
+      Every correction and evaluation has a date. Providers change cache behaviour without notice, so providers.dev evidence (a correction, an evaluation, a measured lifetime or input window)
       whose date is more than <span data-meta="stale_after_days"><code>stale_after_days</code></span> days before today is marked <span class="stale">stale</span>. It stays published, with its date.
     </p>
     <p>

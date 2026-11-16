@@ -2,11 +2,12 @@ import { describe, expect, it } from "vitest";
 import { CACHE_AGES_S, cacheLifetime, cacheResult, documentedCaching, type CacheEvaluation, type EntryCache, type RetentionProfile } from "../src/core/cache.ts";
 import { buildIndex, type Summary } from "../src/core/entries.ts";
 import type { Json, JsonObject } from "../src/core/merge.ts";
+import { emptyInputWindow, inputWindow, type InputWindow } from "../src/core/limits.ts";
 import { entryHtml, rowHtml } from "../src/core/render.ts";
 import { resolve } from "../src/core/resolve.ts";
 import { NS, UpstreamModel, type ModelExtension } from "../src/core/schema.ts";
 import { pricingOf } from "../src/core/policies.ts";
-import { NO_CACHE, summaryOf } from "./helpers.ts";
+import { limitOf, NO_CACHE, summaryOf } from "./helpers.ts";
 
 const row = (more: Partial<Summary>): string => rowHtml(summaryOf(more), { today: { date: new Date("2026-11-13T00:00:00Z"), stale_after_days: 90 } });
 const count = (html: string, part: string): number => html.split(part).length - 1;
@@ -108,8 +109,9 @@ describe("the entry page", () => {
 
   it("has the same sections, tables and rows whatever is known about the entry", () => {
     const bare = skeleton(pages.bare);
-    expect(bare.filter((item) => item.startsWith("h"))).toEqual(["h2 Limits", "h3 Documented", "h3 Measured tokens", "h2 Price", "h3 Conditional rates", "h3 Request controls", "h2 Prompt caching", "h3 Lifetimes", "h3 Cache modes", "h3 Retention", "h2 Provenance", "h2 Data"]);
+    expect(bare.filter((item) => item.startsWith("h"))).toEqual(["h2 Limits", "h3 Input window", "h3 Documented", "h3 Measured tokens", "h2 Price", "h3 Conditional rates", "h3 Request controls", "h2 Prompt caching", "h3 Lifetimes", "h3 Cache modes", "h3 Retention", "h2 Provenance", "h2 Data"]);
     expect(bare.filter((item) => item.startsWith("row"))).toEqual([
+      "row Input window", "row Documented", "row Measured",
       "row Context window", "row Largest input", "row Maximum output",
       "row Input", "row Output", "row Reasoning output", "row Cache read", "row Cache write",
       "row Service tier", "row Short retention", "row Long retention", "row Automatic implicit", "row Manual explicit", "row Cache retention",
@@ -194,7 +196,7 @@ describe("the cache lifetime in a table row", () => {
 
   it("names the column of every cell, for where the table is stacked", () => {
     const html = row({ cache_lifetime: CASES.opus.lifetime });
-    for (const label of ["Provider", "Context", "Max output", "Price in / out", "Released", "Cache lifetime", "Source"]) expect(html).toContain(`data-label="${label}"`);
+    for (const label of ["Provider", "Input window", "Context", "Max output", "Price in / out", "Released", "Cache lifetime", "Source"]) expect(html).toContain(`data-label="${label}"`);
     expect(count(rowHtml(summaryOf({}), { today: { date: new Date("2026-11-13T00:00:00Z"), stale_after_days: 90 }, hideProvider: true }), 'data-label="Provider"')).toBe(0);
   });
 
@@ -461,5 +463,193 @@ describe("the deleted cache fields", () => {
     expect(cache.lifetime.lifetimes.map((item) => [item.retention_profile, item.mode, item.documented_as, item.lifetime_s])).toEqual([["short", "explicit", "5m", 300], ["long", "explicit", "1h", 3600]]);
     expect(model.capabilities).toEqual({ cache: { explicit: { ttl: ["5m", "1h"] } } });
     expect(rowHtml(index.entries[0]!, { today: { date: new Date("2026-11-15T00:00:00Z"), stale_after_days: 90 } })).toContain("1 h");
+  });
+});
+
+// The input window as the API publishes it (design/usable-input-window.md, sections 2 and 10): the five cases of 2.2,
+// made by the rule from the numbers of the design's worked examples. A page prints the record: what is a lower bound is
+// `bound`, the published value is `basis`, the label of the documentation is `documented_status`, a measurement's words
+// are its `kind`.
+describe("the input window", () => {
+  const sourceOf = () => ({ source: "models.dev" as const, date: "2026-11-15" });
+  const login = { route: "codex-subscription", route_label: "ChatGPT plan through the Codex login", client: "cliproxyapi", client_label: "Requests sent through CLIProxyAPI" };
+  const bracket = (date: string) => limitOf({ ...login, input_accepted: 915011, input_refused: 922500, date });
+  const CASES = {
+    /** anthropic/claude-opus-5-5 (example 9): a window documented, not measured. */
+    documented: inputWindow({ context: 1000000, output: 128000 }, [], [], sourceOf),
+    /** openai-codex/gpt-6.1-sol (example 1): an input limit documented, a bracket under it. */
+    notContradicted: inputWindow({ context: 1050000, input: 922000, output: 128000 }, [], [bracket("2026-11-13")], sourceOf),
+    /** A documented window the route names smaller (test a of 4.2). */
+    contradicted: inputWindow({ context: 1000000 }, [], [limitOf({ ...login, context: 900000, date: "2026-11-08" })], sourceOf),
+    /** openai-codex/gpt-6-astra (example 3): nothing documented, a bracket. */
+    measured: inputWindow(undefined, [], [bracket("2026-11-11")], sourceOf),
+    /** devin/claude-opus-5-5 (example 11): nothing known. */
+    none: emptyInputWindow(),
+  } satisfies Record<string, InputWindow>;
+  /** claude-subscription/claude-opus-5-5 (example 6): the window the route names, written onto the added entry. */
+  const named = inputWindow({ context: 1000000, output: 128000 }, ["context", "output"], [limitOf({ ...login, context: 1000000, output: 128000, date: "2026-11-08" })], sourceOf);
+
+  const { catalog } = resolve({
+    upstream: { lab: { id: "lab", name: "Lab", models: { m: UpstreamModel.parse({ id: "m", name: "M" }) } } },
+    additions: [], overrides: [], routes: {}, access: { default: "api", default_basis: "fixture", patterns: [], providers: {} }, upstreamDate: "2026-11-15",
+  });
+  const index = buildIndex(catalog, "fixture", "2026-11-15T00:00:00Z", "2026-11-15T00:00:00Z");
+  /** The page of an entry whose record is `w`, on the full entry and on its summary, as the API has it. */
+  const page = (w: InputWindow, more: Partial<Summary> = {}, date = new Date("2026-11-16T00:00:00Z")): string => {
+    const model = structuredClone(catalog.lab!.models.m!) as JsonObject;
+    (model[NS] as unknown as ModelExtension).limits.input_window = w;
+    return entryHtml({ summary: { ...index.entries[0]!, input_window: w, ...more }, provider: index.providers[0]!, model, today: { date, stale_after_days: 90 }, cache_ages_s: CACHE_AGES_S, imported: "2026-11-15" });
+  };
+  const text = (html: string): string => html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  const table = (html: string): string => html.slice(html.indexOf('<h3 id="input-window">'), html.indexOf("<h3>Documented</h3>"));
+  /** The rows of the Input window table, each as "label | value | source"; a row label without its hint. */
+  const lines = (html: string): string[] =>
+    [...table(html).matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/g)].slice(1).map((row) =>
+      [...row[1]!.matchAll(/<(th|td)[^>]*>([\s\S]*?)<\/\1>/g)].map((cell) => text(cell[1] === "th" ? cell[2]!.split("<div")[0]! : cell[2]!)).join(" | "));
+  const tile = (html: string): string => text(html.slice(html.indexOf('<div class="tiles'), html.indexOf("Context window</div>")));
+  /** The Input window cell of a row of the entry table. */
+  const cell = (w: InputWindow, more: Partial<Summary> = {}): string => {
+    const html = row({ input_window: w, ...more });
+    const at = html.indexOf('<td class="num window-col"');
+    return html.slice(at, html.indexOf("</td>", at));
+  };
+
+  it("is built from the five cases of the record", () => {
+    expect([CASES.documented, CASES.notContradicted, CASES.contradicted, CASES.measured, CASES.none].map((w) => [w.basis, w.documented_tokens !== null, w.measured_tokens !== null, w.documented_status])).toEqual([
+      ["documented", true, false, null], ["documented", true, true, "not_contradicted"], ["measured", true, true, "contradicted"], ["measured", false, true, null], ["none", false, false, null],
+    ]);
+  });
+
+  it("has the same three rows on every entry, the value, the documented figure and the measurements", () => {
+    for (const w of [...Object.values(CASES), named]) expect(lines(page(w)).map((line) => line.split(" | ")[0])).toEqual(["Input window", "Documented", "Measured"]);
+    expect(lines(page(CASES.none))).toEqual(["Input window | Unknown | –", "Documented | Not documented | –", "Measured | Not measured | –"]);
+  });
+
+  it("prints each row of the five cases as the record has it", () => {
+    expect(lines(page(CASES.documented))).toEqual([
+      "Input window | 1,000,000 tokens documented Input and output together | models.dev 2026-11-15",
+      "Documented | 1,000,000 tokens limit.context | models.dev 2026-11-15",
+      "Measured | Not measured | –",
+    ]);
+    expect(lines(page(CASES.notContradicted))).toEqual([
+      "Input window | 922,000 tokens documented Input alone | models.dev 2026-11-15",
+      "Documented | 922,000 tokens limit.input Documentation not contradicted | models.dev 2026-11-15",
+      "Measured | at least 915,011 tokens 915,011 accepted · 922,500 refused | Requests sent through CLIProxyAPI 2026-11-13 · Raw result",
+    ]);
+    expect(lines(page(CASES.contradicted))).toEqual([
+      "Input window | 900,000 tokens measured Input and output together | providers.dev 2026-11-08",
+      "Documented | 1,000,000 tokens limit.context Documentation contradicted | models.dev 2026-11-15",
+      "Measured | 900,000 tokens Window named by the route | Requests sent through CLIProxyAPI 2026-11-08 · Raw result",
+    ]);
+    expect(lines(page(CASES.measured))).toEqual([
+      "Input window | at least 915,011 tokens measured Input alone | providers.dev 2026-11-11",
+      "Documented | Not documented | –",
+      "Measured | at least 915,011 tokens 915,011 accepted · 922,500 refused | Requests sent through CLIProxyAPI 2026-11-11 · Raw result",
+    ]);
+    // A window written onto an added entry from a measurement is a measurement: not documented.
+    expect(lines(page(named))).toEqual([
+      "Input window | 1,000,000 tokens measured Input and output together | providers.dev 2026-11-08",
+      "Documented | Not documented | –",
+      "Measured | 1,000,000 tokens Window named by the route | Requests sent through CLIProxyAPI 2026-11-08 · Raw result",
+    ]);
+    expect(table(page(CASES.measured))).toContain('<a href="https://example.com/result" rel="noopener">Raw result</a>');
+  });
+
+  it("gives each measurement its own line, in the order of the record, under one row heading", () => {
+    const two = inputWindow(undefined, [], [bracket("2026-11-11"), limitOf({ client: "direct", client_label: "Straight to the provider", input_accepted: 950000, input_read: 940000, date: "2026-11-12", source: "https://example.com/other" })], sourceOf);
+    expect(two.measurements.map((item) => item.client)).toEqual(["cliproxyapi", "direct"]);
+    expect(lines(page(two)).slice(2)).toEqual([
+      "Measured | at least 915,011 tokens 915,011 accepted · 922,500 refused | Requests sent through CLIProxyAPI 2026-11-11 · Raw result",
+      "at least 940,000 tokens 950,000 accepted · 940,000 read to the end · nothing refused | Straight to the provider 2026-11-12 · Raw result",
+    ]);
+    expect(table(page(two))).toContain('<th scope="row" rowspan="2">Measured');
+    // The reverse order in the record is the order on the page: nothing is sorted here.
+    expect(lines(page({ ...two, measurements: [...two.measurements].reverse() })).slice(2).map((line) => line.split(" tokens")[0])).toEqual(["Measured | at least 940,000", "at least 915,011"]);
+  });
+
+  it("says at least, and ≥, where bound says so and from nothing else", () => {
+    // A documented value with `at_least`, and a measured bracket with `limit`: the page follows `bound`, not the basis or the kind.
+    const atLeast = { ...CASES.notContradicted, bound: "at_least" as const };
+    expect(lines(page(atLeast))[0]).toBe("Input window | at least 922,000 tokens documented Input alone | models.dev 2026-11-15");
+    expect(text(cell(atLeast))).toBe("≥ 922K documented");
+    const limit = { ...CASES.measured, bound: "limit" as const };
+    expect(lines(page(limit))[0]).toBe("Input window | 915,011 tokens measured Input alone | providers.dev 2026-11-11");
+    expect(text(cell(limit))).toBe("915K measured");
+    expect(tile(page(limit))).not.toContain("at least");
+    // A measurement's line reads its own bound, and the tile reads `measured_bound` for the other figure.
+    const item = { ...CASES.notContradicted, measured_bound: "limit" as const, measurements: [{ ...CASES.notContradicted.measurements[0]!, bound: "limit" as const }] };
+    expect(lines(page(item))[2]).toBe("Measured | 915,011 tokens 915,011 accepted · 922,500 refused | Requests sent through CLIProxyAPI 2026-11-13 · Raw result");
+    expect(tile(page(item))).toContain("Measured 915,011");
+    expect(tile(page(item))).not.toContain("at least");
+    // The lower bound is rounded down in the compact number, the limit as usual.
+    const wonder = { ...CASES.measured, tokens: 1047604 };
+    expect(text(cell(wonder))).toBe("≥ 1.04M measured");
+    expect(text(cell({ ...wonder, bound: "limit" }))).toBe("1.05M measured");
+  });
+
+  it("prints the label of the documentation from documented_status, and a measurement's words from its kind", () => {
+    const status = (documented_status: InputWindow["documented_status"]) => lines(page({ ...CASES.notContradicted, documented_status }))[1];
+    expect(status("contradicted")).toBe("Documented | 922,000 tokens limit.input Documentation contradicted | models.dev 2026-11-15");
+    expect(status("not_contradicted")).toBe("Documented | 922,000 tokens limit.input Documentation not contradicted | models.dev 2026-11-15");
+    expect(status(null)).toBe("Documented | 922,000 tokens limit.input | models.dev 2026-11-15");
+    expect(table(page({ ...CASES.notContradicted, documented_status: "contradicted" }))).toContain('<span class="case contradicted"');
+    const base = CASES.notContradicted.measurements[0]!;
+    const kind = (item: Partial<InputWindow["measurements"][number]>) => lines(page({ ...CASES.notContradicted, measurements: [{ ...base, ...item }] }))[2]!.split(" | ")[1];
+    expect(kind({ kind: "window" })).toBe("at least 915,011 tokens Window named by the route · an input of 915,011 accepted");
+    expect(kind({ kind: "window", accepted: null })).toBe("at least 915,011 tokens Window named by the route");
+    expect(kind({ kind: "bracket" })).toBe("at least 915,011 tokens 915,011 accepted · 922,500 refused");
+    expect(kind({ kind: "accepted", refused: null, read: 915011 })).toBe("at least 915,011 tokens 915,011 accepted · 915,011 read to the end · nothing refused");
+    expect(kind({ kind: "bracket", read: 900000 })).toBe("at least 915,011 tokens 915,011 accepted · 922,500 refused · 900,000 read to the end");
+  });
+
+  it("starts the page with the value, its basis, source and date, and the other of the two figures", () => {
+    expect(tile(page(CASES.notContradicted))).toBe("Input window 922,000 tokens documented models.dev · 2026-11-15 Input alone Measured at least 915,011");
+    expect(tile(page(CASES.measured))).toBe("Input window at least 915,011 tokens measured providers.dev · 2026-11-11 Input alone");
+    expect(tile(page(CASES.contradicted))).toBe("Input window 900,000 tokens measured providers.dev · 2026-11-08 Input and output together Documented 1,000,000, contradicted");
+    expect(page(CASES.contradicted)).toContain('<div class="contradicted">Documented 1,000,000, contradicted</div>');
+    expect(tile(page(CASES.documented))).toBe("Input window 1,000,000 tokens documented models.dev · 2026-11-15 Input and output together");
+    expect(tile(page(named))).toBe("Input window 1,000,000 tokens measured providers.dev · 2026-11-08 Input and output together");
+    expect(tile(page(CASES.none))).toBe("Input window Unknown Not documented or measured");
+    // The input window is the first of the tiles.
+    expect(page(CASES.measured)).toMatch(/<div class="tiles tiles-entry mt-6">\s*<div class="tile"><div class="label">Input window<\/div>/);
+  });
+
+  it("shows the value in the entry table with its basis, and what it rests on in the hover text", () => {
+    expect(text(cell(CASES.notContradicted))).toBe("922K documented");
+    expect(text(cell(CASES.measured))).toBe("≥ 915K measured");
+    expect(text(cell(CASES.contradicted))).toBe("900K measured");
+    expect(text(cell(CASES.none))).toBe("Unknown");
+    expect(cell(CASES.measured)).toContain('<a class="plain window" href="/entries/p/m#input-window"');
+    expect(cell(CASES.measured)).toContain('title="Input window: at least 915,011 tokens, input alone. Measured by providers.dev, 2026-11-11: the largest input seen accepted; 922,500 tokens refused. Not documented."');
+    expect(cell(CASES.notContradicted)).toContain('title="Input window: 922,000 tokens, input alone. Documented in limit.input, models.dev, 2026-11-15. Measured: at least 915,011 tokens (1 client, 1 evaluation). Documentation not contradicted."');
+    expect(cell(CASES.contradicted)).toContain('title="Input window: 900,000 tokens, input and output together. Measured by providers.dev, 2026-11-08: the window the route named. Documented: 1,000,000 tokens in limit.context, models.dev. Documentation contradicted."');
+    expect(cell(CASES.documented)).toContain('title="Input window: 1,000,000 tokens, input and output together. Documented in limit.context, models.dev, 2026-11-15. Not measured."');
+    expect(cell(CASES.none)).toContain('title="Input window: unknown. Nothing documented or measured."');
+  });
+
+  it("reads no limit from measured_input_accepted or measured_input_refused: the Context column is limit.context and nothing else", () => {
+    const options = { today: { date: new Date("2026-11-16T00:00:00Z"), stale_after_days: 90 } };
+    const evaluated = { measured_input_accepted: 915011, measured_input_refused: 922500, measured_limit_count: 1 };
+    const blank = { measured_input_accepted: null, measured_input_refused: null };
+    for (const w of [...Object.values(CASES), named]) {
+      expect(rowHtml(summaryOf({ input_window: w, ...evaluated }), options)).toBe(rowHtml(summaryOf({ input_window: w, ...evaluated, ...blank }), options));
+      expect(page(w, evaluated)).toBe(page(w, blank));
+    }
+    // An entry with no context window documented: before, its Context cell said "≥ 915K input" from the summary.
+    const html = row({ input_window: CASES.measured, ...evaluated });
+    const context = html.slice(html.indexOf('data-label="Context"'), html.indexOf("</td>", html.indexOf('data-label="Context"')));
+    expect(text(`<td ${context}`)).toBe("Unknown");
+    expect(html).not.toContain("limit-measured");
+  });
+
+  it("marks a providers.dev date stale by the published threshold, and never models.dev's", () => {
+    const later = new Date("2027-03-01T00:00:00Z");
+    expect(lines(page(CASES.measured, {}, later))).toEqual([
+      "Input window | at least 915,011 tokens measured Input alone | providers.dev 2026-11-11 · stale",
+      "Documented | Not documented | –",
+      "Measured | at least 915,011 tokens 915,011 accepted · 922,500 refused | Requests sent through CLIProxyAPI 2026-11-11 · stale · Raw result",
+    ]);
+    expect(lines(page(CASES.notContradicted, {}, later)).slice(0, 2).join(" ")).not.toContain("stale");
+    expect(lines(page(CASES.notContradicted, {}, later))[2]).toContain("2026-11-13 · stale");
   });
 });

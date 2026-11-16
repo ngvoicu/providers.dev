@@ -485,6 +485,31 @@
       grid-template-columns: repeat(4, minmax(0, 1fr));
     }
   }
+  /* An entry's five tiles: the input window first, across the whole width on a phone; from a tablet up the three limits
+     on one line and the two cache lifetimes under them; on a wide screen all five on one line */
+  .tiles.tiles-entry > .tile:first-child {
+    grid-column: 1 / -1;
+  }
+  @media (min-width: 640px) {
+    .tiles.tiles-entry {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+    .tiles.tiles-entry > .tile {
+      grid-column: span 3;
+    }
+    .tiles.tiles-entry > .tile:nth-child(-n + 3) {
+      grid-column: span 2;
+    }
+  }
+  @media (min-width: 1200px) {
+    .tiles.tiles-entry {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+    .tiles.tiles-entry > .tile,
+    .tiles.tiles-entry > .tile:nth-child(-n + 3) {
+      grid-column: auto;
+    }
+  }
   .tile {
     border: 1px solid var(--line);
     border-radius: 12px;
@@ -652,23 +677,46 @@
   th.nowrap {
     white-space: nowrap;
   }
-  .price-inherited,
-  .limit-measured {
+  .price-inherited {
     display: inline-flex;
     flex-direction: column;
     gap: 0.1rem;
     line-height: 1.35;
     white-space: nowrap;
   }
-  .price-from,
-  .limit-note {
+  .price-from {
     color: var(--muted);
     font-family: var(--font-sans, inherit);
     font-size: 0.8rem;
   }
-  /* A measured value wears the colour of the measured column */
-  .limit-value {
-    color: var(--measured);
+  /* The input window in a table row: the number, then its basis in a word under it, both to the right of the column */
+  a.window {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.15rem;
+    line-height: 1.35;
+    white-space: nowrap;
+    text-decoration: none;
+  }
+  a.window:hover {
+    text-decoration: none;
+  }
+  a.window:hover .window-value {
+    color: var(--link);
+  }
+  a.window .basis {
+    font-family: var(--font-sans);
+  }
+  .window-value {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  /* "at least" before a lower bound, in words, beside the number it qualifies */
+  .window-value .bound {
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    color: var(--muted);
   }
   .price {
     white-space: nowrap;
@@ -1286,6 +1334,68 @@
     background: var(--warn-bg);
     border-color: transparent;
   }
+  /* The input window on an entry's page: the published value, the documented figure and each measurement, their numbers
+     in one column so that they read side by side; under each, what it is, in words */
+  /* The input window and the documented limits under it: the values and the sources in columns of the same width, so
+     that the two tables read as one */
+  @media (min-width: 1024px) {
+    table.limit-facts > thead th:nth-child(2) {
+      width: 20rem;
+    }
+    table.limit-facts > thead th:nth-child(3) {
+      width: 17rem;
+    }
+  }
+  table.window-table .window-value {
+    font-size: 0.9rem;
+  }
+  table.window-table tr.published .window-value {
+    font-size: 1rem;
+    font-weight: 620;
+  }
+  table.window-table .window-value > .muted {
+    font-size: 0.84rem;
+    font-weight: 400;
+  }
+  /* "Not documented", "Not measured", "Unknown": words, not numbers */
+  table.window-table td.num > :is(.muted, .unknown) {
+    font-family: var(--font-sans);
+    font-size: 0.86rem;
+  }
+  table.window-table .window-what {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.3rem 0.6rem;
+    margin-top: 0.3rem;
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    color: var(--fg-soft);
+    white-space: normal;
+  }
+  table.window-table .window-what code {
+    font-size: 0.78rem;
+  }
+  table.window-table td.num > .hint {
+    margin-top: 0.2rem;
+    font-family: var(--font-sans);
+    white-space: normal;
+  }
+  table.window-table .client {
+    font-weight: 500;
+  }
+  table.window-table td .hint .date,
+  table.window-table td .hint .stale {
+    margin-right: 0.1rem;
+  }
+  /* Two measurements of one entry: a lighter line between them, under the one row heading */
+  table.window-table tr.more > td {
+    border-top: 1px dashed var(--line);
+  }
+  table.window-table tr:has(+ tr.more) > td {
+    border-bottom: 0;
+  }
   /* The note of an evaluation, in sight with the lifetime it belongs to */
   .run-note {
     margin-top: 0.4rem;
@@ -1711,6 +1821,9 @@
     table.stack-phone > tbody > tr > td.num {
       text-align: left;
     }
+    table.stack-phone.window-table .window-what {
+      justify-content: flex-start;
+    }
     table.stack-phone > tbody > tr > [data-label]::before {
       content: attr(data-label);
       display: block;
@@ -1734,6 +1847,10 @@
     table.entries.stack-tablet > tbody > tr > .num,
     table.entries.stack-tablet > tbody > tr > .wide-only {
       flex: 1 1 5.5rem;
+    }
+    /* Stacked, the input window sits under its column's name like the numbers beside it, its basis under it */
+    table.entries.stack-tablet a.window {
+      align-items: flex-start;
     }
     /* The price is the widest of the numbers; a price per unit other than tokens may take two lines */
     table.entries.stack-tablet > tbody > tr > .mid-only {

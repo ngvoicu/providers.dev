@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { pricingOf } from "../src/core/policies.ts";
 import { addResults, cacheResult, documentedCache, profileOf, retentionOf } from "../src/core/cache.ts";
-import { importDate, shortAge } from "../src/core/format.ts";
+import { compactTokens, compactTokensDown, importDate, shortAge } from "../src/core/format.ts";
 import { emptyInputWindow } from "../src/core/limits.ts";
 import type { JsonObject } from "../src/core/merge.ts";
 import type { MeasuredLimit } from "../src/core/schema.ts";
@@ -85,5 +85,23 @@ describe("cache evaluations as the API publishes them", () => {
     for (const cache of cases) {
       expect(retentionOf(documentedCache({ capabilities: { cache } }), [])).toMatchObject({ support: "unknown", parameter: null, accepted_values: null });
     }
+  });
+});
+
+describe("compact numbers of tokens", () => {
+  it("rounds a limit to the nearest, and a lower bound down, never up", () => {
+    // A lower bound ("at least") must stay true: 1,047,604 is "1.04M", not "1.05M".
+    expect(compactTokensDown(1047604)).toBe("1.04M");
+    expect(compactTokens(1047604)).toBe("1.05M");
+    expect(compactTokensDown(915011)).toBe("915K");
+    expect(compactTokensDown(915390)).toBe("915K");
+    expect(compactTokensDown(999999)).toBe("999K");
+    expect(compactTokens(999999)).toBe("1000K");
+    expect(compactTokensDown(99999)).toBe("99.99K");
+    // Where the number is round, both say the same.
+    for (const value of [1000000, 1050000, 1040000, 922000, 128000, 4500, 999, 1]) expect(compactTokensDown(value)).toBe(compactTokens(value));
+    expect(compactTokensDown(4509)).toBe("4.5K");
+    expect(compactTokensDown(1999999)).toBe("1.99M");
+    expect(compactTokensDown(123456789)).toBe("123M");
   });
 });
