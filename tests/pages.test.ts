@@ -188,6 +188,7 @@ describe("API response boundary", () => {
       "A value with no source.", "A measured value without its raw results.", "A value copied from another access method.", "A paid listing or a paid correction.",
       "providers.dev has one maintainer. No response time is promised. A request with a link to the provider's page is quick to check. A measurement waits for quota and time.",
       '<a href="/docs/licensing/">licensing</a>', "<em>I am asking for a measurement</em>", "blank issue",
+      'const email = "office@providers.dev";', '<h2 id="contact">Contact</h2>', "write to <a href={`mailto:${email}`}>{email}</a>", "a correction that cannot be made public", "A wrong or missing value goes in an issue",
     ]) expect(source, words).toContain(words);
     // Astro drops a line break before a tag: a word at the end of a line and a tag at the start of the next would run together.
     const raw = readFileSync(join(ROOT, "src", "pages", "reference-content", "docs", "contributing.astro"), "utf8");
@@ -205,7 +206,8 @@ describe("API response boundary", () => {
     expect(methodology).toContain("providers.dev takes no payment for listing, correcting or measuring an entry. A provider may supply documentation, or access for a measurement; the result is published whatever it shows.");
     expect(methodology.match(/<a href="\/docs\/contributing\/">contributing<\/a>/g)).toHaveLength(2);
     const layout = readFileSync(join(ROOT, "src", "layouts", "Base.astro"), "utf8");
-    expect(layout).toMatch(/<li><a href="\/docs\/licensing\/">Licensing and attribution<\/a><\/li>\s*<li><a href="\/docs\/contributing\/">Contributing<\/a><\/li>/);
+    expect(layout).toMatch(/<li><a href="\/docs\/licensing\/">Licensing and attribution<\/a><\/li>\s*<li><a href="\/docs\/contributing\/">Contributing<\/a><\/li>\s*<li><a href="mailto:office@providers\.dev">Contact<\/a><\/li>/);
+    expect(methodology).toContain('A provider can write to <a href="mailto:office@providers.dev">office@providers.dev</a>.');
     const evidence = await (await page("/evidence/")).text();
     expect(evidence).toContain('To propose a correction or ask for an evaluation, see <a href="/docs/contributing/">Contributing</a>.');
   });
@@ -214,7 +216,11 @@ describe("API response boundary", () => {
     const contributing = readFileSync(join(ROOT, "CONTRIBUTING.md"), "utf8");
     expect(contributing).toContain("https://providers.dev/docs/contributing/");
     expect(contributing).toContain("(./README.md#authoring)");
-    expect(readFileSync(join(ROOT, "README.md"), "utf8")).toMatch(/## Contributing\n[^#]*https:\/\/providers\.dev\/docs\/contributing\//);
+    expect(contributing).toContain("[office@providers.dev](mailto:office@providers.dev)");
+    const readme = readFileSync(join(ROOT, "README.md"), "utf8");
+    const section = readme.slice(readme.indexOf("\n## Contributing\n"), readme.indexOf("\n## Licensing\n"));
+    expect(section).toContain("https://providers.dev/docs/contributing/");
+    expect(section).toContain("[office@providers.dev](mailto:office@providers.dev)");
 
     const form = parse(readFileSync(join(ROOT, ".github", "ISSUE_TEMPLATE", "value.yml"), "utf8")) as { name: string; body: { type: string; id?: string; attributes: { label?: string; options?: string[] }; validations?: { required: boolean } }[] };
     expect(form.name).toBe("A value is wrong or missing");

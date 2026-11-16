@@ -110,6 +110,7 @@ export function openapi(): Record<string, unknown> {
       description:
         "Read-only data about AI models as each provider and access method exposes them: limits, prices, prompt caching, and what providers.dev measured. " +
         "The baseline is imported from models.dev (MIT); everything providers.dev adds is under the `providers_dev` key. No key is needed.",
+      contact: { name: "providers.dev", email: "office@providers.dev", url: "https://providers.dev/docs/contributing/" },
       license: { name: "MIT", url: "https://providers.dev/docs/licensing/" },
     },
     servers: [{ url: "https://providers.dev" }],

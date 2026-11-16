@@ -19,3 +19,7 @@ Two ways in:
   `npm run build && npm run check` must pass; the build fails without evidence.
 
 One maintainer, no promised response time.
+
+Contact: [office@providers.dev](mailto:office@providers.dev), for what does not fit an issue (a provider that wants to
+supply documentation or access for a measurement, a correction that cannot be made public, a question about the data).
+A wrong or missing value goes in an issue.

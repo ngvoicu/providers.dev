@@ -560,6 +560,7 @@ providers.dev takes no payment for listing, correcting or measuring an entry. Ho
 contribution needs: [providers.dev/docs/contributing](https://providers.dev/docs/contributing/) (the same text is
 `src/pages/reference-content/docs/contributing.astro`); the essentials are in [`CONTRIBUTING.md`](./CONTRIBUTING.md).
 A pull request writes the change as in [Authoring](#authoring); `.github/workflows/check.yml` builds and checks it.
+For what does not fit an issue: [office@providers.dev](mailto:office@providers.dev).
 
 ## Licensing
 
