@@ -1,8 +1,8 @@
 # The input window: how much input a request can carry on an entry
 
 Design, 2026-11-16 (task LWL-01). Nothing here is built. The owner's decisions it starts from are in section 1;
-what is still his to decide is in section 13, each with a recommendation, and the design is written as if each
-recommendation were taken. `AGENTS.md` and `README.md` stay the rules of the data and the contract;
+the questions it left open were decided on 2026-11-16, as recommended, and are in section 13; the design is written
+to those decisions. `AGENTS.md` and `README.md` stay the rules of the data and the contract;
 `design/safe-cache-lifetime.md` is the pattern this follows: a value worked out once in the data build, published
 with its basis, printed by the pages.
 
@@ -46,7 +46,7 @@ new key in `providers_dev.limits` and one new key in the summary; a limit evalua
 The brief calls it the "usable input window". The methodology page already uses "usable context" for something
 else, and says it is not published: the window less the system prompt and tools of the client in use. This value is
 not that: it is what the route accepts, counted as the provider counts, the client's own prompt included. So the key
-is `input_window` and the pages say "Input window" (question 5 of section 13).
+is `input_window` and the pages say "Input window" (decision 5 of section 13).
 
 ## 2. The record
 
@@ -396,7 +396,7 @@ Why "clearly" has a margin in c and d, and none in a and b:
   hundred tokens under. With no margin, a finer walk would mark more and more correct documentation as contradicted,
   each by a few tokens, and replace a documented 922,000 by whatever size the walk stopped at.
 - The margin is 1 % of the documented value: for 922,000, a refusal at or below 912,780, or an accepted input of
-  931,220 or more. It is the owner's to set (question 1 of section 13). The one evaluation that sits inside it is
+  931,220 or more. It was set so (decision 1 of section 13). The one evaluation that sits inside it is
   in section 8.
 
 How the test reads in each case the brief names:
@@ -420,7 +420,7 @@ What follows:
   says how far it went.
 - Differently from cache lifetimes, a measurement can raise the value (d). There, a hit after the documented
   lifetime is luck. Here, an input accepted and read above the documented maximum means the maximum is wrong, and
-  the case the owner started from is of this kind: a client told 500,000 on a login that takes 922,000 (question 3).
+  the case the owner started from is of this kind: a client told 500,000 on a login that takes 922,000 (decision 3).
   Nothing is raised today.
 
 ### 4.3 Every entry with a documented value and a counted evaluation
@@ -646,8 +646,8 @@ It is left out for three reasons:
    route, kept inside the margin. For Astra and Luna it would be providers.dev asserting it.
 3. On Devin it is plainly not the same limit for a client: Devin puts about 390 tokens of its own in front.
 
-It is the owner's to decide (question 2 of section 13). The step adds one basis and one key and changes no other,
-so it can be added later.
+It is not taken (decision 2 of section 13). The step adds one basis and one key and changes no other,
+so it could be added later.
 
 **Two ways to a higher number that need no new rule.** A finer walk on Astra and Luna: Terra's took six accepted
 requests to reach 920,870, and the published value would then be about that. And models.dev: the day it lists Astra
@@ -658,7 +658,7 @@ the rule gives 922,000, documented, not contradicted.
 (groundtruth `9ac70e3`: "keep the documented 922,000 input limit"). Under a test with no margin that row would mark
 the documentation as contradicted, by 114 tokens, and publish 920,870. Under the test of 4.2 it does not contradict
 (921,875 is above 912,780), the value stays 922,000, documented, and the row can be published beside it:
-`measured_tokens` 920,870, `at_least`, `measured_refused` 921,875 (question 4).
+`measured_tokens` 920,870, `at_least`, `measured_refused` 921,875 (decision 4).
 
 ## 9. What the measurements file has to carry
 
@@ -874,29 +874,30 @@ keys and change no existing value; task 6 is the pages. Task 7 is groundtruth's 
 **Task 7. groundtruth (not in this repository).** The requirements of section 9: `input_refused` in tokens on the
 four rows that have one; `input_accepted` on the three Claude-login rows; `date` on every row; `input_read` where a
 read check was made; the checks of requirement 1 and of the three inconsistencies in `scripts/build_observed.py`.
-And, if question 4 is answered yes, Terra's row back in.
+And Terra's row back in (decision 4).
 
 **Not in these tasks.** A sort or filter on the value (section 11); the `reference` step (section 8); a limit that
 depends on a request setting (section 9); the vendor's own lists as values of an entry.
 
-## 13. What is the owner's to decide
+## 13. What was decided
 
-Each with the recommendation the design is written to.
+The questions this design left open, each put with a recommendation. All were decided on 2026-11-16, as
+recommended.
 
-| # | Question | Recommendation | What it changes today |
-|---|---|---|---|
-| 1 | When does a refusal or an accepted input contradict a documented value: at any distance, or only clearly, and how far is "clearly"? | Clearly, with a margin of 1 % of the documented value (4.2). A window the route names is exact and has no margin. | Nothing in the published data. With no margin, Terra's walk (question 4) would turn 922,000 into 920,870. |
-| 2 | Astra and Luna on the ChatGPT-plan login: 915,011 as measured, or 922,000 through the API entry's documentation (section 8)? | 915,011, measured, "at least", with 922,500 refused beside it. The `reference` step can be added later without changing a key. | The two entries, and `devin/gpt-6-1-sol` (915,390 or 922,000). |
-| 3 | May a measurement raise the value above a documented one (an input accepted, below a refusal or read to the end, at 101 % of it or more)? For cache lifetimes the answer was never. | Yes. A documented maximum that a larger accepted input exceeds is wrong, and that is the case this work started from. | Nothing today. |
-| 4 | Terra's walk on the login (920,870 accepted, 921,875 refused), taken out of `observed.json` on 15 November: back in? | Yes, once question 1 is answered with a margin: it is then published beside the documented 922,000, which stays. | `openai-codex/gpt-6.1-terra` gets `documented_status: not_contradicted` and a measurement. A change in groundtruth. |
-| 5 | The name: `input_window`, "Input window" on the pages, not "usable" (section 1). | As written. | The key and the labels. |
-| 6 | Several clients on one entry: the lowest decides, as for cache lifetimes (3.4)? | Yes, with each client's value in `measurements`. | Nothing today: no entry has two. |
-| 7 | Does a measured value expire? For cache lifetimes: no, its date is published and marked stale after 90 days. | The same. | Nothing. |
-| 8 | Should the vendors' own lists (Codex's 272K, 500K and 872K; Devin's 1,000,000) become values of the entries, so that the API shows them contradicted? Today they are in the notes of the evaluations. | Not in this work. If wanted: a `limit` in the provider file with evidence of kind `listed`; the rule then marks it contradicted with no change (example 5). | Nothing. |
+| # | Decision | Date |
+|---|---|---|
+| 1 | A refusal or an accepted input contradicts a documented value only clearly, with a margin of 1 % of the documented value (4.2). A window the route names is exact and has no margin. | 2026-11-16 |
+| 2 | GPT-6 Astra and Luna on the ChatGPT-plan login publish the measured lower bound: 915,011, "at least", with 922,500 refused beside it (section 8). There is no `reference` step. | 2026-11-16 |
+| 3 | A measurement may raise the value above a documented one: an input accepted, below a refusal or read to the end, at 101 % of the documented value or more (4.2, d). | 2026-11-16 |
+| 4 | Terra's walk on the login (920,870 accepted, 921,875 refused) goes back into the measurements file and is shown beside the documented 922,000, which stays. | 2026-11-16 |
+| 5 | The key is `input_window`, "Input window" on the pages, not "usable" (section 1). | 2026-11-16 |
+| 6 | Where several clients were measured on one entry, the lowest decides, with each client's value in `measurements` (3.4). | 2026-11-16 |
+| 7 | A measured value does not expire: it is dated, and marked stale after the published number of days, as for cache lifetimes. | 2026-11-16 |
+| 8 | Vendors' own lists (Codex's 272K, 500K and 872K; Devin's 1,000,000) do not become values of the entries in this work; they stay in the notes of the evaluations. | 2026-11-16 |
+| 9 | A measurements file with a doubled or inconsistent `limits` row is refused when read (section 6), as the cache design refuses a doubled age. | 2026-11-16 |
+| 10 | The pages show the value as built: a column before Context with the basis under the number, and on the entry page a first tile and a table (section 10). | 2026-11-16 |
 
-For the chief, not the owner: refusing a measurements file with a doubled or inconsistent `limits` row, as the
-cache design refuses a doubled age (section 6), against reporting it and going on; and the three points of look in
-section 10, for the designer.
+Open: none.
 
 ## 14. What the data or the contract makes awkward
 
