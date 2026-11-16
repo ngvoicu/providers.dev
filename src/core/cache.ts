@@ -254,18 +254,25 @@ function shortestDocumentedS(caching: DocumentedCaching): number | null {
 }
 
 /**
- * The evaluation settings that ask for a cache lifetime, and the request field each one stands for.
- * `ttl` is how the evaluation tool names the lifetime of a cache marker.
+ * The evaluation settings that ask for a cache lifetime, and the request field each one stands for. `path` is where
+ * the setting is in the evaluation's settings, as the request body has it, one key per level.
+ * `ttl` is how the evaluation tool names the lifetime of a cache marker (Anthropic's); `prompt_cache_options.ttl` is
+ * OpenAI's minimum cache lifetime for a request (`{"prompt_cache_options": {"ttl": "12h"}}`).
  */
-const LIFETIME_SETTINGS: Record<string, { name: string; location: string }> = {
-  ttl: { name: "cache_control.ttl", location: "Request body, in each cache_control marker" },
-  prompt_cache_retention: { name: "prompt_cache_retention", location: "Request body, top level" },
-};
+const LIFETIME_SETTINGS: readonly { path: readonly string[]; name: string; location: string }[] = [
+  { path: ["ttl"], name: "cache_control.ttl", location: "Request body, in each cache_control marker" },
+  { path: ["prompt_cache_retention"], name: "prompt_cache_retention", location: "Request body, top level" },
+  { path: ["prompt_cache_options", "ttl"], name: "prompt_cache_options.ttl", location: "Request body, in the prompt_cache_options object" },
+];
 
-/** The lifetime an evaluation's requests asked for. Null = none: they left it to the provider. */
+/**
+ * The lifetime an evaluation's requests asked for. Null = none: they left it to the provider. Only a non-empty string
+ * asks; a setting of any other type is read as not there, whichever field it is.
+ */
 export function lifetimeAsked(settings: JsonObject | undefined): { parameter: string; location: string; value: string } | null {
-  for (const [setting, field] of Object.entries(LIFETIME_SETTINGS)) {
-    const value = settings?.[setting];
+  for (const field of LIFETIME_SETTINGS) {
+    let value: Json | undefined = settings;
+    for (const key of field.path) value = isObject(value) ? value[key] : undefined;
     if (typeof value === "string" && value) return { parameter: field.name, location: field.location, value };
   }
   return null;
@@ -550,9 +557,15 @@ export function retentionOf(documented: CacheDocumentation, evidence: readonly R
   return { support: "unknown", parameter: null, accepted_values: null, default: null, profiles: [], conditions: [], evidence: [] };
 }
 
-/** The settings of an evaluation in one line: `format=messages, ttl=1h`. */
+/**
+ * The settings of an evaluation in one line: `format=messages, ttl=1h`. A setting that is an object is written as the
+ * fields it holds, as a developer names them: `prompt_cache_options.ttl=12h`.
+ */
 export function settingsText(settings: JsonObject | undefined): string {
-  return Object.entries(settings ?? {})
-    .map(([key, value]: [string, Json]) => `${key}=${typeof value === "string" ? value : JSON.stringify(value)}`)
-    .join(", ");
+  const lines = (prefix: string, object: JsonObject): string[] =>
+    Object.entries(object).flatMap(([key, value]: [string, Json]) =>
+      isObject(value) && Object.keys(value).length > 0
+        ? lines(`${prefix}${key}.`, value)
+        : [`${prefix}${key}=${typeof value === "string" ? value : JSON.stringify(value)}`]);
+  return lines("", settings ?? {}).join(", ");
 }

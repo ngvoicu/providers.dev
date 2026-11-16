@@ -43,7 +43,7 @@ export const CacheResultSchema = z
 
 const retentionSetting = {
   retention_profile: RetentionProfileSchema,
-  parameter: z.string().nullable().describe("The request field that asked for the lifetime, for example cache_control.ttl or prompt_cache_retention. Null = no lifetime was asked for."),
+  parameter: z.string().nullable().describe("The request field that asked for the lifetime, for example cache_control.ttl, prompt_cache_retention or prompt_cache_options.ttl. Null = no lifetime was asked for."),
   value: z.string().nullable().describe("The value sent in it, for example 1h. Null together with parameter."),
 };
 

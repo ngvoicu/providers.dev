@@ -9,7 +9,9 @@ import {
   documentedItems,
   emptyCacheLifetime,
   evaluationLifetime,
+  lifetimeAsked,
   lifetimeSeconds,
+  settingsText,
   type CacheEvaluation,
   type CacheLifetimeItem,
   type CacheMode,
@@ -571,6 +573,26 @@ describe("cacheLifetime: the rules", () => {
     ]);
     expect(record.long).toMatchObject({ safe_s: 1800, clients: 1, evaluations: 2 });
     expect(lifetimeRuleBreaks(record, [ttl, retention], documentedCaching({}).documented)).toEqual([]);
+  });
+
+  it("reads the lifetime asked from ttl, prompt_cache_retention and prompt_cache_options.ttl, a non-empty string only", () => {
+    expect(lifetimeAsked({ ttl: "1h" })).toEqual({ parameter: "cache_control.ttl", location: "Request body, in each cache_control marker", value: "1h" });
+    expect(lifetimeAsked({ prompt_cache_retention: "24h" })).toEqual({ parameter: "prompt_cache_retention", location: "Request body, top level", value: "24h" });
+    expect(lifetimeAsked({ prompt_cache_options: { ttl: "12h" } })).toEqual({ parameter: "prompt_cache_options.ttl", location: "Request body, in the prompt_cache_options object", value: "12h" });
+    // Not a duration: still what was asked (its profile is long).
+    expect(lifetimeAsked({ prompt_cache_options: { ttl: "a while" } })?.value).toBe("a while");
+    for (const settings of [undefined, {}, { prompt_cache_options: {} }, { prompt_cache_options: { ttl: 43200 } }, { prompt_cache_options: { ttl: "" } }, { prompt_cache_options: { ttl: null } }, { prompt_cache_options: "12h" }, { prompt_cache_options: ["12h"] }, { "prompt_cache_options.ttl": "12h" }, { ttl: 3600 }] as (JsonObject | undefined)[]) {
+      expect(lifetimeAsked(settings)).toBeNull();
+    }
+    // The setting of the evaluation tool is read first, as before.
+    expect(lifetimeAsked({ prompt_cache_options: { ttl: "12h" }, ttl: "1h" })?.parameter).toBe("cache_control.ttl");
+  });
+
+  it("writes an evaluation's settings in one line, a setting that is an object as the fields it holds", () => {
+    expect(settingsText({ format: "messages", ttl: "1h", prefix_tokens: 2048, session_id: true })).toBe("format=messages, ttl=1h, prefix_tokens=2048, session_id=true");
+    expect(settingsText({ prompt_cache_options: { ttl: "12h" } })).toBe("prompt_cache_options.ttl=12h");
+    expect(settingsText({ a: { b: { c: 1 }, d: ["x"] }, e: {} })).toBe('a.b.c=1, a.d=["x"], e={}');
+    expect(settingsText(undefined)).toBe("");
   });
 
   it("orders the list in plain character order, whatever the locale, and whatever the order of the input", () => {

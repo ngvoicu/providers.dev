@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { emptyCacheLifetime } from "../src/core/cache.ts";
 import { CacheLifetimeRecordSchema } from "../src/core/contract.ts";
-import { clone } from "../src/core/merge.ts";
+import { clone, type Json, type JsonObject } from "../src/core/merge.ts";
 import { summarize } from "../src/core/entries.ts";
 import { emptyInputWindow } from "../src/core/limits.ts";
 import { resolve, type ResolveInput } from "../src/core/resolve.ts";
@@ -874,6 +874,77 @@ describe("resolve: measurements", () => {
       };
       const declared = OverrideFileSchema.parse({ provider: "lab", rules: [{ models: ["model-a"], cache_retention: declaration, reason: "Declared", evidence }] });
       expect(record(["60s", "1m"], [declared]).evaluations[0]!.retention_profile).toBe("long");
+    });
+
+    // OpenAI's minimum cache lifetime for a request, sent as {"prompt_cache_options": {"ttl": "12h"}}: the run of
+    // groundtruth 8dec117 on openai/gpt-6.1-sol, warm through 12 hours and cold at 24, on an entry documenting 30m and 12h.
+    const twelveHours = [{ age_s: 1800, warm: 3, total: 3 }, { age_s: 21600, warm: 3, total: 3 }, { age_s: 43200, warm: 3, total: 3 }, { age_s: 86400, warm: 0, total: 3 }];
+    const openai = (options: JsonObject, overrides: OverrideFile[] = []) => {
+      const runs: ObservedFile = { ...observed, cache: [run("sol-12h", twelveHours, { options })] };
+      return ext(resolve(input(overrides, { upstream: documenting(["30m", "12h"]), observed: runs, routes, labels: directLabel, additions: [login] })).catalog.lab!.models["model-a"]!).cache;
+    };
+    const asked = (cache: ReturnType<typeof openai>) => cache.evaluations.map((item) => [item.retention_profile, item.parameter, item.value]);
+
+    it("puts an evaluation that sent prompt_cache_options.ttl=12h in long, beside the documented 12 hours, with the field it sent", () => {
+      const cache = openai({ prompt_cache_options: { ttl: "12h" } });
+      expect(asked(cache)).toEqual([["long", "prompt_cache_options.ttl", "12h"]]);
+      expect(cache.evaluations[0]!.request_settings).toEqual({ prompt_cache_options: { ttl: "12h" } });
+      expect(cache.lifetime.long).toMatchObject({ safe_s: 43200, basis: "documented", documented_s: 43200, measured_s: 43200, documented_status: "not_contradicted", evaluations: 1 });
+      expect(cache.lifetime.short).toMatchObject({ safe_s: 1800, basis: "documented", documented_s: 1800, measured_s: null, evaluations: 0 });
+      expect(cache.lifetime.lifetimes.filter((item) => item.basis === "measured").map((item) => [item.retention_profile, item.parameter, item.value, item.lifetime_s, item.first_miss_s]))
+        .toEqual([["long", "prompt_cache_options.ttl", "12h", 43200, 86400]]);
+      // The shortest documented lifetime asked for by the same field is short, as with the other two fields.
+      expect(asked(openai({ prompt_cache_options: { ttl: "30m" } }))).toEqual([["short", "prompt_cache_options.ttl", "30m"]]);
+      expect(asked(openai({ ttl: "12h" }))).toEqual([["long", "cache_control.ttl", "12h"]]);
+      expect(asked(openai({ prompt_cache_retention: "12h" }))).toEqual([["long", "prompt_cache_retention", "12h"]]);
+    });
+
+    it("puts the same run with empty options in short, beside the documented 30 minutes", () => {
+      const cache = openai({});
+      expect(asked(cache)).toEqual([["short", null, null]]);
+      expect(cache.lifetime.short).toMatchObject({ safe_s: 1800, basis: "documented", documented_s: 1800, measured_s: 43200, documented_status: "not_contradicted", evaluations: 1 });
+      expect(cache.lifetime.long).toMatchObject({ safe_s: 43200, basis: "documented", measured_s: null, evaluations: 0 });
+      // prompt_cache_options without a ttl asks for nothing either.
+      expect(asked(openai({ prompt_cache_options: {} }))).toEqual([["short", null, null]]);
+    });
+
+    it("reads a malformed prompt_cache_options.ttl as it reads a malformed ttl", () => {
+      // Not a string (or an empty one, or no object to hold it): no lifetime asked, short, as for ttl.
+      for (const [value, ttl] of [[43200, 43200], [true, true], [null, null], ["", ""], [["12h"], ["12h"]], [{ seconds: 43200 }, { seconds: 43200 }]] as [Json, Json][]) {
+        expect(asked(openai({ prompt_cache_options: { ttl: value } }))).toEqual([["short", null, null]]);
+        expect(asked(openai({ ttl }))).toEqual([["short", null, null]]);
+      }
+      expect(asked(openai({ prompt_cache_options: "12h" }))).toEqual([["short", null, null]]);
+      expect(asked(openai({ prompt_cache_options: ["12h"] }))).toEqual([["short", null, null]]);
+      // A string that is not a duration: asked, and long, as for ttl.
+      for (const value of ["twelve hours", "500ms", "12h-24h"]) {
+        expect(asked(openai({ prompt_cache_options: { ttl: value } }))).toEqual([["long", "prompt_cache_options.ttl", value]]);
+        expect(asked(openai({ ttl: value }))).toEqual([["long", "cache_control.ttl", value]]);
+      }
+    });
+
+    it("lets a retention declaration on prompt_cache_options.ttl decide the profile of the evaluations that sent it", () => {
+      const source = { kind: "documented" as const, url: "https://example.com/prompt-caching", date: "2026-11-14", note: "The guide names the field and its values." };
+      const declared = (profile12h: "short" | "long") => OverrideFileSchema.parse({
+        provider: "lab",
+        rules: [{
+          models: ["model-a"], reason: "The provider documents the field", evidence,
+          request_controls: [{
+            id: "cache.retention", support: "supported", when: null,
+            bindings: [{ location: "body", path: "/prompt_cache_options/ttl", scope: "request" }],
+            options: [
+              { value: "30m", attributes: { retention_s: 1800, profile: "short" }, settings: null, when: null },
+              { value: "12h", attributes: { retention_s: 43200, profile: profile12h }, settings: null, when: null },
+            ],
+            default: { value: "30m" }, conditions: [], evidence: [source],
+          }],
+        }],
+      });
+      expect(asked(openai({ prompt_cache_options: { ttl: "12h" } }, [declared("long")]))).toEqual([["long", "prompt_cache_options.ttl", "12h"]]);
+      // The declaration is read for the field it names: a profile declared there decides first.
+      expect(asked(openai({ prompt_cache_options: { ttl: "12h" } }, [declared("short")]))).toEqual([["short", "prompt_cache_options.ttl", "12h"]]);
+      // The same value sent by another field is not what the declaration speaks of: decided in seconds.
+      expect(asked(openai({ ttl: "12h" }, [declared("short")]))).toEqual([["long", "cache_control.ttl", "12h"]]);
     });
 
     it("makes the same lifetime record of every entry from inputs in reverse order, and whatever the locale's order of text", () => {

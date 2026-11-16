@@ -3,7 +3,7 @@ import { CACHE_AGES_S, cacheLifetime, cacheResult, documentedCaching, type Cache
 import { buildIndex, type Summary } from "../src/core/entries.ts";
 import type { Json, JsonObject } from "../src/core/merge.ts";
 import { emptyInputWindow, inputWindow, type InputWindow } from "../src/core/limits.ts";
-import { entryHtml, rowHtml } from "../src/core/render.ts";
+import { entryHtml, evaluationStrip, rowHtml } from "../src/core/render.ts";
 import { resolve } from "../src/core/resolve.ts";
 import { NS, UpstreamModel, type ModelExtension } from "../src/core/schema.ts";
 import { pricingOf } from "../src/core/policies.ts";
@@ -325,6 +325,20 @@ describe("the cache lifetimes on an entry page", () => {
     expect(text(runs[0]!)).toContain("cpa-8.0.53/K1-beta 2026-11-04 Lab API key · format=messages, ttl=1h, beta=extended-cache-ttl-2025-04-11 · Also checked: 1 h 5 min 0% (0/3) Raw result");
     expect(runs[0]).toContain('<a href="https://example.com/results/cpa-8.0.53/K1-beta.json" rel="noopener">Raw result</a>');
     expect(text(runs[1]!)).toContain("cpa-8.0.53/K1-nobeta 2026-11-04 Lab API key · format=messages, ttl=1h");
+  });
+
+  it("labels a lifetime asked by prompt_cache_options.ttl as sent, on the entry page and in the evidence strip", () => {
+    // openai/gpt-6.1-sol: documented 30m and 12h; one evaluation that sent {"prompt_cache_options": {"ttl": "12h"}}.
+    const sol = run("openai-12h/S1", "direct", "long", [[0, 1, 1], [1800, 3, 3], [43200, 3, 3], [86400, 0, 3]], { parameter: "prompt_cache_options.ttl", value: "12h", request_settings: { prompt_cache_options: { ttl: "12h" } } });
+    const html = page(cacheOf({ explicit: { ttl: ["30m", "12h"] } }, [sol]));
+    const rows = bodies(html);
+    expect(rows.map((body) => body.split(":")[0])).toEqual(["profile", "item documented", "profile", "item documented", "item measured"]);
+    expect(rows[4]).toMatch(/^item measured: 12 h measured .* Requests sent through direct Sent prompt_cache_options\.ttl=12h · 7 of 10 checks hit Tested from 30 min · First miss 24 h/);
+    const item = section(html).split('<tbody class="item measured">')[1]!;
+    expect(text(item.split('<tr class="run">')[1]!)).toContain("openai-12h/S1 2026-11-04 Lab API key · prompt_cache_options.ttl=12h");
+    const strip = evaluationStrip(sol, CACHE_AGES_S);
+    expect(strip).toContain('title="Long retention: the requests sent prompt_cache_options.ttl=12h. Evaluated on 2026-11-04."');
+    expect(text(strip)).toMatch(/^Long 12h /);
   });
 
   it("shows a result by age as a whole percentage, the exact one with the counts in its title", () => {
