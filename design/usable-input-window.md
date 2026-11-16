@@ -509,6 +509,7 @@ all four.
 
 Versions: `dataset_version` changes with the data. `schema_version` stays 1 and `api_version` stays `v1`. The
 `version` of the OpenAPI document goes from 2.0.0 to 2.1.0: keys are added, none removed.
+(2026-11-16: the version restarted at 1.0.0 with the first public release; README.md, One contract.)
 
 Size, before gzip: the record of an entry nothing is known about is 361 bytes, in the catalog and in the index, so
 about 2.2 MB more in each of `catalog.json` (24.6 MB today) and `index.json` (18.2 MB). The assets served are the

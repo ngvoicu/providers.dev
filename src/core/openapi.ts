@@ -106,7 +106,7 @@ export function openapi(): Record<string, unknown> {
     openapi: "3.1.0",
     info: {
       title: "providers.dev API",
-      version: "2.1.0",
+      version: "1.0.0",
       description:
         "Read-only data about AI models as each provider and access method exposes them: limits, prices, prompt caching, and what providers.dev measured. " +
         "The baseline is imported from models.dev (MIT); everything providers.dev adds is under the `providers_dev` key. No key is needed.",

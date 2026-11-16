@@ -812,6 +812,7 @@ Versions: `dataset_version` changes with each change of the data, because it is 
 summaries, and with it every ETag. `schema_version` stays 1 and `api_version` stays `v1`: the API is not public yet.
 The `version` of the OpenAPI document went to 1.3.0 with task 4 and to 2.0.0 with task 6, which removed fields; it
 stays 2.0.0 with `documented_status`, as the API has never been public.
+(2026-11-16: the version restarted at 1.0.0 with the first public release; README.md, One contract.)
 
 Size, before gzip: `index.json` was 26 MB and the catalog 36 MB before this work. The record of an entry nothing is
 known about is about 500 bytes; with the old fields gone and `documented_status` on every profile, `index.json` is
