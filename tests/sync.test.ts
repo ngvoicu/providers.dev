@@ -22,13 +22,15 @@ const REPEATED_AGE = /Run "probe\/R1" has two checks at age 150 s\. A run has on
 const observedWithLimits = (limits: object[]): string => JSON.stringify({ ...JSON.parse(observedWith([150, 300])), limits });
 const LIMIT_ROW = { route: "devin", client: "cliproxyapi", model: "gpt-6-1-sol", base_model: "openai/gpt-6.1-sol", models_dev: null, source: "results/limits-2026-11-08/limits.jsonl" };
 const ROW_NAME = 'The limits row of route "devin", client "cliproxyapi", model "gpt-6-1-sol"';
-/** The four rows the design refuses (section 6), each with the words of its refusal; a good row beside each. */
+/** The rows the design refuses (section 6), and a token count that is not a whole number of 0 or more, each with the words of its refusal; a good row beside each. */
 const REFUSED_LIMITS: [string, object[], RegExp][] = [
   ["two rows with the same route, client and model", [{ ...LIMIT_ROW, input_accepted: 915390, input_refused: 925000 }, { ...LIMIT_ROW, input_accepted: 900000, input_refused: 925000, date: "2026-11-12" }], /is in the file twice\. There is one limits row per route, client and model\./],
   ["an input accepted that is not below the input refused", [{ ...LIMIT_ROW, input_accepted: 925000, input_refused: 925000 }], /has input_accepted 925000, not below its input_refused 925000\./],
   ["an input accepted above the window the route names", [{ ...LIMIT_ROW, context: 1000000, input_accepted: 1000001 }], /has input_accepted 1000001, above its context 1000000\./],
   ["an input read above the input accepted", [{ ...LIMIT_ROW, input_accepted: 250000, input_read: 250001 }], /has input_read 250001, above its input_accepted 250000\./],
   ["an input read with no input accepted", [{ ...LIMIT_ROW, input_read: 250000 }], /has input_read 250000 and no input_accepted\./],
+  ["a token count that is not a whole number", [{ ...LIMIT_ROW, input_accepted: 1000, input_read: 999.5 }], /has input_read 999\.5\. A token count is a whole number, 0 or more\./],
+  ["a negative token count", [{ ...LIMIT_ROW, input_accepted: 1000, input_refused: 2000, output: -1 }], /has output -1\. A token count is a whole number, 0 or more\./],
 ];
 const GOOD_LIMITS = [
   { ...LIMIT_ROW, input_accepted: 915390, input_refused: 925000 },

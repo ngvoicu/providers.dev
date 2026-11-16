@@ -378,7 +378,8 @@ out once, when the data is built; the rule in full is in `design/usable-input-wi
 OpenAPI document. `limit` stays as imported, and `context`, `input`, `max_output` and the `measured_*` keys of a
 summary keep their meaning. A limits row of the measurements file may carry `date` and `input_read` (the largest input
 the reply showed was read to the end); a file with two rows for one route, client and model, or a row whose numbers
-contradict each other, is refused when read and the last good copy stays.
+contradict each other, or a token count that is not a whole number of 0 or more, is refused when read and the last
+good copy stays.
 
 The safe value, like every figure the site shows, is worked out once, when the data is built, and published in the
 API. A page never works anything out: it prints fields of the API, formatted. The site never shows anything that is

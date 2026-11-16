@@ -295,6 +295,9 @@ export type ObservedRun = z.infer<typeof ObservedRun>;
 /** How a limits row is named in a refusal: its route, client and model, the three that make it one row. */
 const limitRow = (row: { route: string; client: string; model: string }): string => `The limits row of route "${row.route}", client "${row.client}", model "${row.model}"`;
 
+/** The fields of a limits row that count tokens. */
+const LIMIT_TOKEN_FIELDS = ["context", "output", "input_accepted", "input_refused", "input_read", "output_accepted"] as const;
+
 export const ObservedLimit = z
   .looseObject({
     route: z.string(),
@@ -316,6 +319,13 @@ export const ObservedLimit = z
   })
   // A row that contradicts itself is refused rather than read one way or another (design/usable-input-window.md, 6).
   .superRefine((row, ctx) => {
+    // Every number of a row is a count of tokens: a whole number, 0 or more. A fraction would be published as it is.
+    for (const field of LIMIT_TOKEN_FIELDS) {
+      const value = row[field];
+      if (value !== undefined && value !== null && !(Number.isInteger(value) && value >= 0)) {
+        ctx.addIssue({ code: "custom", path: [field], message: `${limitRow(row)} has ${field} ${value}. A token count is a whole number, 0 or more.` });
+      }
+    }
     const accepted = row.input_accepted;
     const refused = row.input_refused;
     const named = row.context ?? undefined;
