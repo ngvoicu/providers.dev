@@ -8,6 +8,7 @@ import { handleApi, type ApiDeps } from "../src/core/api.ts";
 import { CorrectionSchema, DocumentationSchema, FacetsSchema, one, pageOf } from "../src/core/contract.ts";
 import { fillShell, MARK } from "../src/core/page-shell.ts";
 import { handlePage, type PageDeps } from "../src/core/pages.ts";
+import { PARAMS } from "../src/core/query.ts";
 import { readSnapshot, type AssetBinding } from "../src/core/snapshot.ts";
 import worker from "../worker/index.ts";
 import { depsFrom, fetchReturning, fixtureUpstream, ROOT, tempDataDir, writeAuthored } from "./helpers.ts";
@@ -134,6 +135,26 @@ describe("API response boundary", () => {
     // No header is marked as sorted: the table has no cache lifetime sort control.
     expect(html).not.toContain("aria-sort");
     expect((await page("/?lifetime_basis=none")).status).toBe(400);
+  });
+
+  it("keeps the basis filter in the catalog's form, with one value and with both", async () => {
+    const form = (html: string): string => html.match(/<form id="filters"[\s\S]*?<\/form>/)?.[0] ?? "";
+    const one = form(await (await page("/?lifetime_basis=measured&sort=cache_long&order=desc&limit=100")).text());
+    expect(one).toContain('<input type="hidden" name="lifetime_basis" value="measured">');
+    expect(one).toContain('<input type="hidden" name="sort" value="cache_long"><input type="hidden" name="order" value="desc"><input type="hidden" name="limit" value="100">');
+    const both = form(await (await page("/?lifetime_basis=documented,measured")).text());
+    expect(both).toContain('<input type="hidden" name="lifetime_basis" value="documented,measured">');
+    expect(form(await (await page("/")).text())).not.toContain('name="lifetime_basis"');
+  });
+
+  it("has every declared filter of the entry list in the catalog's form, as a control or carried, once", async () => {
+    // A query that sets every parameter, so that a carried one is written.
+    const all = "q=model&provider=provider-02&family=f&canonical_id=lab/model-1&type=chat&access=api&origin=upstream&cache=yes&cache_mode=implicit&lifetime_basis=measured&min_context=1&min_output=1&max_age_months=600&evaluated=false&sort=cache_short&order=desc&limit=10&offset=10";
+    expect(PARAMS.map(({ name }) => name).filter((name) => !all.includes(`${name}=`))).toEqual([]);
+    const html = (await (await page(`/?${all}`)).text()).match(/<form id="filters"[\s\S]*?<\/form>/)?.[0] ?? "";
+    const names = [...html.matchAll(/<(?:input|select)\b[^>]*\bname="([^"]+)"/g)].map((match) => match[1]);
+    // offset is left out on purpose: a new filter starts again at the first page.
+    expect([...names].sort()).toEqual(PARAMS.map(({ name }) => name).filter((name) => name !== "offset").sort());
   });
 
   it("takes the stale threshold from the published meta, on the pages and in the methodology", async () => {

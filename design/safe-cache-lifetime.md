@@ -1140,7 +1140,7 @@ All on 2026-11-15. "The owner" decided; "the chief" is the project's chief, who 
 | 17 | `retention_s` on the options of the `cache.retention` control is left where it is and is no item. | As recommended; shown to the owner, no objection |
 | 18 | No floor on the number of checks per age. | As recommended; shown to the owner, no objection |
 | 19 | A measured value does not expire; its date is published. | As recommended; shown to the owner, no objection |
-| 20 | A filter and a sort on the value in `/api/v1/entries`: **open**, to be decided with the page design. | Deferred |
+| 20 | 2026-11-16: decided and built in `632ea5b`. A sort on the value in `/api/v1/entries`: `sort=cache_short` and `sort=cache_long`, by the safe value of the profile (`cache_lifetime.short.safe_s`, `cache_lifetime.long.safe_s`); 0 is a value, and an entry whose value is not known comes last in either order. A filter on its basis: `lifetime_basis` (`documented`, `measured`, a list), an entry matches when the basis of its short or of its long profile is one of the values. A filter on the value itself (by seconds) is not built. | The owner |
 | 21 | A cell of results by age shows a rounded hit percentage; the API and the hover text are exact. | Decided separately, outside this design |
 | 22 | The Muse Code subscription runs land on a subscription provider, `meta-subscription`, not on Meta's API entries. | The owner; done in `e6cd269` (groundtruth `60423f2`) |
 | 23 | 2026-11-15: the record holds whole seconds only. A documented text that does not come to a whole number of seconds above 0 (`500ms`, `0s`) makes no item and is reported as `unparsed-lifetime`; nothing is rounded (5.3). | The chief, after review T-14 |
@@ -1154,7 +1154,7 @@ All on 2026-11-15. "The owner" decided; "the chief" is the project's chief, who 
 | 31 | 2026-11-15: a documented 0 prints "None" (the provider documents that it does not cache), a measured 0 prints "0 s" (no age at which every check hit), and not known prints "Unknown" (9). | The chief, with the page design (T-23) |
 | 32 | 2026-11-15: what the rule found of the documentation is published, as `documented_status` on each profile (`contradicted`, `not_contradicted`, or null where nothing above 0 is documented, nothing is measured, or the provider documents that it does not cache), set by `cacheLifetime` where the rule is applied (2.2, 2.6, 4.1). The pages print "Documentation contradicted" and "Documentation not contradicted" from this key and from nothing else (9); the OpenAPI version stays 2.0.0. Where `measured_s` is null a page says "Not measured" (9). | The chief, after the final review T-26 |
 
-Open: 20.
+Open: none. Decision 20 was decided by the owner on 2026-11-16 and built in `632ea5b` (sort `cache_short`, `cache_long`; filter `lifetime_basis`); a filter on the value itself is not built.
 
 ## 13. What the data or the contract makes awkward
 

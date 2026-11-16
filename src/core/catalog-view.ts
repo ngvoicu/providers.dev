@@ -1,7 +1,7 @@
 import type { ProviderSummary, Summary } from "./entries.ts";
 import { escapeHtml as e, exact, modelHref, plural, type Today } from "./format.ts";
 import type { Query } from "./query.ts";
-import { serializeQuery } from "./query.ts";
+import { PARAMS, serializeQuery } from "./query.ts";
 import { rowHtml, tableHead } from "./render.ts";
 import type { CanonicalModel, Facets, Page } from "./resources.ts";
 import type { Meta } from "./schema.ts";
@@ -28,18 +28,24 @@ export function apiLink(path: string): string {
   return `<a href="${e(path)}"><code>GET ${e(path)}</code></a>`;
 }
 
+/** Parameters the form never carries: a new filter starts again at the first page. */
+const NOT_CARRIED: readonly (keyof Query)[] = ["offset"];
+
 export function catalogHtml(result: Envelope<Summary>, query: Query, facets: Facets, meta: Meta, url: URL, today: Today): string {
   const value = (name: keyof Query): string => e(Array.isArray(query[name]) ? (query[name] as string[]).join(",") : String(query[name] ?? ""));
-  const select = (name: keyof Query, label: string, options: [string, string][]): string => `<label class="field">${label}<select name="${name}"><option value="">Any</option>${options.map(([id, text]) => `<option value="${e(id)}"${value(name) === e(id) ? " selected" : ""}>${e(text)}</option>`).join("")}</select></label>`;
+  // Every control registers its name as it is written; each other declared parameter of the query is carried in a hidden input.
+  const controls = new Set<keyof Query>();
+  const named = (name: keyof Query): string => (controls.add(name), `name="${name}"`);
+  const select = (name: keyof Query, label: string, options: [string, string][]): string => `<label class="field">${label}<select ${named(name)}><option value="">Any</option>${options.map(([id, text]) => `<option value="${e(id)}"${value(name) === e(id) ? " selected" : ""}>${e(text)}</option>`).join("")}</select></label>`;
   const api = `/api/v1/entries?${serializeQuery(query)}`;
   const providerNames = Object.fromEntries(facets.providers.map((provider) => [provider.id, provider.name]));
   return `<header class="home-head"><h1>AI models as each provider exposes them</h1>
     <p class="lead">Context window, maximum output, price and prompt caching for ${exact(meta.counts.entries)} entries. Built on <a href="https://models.dev">models.dev</a>, with <a href="/?origin=modified,added">${exact(facets.evidence_entries)} entries</a> corrected or evaluated by providers.dev.</p>
     <p class="facts-line muted"><span>${exact(meta.counts.providers)} providers, <a href="/?access=subscription">${exact(facets.subscription_providers)} by subscription</a></span><span><a href="/models/">${exact(meta.counts.models)} models</a></span><span><a href="/evidence/#cache">${exact(meta.counts.cache_evaluations)} cache evaluations</a></span><span>Updated ${e(meta.generated_at.slice(0, 10))}</span></p></header>
     <form id="filters" class="mt-5" role="search" aria-label="Filter entries" method="get">
-      <label class="search block"><span class="sr-only">Search</span><input type="search" name="q" value="${value("q")}" placeholder="Search models, providers and families" autocomplete="off" spellcheck="false"><kbd class="hidden sm:block">/</kbd></label>
+      <label class="search block"><span class="sr-only">Search</span><input type="search" ${named("q")} value="${value("q")}" placeholder="Search models, providers and families" autocomplete="off" spellcheck="false"><kbd class="hidden sm:block">/</kbd></label>
       <details id="more-filters" class="mt-3" open><summary class="button sm:hidden">Filters</summary><div class="panel mt-3 grid grid-cols-2 gap-3 sm:mt-0 sm:grid-cols-4 lg:grid-cols-8">
-        <label class="field">Provider<input name="provider" value="${value("provider")}" list="provider-ids" placeholder="Any" autocomplete="off"></label>
+        <label class="field">Provider<input ${named("provider")} value="${value("provider")}" list="provider-ids" placeholder="Any" autocomplete="off"></label>
         ${select("access", "Access", [["api", "API key"], ["subscription", "Subscription"], ["unknown", "Unclassified"]])}
         ${select("type", "Type", facets.types.map((type) => [type, type]))}
         ${select("cache", "Cache, documented", [["yes", "Supported"], ["no", "Not supported"], ["unknown", "Unknown"]])}
@@ -47,13 +53,12 @@ export function catalogHtml(result: Envelope<Summary>, query: Query, facets: Fac
         ${select("origin", "Source", [["modified,added", "With providers.dev evidence"], ["added", "providers.dev only"], ["upstream", "models.dev only"]])}
         ${select("evaluated", "Cache evaluated", [["true", "Yes"], ["false", "No"]])}
         <div class="field justify-end"><button type="reset" class="button">Clear filters</button></div>
-        <label class="field col-span-2">Minimum context window (tokens)<input name="min_context" value="${value("min_context")}" inputmode="numeric" placeholder="200000"><span class="hint">Entries with an unknown window are excluded.</span></label>
-        <label class="field col-span-2">Minimum maximum output (tokens)<input name="min_output" value="${value("min_output")}" inputmode="numeric" placeholder="64000"><span class="hint">The largest single response, not a default.</span></label>
+        <label class="field col-span-2">Minimum context window (tokens)<input ${named("min_context")} value="${value("min_context")}" inputmode="numeric" placeholder="200000"><span class="hint">Entries with an unknown window are excluded.</span></label>
+        <label class="field col-span-2">Minimum maximum output (tokens)<input ${named("min_output")} value="${value("min_output")}" inputmode="numeric" placeholder="64000"><span class="hint">The largest single response, not a default.</span></label>
         ${select("max_age_months", "Released", [...new Set([1, 3, 6, 12, 24, ...(query.max_age_months ? [query.max_age_months] : [])])].map((months) => [String(months), `Last ${months} months`]))}
         <div class="field justify-end"><button class="button" type="submit">Apply filters</button></div>
       </div></details>
-      ${(["family", "canonical_id"] as const).filter((name) => query[name]).map((name) => `<input type="hidden" name="${name}" value="${value(name)}">`).join("")}
-      <input type="hidden" name="sort" value="${value("sort")}"><input type="hidden" name="order" value="${value("order")}"><input type="hidden" name="limit" value="${query.limit}">
+      ${PARAMS.map(({ name }) => name).filter((name) => !controls.has(name) && !NOT_CARRIED.includes(name) && value(name) !== "").map((name) => `<input type="hidden" name="${name}" value="${value(name)}">`).join("")}
       <datalist id="provider-ids">${facets.providers.map((provider) => `<option value="${e(provider.id)}">${e(provider.name)}</option>`).join("")}</datalist>
     </form>
     <div class="mt-6 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-[0.85rem]"><p id="count" class="font-medium" aria-live="polite">${exact(result.total)} entries</p><p class="muted flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 sm:flex-nowrap"><span>This view as JSON</span><a id="api-link" class="min-w-0 sm:truncate" href="${e(api)}"><code>${e(api)}</code></a><button type="button" id="api-copy" class="copy" data-copy="${e(api)}">Copy</button></p></div>
