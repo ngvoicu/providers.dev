@@ -154,29 +154,52 @@ const escapeRegExp = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/
  * The version written next to `word` in a model id, a canonical id or a name, as [major, minor] (minor 0 when none
  * is written). Read on either side of the word: claude-opus-4-1, opus4-7, Claude Opus 4.1, claude-3-7-sonnet,
  * claude-4.5-sonnet, duo-chat-sonnet-5. A date is not a version: claude-opus-4-20250514 is 4, claude-3-opus-20240229 is 3.
- * Where both sides have a number, the one written first counts. Null = no version is written there.
+ * A letter after the number is not read (gpt-4o is 4). With `joined`, two digits written together right after the word
+ * are major and minor (gpt-56-sol is 5.6). Where several places have a number, the one written first counts.
+ * Null = no version is written there.
  */
-export function versionNextTo(text: string | null | undefined, word: string): [number, number] | null {
+export function versionNextTo(text: string | null | undefined, words: string | readonly string[], joined = false): [number, number] | null {
   if (!text) return null;
   const lower = text.toLowerCase();
-  const w = escapeRegExp(word);
-  const after = new RegExp(`(?<![a-z])${w}[-_ .]?(\\d{1,2})(?!\\d)(?:[-_.](\\d)(?![a-z\\d]))?`).exec(lower);
-  const before = new RegExp(`(?<![a-z\\d.])(\\d{1,2})(?:[-_.](\\d))?[-_ .]?${w}(?![a-z])`).exec(lower);
-  const first = [after, before].filter((match): match is RegExpExecArray => match !== null).sort((a, b) => a.index - b.index)[0];
-  return first ? [Number(first[1]), Number(first[2] ?? 0)] : null;
+  const found: { index: number; version: [number, number] }[] = [];
+  for (const word of typeof words === "string" ? [words] : words) {
+    const w = escapeRegExp(word);
+    const pair = joined ? new RegExp(`(?<![a-z])${w}[-_ .]?(\\d)(\\d)(?!\\d)`).exec(lower) : null;
+    const after = new RegExp(`(?<![a-z])${w}[-_ .]?(\\d{1,2})(?!\\d)(?:[-_.](\\d)(?![a-z\\d]))?`).exec(lower);
+    const before = new RegExp(`(?<![a-z\\d.])(\\d{1,2})(?:[-_.](\\d))?[-_ .]?${w}(?![a-z])`).exec(lower);
+    // Two digits together are read where the word's first number is, never further on.
+    for (const match of [pair && pair.index === after?.index ? pair : after, before]) {
+      if (match) found.push({ index: match.index, version: [Number(match[1]), Number(match[2] ?? 0)] });
+    }
+  }
+  return found.sort((a, b) => a.index - b.index)[0]?.version ?? null;
 }
 
-/** Whether an entry falls under a family rule: "out" (an earlier version), "kept", or "unread" (no version is written). */
-export function familyRuleVerdict(model: { id: string; name?: unknown; family?: unknown; canonical_id?: unknown }, rule: Pick<FamilyExclusion, "family" | "word" | "before" | "aliases">): "out" | "kept" | "unread" | null {
-  if (model.family !== rule.family) return null;
-  const w = escapeRegExp(rule.word);
-  if (rule.aliases.some((alias) => new RegExp(`(?<![a-z])${w}[-_ .]?${escapeRegExp(alias)}(?![a-z])`).test(model.id.toLowerCase()))) return "kept";
-  // The entry's own id first, then the canonical model it names, then its display name.
-  const version =
-    versionNextTo(model.id, rule.word) ??
-    versionNextTo(typeof model.canonical_id === "string" ? model.canonical_id : null, rule.word) ??
-    versionNextTo(typeof model.name === "string" ? model.name : null, rule.word);
-  if (!version) return "unread";
+type FamilyRule = Pick<FamilyExclusion, "family" | "word" | "before" | "aliases"> & Partial<Pick<FamilyExclusion, "read" | "joined_digits" | "no_version">>;
+
+/** Whether a rule covers an entry's family. */
+export function ruleCovers(rule: Pick<FamilyExclusion, "family">, family: unknown): boolean {
+  return typeof family === "string" && (typeof rule.family === "string" ? rule.family === family : rule.family.includes(family));
+}
+
+/**
+ * Whether an entry falls under a family rule: "out" (an earlier version), "kept", or "unread" (no version where the
+ * rule reads, and the rule asks for a report). Null = the rule does not cover the entry's family.
+ */
+export function familyRuleVerdict(model: { id: string; name?: unknown; family?: unknown; canonical_id?: unknown }, rule: FamilyRule): "out" | "kept" | "unread" | null {
+  if (!ruleCovers(rule, model.family)) return null;
+  const words = typeof rule.word === "string" ? [rule.word] : rule.word;
+  const id = model.id.toLowerCase();
+  if (rule.aliases.some((alias) => words.some((word) => new RegExp(`(?<![a-z])${escapeRegExp(word)}[-_ .]?${escapeRegExp(alias)}(?![a-z])`).test(id)))) return "kept";
+  const places = { id: model.id, canonical_id: model.canonical_id, name: model.name };
+  // By default the entry's own id first, then the canonical model it names, then its display name.
+  let version: [number, number] | null = null;
+  for (const place of rule.read ?? ["id", "canonical_id", "name"]) {
+    const text = places[place];
+    version = versionNextTo(typeof text === "string" ? text : null, words, rule.joined_digits ?? false);
+    if (version) break;
+  }
+  if (!version) return (rule.no_version ?? "report") === "keep" ? "kept" : "unread";
   const [major, minor] = rule.before.split(".").map(Number) as [number, number | undefined];
   return version[0] < major || (version[0] === major && version[1] < (minor ?? 0)) ? "out" : "kept";
 }
@@ -442,7 +465,7 @@ export function resolve(input: ResolveInput): ResolveResult {
             level: "warning",
             code: "rule-version-unread",
             target: ref,
-            message: `${ref} is of family ${rule.family}, but no version can be read next to "${rule.word}" in its id, canonical_id or name, so the rule ${rule.id} cannot tell whether to leave it out. It is published. Correct its canonical_id with an override, or add the word it uses to the rule's aliases.`,
+            message: `${ref} is of family ${String(model.family)}, but no version can be read next to "${[rule.word].flat().join('" or "')}" in its ${rule.read.join(", ")}, so the rule ${rule.id} cannot tell whether to leave it out. It is published. Correct its canonical_id with an override, or add the word it uses to the rule's aliases.`,
           });
         }
         if (verdict !== "out") continue;

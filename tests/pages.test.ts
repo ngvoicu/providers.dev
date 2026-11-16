@@ -282,3 +282,38 @@ it("publishes new data without rebuilding the shell, while in-flight API reads s
   expect((await worker.fetch(new Request("https://providers.dev/current.json"), { ASSETS: assets })).status).toBe(404);
   expect((await worker.fetch(new Request("https://providers.dev/api/v1/entries"), { ASSETS: assets })).headers.get("X-Dataset-Version")).toBe(current.meta.dataset_version);
 });
+
+it("keeps a provider whose every entry a catalog rule leaves out, with no entries, in the API and on the pages", async () => {
+  const emptied = tempDataDir();
+  const upstream = fixtureUpstream();
+  upstream["old-router"] = { id: "old-router", name: "Old router", doc: "https://example.com", models: { "oldfam-1": { id: "oldfam-1", name: "Oldfam 1", family: "oldfam" }, "oldfam-1.5": { id: "oldfam-1.5", name: "Oldfam 1.5", family: "oldfam" } } };
+  await sync({ dataDir: emptied, fetch: fetchReturning(JSON.stringify(upstream)) });
+  writeAuthored(emptied);
+  writeFileSync(join(emptied, "authored", "catalog-rules.yaml"), "exclude:\n  - { id: oldfam-before-2, family: oldfam, word: oldfam, before: \"2\", leaves_out: Oldfam before 2, reason: Editorial choice., date: \"2026-11-16\" }\n");
+  const report = publish({ dataDir: emptied, rootDir: ROOT, now });
+  expect([report.errors, report.issues, report.meta?.counts.providers, report.meta?.exclusions[0]?.entries]).toEqual([[], [], 32, 2]);
+  const destination = tempDataDir();
+  mkdirSync(join(destination, "site-shell"));
+  writeFileSync(join(destination, "site-shell", "index.html"), shell);
+  stageSnapshot(join(emptied, "published"), destination);
+  const assets: AssetBinding = { async fetch(request) {
+    const path = new URL(typeof request === "string" ? request : request.url).pathname;
+    const file = join(destination, path.endsWith("/") ? `${path}index.html` : path);
+    return existsSync(file) ? new Response(readFileSync(file)) : new Response(null, { status: 404 });
+  } };
+  const get = (path: string) => worker.fetch(new Request(`https://providers.dev${path}`), { ASSETS: assets });
+  const provider = await (await get("/api/v1/providers/old-router?view=full")).json() as { data: { provider: { entry_count: number }; entries: unknown[]; models: Record<string, unknown> } };
+  expect([provider.data.provider.entry_count, provider.data.entries, provider.data.models]).toEqual([0, [], {}]);
+  const entries = await (await get("/api/v1/entries?provider=old-router&q=oldfam")).json() as { total: number; data: unknown[] };
+  expect([entries.total, entries.data]).toEqual([0, []]);
+  expect((await get("/api/v1/entries/old-router/oldfam-1")).status).toBe(404);
+  const providers = await (await get("/api/v1/providers?q=Old")).json() as { data: { id: string; entry_count: number }[] };
+  expect(providers.data).toEqual([expect.objectContaining({ id: "old-router", entry_count: 0 })]);
+  const page = await get("/providers/old-router/");
+  expect(page.status).toBe(200);
+  expect(await page.text()).toContain("No entries are listed for this provider.");
+  const catalog = await get("/?provider=old-router");
+  expect(catalog.status).toBe(200);
+  expect(await catalog.text()).toMatch(/<div id="empty" class="empty">/);
+  expect((await get("/providers/")).status).toBe(200);
+});

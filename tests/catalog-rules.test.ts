@@ -120,6 +120,50 @@ describe("catalog rules: reading a version", () => {
   });
 });
 
+describe("catalog rules: GPT, read in the id only", () => {
+  const gpt = rules.exclude.find((rule) => rule.id === "gpt-before-6")!;
+  // [family, id, canonical_id, name]: the canonical id and name are given where they would say something else, to show they are not read.
+  type GptEntry = [family: string, id: string, canonical?: string, name?: string];
+  const verdicts = (entries: GptEntry[]) => entries.map(([family, id, canonical, name]) => [id, familyRuleVerdict({ id, family, name: name ?? id, ...(canonical ? { canonical_id: canonical } : {}) }, gpt)]);
+  const out: GptEntry[] = [
+    ["gpt", "gpt-3.5-turbo-0125"], ["gpt", "gpt-4"], ["gpt", "gpt-4-turbo"], ["gpt", "gpt-4.1@eu"], ["gpt", "gpt-4o"], ["gpt", "gpt-4o-2024-08-06"],
+    ["gpt-mini", "gpt-4o-mini"], ["gpt", "chatgpt-4o-latest"], ["gpt", "gpt-4o-latest"], ["gpt", "gpt-4o-transcribe"], ["gpt-mini", "gpt-4o-mini-tts"],
+    ["gpt", "gpt-5-chat-latest"], ["gpt", "gpt-5.1-chat-latest"], ["gpt", "gpt-5.3-chat-latest"], ["gpt", "gpt-5.1-2025-11-13"], ["gpt", "gpt-5.5:free"],
+    ["gpt-sol", "gpt-5.6-sol"], ["gpt-sol", "gpt-5-6-sol"], ["gpt-sol", "openai-gpt-56-sol"], ["gpt", "openai-gpt-52"], ["gpt-mini", "openai-gpt-54-mini"],
+    ["gpt-sol", "gpt-5.6-sol:official"], ["gpt", "gpt-5.1-instant"], ["gpt", "gpt-5-thinking"], ["gpt", "gpt-5.2-fast"], ["gpt-codex", "gpt-5.3-codex-xhigh"],
+    ["gpt", "gpt-5-image"], ["gpt", "gpt-5.4-image-2"], ["gpt", "gpt-5-search-api"], ["gpt-codex", "duo-chat-gpt-5-3-codex"], ["gpt-luna", "us.openai.gpt-5.6-luna"],
+  ];
+  const kept: GptEntry[] = [
+    ["gpt-sol", "gpt-6-sol"], ["gpt-sol", "gpt-6.1-sol@eu"], ["gpt-sol", "openai-gpt-61-sol"], ["gpt-sol", "gpt-6-1-sol"], ["gpt-astra", "gpt-6-astra:low-cost"],
+    ["gpt", "gpt-6.2"], ["gpt", "gpt-7"], ["gpt-sol", "gpt-7-sol"], ["gpt-sol", "openai-gpt-62-sol"],
+    // Moving aliases: no version in the id, whatever the canonical id or the name says.
+    ["gpt", "gpt-latest"], ["gpt", "gpt-chat-latest"], ["gpt-sol", "gpt-sol-latest"], ["gpt-mini", "openai/gpt-mini-latest", "openai/gpt-5-4-mini", "GPT mini latest (GPT-5.4 mini)"],
+    ["gpt", "gpt-daybreak-red-latest", "openai/gpt-5-6-sol"],
+    // Models with numbering of their own.
+    ["gpt", "gpt-audio-1.5"], ["gpt", "gpt-realtime-2"], ["gpt-mini", "gpt-realtime-2.1-mini"], ["gpt-live", "gpt-live-1"], ["gpt-codex-mini", "codex-mini"], ["gpt", "nano-gpt-help"], ["gpt", "route-llm"],
+  ];
+
+  it("leaves out every version before 6 in every spelling, two digits together read as major and minor", () => {
+    expect(verdicts(out)).toEqual(out.map(([, id]) => [id, "out"]));
+  });
+
+  it("keeps 6 and later, moving aliases and models numbered their own way, silently", () => {
+    expect(verdicts(kept)).toEqual(kept.map(([, id]) => [id, "kept"]));
+  });
+
+  it("does not cover gpt-oss, gpt-image or the o models", () => {
+    for (const [family, id] of [["gpt-oss", "gpt-oss-120b"], ["gpt-image", "gpt-image-1"], ["o", "o3"], ["o-mini", "o4-mini"], ["o-pro", "o1-pro"]] as const) {
+      expect(familyRuleVerdict({ id, family }, gpt)).toBeNull();
+    }
+  });
+
+  it("reads two digits together only where a rule asks for it", () => {
+    expect(versionNextTo("gpt-56-sol", "gpt", true)).toEqual([5, 6]);
+    expect(versionNextTo("gpt-56-sol", "gpt")).toEqual([56, 0]);
+    expect(versionNextTo("gpt-5-2025-08-07", "gpt", true)).toEqual([5, 0]);
+  });
+});
+
 describe("catalog rules: in the build", () => {
   const model = (id: string, family: string, canonical?: string) => ({ id, name: id, family, ...(canonical ? { canonical_id: canonical } : {}), limit: { context: 200000, output: 32000 } });
   const upstream = (): UpstreamCatalog => ({
@@ -155,6 +199,7 @@ describe("catalog rules: in the build", () => {
       expect.objectContaining({ kind: "rule", target: "claude-sonnet-before-5.5", entries: 1 }),
       expect.objectContaining({ kind: "rule", target: "claude-haiku-before-5.5", entries: 0 }),
       expect.objectContaining({ kind: "rule", target: "claude-fable-before-5.2", entries: 0 }),
+      expect.objectContaining({ kind: "rule", target: "gpt-before-6", entries: 0 }),
     ]);
     // An entry of the family with no version anywhere is published and reported, not guessed.
     expect(issues).toEqual([expect.objectContaining({ level: "warning", code: "rule-version-unread", target: "gateway/anthropic/claude-opus-next" })]);

@@ -162,6 +162,19 @@ every model of another family with the word in its name, is kept. An entry of th
 published and reported (**rule-version-unread**). An entry whose `family` models.dev leaves out, or writes otherwise,
 is not looked at.
 
+Where ids are less regular, a rule can say more (left out = the default, as for the Claude rules):
+
+| Option | What it does |
+|---|---|
+| `family: [a, b]` | one rule over several families, published once with the count for all of them |
+| `word: [gpt, chatgpt]` | the version can be written next to any of these words |
+| `read: [id]` | where the version is read, in order; default `[id, canonical_id, name]`. `[id]` keeps an alias whose canonical id or name names a version |
+| `joined_digits: true` | two digits together after the word are major and minor: `gpt-56-sol` is 5.6, `gpt-61-sol` 6.1. A version 10 or above cannot then be written that way |
+| `no_version: keep` | an entry with no version where the rule reads is kept without an issue (moving aliases such as `gpt-sol-latest`, models numbered their own way such as `gpt-realtime-2`); default `report` |
+
+The GPT rule (`gpt-before-6`) uses all five: see the comment above it in the file. A letter after the number is not
+read, so `gpt-4o` is 4.
+
 A rule has no evidence: it says what providers.dev lists, not what a provider does. `/api/v1/meta` lists it once in
 `exclusions` (`kind: rule`, its words, reason and date, and the number of entries it removed in this build), never
 the entries one by one. An override that names an entry a rule leaves out stays valid and raises no issue; an

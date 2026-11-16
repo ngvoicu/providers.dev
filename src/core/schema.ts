@@ -142,14 +142,23 @@ export type OverrideFile = z.infer<typeof OverrideFile>;
 export const FamilyExclusion = z.strictObject({
   /** Names the rule in /api/v1/meta. */
   id: z.string().regex(/^[a-z0-9][a-z0-9.-]*$/),
-  /** The published `family` of the entries the rule looks at, exactly as models.dev writes it. */
-  family: z.string().min(1),
-  /** The word next to which the version is written in an id or a name ("opus" in claude-opus-4-1, claude-3-opus). */
-  word: z.string().regex(/^[a-z]+$/),
+  /** The published `family` of the entries the rule looks at, exactly as models.dev writes it; or a list of families that one rule covers. */
+  family: z.union([z.string().min(1), z.array(z.string().min(1)).min(1)]),
+  /**
+   * The word next to which the version is written ("opus" in claude-opus-4-1, claude-3-opus), or several words (gpt,
+   * chatgpt). The word stands alone: "opus" is not read in "opusdistill" or "magnum-opus".
+   */
+  word: z.union([z.string().regex(/^[a-z]+$/), z.array(z.string().regex(/^[a-z]+$/)).min(1)]),
   /** The first version that is kept: major, or major.minor. Every version below it is left out, every one from it on is kept. */
   before: z.string().regex(/^\d{1,2}(\.\d)?$/),
   /** Words that, written right after `word` in a model id instead of a version, make the entry an alias that is kept (claude-opus-latest). */
   aliases: z.array(z.string().regex(/^[a-z]+$/)).default([]),
+  /** Where the version is read, in this order: the first that has one counts. */
+  read: z.array(z.enum(["id", "canonical_id", "name"])).min(1).default(["id", "canonical_id", "name"]),
+  /** True: two digits written together right after the word are major and minor (gpt-56 is 5.6, gpt-61 is 6.1). A version 10 or above cannot be told from them. */
+  joined_digits: z.boolean().default(false),
+  /** An entry of the family with no version where the rule reads: `report` publishes it and reports a dataset issue; `keep` publishes it, silently (a moving alias, a model with numbering of its own). */
+  no_version: z.enum(["report", "keep"]).default("report"),
   /** What the rule leaves out, in words, as published. */
   leaves_out: z.string().min(1),
   reason: z.string().min(1),

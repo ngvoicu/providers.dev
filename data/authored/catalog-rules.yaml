@@ -10,7 +10,13 @@
 #   before      the first version that is kept (5.5): every one below it is left out, every one from it on is kept.
 #   aliases     words written after `word` in an id instead of a version (claude-opus-latest): such an entry is kept.
 #   leaves_out, reason, date: published as they are.
-# An entry of the family with no version written anywhere is published and reported as a dataset issue.
+# Options, for families whose ids are less regular (left out = the default):
+#   family      a list of families instead of one: the rule covers them all and is published once.
+#   word        a list of words instead of one (gpt, chatgpt).
+#   read        where the version is read, in order. Default [id, canonical_id, name]; [id] reads the model id only.
+#   joined_digits  true: two digits written together after the word are major and minor (gpt-56 is 5.6). Default false.
+#   no_version  an entry of the family with no version where the rule reads: `report` (default) publishes it and
+#               reports a dataset issue; `keep` publishes it without one (moving aliases, models numbered their own way).
 exclude:
   - id: claude-opus-before-5.5
     family: claude-opus
@@ -43,4 +49,19 @@ exclude:
     aliases: [latest]
     leaves_out: Claude Fable versions before 5.2, at every provider
     reason: "Editorial choice of providers.dev: Claude Fable versions before 5.2 are not listed."
+    date: "2026-11-16"
+  # GPT ids are less regular: the version is read in the id only (several aliases name a version in their canonical_id
+  # or name, and move with the next release), two digits together are major and minor (gpt-56-sol, openai-gpt-61-sol),
+  # and an id with no version (gpt-latest, gpt-sol-latest, gpt-realtime-2, gpt-audio-1.5, codex-mini) is kept.
+  # The letter of gpt-4o is not part of the number: it is read as 4. Families gpt-oss, gpt-image, o, o-mini and o-pro
+  # are not covered.
+  - id: gpt-before-6
+    family: [gpt, gpt-mini, gpt-nano, gpt-pro, gpt-codex, gpt-codex-spark, gpt-codex-mini, gpt-luna, gpt-sol, gpt-terra, gpt-astra, gpt-live]
+    word: [gpt, chatgpt]
+    before: "6"
+    read: [id]
+    joined_digits: true
+    no_version: keep
+    leaves_out: GPT versions before 6 (GPT and its mini, nano, Pro, Codex, Luna, Sol, Terra, Astra and Live models), at every provider
+    reason: "Editorial choice of providers.dev: GPT versions before 6 are not listed."
     date: "2026-11-16"

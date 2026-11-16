@@ -16,7 +16,7 @@ export function providerHtml(provider: ProviderSummary, entries: Summary[], impo
     ${extension.note ? `<dt class="muted">Note</dt><dd>${e(extension.note)}</dd>` : ""}
     ${extension.evidence.length ? `<dt class="muted">Evidence</dt><dd>${extension.evidence.map((item) => `<div><span class="badge ${item.kind}">${e(item.kind)}</span> <a href="${e(item.url)}">Source</a> <span class="muted">${e(item.date)}</span></div>`).join("")}</dd>` : ""}</dl>
     <div class="mt-8 flex flex-wrap items-end justify-between gap-3"><h2 class="!m-0">Entries</h2><p class="hint"><a href="/?provider=${e(provider.id)}">Filter and sort in the catalog</a> · ${apiLink(`/api/v1/providers/${encodeURIComponent(provider.id)}`)}</p></div>
-    <div class="scroll mt-3"><table class="entries stack-tablet"><caption class="sr-only">Entries at ${e(provider.name)}</caption><thead>${tableHead({ hideProvider: true })}</thead><tbody>${entries.map((entry) => rowHtml(entry, { today, imported, hideProvider: true })).join("")}</tbody></table></div>`;
+    <div class="scroll mt-3"><table class="entries stack-tablet"><caption class="sr-only">Entries at ${e(provider.name)}</caption><thead>${tableHead({ hideProvider: true })}</thead><tbody>${entries.map((entry) => rowHtml(entry, { today, imported, hideProvider: true })).join("")}</tbody></table></div>${entries.length === 0 ? '<p class="empty">No entries are listed for this provider. What providers.dev leaves out of the catalog is listed under <a href="/evidence/#issues">Dataset issues</a>.</p>' : ""}`;
 }
 
 export function modelHtml(model: CanonicalModelDetail, providerNames: Record<string, string>, imported: string, today: Today): string {
