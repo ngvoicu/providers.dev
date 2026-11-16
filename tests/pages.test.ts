@@ -191,8 +191,11 @@ describe("API response boundary", () => {
       'const email = "office@providers.dev";', '<h2 id="contact">Contact</h2>', "write to <a href={`mailto:${email}`}>{email}</a>", "a correction that cannot be made public", "A wrong or missing value goes in an issue",
     ]) expect(source, words).toContain(words);
     // Astro drops a line break before a tag: a word at the end of a line and a tag at the start of the next would run together.
-    const raw = readFileSync(join(ROOT, "src", "pages", "reference-content", "docs", "contributing.astro"), "utf8");
-    expect(raw).not.toMatch(/[\w,.;:)]\n\s*<(a|code|em|strong|span)\b/);
+    // The same holds on the methodology ("an<em>Input window", "an<em>at least", ":<code>contradicted") and the licensing page ("as<a").
+    for (const name of ["contributing", "methodology", "licensing"]) {
+      const raw = readFileSync(join(ROOT, "src", "pages", "reference-content", "docs", `${name}.astro`), "utf8");
+      expect(raw, name).not.toMatch(/[\w,.;:)]\n\s*<(a|code|em|strong|span)\b/);
+    }
     // The worked examples are entries of data/authored, as written there.
     const openrouter = readFileSync(join(ROOT, "data", "authored", "overrides", "openrouter.yaml"), "utf8");
     for (const words of ["https://openrouter.ai/docs/guides/best-practices/prompt-caching#deepseek", "Prompt caching with DeepSeek is automated and does not require any additional configuration.", "results/openrouter-direct/R10-2026-11-04T19-00-07.json", "20 of 27 later re-sends were served from the cache, the oldest at 25 minutes."]) {
