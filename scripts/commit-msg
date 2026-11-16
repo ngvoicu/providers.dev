@@ -1,0 +1,13 @@
+#!/bin/sh
+# Git commit-msg hook: a commit message carries no link to an agent session. Removes every line that begins
+# "Claude-Session:" from the message, and the blank lines that this leaves at its end.
+# Install once per clone: ln -sf ../../scripts/commit-msg .git/hooks/commit-msg
+set -eu
+msg="$1"
+tmp="$msg.commit-msg.$$"
+awk '
+  /^Claude-Session:/ { next }
+  /^[[:space:]]*$/ { blank = blank $0 "\n"; next }
+  { printf "%s%s\n", blank, $0; blank = "" }
+' "$msg" > "$tmp"
+mv "$tmp" "$msg"

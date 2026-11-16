@@ -128,6 +128,8 @@ The baseline is imported from models.dev; our additions, corrections and measure
   coding agent used on top of CLIProxyAPI is not named ("A coding agent, through CLIProxyAPI"). The public names
   are in `data/authored/measurement-labels.yaml`; a new client id must be added there (the build warns and publishes
   it as "other"). Runs marked `lacks` are not published: they say something about a proxy build, not a provider.
+- Commit messages carry no links to agent sessions (no `Claude-Session:` line). `scripts/commit-msg` removes one;
+  install it once per clone with `ln -sf ../../scripts/commit-msg .git/hooks/commit-msg`.
 
 ## Commands
 
