@@ -182,7 +182,9 @@ Every rule, added provider and added model needs at least one evidence item, or 
 | `date` | the day we read or ran it (`YYYY-MM-DD`) |
 | `note` | optional: the sentence quoted, or what was run |
 
-Imported values never get a verification date. Evidence older than 90 days is shown as stale.
+Imported values never get a verification date. providers.dev evidence whose date is more than `stale_after_days` of
+`/api/v1/meta` (90) days before today is shown as stale: a page compares a published date with today's date using
+the published threshold, and that is the only thing a page works out.
 
 ### Access classification
 
@@ -229,7 +231,7 @@ method), **models** (canonical: a model as its lab names it) and **evaluations**
 | `GET /api/v1/evaluations/cache` | every cache evaluation, with the entry it was made on |
 | `GET /api/v1/evaluations/limits` | every limit evaluation, with the entry it was made on |
 | `GET /api/v1/catalog` | the complete merged catalog, `{ meta, data }` with `data` keyed by provider id |
-| `GET /api/v1/meta` | dataset version, counts, freshness, upstream commit, sync status, open issues |
+| `GET /api/v1/meta` | dataset version, counts, freshness, the stale threshold (`stale_after_days`), upstream commit, sync status, open issues |
 | `GET /api/v1/openapi.json` | the OpenAPI 3.1 document |
 | `GET /api.json` | the merged catalog keyed by provider id, in the models.dev v2 structure, no envelope |
 

@@ -174,7 +174,7 @@ describe("uniform pricing and controls", () => {
     ext(model).limits = { measured: [limitOf({ route: "p", route_label: "P", input_accepted: 915011, input_refused: 922500, note: "A free-text claim that should stay in raw evidence" })], from_measurement: [] };
     const index = buildIndex(catalog, "fixture", "2026-11-14T00:00:00Z", "2026-11-14T00:00:00Z");
     const summary = index.entries.find((entry) => entry.ref === "p/m")!;
-    const html = entryHtml({ summary, provider: index.providers[0]!, model, now: new Date("2026-11-14T00:00:00Z"), imported: "2026-11-14" });
+    const html = entryHtml({ summary, provider: index.providers[0]!, model, today: { date: new Date("2026-11-14T00:00:00Z"), stale_after_days: 90 }, imported: "2026-11-14" });
     const visibleLimits = html.split('<section aria-labelledby="limits">')[1]!.split('</section>')[0]!;
     expect(visibleLimits).toContain("Input accepted");
     expect(visibleLimits).toContain("915,011");
@@ -188,7 +188,7 @@ describe("uniform pricing and controls", () => {
     expect(html).toContain("Whole request");
     expect(html).toContain("x-example-cache");
     expect(html).not.toContain("the prices above do not change");
-    expect(rowHtml(summary, { now: new Date("2026-11-14T00:00:00Z") })).toContain("Conditional rates");
+    expect(rowHtml(summary, { today: { date: new Date("2026-11-14T00:00:00Z"), stale_after_days: 90 } })).toContain("Conditional rates");
   });
 
   it("keeps every recursive OpenAPI reference resolvable and every new entry field required", () => {

@@ -26,6 +26,12 @@ import {
 import { readJsonIfExists, sha256, swapDir } from "./files.ts";
 import { loadUpstream, type SyncStatus } from "./sync.ts";
 
+/**
+ * providers.dev evidence (a correction, an evaluation, a measured lifetime) whose date is more than this many days before
+ * today is shown as stale. Set here once and published as `stale_after_days` of /api/v1/meta: pages read it from there.
+ */
+export const STALE_AFTER_DAYS = 90;
+
 export interface PublishOptions {
   dataDir: string;
   /** The folder holding LICENSES/models.dev-MIT.txt. */
@@ -140,6 +146,7 @@ export function publish(input: PublishOptions): PublishReport {
       limit_evaluations: index.entries.reduce((sum, entry) => sum + entry.measured_limit_count, 0),
     },
     cache_ages_s: [...CACHE_AGES_S],
+    stale_after_days: STALE_AFTER_DAYS,
     // Every key is always there: what is not known is null.
     upstream: {
       source: upstream.meta.source,

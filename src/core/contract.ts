@@ -309,6 +309,7 @@ export const MetaSchema = z
       limit_evaluations: z.int(),
     }),
     cache_ages_s: z.array(z.int()).describe("The ages, in seconds, that every table of cache results by age has a column for, after the control at age 0. Results at other ages are in the data at their exact age."),
+    stale_after_days: z.int().positive().describe("providers.dev evidence (a correction, an evaluation, a measured lifetime) whose date is more than this many days before today is shown as stale. The API publishes the dates and this number, set once when the data is built; a reader applies it to its own date. Imported models.dev values carry no such date and are never stale."),
     upstream: z
       .strictObject({
         source: z.string(),

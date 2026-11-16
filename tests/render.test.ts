@@ -8,7 +8,7 @@ import { NS, UpstreamModel, type ModelExtension } from "../src/core/schema.ts";
 import { pricingOf } from "../src/core/policies.ts";
 import { NO_CACHE, summaryOf } from "./helpers.ts";
 
-const row = (more: Partial<Summary>): string => rowHtml(summaryOf(more), { now: new Date("2026-11-13T00:00:00Z") });
+const row = (more: Partial<Summary>): string => rowHtml(summaryOf(more), { today: { date: new Date("2026-11-13T00:00:00Z"), stale_after_days: 90 } });
 const count = (html: string, part: string): number => html.split(part).length - 1;
 
 /** A published evaluation, its results written out as [age, hits, checks]; age 0 is the control. */
@@ -57,7 +57,7 @@ describe("documented cache support on an entry page", () => {
     });
     const index = buildIndex(catalog, "fixture", "2026-11-14T00:00:00Z", "2026-11-14T00:00:00Z");
     const summary = index.entries[0]!;
-    const html = entryHtml({ summary, provider: index.providers[0]!, model: catalog.p!.models.m!, now: new Date("2026-11-14T00:00:00Z") });
+    const html = entryHtml({ summary, provider: index.providers[0]!, model: catalog.p!.models.m!, today: { date: new Date("2026-11-14T00:00:00Z"), stale_after_days: 90 } });
     return { summary, html, documented: html.split('<h2 id="cache">')[1]!.split("<h3>Retention</h3>")[0]! };
   };
 
@@ -99,7 +99,7 @@ describe("the entry page", () => {
   const index = buildIndex(catalog, "fixture", "2026-11-14T00:00:00Z", "2026-11-14T00:00:00Z");
   const page = (ref: string): string => {
     const summary = index.entries.find((entry) => entry.ref === ref)!;
-    return entryHtml({ summary, provider: index.providers.find((item) => item.id === summary.provider)!, model: catalog[summary.provider]!.models[summary.model]!, now: new Date("2026-11-14T00:00:00Z"), imported: "2026-11-13" });
+    return entryHtml({ summary, provider: index.providers.find((item) => item.id === summary.provider)!, model: catalog[summary.provider]!.models[summary.model]!, today: { date: new Date("2026-11-14T00:00:00Z"), stale_after_days: 90 }, imported: "2026-11-13" });
   };
   const pages = { bare: page("lab/bare"), full: page("lab/full"), login: page("lab-login/full") };
   /** The skeleton of a page: its headings, the column heads of its tables, and the labels of its rows. */
@@ -195,7 +195,7 @@ describe("the cache lifetime in a table row", () => {
   it("names the column of every cell, for where the table is stacked", () => {
     const html = row({ cache_lifetime: CASES.opus.lifetime });
     for (const label of ["Provider", "Context", "Max output", "Price in / out", "Released", "Cache lifetime", "Source"]) expect(html).toContain(`data-label="${label}"`);
-    expect(count(rowHtml(summaryOf({}), { now: new Date("2026-11-13T00:00:00Z"), hideProvider: true }), 'data-label="Provider"')).toBe(0);
+    expect(count(rowHtml(summaryOf({}), { today: { date: new Date("2026-11-13T00:00:00Z"), stale_after_days: 90 }, hideProvider: true }), 'data-label="Provider"')).toBe(0);
   });
 
   it("says whose price a subscription entry shows", () => {
@@ -233,7 +233,7 @@ describe("the cache lifetimes on an entry page", () => {
   const page = (cache: EntryCache): string => {
     const model = structuredClone(catalog.lab!.models.m!) as JsonObject;
     (model[NS] as unknown as ModelExtension).cache = cache;
-    return entryHtml({ summary: { ...index.entries[0]!, cache_lifetime: cache.lifetime, evaluation_count: cache.evaluations.length }, provider: index.providers[0]!, model, now, imported: "2026-11-15" });
+    return entryHtml({ summary: { ...index.entries[0]!, cache_lifetime: cache.lifetime, evaluation_count: cache.evaluations.length }, provider: index.providers[0]!, model, today: { date: now, stale_after_days: 90 }, imported: "2026-11-15" });
   };
   const section = (html: string): string => html.slice(html.indexOf('<h2 id="cache">'), html.indexOf("<h3>Cache modes</h3>"));
   const tiles = (html: string): string => html.slice(html.indexOf('<div class="tiles'), html.indexOf("</div>\n\n<section"));
@@ -348,6 +348,43 @@ describe("the cache lifetimes on an entry page", () => {
   });
 });
 
+describe("stale evidence", () => {
+  // The threshold is the one the API publishes in /api/v1/meta; the renderer has none of its own.
+  const { catalog } = resolve({
+    upstream: { lab: { id: "lab", name: "Lab", models: { m: UpstreamModel.parse({ id: "m", name: "M" }) } } },
+    additions: [], overrides: [], routes: {}, access: { default: "api", default_basis: "fixture", patterns: [], providers: {} }, upstreamDate: "2026-11-15",
+  });
+  const index = buildIndex(catalog, "fixture", "2026-11-15T00:00:00Z", "2026-11-15T00:00:00Z");
+  const date = new Date("2026-11-15T00:00:00Z");
+  const page = (cache: EntryCache, staleAfterDays: number): string => {
+    const model = structuredClone(catalog.lab!.models.m!) as JsonObject;
+    (model[NS] as unknown as ModelExtension).cache = cache;
+    return entryHtml({ summary: { ...index.entries[0]!, cache_lifetime: cache.lifetime, evaluation_count: cache.evaluations.length }, provider: index.providers[0]!, model, today: { date, stale_after_days: staleAfterDays }, imported: "2026-11-15" });
+  };
+
+  it("marks a providers.dev date by the threshold it is given, and says that number in the hover text", () => {
+    // The evaluation of the flash case is from 2026-11-04: 11 days before 2026-11-15.
+    const fresh = page(CASES.flash, 90);
+    expect(fresh).not.toContain("· stale");
+    const stale = page(CASES.flash, 10);
+    expect(stale).toContain("2026-11-04 · stale");
+    expect(stale).toContain("More than 10 days ago.");
+    expect(stale).toContain('title="Evaluated more than 10 days ago."');
+    expect(stale).not.toMatch(/90 days/);
+    // Exactly the threshold is not more than it.
+    expect(page(CASES.flash, 11)).not.toContain("· stale");
+    // A models.dev date is never stale.
+    expect(page(CASES.opus, 1)).toContain('<span class="muted date" title="Imported from models.dev on this date.">2026-11-15</span>');
+  });
+
+  it("marks the newest evidence of a row by the threshold it is given", () => {
+    const row = (staleAfterDays: number): string => rowHtml(summaryOf({ origin: "modified", verified: "2026-11-04" }), { today: { date, stale_after_days: staleAfterDays } });
+    expect(row(90)).not.toContain("· stale");
+    expect(row(7)).toContain("2026-11-04 · stale");
+    expect(row(7)).toContain("more than 7 days ago.");
+  });
+});
+
 describe("the deleted cache fields", () => {
   // `cache_ttl_s`, `cache_ttl_by_mode_s`, `cache_results`, `providers_dev.cache.results` and `documented.modes.<mode>.ttl`
   // were folded into the lifetime record and deleted. The documented texts stay in `capabilities.cache`, as imported.
@@ -368,6 +405,6 @@ describe("the deleted cache fields", () => {
   it("are read from the lifetime record, and from capabilities.cache as imported", () => {
     expect(cache.lifetime.lifetimes.map((item) => [item.retention_profile, item.mode, item.documented_as, item.lifetime_s])).toEqual([["short", "explicit", "5m", 300], ["long", "explicit", "1h", 3600]]);
     expect(model.capabilities).toEqual({ cache: { explicit: { ttl: ["5m", "1h"] } } });
-    expect(rowHtml(index.entries[0]!, { now: new Date("2026-11-15T00:00:00Z") })).toContain("1 h");
+    expect(rowHtml(index.entries[0]!, { today: { date: new Date("2026-11-15T00:00:00Z"), stale_after_days: 90 } })).toContain("1 h");
   });
 });

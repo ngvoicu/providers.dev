@@ -1,9 +1,6 @@
 // How values are written on the site. Shared by server-rendered pages and browser table updates.
 import type { Summary } from "./entries.ts";
 
-/** Our evidence older than this is marked as stale. */
-export const STALE_AFTER_DAYS = 90;
-
 export function escapeHtml(value: unknown): string {
   return String(value).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char] as string);
 }
@@ -49,9 +46,19 @@ export function importDate(index: { upstream_fetched_at?: string }): string | un
   return index.upstream_fetched_at?.slice(0, 10);
 }
 
-export function isStale(date: string | null | undefined, now: Date): boolean {
+/**
+ * What a page needs to mark providers.dev evidence as stale: today's date (UTC), and the threshold the API publishes,
+ * `stale_after_days` of /api/v1/meta. A page has no threshold of its own.
+ */
+export interface Today {
+  date: Date;
+  stale_after_days: number;
+}
+
+/** A published date more than the published number of days before today. The only thing a page works out. */
+export function isStale(date: string | null | undefined, today: Today): boolean {
   if (!date) return false;
-  return now.getTime() - new Date(`${date}T00:00:00Z`).getTime() > STALE_AFTER_DAYS * 86400 * 1000;
+  return today.date.getTime() - new Date(`${date}T00:00:00Z`).getTime() > today.stale_after_days * 86400 * 1000;
 }
 
 export function plural(count: number, word: string): string {

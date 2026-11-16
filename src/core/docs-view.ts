@@ -1,6 +1,21 @@
 // Presentation only: all descriptions, fields and examples come from the served OpenAPI JSON.
-import { escapeHtml as e } from "./format.ts";
+import { escapeHtml as e, exact } from "./format.ts";
 import type { Documentation } from "./resources.ts";
+import type { Meta } from "./schema.ts";
+
+/** The fields of /api/v1/meta that authored text can name in a slot. */
+const META_SLOTS = { stale_after_days: (meta: Meta) => exact(meta.stale_after_days) } as const;
+
+/**
+ * Authored text is compiled with the templates and holds no published value: where it states one, it names the field
+ * of /api/v1/meta in a slot, `<span data-meta="stale_after_days"><code>stale_after_days</code></span>`. A page prints
+ * the field there, from the meta it read for this response.
+ */
+export function fillMetaSlots(document: Documentation, meta: Meta): Documentation {
+  const body_html = document.body_html.replace(/<span data-meta="([a-z_]+)">(?:<code>[a-z_]+<\/code>)?<\/span>/g, (slot, name: string) =>
+    name in META_SLOTS ? `<span data-meta="${name}">${META_SLOTS[name as keyof typeof META_SLOTS](meta)}</span>` : slot);
+  return { ...document, body_html };
+}
 
 type Schema = Record<string, unknown>;
 export interface OpenApiDocument {

@@ -2,9 +2,9 @@
 import { etagMatches, refFromPath, representationTag } from "./api.ts";
 import { catalogHtml, modelsHtml, providersHtml, type Envelope, type One } from "./catalog-view.ts";
 import { evidenceHtml, modelHtml, providerHtml } from "./detail-view.ts";
-import { documentHtml, openapiHtml, type OpenApiDocument } from "./docs-view.ts";
+import { documentHtml, fillMetaSlots, openapiHtml, type OpenApiDocument } from "./docs-view.ts";
 import type { ProviderSummary, Summary } from "./entries.ts";
-import { entryHref, escapeHtml as e } from "./format.ts";
+import { entryHref, escapeHtml as e, type Today } from "./format.ts";
 import type { JsonObject } from "./merge.ts";
 import { fillShell, PAGE_SHELL } from "./page-shell.ts";
 import { parseQuery, serializeQuery, SITE_DEFAULT } from "./query.ts";
@@ -57,29 +57,31 @@ export async function handlePage(request: Request, deps: PageDeps): Promise<Resp
   try {
     meta = await one<Meta>("/api/v1/meta");
     const imported = meta.upstream.fetched_at.slice(0, 10);
+    // Staleness is the published threshold applied to today: the one thing a page works out.
+    const today: Today = { date: now, stale_after_days: meta.stale_after_days };
     if (path === "/") {
       const params = new URLSearchParams(url.search);
       if (!params.has("sort")) for (const [name, value] of new URLSearchParams(SITE_DEFAULT)) if (!params.has(name)) params.set(name, value);
       const parsed = parseQuery(params, true);
       if (!parsed.ok) throw new ApiError(400);
       const [result, facets] = await Promise.all([read<Envelope<Summary>>(`/api/v1/entries?${serializeQuery(parsed.query)}`), one<Facets>("/api/v1/facets")]);
-      view = { title: "AI model catalog", description: "Context, output, pricing and prompt caching by model, provider and access method.", html: catalogHtml(result, parsed.query, facets, meta, url, now) };
+      view = { title: "AI model catalog", description: "Context, output, pricing and prompt caching by model, provider and access method.", html: catalogHtml(result, parsed.query, facets, meta, url, today) };
     } else if (path === "/providers") {
       view = { title: "Providers", description: "Providers and access methods in the catalog.", html: providersHtml(await read<Envelope<ProviderSummary>>(`/api/v1/providers${url.search}`), url) };
     } else if (path.startsWith("/providers/")) {
       const { provider, entries } = await one<{ provider: ProviderSummary; entries: Summary[] }>(`/api/v1${path}`);
-      view = { title: provider.name, description: `${provider.name}: ${provider.entry_count} model entries.`, html: providerHtml(provider, entries, imported, now) };
+      view = { title: provider.name, description: `${provider.name}: ${provider.entry_count} model entries.`, html: providerHtml(provider, entries, imported, today) };
     } else if (path === "/models") {
       view = { title: "Models", description: "Canonical models and the providers that serve them.", html: modelsHtml(await read<Envelope<CanonicalModel>>(`/api/v1/models${url.search}`), url) };
     } else if (path.startsWith("/models/")) {
       if (!refFromPath(path.slice("/models/".length))) throw new ApiError(404);
       const [model, facets] = await Promise.all([one<CanonicalModelDetail>(`/api/v1${path}`), one<Facets>("/api/v1/facets")]);
-      view = { title: model.name, description: `${model.name}: ${model.entry_count} entries across providers and access methods.`, html: modelHtml(model, Object.fromEntries(facets.providers.map((provider) => [provider.id, provider.name])), imported, now) };
+      view = { title: model.name, description: `${model.name}: ${model.entry_count} entries across providers and access methods.`, html: modelHtml(model, Object.fromEntries(facets.providers.map((provider) => [provider.id, provider.name])), imported, today) };
     } else if (path.startsWith("/entries/")) {
       if (!refFromPath(path.slice("/entries/".length))) throw new ApiError(404);
       const { provider, summary, entry } = await one<{ provider: ProviderSummary; summary: Summary; entry: JsonObject }>(`/api/v1${path}`);
       const facts = [summary.context === null ? "" : `context window ${summary.context.toLocaleString("en-US")} tokens`, summary.max_output === null ? "" : `maximum output ${summary.max_output.toLocaleString("en-US")} tokens`].filter(Boolean);
-      view = { title: `${summary.name} at ${provider.name}`, description: `${summary.name} at ${provider.name} (${summary.ref})${facts.length ? `: ${facts.join(", ")}` : ""}. Limits, prices and prompt caching, with sources.`, canonical: entryHref(summary.ref), html: entryHtml({ summary, provider, model: entry, imported, now }) };
+      view = { title: `${summary.name} at ${provider.name}`, description: `${summary.name} at ${provider.name} (${summary.ref})${facts.length ? `: ${facts.join(", ")}` : ""}. Limits, prices and prompt caching, with sources.`, canonical: entryHref(summary.ref), html: entryHtml({ summary, provider, model: entry, imported, today }) };
     } else if (path === "/evidence") {
       const [corrections, added, cache, measured] = await Promise.all([
         read<Envelope<Correction>>(`/api/v1/corrections?offset=${encodeURIComponent(url.searchParams.get("corrections_offset") ?? "0")}`),
@@ -87,12 +89,12 @@ export async function handlePage(request: Request, deps: PageDeps): Promise<Resp
         read<Envelope<CacheEvaluationRecord>>(`/api/v1/evaluations/cache?offset=${encodeURIComponent(url.searchParams.get("cache_offset") ?? "0")}`),
         read<Envelope<LimitEvaluationRecord>>(`/api/v1/evaluations/limits?offset=${encodeURIComponent(url.searchParams.get("limits_offset") ?? "0")}`),
       ]);
-      view = { title: "Evidence", description: "Corrections and evaluations with sources and dates.", html: evidenceHtml(meta, corrections, added, cache, measured, url, now) };
+      view = { title: "Evidence", description: "Corrections and evaluations with sources and dates.", html: evidenceHtml(meta, corrections, added, cache, measured, url, today) };
     } else if (path === "/docs/api") {
       view = { title: "API", description: "The providers.dev API: endpoints, parameters, response schemas and examples.", html: openapiHtml(await read<OpenApiDocument>("/api/v1/openapi.json")) };
     } else if (path === "/docs/methodology" || path === "/docs/licensing") {
       const document = await one<Documentation>(`/api/v1${path}`);
-      view = { title: document.title, description: document.description, html: documentHtml(document) };
+      view = { title: document.title, description: document.description, html: documentHtml(fillMetaSlots(document, meta)) };
     } else throw new ApiError(404);
   } catch (error) {
     status = error instanceof ApiError && (error.status === 400 || error.status === 404) ? error.status : 503;

@@ -314,7 +314,7 @@ describe("lookups", () => {
     const catalog = await json<{ meta: { dataset_version: string }; data: Catalog }>("/api/v1/catalog");
     expect(Object.keys(catalog)).toEqual(["meta", "data"]);
     expect(Object.keys(catalog.data)).toHaveLength(31);
-    const answer = await json<{ meta: { dataset_version: string }; data: { dataset_version: string; counts: { entries: number; models: number }; cache_ages_s: number[]; upstream: { commit: string } } }>("/api/v1/meta");
+    const answer = await json<{ meta: { dataset_version: string }; data: { dataset_version: string; counts: { entries: number; models: number }; cache_ages_s: number[]; stale_after_days: number; upstream: { commit: string } } }>("/api/v1/meta");
     expect(Object.keys(answer)).toEqual(["meta", "data"]);
     expect(answer.meta).toEqual(catalog.meta);
     const meta = answer.data;
@@ -322,6 +322,8 @@ describe("lookups", () => {
     expect(meta.counts.entries).toBe(601);
     expect(meta.counts.models).toBe(20);
     expect(meta.cache_ages_s.slice(0, 4)).toEqual([150, 300, 450, 600]);
+    // The age after which providers.dev evidence is shown as stale: published once, read by every page.
+    expect(meta.stale_after_days).toBe(90);
     expect(meta.upstream.commit).toBe("abc123");
   });
 });

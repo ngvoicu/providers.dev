@@ -1,5 +1,5 @@
 import type { ProviderSummary, Summary } from "./entries.ts";
-import { escapeHtml as e, exact, modelHref, plural } from "./format.ts";
+import { escapeHtml as e, exact, modelHref, plural, type Today } from "./format.ts";
 import type { Query } from "./query.ts";
 import { serializeQuery } from "./query.ts";
 import { rowHtml, tableHead } from "./render.ts";
@@ -28,7 +28,7 @@ export function apiLink(path: string): string {
   return `<a href="${e(path)}"><code>GET ${e(path)}</code></a>`;
 }
 
-export function catalogHtml(result: Envelope<Summary>, query: Query, facets: Facets, meta: Meta, url: URL, now: Date): string {
+export function catalogHtml(result: Envelope<Summary>, query: Query, facets: Facets, meta: Meta, url: URL, today: Today): string {
   const value = (name: keyof Query): string => e(Array.isArray(query[name]) ? (query[name] as string[]).join(",") : String(query[name] ?? ""));
   const select = (name: keyof Query, label: string, options: [string, string][]): string => `<label class="field">${label}<select name="${name}"><option value="">Any</option>${options.map(([id, text]) => `<option value="${e(id)}"${value(name) === e(id) ? " selected" : ""}>${e(text)}</option>`).join("")}</select></label>`;
   const api = `/api/v1/entries?${serializeQuery(query)}`;
@@ -57,8 +57,8 @@ export function catalogHtml(result: Envelope<Summary>, query: Query, facets: Fac
       <datalist id="provider-ids">${facets.providers.map((provider) => `<option value="${e(provider.id)}">${e(provider.name)}</option>`).join("")}</datalist>
     </form>
     <div class="mt-6 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-[0.85rem]"><p id="count" class="font-medium" aria-live="polite">${exact(result.total)} entries</p><p class="muted flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 sm:flex-nowrap"><span>This view as JSON</span><a id="api-link" class="min-w-0 sm:truncate" href="${e(api)}"><code>${e(api)}</code></a><button type="button" id="api-copy" class="copy" data-copy="${e(api)}">Copy</button></p></div>
-    <div class="scroll mt-3"><table class="entries stack-tablet" id="entries" data-now="${now.toISOString().slice(0, 10)}" data-version="${e(meta.dataset_version)}" data-publication="${e(meta.generated_at)}"${result.total === 0 ? " hidden" : ""}>
-      <caption class="sr-only">Provider-model entries</caption><thead id="head">${tableHead({ sortable: true, sort: query.sort, order: query.order })}</thead><tbody id="rows">${result.data.map((entry) => rowHtml(entry, { now, providerNames, imported: result.meta.upstream_fetched_at.slice(0, 10) })).join("")}</tbody></table>
+    <div class="scroll mt-3"><table class="entries stack-tablet" id="entries" data-now="${today.date.toISOString().slice(0, 10)}" data-stale-after-days="${today.stale_after_days}" data-version="${e(meta.dataset_version)}" data-publication="${e(meta.generated_at)}"${result.total === 0 ? " hidden" : ""}>
+      <caption class="sr-only">Provider-model entries</caption><thead id="head">${tableHead({ sortable: true, sort: query.sort, order: query.order })}</thead><tbody id="rows">${result.data.map((entry) => rowHtml(entry, { today, providerNames, imported: result.meta.upstream_fetched_at.slice(0, 10) })).join("")}</tbody></table>
       <div id="empty" class="empty"${result.total > 0 ? " hidden" : ""}><p class="font-medium text-fg">No entries match these filters</p><button type="button" class="button mt-4" id="empty-reset">Clear filters</button></div>
       <div id="failed" class="empty" role="alert" hidden><p class="font-medium text-fg">The API request failed</p><p>Try again to load this view.</p><button type="button" class="button mt-4" id="retry">Try again</button></div></div>
     ${pageLinks(result, url)}

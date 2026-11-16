@@ -29,6 +29,7 @@ import {
   plural,
   shortAge,
   usd,
+  type Today,
 } from "./format.ts";
 import { isObject, type Json, type JsonObject } from "./merge.ts";
 import { NS, type MeasuredLimit, type ModelExtension, type Provenance, type PublishedEvidence } from "./schema.ts";
@@ -50,15 +51,15 @@ function copyButton(value: string, label: string): string {
   return `<button type="button" class="copy" data-copy="${e(value)}" aria-label="Copy ${e(label)}" title="Copy ${e(label)}">Copy</button>`;
 }
 
-function dateTag(date: string | null, now: Date): string {
+function dateTag(date: string | null, today: Today): string {
   if (!date) return "";
-  return isStale(date, now)
-    ? `<span class="stale" title="The newest providers.dev evidence for this entry is from ${e(date)}, more than 90 days ago.">${e(date)} · stale</span>`
+  return isStale(date, today)
+    ? `<span class="stale" title="The newest providers.dev evidence for this entry is from ${e(date)}, more than ${plural(today.stale_after_days, "day")} ago.">${e(date)} · stale</span>`
     : `<span class="muted date" title="Date of the newest providers.dev evidence.">${e(date)}</span>`;
 }
 
 /** One line per source with its own date: the models.dev import, and the newest providers.dev evidence. */
-function sourcesHtml(entry: Pick<Summary, "origin" | "verified" | "overridden_fields">, options: { now: Date; imported?: string }, inline = false): string {
+function sourcesHtml(entry: Pick<Summary, "origin" | "verified" | "overridden_fields">, options: { today: Today; imported?: string }, inline = false): string {
   const parts: string[] = [];
   if (entry.origin !== "added") {
     const date = options.imported ? `<span class="muted date" title="Imported from models.dev on this date.">${e(options.imported)}</span>` : "<span></span>";
@@ -66,7 +67,7 @@ function sourcesHtml(entry: Pick<Summary, "origin" | "verified" | "overridden_fi
   }
   if (entry.origin !== "upstream") {
     const corrected = entry.overridden_fields.length > 0 ? ` Corrected fields: ${entry.overridden_fields.join(", ")}.` : "";
-    parts.push(`<span class="origin added" title="${e(ORIGIN_TITLE[entry.origin] + corrected)}">${ORIGIN_LABEL.added}</span>${dateTag(entry.verified, options.now) || "<span></span>"}`);
+    parts.push(`<span class="origin added" title="${e(ORIGIN_TITLE[entry.origin] + corrected)}">${ORIGIN_LABEL.added}</span>${dateTag(entry.verified, options.today) || "<span></span>"}`);
   }
   return `<span class="sources${inline ? " side" : ""}">${parts.join("")}</span>`;
 }
@@ -125,14 +126,14 @@ function basisTag(basis: "documented" | "measured"): string {
   return `<span class="basis ${basis}" title="${BASIS_TITLE[basis]}">${basis}</span>`;
 }
 
-/** Who a lifetime is from, and its date. A providers.dev date is marked stale after 90 days, like all our evidence. */
-function lifetimeSource(source: LifetimeSource, date: string | null, basis: "documented" | "measured", now: Date): string {
+/** Who a lifetime is from, and its date. A providers.dev date is marked stale like all our evidence, after the published `stale_after_days`. */
+function lifetimeSource(source: LifetimeSource, date: string | null, basis: "documented" | "measured", today: Today): string {
   const name =
     source === "models.dev"
       ? `<span class="origin upstream" title="${e(ORIGIN_TITLE.upstream)}">models.dev</span>`
       : `<span class="origin added" title="${basis === "measured" ? "Measured by providers.dev." : "Documented, with a providers.dev correction or on an entry providers.dev added."}">providers.dev</span>`;
   const title = basis === "measured" ? "The date of the newest evaluation." : source === "models.dev" ? "Imported from models.dev on this date." : "The date of the newest providers.dev evidence.";
-  const when = date === null ? '<span class="muted date">Date unknown</span>' : source === "providers.dev" && isStale(date, now) ? `<span class="stale" title="${title} More than 90 days ago.">${e(date)} · stale</span>` : `<span class="muted date" title="${title}">${e(date)}</span>`;
+  const when = date === null ? '<span class="muted date">Date unknown</span>' : source === "providers.dev" && isStale(date, today) ? `<span class="stale" title="${title} More than ${plural(today.stale_after_days, "day")} ago.">${e(date)} · stale</span>` : `<span class="muted date" title="${title}">${e(date)}</span>`;
   return `<span class="life-source">${name}${when}</span>`;
 }
 
@@ -215,7 +216,7 @@ export function evaluationStrip(evaluation: RetentionSetting & { results: readon
 }
 
 export interface RowOptions {
-  now: Date;
+  today: Today;
   /** The date of the models.dev import, shown next to the models.dev source. */
   imported?: string;
   /** Leave the provider column out (on a provider's own page). */
@@ -447,11 +448,11 @@ function otherAges(results: readonly CacheResult[]): string {
 }
 
 /** The safe lifetime of a profile, then the two lifetimes it was chosen from and how many checks hit inside the documented one. */
-function profileRow(profile: RetentionProfile, p: SafeLifetime, now: Date): string {
+function profileRow(profile: RetentionProfile, p: SafeLifetime, today: Today): string {
   const safe =
     p.safe_s === null || p.basis === "none" || p.source === null
       ? UNKNOWN
-      : `<span class="life-value">${lifetimeText(p.safe_s, p.basis)}</span>${basisTag(p.basis)}${lifetimeSource(p.source, p.date, p.basis, now)}`;
+      : `<span class="life-value">${lifetimeText(p.safe_s, p.basis)}</span>${basisTag(p.basis)}${lifetimeSource(p.source, p.date, p.basis, today)}`;
   // The case, as the API publishes it in `documented_status`, and from nothing else.
   const verdict =
     p.documented_status === "contradicted"
@@ -469,8 +470,8 @@ ${fact("Inside the documented lifetime", p.checks_inside === null || p.hits_insi
 }
 
 /** The value of an item, its basis, its source and its date: the first cell of every lifetime. */
-function lifetimeHead(item: CacheLifetimeItem, now: Date): string {
-  return `<td class="life" data-label="Lifetime"><span class="life-value">${lifetimeText(item.lifetime_s, item.basis)}</span>${basisTag(item.basis)}${lifetimeSource(item.source, item.date, item.basis, now)}</td>`;
+function lifetimeHead(item: CacheLifetimeItem, today: Today): string {
+  return `<td class="life" data-label="Lifetime"><span class="life-value">${lifetimeText(item.lifetime_s, item.basis)}</span>${basisTag(item.basis)}${lifetimeSource(item.source, item.date, item.basis, today)}</td>`;
 }
 
 /** The note of an evaluation, where it has one, named by the evaluation where the note could be read as another's. */
@@ -480,10 +481,10 @@ const runNote = (run: CacheEvaluation, named: boolean): string => (run.note ? `<
  * One evaluation under its measured lifetime: the run, its settings, the raw result, and its own results by age. Its note
  * is on the lifetime's row, in sight before the evaluations are opened; an evaluation in no lifetime carries its own.
  */
-function runRow(run: CacheEvaluation, now: Date, withNote = false): string {
+function runRow(run: CacheEvaluation, today: Today, withNote = false): string {
   const settings = settingsText(run.request_settings);
   const other = otherAges(run.results);
-  const date = isStale(run.date, now) ? `<span class="stale" title="Evaluated more than 90 days ago.">${e(run.date)} · stale</span>` : `<span class="muted date" title="The date of this evaluation.">${e(run.date)}</span>`;
+  const date = isStale(run.date, today) ? `<span class="stale" title="Evaluated more than ${plural(today.stale_after_days, "day")} ago.">${e(run.date)} · stale</span>` : `<span class="muted date" title="The date of this evaluation.">${e(run.date)}</span>`;
   return `<tr class="run"><td class="run-head" colspan="2">${withNote ? runNote(run, false) : ""}<code>${e(run.id)}</code> ${date}<div class="hint">${e(run.route_label)}${settings ? ` · <code>${e(settings)}</code>` : ""}${other ? ` · ${e(other)}` : ""}</div><a href="${e(run.source)}" rel="noopener">Raw result</a></td>${COLUMNS.map((column) => heatCell(inColumn(run.results, column), column)).join("")}</tr>`;
 }
 
@@ -492,13 +493,13 @@ function runRow(run: CacheEvaluation, now: Date, withNote = false): string {
  * documented for and the text as documented; a measured one names its client and setting, its checks and results by
  * age, the notes of its evaluations, and opens onto each evaluation.
  */
-function itemRows(item: CacheLifetimeItem, evaluations: readonly CacheEvaluation[], now: Date): string {
+function itemRows(item: CacheLifetimeItem, evaluations: readonly CacheEvaluation[], today: Today): string {
   if (item.basis === "documented") {
     const what =
       item.mode === null
         ? "Documented as not caching"
         : `<span title="${e(CACHE_MODE_TITLE[item.mode])}">${CACHE_MODE_WORD[item.mode]}</span> <span class="chip">${item.mode}</span><div class="hint">As documented: <code>${e(item.documented_as ?? "")}</code></div>`;
-    return `<tbody class="item documented"><tr>${lifetimeHead(item, now)}<td class="through" data-label="Documented for">${what}</td><td class="heat-none" colspan="${AGE_COLUMNS}" data-label="Results by age"><span class="muted" title="A documented lifetime has no results by age.">Not applicable</span></td></tr></tbody>`;
+    return `<tbody class="item documented"><tr>${lifetimeHead(item, today)}<td class="through" data-label="Documented for">${what}</td><td class="heat-none" colspan="${AGE_COLUMNS}" data-label="Results by age"><span class="muted" title="A documented lifetime has no results by age.">Not applicable</span></td></tr></tbody>`;
   }
   const runs = item.evaluation_ids.flatMap((id) => evaluations.filter((run) => run.id === id));
   const setting = item.parameter && item.value ? `Sent <code>${e(item.parameter)}=${e(item.value)}</code>` : "No lifetime asked for";
@@ -508,21 +509,21 @@ function itemRows(item: CacheLifetimeItem, evaluations: readonly CacheEvaluation
   const notes = runs.map((run) => runNote(run, runs.length > 1)).join("");
   const what = `<strong class="client">${e(item.client_label ?? item.client ?? "")}</strong><div class="hint">${setting} · ${checks}</div><div class="hint">${ages}${other ? ` · ${e(other)}` : ""}</div>${notes}<details class="runs"><summary>${plural(item.evaluations, "evaluation")}</summary></details>`;
   const results = item.results ?? [];
-  return `<tbody class="item measured"><tr>${lifetimeHead(item, now)}<td class="through" data-label="Measured through">${what}</td>${COLUMNS.map((column) => heatCell(inColumn(results, column), column)).join("")}</tr>${runs.map((run) => runRow(run, now)).join("")}</tbody>`;
+  return `<tbody class="item measured"><tr>${lifetimeHead(item, today)}<td class="through" data-label="Measured through">${what}</td>${COLUMNS.map((column) => heatCell(inColumn(results, column), column)).join("")}</tr>${runs.map((run) => runRow(run, today)).join("")}</tbody>`;
 }
 
 /**
  * Every lifetime of an entry, one table for all: per retention profile the safe value and what it was chosen from, then
  * each documented and each measured lifetime as the API lists them, in its order. Both profiles on every entry.
  */
-function lifetimesTable(cache: EntryCache, now: Date): string {
+function lifetimesTable(cache: EntryCache, today: Today): string {
   const record = cache.lifetime;
-  const body = RETENTION_PROFILES.map((profile) => profileRow(profile, record[profile], now) + record.lifetimes.filter((item) => item.retention_profile === profile).map((item) => itemRows(item, cache.evaluations, now)).join("")).join("");
+  const body = RETENTION_PROFILES.map((profile) => profileRow(profile, record[profile], today) + record.lifetimes.filter((item) => item.retention_profile === profile).map((item) => itemRows(item, cache.evaluations, today)).join("")).join("");
   // An evaluation that is in no lifetime (no timed result, and a control that hit) is still on the page.
   const named = new Set(record.lifetimes.flatMap((item) => item.evaluation_ids));
   const others = cache.evaluations.filter((run) => !named.has(run.id));
   const rest = others.length
-    ? `<tbody class="profile"><tr><th scope="row">Other evaluations</th><td class="profile-facts" colspan="${1 + AGE_COLUMNS}"><span class="muted">In no lifetime</span></td></tr></tbody><tbody class="item others">${others.map((run) => runRow(run, now, true)).join("")}</tbody>`
+    ? `<tbody class="profile"><tr><th scope="row">Other evaluations</th><td class="profile-facts" colspan="${1 + AGE_COLUMNS}"><span class="muted">In no lifetime</span></td></tr></tbody><tbody class="item others">${others.map((run) => runRow(run, today, true)).join("")}</tbody>`
     : "";
   return `<div class="scroll"><table class="facts heat lifetimes stack-tablet"><caption class="sr-only">Every cache lifetime of this entry, by retention</caption><thead><tr><th scope="col" rowspan="2">Lifetime</th><th scope="col" rowspan="2">Documented for, or measured through</th><th scope="colgroup" colspan="${AGE_COLUMNS}" class="span">Time since the prompt was cached · served from the cache, in percent, with hits/checks</th></tr><tr>${HEAT_HEAD}</tr></thead>${body}${rest}</table></div>
 <p class="legend"><span><span class="heat-key all">100</span> All served from the cache</span><span><span class="heat-key most">67</span> Half or more</span><span><span class="heat-key few">33</span> Fewer</span><span><span class="heat-key none">0</span> None</span><span><span class="heat-key skip">·</span> Not checked at that age</span><span><a href="/docs/methodology/#evaluations">Methodology</a></span></p>`;
@@ -602,13 +603,13 @@ export interface EntryView {
   summary: Summary;
   provider: ProviderSummary;
   model: JsonObject;
-  now: Date;
+  today: Today;
   /** The date of the models.dev import. */
   imported?: string;
 }
 
 export function entryHtml(view: EntryView): string {
-  const { summary, provider, model, now } = view;
+  const { summary, provider, model, today } = view;
   const extension = model[NS] as unknown as ModelExtension;
   const provenance = extension.provenance;
   const limit = isObject(model.limit) ? model.limit : {};
@@ -683,7 +684,7 @@ export function entryHtml(view: EntryView): string {
 <section aria-labelledby="cache">
   <h2 id="cache">Prompt caching</h2>
   <h3>Lifetimes</h3>
-  ${lifetimesTable(cache, now)}
+  ${lifetimesTable(cache, today)}
   <h3>Cache modes</h3>
   ${cacheDocumented(cache.documented, sourceOf("capabilities.cache", provenance, extension.origin))}
   <h3>Retention</h3>

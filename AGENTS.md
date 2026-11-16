@@ -73,7 +73,9 @@ The baseline is imported from models.dev; our additions, corrections and measure
   The safe value is a published number made by a published rule, not a verdict a page writes.
 - The safe value, like every figure the site shows, is worked out once, when the data is built, and published in the
   API. A page never works anything out: it prints fields of the API, formatted. The site never shows anything that is
-  not from the API.
+  not from the API. One exception, the only thing a page works out: it marks providers.dev evidence stale by comparing
+  a published date with today's date using the published threshold, `stale_after_days` of `/api/v1/meta` (set once in
+  `scripts/lib/publish.ts`); a page has no threshold of its own in its code.
 - Cache mode support comes from `providers_dev.cache.documented`; retention parameter support requires a sourced
   declaration. A requested setting or cache hit alone does not confirm parameter support.
 - A retention declaration is a `request_controls` item with id `cache.retention` in

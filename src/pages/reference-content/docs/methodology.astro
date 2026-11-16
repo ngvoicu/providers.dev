@@ -1,6 +1,5 @@
 ---
 import Doc from "../../../layouts/Doc.astro";
-import { STALE_AFTER_DAYS } from "../../../core/format.ts";
 import { IDENTITY_FIELDS } from "../../../core/resolve.ts";
 ---
 
@@ -255,8 +254,12 @@ import { IDENTITY_FIELDS } from "../../../core/resolve.ts";
 
     <h2 id="stale">Dates and staleness</h2>
     <p>
-      Every correction and evaluation has a date. Providers change cache behaviour without notice, so evidence older than {STALE_AFTER_DAYS} days is marked <span class="stale">stale</span>. It
-      stays published, with its date.
+      Every correction and evaluation has a date. Providers change cache behaviour without notice, so providers.dev evidence (a correction, an evaluation, a measured lifetime)
+      whose date is more than <span data-meta="stale_after_days"><code>stale_after_days</code></span> days before today is marked <span class="stale">stale</span>. It stays published, with its date.
+    </p>
+    <p>
+      The number is <code>stale_after_days</code> of <a href="/api/v1/meta"><code>/api/v1/meta</code></a>, set once when the data is built. The API publishes the dates and this
+      number; a page compares a published date with today's date using it, and that is the only thing a page works out. A reader of the API applies it to its own date.
     </p>
     <p>Licences and attribution are on the <a href="/docs/licensing/">licensing</a> page.</p>
   </div>

@@ -121,6 +121,29 @@ describe("API response boundary", () => {
     expect(html).toContain("new-value");
   });
 
+  it("takes the stale threshold from the published meta, on the pages and in the methodology", async () => {
+    // A publication whose threshold is 7 days: the pages say 7, and nowhere 90.
+    const sevenDays = async (path: string): Promise<Response> => {
+      if (path === "/api/v1/meta") {
+        const answer = await (await api(path)).json() as { meta: unknown; data: { stale_after_days: number } };
+        return Response.json({ ...answer, data: { ...answer.data, stale_after_days: 7 } });
+      }
+      if (path === "/api/v1/docs/methodology") {
+        const answer = await (await api(path)).json() as { meta: unknown; data: { body_html: string } };
+        return Response.json({ ...answer, data: { ...answer.data, body_html: '<p>Older than <span data-meta="stale_after_days"><code>stale_after_days</code></span> days is stale.</p>' } });
+      }
+      return api(path);
+    };
+    const evidence = await (await page("/evidence/", sevenDays)).text();
+    expect(evidence).toContain("Evidence older than 7 days is marked stale.");
+    const methodology = await (await page("/docs/methodology/", sevenDays)).text();
+    expect(methodology).toContain('Older than <span data-meta="stale_after_days">7</span> days is stale.');
+    // The catalog hands the threshold to the list rendered in the browser.
+    const catalog = await (await page("/", sevenDays)).text();
+    expect(catalog).toContain('data-stale-after-days="7"');
+    expect(`${evidence}${methodology}${catalog}`).not.toMatch(/90 days/);
+  });
+
   it("fails visibly on API errors and does not substitute stale or private data", async () => {
     const response = await page("/providers/", async (path) => path === "/api/v1/meta" ? api(path) : new Response(null, { status: 503 }));
     expect(response.status).toBe(503);
