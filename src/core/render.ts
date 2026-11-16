@@ -1,7 +1,6 @@
 // HTML for the entry table and the entry detail view. The same functions render server responses and
 // re-render in the browser, so a row looks and reads the same wherever it appears.
 import {
-  CACHE_AGES_S,
   RETENTION_PROFILES,
   settingsText,
   type CacheDocumentation,
@@ -178,16 +177,28 @@ const CONTROL_TITLE = "At once: the prompt sent again immediately. It shows that
 const level = (result: CacheResult): string => (result.hit_rate_pct === 100 ? "all" : result.hit_rate_pct === 0 ? "none" : result.hit_rate_pct >= 50 ? "most" : "few");
 const said = (result: CacheResult): string => `${result.kind === "control" ? "At once" : `After ${ageText(result.age_s)}`}: ${result.hits} of ${result.checks} re-sends served from the cache (${result.hit_rate_pct}%)`;
 
-/** The columns of every summary table: the control, then the ladder of ages. */
-const COLUMNS: { kind: CacheResult["kind"]; age_s: number }[] = [{ kind: "control", age_s: 0 }, ...CACHE_AGES_S.map((age) => ({ kind: "timed" as const, age_s: age }))];
-const inColumn = (results: readonly CacheResult[], column: (typeof COLUMNS)[number]): CacheResult | undefined =>
+/**
+ * The ages, in seconds, that every table of results by age has a column for, after the control: `cache_ages_s` of
+ * /api/v1/meta, as the page read it for this request. A page has no ages of its own.
+ */
+export type CacheAges = readonly number[];
+
+/** One column of a table of results by age. */
+interface Column {
+  kind: CacheResult["kind"];
+  age_s: number;
+}
+
+/** The columns of every table of results by age: the control, then the published ages. */
+const columnsOf = (ages: CacheAges): Column[] => [{ kind: "control", age_s: 0 }, ...ages.map((age) => ({ kind: "timed" as const, age_s: age }))];
+const inColumn = (results: readonly CacheResult[], column: Column): CacheResult | undefined =>
   results.find((result) => result.kind === column.kind && result.age_s === column.age_s);
-const stripHead = (where: "column" | "row"): string =>
-  `<span class="heat-strip strip-head${where === "row" ? " in-row" : ""}" aria-hidden="true"><span></span><span class="strip">${COLUMNS.map((column) => `<span${column.kind === "control" ? ' class="control"' : ""}>${column.kind === "control" ? "once" : columnLabel(column.age_s)}</span>`).join("")}</span></span>`;
-/** The ages of the strip, written once in the column head so that every row lines up under them. */
-export const STRIP_HEAD = stripHead("column");
-/** The same ages inside a row, shown only where the table is stacked and the column head is out of sight. */
-export const STRIP_HEAD_IN_ROW = stripHead("row");
+/**
+ * The ages of the strip: in the column head (`column`), written once so that every row lines up under them, or inside a
+ * row (`row`), shown only where the table is stacked and the column head is out of sight.
+ */
+export const stripHead = (ages: CacheAges, where: "column" | "row"): string =>
+  `<span class="heat-strip strip-head${where === "row" ? " in-row" : ""}" aria-hidden="true"><span></span><span class="strip">${columnsOf(ages).map((column) => `<span${column.kind === "control" ? ' class="control"' : ""}>${column.kind === "control" ? "once" : columnLabel(column.age_s)}</span>`).join("")}</span></span>`;
 
 /** What an evaluation's requests asked for: the retention profile, and the request field and value where one was sent. */
 type RetentionSetting = Pick<CacheEvaluation, "retention_profile" | "parameter" | "value">;
@@ -204,9 +215,9 @@ function retentionSaid(setting: RetentionSetting): string {
 }
 
 /** One evaluation as a line of small cells, one per column, with the hit rate in percent (the evidence page). */
-export function evaluationStrip(evaluation: RetentionSetting & { results: readonly CacheResult[]; date: string }): string {
+export function evaluationStrip(evaluation: RetentionSetting & { results: readonly CacheResult[]; date: string }, ages: CacheAges): string {
   const label = `<span class="strip-label" title="${e(`${retentionSaid(evaluation)} Evaluated on ${evaluation.date}.`)}">${retentionWord(evaluation)}</span>`;
-  const cells = COLUMNS.map((column) => {
+  const cells = columnsOf(ages).map((column) => {
     const result = inColumn(evaluation.results, column);
     const control = column.kind === "control" ? " control" : "";
     if (!result) return `<span class="skip${control}" title="${column.kind === "control" ? "At once" : `After ${ageText(column.age_s)}`}: not checked"></span>`;
@@ -428,27 +439,28 @@ function fact(label: string, hint: string, value: string, source: string): strin
 }
 
 /** A column's heading in the table of lifetimes, also repeated by each of its cells where the table is stacked. */
-const heatLabel = (column: (typeof COLUMNS)[number]): string => (column.kind === "control" ? "At once" : shortAge(column.age_s));
+const heatLabel = (column: Column): string => (column.kind === "control" ? "At once" : shortAge(column.age_s));
 
 /** One cell of results by age: the hit rate in percent, rounded, with hits/checks under it; the exact rate is in the title. */
-function heatCell(result: CacheResult | undefined, column: (typeof COLUMNS)[number]): string {
+function heatCell(result: CacheResult | undefined, column: Column): string {
   const label = ` data-label="${heatLabel(column)}"`;
   if (!result) return `<td class="heat unchecked"${label}><span class="skip" title="${column.kind === "control" ? "At once" : `After ${ageText(column.age_s)}`}: not checked">·</span></td>`;
   return `<td class="heat"${label}><span class="${level(result)}" title="${e(said(result))}">${Math.round(result.hit_rate_pct)}<small>${result.hits}/${result.checks}</small></span></td>`;
 }
 
-const HEAT_HEAD = COLUMNS.map((column) => `<th scope="col" class="age"${column.kind === "control" ? ` title="${CONTROL_TITLE}"` : ""}>${heatLabel(column)}</th>`).join("");
-const AGE_COLUMNS = COLUMNS.length;
+const heatHead = (columns: readonly Column[]): string => columns.map((column) => `<th scope="col" class="age"${column.kind === "control" ? ` title="${CONTROL_TITLE}"` : ""}>${heatLabel(column)}</th>`).join("");
+/** The cells of one row of results by age, one per column. */
+const heatCells = (results: readonly CacheResult[], columns: readonly Column[]): string => columns.map((column) => heatCell(inColumn(results, column), column)).join("");
 
 /** Results at ages without a column, in words. Nothing an evaluation checked is left out of the page. */
-function otherAges(results: readonly CacheResult[]): string {
-  const others = results.filter((result) => !COLUMNS.some((column) => column.kind === result.kind && column.age_s === result.age_s));
+function otherAges(results: readonly CacheResult[], columns: readonly Column[]): string {
+  const others = results.filter((result) => !columns.some((column) => column.kind === result.kind && column.age_s === result.age_s));
   if (others.length === 0) return "";
   return `Also checked: ${others.map((result) => `${ageText(result.age_s)} ${Math.round(result.hit_rate_pct)}% (${result.hits}/${result.checks})`).join(", ")}`;
 }
 
 /** The safe lifetime of a profile, then the two lifetimes it was chosen from and how many checks hit inside the documented one. */
-function profileRow(profile: RetentionProfile, p: SafeLifetime, today: Today): string {
+function profileRow(profile: RetentionProfile, p: SafeLifetime, today: Today, columns: readonly Column[]): string {
   const safe =
     p.safe_s === null || p.basis === "none" || p.source === null
       ? UNKNOWN
@@ -461,7 +473,7 @@ function profileRow(profile: RetentionProfile, p: SafeLifetime, today: Today): s
         ? '<span class="case" title="No evaluation contradicts the documented lifetime: the safe value is the documented one. Not contradicted is not confirmed.">Documentation not contradicted</span>'
         : "";
   const fact = (label: string, value: string): string => `<div><dt>${label}</dt><dd>${value}</dd></div>`;
-  return `<tbody class="profile"><tr><th scope="row" title="${PROFILE_TITLE[profile]}">${PROFILE_WORD[profile]} retention</th><td class="profile-facts" colspan="${1 + AGE_COLUMNS}"><dl>
+  return `<tbody class="profile"><tr><th scope="row" title="${PROFILE_TITLE[profile]}">${PROFILE_WORD[profile]} retention</th><td class="profile-facts" colspan="${1 + columns.length}"><dl>
 ${fact("Safe lifetime", `<span class="safe">${safe}</span>${verdict}`)}
 ${fact("Documented", p.documented_s === null ? '<span class="muted">Not documented</span>' : lifetimeText(p.documented_s, "documented"))}
 ${fact("Measured", p.measured_s === null ? '<span class="muted">Not measured</span>' : `${lifetimeText(p.measured_s, "measured")} <span class="muted">· ${plural(p.clients, "client")}</span>`)}
@@ -481,11 +493,11 @@ const runNote = (run: CacheEvaluation, named: boolean): string => (run.note ? `<
  * One evaluation under its measured lifetime: the run, its settings, the raw result, and its own results by age. Its note
  * is on the lifetime's row, in sight before the evaluations are opened; an evaluation in no lifetime carries its own.
  */
-function runRow(run: CacheEvaluation, today: Today, withNote = false): string {
+function runRow(run: CacheEvaluation, today: Today, columns: readonly Column[], withNote = false): string {
   const settings = settingsText(run.request_settings);
-  const other = otherAges(run.results);
+  const other = otherAges(run.results, columns);
   const date = isStale(run.date, today) ? `<span class="stale" title="Evaluated more than ${plural(today.stale_after_days, "day")} ago.">${e(run.date)} · stale</span>` : `<span class="muted date" title="The date of this evaluation.">${e(run.date)}</span>`;
-  return `<tr class="run"><td class="run-head" colspan="2">${withNote ? runNote(run, false) : ""}<code>${e(run.id)}</code> ${date}<div class="hint">${e(run.route_label)}${settings ? ` · <code>${e(settings)}</code>` : ""}${other ? ` · ${e(other)}` : ""}</div><a href="${e(run.source)}" rel="noopener">Raw result</a></td>${COLUMNS.map((column) => heatCell(inColumn(run.results, column), column)).join("")}</tr>`;
+  return `<tr class="run"><td class="run-head" colspan="2">${withNote ? runNote(run, false) : ""}<code>${e(run.id)}</code> ${date}<div class="hint">${e(run.route_label)}${settings ? ` · <code>${e(settings)}</code>` : ""}${other ? ` · ${e(other)}` : ""}</div><a href="${e(run.source)}" rel="noopener">Raw result</a></td>${heatCells(run.results, columns)}</tr>`;
 }
 
 /**
@@ -493,39 +505,41 @@ function runRow(run: CacheEvaluation, today: Today, withNote = false): string {
  * documented for and the text as documented; a measured one names its client and setting, its checks and results by
  * age, the notes of its evaluations, and opens onto each evaluation.
  */
-function itemRows(item: CacheLifetimeItem, evaluations: readonly CacheEvaluation[], today: Today): string {
+function itemRows(item: CacheLifetimeItem, evaluations: readonly CacheEvaluation[], today: Today, columns: readonly Column[]): string {
   if (item.basis === "documented") {
     const what =
       item.mode === null
         ? "Documented as not caching"
         : `<span title="${e(CACHE_MODE_TITLE[item.mode])}">${CACHE_MODE_WORD[item.mode]}</span> <span class="chip">${item.mode}</span><div class="hint">As documented: <code>${e(item.documented_as ?? "")}</code></div>`;
-    return `<tbody class="item documented"><tr>${lifetimeHead(item, today)}<td class="through" data-label="Documented for">${what}</td><td class="heat-none" colspan="${AGE_COLUMNS}" data-label="Results by age"><span class="muted" title="A documented lifetime has no results by age.">Not applicable</span></td></tr></tbody>`;
+    return `<tbody class="item documented"><tr>${lifetimeHead(item, today)}<td class="through" data-label="Documented for">${what}</td><td class="heat-none" colspan="${columns.length}" data-label="Results by age"><span class="muted" title="A documented lifetime has no results by age.">Not applicable</span></td></tr></tbody>`;
   }
   const runs = item.evaluation_ids.flatMap((id) => evaluations.filter((run) => run.id === id));
   const setting = item.parameter && item.value ? `Sent <code>${e(item.parameter)}=${e(item.value)}</code>` : "No lifetime asked for";
   const checks = `<span title="Re-sends served from the cache, of those made, the control included.">${exact(item.hits)} of ${exact(item.checks)} checks hit</span>`;
   const ages = `${item.tested_from_s === null ? "No timed check" : `Tested from ${span(item.tested_from_s)}`} · ${item.first_miss_s === null ? "No miss" : `First miss ${ageText(item.first_miss_s)}`}`;
-  const other = item.results ? otherAges(item.results) : "";
+  const other = item.results ? otherAges(item.results, columns) : "";
   const notes = runs.map((run) => runNote(run, runs.length > 1)).join("");
   const what = `<strong class="client">${e(item.client_label ?? item.client ?? "")}</strong><div class="hint">${setting} · ${checks}</div><div class="hint">${ages}${other ? ` · ${e(other)}` : ""}</div>${notes}<details class="runs"><summary>${plural(item.evaluations, "evaluation")}</summary></details>`;
   const results = item.results ?? [];
-  return `<tbody class="item measured"><tr>${lifetimeHead(item, today)}<td class="through" data-label="Measured through">${what}</td>${COLUMNS.map((column) => heatCell(inColumn(results, column), column)).join("")}</tr>${runs.map((run) => runRow(run, today)).join("")}</tbody>`;
+  return `<tbody class="item measured"><tr>${lifetimeHead(item, today)}<td class="through" data-label="Measured through">${what}</td>${heatCells(results, columns)}</tr>${runs.map((run) => runRow(run, today, columns)).join("")}</tbody>`;
 }
 
 /**
  * Every lifetime of an entry, one table for all: per retention profile the safe value and what it was chosen from, then
- * each documented and each measured lifetime as the API lists them, in its order. Both profiles on every entry.
+ * each documented and each measured lifetime as the API lists them, in its order. Both profiles on every entry. The age
+ * columns are the published ones (`cache_ages_s` of /api/v1/meta).
  */
-function lifetimesTable(cache: EntryCache, today: Today): string {
+function lifetimesTable(cache: EntryCache, today: Today, ages: CacheAges): string {
   const record = cache.lifetime;
-  const body = RETENTION_PROFILES.map((profile) => profileRow(profile, record[profile], today) + record.lifetimes.filter((item) => item.retention_profile === profile).map((item) => itemRows(item, cache.evaluations, today)).join("")).join("");
+  const columns = columnsOf(ages);
+  const body = RETENTION_PROFILES.map((profile) => profileRow(profile, record[profile], today, columns) + record.lifetimes.filter((item) => item.retention_profile === profile).map((item) => itemRows(item, cache.evaluations, today, columns)).join("")).join("");
   // An evaluation that is in no lifetime (no timed result, and a control that hit) is still on the page.
   const named = new Set(record.lifetimes.flatMap((item) => item.evaluation_ids));
   const others = cache.evaluations.filter((run) => !named.has(run.id));
   const rest = others.length
-    ? `<tbody class="profile"><tr><th scope="row">Other evaluations</th><td class="profile-facts" colspan="${1 + AGE_COLUMNS}"><span class="muted">In no lifetime</span></td></tr></tbody><tbody class="item others">${others.map((run) => runRow(run, today, true)).join("")}</tbody>`
+    ? `<tbody class="profile"><tr><th scope="row">Other evaluations</th><td class="profile-facts" colspan="${1 + columns.length}"><span class="muted">In no lifetime</span></td></tr></tbody><tbody class="item others">${others.map((run) => runRow(run, today, columns, true)).join("")}</tbody>`
     : "";
-  return `<div class="scroll"><table class="facts heat lifetimes stack-tablet"><caption class="sr-only">Every cache lifetime of this entry, by retention</caption><thead><tr><th scope="col" rowspan="2">Lifetime</th><th scope="col" rowspan="2">Documented for, or measured through</th><th scope="colgroup" colspan="${AGE_COLUMNS}" class="span">Time since the prompt was cached · served from the cache, in percent, with hits/checks</th></tr><tr>${HEAT_HEAD}</tr></thead>${body}${rest}</table></div>
+  return `<div class="scroll"><table class="facts heat lifetimes stack-tablet"><caption class="sr-only">Every cache lifetime of this entry, by retention</caption><thead><tr><th scope="col" rowspan="2">Lifetime</th><th scope="col" rowspan="2">Documented for, or measured through</th><th scope="colgroup" colspan="${columns.length}" class="span">Time since the prompt was cached · served from the cache, in percent, with hits/checks</th></tr><tr>${heatHead(columns)}</tr></thead>${body}${rest}</table></div>
 <p class="legend"><span><span class="heat-key all">100</span> All served from the cache</span><span><span class="heat-key most">67</span> Half or more</span><span><span class="heat-key few">33</span> Fewer</span><span><span class="heat-key none">0</span> None</span><span><span class="heat-key skip">·</span> Not checked at that age</span><span><a href="/docs/methodology/#evaluations">Methodology</a></span></p>`;
 }
 
@@ -604,12 +618,14 @@ export interface EntryView {
   provider: ProviderSummary;
   model: JsonObject;
   today: Today;
+  /** The age columns of the results by age: `cache_ages_s` of /api/v1/meta. */
+  cache_ages_s: CacheAges;
   /** The date of the models.dev import. */
   imported?: string;
 }
 
 export function entryHtml(view: EntryView): string {
-  const { summary, provider, model, today } = view;
+  const { summary, provider, model, today, cache_ages_s } = view;
   const extension = model[NS] as unknown as ModelExtension;
   const provenance = extension.provenance;
   const limit = isObject(model.limit) ? model.limit : {};
@@ -684,7 +700,7 @@ export function entryHtml(view: EntryView): string {
 <section aria-labelledby="cache">
   <h2 id="cache">Prompt caching</h2>
   <h3>Lifetimes</h3>
-  ${lifetimesTable(cache, today)}
+  ${lifetimesTable(cache, today, cache_ages_s)}
   <h3>Cache modes</h3>
   ${cacheDocumented(cache.documented, sourceOf("capabilities.cache", provenance, extension.origin))}
   <h3>Retention</h3>

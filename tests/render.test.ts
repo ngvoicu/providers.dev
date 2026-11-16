@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { cacheLifetime, cacheResult, documentedCaching, type CacheEvaluation, type EntryCache, type RetentionProfile } from "../src/core/cache.ts";
+import { CACHE_AGES_S, cacheLifetime, cacheResult, documentedCaching, type CacheEvaluation, type EntryCache, type RetentionProfile } from "../src/core/cache.ts";
 import { buildIndex, type Summary } from "../src/core/entries.ts";
 import type { Json, JsonObject } from "../src/core/merge.ts";
 import { entryHtml, rowHtml } from "../src/core/render.ts";
@@ -57,7 +57,7 @@ describe("documented cache support on an entry page", () => {
     });
     const index = buildIndex(catalog, "fixture", "2026-11-14T00:00:00Z", "2026-11-14T00:00:00Z");
     const summary = index.entries[0]!;
-    const html = entryHtml({ summary, provider: index.providers[0]!, model: catalog.p!.models.m!, today: { date: new Date("2026-11-14T00:00:00Z"), stale_after_days: 90 } });
+    const html = entryHtml({ summary, provider: index.providers[0]!, model: catalog.p!.models.m!, today: { date: new Date("2026-11-14T00:00:00Z"), stale_after_days: 90 }, cache_ages_s: CACHE_AGES_S });
     return { summary, html, documented: html.split('<h2 id="cache">')[1]!.split("<h3>Retention</h3>")[0]! };
   };
 
@@ -99,7 +99,7 @@ describe("the entry page", () => {
   const index = buildIndex(catalog, "fixture", "2026-11-14T00:00:00Z", "2026-11-14T00:00:00Z");
   const page = (ref: string): string => {
     const summary = index.entries.find((entry) => entry.ref === ref)!;
-    return entryHtml({ summary, provider: index.providers.find((item) => item.id === summary.provider)!, model: catalog[summary.provider]!.models[summary.model]!, today: { date: new Date("2026-11-14T00:00:00Z"), stale_after_days: 90 }, imported: "2026-11-13" });
+    return entryHtml({ summary, provider: index.providers.find((item) => item.id === summary.provider)!, model: catalog[summary.provider]!.models[summary.model]!, today: { date: new Date("2026-11-14T00:00:00Z"), stale_after_days: 90 }, cache_ages_s: CACHE_AGES_S, imported: "2026-11-13" });
   };
   const pages = { bare: page("lab/bare"), full: page("lab/full"), login: page("lab-login/full") };
   /** The skeleton of a page: its headings, the column heads of its tables, and the labels of its rows. */
@@ -233,7 +233,7 @@ describe("the cache lifetimes on an entry page", () => {
   const page = (cache: EntryCache): string => {
     const model = structuredClone(catalog.lab!.models.m!) as JsonObject;
     (model[NS] as unknown as ModelExtension).cache = cache;
-    return entryHtml({ summary: { ...index.entries[0]!, cache_lifetime: cache.lifetime, evaluation_count: cache.evaluations.length }, provider: index.providers[0]!, model, today: { date: now, stale_after_days: 90 }, imported: "2026-11-15" });
+    return entryHtml({ summary: { ...index.entries[0]!, cache_lifetime: cache.lifetime, evaluation_count: cache.evaluations.length }, provider: index.providers[0]!, model, today: { date: now, stale_after_days: 90 }, cache_ages_s: CACHE_AGES_S, imported: "2026-11-15" });
   };
   const section = (html: string): string => html.slice(html.indexOf('<h2 id="cache">'), html.indexOf("<h3>Cache modes</h3>"));
   const tiles = (html: string): string => html.slice(html.indexOf('<div class="tiles'), html.indexOf("</div>\n\n<section"));
@@ -359,7 +359,7 @@ describe("stale evidence", () => {
   const page = (cache: EntryCache, staleAfterDays: number): string => {
     const model = structuredClone(catalog.lab!.models.m!) as JsonObject;
     (model[NS] as unknown as ModelExtension).cache = cache;
-    return entryHtml({ summary: { ...index.entries[0]!, cache_lifetime: cache.lifetime, evaluation_count: cache.evaluations.length }, provider: index.providers[0]!, model, today: { date, stale_after_days: staleAfterDays }, imported: "2026-11-15" });
+    return entryHtml({ summary: { ...index.entries[0]!, cache_lifetime: cache.lifetime, evaluation_count: cache.evaluations.length }, provider: index.providers[0]!, model, today: { date, stale_after_days: staleAfterDays }, cache_ages_s: CACHE_AGES_S, imported: "2026-11-15" });
   };
 
   it("marks a providers.dev date by the threshold it is given, and says that number in the hover text", () => {
@@ -382,6 +382,48 @@ describe("stale evidence", () => {
     expect(row(90)).not.toContain("· stale");
     expect(row(7)).toContain("2026-11-04 · stale");
     expect(row(7)).toContain("more than 7 days ago.");
+  });
+});
+
+describe("the age columns of results by age", () => {
+  // The columns are the ages the API publishes in /api/v1/meta (`cache_ages_s`); the renderer has none of its own.
+  const { catalog } = resolve({
+    upstream: { lab: { id: "lab", name: "Lab", models: { m: UpstreamModel.parse({ id: "m", name: "M" }) } } },
+    additions: [], overrides: [], routes: {}, access: { default: "api", default_basis: "fixture", patterns: [], providers: {} }, upstreamDate: "2026-11-15",
+  });
+  const index = buildIndex(catalog, "fixture", "2026-11-15T00:00:00Z", "2026-11-15T00:00:00Z");
+  const page = (cache: EntryCache, ages: readonly number[]): string => {
+    const model = structuredClone(catalog.lab!.models.m!) as JsonObject;
+    (model[NS] as unknown as ModelExtension).cache = cache;
+    return entryHtml({ summary: { ...index.entries[0]!, cache_lifetime: cache.lifetime, evaluation_count: cache.evaluations.length }, provider: index.providers[0]!, model, today: { date: new Date("2026-11-15T00:00:00Z"), stale_after_days: 90 }, cache_ages_s: ages, imported: "2026-11-15" });
+  };
+  const heads = (html: string): string[] => [...html.matchAll(/<th scope="col" class="age"[^>]*>([^<]+)<\/th>/g)].map((match) => match[1]!);
+  const text = (html: string): string => html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+
+  it("draws the columns of the ages it is given, and the spans that go with them", () => {
+    // A publication whose ages are 10 minutes and 1 h 5: the control and those two columns, nothing else.
+    const html = page(CASES.opus, [600, 3900]);
+    expect(heads(html)).toEqual(["At once", "10 min", "1 h 5"]);
+    expect(html).toContain('<th scope="colgroup" colspan="3" class="span">');
+    expect(html).toContain('<td class="profile-facts" colspan="4">');
+    expect(html).toContain('<td class="heat-none" colspan="3" data-label="Results by age">');
+    // Three cells on the measured lifetime's row and on each of its two evaluations.
+    expect(html.match(/<td class="heat( unchecked)?"/g)).toHaveLength(3 * 3);
+    // A column the ages now have shows its result: 1 h 5, 0 of 6, where the published ladder has no column for it.
+    expect(html).toContain('<td class="heat" data-label="1 h 5"><span class="none" title="After 1 h 5 min: 0 of 6 re-sends served from the cache (0%)">0<small>0/6</small></span></td>');
+    // With the published ladder, the same entry has its 19 columns.
+    expect(heads(page(CASES.opus, CACHE_AGES_S))).toHaveLength(1 + CACHE_AGES_S.length);
+  });
+
+  it("still shows a result at an age that has no column, in words beside its lifetime and its evaluation", () => {
+    const html = page(CASES.opus, [600, 3900]);
+    // 30 minutes has no column here: the lifetime (5 of 6) and each evaluation (2 of 3, 3 of 3) say it in words.
+    expect(heads(html)).not.toContain("30 min");
+    expect(text(html)).toContain("First miss 30 min · Also checked: 30 min 83% (5/6) 2 evaluations");
+    expect(text(html)).toContain("cpa-8.0.53/K1-beta 2026-11-04 Lab API key · format=messages, ttl=1h, beta=extended-cache-ttl-2025-04-11 · Also checked: 30 min 67% (2/3) Raw result");
+    expect(text(html)).toContain("Also checked: 30 min 100% (3/3) Raw result");
+    // 1 h 5 has a column, so it is no longer in words.
+    expect(text(html)).not.toContain("Also checked: 1 h 5");
   });
 });
 

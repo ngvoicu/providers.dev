@@ -159,6 +159,25 @@ describe("API response boundary", () => {
     expect(`${evidence}${methodology}${catalog}`).not.toMatch(/90 days/);
   });
 
+  it("takes the age columns of results by age from the published meta, on the entry page and the evidence page", async () => {
+    // A publication whose ages are 10 minutes and 1 h 5: every table of results by age has those columns, after the control.
+    const twoAges = async (path: string): Promise<Response> => {
+      if (path !== "/api/v1/meta") return api(path);
+      const answer = await (await api(path)).json() as { meta: unknown; data: { cache_ages_s: number[] } };
+      return Response.json({ ...answer, data: { ...answer.data, cache_ages_s: [600, 3900] } });
+    };
+    const entry = await (await page("/entries/provider-02/lab/model-4", twoAges)).text();
+    expect([...entry.matchAll(/<th scope="col" class="age"[^>]*>([^<]+)<\/th>/g)].map((match) => match[1])).toEqual(["At once", "10 min", "1 h 5"]);
+    expect(entry).toContain('<th scope="colgroup" colspan="3" class="span">');
+    const strip = '<span class="strip"><span class="control">once</span><span>10m</span><span>65m</span></span>';
+    const evidence = await (await page("/evidence/", twoAges)).text();
+    expect(evidence).toContain(`<span class="heat-strip strip-head" aria-hidden="true"><span></span>${strip}`);
+    expect(evidence).not.toContain("<span>2.5m</span>");
+    // As published, the ladder of the build.
+    const published = await (await page("/evidence/")).text();
+    expect(published).toContain("<span>2.5m</span>");
+  });
+
   it("fails visibly on API errors and does not substitute stale or private data", async () => {
     const response = await page("/providers/", async (path) => path === "/api/v1/meta" ? api(path) : new Response(null, { status: 503 }));
     expect(response.status).toBe(503);
