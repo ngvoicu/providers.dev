@@ -59,7 +59,8 @@ describe("the structure of /api/v1", () => {
     const [major, minor] = version.split(".").map(Number);
     expect(version).toMatch(/^\d+\.\d+\.\d+$/);
     expect(major, "/api/v1 is version 1.x.y. A version 2 would be /api/v2.").toBe(1);
-    if (!isDeepStrictEqual(record(), baseline())) {
+    // Grown: different from the baseline and taking nothing from it (a record that takes something away fails above).
+    if (!isDeepStrictEqual(record(), baseline()) && structureBreaks(baseline(), record()).length === 0) {
       expect(minor, `The structure has grown beyond 1.0.0 and the version is still ${version}. A release that adds something takes a minor step: 1.1.0, then 1.2.0, in src/core/openapi.ts.`).toBeGreaterThanOrEqual(1);
     }
   });
