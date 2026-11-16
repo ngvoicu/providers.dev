@@ -6439,11 +6439,30 @@
       "overrides": [
        {
         "when": {
+         "resolution": {
+          "equals": "1080p"
+         }
+        },
+        "price": 11.7
+       },
+       {
+        "when": {
          "input_video": {
           "equals": true
          }
         },
         "price": 6.4
+       },
+       {
+        "when": {
+         "resolution": {
+          "equals": "1080p"
+         },
+         "input_video": {
+          "equals": true
+         }
+        },
+        "price": 7
        }
       ]
      }
@@ -8060,7 +8079,7 @@
    "release_date": "2025-12-01",
    "limit": {
     "context": 163840,
-    "output": 16384
+    "output": 16000
    },
    "capabilities": {
     "temperature": true,
@@ -8079,10 +8098,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.32
+      "price": 0.2574
      },
      "output": {
-      "price": 0.89
+      "price": 1.0287
      }
     }
    },
@@ -8914,7 +8933,7 @@
    "release_date": "2026-07-31",
    "limit": {
     "context": 1048576,
-    "output": 943718
+    "output": 384000
    },
    "capabilities": {
     "temperature": true,
@@ -8939,13 +8958,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.0434,
+      "price": 0.06,
       "cache": {
-       "read": 0.035
+       "read": 0.015
       }
      },
      "output": {
-      "price": 0.3
+      "price": 0.18
      }
     }
    },
@@ -9371,7 +9390,7 @@
    "release_date": "2026-09-10",
    "limit": {
     "context": 1048576,
-    "output": 943718
+    "output": 393216
    },
    "capabilities": {
     "temperature": true,
@@ -9396,13 +9415,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.3,
+      "price": 0.14,
       "cache": {
-       "read": 0.006
+       "read": 0.0042
       }
      },
      "output": {
-      "price": 1.2
+      "price": 0.42
      }
     }
    },
@@ -9488,7 +9507,7 @@
    "release_date": "2026-10-17",
    "limit": {
     "context": 1048576,
-    "output": 943718
+    "output": 393216
    },
    "capabilities": {
     "temperature": true,
@@ -9513,13 +9532,281 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.038,
+      "price": 0.15,
       "cache": {
-       "read": 0.01
-      }
+       "read": 0.003
+      },
+      "overrides": [
+       {
+        "when": {
+         "utc_days": {
+          "in": [
+           "sat",
+           "sun"
+          ]
+         }
+        },
+        "price": 0.15,
+        "cache": {
+         "read": 0.003
+        }
+       },
+       {
+        "when": {
+         "utc_hours": {
+          "lt": "01:00"
+         },
+         "utc_days": {
+          "in": [
+           "mon",
+           "tue",
+           "wed",
+           "thu",
+           "fri"
+          ]
+         }
+        },
+        "price": 0.15,
+        "cache": {
+         "read": 0.003
+        }
+       },
+       {
+        "when": {
+         "utc_days": {
+          "in": [
+           "mon",
+           "tue",
+           "wed",
+           "thu",
+           "fri"
+          ]
+         },
+         "all": [
+          {
+           "utc_hours": {
+            "gte": "01:00"
+           }
+          },
+          {
+           "utc_hours": {
+            "lt": "04:00"
+           }
+          }
+         ]
+        },
+        "price": 0.3,
+        "cache": {
+         "read": 0.006
+        }
+       },
+       {
+        "when": {
+         "utc_days": {
+          "in": [
+           "mon",
+           "tue",
+           "wed",
+           "thu",
+           "fri"
+          ]
+         },
+         "all": [
+          {
+           "utc_hours": {
+            "gte": "04:00"
+           }
+          },
+          {
+           "utc_hours": {
+            "lt": "06:00"
+           }
+          }
+         ]
+        },
+        "price": 0.15,
+        "cache": {
+         "read": 0.003
+        }
+       },
+       {
+        "when": {
+         "utc_days": {
+          "in": [
+           "mon",
+           "tue",
+           "wed",
+           "thu",
+           "fri"
+          ]
+         },
+         "all": [
+          {
+           "utc_hours": {
+            "gte": "06:00"
+           }
+          },
+          {
+           "utc_hours": {
+            "lt": "10:00"
+           }
+          }
+         ]
+        },
+        "price": 0.3,
+        "cache": {
+         "read": 0.006
+        }
+       },
+       {
+        "when": {
+         "utc_hours": {
+          "gte": "10:00"
+         },
+         "utc_days": {
+          "in": [
+           "mon",
+           "tue",
+           "wed",
+           "thu",
+           "fri"
+          ]
+         }
+        },
+        "price": 0.15,
+        "cache": {
+         "read": 0.003
+        }
+       }
+      ]
      },
      "output": {
-      "price": 0.5
+      "price": 0.6,
+      "overrides": [
+       {
+        "when": {
+         "utc_days": {
+          "in": [
+           "sat",
+           "sun"
+          ]
+         }
+        },
+        "price": 0.6
+       },
+       {
+        "when": {
+         "utc_hours": {
+          "lt": "01:00"
+         },
+         "utc_days": {
+          "in": [
+           "mon",
+           "tue",
+           "wed",
+           "thu",
+           "fri"
+          ]
+         }
+        },
+        "price": 0.6
+       },
+       {
+        "when": {
+         "utc_days": {
+          "in": [
+           "mon",
+           "tue",
+           "wed",
+           "thu",
+           "fri"
+          ]
+         },
+         "all": [
+          {
+           "utc_hours": {
+            "gte": "01:00"
+           }
+          },
+          {
+           "utc_hours": {
+            "lt": "04:00"
+           }
+          }
+         ]
+        },
+        "price": 1.2
+       },
+       {
+        "when": {
+         "utc_days": {
+          "in": [
+           "mon",
+           "tue",
+           "wed",
+           "thu",
+           "fri"
+          ]
+         },
+         "all": [
+          {
+           "utc_hours": {
+            "gte": "04:00"
+           }
+          },
+          {
+           "utc_hours": {
+            "lt": "06:00"
+           }
+          }
+         ]
+        },
+        "price": 0.6
+       },
+       {
+        "when": {
+         "utc_days": {
+          "in": [
+           "mon",
+           "tue",
+           "wed",
+           "thu",
+           "fri"
+          ]
+         },
+         "all": [
+          {
+           "utc_hours": {
+            "gte": "06:00"
+           }
+          },
+          {
+           "utc_hours": {
+            "lt": "10:00"
+           }
+          }
+         ]
+        },
+        "price": 1.2
+       },
+       {
+        "when": {
+         "utc_hours": {
+          "gte": "10:00"
+         },
+         "utc_days": {
+          "in": [
+           "mon",
+           "tue",
+           "wed",
+           "thu",
+           "fri"
+          ]
+         }
+        },
+        "price": 0.6
+       }
+      ]
      }
     }
    },
@@ -17132,7 +17419,7 @@
       }
      },
      "output": {
-      "price": 0.25
+      "price": 0.15
      }
     }
    },
@@ -17632,6 +17919,108 @@
    },
    "open_weights": true,
    "last_updated": "2026-09-29"
+  },
+  "inclusionai/ling-3.2-flash:free": {
+   "id": "inclusionai/ling-3.2-flash:free",
+   "name": "Ling 3.2 Flash (free)",
+   "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
+   "type": "chat",
+   "family": "ling",
+   "release_date": "2026-11-13",
+   "limit": {
+    "context": 1048576,
+    "output": 262144
+   },
+   "capabilities": {
+    "temperature": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@openrouter/ai-sdk-provider",
+      "opencodeai": "@opencode/ai/providers/openrouter"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-11-13"
   },
   "inference-net/schematron-v2-small": {
    "id": "inference-net/schematron-v2-small",
@@ -19419,7 +19808,7 @@
    "release_date": "2024-09-25",
    "limit": {
     "context": 131072,
-    "output": 117964
+    "output": 72000
    },
    "capabilities": {
     "temperature": true,
@@ -19438,10 +19827,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.05
+      "price": 0.0509
      },
      "output": {
-      "price": 0.33
+      "price": 0.335
      }
     }
    },
@@ -21005,7 +21394,7 @@
      }
     },
     "web_search": {
-     "price": 2.5
+     "price": 10
     }
    },
    "modalities": {
@@ -22134,7 +22523,7 @@
    "release_date": "2026-02-12",
    "limit": {
     "context": 198000,
-    "output": 32768
+    "output": 176947
    },
    "capabilities": {
     "temperature": true,
@@ -22153,13 +22542,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.27,
+      "price": 0.295,
       "cache": {
-       "read": 0.03
+       "read": 0.06
       }
      },
      "output": {
-      "price": 0.95
+      "price": 1.2
      }
     }
    },
@@ -26870,13 +27259,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 2,
+      "price": 0.2403,
       "cache": {
        "read": 0.2
       }
      },
      "output": {
-      "price": 10
+      "price": 8.4023
      }
     }
    },
@@ -27872,117 +28261,6 @@
    "knowledge": "2024-08-31",
    "last_updated": "2025-08-26"
   },
-  "nvidia/llama-nemotron-embed-vl-1b-v2:free": {
-   "id": "nvidia/llama-nemotron-embed-vl-1b-v2:free",
-   "name": "Llama Nemotron Embed VL 1B V2 (free)",
-   "description": "Embedding model for semantic search, retrieval, clustering, and ranking pipelines",
-   "type": "embedding",
-   "family": "nemotron",
-   "canonical_id": "nvidia/llama-nemotron-embed-vl-1b-v2",
-   "release_date": "2025-12-18",
-   "limit": {
-    "context": 131072,
-    "output": 2048
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg"
-    ],
-    "output": [
-     "embedding"
-    ]
-   },
-   "api": {
-    "embeddings": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@openrouter/ai-sdk-provider",
-      "opencodeai": "@opencode/ai/providers/openrouter/embeddings"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-12-18"
-  },
-  "nvidia/llama-nemotron-rerank-vl-1b-v2:free": {
-   "id": "nvidia/llama-nemotron-rerank-vl-1b-v2:free",
-   "name": "Llama Nemotron Rerank VL 1B V2 (free)",
-   "description": "Reranking model for improving retrieval quality in search and recommendation systems",
-   "type": "reranking",
-   "family": "nemotron",
-   "canonical_id": "nvidia/llama-nemotron-rerank-vl-1b-v2",
-   "release_date": "2025-12-18",
-   "limit": {
-    "context": 10240,
-    "output": 4096
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/gif",
-     "image/bmp",
-     "image/tiff"
-    ],
-    "output": [
-     "reranking"
-    ]
-   },
-   "api": {
-    "rerank": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/cohere"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-12-18"
-  },
   "nvidia/nemotron-3-embed-1b:free": {
    "id": "nvidia/nemotron-3-embed-1b:free",
    "name": "Nemotron 3 Embed 1B (free)",
@@ -27992,7 +28270,7 @@
    "canonical_id": "nvidia/nemotron-3-embed-1b",
    "release_date": "2026-07-16",
    "limit": {
-    "context": 32768,
+    "context": 4096,
     "output": 0
    },
    "capabilities": {
@@ -29106,7 +29384,7 @@
    "release_date": "2026-10-15",
    "limit": {
     "context": 1048576,
-    "output": 943718
+    "output": 235929
    },
    "capabilities": {
     "temperature": true,
@@ -29132,7 +29410,7 @@
       }
      },
      "output": {
-      "price": 0.47
+      "price": 0.5
      }
     }
    },
@@ -37147,7 +37425,7 @@
    "release_date": "2025-08-05",
    "limit": {
     "context": 131072,
-    "output": 117964
+    "output": 65536
    },
    "capabilities": {
     "temperature": true,
@@ -37171,13 +37449,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.03,
+      "price": 0.075,
       "cache": {
-       "read": 0.03
+       "read": 0.0375
       }
      },
      "output": {
-      "price": 0.13
+      "price": 0.3
      }
     }
    },
@@ -38283,9 +38561,9 @@
    "open_weights": false,
    "last_updated": "2026-04-21"
   },
-  "parallel/decisions-fast:free": {
-   "id": "parallel/decisions-fast:free",
-   "name": "Decisions Fast (free)",
+  "parallel/decisions-fast": {
+   "id": "parallel/decisions-fast",
+   "name": "Decisions Fast",
    "description": "Decision model for typed evaluation of shared state",
    "type": "decision",
    "release_date": "2026-11-06",
@@ -38368,7 +38646,7 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.05,
+      "price": 0.06,
       "cache": {
        "read": 0.003
       }
@@ -41288,7 +41566,7 @@
     "temperature": true,
     "top_k": true,
     "top_p": true,
-    "structured_output": true,
+    "structured_output": false,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -42153,111 +42431,6 @@
    "open_weights": true,
    "last_updated": "2025-10-04"
   },
-  "qwen/qwen3-vl-30b-a3b-thinking": {
-   "id": "qwen/qwen3-vl-30b-a3b-thinking",
-   "name": "Qwen3 VL 30B A3B Thinking",
-   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
-   "type": "chat",
-   "family": "qwen",
-   "release_date": "2025-10-06",
-   "limit": {
-    "context": 262144,
-    "output": 235929
-   },
-   "capabilities": {
-    "temperature": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.29
-     },
-     "output": {
-      "price": 1
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/gif"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@openrouter/ai-sdk-provider",
-      "opencodeai": "@opencode/ai/providers/openrouter"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-03-31",
-   "last_updated": "2025-10-06"
-  },
   "qwen/qwen3-vl-8b-instruct": {
    "id": "qwen/qwen3-vl-8b-instruct",
    "name": "Qwen3 VL 8B Instruct",
@@ -42726,7 +42899,7 @@
    "release_date": "2026-02-15",
    "limit": {
     "context": 262144,
-    "output": 64000
+    "output": 81920
    },
    "capabilities": {
     "temperature": true,
@@ -42746,13 +42919,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.6,
+      "price": 0.45,
       "cache": {
-       "read": 0.12
+       "read": 0.22
       }
      },
      "output": {
-      "price": 3.6
+      "price": 3
      }
     }
    },
@@ -42866,13 +43039,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.141,
+      "price": 0.122,
       "cache": {
-       "read": 0.127
+       "read": 0.11
       }
      },
      "output": {
-      "price": 0.208
+      "price": 0.18
      }
     }
    },
@@ -44383,7 +44556,7 @@
    "canonical_id": "alibaba/qwen3.8-27b",
    "release_date": "2026-08-14",
    "limit": {
-    "context": 1048575,
+    "context": 1024000,
     "output": 235929
    },
    "capabilities": {
@@ -44988,6 +45161,121 @@
    "open_weights": false,
    "last_updated": "2026-09-17"
   },
+  "qwen/qwen4-max": {
+   "id": "qwen/qwen4-max",
+   "name": "Qwen4 Max",
+   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen4-max",
+   "release_date": "2026-11-16",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.5,
+      "cache": {
+       "read": 0.075,
+       "write": 1.875
+      }
+     },
+     "output": {
+      "price": 4.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image",
+     "video"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@openrouter/ai-sdk-provider",
+      "opencodeai": "@opencode/ai/providers/openrouter"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-16"
+  },
   "recraft/recraft-v3": {
    "id": "recraft/recraft-v3",
    "name": "Recraft V3",
@@ -45575,6 +45863,94 @@
    },
    "open_weights": false,
    "last_updated": "2026-09-23"
+  },
+  "recraft/recraft-v4.1-flash-v2": {
+   "id": "recraft/recraft-v4.1-flash-v2",
+   "name": "Recraft V4.1 Flash V2",
+   "description": "Image generation model",
+   "type": "image",
+   "release_date": "2026-11-13",
+   "limit": {
+    "context": 65536,
+    "output": 0
+   },
+   "capabilities": {
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "image": {
+     "output": {
+      "unit": "image",
+      "price": 0.007
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "image/png"
+    ]
+   },
+   "api": {
+    "images": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@openrouter/ai-sdk-provider",
+      "opencodeai": "@opencode/ai/providers/openrouter/images"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-13"
+  },
+  "recraft/recraft-v4.1-flash-v2:free": {
+   "id": "recraft/recraft-v4.1-flash-v2:free",
+   "name": "Recraft V4.1 Flash V2 (free)",
+   "description": "Image generation model",
+   "type": "image",
+   "release_date": "2026-11-13",
+   "limit": {
+    "context": 65536,
+    "output": 0
+   },
+   "capabilities": {
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "image/png"
+    ]
+   },
+   "api": {
+    "images": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@openrouter/ai-sdk-provider",
+      "opencodeai": "@opencode/ai/providers/openrouter/images"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-13"
   },
   "recraft/recraft-v4.1-pro": {
    "id": "recraft/recraft-v4.1-pro",
@@ -48288,110 +48664,6 @@
    "open_weights": false,
    "last_updated": "2026-11-11"
   },
-  "stepfun/step-3.5-flash": {
-   "id": "stepfun/step-3.5-flash",
-   "name": "Step 3.5 Flash",
-   "description": "StepFun flash lane for quick multimodal reasoning and coding assistance",
-   "type": "chat",
-   "family": "step",
-   "canonical_id": "stepfun/step-3.5-flash",
-   "release_date": "2026-01-29",
-   "limit": {
-    "context": 262144,
-    "output": 65536
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.1
-     },
-     "output": {
-      "price": 0.3
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@openrouter/ai-sdk-provider",
-      "opencodeai": "@opencode/ai/providers/openrouter"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-02-13"
-  },
   "stepfun/step-3.7-flash": {
    "id": "stepfun/step-3.7-flash",
    "name": "Step 3.7 Flash",
@@ -48692,75 +48964,6 @@
    "open_weights": false,
    "last_updated": "2026-10-30"
   },
-  "tencent/hunyuan-a13b-instruct": {
-   "id": "tencent/hunyuan-a13b-instruct",
-   "name": "Hunyuan A13B Instruct",
-   "description": "Tencent Hy reasoning model for coding, instruction following, and agent tasks",
-   "type": "chat",
-   "family": "hunyuan",
-   "release_date": "2025-07-08",
-   "limit": {
-    "context": 131072,
-    "output": 117964
-   },
-   "capabilities": {
-    "temperature": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.14
-     },
-     "output": {
-      "price": 0.57
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@openrouter/ai-sdk-provider",
-      "opencodeai": "@opencode/ai/providers/openrouter"
-     }
-    },
-    "responses": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     }
-    },
-    "messages": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-03-31",
-   "last_updated": "2025-07-08"
-  },
   "tencent/hy-image-v3.5-preview": {
    "id": "tencent/hy-image-v3.5-preview",
    "name": "Hy Image 3.5 Preview",
@@ -49024,6 +49227,53 @@
    },
    "open_weights": true,
    "last_updated": "2026-05-21"
+  },
+  "tencent/hy-world-2.1-panorama": {
+   "id": "tencent/hy-world-2.1-panorama",
+   "name": "HY-World 2.1 Panorama",
+   "description": "Image generation model",
+   "type": "image",
+   "release_date": "2026-11-13",
+   "limit": {
+    "context": 4096,
+    "output": 0
+   },
+   "capabilities": {
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "image": {
+     "output": {
+      "price": 1.6
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "image/png"
+    ]
+   },
+   "api": {
+    "images": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@openrouter/ai-sdk-provider",
+      "opencodeai": "@opencode/ai/providers/openrouter/images"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-13"
   },
   "tencent/hy3": {
    "id": "tencent/hy3",
@@ -49405,6 +49655,118 @@
    },
    "open_weights": false,
    "last_updated": "2026-11-04"
+  },
+  "tencent/hy4-flash": {
+   "id": "tencent/hy4-flash",
+   "name": "Hy4 flash",
+   "description": "Tencent Hy reasoning model for coding, instruction following, and agent tasks",
+   "type": "chat",
+   "family": "Hy",
+   "canonical_id": "tencent/hy4-flash",
+   "release_date": "2026-11-16",
+   "limit": {
+    "context": 1048576,
+    "input": 983040,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.035,
+      "cache": {
+       "read": 0.0015
+      }
+     },
+     "output": {
+      "price": 0.1405
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp",
+     "image/gif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@openrouter/ai-sdk-provider",
+      "opencodeai": "@opencode/ai/providers/openrouter"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-16"
   },
   "tencent/hy4-preview": {
    "id": "tencent/hy4-preview",
@@ -52605,64 +52967,6 @@
    "open_weights": false,
    "last_updated": "2026-10-01"
   },
-  "x-ai/grok-stt-1.0": {
-   "id": "x-ai/grok-stt-1.0",
-   "name": "Grok STT 1.0",
-   "description": "Speech-to-text model with word-level timestamps, speaker diarization, multichannel audio, and streaming",
-   "type": "transcription",
-   "family": "grok",
-   "canonical_id": "xai/grok-voice-transcribe-2.0",
-   "release_date": "2026-09-17",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "audio": {
-     "input": {
-      "unit": "second",
-      "price": 0.0000277778
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "audio/wav",
-     "audio/mpeg",
-     "audio/ogg",
-     "audio/flac",
-     "audio/aac",
-     "audio/mp4"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "transcriptions": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/protocols/openai-transcription"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-09-17"
-  },
   "x-ai/grok-stt-2.0": {
    "id": "x-ai/grok-stt-2.0",
    "name": "Grok STT 2.0",
@@ -53515,13 +53819,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.2,
+      "price": 0.13,
       "cache": {
-       "read": 0.03
+       "read": 0.025
       }
      },
      "output": {
-      "price": 1.1
+      "price": 0.85
      }
     }
    },
@@ -53955,13 +54259,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.6,
+      "price": 0.4,
       "cache": {
-       "read": 0.11
+       "read": 0.08
       }
      },
      "output": {
-      "price": 2.2
+      "price": 1.75
      }
     }
    },
@@ -54375,7 +54679,7 @@
    "release_date": "2026-04-07",
    "limit": {
     "context": 204800,
-    "output": 131072
+    "output": 182476
    },
    "capabilities": {
     "temperature": true,
@@ -54624,13 +54928,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.084,
+      "price": 0.0699,
       "cache": {
-       "read": 0.079
+       "read": 0.0689
       }
      },
      "output": {
-      "price": 3.6
+      "price": 1.4
      }
     }
    },
@@ -55853,7 +56157,7 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.038,
+      "price": 0.036,
       "cache": {
        "read": 0.01
       }

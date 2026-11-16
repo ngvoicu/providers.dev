@@ -1008,159 +1008,6 @@
    "knowledge": "2026-06",
    "last_updated": "2026-09-28"
   },
-  "deepseek/deepseek-v4-flash": {
-   "id": "deepseek/deepseek-v4-flash",
-   "name": "DeepSeek V4 Flash",
-   "description": "Fast DeepSeek V4 lane for economical reasoning, coding, and long-context work",
-   "type": "chat",
-   "family": "deepseek-flash",
-   "canonical_id": "deepseek/deepseek-v4-flash",
-   "status": "deprecated",
-   "release_date": "2026-04-24",
-   "limit": {
-    "context": 1000000,
-    "output": 384000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.3,
-      "cache": {
-       "read": 0.006,
-       "write": 0.3
-      }
-     },
-     "output": {
-      "price": 1.2
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.crossmodel.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-04-24"
-  },
-  "deepseek/deepseek-v4-flash-vision-exp": {
-   "id": "deepseek/deepseek-v4-flash-vision-exp",
-   "name": "DeepSeek V4 Flash Vision Exp",
-   "description": "Experimental multimodal DeepSeek V4 Flash model for image understanding, coding, and agentic work",
-   "type": "chat",
-   "family": "deepseek-flash",
-   "canonical_id": "deepseek/deepseek-v4-flash-vision-exp",
-   "status": "deprecated",
-   "release_date": "2026-08-21",
-   "limit": {
-    "context": 1000000,
-    "output": 384000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.3,
-      "cache": {
-       "read": 0.006,
-       "write": 0.3
-      }
-     },
-     "output": {
-      "price": 1.2
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.crossmodel.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-09-01"
-  },
   "deepseek/deepseek-v4-pro": {
    "id": "deepseek/deepseek-v4-pro",
    "name": "DeepSeek V4 Pro",
@@ -2566,6 +2413,83 @@
    "open_weights": false,
    "knowledge": "2026-03",
    "last_updated": "2026-11-10"
+  },
+  "gemini/gemini-4-hydrogen": {
+   "id": "gemini/gemini-4-hydrogen",
+   "name": "Gemini 4 Hydrogen",
+   "description": "Google's Gemini 4 model for everyday coding and agentic workflows, with four thinking levels and a 1M-token context window",
+   "type": "chat",
+   "family": "gemini",
+   "canonical_id": "google/gemini-4-hydrogen",
+   "release_date": "2026-11-12",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.5,
+      "cache": {
+       "read": 0.075,
+       "write": 1.5
+      }
+     },
+     "output": {
+      "price": 7.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image",
+     "audio",
+     "video"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.crossmodel.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-03",
+   "last_updated": "2026-11-12"
   },
   "minimax/minimax-m2.7": {
    "id": "minimax/minimax-m2.7",
@@ -5221,6 +5145,85 @@
    "open_weights": false,
    "last_updated": "2026-09-17"
   },
+  "qwen/qwen4-max": {
+   "id": "qwen/qwen4-max",
+   "name": "Qwen4 Max",
+   "description": "Flagship multimodal model for coding, office productivity, frontend design, and complex agentic tasks",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen4-max",
+   "release_date": "2026-11-16",
+   "limit": {
+    "context": 1000000,
+    "output": 393216
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "high",
+      "xhigh"
+     ],
+     "budget": {
+      "min": 1,
+      "max": 262144
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.6,
+      "cache": {
+       "read": 0.08,
+       "write": 2
+      }
+     },
+     "output": {
+      "price": 4.8
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image",
+     "video"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.crossmodel.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-16"
+  },
   "tencent/hy3": {
    "id": "tencent/hy3",
    "name": "Hy3",
@@ -5372,16 +5375,17 @@
    "open_weights": false,
    "last_updated": "2026-11-04"
   },
-  "tencent/hy4-preview": {
-   "id": "tencent/hy4-preview",
-   "name": "Hy4 preview",
-   "description": "A next-generation productivity model with significantly enhanced Agent and complex task execution capabilities.",
+  "tencent/hy4-flash": {
+   "id": "tencent/hy4-flash",
+   "name": "Hy4 flash",
+   "description": "Tencent's lower-cost Hy4 tier for everyday agent and productivity tasks, with image understanding and a 1M-token context window.",
    "type": "chat",
    "family": "Hy",
-   "canonical_id": "tencent/hy4-preview",
-   "release_date": "2026-08-28",
+   "canonical_id": "tencent/hy4-flash",
+   "release_date": "2026-11-16",
    "limit": {
     "context": 1048576,
+    "input": 983040,
     "output": 65536
    },
    "capabilities": {
@@ -5391,6 +5395,7 @@
     "temperature": true,
     "top_k": true,
     "top_p": true,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -5407,20 +5412,24 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.96,
+      "price": 0.08,
       "cache": {
-       "read": 0.048,
-       "write": 0.96
+       "read": 0.0032,
+       "write": 0.08
       }
      },
      "output": {
-      "price": 2.88
+      "price": 0.32
      }
     }
    },
    "modalities": {
     "input": [
-     "text"
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp",
+     "image/gif"
     ],
     "output": [
      "text"
@@ -5440,8 +5449,8 @@
      }
     }
    },
-   "open_weights": true,
-   "last_updated": "2026-08-28"
+   "open_weights": false,
+   "last_updated": "2026-11-16"
   },
   "x-ai/grok-4.3": {
    "id": "x-ai/grok-4.3",

@@ -3153,6 +3153,92 @@
    "open_weights": false,
    "last_updated": "2026-07-08"
   },
+  "deepseek-ai/deepseek-v4.1-flash-1017": {
+   "id": "deepseek-ai/deepseek-v4.1-flash-1017",
+   "name": "DeepSeek V4.1 Flash 1017",
+   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
+   "type": "chat",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
+   "release_date": "2026-10-17",
+   "limit": {
+    "context": 1000000,
+    "output": 384000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.3,
+      "cache": {
+       "read": 0.007
+      }
+     },
+     "output": {
+      "price": 1.2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "ai-gateway-provider",
+      "opencodeai": "@opencode/ai/providers/cloudflare-ai-gateway"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/cloudflare-ai-gateway"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-10-17"
+  },
   "deepseek/deepseek-v4-pro": {
    "id": "deepseek/deepseek-v4-pro",
    "name": "DeepSeek V4 Pro",
@@ -4968,6 +5054,189 @@
    "knowledge": "2026-03",
    "last_updated": "2026-11-10"
   },
+  "google/gemini-4-hydrogen": {
+   "id": "google/gemini-4-hydrogen",
+   "name": "Gemini 4 Hydrogen",
+   "description": "Google's Gemini 4 model for everyday coding and agentic workflows, with four thinking levels and a 1M-token context window",
+   "type": "chat",
+   "family": "gemini",
+   "canonical_id": "google/gemini-4-hydrogen",
+   "release_date": "2026-11-12",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.5,
+      "cache": {
+       "read": 0.075
+      }
+     },
+     "output": {
+      "price": 7.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "ai-gateway-provider",
+      "opencodeai": "@opencode/ai/providers/cloudflare-ai-gateway"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-03",
+   "last_updated": "2026-11-12"
+  },
+  "google/gemini-decision-1": {
+   "id": "google/gemini-decision-1",
+   "name": "Gemini Decision 1",
+   "description": "Google's decision model that returns calibrated probabilities for typed yes/no, choice and score questions about text, images, audio, video and PDFs",
+   "type": "decision",
+   "family": "gemini",
+   "canonical_id": "google/gemini-decision-1",
+   "release_date": "2026-11-11",
+   "limit": {
+    "context": 262144
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "image/gif",
+     "image/bmp",
+     "image/tiff",
+     "audio/wav",
+     "audio/mp3",
+     "audio/mpeg",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/m4a",
+     "audio/opus",
+     "audio/webm",
+     "audio/l16",
+     "audio/alaw",
+     "audio/mulaw",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/webm",
+     "video/wmv",
+     "video/x-flv",
+     "video/3gpp",
+     "application/pdf"
+    ],
+    "output": [
+     "decision"
+    ]
+   },
+   "api": {
+    "workers-ai-run": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai",
+     "path": "/run",
+     "sdk": {
+      "aisdk": "ai-gateway-provider",
+      "opencodeai": "@opencode/ai/providers/cloudflare-ai-gateway/decisions"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-11"
+  },
   "google/gemini-omni-1.1-flash": {
    "id": "google/gemini-omni-1.1-flash",
    "name": "Gemini Omni 1.1 Flash",
@@ -5054,6 +5323,93 @@
    },
    "open_weights": false,
    "last_updated": "2026-08-27"
+  },
+  "google/gemini-omni-1.2-flash": {
+   "id": "google/gemini-omni-1.2-flash",
+   "name": "Gemini Omni 1.2 Flash",
+   "description": "Video generation and editing model with native audio, up to 15-second clips, extension, frame interpolation, and reference-guided multimodal control",
+   "type": "video",
+   "family": "gemini",
+   "canonical_id": "google/gemini-omni-1.2-flash",
+   "release_date": "2026-11-05",
+   "limit": {
+    "context": 131072,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.5
+     },
+     "output": {
+      "price": 9,
+      "reasoning": 9
+     }
+    },
+    "image": {
+     "input": {
+      "price": 1.5
+     }
+    },
+    "audio": {
+     "input": {
+      "price": 1.5
+     }
+    },
+    "video": {
+     "input": {
+      "price": 1.5
+     },
+     "output": {
+      "price": 12
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp"
+    ],
+    "output": [
+     "video/mp4"
+    ]
+   },
+   "api": {
+    "workers-ai-run": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai",
+     "sdk": {
+      "aisdk": "ai-gateway-provider"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-05"
   },
   "google/gemini-omni-flash": {
    "id": "google/gemini-omni-flash",
@@ -5505,6 +5861,23 @@
          "all": [
           {
            "resolution": {
+            "equals": "4k"
+           }
+          },
+          {
+           "generate_audio": {
+            "equals": true
+           }
+          }
+         ]
+        },
+        "price": 0.6
+       },
+       {
+        "when": {
+         "all": [
+          {
+           "resolution": {
             "equals": "720p"
            }
           },
@@ -5533,23 +5906,6 @@
          ]
         },
         "price": 0.2
-       },
-       {
-        "when": {
-         "all": [
-          {
-           "resolution": {
-            "equals": "4k"
-           }
-          },
-          {
-           "generate_audio": {
-            "equals": true
-           }
-          }
-         ]
-        },
-        "price": 0.6
        }
       ]
      }
@@ -6726,6 +7082,219 @@
    "open_weights": true,
    "last_updated": "2026-10-04"
   },
+  "minimax/h3-highspeed": {
+   "id": "minimax/h3-highspeed",
+   "name": "MiniMax H3 Highspeed",
+   "description": "MiniMax H3 video tier that balances quality and speed, with multimodal references and synchronized audio",
+   "type": "video",
+   "family": "minimax",
+   "canonical_id": "minimax/MiniMax-H3-Highspeed",
+   "release_date": "2026-07-31",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "video": {
+     "output": {
+      "unit": "second",
+      "price": 0.03,
+      "overrides": [
+       {
+        "when": {
+         "resolution": {
+          "equals": "480P"
+         }
+        },
+        "price": 0.02
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/quicktime",
+     "audio/wav",
+     "audio/mpeg"
+    ],
+    "output": [
+     "video/mp4"
+    ]
+   },
+   "api": {
+    "workers-ai-run": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai",
+     "sdk": {
+      "aisdk": "ai-gateway-provider"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-07-31"
+  },
+  "minimax/h3-lite": {
+   "id": "minimax/h3-lite",
+   "name": "MiniMax H3 Lite",
+   "description": "Lower-cost MiniMax H3 video tier for creative exploration and batch generation, with multimodal references",
+   "type": "video",
+   "family": "minimax",
+   "canonical_id": "minimax/MiniMax-H3-Lite",
+   "release_date": "2026-07-31",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "video": {
+     "output": {
+      "unit": "second",
+      "price": 0.0125,
+      "overrides": [
+       {
+        "when": {
+         "resolution": {
+          "equals": "768P"
+         }
+        },
+        "price": 0.02
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/quicktime",
+     "audio/wav",
+     "audio/mpeg"
+    ],
+    "output": [
+     "video/mp4"
+    ]
+   },
+   "api": {
+    "workers-ai-run": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai",
+     "sdk": {
+      "aisdk": "ai-gateway-provider"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-07-31"
+  },
+  "minimax/h3-max": {
+   "id": "minimax/h3-max",
+   "name": "MiniMax H3 Max",
+   "description": "Fast video model post-trained by fal.ai on MiniMax H3, with synchronized audio at 480p and 768p",
+   "type": "video",
+   "family": "minimax",
+   "canonical_id": "minimax/MiniMax-H3-Max",
+   "release_date": "2026-08-26",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "video": {
+     "output": {
+      "unit": "second",
+      "price": 0.05,
+      "overrides": [
+       {
+        "when": {
+         "resolution": {
+          "equals": "768P"
+         }
+        },
+        "price": 0.08
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/quicktime",
+     "audio/wav",
+     "audio/mpeg"
+    ],
+    "output": [
+     "video/mp4"
+    ]
+   },
+   "api": {
+    "workers-ai-run": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai",
+     "sdk": {
+      "aisdk": "ai-gateway-provider"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-08-26"
+  },
   "minimax/hailuo-2.3": {
    "id": "minimax/hailuo-2.3",
    "name": "Hailuo 2.3",
@@ -7220,6 +7789,90 @@
    },
    "open_weights": true,
    "last_updated": "2026-07-16"
+  },
+  "moonshotai/kimi-k3.1-pro": {
+   "id": "moonshotai/kimi-k3.1-pro",
+   "name": "Kimi K3.1 Pro",
+   "description": "Multimodal Kimi model with a 1M-token context window and always-on reasoning, for coding, 3D creation and financial research",
+   "type": "chat",
+   "family": "kimi-k3",
+   "canonical_id": "moonshotai/kimi-k3.1-pro",
+   "release_date": "2026-10-23",
+   "limit": {
+    "context": 1048576,
+    "output": 1048576
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.2
+      }
+     },
+     "output": {
+      "price": 10
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "ai-gateway-provider",
+      "opencodeai": "@opencode/ai/providers/cloudflare-ai-gateway"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-10-23"
   },
   "openai/gpt-4.1": {
    "id": "openai/gpt-4.1",
@@ -10094,8 +10747,8 @@
     ],
     "output": [
      "image/png",
-     "image/jpeg",
-     "image/webp"
+     "image/webp",
+     "image/jpeg"
     ]
    },
    "api": {
@@ -10321,6 +10974,148 @@
    },
    "open_weights": false,
    "last_updated": "2026-09-08"
+  },
+  "openai/gpt-image-2.6-flare": {
+   "id": "openai/gpt-image-2.6-flare",
+   "name": "GPT Image 2.6 Flare",
+   "description": "Fast image generation and editing with complexity control, markup-guided edits, SVG and animated GIF output",
+   "type": "image",
+   "family": "gpt-image",
+   "canonical_id": "openai/gpt-image-2.6-flare",
+   "release_date": "2026-10-28",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 1.25
+      }
+     }
+    },
+    "image": {
+     "input": {
+      "price": 8,
+      "cache": {
+       "read": 2
+      }
+     },
+     "output": {
+      "price": 30
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp"
+    ],
+    "output": [
+     "image/png",
+     "image/webp",
+     "image/jpeg",
+     "image/gif"
+    ]
+   },
+   "api": {
+    "workers-ai-run": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai",
+     "sdk": {
+      "aisdk": "ai-gateway-provider"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-10-28"
+  },
+  "openai/gpt-image-2.6-sunburst": {
+   "id": "openai/gpt-image-2.6-sunburst",
+   "name": "GPT Image 2.6 Sunburst",
+   "description": "Detailed image generation and editing with complexity control, markup-guided edits, SVG and animated GIF output",
+   "type": "image",
+   "family": "gpt-image",
+   "canonical_id": "openai/gpt-image-2.6-sunburst",
+   "release_date": "2026-10-28",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5,
+      "cache": {
+       "read": 1.25
+      }
+     }
+    },
+    "image": {
+     "input": {
+      "price": 8,
+      "cache": {
+       "read": 2
+      }
+     },
+     "output": {
+      "price": 30
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp"
+    ],
+    "output": [
+     "image/png",
+     "image/webp",
+     "image/jpeg",
+     "image/gif"
+    ]
+   },
+   "api": {
+    "workers-ai-run": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai",
+     "sdk": {
+      "aisdk": "ai-gateway-provider"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-10-28"
   },
   "openai/o3": {
    "id": "openai/o3",
@@ -11519,13 +12314,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0,
+      "price": 0.3,
       "cache": {
-       "read": 0
+       "read": 0.04
       }
      },
      "output": {
-      "price": 0
+      "price": 1
      }
     }
    },
@@ -11759,10 +12554,7 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.042,
-      "cache": {
-       "read": 0
-      }
+      "price": 0.042
      },
      "output": {
       "price": 0
@@ -12814,6 +13606,84 @@
    },
    "open_weights": false,
    "last_updated": "2026-03-16"
+  },
+  "xiaomi/mimo-v2.6-pro": {
+   "id": "xiaomi/mimo-v2.6-pro",
+   "name": "MiMo-V2.6-Pro",
+   "description": "Stronger MiMo Pro tier for multimodal reasoning and coding-agent execution",
+   "type": "chat",
+   "family": "mimo",
+   "canonical_id": "xiaomi/mimo-v2.6-pro",
+   "release_date": "2026-09-22",
+   "limit": {
+    "context": 1048576,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 4,
+      "cache": {
+       "read": 0.036
+      }
+     },
+     "output": {
+      "price": 8
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "audio/mpeg",
+     "audio/wav",
+     "audio/flac",
+     "audio/mp4",
+     "audio/ogg",
+     "video/mp4",
+     "video/quicktime",
+     "video/x-msvideo",
+     "video/x-ms-wmv"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+     "sdk": {
+      "aisdk": "ai-gateway-provider",
+      "opencodeai": "@opencode/ai/providers/cloudflare-ai-gateway"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-09-22"
   }
  }
 }

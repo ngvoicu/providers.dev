@@ -68,6 +68,75 @@
    "open_weights": false,
    "last_updated": "2024-01-01"
   },
+  "beam-1.0-501b-a23b": {
+   "id": "beam-1.0-501b-a23b",
+   "name": "Beam 1.0 501B A23B",
+   "description": "Sparse mixture-of-experts reasoning model with 23B active parameters for coding and agentic workflows",
+   "type": "chat",
+   "family": "beam",
+   "canonical_id": "reflection/beam-1.0-501b-a23b",
+   "release_date": "2026-10-05",
+   "limit": {
+    "context": 1048576,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.4,
+      "cache": {
+       "read": 0.04
+      }
+     },
+     "output": {
+      "price": 1.2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.llmgateway.io/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2026-06-30",
+   "last_updated": "2026-10-16"
+  },
   "claude-fable-5": {
    "id": "claude-fable-5",
    "name": "Claude Fable 5",
@@ -1924,6 +1993,76 @@
    "knowledge": "2025-05",
    "last_updated": "2026-07-31"
   },
+  "deepseek-v4-flash-vision-exp": {
+   "id": "deepseek-v4-flash-vision-exp",
+   "name": "DeepSeek V4 Flash Vision Exp",
+   "description": "Experimental multimodal DeepSeek V4 Flash model for image understanding, coding, and agentic work",
+   "type": "chat",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4-flash-vision-exp",
+   "release_date": "2026-08-21",
+   "limit": {
+    "context": 1050000,
+    "output": 384000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.44
+     },
+     "output": {
+      "price": 1.32
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.llmgateway.io/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-09-01"
+  },
   "deepseek-v4-pro": {
    "id": "deepseek-v4-pro",
    "name": "DeepSeek V4 Pro",
@@ -3187,14 +3326,14 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.75,
+      "price": 1.5,
       "cache": {
-       "read": 0.075,
-       "write": 0.08333
+       "read": 0.15,
+       "write": 0.16667
       }
      },
      "output": {
-      "price": 3.75
+      "price": 7.5
      }
     }
    },
@@ -3286,14 +3425,14 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.75,
+      "price": 1.5,
       "cache": {
-       "read": 0.075,
-       "write": 0.08333
+       "read": 0.15,
+       "write": 0.16667
       }
      },
      "output": {
-      "price": 3.75
+      "price": 7.5
      }
     }
    },
@@ -3385,14 +3524,14 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.75,
+      "price": 1.5,
       "cache": {
-       "read": 0.075,
-       "write": 0.08333
+       "read": 0.15,
+       "write": 0.16667
       }
      },
      "output": {
-      "price": 3.75
+      "price": 7.5
      }
     }
    },
@@ -5046,7 +5185,6 @@
      "supported": true,
      "effort": [
       "none",
-      "minimal",
       "low",
       "medium",
       "high",
@@ -5244,7 +5382,7 @@
    "family": "glm",
    "release_date": "2026-09-18",
    "limit": {
-    "context": 1000000,
+    "context": 1048576,
     "output": 1000000
    },
    "capabilities": {
@@ -5258,6 +5396,8 @@
     "reasoning": {
      "supported": true,
      "effort": [
+      "low",
+      "high",
       "xhigh",
       "max"
      ]
@@ -9253,7 +9393,7 @@
    "canonical_id": "tencent/hy4-preview",
    "release_date": "2026-08-28",
    "limit": {
-    "context": 1000000,
+    "context": 1048576,
     "output": 64000
    },
    "capabilities": {
@@ -10138,14 +10278,14 @@
    "cost": {
     "text": {
      "input": {
-      "price": 4,
+      "price": 3.8,
       "cache": {
-       "read": 0.2,
+       "read": 0.19,
        "write": 4
       }
      },
      "output": {
-      "price": 20
+      "price": 19
      }
     }
    },
@@ -10784,6 +10924,89 @@
    },
    "open_weights": true,
    "last_updated": "2026-09-22"
+  },
+  "mimo-v2.6-pro-ultraspeed": {
+   "id": "mimo-v2.6-pro-ultraspeed",
+   "name": "MiMo V2.6 Pro UltraSpeed",
+   "description": "MiMo pro model for strong multimodal reasoning and agent execution",
+   "type": "chat",
+   "family": "mimo",
+   "canonical_id": "xiaomi/mimo-v2.6-pro-ultraspeed",
+   "release_date": "2026-09-21",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 4.35,
+      "cache": {
+       "read": 0.036
+      }
+     },
+     "output": {
+      "price": 8.7
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "audio/mpeg",
+     "audio/wav",
+     "audio/flac",
+     "audio/mp4",
+     "audio/ogg",
+     "video/mp4",
+     "video/quicktime",
+     "video/x-msvideo",
+     "video/x-ms-wmv"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.llmgateway.io/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-09-21"
   },
   "minimax-m2": {
    "id": "minimax-m2",
@@ -12595,6 +12818,82 @@
    },
    "open_weights": false,
    "last_updated": "2026-09-02"
+  },
+  "muse-spark-open": {
+   "id": "muse-spark-open",
+   "name": "Muse Spark Open",
+   "description": "Muse Spark Open is an 816B total / 42B active open-weight multimodal reasoning model from Meta for coding and long-horizon agentic work, with 1M-token context.",
+   "type": "chat",
+   "family": "muse",
+   "canonical_id": "meta/muse-spark-open",
+   "release_date": "2026-10-15",
+   "limit": {
+    "context": 1048576,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "minimal",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.25,
+      "cache": {
+       "read": 0.15
+      }
+     },
+     "output": {
+      "price": 4.25
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image",
+     "video",
+     "audio/wav",
+     "audio/mpeg"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.llmgateway.io/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2026-01-04",
+   "last_updated": "2026-10-15"
   },
   "muse-wonder-1.0": {
    "id": "muse-wonder-1.0",
@@ -14934,6 +15233,83 @@
    },
    "open_weights": true,
    "last_updated": "2026-02-15"
+  },
+  "qwen4-max": {
+   "id": "qwen4-max",
+   "name": "Qwen4 Max",
+   "description": "Flagship multimodal model for coding, office productivity, frontend design, and complex agentic tasks",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen4-max",
+   "release_date": "2026-11-16",
+   "limit": {
+    "context": 983616,
+    "output": 262144
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.5,
+      "cache": {
+       "read": 0.075,
+       "write": 1.875
+      }
+     },
+     "output": {
+      "price": 4.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/x-matroska",
+     "video/quicktime",
+     "video/x-flv",
+     "video/x-ms-wmv",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.llmgateway.io/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-16"
   },
   "reka-edge-2603": {
    "id": "reka-edge-2603",

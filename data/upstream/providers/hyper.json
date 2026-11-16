@@ -1268,7 +1268,14 @@
      "supported": true
     },
     "reasoning": {
-     "supported": true
+     "supported": true,
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
     }
    },
    "cost": {
@@ -1314,6 +1321,77 @@
    },
    "open_weights": false,
    "last_updated": "2026-07-19"
+  },
+  "qwen4-max": {
+   "id": "qwen4-max",
+   "name": "Qwen4 Max",
+   "description": "Flagship multimodal model for coding, office productivity, frontend design, and complex agentic tasks",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen4-max",
+   "release_date": "2026-11-16",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.5,
+      "cache": {
+       "read": 0.075
+      }
+     },
+     "output": {
+      "price": 4.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://hyper.charm.land/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-16"
   }
  }
 }

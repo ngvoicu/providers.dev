@@ -3936,7 +3936,7 @@
    "release_date": "2026-07-31",
    "limit": {
     "context": 1048576,
-    "output": 943718
+    "output": 384000
    },
    "capabilities": {
     "temperature": true,
@@ -4296,7 +4296,7 @@
    "release_date": "2026-10-17",
    "limit": {
     "context": 1048576,
-    "output": 384000
+    "output": 393216
    },
    "capabilities": {
     "temperature": true,
@@ -7615,13 +7615,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.01,
+      "price": 0.04,
       "cache": {
-       "read": 0.005
+       "read": 0.02
       }
      },
      "output": {
-      "price": 0.031
+      "price": 0.12
      }
     }
    },
@@ -8578,69 +8578,6 @@
    },
    "open_weights": false,
    "last_updated": "2026-10-30"
-  },
-  "inclusionai/ling-3.2-flash:free": {
-   "id": "inclusionai/ling-3.2-flash:free",
-   "name": "inclusionAI: Ling 3.2 Flash (free)",
-   "description": "Ling 3.2 Flash is a hybrid reasoning model from inclusionAI that accepts text and image input, with a 1M-token context window and up to 200 images per request. Thinking can...",
-   "type": "chat",
-   "family": "ling",
-   "release_date": "2026-11-13",
-   "limit": {
-    "context": 1048576,
-    "output": 262144
-   },
-   "capabilities": {
-    "temperature": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.kilo.ai/api/gateway",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": false
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-11-13"
   },
   "inference-net/schematron-v2-small": {
    "id": "inference-net/schematron-v2-small",
@@ -11047,8 +10984,8 @@
    "canonical_id": "minimax/MiniMax-M2.5",
    "release_date": "2026-02-12",
    "limit": {
-    "context": 198000,
-    "output": 32768
+    "context": 196608,
+    "output": 176947
    },
    "capabilities": {
     "temperature": true,
@@ -11070,13 +11007,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.27,
+      "price": 0.295,
       "cache": {
-       "read": 0.03
+       "read": 0.06
       }
      },
      "output": {
-      "price": 0.95
+      "price": 1.2
      }
     }
    },
@@ -13988,13 +13925,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 2,
+      "price": 0.2403,
       "cache": {
        "read": 0.2
       }
      },
      "output": {
-      "price": 10
+      "price": 8.4023
      }
     }
    },
@@ -21069,7 +21006,7 @@
    "release_date": "2025-08-05",
    "limit": {
     "context": 131072,
-    "output": 117964
+    "output": 65536
    },
    "capabilities": {
     "temperature": true,
@@ -24493,8 +24430,8 @@
    "canonical_id": "alibaba/qwen3.5-397b-a17b",
    "release_date": "2026-02-15",
    "limit": {
-    "context": 256000,
-    "output": 64000
+    "context": 262144,
+    "output": 81920
    },
    "capabilities": {
     "temperature": true,
@@ -24595,13 +24532,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.032,
+      "price": 0.166,
       "cache": {
-       "read": 0.028
+       "read": 0.149
       }
      },
      "output": {
-      "price": 0.046
+      "price": 0.243
      }
     }
    },
@@ -26134,6 +26071,79 @@
    },
    "open_weights": false,
    "last_updated": "2026-09-17"
+  },
+  "qwen/qwen4-max": {
+   "id": "qwen/qwen4-max",
+   "name": "Qwen: Qwen4 Max",
+   "description": "Qwen4 Max is the flagship model in Alibaba's Qwen4 series. It accepts text, image, and video input and returns text, with a 1M-token context window and reasoning enabled by default....",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen4-max",
+   "release_date": "2026-11-16",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.5,
+      "cache": {
+       "read": 0.075,
+       "write": 1.875
+      }
+     },
+     "output": {
+      "price": 4.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image",
+     "video"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.kilo.ai/api/gateway",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-16"
   },
   "reflection/beam-1.0-501b-a23b": {
    "id": "reflection/beam-1.0-501b-a23b",
@@ -27950,6 +27960,78 @@
    },
    "open_weights": false,
    "last_updated": "2026-11-04"
+  },
+  "tencent/hy4-flash": {
+   "id": "tencent/hy4-flash",
+   "name": "Tencent: Hy4 flash",
+   "description": "Tencent Hy4 Flash is a lower-cost model in the Hy4 family for coding, reasoning, and agentic workflows. It supports deep reasoning with preserved thinking, tool calling, structured outputs, prompt caching, and image understanding, with a 1M-token context window.",
+   "type": "chat",
+   "family": "Hy",
+   "canonical_id": "tencent/hy4-flash",
+   "release_date": "2026-11-16",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.07,
+      "cache": {
+       "read": 0.003
+      }
+     },
+     "output": {
+      "price": 0.281
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp",
+     "image/gif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.kilo.ai/api/gateway",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-16"
   },
   "tencent/hy4-preview": {
    "id": "tencent/hy4-preview",
@@ -30264,13 +30346,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.2,
+      "price": 0.13,
       "cache": {
-       "read": 0.03
+       "read": 0.025
       }
      },
      "output": {
-      "price": 1.1
+      "price": 0.85
      }
     }
    },
@@ -31885,7 +31967,7 @@
    "release_date": "2026-09-14",
    "limit": {
     "context": 1048576,
-    "output": 384000
+    "output": 943718
    },
    "capabilities": {
     "temperature": true,
@@ -31908,13 +31990,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.02,
+      "price": 0.036,
       "cache": {
-       "read": 0.007
+       "read": 0.01
       }
      },
      "output": {
-      "price": 0.108
+      "price": 0.5
      }
     }
    },

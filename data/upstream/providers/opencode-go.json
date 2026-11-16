@@ -1546,6 +1546,78 @@
    "open_weights": false,
    "last_updated": "2026-11-04"
   },
+  "hy4-flash-free": {
+   "id": "hy4-flash-free",
+   "name": "Hy4 flash Free",
+   "description": "Tencent's lower-cost Hy4 tier for everyday agent and productivity tasks, with image understanding and a 1M-token context window.",
+   "type": "chat",
+   "family": "Hy",
+   "canonical_id": "tencent/hy4-flash",
+   "release_date": "2026-11-16",
+   "limit": {
+    "context": 1048576,
+    "input": 983040,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp",
+     "image/gif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://opencode.ai/inference/go/openai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-16"
+  },
   "hy4-preview": {
    "id": "hy4-preview",
    "name": "Hy4 preview",
@@ -3253,6 +3325,109 @@
    },
    "open_weights": false,
    "last_updated": "2026-08-03"
+  },
+  "qwen4-max": {
+   "id": "qwen4-max",
+   "name": "Qwen4 Max",
+   "description": "Flagship multimodal model for coding, office productivity, frontend design, and complex agentic tasks",
+   "type": "chat",
+   "family": "qwen4-max",
+   "canonical_id": "alibaba/qwen4-max",
+   "release_date": "2026-11-16",
+   "limit": {
+    "context": 1000000,
+    "output": 262144
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true,
+     "explicit": {
+      "ttl": [
+       "5m",
+       "1h"
+      ]
+     }
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": true,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "high",
+      "xhigh"
+     ],
+     "budget": {
+      "max": 262144
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.5,
+      "cache": {
+       "read": 0.075,
+       "write": {
+        "5m": 1.875,
+        "1h": 3
+       }
+      }
+     },
+     "output": {
+      "price": 4.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/x-matroska",
+     "video/quicktime",
+     "video/x-flv",
+     "video/x-ms-wmv"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://opencode.ai/inference/go/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-16"
   },
   "space-bunny": {
    "id": "space-bunny",
