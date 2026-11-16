@@ -415,6 +415,19 @@ describe("the age columns of results by age", () => {
     expect(heads(page(CASES.opus, CACHE_AGES_S))).toHaveLength(1 + CACHE_AGES_S.length);
   });
 
+  it("says what the ages and the cells are: to a screen reader over the ages, in sight in their hover texts and the legend", () => {
+    const html = page(CASES.opus, [600, 3900]);
+    // The heading over the ages is read out and not shown.
+    expect(html).toContain('<th scope="colgroup" colspan="3" class="span"><span class="sr-only">Time since the prompt was cached · served from the cache, in percent, with hits/checks</span></th>');
+    // Each age says what it is in its hover text.
+    expect(html).toContain('<th scope="col" class="age" title="At once: the prompt sent again immediately. It shows that the prompt was cached at all.">At once</th>');
+    expect(html).toContain('<th scope="col" class="age" title="The prompt sent again 10 min after it was cached.">10 min</th>');
+    expect(html).toContain('<th scope="col" class="age" title="The prompt sent again 1 h 5 min after it was cached.">1 h 5</th>');
+    // The legend: a sample cell and what a cell and its column are, then the colours.
+    expect(html).toContain('<span class="legend-head"><span class="heat-key most" aria-hidden="true">67<small>2/3</small></span>');
+    expect(text(html)).toContain("67 2/3 Checks served from the cache, in percent and as hits/checks, by time since the prompt was cached 100 All 67 Half or more 33 Fewer 0 None · Not checked at that age Methodology");
+  });
+
   it("still shows a result at an age that has no column, in words beside its lifetime and its evaluation", () => {
     const html = page(CASES.opus, [600, 3900]);
     // 30 minutes has no column here: the lifetime (5 of 6) and each evaluation (2 of 3, 3 of 3) say it in words.

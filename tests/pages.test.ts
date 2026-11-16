@@ -168,7 +168,7 @@ describe("API response boundary", () => {
     };
     const entry = await (await page("/entries/provider-02/lab/model-4", twoAges)).text();
     expect([...entry.matchAll(/<th scope="col" class="age"[^>]*>([^<]+)<\/th>/g)].map((match) => match[1])).toEqual(["At once", "10 min", "1 h 5"]);
-    expect(entry).toContain('<th scope="colgroup" colspan="3" class="span">');
+    expect(entry).toContain('<th scope="colgroup" colspan="3" class="span"><span class="sr-only">Time since the prompt was cached');
     const strip = '<span class="strip"><span class="control">once</span><span>10m</span><span>65m</span></span>';
     const evidence = await (await page("/evidence/", twoAges)).text();
     expect(evidence).toContain(`<span class="heat-strip strip-head" aria-hidden="true"><span></span>${strip}`);

@@ -886,6 +886,22 @@
     gap: 0.45rem;
     white-space: nowrap;
   }
+  /* What a cell and its column are: a sample cell and its words, on a line of their own over the colours */
+  .legend > span.legend-head {
+    flex-basis: 100%;
+    color: var(--fg-soft);
+    white-space: normal;
+  }
+  .legend .legend-head .heat-key {
+    flex: none;
+    padding: 0.3rem 0;
+  }
+  .legend .heat-key small {
+    display: block;
+    margin-top: 0.1rem;
+    font-size: 0.66rem;
+    opacity: 0.8;
+  }
   .id {
     display: flex;
     flex-wrap: wrap;
@@ -1128,7 +1144,35 @@
     color: var(--link);
   }
   /* On an entry's page: one table of every lifetime. Each retention starts with its safe value and what it was chosen
-     from; under it each lifetime, documented or measured, in the same columns. */
+     from, on a band; under it each lifetime, documented or measured, in the same columns, set in from the band with a
+     line down its side that ties it to its retention. */
+  table.lifetimes {
+    --band: color-mix(in oklab, var(--panel) 45%, var(--bg));
+    --tie: linear-gradient(var(--line-strong), var(--line-strong)) 0.9rem 0 / 2px 100% no-repeat;
+  }
+  /* The head in the colour of the text on a tint of its own: the column names, then the ages, each over its column */
+  table.lifetimes > thead th {
+    background: var(--panel);
+    color: var(--fg);
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-bottom: 1px solid var(--line-strong);
+  }
+  table.lifetimes > thead th.age {
+    width: 2.75rem;
+    color: var(--fg-soft);
+    font-size: 0.76rem;
+    font-weight: 520;
+    padding: 0.55rem 0.1rem;
+  }
+  table.lifetimes > thead th.age + th.age {
+    box-shadow: inset 1px 0 var(--line-strong);
+  }
+  /* The heading over the ages is for a screen reader; the legend says it in sight */
+  table.lifetimes > thead th.span {
+    padding: 0;
+    border: 0;
+  }
   table.lifetimes td.life {
     min-width: 9.5rem;
   }
@@ -1160,7 +1204,8 @@
       min-width: 11.5rem;
       padding-right: 0.5rem;
     }
-    table.lifetimes td.heat {
+    table.lifetimes td.heat,
+    table.lifetimes > thead th.age {
       width: 2.3rem;
     }
     table.lifetimes td.heat span {
@@ -1177,14 +1222,25 @@
     font-weight: 500;
   }
   table.lifetimes tbody.profile > tr > * {
-    background: var(--bg-subtle);
-    border-top: 2px solid var(--line);
-    padding-top: 0.7rem;
-    padding-bottom: 0.7rem;
+    background: var(--band);
+    border-top: 1px solid var(--line-strong);
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
   }
   table.lifetimes tbody.profile > tr > th {
-    font-weight: 600;
+    font-size: 1rem;
+    font-weight: 650;
     white-space: nowrap;
+  }
+  @media (min-width: 1024px) {
+    table.lifetimes > tbody.item > tr > td.life {
+      padding-left: 1.85rem;
+      background: var(--tie);
+    }
+    table.lifetimes > tbody.item > tr.run > td.run-head {
+      padding-left: 2.8rem;
+      background: var(--tie), var(--bg-subtle);
+    }
   }
   table.lifetimes tbody.profile:first-of-type > tr > * {
     border-top: 0;
@@ -1779,12 +1835,18 @@
     table.lifetimes.stack-tablet > tbody > tr > td.heat.unchecked {
       display: none;
     }
-    table.lifetimes.stack-tablet > tbody.profile > tr,
     table.lifetimes.stack-tablet > tbody > tr.run {
       background: var(--bg-subtle);
     }
     table.lifetimes.stack-tablet > tbody.profile > tr {
-      border-top: 2px solid var(--line);
+      background: var(--band);
+      border-top: 1px solid var(--line-strong);
+    }
+    /* Each lifetime set in under its retention, a line down its side */
+    table.lifetimes.stack-tablet > tbody.item > tr {
+      margin-left: 0.9rem;
+      padding-left: 0.9rem;
+      box-shadow: inset 2px 0 var(--line-strong);
     }
     table.lifetimes.stack-tablet > tbody.profile:first-of-type > tr {
       border-top: 0;
@@ -1817,20 +1879,6 @@
     pre {
       white-space: pre-wrap;
       overflow-wrap: anywhere;
-    }
-    /* The first line of the head says what the cells are: it stays, as a line over the rows */
-    table.heat.stack-tablet > thead th.span {
-      position: static;
-      display: block;
-      width: auto;
-      height: auto;
-      margin: 0;
-      padding: 0.55rem 0.9rem;
-      overflow: visible;
-      clip-path: none;
-      white-space: normal;
-      text-align: left;
-      border-bottom: 1px solid var(--line);
     }
   }
   @container (max-width: 29.5rem) {

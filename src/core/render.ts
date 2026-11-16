@@ -448,7 +448,9 @@ function heatCell(result: CacheResult | undefined, column: Column): string {
   return `<td class="heat"${label}><span class="${level(result)}" title="${e(said(result))}">${Math.round(result.hit_rate_pct)}<small>${result.hits}/${result.checks}</small></span></td>`;
 }
 
-const heatHead = (columns: readonly Column[]): string => columns.map((column) => `<th scope="col" class="age"${column.kind === "control" ? ` title="${CONTROL_TITLE}"` : ""}>${heatLabel(column)}</th>`).join("");
+/** The headings of the age columns, each saying in its hover text what its age is. */
+const heatHead = (columns: readonly Column[]): string =>
+  columns.map((column) => `<th scope="col" class="age" title="${column.kind === "control" ? CONTROL_TITLE : `The prompt sent again ${ageText(column.age_s)} after it was cached.`}">${heatLabel(column)}</th>`).join("");
 /** The cells of one row of results by age, one per column. */
 const heatCells = (results: readonly CacheResult[], columns: readonly Column[]): string => columns.map((column) => heatCell(inColumn(results, column), column)).join("");
 
@@ -527,7 +529,8 @@ function itemRows(item: CacheLifetimeItem, evaluations: readonly CacheEvaluation
 /**
  * Every lifetime of an entry, one table for all: per retention profile the safe value and what it was chosen from, then
  * each documented and each measured lifetime as the API lists them, in its order. Both profiles on every entry. The age
- * columns are the published ones (`cache_ages_s` of /api/v1/meta).
+ * columns are the published ones (`cache_ages_s` of /api/v1/meta). What the ages and the cells are is said to a screen
+ * reader by the heading over the ages, and in sight by the legend under the table: one sample cell and its words.
  */
 function lifetimesTable(cache: EntryCache, today: Today, ages: CacheAges): string {
   const record = cache.lifetime;
@@ -539,8 +542,8 @@ function lifetimesTable(cache: EntryCache, today: Today, ages: CacheAges): strin
   const rest = others.length
     ? `<tbody class="profile"><tr><th scope="row">Other evaluations</th><td class="profile-facts" colspan="${1 + columns.length}"><span class="muted">In no lifetime</span></td></tr></tbody><tbody class="item others">${others.map((run) => runRow(run, today, columns, true)).join("")}</tbody>`
     : "";
-  return `<div class="scroll"><table class="facts heat lifetimes stack-tablet"><caption class="sr-only">Every cache lifetime of this entry, by retention</caption><thead><tr><th scope="col" rowspan="2">Lifetime</th><th scope="col" rowspan="2">Documented for, or measured through</th><th scope="colgroup" colspan="${columns.length}" class="span">Time since the prompt was cached · served from the cache, in percent, with hits/checks</th></tr><tr>${heatHead(columns)}</tr></thead>${body}${rest}</table></div>
-<p class="legend"><span><span class="heat-key all">100</span> All served from the cache</span><span><span class="heat-key most">67</span> Half or more</span><span><span class="heat-key few">33</span> Fewer</span><span><span class="heat-key none">0</span> None</span><span><span class="heat-key skip">·</span> Not checked at that age</span><span><a href="/docs/methodology/#evaluations">Methodology</a></span></p>`;
+  return `<div class="scroll"><table class="facts heat lifetimes stack-tablet"><caption class="sr-only">Every cache lifetime of this entry, by retention</caption><thead><tr><th scope="col" rowspan="2">Lifetime</th><th scope="col" rowspan="2">Documented for, or measured through</th><th scope="colgroup" colspan="${columns.length}" class="span"><span class="sr-only">Time since the prompt was cached · served from the cache, in percent, with hits/checks</span></th></tr><tr>${heatHead(columns)}</tr></thead>${body}${rest}</table></div>
+<p class="legend"><span class="legend-head"><span class="heat-key most" aria-hidden="true">67<small>2/3</small></span> Checks served from the cache, in percent and as hits/checks, by time since the prompt was cached</span><span><span class="heat-key all">100</span> All</span><span><span class="heat-key most">67</span> Half or more</span><span><span class="heat-key few">33</span> Fewer</span><span><span class="heat-key none">0</span> None</span><span><span class="heat-key skip">·</span> Not checked at that age</span><span><a href="/docs/methodology/#evaluations">Methodology</a></span></p>`;
 }
 
 /** A JSON Pointer into the request body as the field a developer writes: /cache_control/ttl -> cache_control.ttl. */
