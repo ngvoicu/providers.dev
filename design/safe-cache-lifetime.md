@@ -1,11 +1,11 @@
 # One cache record per entry: every lifetime, and the safe value
 
 Design, 2026-11-15, final after the owner's answers of that day (section 12). Built: tasks 1 to 6 of section 11 are
-in `main` up to `5401995`, and `documented_status` (decision 32) after the final review T-26. This file says what
+in `main` up to `a4eef56`, and `documented_status` (decision 32) after the final review T-26. This file says what
 is built and why; sections 6 and 11 also keep the order in which it was built. `AGENTS.md` and `README.md` stay the
 rules of the data and the contract.
 
-Numbers and examples are from the dataset built on 2026-11-15 from commit `e6cd269`: `dataset_version`
+Numbers and examples are from the dataset built on 2026-11-15 from commit `7849dd7`: `dataset_version`
 `c58159b6ef7f9dfa`, models.dev import of 2026-11-15 (commit `c18a3cf`), `observed.json` sha256 `956fa11a…`
 (groundtruth `60423f2`), 332 providers, 10,524 entries, 78 published cache evaluations on 46 entries. The final
 review T-26 rebuilt them on `4d6a1f5df03a858f` (groundtruth `798c409`, after the work): every count and safe value
@@ -738,7 +738,7 @@ Three things changed in what can be read, all small:
 ### 6.5 The order of the change
 
 The old fields were read by the pages (`src/core/render.ts`, `format.ts`). So tasks 1 to 4 added the merged record,
-task 5 moved the pages to it (`c0b5d20`, `ccc86f2`), and task 6 deleted the old fields (`f489197`), one straight
+task 5 moved the pages to it (`e21a705`, `9b3eb79`), and task 6 deleted the old fields (`0ae8afb`), one straight
 after the other. Between task 2 and task 6 the API carried both, with the old ones unchanged in value; that state was
 never published. The change is finished: no renderer reads an old field, and none is in the API.
 
@@ -871,7 +871,7 @@ Long: no item → null.
 
 **2. `meta-subscription/muse-wonder-1.0`, short: one client never hit → 0 measured. Long: one age tested.**
 
-The entry is one providers.dev added for the Muse Code subscription key (commit `e6cd269`); until then these
+The entry is one providers.dev added for the Muse Code subscription key (commit `7849dd7`); until then these
 evaluations were on `meta/muse-wonder-1.0`. Nothing is documented on it.
 
 | Evaluation | Client | Results | `lifetime_s` | `first_miss_s` | `tested_from_s` | `hits` of `checks` |
@@ -1008,9 +1008,9 @@ fifth the thirteen rows of 4.3, and the sixth the same thirteen: twelve `not_con
 
 Six tasks, one straight after the other, all done; this section is the plan they were built from, kept as the
 record of the change. Each left `npm run build && npm run check` passing. Tasks 1 to 4 added the merged record and
-changed no existing value (`08d140a`, `731064b`, `b34026a`, `8c80de2`, with the corrections after the reviews in
-`8168dfb`, `97970e1`, `941db6e`). Task 5 moved the pages to it (`c0b5d20`, `ccc86f2`). Task 6 deleted what was
-folded in (`f489197`). What is said below in the future tense or about "today's" fields describes the state before
+changed no existing value (`2ba250e`, `9aeeab0`, `1777f4b`, `66fc44a`, with the corrections after the reviews in
+`a808839`, `a1765d6`, `fc67483`). Task 5 moved the pages to it (`e21a705`, `9b3eb79`). Task 6 deleted what was
+folded in (`0ae8afb`). What is said below in the future tense or about "today's" fields describes the state before
 each task; sections 1 to 10 describe what is built. After them, `documented_status` (decision 32) was added on
 2026-11-15, after the final review T-26.
 
@@ -1141,9 +1141,9 @@ All on 2026-11-15. "The owner" decided; "the chief" is the project's chief, who 
 | 17 | `retention_s` on the options of the `cache.retention` control is left where it is and is no item. | As recommended; shown to the owner, no objection |
 | 18 | No floor on the number of checks per age. | As recommended; shown to the owner, no objection |
 | 19 | A measured value does not expire; its date is published. | As recommended; shown to the owner, no objection |
-| 20 | 2026-11-16: decided and built in `632ea5b`. A sort on the value in `/api/v1/entries`: `sort=cache_short` and `sort=cache_long`, by the safe value of the profile (`cache_lifetime.short.safe_s`, `cache_lifetime.long.safe_s`); 0 is a value, and an entry whose value is not known comes last in either order. A filter on its basis: `lifetime_basis` (`documented`, `measured`, a list), an entry matches when the basis of its short or of its long profile is one of the values. A filter on the value itself (by seconds) is not built. | The owner |
+| 20 | 2026-11-16: decided and built in `f02eb11`. A sort on the value in `/api/v1/entries`: `sort=cache_short` and `sort=cache_long`, by the safe value of the profile (`cache_lifetime.short.safe_s`, `cache_lifetime.long.safe_s`); 0 is a value, and an entry whose value is not known comes last in either order. A filter on its basis: `lifetime_basis` (`documented`, `measured`, a list), an entry matches when the basis of its short or of its long profile is one of the values. A filter on the value itself (by seconds) is not built. | The owner |
 | 21 | A cell of results by age shows a rounded hit percentage; the API and the hover text are exact. | Decided separately, outside this design |
-| 22 | The Muse Code subscription runs land on a subscription provider, `meta-subscription`, not on Meta's API entries. | The owner; done in `e6cd269` (groundtruth `60423f2`) |
+| 22 | The Muse Code subscription runs land on a subscription provider, `meta-subscription`, not on Meta's API entries. | The owner; done in `7849dd7` (groundtruth `60423f2`) |
 | 23 | 2026-11-15: the record holds whole seconds only. A documented text that does not come to a whole number of seconds above 0 (`500ms`, `0s`) makes no item and is reported as `unparsed-lifetime`; nothing is rounded (5.3). | The chief, after review T-14 |
 | 24 | 2026-11-15: the list is ordered in plain character order, never by the locale, and completely: documented items of one lifetime and mode by `documented_as`, measured items of one client and value by `parameter`, null first (2.4). | The chief, after review T-14 |
 | 25 | 2026-11-15: the date of a documented lifetime on an added entry is the newest non-`listed` evidence of the entry as published, the declarations made for it by name included (5.4). | The chief, after review T-14 |
@@ -1155,7 +1155,7 @@ All on 2026-11-15. "The owner" decided; "the chief" is the project's chief, who 
 | 31 | 2026-11-15: a documented 0 prints "None" (the provider documents that it does not cache), a measured 0 prints "0 s" (no age at which every check hit), and not known prints "Unknown" (9). | The chief, with the page design (T-23) |
 | 32 | 2026-11-15: what the rule found of the documentation is published, as `documented_status` on each profile (`contradicted`, `not_contradicted`, or null where nothing above 0 is documented, nothing is measured, or the provider documents that it does not cache), set by `cacheLifetime` where the rule is applied (2.2, 2.6, 4.1). The pages print "Documentation contradicted" and "Documentation not contradicted" from this key and from nothing else (9); the OpenAPI version stays 2.0.0. Where `measured_s` is null a page says "Not measured" (9). | The chief, after the final review T-26 |
 
-Open: none. Decision 20 was decided by the owner on 2026-11-16 and built in `632ea5b` (sort `cache_short`, `cache_long`; filter `lifetime_basis`); a filter on the value itself is not built.
+Open: none. Decision 20 was decided by the owner on 2026-11-16 and built in `f02eb11` (sort `cache_short`, `cache_long`; filter `lifetime_basis`); a filter on the value itself is not built.
 
 ## 13. What the data or the contract makes awkward
 
@@ -1219,7 +1219,7 @@ Open: none. Decision 20 was decided by the owner on 2026-11-16 and built in `632
 14. **"A measurement never replaces a documented value"** (`AGENTS.md`, the methodology) holds for the data: the
     documented item and `capabilities.cache` stay. But on one profile today a measured value is the safe value
     where a documented one exists (`openrouter/google/gemini-3.8-flash`). The methodology says so since task 5
-    (`ccc86f2`): the documented lifetime stays listed beside the measured one.
+    (`9b3eb79`): the documented lifetime stays listed beside the measured one.
 
 **The data, as before**
 

@@ -7,7 +7,7 @@ to those decisions. `AGENTS.md` and `README.md` stay the rules of the data and t
 with its basis, printed by the pages.
 
 Numbers and examples are from the dataset the local preview served on 2026-11-16: `dataset_version`
-`44f1435184e4b01c`, built from commit `0c420ce`, models.dev import of 2026-11-15 (commit `c18a3cf`), `observed.json`
+`44f1435184e4b01c`, built from commit `49b1dd9`, models.dev import of 2026-11-15 (commit `c18a3cf`), `observed.json`
 sha256 `4ce313b6…` (groundtruth `798c409`): 332 providers, 6,105 entries, 17 limit evaluations on 17 entries.
 
 ## 1. What is published

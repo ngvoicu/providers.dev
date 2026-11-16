@@ -361,7 +361,7 @@ describe("resolve: access and additions", () => {
 });
 
 /**
- * What resolve published for the entries of the input window fixture before the input window existed (commit b3f3037,
+ * What resolve published for the entries of the input window fixture before the input window existed (commit 355b308,
  * the same fixture): limit, limits.measured, limits.from_measurement, verified and origin. The record adds a key and
  * changes none of these.
  */
