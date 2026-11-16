@@ -50,6 +50,11 @@ The baseline is imported from models.dev; our additions, corrections and measure
   an empty list, never a missing key, and the same keys whatever the query parameters. Do not add an optional field
   to a published type or to `src/core/contract.ts`; the contract test fails on two objects of a kind with different
   keys. Only the models.dev part of an entry keeps models.dev's shape, where a field can be absent.
+- The structure of `/api/v1` only grows: add a path, an optional parameter, an allowed value, a property, a component
+  or an enum value; never remove, rename or retype one, never make a property optional or nullable, never add a
+  required parameter. That would be `/api/v2`. `structure/api-v1-1.0.0.json` is the structure of 1.0.0 and is never
+  edited. A change of structure needs the record updated in the same commit (`npm run structure:update`, which writes
+  `structure/api-v1.json`) and a version step in `src/core/openapi.ts`: a minor step for a release that adds something.
 - A measurement never replaces a documented value on an upstream entry. It goes under `providers_dev`.
 - Everything we add to a provider or model object lives under the `providers_dev` key. Do not add other top-level
   fields to upstream objects.
@@ -135,6 +140,7 @@ npm run refresh:data # data + stage into public/ and dist/; no template build
 npm run dev         # build + Wrangler dev (all pages and API)
 npm run preview     # wrangler dev: the built site and the API as on Cloudflare
 npm run check       # eslint + tsc + astro check + vitest
+npm run structure:update # write structure/api-v1.json after a change of the API's structure made on purpose
 ```
 
 The Worker reads versioned snapshot assets at runtime; no dataset is bundled into its code.

@@ -256,6 +256,13 @@ describe("API response boundary", () => {
     expect((await page("/?min_context=nope")).status).toBe(400);
   });
 
+  it("shows the version and the Stability section of the OpenAPI document on /docs/api/", async () => {
+    const html = await (await page("/docs/api/")).text();
+    expect(html).toContain("Version 1.0.0 ·");
+    expect(html).toContain('<h2 id="stability">Stability</h2>');
+    expect(html).toContain("/api/v1 only grows.");
+  });
+
   it("renders OpenAPI changes and examples without a documentation build", async () => {
     const html = await (await page("/docs/api/", async (path) => {
       if (path !== "/api/v1/openapi.json") return api(path);

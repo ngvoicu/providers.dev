@@ -1,0 +1,4663 @@
+{
+  "about": "The structure of /api/v1 at version 1.0.0, the first public release. Never edited: the record (structure/api-v1.json) may only grow from it.",
+  "paths": {
+    "/api/v1/entries": {
+      "get": {
+        "parameters": {
+          "query:q": {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "query:provider": {
+            "in": "query",
+            "name": "provider",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "list": true
+            }
+          },
+          "query:family": {
+            "in": "query",
+            "name": "family",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "query:canonical_id": {
+            "in": "query",
+            "name": "canonical_id",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "query:type": {
+            "in": "query",
+            "name": "type",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "list": true
+            }
+          },
+          "query:access": {
+            "in": "query",
+            "name": "access",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "list": [
+                "api",
+                "subscription",
+                "unknown"
+              ]
+            }
+          },
+          "query:origin": {
+            "in": "query",
+            "name": "origin",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "list": [
+                "added",
+                "modified",
+                "upstream"
+              ]
+            }
+          },
+          "query:cache": {
+            "in": "query",
+            "name": "cache",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "list": [
+                "no",
+                "unknown",
+                "yes"
+              ]
+            }
+          },
+          "query:cache_mode": {
+            "in": "query",
+            "name": "cache_mode",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "list": [
+                "explicit",
+                "implicit"
+              ]
+            }
+          },
+          "query:lifetime_basis": {
+            "in": "query",
+            "name": "lifetime_basis",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "list": [
+                "documented",
+                "measured"
+              ]
+            }
+          },
+          "query:min_context": {
+            "in": "query",
+            "name": "min_context",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "query:min_output": {
+            "in": "query",
+            "name": "min_output",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "query:max_age_months": {
+            "in": "query",
+            "name": "max_age_months",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 600
+            }
+          },
+          "query:evaluated": {
+            "in": "query",
+            "name": "evaluated",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          "query:sort": {
+            "in": "query",
+            "name": "sort",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "cache_long",
+                "cache_short",
+                "context",
+                "max_output",
+                "model",
+                "name",
+                "price_in",
+                "price_out",
+                "provider",
+                "release_date",
+                "verified"
+              ]
+            }
+          },
+          "query:order": {
+            "in": "query",
+            "name": "order",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          },
+          "query:limit": {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50
+            }
+          },
+          "query:offset": {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "headers": {
+              "ETag": {
+                "type": "string"
+              },
+              "X-Dataset-Version": {
+                "type": "string"
+              },
+              "X-Dataset-Generated-At": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "X-Upstream-Fetched-At": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "content": {
+              "application/json": {
+                "type": "object",
+                "properties": {
+                  "meta": {
+                    "ref": "BriefMeta"
+                  },
+                  "total": {
+                    "type": "integer"
+                  },
+                  "limit": {
+                    "type": "integer"
+                  },
+                  "offset": {
+                    "type": "integer"
+                  },
+                  "next_offset": {
+                    "type": "integer",
+                    "nullable": true
+                  },
+                  "data": {
+                    "type": "array",
+                    "items": {
+                      "ref": "EntrySummary"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "headers": {},
+            "content": {}
+          },
+          "400": {
+            "headers": {},
+            "content": {
+              "application/json": {
+                "ref": "Error"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/entries/{provider}/{model}": {
+      "get": {
+        "parameters": {
+          "path:provider": {
+            "in": "path",
+            "name": "provider",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "path:model": {
+            "in": "path",
+            "name": "model",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "headers": {
+              "ETag": {
+                "type": "string"
+              },
+              "X-Dataset-Version": {
+                "type": "string"
+              },
+              "X-Dataset-Generated-At": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "X-Upstream-Fetched-At": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "content": {
+              "application/json": {
+                "type": "object",
+                "properties": {
+                  "meta": {
+                    "ref": "BriefMeta"
+                  },
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "provider": {
+                        "ref": "ProviderSummary"
+                      },
+                      "summary": {
+                        "ref": "EntrySummary"
+                      },
+                      "entry": {
+                        "ref": "Entry"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "headers": {},
+            "content": {}
+          },
+          "400": {
+            "headers": {},
+            "content": {
+              "application/json": {
+                "ref": "Error"
+              }
+            }
+          },
+          "404": {
+            "headers": {},
+            "content": {
+              "application/json": {
+                "ref": "Error"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/providers": {
+      "get": {
+        "parameters": {
+          "query:q": {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "query:access": {
+            "in": "query",
+            "name": "access",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "list": [
+                "api",
+                "subscription",
+                "unknown"
+              ]
+            }
+          },
+          "query:origin": {
+            "in": "query",
+            "name": "origin",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "list": [
+                "added",
+                "upstream"
+              ]
+            }
+          },
+          "query:limit": {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50
+            }
+          },
+          "query:offset": {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "headers": {
+              "ETag": {
+                "type": "string"
+              },
+              "X-Dataset-Version": {
+                "type": "string"
+              },
+              "X-Dataset-Generated-At": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "X-Upstream-Fetched-At": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "content": {
+              "application/json": {
+                "type": "object",
+                "properties": {
+                  "meta": {
+                    "ref": "BriefMeta"
+                  },
+                  "total": {
+                    "type": "integer"
+                  },
+                  "limit": {
+                    "type": "integer"
+                  },
+                  "offset": {
+                    "type": "integer"
+                  },
+                  "next_offset": {
+                    "type": "integer",
+                    "nullable": true
+                  },
+                  "data": {
+                    "type": "array",
+                    "items": {
+                      "ref": "ProviderSummary"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "headers": {},
+            "content": {}
+          },
+          "400": {
+            "headers": {},
+            "content": {
+              "application/json": {
+                "ref": "Error"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/providers/{provider}": {
+      "get": {
+        "parameters": {
+          "path:provider": {
+            "in": "path",
+            "name": "provider",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "query:view": {
+            "in": "query",
+            "name": "view",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "full",
+                "summary"
+              ]
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "headers": {
+              "ETag": {
+                "type": "string"
+              },
+              "X-Dataset-Version": {
+                "type": "string"
+              },
+              "X-Dataset-Generated-At": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "X-Upstream-Fetched-At": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "content": {
+              "application/json": {
+                "type": "object",
+                "properties": {
+                  "meta": {
+                    "ref": "BriefMeta"
+                  },
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "provider": {
+                        "ref": "ProviderSummary"
+                      },
+                      "entries": {
+                        "type": "array",
+                        "items": {
+                          "ref": "EntrySummary"
+                        }
+                      },
+                      "models": {
+                        "type": "object",
+                        "additional": {
+                          "ref": "Entry"
+                        },
+                        "nullable": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "headers": {},
+            "content": {}
+          },
+          "400": {
+            "headers": {},
+            "content": {
+              "application/json": {
+                "ref": "Error"
+              }
+            }
+          },
+          "404": {
+            "headers": {},
+            "content": {
+              "application/json": {
+                "ref": "Error"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/models": {
+      "get": {
+        "parameters": {
+          "query:q": {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "query:lab": {
+            "in": "query",
+            "name": "lab",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "query:limit": {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50
+            }
+          },
+          "query:offset": {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "headers": {
+              "ETag": {
+                "type": "string"
+              },
+              "X-Dataset-Version": {
+                "type": "string"
+              },
+              "X-Dataset-Generated-At": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "X-Upstream-Fetched-At": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "content": {
+              "application/json": {
+                "type": "object",
+                "properties": {
+                  "meta": {
+                    "ref": "BriefMeta"
+                  },
+                  "total": {
+                    "type": "integer"
+                  },
+                  "limit": {
+                    "type": "integer"
+                  },
+                  "offset": {
+                    "type": "integer"
+                  },
+                  "next_offset": {
+                    "type": "integer",
+                    "nullable": true
+                  },
+                  "data": {
+                    "type": "array",
+                    "items": {
+                      "ref": "CanonicalModel"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "headers": {},
+            "content": {}
+          },
+          "400": {
+            "headers": {},
+            "content": {
+              "application/json": {
+                "ref": "Error"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/models/{lab}/{model}": {
+      "get": {
+        "parameters": {
+          "path:lab": {
+            "in": "path",
+            "name": "lab",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "path:model": {
+            "in": "path",
+            "name": "model",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "headers": {
+              "ETag": {
+                "type": "string"
+              },
+              "X-Dataset-Version": {
+                "type": "string"
+              },
+              "X-Dataset-Generated-At": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "X-Upstream-Fetched-At": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "content": {
+              "application/json": {
+                "type": "object",
+                "properties": {
+                  "meta": {
+                    "ref": "BriefMeta"
+                  },
+                  "data": {
+                    "ref": "CanonicalModelDetail"
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "headers": {},
+            "content": {}
+          },
+          "400": {
+            "headers": {},
+            "content": {
+              "application/json": {
+                "ref": "Error"
+              }
+            }
+          },
+          "404": {
+            "headers": {},
+            "content": {
+              "application/json": {
+                "ref": "Error"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/evaluations/cache": {
+      "get": {
+        "parameters": {
+          "query:provider": {
+            "in": "query",
+            "name": "provider",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "list": true
+            }
+          },
+          "query:entry": {
+            "in": "query",
+            "name": "entry",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "query:client": {
+            "in": "query",
+            "name": "client",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "list": true
+            }
+          },
+          "query:retention_profile": {
+            "in": "query",
+            "name": "retention_profile",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "long",
+                "short"
+              ]
+            }
+          },
+          "query:limit": {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50
+            }
+          },
+          "query:offset": {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "headers": {
+              "ETag": {
+                "type": "string"
+              },
+              "X-Dataset-Version": {
+                "type": "string"
+              },
+              "X-Dataset-Generated-At": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "X-Upstream-Fetched-At": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "content": {
+              "application/json": {
+                "type": "object",
+                "properties": {
+                  "meta": {
+                    "ref": "BriefMeta"
+                  },
+                  "total": {
+                    "type": "integer"
+                  },
+                  "limit": {
+                    "type": "integer"
+                  },
+                  "offset": {
+                    "type": "integer"
+                  },
+                  "next_offset": {
+                    "type": "integer",
+                    "nullable": true
+                  },
+                  "data": {
+                    "type": "array",
+                    "items": {
+                      "ref": "CacheEvaluationRecord"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "headers": {},
+            "content": {}
+          },
+          "400": {
+            "headers": {},
+            "content": {
+              "application/json": {
+                "ref": "Error"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/evaluations/limits": {
+      "get": {
+        "parameters": {
+          "query:provider": {
+            "in": "query",
+            "name": "provider",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "list": true
+            }
+          },
+          "query:entry": {
+            "in": "query",
+            "name": "entry",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "query:client": {
+            "in": "query",
+            "name": "client",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "list": true
+            }
+          },
+          "query:limit": {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50
+            }
+          },
+          "query:offset": {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "headers": {
+              "ETag": {
+                "type": "string"
+              },
+              "X-Dataset-Version": {
+                "type": "string"
+              },
+              "X-Dataset-Generated-At": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "X-Upstream-Fetched-At": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "content": {
+              "application/json": {
+                "type": "object",
+                "properties": {
+                  "meta": {
+                    "ref": "BriefMeta"
+                  },
+                  "total": {
+                    "type": "integer"
+                  },
+                  "limit": {
+                    "type": "integer"
+                  },
+                  "offset": {
+                    "type": "integer"
+                  },
+                  "next_offset": {
+                    "type": "integer",
+                    "nullable": true
+                  },
+                  "data": {
+                    "type": "array",
+                    "items": {
+                      "ref": "LimitEvaluationRecord"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "headers": {},
+            "content": {}
+          },
+          "400": {
+            "headers": {},
+            "content": {
+              "application/json": {
+                "ref": "Error"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/meta": {
+      "get": {
+        "parameters": {},
+        "responses": {
+          "200": {
+            "headers": {
+              "ETag": {
+                "type": "string"
+              },
+              "X-Dataset-Version": {
+                "type": "string"
+              },
+              "X-Dataset-Generated-At": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "X-Upstream-Fetched-At": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "content": {
+              "application/json": {
+                "type": "object",
+                "properties": {
+                  "meta": {
+                    "ref": "BriefMeta"
+                  },
+                  "data": {
+                    "ref": "Meta"
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "headers": {},
+            "content": {}
+          },
+          "400": {
+            "headers": {},
+            "content": {
+              "application/json": {
+                "ref": "Error"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/catalog": {
+      "get": {
+        "parameters": {},
+        "responses": {
+          "200": {
+            "headers": {
+              "ETag": {
+                "type": "string"
+              },
+              "X-Dataset-Version": {
+                "type": "string"
+              },
+              "X-Dataset-Generated-At": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "X-Upstream-Fetched-At": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "content": {
+              "application/json": {
+                "type": "object",
+                "properties": {
+                  "meta": {
+                    "ref": "BriefMeta"
+                  },
+                  "data": {
+                    "type": "object",
+                    "additional": {
+                      "ref": "Provider"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "headers": {},
+            "content": {}
+          }
+        }
+      }
+    },
+    "/api/v1/openapi.json": {
+      "get": {
+        "parameters": {},
+        "responses": {
+          "200": {
+            "headers": {
+              "ETag": {
+                "type": "string"
+              },
+              "X-Dataset-Version": {
+                "type": "string"
+              },
+              "X-Dataset-Generated-At": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "X-Upstream-Fetched-At": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "content": {
+              "application/json": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/facets": {
+      "get": {
+        "parameters": {},
+        "responses": {
+          "200": {
+            "headers": {
+              "ETag": {
+                "type": "string"
+              },
+              "X-Dataset-Version": {
+                "type": "string"
+              },
+              "X-Dataset-Generated-At": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "X-Upstream-Fetched-At": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "content": {
+              "application/json": {
+                "type": "object",
+                "properties": {
+                  "meta": {
+                    "ref": "BriefMeta"
+                  },
+                  "data": {
+                    "ref": "Facets"
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "headers": {},
+            "content": {}
+          },
+          "400": {
+            "headers": {},
+            "content": {
+              "application/json": {
+                "ref": "Error"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/corrections": {
+      "get": {
+        "parameters": {
+          "query:provider": {
+            "in": "query",
+            "name": "provider",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          "query:limit": {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50
+            }
+          },
+          "query:offset": {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "headers": {
+              "ETag": {
+                "type": "string"
+              },
+              "X-Dataset-Version": {
+                "type": "string"
+              },
+              "X-Dataset-Generated-At": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "X-Upstream-Fetched-At": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "content": {
+              "application/json": {
+                "type": "object",
+                "properties": {
+                  "meta": {
+                    "ref": "BriefMeta"
+                  },
+                  "total": {
+                    "type": "integer"
+                  },
+                  "limit": {
+                    "type": "integer"
+                  },
+                  "offset": {
+                    "type": "integer"
+                  },
+                  "next_offset": {
+                    "type": "integer",
+                    "nullable": true
+                  },
+                  "data": {
+                    "type": "array",
+                    "items": {
+                      "ref": "Correction"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "headers": {},
+            "content": {}
+          },
+          "400": {
+            "headers": {},
+            "content": {
+              "application/json": {
+                "ref": "Error"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/docs/{document}": {
+      "get": {
+        "parameters": {
+          "path:document": {
+            "in": "path",
+            "name": "document",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "headers": {
+              "ETag": {
+                "type": "string"
+              },
+              "X-Dataset-Version": {
+                "type": "string"
+              },
+              "X-Dataset-Generated-At": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "X-Upstream-Fetched-At": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "content": {
+              "application/json": {
+                "type": "object",
+                "properties": {
+                  "meta": {
+                    "ref": "BriefMeta"
+                  },
+                  "data": {
+                    "ref": "Documentation"
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "headers": {},
+            "content": {}
+          },
+          "400": {
+            "headers": {},
+            "content": {
+              "application/json": {
+                "ref": "Error"
+              }
+            }
+          },
+          "404": {
+            "headers": {},
+            "content": {
+              "application/json": {
+                "ref": "Error"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api.json": {
+      "get": {
+        "parameters": {},
+        "responses": {
+          "200": {
+            "headers": {
+              "ETag": {
+                "type": "string"
+              },
+              "X-Dataset-Version": {
+                "type": "string"
+              },
+              "X-Dataset-Generated-At": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "X-Upstream-Fetched-At": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "content": {
+              "application/json": {
+                "type": "object",
+                "additional": {
+                  "ref": "Provider"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "BriefMeta": {
+      "type": "object",
+      "properties": {
+        "dataset_version": {
+          "type": "string"
+        },
+        "generated_at": {
+          "type": "string"
+        },
+        "upstream_fetched_at": {
+          "type": "string"
+        }
+      }
+    },
+    "Evidence": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "documented",
+            "listed",
+            "measured"
+          ]
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "date": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "note": {
+          "type": "string",
+          "nullable": true
+        }
+      }
+    },
+    "Facets": {
+      "type": "object",
+      "properties": {
+        "providers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "types": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "evidence_entries": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "subscription_providers": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "Correction": {
+      "type": "object",
+      "properties": {
+        "provider": {
+          "type": "string"
+        },
+        "change": {
+          "ref": "Provenance"
+        },
+        "entry_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "Documentation": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "lead": {
+          "type": "string"
+        },
+        "toc": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "body_html": {
+          "type": "string"
+        }
+      }
+    },
+    "EntrySummary": {
+      "type": "object",
+      "properties": {
+        "ref": {
+          "type": "string"
+        },
+        "provider": {
+          "type": "string"
+        },
+        "model": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "nullable": true
+        },
+        "family": {
+          "type": "string",
+          "nullable": true
+        },
+        "canonical_id": {
+          "type": "string",
+          "nullable": true
+        },
+        "status": {
+          "type": "string",
+          "nullable": true
+        },
+        "release_date": {
+          "type": "string",
+          "nullable": true
+        },
+        "access": {
+          "type": "string",
+          "enum": [
+            "api",
+            "subscription",
+            "unknown"
+          ]
+        },
+        "origin": {
+          "type": "string",
+          "enum": [
+            "added",
+            "modified",
+            "upstream"
+          ]
+        },
+        "context": {
+          "type": "number",
+          "nullable": true
+        },
+        "input": {
+          "type": "number",
+          "nullable": true
+        },
+        "max_output": {
+          "type": "number",
+          "nullable": true
+        },
+        "input_window": {
+          "ref": "InputWindow"
+        },
+        "cache": {
+          "type": "string",
+          "enum": [
+            "no",
+            "unknown",
+            "yes"
+          ]
+        },
+        "cache_modes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "explicit",
+              "implicit"
+            ]
+          }
+        },
+        "cache_mode_support": {
+          "type": "object",
+          "properties": {
+            "implicit": {
+              "type": "string",
+              "enum": [
+                "supported",
+                "unknown",
+                "unsupported"
+              ]
+            },
+            "explicit": {
+              "type": "string",
+              "enum": [
+                "supported",
+                "unknown",
+                "unsupported"
+              ]
+            }
+          }
+        },
+        "cache_retention": {
+          "type": "string",
+          "enum": [
+            "supported",
+            "unknown",
+            "unsupported"
+          ]
+        },
+        "cache_lifetime": {
+          "ref": "CacheLifetime"
+        },
+        "evaluation_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "price_in": {
+          "type": "number",
+          "nullable": true
+        },
+        "price_out": {
+          "type": "number",
+          "nullable": true
+        },
+        "price_from": {
+          "type": "string",
+          "nullable": true
+        },
+        "pricing": {
+          "ref": "Pricing"
+        },
+        "request_controls": {
+          "ref": "RequestControls"
+        },
+        "measured_input_accepted": {
+          "type": "number",
+          "nullable": true
+        },
+        "measured_input_refused": {
+          "type": "number",
+          "nullable": true
+        },
+        "measured_limit_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "overridden_fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "verified": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "nullable": true
+        },
+        "shard": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "Entry": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "optional": true
+        },
+        "type": {
+          "type": "string",
+          "optional": true
+        },
+        "family": {
+          "type": "string",
+          "optional": true
+        },
+        "canonical_id": {
+          "type": "string",
+          "optional": true
+        },
+        "status": {
+          "type": "string",
+          "optional": true
+        },
+        "release_date": {
+          "type": "string",
+          "optional": true
+        },
+        "limit": {
+          "type": "object",
+          "properties": {
+            "context": {
+              "type": "number",
+              "minimum": 0,
+              "optional": true
+            },
+            "input": {
+              "type": "number",
+              "minimum": 0,
+              "optional": true
+            },
+            "output": {
+              "type": "number",
+              "minimum": 0,
+              "optional": true
+            }
+          },
+          "additional": {
+            "type": "any"
+          },
+          "optional": true
+        },
+        "capabilities": {
+          "ref": "Capabilities",
+          "optional": true
+        },
+        "cost": {
+          "ref": "Cost",
+          "optional": true
+        },
+        "modalities": {
+          "type": "object",
+          "properties": {
+            "input": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "optional": true
+            },
+            "output": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "optional": true
+            }
+          },
+          "additional": {
+            "type": "any"
+          },
+          "optional": true
+        },
+        "api": {
+          "type": "object",
+          "additional": {
+            "ref": "ApiEndpoint"
+          },
+          "optional": true
+        },
+        "providers_dev": {
+          "ref": "EntryExtension"
+        }
+      },
+      "additional": {
+        "type": "any"
+      }
+    },
+    "EntryExtension": {
+      "type": "object",
+      "properties": {
+        "origin": {
+          "type": "string",
+          "enum": [
+            "added",
+            "upstream"
+          ]
+        },
+        "access": {
+          "type": "string",
+          "enum": [
+            "api",
+            "subscription",
+            "unknown"
+          ]
+        },
+        "provenance": {
+          "type": "array",
+          "items": {
+            "ref": "Provenance"
+          }
+        },
+        "inherited": {
+          "type": "object",
+          "properties": {
+            "from": {
+              "type": "string"
+            },
+            "fields": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "nullable": true
+        },
+        "cache": {
+          "ref": "EntryCache"
+        },
+        "pricing": {
+          "ref": "Pricing"
+        },
+        "request_controls": {
+          "ref": "RequestControls"
+        },
+        "limits": {
+          "type": "object",
+          "properties": {
+            "measured": {
+              "type": "array",
+              "items": {
+                "ref": "MeasuredLimit"
+              }
+            },
+            "from_measurement": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "context",
+                  "output"
+                ]
+              }
+            },
+            "input_window": {
+              "ref": "InputWindow"
+            }
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "ref": "Evidence"
+          }
+        },
+        "verified": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "nullable": true
+        }
+      }
+    },
+    "EntryCache": {
+      "type": "object",
+      "properties": {
+        "documented": {
+          "ref": "CacheDocumentation"
+        },
+        "retention": {
+          "ref": "CacheRetention"
+        },
+        "lifetime": {
+          "ref": "CacheLifetime"
+        },
+        "evaluations": {
+          "type": "array",
+          "items": {
+            "ref": "CacheEvaluation"
+          }
+        }
+      }
+    },
+    "CacheDocumentation": {
+      "type": "object",
+      "properties": {
+        "support": {
+          "type": "string",
+          "enum": [
+            "supported",
+            "unknown",
+            "unsupported"
+          ]
+        },
+        "modes": {
+          "type": "object",
+          "properties": {
+            "implicit": {
+              "ref": "CacheModeDocumentation"
+            },
+            "explicit": {
+              "ref": "CacheModeDocumentation"
+            }
+          }
+        }
+      }
+    },
+    "CacheModeDocumentation": {
+      "type": "object",
+      "properties": {
+        "support": {
+          "type": "string",
+          "enum": [
+            "supported",
+            "unknown",
+            "unsupported"
+          ]
+        },
+        "min_tokens": {
+          "type": "number",
+          "nullable": true
+        },
+        "max_breakpoints": {
+          "type": "number",
+          "nullable": true
+        },
+        "targets": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "nullable": true
+        }
+      }
+    },
+    "CacheRetention": {
+      "type": "object",
+      "properties": {
+        "support": {
+          "type": "string",
+          "enum": [
+            "supported",
+            "unknown",
+            "unsupported"
+          ]
+        },
+        "parameter": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "location": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "nullable": true
+        },
+        "accepted_values": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "nullable": true
+        },
+        "default": {
+          "type": "string",
+          "nullable": true
+        },
+        "profiles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "profile": {
+                "type": "string",
+                "enum": [
+                  "long",
+                  "short"
+                ]
+              },
+              "value": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          }
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "ref": "PolicyEvidence"
+          }
+        }
+      }
+    },
+    "CacheLifetime": {
+      "type": "object",
+      "properties": {
+        "short": {
+          "ref": "SafeLifetime"
+        },
+        "long": {
+          "ref": "SafeLifetime"
+        },
+        "lifetimes": {
+          "type": "array",
+          "items": {
+            "ref": "CacheLifetimeItem"
+          }
+        }
+      }
+    },
+    "SafeLifetime": {
+      "type": "object",
+      "properties": {
+        "safe_s": {
+          "type": "integer",
+          "minimum": 0,
+          "nullable": true
+        },
+        "basis": {
+          "type": "string",
+          "enum": [
+            "documented",
+            "measured",
+            "none"
+          ]
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "models.dev",
+            "providers.dev"
+          ],
+          "nullable": true
+        },
+        "date": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "nullable": true
+        },
+        "documented_s": {
+          "type": "integer",
+          "minimum": 0,
+          "nullable": true
+        },
+        "measured_s": {
+          "type": "integer",
+          "minimum": 0,
+          "nullable": true
+        },
+        "documented_status": {
+          "type": "string",
+          "enum": [
+            "contradicted",
+            "not_contradicted"
+          ],
+          "nullable": true
+        },
+        "clients": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "evaluations": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "checks": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "hits": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "checks_inside": {
+          "type": "integer",
+          "minimum": 0,
+          "nullable": true
+        },
+        "hits_inside": {
+          "type": "integer",
+          "minimum": 0,
+          "nullable": true
+        },
+        "tested_from_s": {
+          "type": "integer",
+          "minimum": 0,
+          "nullable": true
+        },
+        "first_miss_s": {
+          "type": "integer",
+          "minimum": 0,
+          "nullable": true
+        }
+      }
+    },
+    "CacheLifetimeItem": {
+      "type": "object",
+      "properties": {
+        "retention_profile": {
+          "type": "string",
+          "enum": [
+            "long",
+            "short"
+          ]
+        },
+        "basis": {
+          "type": "string",
+          "enum": [
+            "documented",
+            "measured"
+          ]
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "models.dev",
+            "providers.dev"
+          ]
+        },
+        "date": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "nullable": true
+        },
+        "lifetime_s": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "explicit",
+            "implicit"
+          ],
+          "nullable": true
+        },
+        "documented_as": {
+          "type": "string",
+          "nullable": true
+        },
+        "client": {
+          "type": "string",
+          "nullable": true
+        },
+        "client_label": {
+          "type": "string",
+          "nullable": true
+        },
+        "parameter": {
+          "type": "string",
+          "nullable": true
+        },
+        "value": {
+          "type": "string",
+          "nullable": true
+        },
+        "evaluations": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "evaluation_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "checks": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "hits": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "tested_from_s": {
+          "type": "integer",
+          "minimum": 0,
+          "nullable": true
+        },
+        "first_miss_s": {
+          "type": "integer",
+          "minimum": 0,
+          "nullable": true
+        },
+        "results": {
+          "type": "array",
+          "items": {
+            "ref": "CacheResult"
+          },
+          "nullable": true
+        }
+      }
+    },
+    "CacheResult": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "control",
+            "timed"
+          ]
+        },
+        "age_s": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "hits": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "checks": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "hit_rate_pct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        }
+      }
+    },
+    "CacheEvaluation": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "route": {
+          "type": "string"
+        },
+        "route_label": {
+          "type": "string"
+        },
+        "client": {
+          "type": "string"
+        },
+        "client_label": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "request_settings": {
+          "type": "object",
+          "additional": {
+            "type": "json"
+          }
+        },
+        "retention_profile": {
+          "type": "string",
+          "enum": [
+            "long",
+            "short"
+          ]
+        },
+        "parameter": {
+          "type": "string",
+          "nullable": true
+        },
+        "value": {
+          "type": "string",
+          "nullable": true
+        },
+        "results": {
+          "type": "array",
+          "items": {
+            "ref": "CacheResult"
+          }
+        },
+        "late_excluded": {
+          "type": "integer",
+          "minimum": 0,
+          "nullable": true
+        },
+        "note": {
+          "type": "string",
+          "nullable": true
+        },
+        "source": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "Capabilities": {
+      "type": "object",
+      "properties": {
+        "cache": {
+          "ref": "DocumentedCache",
+          "optional": true
+        },
+        "temperature": {
+          "type": "boolean",
+          "optional": true
+        },
+        "top_k": {
+          "type": "boolean",
+          "optional": true
+        },
+        "top_p": {
+          "type": "boolean",
+          "optional": true
+        },
+        "structured_output": {
+          "type": "boolean",
+          "optional": true
+        },
+        "prompt_cache_key": {
+          "type": "boolean",
+          "optional": true
+        },
+        "store": {
+          "type": "boolean",
+          "optional": true
+        },
+        "stream_usage": {
+          "type": "boolean",
+          "optional": true
+        },
+        "system_updates": {
+          "type": "boolean",
+          "optional": true
+        },
+        "effort_updates": {
+          "type": "boolean",
+          "optional": true
+        },
+        "service_tier": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "tools": {
+          "type": "object",
+          "properties": {
+            "supported": {
+              "type": "boolean",
+              "optional": true
+            },
+            "choice": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "optional": true
+            },
+            "freeform": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "optional": true
+            },
+            "strict": {
+              "type": "boolean",
+              "optional": true
+            },
+            "updates": {
+              "type": "boolean",
+              "optional": true
+            }
+          },
+          "additional": {
+            "type": "any"
+          },
+          "optional": true
+        },
+        "reasoning": {
+          "type": "object",
+          "properties": {
+            "supported": {
+              "type": "boolean",
+              "optional": true
+            },
+            "toggle": {
+              "type": "boolean",
+              "optional": true
+            },
+            "effort": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "optional": true
+            },
+            "budget": {
+              "type": "object",
+              "properties": {
+                "min": {
+                  "type": "number",
+                  "optional": true
+                },
+                "max": {
+                  "type": "number",
+                  "optional": true
+                }
+              },
+              "additional": {
+                "type": "any"
+              },
+              "optional": true
+            },
+            "default": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "optional": true
+                },
+                "value": {
+                  "anyOf": [
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "optional": true
+                }
+              },
+              "additional": {
+                "type": "any"
+              },
+              "optional": true
+            }
+          },
+          "additional": {
+            "type": "any"
+          },
+          "optional": true
+        }
+      },
+      "additional": {
+        "type": "any"
+      }
+    },
+    "DocumentedCache": {
+      "anyOf": [
+        {
+          "type": "boolean",
+          "const": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "implicit": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "ttl": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "optional": true
+                    },
+                    "min_tokens": {
+                      "type": "number",
+                      "minimum": 0,
+                      "optional": true
+                    },
+                    "max_breakpoints": {
+                      "type": "number",
+                      "minimum": 0,
+                      "optional": true
+                    },
+                    "targets": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "optional": true
+                    }
+                  },
+                  "additional": {
+                    "type": "any"
+                  }
+                }
+              ],
+              "optional": true
+            },
+            "explicit": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "ttl": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "optional": true
+                    },
+                    "min_tokens": {
+                      "type": "number",
+                      "minimum": 0,
+                      "optional": true
+                    },
+                    "max_breakpoints": {
+                      "type": "number",
+                      "minimum": 0,
+                      "optional": true
+                    },
+                    "targets": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "optional": true
+                    }
+                  },
+                  "additional": {
+                    "type": "any"
+                  }
+                }
+              ],
+              "optional": true
+            }
+          },
+          "additional": {
+            "type": "any"
+          }
+        }
+      ]
+    },
+    "Cost": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "ref": "TextPrice",
+          "optional": true
+        },
+        "multipliers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "when": {
+                "ref": "PriceCondition"
+              },
+              "factor": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "text": {
+                        "anyOf": [
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "input": {
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "object",
+                                    "properties": {
+                                      "price": {
+                                        "type": "number",
+                                        "optional": true
+                                      },
+                                      "cache": {
+                                        "ref": "CachePrice",
+                                        "optional": true
+                                      }
+                                    },
+                                    "additional": {
+                                      "type": "any"
+                                    }
+                                  }
+                                ],
+                                "optional": true
+                              },
+                              "output": {
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "object",
+                                    "properties": {
+                                      "price": {
+                                        "type": "number",
+                                        "optional": true
+                                      },
+                                      "reasoning": {
+                                        "type": "number",
+                                        "optional": true
+                                      }
+                                    },
+                                    "additional": {
+                                      "type": "any"
+                                    }
+                                  }
+                                ],
+                                "optional": true
+                              }
+                            },
+                            "additional": {
+                              "type": "any"
+                            }
+                          }
+                        ],
+                        "optional": true
+                      }
+                    },
+                    "additional": {
+                      "type": "any"
+                    }
+                  }
+                ]
+              }
+            },
+            "additional": {
+              "type": "any"
+            }
+          },
+          "optional": true
+        }
+      },
+      "additional": {
+        "type": "any"
+      }
+    },
+    "TextPrice": {
+      "type": "object",
+      "properties": {
+        "input": {
+          "type": "object",
+          "properties": {
+            "price": {
+              "type": "number",
+              "optional": true
+            },
+            "cache": {
+              "ref": "CachePrice",
+              "optional": true
+            },
+            "unit": {
+              "type": "string",
+              "optional": true
+            },
+            "overrides": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "when": {
+                    "ref": "PriceCondition"
+                  },
+                  "price": {
+                    "type": "number",
+                    "optional": true
+                  },
+                  "cache": {
+                    "ref": "CachePrice",
+                    "optional": true
+                  }
+                },
+                "additional": {
+                  "type": "any"
+                }
+              },
+              "optional": true
+            }
+          },
+          "additional": {
+            "type": "any"
+          },
+          "optional": true
+        },
+        "output": {
+          "type": "object",
+          "properties": {
+            "price": {
+              "type": "number",
+              "optional": true
+            },
+            "reasoning": {
+              "type": "number",
+              "optional": true
+            },
+            "unit": {
+              "type": "string",
+              "optional": true
+            },
+            "overrides": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "when": {
+                    "ref": "PriceCondition"
+                  },
+                  "price": {
+                    "type": "number",
+                    "optional": true
+                  },
+                  "reasoning": {
+                    "type": "number",
+                    "optional": true
+                  }
+                },
+                "additional": {
+                  "type": "any"
+                }
+              },
+              "optional": true
+            }
+          },
+          "additional": {
+            "type": "any"
+          },
+          "optional": true
+        }
+      },
+      "additional": {
+        "type": "any"
+      }
+    },
+    "CachePrice": {
+      "type": "object",
+      "properties": {
+        "read": {
+          "type": "number",
+          "optional": true
+        },
+        "write": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "object",
+              "additional": {
+                "type": "number"
+              }
+            }
+          ],
+          "optional": true
+        },
+        "storage": {
+          "type": "number",
+          "optional": true
+        },
+        "explicit": {
+          "type": "object",
+          "properties": {
+            "read": {
+              "type": "number",
+              "optional": true
+            },
+            "write": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "object",
+                  "additional": {
+                    "type": "number"
+                  }
+                }
+              ],
+              "optional": true
+            },
+            "storage": {
+              "type": "number",
+              "optional": true
+            }
+          },
+          "additional": {
+            "type": "any"
+          },
+          "optional": true
+        }
+      },
+      "additional": {
+        "type": "any"
+      }
+    },
+    "PriceCondition": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "object",
+          "properties": {
+            "gt": {
+              "type": "number",
+              "optional": true
+            },
+            "gte": {
+              "type": "number",
+              "optional": true
+            },
+            "lt": {
+              "type": "number",
+              "optional": true
+            },
+            "lte": {
+              "type": "number",
+              "optional": true
+            },
+            "equals": {
+              "type": "number",
+              "optional": true
+            }
+          },
+          "additional": {
+            "type": "any"
+          },
+          "optional": true
+        },
+        "service_tier": {
+          "type": "object",
+          "properties": {
+            "equals": {
+              "type": "string",
+              "optional": true
+            },
+            "in": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "optional": true
+            },
+            "gt": {
+              "type": "string",
+              "optional": true
+            },
+            "gte": {
+              "type": "string",
+              "optional": true
+            },
+            "lt": {
+              "type": "string",
+              "optional": true
+            },
+            "lte": {
+              "type": "string",
+              "optional": true
+            }
+          },
+          "additional": {
+            "type": "any"
+          },
+          "optional": true
+        },
+        "region": {
+          "type": "object",
+          "properties": {
+            "equals": {
+              "type": "string",
+              "optional": true
+            },
+            "in": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "optional": true
+            },
+            "gt": {
+              "type": "string",
+              "optional": true
+            },
+            "gte": {
+              "type": "string",
+              "optional": true
+            },
+            "lt": {
+              "type": "string",
+              "optional": true
+            },
+            "lte": {
+              "type": "string",
+              "optional": true
+            }
+          },
+          "additional": {
+            "type": "any"
+          },
+          "optional": true
+        },
+        "date": {
+          "type": "object",
+          "properties": {
+            "equals": {
+              "type": "string",
+              "optional": true
+            },
+            "in": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "optional": true
+            },
+            "gt": {
+              "type": "string",
+              "optional": true
+            },
+            "gte": {
+              "type": "string",
+              "optional": true
+            },
+            "lt": {
+              "type": "string",
+              "optional": true
+            },
+            "lte": {
+              "type": "string",
+              "optional": true
+            }
+          },
+          "additional": {
+            "type": "any"
+          },
+          "optional": true
+        },
+        "utc_hours": {
+          "type": "object",
+          "properties": {
+            "equals": {
+              "type": "string",
+              "optional": true
+            },
+            "in": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "optional": true
+            },
+            "gt": {
+              "type": "string",
+              "optional": true
+            },
+            "gte": {
+              "type": "string",
+              "optional": true
+            },
+            "lt": {
+              "type": "string",
+              "optional": true
+            },
+            "lte": {
+              "type": "string",
+              "optional": true
+            }
+          },
+          "additional": {
+            "type": "any"
+          },
+          "optional": true
+        },
+        "utc_days": {
+          "type": "object",
+          "properties": {
+            "equals": {
+              "type": "string",
+              "optional": true
+            },
+            "in": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "optional": true
+            },
+            "gt": {
+              "type": "string",
+              "optional": true
+            },
+            "gte": {
+              "type": "string",
+              "optional": true
+            },
+            "lt": {
+              "type": "string",
+              "optional": true
+            },
+            "lte": {
+              "type": "string",
+              "optional": true
+            }
+          },
+          "additional": {
+            "type": "any"
+          },
+          "optional": true
+        },
+        "holiday": {
+          "type": "object",
+          "properties": {
+            "equals": {
+              "type": "string",
+              "optional": true
+            },
+            "in": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "optional": true
+            },
+            "gt": {
+              "type": "string",
+              "optional": true
+            },
+            "gte": {
+              "type": "string",
+              "optional": true
+            },
+            "lt": {
+              "type": "string",
+              "optional": true
+            },
+            "lte": {
+              "type": "string",
+              "optional": true
+            }
+          },
+          "additional": {
+            "type": "any"
+          },
+          "optional": true
+        },
+        "thinking": {
+          "type": "object",
+          "properties": {
+            "equals": {
+              "type": "boolean",
+              "optional": true
+            }
+          },
+          "additional": {
+            "type": "any"
+          },
+          "optional": true
+        },
+        "all": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additional": {
+              "type": "json"
+            }
+          },
+          "optional": true
+        },
+        "any": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additional": {
+              "type": "json"
+            }
+          },
+          "optional": true
+        },
+        "not": {
+          "type": "object",
+          "additional": {
+            "type": "json"
+          },
+          "optional": true
+        }
+      },
+      "additional": {
+        "type": "any"
+      }
+    },
+    "ApiEndpoint": {
+      "type": "object",
+      "properties": {
+        "base_url": {
+          "type": "string",
+          "optional": true
+        },
+        "path": {
+          "type": "string",
+          "optional": true
+        },
+        "sdk": {
+          "type": "object",
+          "additional": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "capabilities": {
+          "ref": "Capabilities",
+          "optional": true
+        },
+        "compatibility": {
+          "type": "object",
+          "properties": {
+            "max_tokens_field": {
+              "type": "string",
+              "optional": true
+            },
+            "reasoning_field": {
+              "type": "string",
+              "optional": true
+            }
+          },
+          "additional": {
+            "type": "any"
+          },
+          "optional": true
+        }
+      },
+      "additional": {
+        "type": "any"
+      }
+    },
+    "Condition": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "not"
+            },
+            "condition": {
+              "ref": "Condition"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "predicate"
+            },
+            "field": {
+              "type": "string",
+              "minLength": 1
+            },
+            "op": {
+              "type": "string",
+              "enum": [
+                "eq",
+                "gt",
+                "gte",
+                "in",
+                "lt",
+                "lte",
+                "min_items"
+              ]
+            },
+            "value": {
+              "type": "json"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "unknown"
+            },
+            "raw": {
+              "type": "json"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "all",
+                "any"
+              ]
+            },
+            "conditions": {
+              "minItems": 1,
+              "type": "array",
+              "items": {
+                "ref": "Condition"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "PolicyEvidence": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "documented",
+            "measured"
+          ]
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "date": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "nullable": true
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "BillingUnit": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "quantity": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "nullable": true
+        }
+      }
+    },
+    "PricingRule": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "when": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "not"
+                },
+                "condition": {
+                  "recursive": 1
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "predicate"
+                },
+                "field": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "op": {
+                  "type": "string",
+                  "enum": [
+                    "eq",
+                    "gt",
+                    "gte",
+                    "in",
+                    "lt",
+                    "lte",
+                    "min_items"
+                  ]
+                },
+                "value": {
+                  "type": "json"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "unknown"
+                },
+                "raw": {
+                  "type": "json"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "all",
+                    "any"
+                  ]
+                },
+                "conditions": {
+                  "minItems": 1,
+                  "type": "array",
+                  "items": {
+                    "recursive": 1
+                  }
+                }
+              }
+            }
+          ],
+          "nullable": true
+        },
+        "meter": {
+          "type": "string",
+          "minLength": 1
+        },
+        "operation": {
+          "type": "string",
+          "enum": [
+            "multiply",
+            "set"
+          ]
+        },
+        "amount": {
+          "type": "number",
+          "minimum": 0
+        },
+        "currency": {
+          "type": "string",
+          "nullable": true
+        },
+        "unit": {
+          "ref": "BillingUnit",
+          "nullable": true
+        },
+        "applies_to": {
+          "type": "string",
+          "enum": [
+            "above_threshold",
+            "all_usage"
+          ],
+          "nullable": true
+        },
+        "source_path": {
+          "type": "string",
+          "nullable": true
+        },
+        "period": {
+          "type": "string",
+          "enum": [
+            "off_peak",
+            "peak"
+          ],
+          "nullable": true
+        },
+        "resulting_rates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "meter": {
+                "type": "string",
+                "minLength": 1
+              },
+              "amount": {
+                "type": "number",
+                "minimum": 0
+              },
+              "currency": {
+                "type": "string",
+                "nullable": true
+              },
+              "unit": {
+                "ref": "BillingUnit",
+                "nullable": true
+              }
+            }
+          },
+          "nullable": true
+        }
+      }
+    },
+    "Pricing": {
+      "type": "object",
+      "properties": {
+        "coverage": {
+          "type": "string",
+          "enum": [
+            "complete",
+            "not_applicable",
+            "partial",
+            "unknown"
+          ]
+        },
+        "billing": {
+          "type": "string",
+          "enum": [
+            "not_applicable",
+            "per_use",
+            "reference",
+            "unknown"
+          ]
+        },
+        "reference_ref": {
+          "type": "string",
+          "nullable": true
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "ref": "PricingRule"
+          },
+          "nullable": true
+        },
+        "rule_order": {
+          "type": "string",
+          "const": "listed",
+          "nullable": true
+        },
+        "unparsed": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "value": {
+                "type": "json"
+              }
+            }
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "ref": "PolicyEvidence"
+          }
+        }
+      }
+    },
+    "RequestBinding": {
+      "type": "object",
+      "properties": {
+        "location": {
+          "type": "string",
+          "enum": [
+            "body",
+            "header",
+            "query"
+          ]
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "type": "string",
+          "enum": [
+            "content_block",
+            "request"
+          ],
+          "nullable": true
+        }
+      }
+    },
+    "RequestSetting": {
+      "type": "object",
+      "properties": {
+        "location": {
+          "type": "string",
+          "enum": [
+            "body",
+            "header",
+            "query"
+          ]
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "type": "string",
+          "enum": [
+            "content_block",
+            "request"
+          ],
+          "nullable": true
+        },
+        "value": {
+          "type": "json"
+        }
+      }
+    },
+    "RequestOption": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "json"
+        },
+        "attributes": {
+          "type": "object",
+          "additional": {
+            "type": "json"
+          },
+          "nullable": true
+        },
+        "settings": {
+          "type": "array",
+          "items": {
+            "ref": "RequestSetting"
+          },
+          "nullable": true
+        },
+        "when": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "not"
+                },
+                "condition": {
+                  "recursive": 1
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "predicate"
+                },
+                "field": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "op": {
+                  "type": "string",
+                  "enum": [
+                    "eq",
+                    "gt",
+                    "gte",
+                    "in",
+                    "lt",
+                    "lte",
+                    "min_items"
+                  ]
+                },
+                "value": {
+                  "type": "json"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "unknown"
+                },
+                "raw": {
+                  "type": "json"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "all",
+                    "any"
+                  ]
+                },
+                "conditions": {
+                  "minItems": 1,
+                  "type": "array",
+                  "items": {
+                    "recursive": 1
+                  }
+                }
+              }
+            }
+          ],
+          "nullable": true
+        }
+      }
+    },
+    "RequestControl": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "support": {
+          "type": "string",
+          "enum": [
+            "supported",
+            "unknown",
+            "unsupported"
+          ]
+        },
+        "when": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "not"
+                },
+                "condition": {
+                  "recursive": 1
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "predicate"
+                },
+                "field": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "op": {
+                  "type": "string",
+                  "enum": [
+                    "eq",
+                    "gt",
+                    "gte",
+                    "in",
+                    "lt",
+                    "lte",
+                    "min_items"
+                  ]
+                },
+                "value": {
+                  "type": "json"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "unknown"
+                },
+                "raw": {
+                  "type": "json"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "all",
+                    "any"
+                  ]
+                },
+                "conditions": {
+                  "minItems": 1,
+                  "type": "array",
+                  "items": {
+                    "recursive": 1
+                  }
+                }
+              }
+            }
+          ],
+          "nullable": true
+        },
+        "bindings": {
+          "type": "array",
+          "items": {
+            "ref": "RequestBinding"
+          },
+          "nullable": true
+        },
+        "options": {
+          "type": "array",
+          "items": {
+            "ref": "RequestOption"
+          },
+          "nullable": true
+        },
+        "default": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "json"
+            }
+          },
+          "nullable": true
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "ref": "PolicyEvidence"
+          }
+        }
+      }
+    },
+    "RequestControls": {
+      "type": "object",
+      "properties": {
+        "coverage": {
+          "type": "string",
+          "enum": [
+            "complete",
+            "not_applicable",
+            "partial",
+            "unknown"
+          ]
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "ref": "RequestControl"
+          }
+        }
+      }
+    },
+    "MeasuredLimit": {
+      "type": "object",
+      "properties": {
+        "route": {
+          "type": "string"
+        },
+        "route_label": {
+          "type": "string"
+        },
+        "client": {
+          "type": "string"
+        },
+        "client_label": {
+          "type": "string"
+        },
+        "context": {
+          "type": "number",
+          "nullable": true
+        },
+        "output": {
+          "type": "number",
+          "nullable": true
+        },
+        "input_accepted": {
+          "type": "number",
+          "nullable": true
+        },
+        "input_refused": {
+          "type": "number",
+          "nullable": true
+        },
+        "input_read": {
+          "type": "number",
+          "nullable": true
+        },
+        "output_accepted": {
+          "type": "number",
+          "nullable": true
+        },
+        "note": {
+          "type": "string",
+          "nullable": true
+        },
+        "date": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "nullable": true
+        },
+        "source": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "InputWindow": {
+      "type": "object",
+      "properties": {
+        "tokens": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "nullable": true
+        },
+        "basis": {
+          "type": "string",
+          "enum": [
+            "documented",
+            "measured",
+            "none"
+          ]
+        },
+        "bound": {
+          "type": "string",
+          "enum": [
+            "at_least",
+            "limit"
+          ],
+          "nullable": true
+        },
+        "scope": {
+          "type": "string",
+          "enum": [
+            "input",
+            "window"
+          ],
+          "nullable": true
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "models.dev",
+            "providers.dev"
+          ],
+          "nullable": true
+        },
+        "date": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "nullable": true
+        },
+        "documented_tokens": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "nullable": true
+        },
+        "documented_field": {
+          "type": "string",
+          "enum": [
+            "limit.context",
+            "limit.input"
+          ],
+          "nullable": true
+        },
+        "documented_source": {
+          "type": "string",
+          "enum": [
+            "models.dev",
+            "providers.dev"
+          ],
+          "nullable": true
+        },
+        "documented_date": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "nullable": true
+        },
+        "documented_status": {
+          "type": "string",
+          "enum": [
+            "contradicted",
+            "not_contradicted"
+          ],
+          "nullable": true
+        },
+        "measured_tokens": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "nullable": true
+        },
+        "measured_bound": {
+          "type": "string",
+          "enum": [
+            "at_least",
+            "limit"
+          ],
+          "nullable": true
+        },
+        "measured_kind": {
+          "type": "string",
+          "enum": [
+            "accepted",
+            "bracket",
+            "window"
+          ],
+          "nullable": true
+        },
+        "measured_refused": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "nullable": true
+        },
+        "measured_date": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "nullable": true
+        },
+        "clients": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "evaluations": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "measurements": {
+          "type": "array",
+          "items": {
+            "ref": "InputWindowMeasurement"
+          }
+        }
+      }
+    },
+    "InputWindowMeasurement": {
+      "type": "object",
+      "properties": {
+        "client": {
+          "type": "string"
+        },
+        "client_label": {
+          "type": "string"
+        },
+        "route": {
+          "type": "string"
+        },
+        "route_label": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "nullable": true
+        },
+        "tokens": {
+          "type": "integer",
+          "exclusiveMinimum": 0
+        },
+        "bound": {
+          "type": "string",
+          "enum": [
+            "at_least",
+            "limit"
+          ]
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "accepted",
+            "bracket",
+            "window"
+          ]
+        },
+        "accepted": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "nullable": true
+        },
+        "refused": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "nullable": true
+        },
+        "named": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "nullable": true
+        },
+        "read": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "nullable": true
+        },
+        "source": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "Provenance": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "op": {
+          "type": "string",
+          "enum": [
+            "delete",
+            "set",
+            "unknown"
+          ]
+        },
+        "value": {
+          "type": "json"
+        },
+        "had_upstream": {
+          "type": "boolean"
+        },
+        "upstream": {
+          "type": "json"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "ref": "Evidence"
+          }
+        }
+      }
+    },
+    "ProviderSummary": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "doc": {
+          "type": "string",
+          "nullable": true
+        },
+        "env": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "access": {
+          "type": "string",
+          "enum": [
+            "api",
+            "subscription",
+            "unknown"
+          ]
+        },
+        "access_reviewed": {
+          "type": "boolean"
+        },
+        "origin": {
+          "type": "string",
+          "enum": [
+            "added",
+            "upstream"
+          ]
+        },
+        "entry_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "evidence_entry_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "providers_dev": {
+          "ref": "ProviderExtension"
+        }
+      }
+    },
+    "ProviderExtension": {
+      "type": "object",
+      "properties": {
+        "origin": {
+          "type": "string",
+          "enum": [
+            "added",
+            "upstream"
+          ]
+        },
+        "access": {
+          "type": "string",
+          "enum": [
+            "api",
+            "subscription",
+            "unknown"
+          ]
+        },
+        "access_basis": {
+          "type": "string"
+        },
+        "access_reviewed": {
+          "type": "boolean"
+        },
+        "access_source": {
+          "type": "string",
+          "format": "uri",
+          "nullable": true
+        },
+        "note": {
+          "type": "string",
+          "nullable": true
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "ref": "Evidence"
+          }
+        },
+        "provenance": {
+          "type": "array",
+          "items": {
+            "ref": "Provenance"
+          }
+        }
+      }
+    },
+    "Provider": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "doc": {
+          "type": "string",
+          "optional": true
+        },
+        "env": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "models": {
+          "type": "object",
+          "additional": {
+            "ref": "Entry"
+          }
+        },
+        "providers_dev": {
+          "ref": "ProviderExtension"
+        }
+      },
+      "additional": {
+        "type": "any"
+      }
+    },
+    "CanonicalModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "lab": {
+          "type": "string"
+        },
+        "reference_ref": {
+          "type": "string",
+          "nullable": true
+        },
+        "entry_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "subscription_entry_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "evidence_entry_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "context_min": {
+          "type": "number",
+          "nullable": true
+        },
+        "context_max": {
+          "type": "number",
+          "nullable": true
+        },
+        "max_output_min": {
+          "type": "number",
+          "nullable": true
+        },
+        "max_output_max": {
+          "type": "number",
+          "nullable": true
+        }
+      }
+    },
+    "CanonicalModelDetail": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "lab": {
+          "type": "string"
+        },
+        "reference_ref": {
+          "type": "string",
+          "nullable": true
+        },
+        "entry_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "subscription_entry_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "evidence_entry_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "context_min": {
+          "type": "number",
+          "nullable": true
+        },
+        "context_max": {
+          "type": "number",
+          "nullable": true
+        },
+        "max_output_min": {
+          "type": "number",
+          "nullable": true
+        },
+        "max_output_max": {
+          "type": "number",
+          "nullable": true
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "ref": "EntrySummary"
+          }
+        }
+      }
+    },
+    "CacheEvaluationRecord": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "cache"
+        },
+        "entry_ref": {
+          "type": "string"
+        },
+        "entry_name": {
+          "type": "string"
+        },
+        "access": {
+          "type": "string",
+          "enum": [
+            "api",
+            "subscription",
+            "unknown"
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "route": {
+          "type": "string"
+        },
+        "route_label": {
+          "type": "string"
+        },
+        "client": {
+          "type": "string"
+        },
+        "client_label": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "request_settings": {
+          "type": "object",
+          "additional": {
+            "type": "json"
+          }
+        },
+        "retention_profile": {
+          "type": "string",
+          "enum": [
+            "long",
+            "short"
+          ]
+        },
+        "parameter": {
+          "type": "string",
+          "nullable": true
+        },
+        "value": {
+          "type": "string",
+          "nullable": true
+        },
+        "results": {
+          "type": "array",
+          "items": {
+            "ref": "CacheResult"
+          }
+        },
+        "late_excluded": {
+          "type": "integer",
+          "minimum": 0,
+          "nullable": true
+        },
+        "note": {
+          "type": "string",
+          "nullable": true
+        },
+        "source": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "LimitEvaluationRecord": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "limit"
+        },
+        "entry_ref": {
+          "type": "string"
+        },
+        "entry_name": {
+          "type": "string"
+        },
+        "access": {
+          "type": "string",
+          "enum": [
+            "api",
+            "subscription",
+            "unknown"
+          ]
+        },
+        "route": {
+          "type": "string"
+        },
+        "route_label": {
+          "type": "string"
+        },
+        "client": {
+          "type": "string"
+        },
+        "client_label": {
+          "type": "string"
+        },
+        "context": {
+          "type": "number",
+          "nullable": true
+        },
+        "output": {
+          "type": "number",
+          "nullable": true
+        },
+        "input_accepted": {
+          "type": "number",
+          "nullable": true
+        },
+        "input_refused": {
+          "type": "number",
+          "nullable": true
+        },
+        "input_read": {
+          "type": "number",
+          "nullable": true
+        },
+        "output_accepted": {
+          "type": "number",
+          "nullable": true
+        },
+        "note": {
+          "type": "string",
+          "nullable": true
+        },
+        "date": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "nullable": true
+        },
+        "source": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "Meta": {
+      "type": "object",
+      "properties": {
+        "api_version": {
+          "type": "string",
+          "const": "v1"
+        },
+        "schema_version": {
+          "type": "integer"
+        },
+        "upstream_schema": {
+          "type": "string"
+        },
+        "dataset_version": {
+          "type": "string"
+        },
+        "generated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "counts": {
+          "type": "object",
+          "properties": {
+            "providers": {
+              "type": "integer"
+            },
+            "entries": {
+              "type": "integer"
+            },
+            "models": {
+              "type": "integer"
+            },
+            "added_providers": {
+              "type": "integer"
+            },
+            "added_entries": {
+              "type": "integer"
+            },
+            "corrected_entries": {
+              "type": "integer"
+            },
+            "evaluated_entries": {
+              "type": "integer"
+            },
+            "cache_evaluations": {
+              "type": "integer"
+            },
+            "limit_evaluations": {
+              "type": "integer"
+            }
+          }
+        },
+        "cache_ages_s": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "stale_after_days": {
+          "type": "integer",
+          "exclusiveMinimum": 0
+        },
+        "upstream": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string"
+            },
+            "schema": {
+              "type": "string"
+            },
+            "fetched_at": {
+              "type": "string"
+            },
+            "checked_at": {
+              "type": "string"
+            },
+            "etag": {
+              "type": "string",
+              "nullable": true
+            },
+            "commit": {
+              "type": "string",
+              "nullable": true
+            },
+            "commit_date": {
+              "type": "string",
+              "nullable": true
+            },
+            "sha256": {
+              "type": "string"
+            },
+            "providers": {
+              "type": "integer"
+            },
+            "models": {
+              "type": "integer"
+            }
+          }
+        },
+        "measurements": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string"
+            },
+            "fetched_at": {
+              "type": "string"
+            },
+            "checked_at": {
+              "type": "string"
+            },
+            "etag": {
+              "type": "string",
+              "nullable": true
+            },
+            "sha256": {
+              "type": "string"
+            },
+            "repository": {
+              "type": "string",
+              "format": "uri"
+            }
+          },
+          "nullable": true
+        },
+        "sync": {
+          "type": "object",
+          "properties": {
+            "last_attempt_at": {
+              "type": "string",
+              "nullable": true
+            },
+            "last_attempt_ok": {
+              "type": "boolean",
+              "nullable": true
+            },
+            "last_error": {
+              "type": "string",
+              "nullable": true
+            }
+          }
+        },
+        "exclusions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "entry",
+                  "provider",
+                  "rule"
+                ]
+              },
+              "target": {
+                "type": "string"
+              },
+              "leaves_out": {
+                "type": "string",
+                "nullable": true
+              },
+              "reason": {
+                "type": "string"
+              },
+              "date": {
+                "type": "string",
+                "nullable": true
+              },
+              "evidence": {
+                "type": "array",
+                "items": {
+                  "ref": "Evidence"
+                }
+              },
+              "entries": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "level": {
+                "type": "string",
+                "enum": [
+                  "error",
+                  "notice",
+                  "warning"
+                ]
+              },
+              "code": {
+                "type": "string"
+              },
+              "target": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            },
+            "additional": {
+              "type": "any"
+            }
+          }
+        },
+        "license": {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "string"
+            },
+            "upstream": {
+              "type": "string"
+            },
+            "notice": {
+              "type": "string"
+            }
+          },
+          "additional": {
+            "type": "any"
+          }
+        }
+      },
+      "additional": {
+        "type": "any"
+      }
+    },
+    "Error": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            },
+            "details": {
+              "type": "json",
+              "optional": true
+            }
+          }
+        }
+      }
+    }
+  }
+}

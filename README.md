@@ -343,6 +343,19 @@ external callers. The page layer has no index, catalog or filesystem access. Fil
 the API; the website formats its response. The homepage sends searches to `/api/v1/entries` instead of downloading
 the entire index. Provider and model lists use API search and pagination, including without JavaScript.
 
+The structure of `/api/v1` is locked: it only grows. `structure/api-v1.json` records it, as read from the OpenAPI
+document the code generates: the paths and methods; each parameter (where it is, whether it is required, its type,
+its allowed values); each response and its schema; each component schema (its properties, their types, which are
+required, which may be null, enum values, array items). Descriptions, examples and the guide are not part of it.
+`tests/api-structure.test.ts` fails when the structure of the API is not exactly the record. After a change of
+structure made on purpose, run `npm run structure:update` and commit the record with the change. The record may only
+grow from `structure/api-v1-1.0.0.json`, the structure of 1.0.0, which is never edited: a new path, optional
+parameter, allowed value, property, component or enum value passes; a path, parameter, property, component or value
+removed or renamed, a changed type, a property that may become absent or null, or a new required parameter fails,
+and belongs in `/api/v2`. Once the record has grown beyond 1.0.0, the version (`info.version` in
+`src/core/openapi.ts`) must be above it: a release that adds something takes a minor step. The version restarted at
+1.0.0 with the first public release; the numbers before it were never public.
+
 Cache evaluations are published as counts and percentages at exact ages, the control ("at once") first: each
 evaluation with its own results (`providers_dev.cache.evaluations` of an entry), and the evaluations of one client
 with one retention setting added up as the `results` of a measured item of the lifetime record below, short and long
