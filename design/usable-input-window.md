@@ -1,6 +1,7 @@
 # The input window: how much input a request can carry on an entry
 
-Design, 2026-11-16 (task LWL-01). Nothing here is built. The owner's decisions it starts from are in section 1;
+Design, 2026-11-16 (task LWL-01). It is built: the rule in `src/core/limits.ts`, the record on every entry and
+summary, and the pages. The owner's decisions it starts from are in section 1;
 the questions it left open were decided on 2026-11-16, as recommended, and are in section 13; the design is written
 to those decisions. `AGENTS.md` and `README.md` stay the rules of the data and the contract;
 `design/safe-cache-lifetime.md` is the pattern this follows: a value worked out once in the data build, published
@@ -721,7 +722,9 @@ With it, the "Context" column prints `context` and nothing else. Today, where no
 "≥ 915K input" from `measured_input_accepted`, rounded by the page; that is the one place where a page still works
 out a limit, and the record replaces it.
 
-**The look that needs deciding** (the designer's, through the chief):
+**The look, as it was put to the designer.** It was decided and built: an "Input window" column before Context in the
+catalog, with the basis under the number and "≥" for a lower bound, and on the entry page a first tile and an
+"Input window" table. The three points were:
 
 1. Whether the catalog takes an eighth column, and at which widths it shows, or whether "Input" takes the place of
    another.
@@ -778,6 +781,8 @@ Not in this work. The value is in every summary, so a client that wants an order
 limit is that or more).
 
 ## 12. The work, as tasks
+
+The tasks were carried out on 2026-11-16.
 
 Seven tasks in the site, in this order, each leaving `npm run build && npm run check` passing. Tasks 1 to 5 add
 keys and change no existing value; task 6 is the pages. Task 7 is groundtruth's and is not blocked by the others.
@@ -859,7 +864,7 @@ keys and change no existing value; task 6 is the pages. Task 7 is groundtruth's 
   documented value on an upstream entry" holds: `limit` is untouched, and the documented value stays in the record.
 - `tests/api.test.ts`: the OpenAPI document has the two components and the guide section.
 
-**Task 6. The pages.** After the designer's answer to the three points of section 10.
+**Task 6. The pages.** The look of section 10, as decided (decision 10).
 
 - `src/core/render.ts`: the "Input window" table of the entry page; the "Input" column of the entry table;
   `contextCell` prints `context` only. `src/core/format.ts`: a compact number rounded down, for an `at_least` value.
