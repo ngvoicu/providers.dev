@@ -258,6 +258,7 @@ export const EntrySummarySchema = z
     context: z.number().nullable().describe("limit.context in tokens: the window this provider exposes for the model. Null = unknown."),
     input: z.number().nullable().describe("limit.input in tokens, stated where the input limit is lower than the window. Null = not stated."),
     max_output: z.number().nullable().describe("limit.output in tokens: the most one response can hold. A maximum, not a default. Null = unknown."),
+    input_window: InputWindowSchema.describe("How much input a request can carry on this entry, documented or measured, and what that rests on: the same object as providers_dev.limits.input_window of the full entry. context, input and max_output beside it are limit as published, unchanged."),
     cache: z.enum(["yes", "no", "unknown"]).describe("Prompt caching as documented. unknown = the source says nothing, which is not the same as no."),
     cache_modes: z.array(z.enum(["implicit", "explicit"])).describe("implicit = the provider caches on its own. explicit = the request marks what to cache."),
     cache_mode_support: z.strictObject({ implicit: SupportSchema, explicit: SupportSchema }).describe("Support for each mode, from providers_dev.cache.documented.modes. An omitted mode stays unknown."),

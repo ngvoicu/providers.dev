@@ -39,7 +39,7 @@ export function limitOf(more: Partial<MeasuredLimit> = {}): MeasuredLimit {
 export function summaryOf(more: Partial<Summary> = {}): Summary {
   return {
     ref: "p/m", provider: "p", model: "m", name: "M", type: null, family: null, canonical_id: null, status: null, release_date: null,
-    access: "api", origin: "upstream", context: null, input: null, max_output: null,
+    access: "api", origin: "upstream", context: null, input: null, max_output: null, input_window: emptyInputWindow(),
     cache: "unknown", cache_modes: [], cache_mode_support: { implicit: "unknown", explicit: "unknown" },
     cache_retention: "unknown", cache_lifetime: emptyCacheLifetime(), evaluation_count: 0,
     price_in: null, price_out: null, price_from: null, pricing: pricingOf({}, "api", null, []), request_controls: controlsOf({}, NO_CACHE.retention, []),

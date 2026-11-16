@@ -134,7 +134,7 @@ describe("GET /api/v1/entries", () => {
 
   it("adds cache_lifetime to a summary and leaves every other key as it was", () => {
     expect(Object.keys(deps.index.entries[0]!)).toEqual([
-      "ref", "provider", "model", "name", "type", "family", "canonical_id", "status", "release_date", "access", "origin", "context", "input", "max_output",
+      "ref", "provider", "model", "name", "type", "family", "canonical_id", "status", "release_date", "access", "origin", "context", "input", "max_output", "input_window",
       "cache", "cache_modes", "cache_mode_support", "cache_retention", "cache_lifetime", "evaluation_count",
       "price_in", "price_out", "price_from", "pricing", "request_controls", "measured_input_accepted", "measured_input_refused", "measured_limit_count", "overridden_fields", "verified", "shard",
     ]);
@@ -145,6 +145,39 @@ describe("GET /api/v1/entries", () => {
       delete (model.providers_dev as unknown as { cache: Partial<ModelExtension["cache"]> }).cache.lifetime;
       const { cache_lifetime: _without, ...rest } = summarize(entry.provider, model, entry.shard);
       const { cache_lifetime: _with, ...published } = entry;
+      expect(rest).toEqual(published);
+    }
+  });
+
+  it("returns the same input window record on entry, provider, model and catalog routes", async () => {
+    for (const ref of ["added-login/lab/model-2", "provider-02/lab/model-4", "provider-03/model-7"]) {
+      const detail = one(EntryDetailSchema).parse(await json(`/api/v1/entries/${ref}`));
+      const expected = detail.data.entry.providers_dev.limits.input_window;
+      const { provider, model } = { provider: detail.data.summary.provider, model: detail.data.summary.model };
+      const collection = pageOf(EntrySummarySchema).parse(await json(`/api/v1/entries?provider=${provider}&limit=200`));
+      const full = one(ProviderDetailSchema).parse(await json(`/api/v1/providers/${provider}?view=full`));
+      const canonical = one(CanonicalModelDetailSchema).parse(await json(`/api/v1/models/${detail.data.summary.canonical_id}`));
+      const catalog = (await json<{ data: Catalog }>("/api/v1/catalog")).data;
+      for (const summary of [detail.data.summary, collection.data.find((entry) => entry.ref === ref)!, full.data.entries.find((entry) => entry.ref === ref)!, canonical.data.entries.find((entry) => entry.ref === ref)!]) {
+        expect(summary.input_window, ref).toEqual(expected);
+      }
+      expect(full.data.models?.[model]?.providers_dev.limits.input_window).toEqual(expected);
+      expect((catalog[provider]!.models[model]!.providers_dev as unknown as ModelExtension).limits.input_window).toEqual(expected);
+    }
+    // The fixture's three kinds: measured over a contradicted window, documented, nothing known (model-7 has no limit).
+    const basis = (ref: string) => deps.index.entries.find((entry) => entry.ref === ref)!.input_window;
+    expect([basis("added-login/lab/model-2").basis, basis("added-login/lab/model-2").tokens]).toEqual(["measured", 600000]);
+    expect([basis("provider-02/lab/model-4").basis, basis("provider-02/lab/model-4").tokens, basis("provider-02/lab/model-4").source]).toEqual(["documented", 500000, "models.dev"]);
+    expect([basis("provider-03/model-7").basis, basis("provider-03/model-7").tokens]).toEqual(["none", null]);
+  });
+
+  it("adds input_window to a summary and leaves every other key as it was", () => {
+    const exported = JSON.parse(readFileSync(join(published, "site", "api.json"), "utf8")) as Catalog;
+    for (const entry of deps.index.entries) {
+      const model = structuredClone(exported[entry.provider]!.models[entry.model]!);
+      delete (model.providers_dev as unknown as { limits: Partial<ModelExtension["limits"]> }).limits.input_window;
+      const { input_window: _without, ...rest } = summarize(entry.provider, model, entry.shard);
+      const { input_window: _with, ...published } = entry;
       expect(rest).toEqual(published);
     }
   });
@@ -520,6 +553,26 @@ describe("the contract", () => {
     const shapes = (items: readonly object[]): string[] => [...new Set(items.map((item) => Object.keys(item).sort().join(",")))];
     const same = (items: readonly object[], what: string): void => expect(shapes(items).length, `${what}: ${shapes(items).slice(0, 2).join(" | ")}`).toBeLessThanOrEqual(1);
     same(local.index.entries, "entry summaries");
+    same(local.index.entries.map((entry) => entry.input_window), "input_window of a summary");
+    // context, input, max_output and the three measured_* keys of every summary are what they were: limit as published,
+    // and the widest accepted, the narrowest refused and the number of limit evaluations, whether they count or not.
+    const asBefore: string[] = [];
+    for (const entry of local.index.entries) {
+      const full = exported[entry.provider]!.models[entry.model]!;
+      const limit = (typeof full.limit === "object" && full.limit !== null ? full.limit : {}) as Record<string, unknown>;
+      const number = (value: unknown) => (typeof value === "number" ? value : null);
+      const measured = (full.providers_dev as unknown as ModelExtension).limits.measured;
+      const accepted = measured.flatMap((item) => (item.input_accepted === null ? [] : [item.input_accepted]));
+      const refused = measured.flatMap((item) => (item.input_refused === null ? [] : [item.input_refused]));
+      const expected = {
+        context: number(limit.context), input: number(limit.input), max_output: number(limit.output),
+        measured_input_accepted: accepted.length > 0 ? Math.max(...accepted) : null, measured_input_refused: refused.length > 0 ? Math.min(...refused) : null, measured_limit_count: measured.length,
+      };
+      const actual = { context: entry.context, input: entry.input, max_output: entry.max_output, measured_input_accepted: entry.measured_input_accepted, measured_input_refused: entry.measured_input_refused, measured_limit_count: entry.measured_limit_count };
+      if (!isDeepStrictEqual(actual, expected)) asBefore.push(entry.ref);
+      if (!isDeepStrictEqual(entry.input_window, (full.providers_dev as unknown as ModelExtension).limits.input_window)) asBefore.push(`${entry.ref} input_window`);
+    }
+    expect(asBefore).toEqual([]);
     // The summaries also list their keys in one order.
     expect(new Set(local.index.entries.map((entry) => Object.keys(entry).join(","))).size).toBe(1);
     same(local.index.providers, "provider summaries");

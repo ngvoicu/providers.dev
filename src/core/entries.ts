@@ -1,6 +1,7 @@
 // The flat view of the catalog: one summary per provider-model entry.
 // The website tables, /api/v1/entries and the compact index all use these summaries, built once by buildIndex().
 import { cacheFacts, type CacheLifetimeRecord, type CacheMode, type CacheRetention, type CacheSupport, type Support } from "./cache.ts";
+import type { InputWindow } from "./limits.ts";
 import { isObject, type JsonObject } from "./merge.ts";
 import type { Pricing, RequestControls } from "./policy-contract.ts";
 import { NS, type Access, type Catalog, type ModelExtension, type ProviderExtension } from "./schema.ts";
@@ -33,6 +34,8 @@ export interface Summary {
   input: number | null;
   /** limit.output: the most tokens one response can hold. A maximum, not a default. Null = unknown. */
   max_output: number | null;
+  /** How much input a request can carry on this entry: the same object as `providers_dev.limits.input_window` of the full entry. */
+  input_window: InputWindow;
   cache: CacheSupport;
   cache_modes: CacheMode[];
   cache_mode_support: Record<CacheMode, Support>;
@@ -126,6 +129,7 @@ export function summarize(providerId: string, model: JsonObject, shard: number):
     context: count(limit.context),
     input: count(limit.input),
     max_output: count(limit.output),
+    input_window: extension.limits.input_window,
     ...cacheFacts(extension.cache.documented),
     cache_retention: extension.cache.retention.support,
     cache_lifetime: extension.cache.lifetime,
