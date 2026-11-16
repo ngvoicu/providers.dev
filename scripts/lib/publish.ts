@@ -12,6 +12,7 @@ import { resolve } from "../../src/core/resolve.ts";
 import {
   AccessRules,
   AuthoredProvider,
+  CatalogRules,
   MeasurementLabels,
   ObservedFile,
   OverrideFile,
@@ -96,6 +97,8 @@ export function publish(input: PublishOptions): PublishReport {
   const routes = loadYaml(join(authored, "routes.yaml"), RouteMap, errors);
   const labelsPath = join(authored, "measurement-labels.yaml");
   const labels = existsSync(labelsPath) ? loadYaml(labelsPath, MeasurementLabels, errors) : undefined;
+  const rulesPath = join(authored, "catalog-rules.yaml");
+  const catalogRules = existsSync(rulesPath) ? loadYaml(rulesPath, CatalogRules, errors) : undefined;
 
   const observedPath = join(dataDir, "sources", "observed.json");
   let observed: ObservedFile | undefined;
@@ -114,6 +117,7 @@ export function publish(input: PublishOptions): PublishReport {
     routes,
     upstreamDate: upstream.meta.fetched_at.slice(0, 10),
     ...(labels ? { labels } : {}),
+    ...(catalogRules ? { catalogRules } : {}),
     ...(observed ? { observed } : {}),
   });
   for (const issue of issues) if (issue.level === "error") errors.push(`${issue.target}: ${issue.message}`);

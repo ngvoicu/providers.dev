@@ -19,7 +19,7 @@ The baseline is imported from models.dev; our additions, corrections and measure
 |---|---|---|
 | `data/upstream/` | the last good import of models.dev, one file per provider | `npm run sync` only |
 | `data/sources/` | the measurements file from groundtruth | `npm run sync` only |
-| `data/authored/` | our providers, overrides, access rules, route map, measurement labels | people |
+| `data/authored/` | our providers, overrides, catalog-wide rules, access rules, route map, measurement labels | people |
 | `data/published/` | the resolved snapshot (not in git) | `npm run data` only |
 | `src/core/` | pure logic shared by scripts, Worker, pages and browser: merge, resolve, entries, query, api, render | |
 | `scripts/` | sync, data build, staging | |
@@ -30,6 +30,11 @@ The baseline is imported from models.dev; our additions, corrections and measure
 
 - Never edit `data/upstream/`, `data/sources/` or `data/published/` by hand. A correction is an override in
   `data/authored/overrides/<provider>.yaml`; it survives every sync.
+- To leave out the earlier versions of a model family everywhere (an editorial choice, such as "no Claude Opus before
+  5.5"), add one rule to `data/authored/catalog-rules.yaml`, never an `exclude: true` per entry. It reads the version
+  from each entry of the family at every provider, after every override, and follows syncs; it has a reason and a
+  date and no evidence, and `/api/v1/meta` lists it once in `exclusions` with the number of entries it removed. Do not
+  edit an override because a rule leaves out an entry it names: that raises no issue. The README says how.
 - Every override and every added provider or model needs a `reason` (where the schema has one) and `evidence` with
   `kind`, `url` and `date`. The build fails without them. Do not invent limits, lifetimes, model mappings or dates.
 - Unknown is not zero and not unsupported. A missing value stays missing; `null` in an override means "publish as

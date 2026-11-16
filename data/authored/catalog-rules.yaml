@@ -1,0 +1,46 @@
+# Rules over the whole catalog: each applies to every provider, imported or added, after every override, and keeps
+# applying as models.dev changes. They are editorial choices of providers.dev, not statements about a provider, so they
+# carry a reason and a date and no evidence. Each is published as one item of `exclusions` in /api/v1/meta, with the
+# number of entries it removed.
+#
+# `exclude`: leave out the versions of a model family before a given one.
+#   family      the published `family` of an entry, exactly as models.dev writes it. Only entries of it are looked at.
+#   word        the word the version is written next to, on either side: claude-opus-4-1, opus4-7, claude-3-opus,
+#               Claude Opus 4.1. Read in the entry's id, then its canonical_id, then its name; a date is not a version.
+#   before      the first version that is kept (5.5): every one below it is left out, every one from it on is kept.
+#   aliases     words written after `word` in an id instead of a version (claude-opus-latest): such an entry is kept.
+#   leaves_out, reason, date: published as they are.
+# An entry of the family with no version written anywhere is published and reported as a dataset issue.
+exclude:
+  - id: claude-opus-before-5.5
+    family: claude-opus
+    word: opus
+    before: "5.5"
+    aliases: [latest]
+    leaves_out: Claude Opus versions before 5.5, at every provider
+    reason: "Editorial choice of providers.dev: Claude Opus versions before 5.5 are not listed."
+    date: "2026-11-16"
+  - id: claude-sonnet-before-5.5
+    family: claude-sonnet
+    word: sonnet
+    before: "5.5"
+    aliases: [latest]
+    leaves_out: Claude Sonnet versions before 5.5, at every provider
+    reason: "Editorial choice of providers.dev: Claude Sonnet versions before 5.5 are not listed."
+    date: "2026-11-16"
+  - id: claude-haiku-before-5.5
+    family: claude-haiku
+    word: haiku
+    before: "5.5"
+    aliases: [latest]
+    leaves_out: Claude Haiku versions before 5.5, at every provider
+    reason: "Editorial choice of providers.dev: Claude Haiku versions before 5.5 are not listed."
+    date: "2026-11-16"
+  - id: claude-fable-before-5.2
+    family: claude-fable
+    word: fable
+    before: "5.2"
+    aliases: [latest]
+    leaves_out: Claude Fable versions before 5.2, at every provider
+    reason: "Editorial choice of providers.dev: Claude Fable versions before 5.2 are not listed."
+    date: "2026-11-16"

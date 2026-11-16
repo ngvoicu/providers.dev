@@ -71,6 +71,9 @@ An override is a patch that is merged over one upstream entry, field by field.
 | `"$delete"` | removed: the field does not apply to this entry |
 | `exclude: true` | the entry or provider is left out of the catalog and listed as excluded |
 
+To leave out a whole model family's earlier versions at every provider, there is one catalog-wide rule instead of an
+`exclude` per entry: see [Leave out earlier versions of a family](#leave-out-earlier-versions-of-a-family).
+
 Example. Upstream says:
 
 ```yaml
@@ -107,6 +110,9 @@ What the build reports (in the console, on the *Our data* page and in `/api/v1/m
 - **addition-collides**: upstream added a provider with the id of one of ours.
 - **orphan-observation**, **unmapped-route**: evaluations that have no entry or provider to land on.
 - **unmapped-client**: an evaluation names a client that `data/authored/measurement-labels.yaml` does not describe.
+- **excluded-observation**: an evaluation names an entry that a catalog-wide rule leaves out. It is not published.
+- **rule-version-unread**: an entry of a family a catalog-wide rule covers has no version the rule can read. It is
+  published; correct its `canonical_id` with an override, or add the word it uses to the rule's `aliases`.
 
 ## Authoring
 
@@ -131,6 +137,35 @@ rules:
 
 `id`, `models` and `providers_dev` cannot be overridden. To remove an entry, use `exclude: true` instead of `set`.
 To remove a whole provider, put `exclude: { reason, evidence }` at the top of the file.
+
+### Leave out earlier versions of a family
+
+An editorial choice that holds for the whole catalog ("no Claude Opus before 5.5") is one rule in
+`data/authored/catalog-rules.yaml`, not an `exclude` per entry. It applies at every provider, imported or added, after
+every override, and follows each sync: an earlier version that appears at a new provider is left out without an edit.
+
+```yaml
+exclude:
+  - id: claude-opus-before-5.5        # names the rule in /api/v1/meta
+    family: claude-opus               # only entries whose published `family` is this
+    word: opus                        # the version is read next to this word
+    before: "5.5"                     # the first version kept; every one below it is left out
+    aliases: [latest]                 # claude-opus-latest has no version and is kept
+    leaves_out: Claude Opus versions before 5.5, at every provider
+    reason: "Editorial choice of providers.dev: Claude Opus versions before 5.5 are not listed."
+    date: "2026-11-16"
+```
+
+The version is read on either side of the word, in the entry's id, then its `canonical_id`, then its name
+(`claude-opus-4-1`, `opus4-7`, `claude-3-opus`, `Claude Opus 4.1`); a date is not a version. A later version, and
+every model of another family with the word in its name, is kept. An entry of the family with no version anywhere is
+published and reported (**rule-version-unread**). An entry whose `family` models.dev leaves out, or writes otherwise,
+is not looked at.
+
+A rule has no evidence: it says what providers.dev lists, not what a provider does. `/api/v1/meta` lists it once in
+`exclusions` (`kind: rule`, its words, reason and date, and the number of entries it removed in this build), never
+the entries one by one. An override that names an entry a rule leaves out stays valid and raises no issue; an
+evaluation of such an entry is reported (**excluded-observation**). To add a rule, add an item under `exclude`.
 
 ### Add a provider or a model
 

@@ -331,7 +331,19 @@ export const MetaSchema = z
     sync: z
       .strictObject({ last_attempt_at: z.string().nullable(), last_attempt_ok: z.boolean().nullable(), last_error: z.string().nullable() })
       .describe("The last attempt to import. All null = no attempt is recorded."),
-    exclusions: z.array(z.strictObject({ target: z.string(), reason: z.string(), evidence: z.array(EvidenceSchema) }) satisfies z.ZodType<Exclusion>),
+    exclusions: z
+      .array(
+        z.strictObject({
+          kind: z.enum(["entry", "provider", "rule"]).describe("entry or provider: an override left it out, with its evidence. rule: a catalog-wide rule, an editorial choice of providers.dev, left out every entry it matches."),
+          target: z.string().describe("The entry (provider/model), the provider id, or the rule id."),
+          leaves_out: z.string().nullable().describe("What a rule leaves out, in words. Null for an entry or a provider."),
+          reason: z.string(),
+          date: z.string().nullable().describe("The day a rule was decided (YYYY-MM-DD). Null for an entry or a provider: its evidence carries the dates."),
+          evidence: z.array(EvidenceSchema).describe("The sources for an entry or a provider. Empty for a rule: an editorial choice cites none."),
+          entries: z.int().min(0).describe("How many entries it removed in this build."),
+        }) satisfies z.ZodType<Exclusion>,
+      )
+      .describe("What is left out of the catalog: one item per excluded entry or provider, and one per catalog-wide rule, never a list of the entries a rule removed."),
     issues: z.array(issue).describe("Corrections and evaluations that no longer match an entry."),
     license: z.looseObject({ data: z.string(), upstream: z.string(), notice: z.string() }),
   })

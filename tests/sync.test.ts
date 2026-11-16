@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { publish } from "../scripts/lib/publish.ts";
+import { MetaSchema } from "../src/core/contract.ts";
 import { loadUpstream, sync, SyncBusyError } from "../scripts/lib/sync.ts";
 import { stringify } from "yaml";
 import { fetchReturning, fixtureUpstream, ROOT, tempDataDir, writeAuthored } from "./helpers.ts";
@@ -146,6 +147,26 @@ describe("publish", () => {
     expect(second.ok).toBe(false);
     expect(second.errors.join(" ")).toMatch(/reason|evidence/);
     expect(readFileSync(join(dataDir, "published", "site", "data", "meta.json"), "utf8")).toBe(before);
+  });
+
+  it("publishes one exclusions item per catalog rule, with the count of the entries it removed", async () => {
+    const dataDir = await firstImport();
+    writeAuthored(dataDir);
+    const before = publish({ dataDir, rootDir: ROOT });
+    // family-0 is models 0, 3, 6, 9, 12, 15, 18 at each of the 30 providers; the rule leaves out 0, 3 and 6.
+    const rule = { id: "family-0-before-9", family: "family-0", word: "model", before: "9", leaves_out: "Family 0 before 9", reason: "Editorial choice.", date: "2026-11-16" };
+    writeFileSync(join(dataDir, "authored", "catalog-rules.yaml"), stringify({ exclude: [rule] }));
+    const after = publish({ dataDir, rootDir: ROOT });
+    expect(after.errors).toEqual([]);
+    expect(after.meta?.exclusions).toEqual([{ kind: "rule", target: "family-0-before-9", leaves_out: "Family 0 before 9", reason: "Editorial choice.", date: "2026-11-16", evidence: [], entries: 90 }]);
+    expect(after.meta!.counts.entries).toBe(before.meta!.counts.entries - 90);
+    expect(after.meta?.issues).toEqual([]);
+    const meta = JSON.parse(readFileSync(join(dataDir, "published", "site", "data", "meta.json"), "utf8"));
+    expect(MetaSchema.parse(meta).exclusions).toHaveLength(1);
+    expect(existsSync(join(dataDir, "published", "site", "data", "entries", "provider-00"))).toBe(true);
+    const index = JSON.parse(readFileSync(join(dataDir, "published", "site", "data", "index.json"), "utf8"));
+    expect(index.entries.some((entry: { ref: string }) => entry.ref === "provider-00/lab/model-6")).toBe(false);
+    expect(index.entries.some((entry: { ref: string }) => entry.ref === "provider-00/model-9")).toBe(true);
   });
 
   it("gives the same dataset version for the same data and a new one when the data changes", async () => {

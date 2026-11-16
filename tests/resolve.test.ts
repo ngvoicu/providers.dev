@@ -222,6 +222,7 @@ describe("resolve: overrides", () => {
     expect(Object.keys(catalog)).toEqual(["lab"]);
     expect(Object.keys(catalog.lab!.models)).toEqual(["model-a"]);
     expect(exclusions.map((item) => item.target)).toEqual(["lab/model-b", "lab-coding-plan"]);
+    expect(exclusions.map((item) => [item.kind, item.leaves_out, item.date, item.evidence.length, item.entries])).toEqual([["entry", null, null, 1, 1], ["provider", null, null, 1, 1]]);
   });
 
   it("refuses to override reserved fields", () => {

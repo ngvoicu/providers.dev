@@ -134,6 +134,41 @@ export const OverrideFile = z.strictObject({
 });
 export type OverrideFile = z.infer<typeof OverrideFile>;
 
+// ---- authored: rules over the whole catalog (data/authored/catalog-rules.yaml)
+/**
+ * Leaves out the versions of a model family before a given one, at every provider, whoever added the entry. An
+ * editorial choice of providers.dev, not a statement about a provider: it carries a reason and a date, no evidence.
+ */
+export const FamilyExclusion = z.strictObject({
+  /** Names the rule in /api/v1/meta. */
+  id: z.string().regex(/^[a-z0-9][a-z0-9.-]*$/),
+  /** The published `family` of the entries the rule looks at, exactly as models.dev writes it. */
+  family: z.string().min(1),
+  /** The word next to which the version is written in an id or a name ("opus" in claude-opus-4-1, claude-3-opus). */
+  word: z.string().regex(/^[a-z]+$/),
+  /** The first version that is kept: major, or major.minor. Every version below it is left out, every one from it on is kept. */
+  before: z.string().regex(/^\d{1,2}(\.\d)?$/),
+  /** Words that, written right after `word` in a model id instead of a version, make the entry an alias that is kept (claude-opus-latest). */
+  aliases: z.array(z.string().regex(/^[a-z]+$/)).default([]),
+  /** What the rule leaves out, in words, as published. */
+  leaves_out: z.string().min(1),
+  reason: z.string().min(1),
+  /** The day the rule was decided (YYYY-MM-DD). */
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+});
+export type FamilyExclusion = z.infer<typeof FamilyExclusion>;
+
+export const CatalogRules = z
+  .strictObject({ exclude: z.array(FamilyExclusion).default([]) })
+  .superRefine((rules, ctx) => {
+    const seen = new Set<string>();
+    rules.exclude.forEach((rule, index) => {
+      if (seen.has(rule.id)) ctx.addIssue({ code: "custom", path: ["exclude", index, "id"], message: `Two rules have the id "${rule.id}".` });
+      seen.add(rule.id);
+    });
+  });
+export type CatalogRules = z.infer<typeof CatalogRules>;
+
 // ---- authored: access classification (data/authored/access.yaml)
 export const AccessRules = z.strictObject({
   default: Access,
@@ -350,6 +385,8 @@ export interface Issue {
   code:
     | "orphan-override"
     | "orphan-observation"
+    | "excluded-observation"
+    | "rule-version-unread"
     | "redundant-override"
     | "addition-collides"
     | "inherit-target-missing"
@@ -364,10 +401,21 @@ export interface Issue {
   message: string;
 }
 
+/**
+ * What is left out of the catalog. `entry` and `provider`: an override's `exclude`, with its evidence. `rule`: a rule of
+ * data/authored/catalog-rules.yaml, an editorial choice with no evidence, its target the rule id.
+ */
 export interface Exclusion {
+  kind: "entry" | "provider" | "rule";
   target: string;
+  /** What a rule leaves out, in words. Null for an entry or a provider: the target says it. */
+  leaves_out: string | null;
   reason: string;
+  /** The day a rule was decided. Null for an entry or a provider: the evidence carries the dates. */
+  date: string | null;
   evidence: PublishedEvidence[];
+  /** The entries it removed in this build. */
+  entries: number;
 }
 
 export interface Meta {

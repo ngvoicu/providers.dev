@@ -25,6 +25,8 @@ import {
   type AuthoredModel,
   type AuthoredProvider,
   type Catalog,
+  type CatalogRules,
+  type FamilyExclusion,
   type DraftProvenance,
   type Evidence,
   type Exclusion,
@@ -52,6 +54,8 @@ export interface ResolveInput {
   routes: RouteMap;
   labels?: MeasurementLabels;
   observed?: ObservedFile;
+  /** Rules over the whole catalog (data/authored/catalog-rules.yaml). */
+  catalogRules?: CatalogRules;
   /** The date of the models.dev import (YYYY-MM-DD): the date of what is taken from its documentation. */
   upstreamDate?: string;
 }
@@ -142,6 +146,39 @@ function classify(id: string, rules: AccessRules): Pick<DraftProvider, "access" 
 
 function sortKeys<T>(record: Record<string, T>): Record<string, T> {
   return Object.fromEntries(Object.keys(record).sort().map((key) => [key, record[key] as T]));
+}
+
+const escapeRegExp = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+/**
+ * The version written next to `word` in a model id, a canonical id or a name, as [major, minor] (minor 0 when none
+ * is written). Read on either side of the word: claude-opus-4-1, opus4-7, Claude Opus 4.1, claude-3-7-sonnet,
+ * claude-4.5-sonnet, duo-chat-sonnet-5. A date is not a version: claude-opus-4-20250514 is 4, claude-3-opus-20240229 is 3.
+ * Where both sides have a number, the one written first counts. Null = no version is written there.
+ */
+export function versionNextTo(text: string | null | undefined, word: string): [number, number] | null {
+  if (!text) return null;
+  const lower = text.toLowerCase();
+  const w = escapeRegExp(word);
+  const after = new RegExp(`(?<![a-z])${w}[-_ .]?(\\d{1,2})(?!\\d)(?:[-_.](\\d)(?![a-z\\d]))?`).exec(lower);
+  const before = new RegExp(`(?<![a-z\\d.])(\\d{1,2})(?:[-_.](\\d))?[-_ .]?${w}(?![a-z])`).exec(lower);
+  const first = [after, before].filter((match): match is RegExpExecArray => match !== null).sort((a, b) => a.index - b.index)[0];
+  return first ? [Number(first[1]), Number(first[2] ?? 0)] : null;
+}
+
+/** Whether an entry falls under a family rule: "out" (an earlier version), "kept", or "unread" (no version is written). */
+export function familyRuleVerdict(model: { id: string; name?: unknown; family?: unknown; canonical_id?: unknown }, rule: Pick<FamilyExclusion, "family" | "word" | "before" | "aliases">): "out" | "kept" | "unread" | null {
+  if (model.family !== rule.family) return null;
+  const w = escapeRegExp(rule.word);
+  if (rule.aliases.some((alias) => new RegExp(`(?<![a-z])${w}[-_ .]?${escapeRegExp(alias)}(?![a-z])`).test(model.id.toLowerCase()))) return "kept";
+  // The entry's own id first, then the canonical model it names, then its display name.
+  const version =
+    versionNextTo(model.id, rule.word) ??
+    versionNextTo(typeof model.canonical_id === "string" ? model.canonical_id : null, rule.word) ??
+    versionNextTo(typeof model.name === "string" ? model.name : null, rule.word);
+  if (!version) return "unread";
+  const [major, minor] = rule.before.split(".").map(Number) as [number, number | undefined];
+  return version[0] < major || (version[0] === major && version[1] < (minor ?? 0)) ? "out" : "kept";
 }
 
 function newestDate(dates: (string | undefined)[]): string | undefined {
@@ -295,7 +332,7 @@ export function resolve(input: ResolveInput): ResolveResult {
     }
     if (file.exclude) {
       delete catalog[file.provider];
-      exclusions.push({ target: file.provider, reason: file.exclude.reason, evidence: publishEvidence(file.exclude.evidence) });
+      exclusions.push({ kind: "provider", target: file.provider, leaves_out: null, reason: file.exclude.reason, date: null, evidence: publishEvidence(file.exclude.evidence), entries: Object.keys(provider.models).length });
       continue;
     }
     if (file.set) {
@@ -326,7 +363,7 @@ export function resolve(input: ResolveInput): ResolveResult {
         }
         if (rule.exclude) {
           delete provider.models[id];
-          exclusions.push({ target, reason: rule.reason, evidence: publishEvidence(rule.evidence) });
+          exclusions.push({ kind: "entry", target, leaves_out: null, reason: rule.reason, date: null, evidence: publishEvidence(rule.evidence), entries: 1 });
           continue;
         }
         if (rule.cache_retention) retentionDeclarations.set(model, rule.cache_retention);
@@ -390,6 +427,38 @@ export function resolve(input: ResolveInput): ResolveResult {
     }
   }
 
+  // 4c. Rules over the whole catalog, after every override: an override may correct what a rule reads (family, ids),
+  // and an override that names an entry a rule leaves out stays valid. The rule removes entries at every provider,
+  // imported, added or measured. An entry of the family with no version written anywhere is reported, not guessed.
+  const ruledOut = new Map<string, string>();
+  for (const rule of input.catalogRules?.exclude ?? []) {
+    let removed = 0;
+    for (const [providerId, provider] of Object.entries(catalog)) {
+      for (const [id, model] of Object.entries(provider.models)) {
+        const verdict = familyRuleVerdict(model, rule);
+        const ref = `${providerId}/${id}`;
+        if (verdict === "unread") {
+          issues.push({
+            level: "warning",
+            code: "rule-version-unread",
+            target: ref,
+            message: `${ref} is of family ${rule.family}, but no version can be read next to "${rule.word}" in its id, canonical_id or name, so the rule ${rule.id} cannot tell whether to leave it out. It is published. Correct its canonical_id with an override, or add the word it uses to the rule's aliases.`,
+          });
+        }
+        if (verdict !== "out") continue;
+        delete provider.models[id];
+        ruledOut.set(ref, rule.id);
+        removed += 1;
+      }
+    }
+    exclusions.push({ kind: "rule", target: rule.id, leaves_out: rule.leaves_out, reason: rule.reason, date: rule.date, evidence: [], entries: removed });
+  }
+  // What an override said of an entry a rule then left out is moot, not a problem with the override.
+  for (let index = issues.length - 1; index >= 0; index -= 1) {
+    const issue = issues[index] as Issue;
+    if ((issue.code === "orphan-override" || issue.code === "redundant-override") && ruledOut.has(issue.target.split("#")[0] as string)) issues.splice(index, 1);
+  }
+
   // A richer cache control is also the source for the legacy cache representation and evaluation profiles.
   for (const [model, controls] of controlDeclarations) {
     const cache = controls.find((control) => control.id === "cache.retention");
@@ -433,6 +502,16 @@ export function resolve(input: ResolveInput): ResolveResult {
     const orphan = (ref: string, route: string): void => {
       if (unmapped.has(route) || orphaned.has(ref)) return;
       orphaned.add(ref);
+      const rule = ruledOut.get(ref);
+      if (rule) {
+        issues.push({
+          level: "warning",
+          code: "excluded-observation",
+          target: ref,
+          message: `Measurements for ${ref} were not published: the catalog rule ${rule} leaves the entry out.`,
+        });
+        return;
+      }
       issues.push({
         level: "warning",
         code: "orphan-observation",

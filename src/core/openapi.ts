@@ -87,7 +87,7 @@ export const ENDPOINTS: { path: string; summary: string; description?: string; p
   { path: "/api/v1/models/{lab}/{model}", summary: "One canonical model with every entry that serves it", params: [], returns: "CanonicalModelDetail" },
   { path: "/api/v1/evaluations/cache", summary: "List cache evaluations", description: "Every cache evaluation, newest first, each with the entry it was made on.", params: CACHE_EVALUATION_PARAMS, returns: "A page of CacheEvaluationRecord" },
   { path: "/api/v1/evaluations/limits", summary: "List limit evaluations", description: "Every limit evaluation, newest first, each with the entry it was made on.", params: LIMIT_EVALUATION_PARAMS, returns: "A page of LimitEvaluationRecord" },
-  { path: "/api/v1/meta", summary: "The dataset: version, counts, freshness, the stale threshold, open issues", params: [], returns: "Meta" },
+  { path: "/api/v1/meta", summary: "The dataset: version, counts, freshness, the stale threshold, what is left out, open issues", params: [], returns: "Meta" },
   { path: "/api/v1/catalog", summary: "Everything in one file", description: "`{ meta, data }`, where `data` is keyed by provider id and each provider holds `models` keyed by model id. Includes full pricing and request controls; use paginated resources when a full download is unnecessary.", params: [], returns: "The catalog, keyed by provider id" },
   { path: "/api/v1/openapi.json", summary: "This document", params: [], returns: "OpenAPI 3.1" },
   // What the pages of the website are drawn from, beyond the resources above.
