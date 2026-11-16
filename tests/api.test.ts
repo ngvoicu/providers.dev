@@ -540,6 +540,8 @@ describe("the input window in the OpenAPI document", () => {
     expect(section.title).toBe("Input window");
     const text = section.paragraphs.join(" ");
     for (const words of ["providers_dev.limits.input_window", "never 0", "system prompt", "99 %", "101 %", "912,780", "931,220", "lowest", "at_least", "measured_refused", "scope", "limit.input", "limit.context", "from_measurement", "none stated", "window", "bracket", "input_read", "limit-not-counted", "measured_input_accepted", "not contradicted is not confirmed", "probe's count"]) expect(text).toContain(words);
+    expect(text).toContain("912,780 or less) above an accepted one");
+    expect(text).not.toContain("below an accepted one");
   });
 });
 
