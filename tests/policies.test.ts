@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { CACHE_AGES_S } from "../src/core/cache.ts";
 import { buildIndex } from "../src/core/entries.ts";
+import { emptyInputWindow } from "../src/core/limits.ts";
 import { openapi } from "../src/core/openapi.ts";
 import { conditionOf, controlsOf, pricingOf } from "../src/core/policies.ts";
 import { PricingDeclarationSchema, PricingSchema, RequestControlDeclarationSchema, RequestControlsSchema } from "../src/core/policy-contract.ts";
@@ -172,7 +173,7 @@ describe("uniform pricing and controls", () => {
   it("renders the normalized rates and numeric limits without narrative notes", () => {
     const catalog = fixture(true);
     const model = catalog.p!.models.m!;
-    ext(model).limits = { measured: [limitOf({ route: "p", route_label: "P", input_accepted: 915011, input_refused: 922500, note: "A free-text claim that should stay in raw evidence" })], from_measurement: [] };
+    ext(model).limits = { measured: [limitOf({ route: "p", route_label: "P", input_accepted: 915011, input_refused: 922500, note: "A free-text claim that should stay in raw evidence" })], from_measurement: [], input_window: emptyInputWindow() };
     const index = buildIndex(catalog, "fixture", "2026-11-14T00:00:00Z", "2026-11-14T00:00:00Z");
     const summary = index.entries.find((entry) => entry.ref === "p/m")!;
     const html = entryHtml({ summary, provider: index.providers[0]!, model, today: { date: new Date("2026-11-14T00:00:00Z"), stale_after_days: 90 }, cache_ages_s: CACHE_AGES_S, imported: "2026-11-14" });

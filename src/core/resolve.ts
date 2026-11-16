@@ -17,6 +17,7 @@ import {
   type LifetimeSource,
   type RetentionEvidence,
 } from "./cache.ts";
+import { inputWindow, windowMeasurement, type DocumentedField, type LimitSource } from "./limits.ts";
 import { clone, isObject, mergePatch, type Change, type Json, type JsonObject } from "./merge.ts";
 import { controlsOf, pricingOf, retentionFromControl } from "./policies.ts";
 import {
@@ -817,6 +818,29 @@ export function resolve(input: ResolveInput): ResolveResult {
           });
         }
       }
+      // The input window: the documented input unless a counted limit evaluation clearly contradicts it, else the
+      // measured value, else null (design/usable-input-window.md). Where a documented value comes from: a providers.dev
+      // correction of the field read or of the whole limit, an entry providers.dev added (the newest of its published
+      // evidence, of any kind), or the models.dev import.
+      const measuredLimits = extension.limits?.measured ?? [];
+      const fromMeasurement = extension.limits?.from_measurement ?? [];
+      const limitSource = (field: DocumentedField): { source: LimitSource; date: string | null } => {
+        const corrections = (extension.provenance ?? []).filter((change) => change.path === field || change.path === "limit");
+        if (corrections.length > 0) return { source: "providers.dev", date: newestDate(corrections.flatMap((change) => change.evidence.map((source) => source.date))) ?? null };
+        if (extension.origin === "added") return { source: "providers.dev", date: newestDate(evidence.map((source) => source.date)) ?? null };
+        return { source: "models.dev", date: input.upstreamDate ?? null };
+      };
+      const entryWindow = inputWindow(model.limit, fromMeasurement, measuredLimits, limitSource);
+      for (const limit of measuredLimits) {
+        if ((limit.input_accepted === null && limit.input_refused === null) || windowMeasurement(limit) !== null) continue;
+        const stated = [limit.input_accepted !== null ? `input_accepted ${limit.input_accepted}` : null, limit.input_refused !== null ? `input_refused ${limit.input_refused}` : null, limit.context !== null ? `context ${limit.context}` : null].filter(Boolean).join(", ");
+        issues.push({
+          level: "notice",
+          code: "limit-not-counted",
+          target: `${ref}#limits`,
+          message: `The limit evaluation of ${ref} by ${limit.client} on ${limit.route}${limit.date ? ` (${limit.date})` : ""} states ${stated}, and gives no input window: no input accepted below a refusal, no window named by the route, no input read to the end. It is published in limits.measured and counts for nothing.`,
+        });
+      }
       const verified = newestDate([
         ...evidence.map((e) => e.date),
         ...(extension.provenance ?? []).flatMap((p) => p.evidence.map((e) => e.date)),
@@ -832,7 +856,7 @@ export function resolve(input: ResolveInput): ResolveResult {
         cache,
         pricing,
         request_controls: requestControls,
-        limits: { measured: extension.limits?.measured ?? [], from_measurement: extension.limits?.from_measurement ?? [] },
+        limits: { measured: measuredLimits, from_measurement: fromMeasurement, input_window: entryWindow },
         evidence: publishEvidence(evidence),
         verified: verified ?? null,
       };

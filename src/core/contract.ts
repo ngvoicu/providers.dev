@@ -12,6 +12,7 @@ import { CacheDocumentationSchema, CacheModeDocumentationSchema, CacheRetentionS
 import { ApiEndpointSchema, CapabilitiesSchema, CachePriceSchema, CostSchema, DocumentedCacheSchema, ModelMetadataShape, PriceConditionSchema, TextPriceSchema } from "./metadata-contract.ts";
 import { BillingUnitSchema, ConditionSchema, PolicyEvidenceSchema, PricingRuleSchema, PricingSchema, RequestBindingSchema, RequestControlSchema, RequestControlsSchema, RequestOptionSchema, RequestSettingSchema } from "./policy-contract.ts";
 import type { ProviderSummary, Summary } from "./entries.ts";
+import type { InputWindow, InputWindowMeasurement } from "./limits.ts";
 import type { CanonicalModel, CanonicalModelDetail, Correction, Documentation, Facets } from "./resources.ts";
 import { Access, type Exclusion, type MeasuredLimit, type ModelExtension, type ProviderExtension, type Provenance, type PublishedEvidence } from "./schema.ts";
 
@@ -144,6 +145,54 @@ export const MeasuredLimitSchema = z
   })
   .describe("One limit evaluation. Every evaluation has every field; what it did not measure is null.") satisfies z.ZodType<MeasuredLimit>;
 
+const windowBound = z.enum(["limit", "at_least"]);
+const windowKind = z.enum(["window", "bracket", "accepted"]);
+const tokens = z.int().positive();
+
+export const InputWindowMeasurementSchema = z
+  .strictObject({
+    client: z.string().describe("The public id of the client the requests went through, as on the evaluation."),
+    client_label: z.string(),
+    route: z.string().describe("The access method the requests went through, as on the evaluation."),
+    route_label: z.string(),
+    date: date.nullable().describe("The day the requests were sent, as on the evaluation. Null = the result carries no date."),
+    tokens: tokens.describe("The value this evaluation gives: named for kind window, accepted for bracket, read for accepted."),
+    bound: windowBound.describe("limit for kind window: the route named its limit. at_least for bracket and accepted: the largest input seen accepted; the real limit is this or more."),
+    kind: windowKind.describe("window: the route's own answer named its context window, and no smaller input was refused. bracket: an input was accepted and a larger one refused; the value is the accepted one. accepted: an input was accepted and the reply showed it was read to the end, nothing refused and no window named."),
+    accepted: tokens.nullable().describe("input_accepted of the evaluation: the largest input seen accepted. Null = none recorded."),
+    refused: tokens.nullable().describe("input_refused of the evaluation: the smallest input seen refused. Null = none."),
+    named: tokens.nullable().describe("context of the evaluation: the window the route names. Null = it named none."),
+    read: tokens.nullable().describe("input_read of the evaluation: the largest input the reply showed was read to the end. Null = not checked."),
+    source: z.url().describe("The raw result, as on the evaluation."),
+  })
+  .describe("One limit evaluation of the entry that counts for the input window, with the value it gives. One route, one client, one model.") satisfies z.ZodType<InputWindowMeasurement>;
+
+const limitSource = z.enum(["providers.dev", "models.dev"]);
+
+export const InputWindowSchema = z
+  .strictObject({
+    tokens: tokens.nullable().describe("The most input a request can carry on this entry, in tokens as the provider counts them, the client's own system prompt and tools included: documented_tokens unless a counted evaluation clearly contradicts it, else measured_tokens, else null. basis says which. Null = not known. Never 0."),
+    basis: z.enum(["documented", "measured", "none"]).describe("documented: tokens is documented_tokens. measured: tokens is measured_tokens. none: exactly when tokens is null."),
+    bound: windowBound.nullable().describe("limit: the value is the limit, as documented or as the route names it. at_least: the value is the largest input seen accepted, and the real limit is this or more; measured_refused, where set, is an input seen refused. A documented value is always limit. Null with none."),
+    scope: z.enum(["input", "window"]).nullable().describe("input: a figure for the input alone (limit.input, or an input size seen accepted). window: a context window that input and output share (limit.context, or a window the route names): the response is counted against the same figure. Null with none."),
+    source: limitSource.nullable().describe("Who the value is from. measured: always providers.dev. documented: documented_source. Null with none."),
+    date: date.nullable().describe("measured: measured_date. documented: documented_date. Null with none, and where the source has no date."),
+    documented_tokens: tokens.nullable().describe("The documented input of the entry: limit.input where it is above 0, else limit.context where it is above 0 and not a measured value named in limits.from_measurement. 0 means none stated. Nothing is read from another entry. Null = none is documented."),
+    documented_field: z.enum(["limit.input", "limit.context"]).nullable().describe("The field of the entry documented_tokens is read from. Null with documented_tokens."),
+    documented_source: limitSource.nullable().describe("models.dev for an imported value; providers.dev for a correction of the field and for a value in an entry providers.dev added. Null with documented_tokens."),
+    documented_date: date.nullable().describe("The import date for models.dev; the newest evidence date for providers.dev. Null = none is documented, or the source has no date."),
+    documented_status: z.enum(["contradicted", "not_contradicted"]).nullable().describe("What the rule found of the documented value, where one is documented and at least one evaluation counts. contradicted: an evaluation names a window below it, names another window than a documented limit.context, refused an input at or below 99 % of it, or accepted one at or above 101 % of it; tokens is measured_tokens. not_contradicted: none does, and tokens is documented_tokens; that is not the same as confirmed. Null in every other case."),
+    measured_tokens: tokens.nullable().describe("The measured value of the entry: the lowest tokens of measurements, whatever the client. Null = no evaluation counts."),
+    measured_bound: windowBound.nullable().describe("The bound of the measurement that gives measured_tokens (measurements[0]). Null with measured_tokens."),
+    measured_kind: windowKind.nullable().describe("Its kind. Null with measured_tokens."),
+    measured_refused: tokens.nullable().describe("Its refused where its kind is bracket: the smallest input it saw refused; the limit is below this. Null otherwise."),
+    measured_date: date.nullable().describe("Its date. Null with measured_tokens, and where the evaluation has no date."),
+    clients: z.int().min(0).describe("How many different clients measurements has. 0 = not measured."),
+    evaluations: z.int().min(0).describe("How many items measurements has: the limit evaluations of the entry that count. 0 = none counts."),
+    measurements: z.array(InputWindowMeasurementSchema).describe("One item per counted limit evaluation, ordered by tokens, then limit before at_least, then by client, route, date and source in plain character order, null first. The first item gives the measured_* keys. Empty = none counts. An evaluation that does not count (a refusal with nothing accepted, an accepted size with no refusal, no named window and no read check, the output alone) stays in limits.measured and is in no item."),
+  })
+  .describe("How much input a request can carry on this entry, and what that rests on: the documented value, the measured one beside it, and which the rule chose. Worked out once when the data is built. What the documentation says and what evaluations found on their dates, not a guarantee.") satisfies z.ZodType<InputWindow>;
+
 export const ProvenanceSchema = z
   .strictObject({
     path: z.string().describe("The field, for example limit.context."),
@@ -172,6 +221,7 @@ export const EntryExtensionSchema = z
     limits: z.strictObject({
       measured: z.array(MeasuredLimitSchema).describe("Limit evaluations on this entry. Empty = none."),
       from_measurement: z.array(z.enum(["context", "output"])).describe("On an added entry: which of limit.context and limit.output are measured values. Empty = none."),
+      input_window: InputWindowSchema,
     }),
     evidence: z.array(EvidenceSchema).describe("Sources for an added entry and for authored declarations. Empty = none."),
     verified: date.nullable().describe("The newest date of providers.dev evidence or evaluations for this entry. Null = it has none."),
@@ -439,6 +489,8 @@ export const COMPONENTS = {
   RequestControl: RequestControlSchema,
   RequestControls: RequestControlsSchema,
   MeasuredLimit: MeasuredLimitSchema,
+  InputWindow: InputWindowSchema,
+  InputWindowMeasurement: InputWindowMeasurementSchema,
   Provenance: ProvenanceSchema,
   ProviderSummary: ProviderSummarySchema,
   ProviderExtension: ProviderExtensionSchema,

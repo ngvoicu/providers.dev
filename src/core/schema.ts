@@ -2,6 +2,7 @@
 // the measurements file, and the published catalog.
 import { z } from "zod";
 import type { EntryCache } from "./cache.ts";
+import type { InputWindow } from "./limits.ts";
 import { CacheRetentionDeclarationSchema } from "./cache-contract.ts";
 import { ModelMetadataShape } from "./metadata-contract.ts";
 import { PricingDeclarationSchema, RequestControlDeclarationsSchema, type Pricing, type RequestControls } from "./policy-contract.ts";
@@ -440,6 +441,8 @@ export interface ModelExtension {
     measured: MeasuredLimit[];
     /** On an entry we add: which of limit.context and limit.output are our measured values. */
     from_measurement: ("context" | "output")[];
+    /** How much input a request can carry on this entry, and what that rests on (`inputWindow` in limits.ts). On every entry. */
+    input_window: InputWindow;
   };
   evidence: PublishedEvidence[];
   /** The newest date among our evidence and measurements for this entry. Null = none. */
@@ -479,7 +482,8 @@ export interface Issue {
     | "reserved-field"
     | "lifetime-differs"
     | "unparsed-lifetime"
-    | "retention-lifetime-differs";
+    | "retention-lifetime-differs"
+    | "limit-not-counted";
   target: string;
   message: string;
 }

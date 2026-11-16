@@ -32,7 +32,7 @@ import { MARK } from "../src/core/page-shell.ts";
 import { CACHE_EVALUATION_PARAMS, LIMIT_EVALUATION_PARAMS, PARAMS, parseQuery, runQuery } from "../src/core/query.ts";
 import { canonicalModels, listEvaluations, withoutEntries } from "../src/core/resources.ts";
 import type { Catalog, ModelExtension } from "../src/core/schema.ts";
-import { depsFrom, fetchReturning, fixtureUpstream, lifetimeRuleBreaks, ROOT, summaryOf, tempDataDir, writeAuthored } from "./helpers.ts";
+import { depsFrom, fetchReturning, fixtureUpstream, inputWindowRuleBreaks, lifetimeRuleBreaks, ROOT, summaryOf, tempDataDir, writeAuthored } from "./helpers.ts";
 
 let deps: ApiDeps;
 let published: string;
@@ -538,6 +538,9 @@ describe("the contract", () => {
     same(extensions.flatMap((extension) => extension.cache.evaluations), "cache evaluations");
     same(extensions.flatMap((extension) => extension.cache.evaluations.flatMap((evaluation) => evaluation.results)), "cache results");
     same(extensions.flatMap((extension) => extension.limits.measured), "limit evaluations");
+    same(extensions.map((extension) => extension.limits.input_window), "limits.input_window");
+    same(extensions.flatMap((extension) => extension.limits.input_window.measurements), "limits.input_window.measurements");
+    expect(Object.keys(extensions[0]!.limits)).toEqual(["measured", "from_measurement", "input_window"]);
     // Every limit evaluation has every key of the contract, input_read among them, on the entry and in the list.
     const limitKeys = Object.keys(MeasuredLimitSchema.shape);
     expect(limitKeys).toContain("input_read");
@@ -561,6 +564,16 @@ describe("the contract", () => {
       }),
     );
     expect(broken).toEqual([]);
+
+    // The input window record of every entry keeps the rules of section 2.6 of design/usable-input-window.md, redone
+    // from the published entry alone: its limit, limits.from_measurement and limits.measured.
+    const windowBreaks = Object.entries(exported).flatMap(([id, provider]) =>
+      Object.entries(provider.models).flatMap(([modelId, entry]) => {
+        const limits = (entry.providers_dev as unknown as ModelExtension).limits;
+        return inputWindowRuleBreaks(limits.input_window, (entry as { limit?: unknown }).limit, limits.from_measurement, limits.measured).map((rule) => `${id}/${modelId}: ${rule}`);
+      }),
+    );
+    expect(windowBreaks).toEqual([]);
 
     // Nothing of the deleted fields is lost: every documented lifetime text and every counted result is in exactly one
     // place of the record. Each text of capabilities.cache.<mode>.ttl (as published) that is a duration is the
@@ -634,6 +647,33 @@ describe("the contract", () => {
   it.skipIf(!existsSync(join(real, "site", "api.json")))("holds for every answer of the real published snapshot", async () => {
     await holds(real);
   }, 120_000);
+
+  it("gives the fixture's added entry its documented window, contradicted by a bracket under it", () => {
+    const window = deps.index.entries.find((entry) => entry.ref === "added-login/lab/model-2")!;
+    const record = JSON.parse(readFileSync(join(published, "site", "api.json"), "utf8"))["added-login"].models["lab/model-2"].providers_dev.limits.input_window;
+    expect(window.measured_limit_count).toBe(4);
+    // 880,000 refused is at or below 99 % of the documented 900,000: contradicted, and the lowest client decides.
+    expect(record).toMatchObject({ tokens: 600000, basis: "measured", bound: "at_least", scope: "input", documented_tokens: 900000, documented_field: "limit.context", documented_source: "providers.dev", documented_date: "2026-11-01", documented_status: "contradicted", measured_kind: "accepted", measured_date: "2026-11-11", clients: 3, evaluations: 3 });
+    expect(record.measurements.map((item: { client: string; kind: string; tokens: number }) => [item.client, item.kind, item.tokens])).toEqual([["agent", "accepted", 600000], ["proxy", "bracket", 850000], ["direct", "window", 900000]]);
+    expect(deps.meta.issues.filter((issue) => issue.code === "limit-not-counted").map((issue) => issue.target)).toEqual(["added-login/lab/model-2#limits"]);
+  });
+
+  // The counts of section 7 of design/usable-input-window.md were taken on the dataset built from the models.dev
+  // import c18a3cf and the measurements file 4ce313b6. Checked where the real snapshot is built from those two.
+  const realMeta = existsSync(join(real, "site", "data", "meta.json")) ? (JSON.parse(readFileSync(join(real, "site", "data", "meta.json"), "utf8")) as { upstream: { commit: string | null }; measurements: { sha256: string } | null }) : null;
+  const designInputs = realMeta?.upstream.commit?.startsWith("c18a3cf") === true && realMeta.measurements?.sha256.startsWith("4ce313b6") === true;
+  it.skipIf(!designInputs)("gives the counts of the design on the real published snapshot built from its inputs", () => {
+    const index = depsFrom(real).index;
+    const exported = JSON.parse(readFileSync(join(real, "site", "api.json"), "utf8")) as Catalog;
+    const window = (entry: Summary) => (exported[entry.provider]!.models[entry.model]!.providers_dev as unknown as ModelExtension).limits.input_window;
+    const count = (keep: (entry: Summary) => boolean) => index.entries.filter(keep).length;
+    expect([count((entry) => window(entry).basis === "documented"), count((entry) => window(entry).basis === "measured"), count((entry) => window(entry).basis === "none")]).toEqual([5744, 7, 354]);
+    expect([count((entry) => window(entry).documented_field === "limit.input" && window(entry).basis === "documented"), count((entry) => window(entry).documented_field === "limit.context" && window(entry).basis === "documented")]).toEqual([813, 4931]);
+    expect(count((entry) => window(entry).basis === "documented" && window(entry).evaluations > 0)).toBe(10);
+    expect(count((entry) => window(entry).documented_status === "contradicted")).toBe(0);
+    expect([count((entry) => window(entry).basis === "measured" && window(entry).bound === "limit"), count((entry) => window(entry).basis === "measured" && window(entry).bound === "at_least")]).toEqual([4, 3]);
+    expect([count((entry) => window(entry).basis === "none" && entry.context === 0), count((entry) => window(entry).basis === "none" && entry.origin === "added")]).toEqual([335, 19]);
+  });
 });
 
 describe("entry pages", () => {

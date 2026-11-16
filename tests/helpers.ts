@@ -6,7 +6,7 @@ import type { ApiDeps } from "../src/core/api.ts";
 import { addResults, documentedCache, emptyCacheLifetime, RETENTION_PROFILES, type CacheDocumentation, type CacheEvaluation, type CacheLifetimeRecord, type CacheResult, type EntryCache } from "../src/core/cache.ts";
 import type { Index, Summary } from "../src/core/entries.ts";
 import { controlsOf, pricingOf } from "../src/core/policies.ts";
-import type { InputWindow } from "../src/core/limits.ts";
+import { emptyInputWindow, type InputWindow } from "../src/core/limits.ts";
 import type { MeasuredLimit, Meta, ModelExtension, UpstreamCatalog } from "../src/core/schema.ts";
 import { ROOT } from "../scripts/lib/files.ts";
 
@@ -23,7 +23,7 @@ export function extensionOf(more: Partial<ModelExtension> = {}): ModelExtension 
     cache: NO_CACHE,
     pricing: pricingOf({}, more.access ?? "api", null, []),
     request_controls: controlsOf({}, NO_CACHE.retention, []),
-    limits: { measured: [], from_measurement: [] },
+    limits: { measured: [], from_measurement: [], input_window: emptyInputWindow() },
     evidence: [],
     verified: null,
     ...more,

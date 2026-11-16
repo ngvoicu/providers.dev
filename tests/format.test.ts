@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { pricingOf } from "../src/core/policies.ts";
 import { addResults, cacheResult, documentedCache, profileOf, retentionOf } from "../src/core/cache.ts";
 import { importDate, shortAge } from "../src/core/format.ts";
+import { emptyInputWindow } from "../src/core/limits.ts";
 import type { JsonObject } from "../src/core/merge.ts";
 import type { MeasuredLimit } from "../src/core/schema.ts";
 
@@ -42,7 +43,7 @@ describe("prices", () => {
 describe("measured input", () => {
   it("puts the bounds of an evaluated input limit in the summary", async () => {
     const { summarize } = await import("../src/core/entries.ts");
-    const model = (measured: MeasuredLimit[]) => ({ id: "m", name: "M", providers_dev: extensionOf({ origin: "added", access: "subscription", limits: { measured, from_measurement: [] } }) }) as never;
+    const model = (measured: MeasuredLimit[]) => ({ id: "m", name: "M", providers_dev: extensionOf({ origin: "added", access: "subscription", limits: { measured, from_measurement: [], input_window: emptyInputWindow() } }) }) as never;
     const two = summarize("p", model([limitOf({ input_accepted: 915011, input_refused: 922500 }), limitOf({ input_accepted: 920870, input_refused: 921875 })]), 0);
     // The widest accepted and the narrowest refused: the real limit is between them.
     expect([two.measured_input_accepted, two.measured_input_refused, two.context]).toEqual([920870, 921875, null]);

@@ -3,7 +3,9 @@ import { emptyCacheLifetime } from "../src/core/cache.ts";
 import { CacheLifetimeRecordSchema } from "../src/core/contract.ts";
 import { clone } from "../src/core/merge.ts";
 import { summarize } from "../src/core/entries.ts";
+import { emptyInputWindow } from "../src/core/limits.ts";
 import { resolve, type ResolveInput } from "../src/core/resolve.ts";
+import { inputWindowRuleBreaks } from "./helpers.ts";
 import { MeasurementLabels, OverrideFile as OverrideFileSchema, ext, providerExt, type AccessRules, type AuthoredProvider, type Evidence, type ObservedFile, type OverrideFile, type UpstreamCatalog } from "../src/core/schema.ts";
 
 const evidence: Evidence[] = [{ kind: "documented", url: "https://example.com/docs", date: "2026-11-01" }];
@@ -358,6 +360,23 @@ describe("resolve: access and additions", () => {
   });
 });
 
+/**
+ * What resolve published for the entries of the input window fixture before the input window existed (commit b3f3037,
+ * the same fixture): limit, limits.measured, limits.from_measurement, verified and origin. The record adds a key and
+ * changes none of these.
+ */
+const BEFORE_INPUT_WINDOW = {
+  "added/x": {"limit":{"context":64000},"measured":[],"from_measurement":[],"verified":"2026-11-07","origin":"added"},
+  "lab/model-a": {"limit":{"context":200000,"output":64000},"measured":[{"route":"lab-api","route_label":"Lab API key","client":"direct","client_label":"Straight to the provider","context":null,"output":null,"input_accepted":930000,"input_refused":null,"input_read":null,"output_accepted":null,"note":null,"date":"2026-11-09","source":"https://github.com/example/probe/blob/main/results/limits-2026-11-09/l.jsonl"}],"from_measurement":[],"verified":"2026-11-09","origin":"upstream"},
+  "lab/model-b": {"limit":{"context":120000,"output":8000},"measured":[],"from_measurement":[],"verified":"2026-11-04","origin":"upstream"},
+  "lab/model-c": {"limit":{"context":300000,"input":260000,"output":8000},"measured":[],"from_measurement":[],"verified":"2026-11-03","origin":"upstream"},
+  "lab/model-d": {"limit":{"context":0,"output":0},"measured":[],"from_measurement":[],"verified":null,"origin":"upstream"},
+  "lab/model-e": {"limit":{"context":600000,"input":400000},"measured":[],"from_measurement":[],"verified":"2026-11-05","origin":"upstream"},
+  "lab-coding-plan/model-a": {"limit":null,"measured":[],"from_measurement":[],"verified":null,"origin":"upstream"},
+  "lab-login/m1": {"limit":null,"measured":[{"route":"lab-login","route_label":"Lab login","client":"direct","client_label":"Straight to the provider","context":null,"output":null,"input_accepted":190000,"input_refused":195000,"input_read":null,"output_accepted":null,"note":null,"date":"2026-11-08","source":"https://github.com/example/probe/blob/main/results/limits-2026-11-08/l.jsonl"}],"from_measurement":[],"verified":"2026-11-08","origin":"added"},
+  "lab-login/m2": {"limit":{"context":1000000,"output":32000},"measured":[{"route":"lab-login","route_label":"Lab login","client":"direct","client_label":"Straight to the provider","context":1000000,"output":32000,"input_accepted":null,"input_refused":null,"input_read":null,"output_accepted":null,"note":null,"date":"2026-11-08","source":"https://github.com/example/probe/blob/main/results/limits-2026-11-08/l.jsonl"}],"from_measurement":["context","output"],"verified":"2026-11-08","origin":"added"},
+};
+
 describe("resolve: measurements", () => {
   const observed: ObservedFile = {
     schema: 1,
@@ -506,6 +525,107 @@ describe("resolve: measurements", () => {
     delete gone.lab!.models["model-a"];
     const { issues } = resolve({ ...input([], { observed, routes, labels: directLabel, additions: [login] }), upstream: gone });
     expect(issues).toContainEqual(expect.objectContaining({ code: "orphan-observation", target: "lab/model-a" }));
+  });
+
+  describe("the input window", () => {
+    const listed: Evidence = { kind: "listed", url: "https://example.com/models", date: "2026-11-07" };
+    const windowUpstream = (): UpstreamCatalog => {
+      const catalog = upstream();
+      catalog.lab!.models["model-c"] = { id: "model-c", name: "Model C", limit: { context: 300000, input: 250000, output: 8000 } };
+      catalog.lab!.models["model-d"] = { id: "model-d", name: "Model D", type: "image", limit: { context: 0, output: 0 } };
+      catalog.lab!.models["model-e"] = { id: "model-e", name: "Model E", limit: { context: 500000, input: 400000 } };
+      return catalog;
+    };
+    const dated = (date: string): Evidence[] => [{ kind: "documented", url: "https://example.com/limits", date }];
+    const corrections: OverrideFile = {
+      provider: "lab",
+      rules: [
+        { models: ["model-b"], set: { limit: { context: 120000 } }, reason: "documented higher", evidence: dated("2026-11-04") },
+        { models: ["model-c"], set: { limit: { input: 260000 } }, reason: "documented higher", evidence: dated("2026-11-03") },
+        { models: ["model-e"], set: { limit: { context: 600000 } }, reason: "documented higher", evidence: dated("2026-11-05") },
+      ],
+    };
+    const added: AuthoredProvider = { id: "added", name: "Added", access: "api", access_basis: "b", evidence, models: [{ id: "x", fields: { limit: { context: 64000 } }, evidence: [...evidence, listed] }] };
+    const limits: ObservedFile = {
+      ...observed,
+      cache: [],
+      limits: [
+        // Created by the measurement, inheriting from lab/model-a (200,000 documented there): a bracket, nothing documented here.
+        { route: "lab-login", client: "direct", model: "m1", base_model: "lab/model-a", input_accepted: 190000, input_refused: 195000, source: "results/limits-2026-11-08/l.jsonl" },
+        // A window the route names, on an entry providers.dev added: measured, not documented.
+        { route: "lab-login", client: "direct", model: "m2", base_model: "lab/model-a", context: 1000000, output: 32000, source: "results/limits-2026-11-08/l.jsonl" },
+        // An accepted size with no refusal, no named window and no read check: it does not count.
+        { route: "lab-api", client: "direct", model: "model-a", models_dev: "lab/model-a", input_accepted: 930000, source: "results/limits-2026-11-09/l.jsonl" },
+      ],
+    };
+    const resolved = () => resolve(input([corrections], { upstream: windowUpstream(), observed: limits, routes, labels: directLabel, additions: [login, added], upstreamDate: "2026-11-15" }));
+    const windowOf = (catalog: ReturnType<typeof resolve>["catalog"], provider: string, model: string) => ext(catalog[provider]!.models[model]!).limits.input_window;
+
+    it("takes source and date from the import, a correction of the field read, or the entry providers.dev added", () => {
+      const { catalog } = resolved();
+      const brief = (provider: string, model: string) => {
+        const w = windowOf(catalog, provider, model);
+        return [w.tokens, w.basis, w.scope, w.documented_field, w.source, w.date];
+      };
+      // Imported, nothing corrected: models.dev and the import date.
+      expect(brief("lab", "model-a")).toEqual([200000, "documented", "window", "limit.context", "models.dev", "2026-11-15"]);
+      // A correction of the field read: providers.dev and the date of its evidence.
+      expect(brief("lab", "model-b")).toEqual([120000, "documented", "window", "limit.context", "providers.dev", "2026-11-04"]);
+      expect(brief("lab", "model-c")).toEqual([260000, "documented", "input", "limit.input", "providers.dev", "2026-11-03"]);
+      // A correction of limit.context where limit.input is the field read: still the import's.
+      expect(brief("lab", "model-e")).toEqual([400000, "documented", "input", "limit.input", "models.dev", "2026-11-15"]);
+      // An entry providers.dev added whose file states a limit: the newest of its evidence, of any kind.
+      expect(brief("added", "x")).toEqual([64000, "documented", "window", "limit.context", "providers.dev", "2026-11-07"]);
+      // A window of 0 on an image model, and an entry with no limit: nothing known.
+      expect(windowOf(catalog, "lab", "model-d")).toEqual(emptyInputWindow());
+      expect(windowOf(catalog, "lab-coding-plan", "model-a")).toEqual(emptyInputWindow());
+      // Without an import date, none is published.
+      const undated = resolve(input([], { upstream: windowUpstream() }));
+      expect(windowOf(undated.catalog, "lab", "model-a")).toMatchObject({ source: "models.dev", date: null, documented_date: null });
+    });
+
+    it("takes nothing from the entry an added entry inherits from, and reads a measured window as a measurement", () => {
+      const { catalog } = resolved();
+      const m1 = catalog["lab-login"]!.models.m1!;
+      expect(ext(m1).inherited?.from).toBe("lab/model-a");
+      expect(m1.limit).toBeUndefined();
+      expect(windowOf(catalog, "lab-login", "m1")).toMatchObject({ tokens: 190000, basis: "measured", bound: "at_least", scope: "input", source: "providers.dev", date: "2026-11-08", documented_tokens: null, measured_refused: 195000, evaluations: 1 });
+      const m2 = catalog["lab-login"]!.models.m2!;
+      expect([m2.limit, ext(m2).limits.from_measurement]).toEqual([{ context: 1000000, output: 32000 }, ["context", "output"]]);
+      expect(windowOf(catalog, "lab-login", "m2")).toMatchObject({ tokens: 1000000, basis: "measured", bound: "limit", scope: "window", documented_tokens: null, documented_status: null, measured_kind: "window" });
+    });
+
+    it("keeps a row that does not count in limits.measured, in no item, and reports it once", () => {
+      const { catalog, issues } = resolved();
+      const model = catalog.lab!.models["model-a"]!;
+      expect(ext(model).limits.measured).toEqual([expect.objectContaining({ input_accepted: 930000, input_refused: null, context: null, input_read: null })]);
+      expect(ext(model).limits.input_window).toMatchObject({ basis: "documented", tokens: 200000, documented_status: null, evaluations: 0, measurements: [] });
+      expect(issues.filter((issue) => issue.code === "limit-not-counted")).toEqual([
+        { level: "notice", code: "limit-not-counted", target: "lab/model-a#limits", message: expect.stringMatching(/^The limit evaluation of lab\/model-a by direct on lab-api \(2026-11-09\) states input_accepted 930000, and gives no input window/) },
+      ]);
+      // An evaluation of the output alone is not reported.
+      const output: ObservedFile = { ...limits, limits: [{ route: "lab-api", client: "direct", model: "model-b", models_dev: "lab/model-b", output: 8000, source: "results/limits-2026-11-09/l.jsonl" }] };
+      expect(resolve(input([], { observed: output, routes, labels: directLabel })).issues.filter((issue) => issue.code === "limit-not-counted")).toEqual([]);
+    });
+
+    it("keeps the rules of 2.6 on every entry", () => {
+      const { catalog } = resolved();
+      for (const provider of Object.values(catalog)) {
+        for (const model of Object.values(provider.models)) {
+          const limits = ext(model).limits;
+          expect(inputWindowRuleBreaks(limits.input_window, model.limit, limits.from_measurement, limits.measured), `${provider.id}/${model.id}`).toEqual([]);
+        }
+      }
+    });
+
+    it("leaves limit, limits.measured, limits.from_measurement, verified and origin as they were", () => {
+      const { catalog } = resolved();
+      const now = Object.fromEntries(Object.values(catalog).flatMap((provider) => Object.values(provider.models).map((model) => {
+        const extension = ext(model);
+        return [`${provider.id}/${model.id}`, { limit: model.limit ?? null, measured: extension.limits.measured, from_measurement: extension.limits.from_measurement, verified: extension.verified, origin: extension.origin }];
+      })));
+      expect(now).toEqual(BEFORE_INPUT_WINDOW);
+    });
   });
 
   describe("the cache lifetime record", () => {
