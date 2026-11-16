@@ -237,6 +237,7 @@ method), **models** (canonical: a model as its lab names it) and **evaluations**
 
 ```
 curl 'https://providers.dev/api/v1/entries?access=subscription&min_context=400000&sort=context&order=desc'
+curl 'https://providers.dev/api/v1/entries?lifetime_basis=measured&sort=cache_long&order=desc'
 curl https://providers.dev/api/v1/entries/openrouter/anthropic/claude-opus-5.5
 curl -H 'If-None-Match: "<dataset version>"' -i https://providers.dev/api/v1/catalog     # 304 until the data changes
 ```
@@ -283,6 +284,9 @@ where nothing is documented, the measured one, the oldest age through which ever
 lifetime above 0 is documented and one is measured: `contradicted` or `not_contradicted` (else `null`). `0` is a value (documented as not caching, or no age at
 which every check hit); `null` is not known. `cacheLifetime` in `src/core/cache.ts` works it out once, when the data
 is built; the rule in full is in `design/safe-cache-lifetime.md` and in the guide of the OpenAPI document.
+`/api/v1/entries` sorts by the safe values with `sort=cache_short` or `sort=cache_long` (`null` last in either order,
+`0` a value), and `lifetime_basis=documented` or `measured` keeps the entries whose short or long safe value has that
+basis.
 
 The safe value, like every figure the site shows, is worked out once, when the data is built, and published in the
 API. A page never works anything out: it prints fields of the API, formatted. The site never shows anything that is

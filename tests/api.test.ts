@@ -21,7 +21,7 @@ import {
   ProviderSchema,
   ProviderSummarySchema,
 } from "../src/core/contract.ts";
-import { lifetimeSeconds } from "../src/core/cache.ts";
+import { emptyCacheLifetime, lifetimeSeconds } from "../src/core/cache.ts";
 import { summarize, type Summary } from "../src/core/entries.ts";
 import { entryHref } from "../src/core/format.ts";
 import { ENDPOINTS, openapi } from "../src/core/openapi.ts";
@@ -225,6 +225,55 @@ describe("GET /api/v1/entries", () => {
     const ascending = await json<Page>("/api/v1/entries?provider=provider-00&sort=context&order=asc&limit=200");
     expect(ascending.data[0]?.context).toBe(100000);
     expect(ascending.data.at(-1)?.context).toBeNull();
+  });
+
+  it("sorts by the safe cache lifetime, 0 a value and unknown last, and filters by its basis", async () => {
+    type Basis = "documented" | "measured" | "none";
+    // An entry by its short and long safe lifetime: [safe_s, basis] each.
+    const entry = (ref: string, short: [number | null, Basis], long: [number | null, Basis]) => {
+      const lifetime = emptyCacheLifetime();
+      Object.assign(lifetime.short, { safe_s: short[0], basis: short[1] });
+      Object.assign(lifetime.long, { safe_s: long[0], basis: long[1] });
+      const [provider, model] = ref.split("/") as [string, string];
+      return summaryOf({ ref, provider, model, cache_lifetime: lifetime });
+    };
+    const entries = [
+      entry("b/hour", [300, "documented"], [3600, "documented"]),
+      entry("a/zero", [0, "measured"], [null, "none"]),
+      entry("c/unknown", [null, "none"], [null, "none"]),
+      entry("a/hour", [600, "measured"], [3600, "documented"]),
+      entry("a/day", [null, "none"], [86400, "measured"]),
+      entry("a/none", [0, "documented"], [0, "documented"]),
+    ];
+    const run = (search: string): string[] => {
+      const parsed = parseQuery(new URLSearchParams(search));
+      if (!parsed.ok) throw new Error(`not a valid query: ${search}`);
+      return runQuery(entries, parsed.query).data.map((item) => item.ref);
+    };
+    // 0 is a value and sorts before every lifetime; null comes last in either order; a tie goes by provider, then model.
+    expect(run("sort=cache_short")).toEqual(["a/none", "a/zero", "b/hour", "a/hour", "a/day", "c/unknown"]);
+    expect(run("sort=cache_short&order=desc")).toEqual(["a/hour", "b/hour", "a/none", "a/zero", "a/day", "c/unknown"]);
+    expect(run("sort=cache_long")).toEqual(["a/none", "a/hour", "b/hour", "a/day", "a/zero", "c/unknown"]);
+    expect(run("sort=cache_long&order=desc")).toEqual(["a/day", "a/hour", "b/hour", "a/none", "a/zero", "c/unknown"]);
+    // The basis of the short or of the long profile; an entry with neither known matches neither value.
+    expect(run("lifetime_basis=documented")).toEqual(["a/hour", "a/none", "b/hour"]);
+    expect(run("lifetime_basis=measured")).toEqual(["a/day", "a/hour", "a/zero"]);
+    expect(run("lifetime_basis=documented,measured")).toEqual(["a/day", "a/hour", "a/none", "a/zero", "b/hour"]);
+    expect((await get("/api/v1/entries?lifetime_basis=none")).status).toBe(400);
+    expect((await get("/api/v1/entries?sort=cache")).status).toBe(400);
+    // Through the API, on the fixture: unknown last in both orders.
+    for (const order of ["asc", "desc"]) {
+      const page = await json<Page>(`/api/v1/entries?sort=cache_long&order=${order}&limit=200`);
+      const values = page.data.map((item) => item.cache_lifetime.long.safe_s);
+      const known = values.filter((value) => value !== null);
+      expect(values.slice(0, known.length)).toEqual(known);
+      expect(known).toEqual([...known].sort((a, b) => (order === "asc" ? a - b : b - a)));
+    }
+    // The fixture has documented lifetimes and no measured one.
+    const documented = await json<Page>("/api/v1/entries?lifetime_basis=documented&limit=200");
+    expect(documented.total).toBeGreaterThan(0);
+    expect(documented.data.every((item) => item.cache_lifetime.short.basis === "documented" || item.cache_lifetime.long.basis === "documented")).toBe(true);
+    expect((await json<Page>("/api/v1/entries?lifetime_basis=measured")).total).toBe(0);
   });
 
   it("rejects unknown and malformed parameters with details", async () => {

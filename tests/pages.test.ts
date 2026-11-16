@@ -121,6 +121,21 @@ describe("API response boundary", () => {
     expect(html).toContain("new-value");
   });
 
+  it("takes the cache lifetime sorts and the basis filter through the catalog's address, as the API does", async () => {
+    const response = await page("/?sort=cache_long&order=desc&lifetime_basis=documented");
+    expect(response.status).toBe(200);
+    const html = await response.text();
+    const answer = await (await api("/api/v1/entries?lifetime_basis=documented&sort=cache_long&order=desc")).json() as { total: number; data: { ref: string }[] };
+    expect(html).toContain(`<code>/api/v1/entries?lifetime_basis=documented&amp;sort=cache_long&amp;order=desc</code>`);
+    expect(html).toContain(`${answer.total.toLocaleString("en-US")} entries`);
+    // The rows in the API's order (each row's copy button carries its entry id).
+    expect([...html.matchAll(/aria-label="Copy entry id"/g)].length).toBe(Math.min(answer.total, 50));
+    expect([...html.matchAll(/data-copy="([^"]+)" aria-label="Copy entry id"/g)].map((match) => match[1])).toEqual(answer.data.map((item) => item.ref));
+    // No header is marked as sorted: the table has no cache lifetime sort control.
+    expect(html).not.toContain("aria-sort");
+    expect((await page("/?lifetime_basis=none")).status).toBe(400);
+  });
+
   it("takes the stale threshold from the published meta, on the pages and in the methodology", async () => {
     // A publication whose threshold is 7 days: the pages say 7, and nowhere 90.
     const sevenDays = async (path: string): Promise<Response> => {
