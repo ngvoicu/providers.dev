@@ -335,7 +335,7 @@ What each line means, and why:
   check; an evaluation of the output alone. It stays in `limits.measured` and in `/api/v1/evaluations/limits`, is in
   no item of `measurements`, and the build reports it (`limit-not-counted`, a notice, section 6).
 
-All 17 evaluations of today count: 13 of kind `window`, 4 of kind `bracket`, none of kind `accepted`.
+All 31 evaluations of today count: 15 of kind `window`, 15 of kind `bracket`, 1 of kind `accepted` (`devin/swe-2`).
 
 ### 3.4 Several evaluations on one entry
 
@@ -447,12 +447,14 @@ Devin's `swe-2` (`groundtruth/results/limits-2026-11-13/README.md`): Devin's lis
 930,000 tokens were answered; a request that needed both ends of its input got no answer even at 250,000. Nothing
 there says how much input the model uses.
 
-- It is not in `observed.json`, and it should stay out (requirement 6 of section 9): a row with
-  `input_accepted: 930000` would also put 930,000 into `measured_input_accepted` of the summary, which says "the
-  real limit is at least this".
+- That attempt is not in `observed.json`: a row with `input_accepted: 930000` would also put 930,000 into
+  `measured_input_accepted` of the summary, which says "the real limit is at least this". Since 2026-11-17 `swe-2`
+  is a row from a later run that showed both ends were read: `input_accepted` and `input_read` 300,499, no refusal,
+  no edge found.
 - If such a row is written all the same, the rule gives it nothing: no refusal, no named window, no `input_read`, so
   it does not count (3.3), and the build says so.
-- `devin/swe-2` has nothing documented either, so its record is `tokens: null`, `basis: "none"`.
+- `devin/swe-2` has nothing documented, so its record is that row, kind `accepted`: 300,499, `basis: "measured"`,
+  `bound: "at_least"`.
 
 ## 6. Where it is computed and how it reaches every answer
 
@@ -685,7 +687,8 @@ which the site reads as they are. Requirement 2 is the only one today's 17 rows 
    the end (a word placed before the filler and one after it, both returned, as in the second half of the `swe-2`
    run). Never above `input_accepted`. It is what gives a value to an accepted size with no refusal and no named
    window; with a refusal or a named window it is welcome and changes nothing.
-6. **An inconclusive measurement is not a row.** `swe-2` stays in `results/` and out of `observed.json`.
+6. **An inconclusive measurement is not a row.** `swe-2`'s attempt of 2026-11-13 stays in `results/`; its row is
+   the later run read to 300,499.
 7. **`date`, new.** `YYYY-MM-DD`, the day the requests were sent. Today the site reads it out of the folder name in
    `source`, and goes on doing so where `date` is absent.
 
