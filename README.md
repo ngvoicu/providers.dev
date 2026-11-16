@@ -71,8 +71,10 @@ An override is a patch that is merged over one upstream entry, field by field.
 | `"$delete"` | removed: the field does not apply to this entry |
 | `exclude: true` | the entry or provider is left out of the catalog and listed as excluded |
 
-To leave out a whole model family's earlier versions at every provider, there is one catalog-wide rule instead of an
-`exclude` per entry: see [Leave out earlier versions of a family](#leave-out-earlier-versions-of-a-family).
+To leave out a whole model family's earlier versions, or every model released in a span of dates, at every provider,
+there is one catalog-wide rule instead of an `exclude` per entry: see
+[Leave out earlier versions of a family](#leave-out-earlier-versions-of-a-family) and
+[Leave out models by release date](#leave-out-models-by-release-date).
 
 Example. Upstream says:
 
@@ -113,6 +115,8 @@ What the build reports (in the console, on the *Our data* page and in `/api/v1/m
 - **excluded-observation**: an evaluation names an entry that a catalog-wide rule leaves out. It is not published.
 - **rule-version-unread**: an entry of a family a catalog-wide rule covers has no version the rule can read. It is
   published; correct its `canonical_id` with an override, or add the word it uses to the rule's `aliases`.
+- **rule-date-unread**: an entry's `release_date` is neither a day (`YYYY-MM-DD`) nor a month (`YYYY-MM`), so the
+  release rules cannot place it. It is published; correct the date with an override.
 
 ## Authoring
 
@@ -174,6 +178,30 @@ Where ids are less regular, a rule can say more (left out = the default, as for 
 
 The GPT rule (`gpt-before-6`) uses all five: see the comment above it in the file. A letter after the number is not
 read, so `gpt-4o` is 4.
+
+### Leave out models by release date
+
+The second kind of rule in `data/authored/catalog-rules.yaml` leaves out every entry whose published `release_date`
+falls in a span, at every provider, whatever its family or type, "latest" aliases included:
+
+```yaml
+placeholder_release_dates: ["1970-01-01"]   # stands for "not known": kept by every release rule
+
+exclude_released:
+  - id: released-2025
+    from: "2025-01-01"                      # first day of the span, inclusive; left out = no lower bound
+    before: "2026-01-01"                    # first day after the span, exclusive; left out = no upper bound
+    leaves_out: Models released in 2025, at every provider
+    reason: "Editorial choice of providers.dev: models released in 2025 are not listed."
+    date: "2026-11-16"
+```
+
+The rule reads the release date the catalog publishes for the entry, after overrides, and nothing else: not the id,
+not the name. A date given to the month (`2025-03`) counts as the first day of the month. An entry with no release
+date, or with a placeholder date, is kept without an issue, and its date is published as it is. Release rules apply
+after every family rule, to what is still in the catalog, so an entry is counted by one rule only. Each is one item
+of `exclusions` in `/api/v1/meta`, like a family rule. A provider whose every entry a rule leaves out stays
+published, with no entries. To add a rule, add an item under `exclude_released`; to drop one, delete its item.
 
 A rule has no evidence: it says what providers.dev lists, not what a provider does. `/api/v1/meta` lists it once in
 `exclusions` (`kind: rule`, its words, reason and date, and the number of entries it removed in this build), never

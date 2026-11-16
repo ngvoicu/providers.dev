@@ -37,6 +37,10 @@ The baseline is imported from models.dev; our additions, corrections and measure
   edit an override because a rule leaves out an entry it names: that raises no issue. Where ids are less regular
   (GPT), a rule can cover several families, read the id only, read two joined digits as major and minor, and keep
   an entry with no version silently (`family` list, `read`, `joined_digits`, `no_version`). The README says how.
+- To leave out every model released in a span of dates, add an item under `exclude_released` in the same file
+  (`from` inclusive, `before` exclusive, either may be left out). It reads only the published `release_date`, after
+  the family rules; no date, or a date listed in `placeholder_release_dates` (1970-01-01), keeps the entry. Do not
+  change a published date to make a rule match: correct it with an override, with evidence.
 - Every override and every added provider or model needs a `reason` (where the schema has one) and `evidence` with
   `kind`, `url` and `date`. The build fails without them. Do not invent limits, lifetimes, model mappings or dates.
 - Unknown is not zero and not unsupported. A missing value stays missing; `null` in an override means "publish as

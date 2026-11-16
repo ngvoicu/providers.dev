@@ -17,6 +17,15 @@
 #   joined_digits  true: two digits written together after the word are major and minor (gpt-56 is 5.6). Default false.
 #   no_version  an entry of the family with no version where the rule reads: `report` (default) publishes it and
 #               reports a dataset issue; `keep` publishes it without one (moving aliases, models numbered their own way).
+#
+# `exclude_released`: leave out every entry whose published `release_date` (after overrides) falls in a span, at
+# every provider, whatever its family or type, "latest" aliases included. Applied after every `exclude` rule, to what
+# is still there: an entry is counted by one rule only.
+#   from        the first day of the span, inclusive. Left out = no lower bound.
+#   before      the first day after the span, exclusive. Left out = no upper bound.
+#   leaves_out, reason, date: published as they are.
+# A release date given to the month (2025-03) counts as the first day of the month. An entry with no release date,
+# or with a date listed under `placeholder_release_dates`, is kept. A date in another form is published and reported.
 exclude:
   - id: claude-opus-before-5.5
     family: claude-opus
@@ -64,4 +73,22 @@ exclude:
     no_version: keep
     leaves_out: GPT versions before 6 (GPT and its mini, nano, Pro, Codex, Luna, Sol, Terra, Astra and Live models), at every provider
     reason: "Editorial choice of providers.dev: GPT versions before 6 are not listed."
+    date: "2026-11-16"
+
+# Release dates that stand for "not known", not for a day: an entry with one is kept by every release rule. The API
+# still publishes the date as models.dev has it.
+placeholder_release_dates: ["1970-01-01"]
+
+exclude_released:
+  - id: released-2025
+    from: "2025-01-01"
+    before: "2026-01-01"
+    leaves_out: Models released in 2025, at every provider
+    reason: "Editorial choice of providers.dev: models released in 2025 are not listed."
+    date: "2026-11-16"
+  # Older still than the owner's 2025 rule; a rule of its own so that it can be dropped by deleting this item.
+  - id: released-before-2025
+    before: "2025-01-01"
+    leaves_out: Models released before 2025, at every provider
+    reason: "Editorial choice of providers.dev: models released before 2025 are not listed."
     date: "2026-11-16"

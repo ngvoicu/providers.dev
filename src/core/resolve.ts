@@ -27,6 +27,7 @@ import {
   type Catalog,
   type CatalogRules,
   type FamilyExclusion,
+  type ReleaseExclusion,
   type DraftProvenance,
   type Evidence,
   type Exclusion,
@@ -202,6 +203,19 @@ export function familyRuleVerdict(model: { id: string; name?: unknown; family?: 
   if (!version) return (rule.no_version ?? "report") === "keep" ? "kept" : "unread";
   const [major, minor] = rule.before.split(".").map(Number) as [number, number | undefined];
   return version[0] < major || (version[0] === major && version[1] < (minor ?? 0)) ? "out" : "kept";
+}
+
+/**
+ * Whether an entry falls under a release rule: "out" (its release date is in the span), "kept" (outside it, no date,
+ * or a placeholder date), or "unread" (a release date that is not YYYY-MM-DD or YYYY-MM). A date given to the month
+ * counts as the first day of that month.
+ */
+export function releaseRuleVerdict(releaseDate: unknown, rule: Pick<ReleaseExclusion, "from" | "before">, placeholders: readonly string[] = []): "out" | "kept" | "unread" {
+  if (releaseDate === undefined || releaseDate === null || releaseDate === "") return "kept";
+  if (typeof releaseDate !== "string" || !/^\d{4}-\d{2}(-\d{2})?$/.test(releaseDate)) return "unread";
+  if (placeholders.includes(releaseDate)) return "kept";
+  const day = releaseDate.length === 7 ? `${releaseDate}-01` : releaseDate;
+  return (rule.from === undefined || day >= rule.from) && (rule.before === undefined || day < rule.before) ? "out" : "kept";
 }
 
 function newestDate(dates: (string | undefined)[]): string | undefined {
@@ -466,6 +480,31 @@ export function resolve(input: ResolveInput): ResolveResult {
             code: "rule-version-unread",
             target: ref,
             message: `${ref} is of family ${String(model.family)}, but no version can be read next to "${[rule.word].flat().join('" or "')}" in its ${rule.read.join(", ")}, so the rule ${rule.id} cannot tell whether to leave it out. It is published. Correct its canonical_id with an override, or add the word it uses to the rule's aliases.`,
+          });
+        }
+        if (verdict !== "out") continue;
+        delete provider.models[id];
+        ruledOut.set(ref, rule.id);
+        removed += 1;
+      }
+    }
+    exclusions.push({ kind: "rule", target: rule.id, leaves_out: rule.leaves_out, reason: rule.reason, date: rule.date, evidence: [], entries: removed });
+  }
+  // Rules by release date, after every family rule: they count only what is still there, so an entry is counted once.
+  const unreadDates = new Set<string>();
+  for (const rule of input.catalogRules?.exclude_released ?? []) {
+    let removed = 0;
+    for (const [providerId, provider] of Object.entries(catalog)) {
+      for (const [id, model] of Object.entries(provider.models)) {
+        const ref = `${providerId}/${id}`;
+        const verdict = releaseRuleVerdict(model.release_date, rule, input.catalogRules?.placeholder_release_dates ?? []);
+        if (verdict === "unread" && !unreadDates.has(ref)) {
+          unreadDates.add(ref);
+          issues.push({
+            level: "warning",
+            code: "rule-date-unread",
+            target: ref,
+            message: `The release_date of ${ref}, ${JSON.stringify(model.release_date)}, is not a day (YYYY-MM-DD) or a month (YYYY-MM), so the release rules cannot place it. It is published. Correct it with an override.`,
           });
         }
         if (verdict !== "out") continue;

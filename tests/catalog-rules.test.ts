@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parse as parseYaml } from "yaml";
 import { describe, expect, it } from "vitest";
-import { familyRuleVerdict, resolve, versionNextTo, type ResolveInput } from "../src/core/resolve.ts";
+import { familyRuleVerdict, releaseRuleVerdict, resolve, versionNextTo, type ResolveInput } from "../src/core/resolve.ts";
 import { CatalogRules, type AccessRules, type Evidence, type ObservedFile, type UpstreamCatalog } from "../src/core/schema.ts";
 import { ROOT } from "../scripts/lib/files.ts";
 
@@ -200,6 +200,8 @@ describe("catalog rules: in the build", () => {
       expect.objectContaining({ kind: "rule", target: "claude-haiku-before-5.5", entries: 0 }),
       expect.objectContaining({ kind: "rule", target: "claude-fable-before-5.2", entries: 0 }),
       expect.objectContaining({ kind: "rule", target: "gpt-before-6", entries: 0 }),
+      expect.objectContaining({ kind: "rule", target: "released-2025", entries: 0 }),
+      expect.objectContaining({ kind: "rule", target: "released-before-2025", entries: 0 }),
     ]);
     // An entry of the family with no version anywhere is published and reported, not guessed.
     expect(issues).toEqual([expect.objectContaining({ level: "warning", code: "rule-version-unread", target: "gateway/anthropic/claude-opus-next" })]);
@@ -229,7 +231,7 @@ describe("catalog rules: in the build", () => {
     expect(catalog.gateway!.models["anthropic/claude-opus-5"]).toBeUndefined();
     expect(issues.filter((issue) => issue.target.startsWith("gateway/anthropic/claude-opus-5#") || issue.target === "gateway/anthropic/claude-opus-5")).toEqual([]);
     // Without the rule the same override is reported, as before.
-    const { issues: without } = resolve(input({ catalogRules: { exclude: [] }, overrides: [{ provider: "gateway", rules: [redundant] }] }));
+    const { issues: without } = resolve(input({ catalogRules: { exclude: [], exclude_released: [], placeholder_release_dates: [] }, overrides: [{ provider: "gateway", rules: [redundant] }] }));
     expect(without).toContainEqual(expect.objectContaining({ code: "redundant-override", target: "gateway/anthropic/claude-opus-5#limit.context" }));
   });
 
@@ -252,5 +254,74 @@ describe("catalog rules: in the build", () => {
       { level: "warning", code: "excluded-observation", target: "gateway/anthropic/claude-opus-5", message: "Measurements for gateway/anthropic/claude-opus-5 were not published: the catalog rule claude-opus-before-5.5 leaves the entry out." },
     ]);
     expect(JSON.stringify(catalog)).not.toContain("run-1");
+  });
+});
+
+describe("catalog rules: by release date", () => {
+  const in2025 = rules.exclude_released.find((rule) => rule.id === "released-2025")!;
+  const before2025 = rules.exclude_released.find((rule) => rule.id === "released-before-2025")!;
+  const placeholders = rules.placeholder_release_dates;
+
+  it("leaves out a day or a month in its span and keeps the rest, no date and the placeholder", () => {
+    const verdicts = (dates: (string | null | undefined)[]) => dates.map((date) => [date, releaseRuleVerdict(date, in2025, placeholders), releaseRuleVerdict(date, before2025, placeholders)]);
+    expect(verdicts(["2025-01-01", "2025-07-14", "2025-12-31", "2025-03", "2025-12"])).toEqual([
+      ["2025-01-01", "out", "kept"], ["2025-07-14", "out", "kept"], ["2025-12-31", "out", "kept"], ["2025-03", "out", "kept"], ["2025-12", "out", "kept"],
+    ]);
+    expect(verdicts(["2024-12-31", "2024-06", "2021-03-01"])).toEqual([["2024-12-31", "kept", "out"], ["2024-06", "kept", "out"], ["2021-03-01", "kept", "out"]]);
+    expect(verdicts(["2026-01-01", "2026-01", "2026-11-12", null, undefined, "1970-01-01"])).toEqual([
+      ["2026-01-01", "kept", "kept"], ["2026-01", "kept", "kept"], ["2026-11-12", "kept", "kept"], [null, "kept", "kept"], [undefined, "kept", "kept"], ["1970-01-01", "kept", "kept"],
+    ]);
+    // Without the placeholder listed, 1970-01-01 is a date like any other.
+    expect(releaseRuleVerdict("1970-01-01", before2025)).toBe("out");
+    expect(releaseRuleVerdict("Q3 2025", in2025, placeholders)).toBe("unread");
+  });
+
+  it("applies after the family rules, counts an entry once, and publishes one item per rule", () => {
+    const model = (id: string, family: string | undefined, release: string | undefined) => ({ id, name: id, ...(family ? { family } : {}), ...(release ? { release_date: release } : {}) });
+    const upstream: UpstreamCatalog = {
+      lab: {
+        id: "lab",
+        name: "Lab",
+        models: {
+          // Removed by the Opus rule, though released in 2025: counted there only.
+          "claude-opus-4-5": model("claude-opus-4-5", "claude-opus", "2025-11-24"),
+          "claude-opus-5-5": model("claude-opus-5-5", "claude-opus", "2026-09-01"),
+          "lab-latest": model("lab-latest", "lab", "2024-07"),
+          "lab-2025": model("lab-2025", "lab", "2025-05-02"),
+          "lab-embed": { ...model("lab-embed", "lab", "2023-01-10"), type: "embedding" },
+          "lab-undated": model("lab-undated", "lab", undefined),
+          "lab-auto": model("lab-auto", undefined, "1970-01-01"),
+        },
+      },
+      // Every entry goes: the provider stays, with none.
+      old: { id: "old", name: "Old", models: { "old-1": model("old-1", "old", "2025-02") } },
+    };
+    const { catalog, exclusions, issues } = resolve({ upstream, additions: [], overrides: [], access, routes: {}, catalogRules: rules });
+    expect(Object.keys(catalog.lab!.models)).toEqual(["claude-opus-5-5", "lab-auto", "lab-undated"]);
+    expect(catalog.lab!.models["lab-auto"]!.release_date).toBe("1970-01-01");
+    expect(catalog.old!.models).toEqual({});
+    expect(exclusions.map((item) => [item.target, item.entries])).toEqual([
+      ["claude-opus-before-5.5", 1], ["claude-sonnet-before-5.5", 0], ["claude-haiku-before-5.5", 0], ["claude-fable-before-5.2", 0], ["gpt-before-6", 0],
+      ["released-2025", 2], ["released-before-2025", 2],
+    ]);
+    expect(exclusions.slice(-2)).toEqual([
+      { kind: "rule", target: "released-2025", leaves_out: "Models released in 2025, at every provider", reason: "Editorial choice of providers.dev: models released in 2025 are not listed.", date: "2026-11-16", evidence: [], entries: 2 },
+      { kind: "rule", target: "released-before-2025", leaves_out: "Models released before 2025, at every provider", reason: "Editorial choice of providers.dev: models released before 2025 are not listed.", date: "2026-11-16", evidence: [], entries: 2 },
+    ]);
+    expect(issues).toEqual([]);
+  });
+
+  it("reports a release date it cannot place, and publishes the entry", () => {
+    const upstream: UpstreamCatalog = { lab: { id: "lab", name: "Lab", models: { odd: { id: "odd", name: "Odd", release_date: "Q3 2025" } } } };
+    const { catalog, issues } = resolve({ upstream, additions: [], overrides: [], access, routes: {}, catalogRules: rules });
+    expect(Object.keys(catalog.lab!.models)).toEqual(["odd"]);
+    expect(issues).toEqual([expect.objectContaining({ level: "warning", code: "rule-date-unread", target: "lab/odd" })]);
+  });
+
+  it("refuses a release rule with no bound, or with its bounds the wrong way round", () => {
+    const base = { id: "r", leaves_out: "x", reason: "x", date: "2026-11-16" };
+    expect(CatalogRules.safeParse({ exclude_released: [base] }).success).toBe(false);
+    expect(CatalogRules.safeParse({ exclude_released: [{ ...base, from: "2026-01-01", before: "2025-01-01" }] }).success).toBe(false);
+    expect(CatalogRules.safeParse({ exclude_released: [{ ...base, before: "2025-01-01" }] }).success).toBe(true);
   });
 });

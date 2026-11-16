@@ -167,14 +167,47 @@ export const FamilyExclusion = z.strictObject({
 });
 export type FamilyExclusion = z.infer<typeof FamilyExclusion>;
 
+/** A day (YYYY-MM-DD) that bounds a span of release dates. */
+const SpanDay = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+
+/**
+ * Leaves out every entry whose published `release_date` falls in a span, at every provider, whatever its family or type.
+ * Read from the published release date only. A date given to the month (2025-03) counts as the first day of that
+ * month. An entry with no release date, or with one of the file's placeholder dates, is kept.
+ */
+export const ReleaseExclusion = z
+  .strictObject({
+    id: z.string().regex(/^[a-z0-9][a-z0-9.-]*$/),
+    /** The first day of the span (inclusive). Left out = no lower bound. */
+    from: SpanDay.optional(),
+    /** The first day after the span (exclusive). Left out = no upper bound. */
+    before: SpanDay.optional(),
+    leaves_out: z.string().min(1),
+    reason: z.string().min(1),
+    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  })
+  .superRefine((rule, ctx) => {
+    if (rule.from === undefined && rule.before === undefined) ctx.addIssue({ code: "custom", message: "A release rule needs `from`, `before` or both." });
+    if (rule.from !== undefined && rule.before !== undefined && rule.from >= rule.before) ctx.addIssue({ code: "custom", path: ["before"], message: "`before` must be after `from`." });
+  });
+export type ReleaseExclusion = z.infer<typeof ReleaseExclusion>;
+
 export const CatalogRules = z
-  .strictObject({ exclude: z.array(FamilyExclusion).default([]) })
+  .strictObject({
+    exclude: z.array(FamilyExclusion).default([]),
+    /** Rules by release date. They apply after every `exclude` rule, to what is still in the catalog. */
+    exclude_released: z.array(ReleaseExclusion).default([]),
+    /** Release dates that stand for "not known" rather than a date (1970-01-01): an entry with one is kept by every release rule. What the API publishes for it is not changed. */
+    placeholder_release_dates: z.array(z.string().regex(/^\d{4}-\d{2}(-\d{2})?$/)).default([]),
+  })
   .superRefine((rules, ctx) => {
     const seen = new Set<string>();
-    rules.exclude.forEach((rule, index) => {
-      if (seen.has(rule.id)) ctx.addIssue({ code: "custom", path: ["exclude", index, "id"], message: `Two rules have the id "${rule.id}".` });
-      seen.add(rule.id);
-    });
+    for (const [key, list] of [["exclude", rules.exclude], ["exclude_released", rules.exclude_released]] as const) {
+      list.forEach((rule, index) => {
+        if (seen.has(rule.id)) ctx.addIssue({ code: "custom", path: [key, index, "id"], message: `Two rules have the id "${rule.id}".` });
+        seen.add(rule.id);
+      });
+    }
   });
 export type CatalogRules = z.infer<typeof CatalogRules>;
 
@@ -396,6 +429,7 @@ export interface Issue {
     | "orphan-observation"
     | "excluded-observation"
     | "rule-version-unread"
+    | "rule-date-unread"
     | "redundant-override"
     | "addition-collides"
     | "inherit-target-missing"
