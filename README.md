@@ -271,8 +271,9 @@ reviewed; the site marks the rest "by default" or "by name".
 ## Syncing
 
 - **By hand:** `npm run sync` (add `-- --force` to download again even if nothing changed), then `npm run build`.
-- **Scheduled:** `.github/workflows/publish.yml` runs daily, on every push to `main`, and from the Actions tab. It
-  imports, builds, tests, commits the snapshot if the data changed, and deploys. Only one run is active at a time.
+- **Scheduled:** `.github/workflows/publish.yml` runs daily, on every push to `main`, and from the Actions tab, on
+  GitHub only. It imports, builds, tests, commits the snapshot if the data changed, and deploys. Only one run is
+  active at a time.
 
 What the sync checks before it replaces the snapshot: the answer is JSON in the expected v2 structure; every
 provider and model id matches its key; the import is not empty and has not lost more than 40% of its providers or
@@ -531,18 +532,25 @@ compiles one shared shell with CSS and scripts, plus authored methodology, licen
 enumerate entries, providers or models. `/docs/api/` renders the actual `/api/v1/openapi.json` response, including
 its guide, parameters, schemas and examples. Authored text is also public through `/api/v1/docs/{document}`.
 
-1. `npx wrangler login`
-2. `npm run build`
-3. `npm run deploy`
-
-For the custom domain, add the zone to Cloudflare and then, in `wrangler.jsonc`:
+The site has one address, `https://providers.dev`. `wrangler.jsonc` attaches it as the Worker's custom domain and
+turns off the `workers.dev` address and the preview URLs:
 
 ```jsonc
-"routes": [{ "pattern": "providers.dev", "custom_domain": true }]
+"routes": [{ "pattern": "providers.dev", "custom_domain": true }],
+"workers_dev": false,
+"preview_urls": false,
 ```
 
-For the scheduled workflow, add the repository secrets `CLOUDFLARE_API_TOKEN` (a token that can edit Workers) and
-`CLOUDFLARE_ACCOUNT_ID`. Without them the workflow builds and tests but does not deploy.
+A deploy takes its credentials from the environment, never from a file: `CLOUDFLARE_API_TOKEN` (an API token that
+can edit Workers scripts and their routes and custom domains on the zone) and `CLOUDFLARE_ACCOUNT_ID`. By hand:
+
+1. `npm run build`
+2. `CLOUDFLARE_API_TOKEN=… CLOUDFLARE_ACCOUNT_ID=… npm run deploy` (try `npx wrangler deploy --dry-run` first)
+
+The scheduled workflow uses the same token, from the repository secrets `CLOUDFLARE_API_TOKEN` and
+`CLOUDFLARE_ACCOUNT_ID`. Without them it builds and tests but does not deploy. It runs on GitHub only: its job has
+`if: github.server_url == 'https://github.com'`, so a mirror that also reads `.github/workflows/` (the Forgejo
+server holding a copy of the repository) skips it, and only GitHub commits the daily snapshot.
 
 A deployment publishes the Worker and assets together. Each request reads `current.json` and pins its API calls
 and data files to one immutable snapshot directory. The parsed index is cached by publication id, not bundled in
