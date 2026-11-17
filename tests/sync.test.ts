@@ -132,6 +132,20 @@ describe("sync", () => {
     expect(stored.models["model-5"]!.modalities).toEqual({ input: ["text", "image"], output: ["text"] });
   });
 
+  it("imports capabilities.tools.updates as models.dev lists it since e337b7d, a value it adds later included, and keeps it as sent", async () => {
+    const sent = fixtureUpstream();
+    const model = sent["provider-04"]!.models["model-1"]!;
+    model.capabilities = { tools: { supported: true, updates: ["add", "remove", "replace"] } };
+    model.api = { chat: { capabilities: { tools: { supported: true, updates: [] } } } };
+    sent["provider-04"]!.models["model-3"]!.capabilities = { tools: { supported: true, updates: ["add", "reorder"] } };
+    const dataDir = tempDataDir();
+    expect((await sync({ dataDir, fetch: fetchReturning(JSON.stringify(sent)) })).upstream.status).toBe("updated");
+    const stored = loadUpstream(dataDir)!.catalog["provider-04"]!.models;
+    expect(stored["model-1"]!.capabilities).toEqual({ tools: { supported: true, updates: ["add", "remove", "replace"] } });
+    expect(stored["model-1"]!.api).toEqual({ chat: { capabilities: { tools: { supported: true, updates: [] } } } });
+    expect(stored["model-3"]!.capabilities).toEqual({ tools: { supported: true, updates: ["add", "reorder"] } });
+  });
+
   it("refuses a measurements file with two checks at one age in a run, and keeps the last good copy", async () => {
     const dataDir = tempDataDir();
     const first = await sync({ dataDir, fetch: fetchWithObserved(observedWith([150, 300])), now: () => new Date("2026-11-13T00:00:00Z") });

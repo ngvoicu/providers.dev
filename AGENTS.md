@@ -55,6 +55,13 @@ The baseline is imported from models.dev; our additions, corrections and measure
   required parameter. That would be `/api/v2`. `structure/api-v1-1.0.0.json` is the structure of 1.0.0 and is never
   edited. A change of structure needs the record updated in the same commit (`npm run structure:update`, which writes
   `structure/api-v1.json`) and a version step in `src/core/openapi.ts`: a minor step for a release that adds something.
+  This holds for everything providers.dev makes itself (summaries, `providers_dev` records, evaluations, corrections,
+  evidence, paths, parameters). The fields imported from models.dev (`limit`, `cost`, `capabilities`, `modalities`
+  and the like) follow the models.dev v2 schema, which models.dev calls experimental: when models.dev changes one of
+  them, providers.dev takes the change over, and that is not a new major version of this API. The first case was on
+  2026-11-17: `capabilities.tools.updates` went from a boolean to a list (`add`, `remove`, `replace`), and the owner
+  had 1.0.0 corrected in place for it, record and baseline in one commit with the new checksum. That was this field
+  only; any other edit of the baseline needs the owner.
 - A measurement never replaces a documented value on an upstream entry. It goes under `providers_dev`.
 - Everything we add to a provider or model object lives under the `providers_dev` key. Do not add other top-level
   fields to upstream objects.

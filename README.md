@@ -357,6 +357,14 @@ and belongs in `/api/v2`. Once the record has grown beyond 1.0.0, the version (`
 `src/core/openapi.ts`) must be above it: a release that adds something takes a minor step. The version restarted at
 1.0.0 with the first public release; the numbers before it were never public.
 
+That promise holds for everything providers.dev makes itself: summaries, `providers_dev` records, evaluations,
+corrections, evidence, paths and parameters. The fields imported from models.dev (`limit`, `cost`, `capabilities`,
+`modalities` and the like) follow the models.dev v2 schema, which models.dev calls experimental. When models.dev
+changes one of them, providers.dev takes the change over, and that is not a new major version of this API. The first
+case was on 2026-11-17: models.dev made `capabilities.tools.updates`, until then `true` or `false`, a list of the tool
+changes an API accepts in the middle of a conversation (`add`, `remove`, `replace`; `[]` for none). Version 1.0.0 was
+corrected in place for it, record and baseline together, by the owner's decision.
+
 Cache evaluations are published as counts and percentages at exact ages, the control ("at once") first: each
 evaluation with its own results (`providers_dev.cache.evaluations` of an entry), and the evaluations of one client
 with one retention setting added up as the `results` of a measured item of the lifetime record below, short and long
@@ -520,7 +528,8 @@ include the rendered page, so a template, stylesheet or metadata change invalida
 catalog hash is unchanged.
 
 `v1` is the version of this API. The model fields follow the models.dev **v2** schema, which is experimental
-upstream; `/api/v1/meta` reports it as `upstream_schema`.
+upstream; `/api/v1/meta` reports it as `upstream_schema`. When models.dev changes one of these fields, providers.dev
+follows it within `/api/v1` (see [One contract](#one-contract)).
 
 `/api.json` is a superset of the models.dev v2 export in the same shape, not a byte-compatible copy: every provider
 and model has an extra `providers_dev` key, and entries we add can lack fields that models.dev requires.

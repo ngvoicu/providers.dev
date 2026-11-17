@@ -23,7 +23,8 @@ const tools = z.looseObject({
   choice: z.array(z.string()).optional(),
   freeform: z.array(z.string()).optional(),
   strict: z.boolean().optional(),
-  updates: z.boolean().optional(),
+  // models.dev e337b7d (2026-11-17): a list of tool changes, no longer a boolean. Open, so a value models.dev adds later is kept.
+  updates: z.array(z.string()).optional().describe("The tool changes the API accepts in the middle of a conversation, as models.dev lists them. Known values: add, remove, replace. [] = none. Other values may be added."),
 });
 export const CapabilitiesSchema = z.looseObject({
   cache: DocumentedCacheSchema.optional(),
