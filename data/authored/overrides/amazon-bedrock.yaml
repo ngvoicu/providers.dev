@@ -33,3 +33,91 @@ rules:
         conditions:
           - The field is cachePoint.ttl in the Converse API and cache_control.ttl in the InvokeModel API.
         evidence: *source
+
+  # GPT-6 and GPT-6.1 at Bedrock: models.dev documents the 30-minute lifetime on the model ids (openai.gpt-6-*), not
+  # on the cross-Region inference profiles (global., us.) through which bedrock-runtime serves them. The user guide
+  # says prompt caching works with cross-Region inference, and each model card names these profiles and prices the
+  # 30-minute cache write for them.
+  - models:
+      - global.openai.gpt-6-astra
+      - global.openai.gpt-6-luna
+      - global.openai.gpt-6-sol
+      - global.openai.gpt-6.1-sol
+      - global.openai.gpt-6.1-terra
+      - us.openai.gpt-6-astra
+      - us.openai.gpt-6-luna
+      - us.openai.gpt-6-sol
+      - us.openai.gpt-6.1-sol
+      - us.openai.gpt-6.1-terra
+    set:
+      capabilities:
+        cache: { explicit: { ttl: ["30m"] } }
+    reason: >-
+      The Bedrock user guide documents a 30-minute lifetime for explicit prompt caching on GPT-5.6 and later models,
+      set with prompt_cache_options.ttl, and says prompt caching can be used with cross-Region inference. These
+      entries are the global. and us. inference profiles of those models.
+    evidence: &gpt6
+      - kind: documented
+        url: https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-caching.html
+        date: "2026-11-17"
+        note: >-
+          Supported models table: 'GPT-6.1 Sol | openai.gpt-6.1-sol | Generally Available | 1,024 | 4 cache writes |
+          30 minutes', the same Supported TTL for GPT-6 Astra, GPT-6 Sol and GPT-6 Luna. GPT-5.6 and later models
+          ('later models such as GPT-6 Astra (openai.gpt-6-astra) and GPT-6.1 Sol (openai.gpt-6.1-sol)'): '30-minute
+          minimum TTL — Cached prefixes remain available for reuse for at least 30 minutes [...] The TTL is set via
+          prompt_cache_options.ttl, and 30m is the only supported value.' 'The cache has a Time To Live (TTL), which
+          resets with each successful cache hit.' Prompt Caching with Cross-region Inference: 'Prompt caching can be
+          used in conjunction with cross region inference.'
+      - kind: documented
+        url: https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-openai-gpt-6-1-sol.html
+        date: "2026-11-17"
+        note: >-
+          'For explicit caching, set prompt_cache_options.mode to explicit. Set prompt_cache_options.ttl to 30m, the
+          only supported TTL and the default.' (the same sentence on the cards of GPT-6 Sol and GPT-6 Luna). 'Use
+          us.openai.gpt-6.1-sol for US geographic cross-Region inference or global.openai.gpt-6.1-sol for global
+          cross-Region inference. Direct in-Region invocation is not supported on bedrock-runtime.'
+      - kind: documented
+        url: https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-openai-gpt-6-1-terra.html
+        date: "2026-11-17"
+        note: >-
+          GPT-6.1 Terra is not in the guide's table. Its card: 'Explicit Prompt Caching (Responses API only)'. 'The
+          30-minute figure is how long a cached prompt prefix is retained, not a quantity of tokens.' The 30-minute
+          cache write is priced for Geo CRIS and Global CRIS; bedrock-runtime 'requests must name the geographic
+          cross-Region inference ID us.openai.gpt-6.1-terra'.
+    request_controls:
+      - id: cache.retention
+        support: supported
+        when: null
+        bindings:
+          - { location: body, path: /prompt_cache_options/ttl, scope: request }
+        options:
+          - value: "30m"
+            attributes: { retention_s: 1800, profile: short }
+            settings: null
+            when: null
+        default: { value: "30m" }
+        conditions:
+          - 30m is the only supported value.
+          - Explicit caching also needs prompt_cache_options.mode set to explicit and a prompt_cache_breakpoint on a content block. Converse has no explicit caching for these models; GPT-6.1 Terra has it in the Responses API only.
+        evidence: *gpt6
+
+  # GLM 5.3 at Bedrock is served through the two cross-Region inference profiles only. Its model card states the
+  # lifetime of explicit caching and names no request field, so none is declared.
+  - models:
+      - global.zai.glm-5.3
+      - us.zai.glm-5.3
+    set:
+      capabilities:
+        cache: { explicit: { ttl: ["30m"] } }
+    reason: >-
+      The Bedrock model card of GLM 5.3 documents a cache retention of at least 30 minutes for explicit prompt
+      caching, and says the model is available through these two inference profiles only.
+    evidence:
+      - kind: documented
+        url: https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-zai-glm-5-3.html
+        date: "2026-11-17"
+        note: >-
+          Explicit prompt caching using bedrock-runtime endpoint: 'Explicit Prompt Caching supported | Min tokens per
+          cache checkpoint | Cache retention (TTL)' / 'Yes | 1,024 | At least 30 minutes'. 'GLM 5.3 is available
+          through cross-Region inference only. Requests must use the US geographic inference profile
+          (us.zai.glm-5.3) or the global inference profile (global.zai.glm-5.3).'
