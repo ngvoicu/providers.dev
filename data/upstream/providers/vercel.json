@@ -8415,6 +8415,91 @@
    "open_weights": false,
    "last_updated": "2026-10-04"
   },
+  "bytedance/seedance-2.5-flash": {
+   "id": "bytedance/seedance-2.5-flash",
+   "name": "Seedance 2.5 Flash",
+   "description": "Video model for prompt-guided generation, editing, and motion workflows",
+   "type": "video",
+   "release_date": "2026-11-16",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "video": {
+     "output": {
+      "price": 7,
+      "overrides": [
+       {
+        "when": {
+         "resolution": {
+          "equals": "480p"
+         },
+         "input_video": {
+          "equals": true
+         }
+        },
+        "price": 4.3
+       },
+       {
+        "when": {
+         "resolution": {
+          "equals": "720p"
+         },
+         "input_video": {
+          "equals": true
+         }
+        },
+        "price": 4.3
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp",
+     "image/bmp",
+     "image/tiff",
+     "image/gif",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/quicktime",
+     "audio/mpeg",
+     "audio/wav"
+    ],
+    "output": [
+     "video"
+    ]
+   },
+   "api": {
+    "videos": {
+     "base_url": "https://ai-gateway.vercel.sh/v4/ai",
+     "sdk": {
+      "aisdk": "@ai-sdk/gateway"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-16"
+  },
   "bytedance/seedance-v1.0-pro": {
    "id": "bytedance/seedance-v1.0-pro",
    "name": "Seedance v1.0 Pro",
@@ -8758,7 +8843,7 @@
     "image": {
      "output": {
       "unit": "image",
-      "price": 0.035
+      "price": 0.09
      }
     }
    },
@@ -15747,6 +15832,106 @@
    },
    "open_weights": false,
    "last_updated": "2026-04-02"
+  },
+  "heygen/heygen-decision-1": {
+   "id": "heygen/heygen-decision-1",
+   "name": "HeyGen Decision 1",
+   "description": "HeyGen Decision 1 is HeyGen's decision model for classification, routing, and scoring. It evaluates text, structured JSON, up to four images, and one video against yes/no questions, custom choices, and ordered rubrics, returning typed answers with probabilities. It answers up to 400 questions over shared content per request with a 128K context window.",
+   "type": "decision",
+   "release_date": "2026-11-16",
+   "limit": {
+    "context": 131072
+   },
+   "capabilities": {
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.14
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "decisions": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/decisions"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-16"
+  },
+  "heygen/heygen-decision-1-turbo": {
+   "id": "heygen/heygen-decision-1-turbo",
+   "name": "HeyGen Decision 1 Turbo",
+   "description": "HeyGen Decision 1 Turbo is a lower-cost, longer-context variant of HeyGen Decision 1 for high-volume classification, routing, and scoring. It evaluates text, structured JSON, up to four images, and one video against yes/no questions, custom choices, and ordered rubrics, returning typed answers with probabilities. It supports a 256K context window and is in preview.",
+   "type": "decision",
+   "release_date": "2026-11-16",
+   "limit": {
+    "context": 262144
+   },
+   "capabilities": {
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.09
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "decisions": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/decisions"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-16"
   },
   "heygen/heygen-video-1": {
    "id": "heygen/heygen-video-1",
@@ -36508,6 +36693,110 @@
    },
    "open_weights": false,
    "last_updated": "2026-05-14"
+  },
+  "recursive/flint-v1.0": {
+   "id": "recursive/flint-v1.0",
+   "name": "Flint",
+   "description": "Reasoning model for deliberate analysis, multi-step problem solving, and tool use",
+   "type": "chat",
+   "family": "flint",
+   "release_date": "2026-11-16",
+   "limit": {
+    "context": 262144,
+    "output": 262144
+   },
+   "capabilities": {
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/gateway",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/open-responses",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": false
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-16"
   },
   "reflection/beam": {
    "id": "reflection/beam",

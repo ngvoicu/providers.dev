@@ -6501,6 +6501,78 @@
    "open_weights": false,
    "last_updated": "2026-10-04"
   },
+  "bytedance/seedance-2.5-flash": {
+   "id": "bytedance/seedance-2.5-flash",
+   "name": "Seedance 2.5 Flash",
+   "description": "Video generation model",
+   "type": "video",
+   "release_date": "2026-11-17",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "video": {
+     "output": {
+      "price": 7,
+      "overrides": [
+       {
+        "when": {
+         "input_video": {
+          "equals": true
+         }
+        },
+        "price": 4.3
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/gif",
+     "video/mp4",
+     "video/mpeg",
+     "video/quicktime",
+     "video/webm",
+     "audio/wav",
+     "audio/mpeg",
+     "audio/flac",
+     "audio/mp4",
+     "audio/ogg",
+     "audio/webm",
+     "audio/aac"
+    ],
+    "output": [
+     "video/mp4"
+    ]
+   },
+   "api": {
+    "videos": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@openrouter/ai-sdk-provider",
+      "opencodeai": "@opencode/ai/providers/openrouter/videos"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-17"
+  },
   "bytedance/ui-tars-1.5-7b": {
    "id": "bytedance/ui-tars-1.5-7b",
    "name": "UI-TARS 7B ",
@@ -9507,7 +9579,7 @@
    "release_date": "2026-10-17",
    "limit": {
     "context": 1048576,
-    "output": 393216
+    "output": 943718
    },
    "capabilities": {
     "temperature": true,
@@ -9532,281 +9604,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.15,
+      "price": 0.036,
       "cache": {
-       "read": 0.003
-      },
-      "overrides": [
-       {
-        "when": {
-         "utc_days": {
-          "in": [
-           "sat",
-           "sun"
-          ]
-         }
-        },
-        "price": 0.15,
-        "cache": {
-         "read": 0.003
-        }
-       },
-       {
-        "when": {
-         "utc_hours": {
-          "lt": "01:00"
-         },
-         "utc_days": {
-          "in": [
-           "mon",
-           "tue",
-           "wed",
-           "thu",
-           "fri"
-          ]
-         }
-        },
-        "price": 0.15,
-        "cache": {
-         "read": 0.003
-        }
-       },
-       {
-        "when": {
-         "utc_days": {
-          "in": [
-           "mon",
-           "tue",
-           "wed",
-           "thu",
-           "fri"
-          ]
-         },
-         "all": [
-          {
-           "utc_hours": {
-            "gte": "01:00"
-           }
-          },
-          {
-           "utc_hours": {
-            "lt": "04:00"
-           }
-          }
-         ]
-        },
-        "price": 0.3,
-        "cache": {
-         "read": 0.006
-        }
-       },
-       {
-        "when": {
-         "utc_days": {
-          "in": [
-           "mon",
-           "tue",
-           "wed",
-           "thu",
-           "fri"
-          ]
-         },
-         "all": [
-          {
-           "utc_hours": {
-            "gte": "04:00"
-           }
-          },
-          {
-           "utc_hours": {
-            "lt": "06:00"
-           }
-          }
-         ]
-        },
-        "price": 0.15,
-        "cache": {
-         "read": 0.003
-        }
-       },
-       {
-        "when": {
-         "utc_days": {
-          "in": [
-           "mon",
-           "tue",
-           "wed",
-           "thu",
-           "fri"
-          ]
-         },
-         "all": [
-          {
-           "utc_hours": {
-            "gte": "06:00"
-           }
-          },
-          {
-           "utc_hours": {
-            "lt": "10:00"
-           }
-          }
-         ]
-        },
-        "price": 0.3,
-        "cache": {
-         "read": 0.006
-        }
-       },
-       {
-        "when": {
-         "utc_hours": {
-          "gte": "10:00"
-         },
-         "utc_days": {
-          "in": [
-           "mon",
-           "tue",
-           "wed",
-           "thu",
-           "fri"
-          ]
-         }
-        },
-        "price": 0.15,
-        "cache": {
-         "read": 0.003
-        }
-       }
-      ]
+       "read": 0.01
+      }
      },
      "output": {
-      "price": 0.6,
-      "overrides": [
-       {
-        "when": {
-         "utc_days": {
-          "in": [
-           "sat",
-           "sun"
-          ]
-         }
-        },
-        "price": 0.6
-       },
-       {
-        "when": {
-         "utc_hours": {
-          "lt": "01:00"
-         },
-         "utc_days": {
-          "in": [
-           "mon",
-           "tue",
-           "wed",
-           "thu",
-           "fri"
-          ]
-         }
-        },
-        "price": 0.6
-       },
-       {
-        "when": {
-         "utc_days": {
-          "in": [
-           "mon",
-           "tue",
-           "wed",
-           "thu",
-           "fri"
-          ]
-         },
-         "all": [
-          {
-           "utc_hours": {
-            "gte": "01:00"
-           }
-          },
-          {
-           "utc_hours": {
-            "lt": "04:00"
-           }
-          }
-         ]
-        },
-        "price": 1.2
-       },
-       {
-        "when": {
-         "utc_days": {
-          "in": [
-           "mon",
-           "tue",
-           "wed",
-           "thu",
-           "fri"
-          ]
-         },
-         "all": [
-          {
-           "utc_hours": {
-            "gte": "04:00"
-           }
-          },
-          {
-           "utc_hours": {
-            "lt": "06:00"
-           }
-          }
-         ]
-        },
-        "price": 0.6
-       },
-       {
-        "when": {
-         "utc_days": {
-          "in": [
-           "mon",
-           "tue",
-           "wed",
-           "thu",
-           "fri"
-          ]
-         },
-         "all": [
-          {
-           "utc_hours": {
-            "gte": "06:00"
-           }
-          },
-          {
-           "utc_hours": {
-            "lt": "10:00"
-           }
-          }
-         ]
-        },
-        "price": 1.2
-       },
-       {
-        "when": {
-         "utc_hours": {
-          "gte": "10:00"
-         },
-         "utc_days": {
-          "in": [
-           "mon",
-           "tue",
-           "wed",
-           "thu",
-           "fri"
-          ]
-         }
-        },
-        "price": 0.6
-       }
-      ]
+      "price": 0.5
      }
     }
    },
@@ -16058,13 +15862,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.09,
+      "price": 0.0765,
       "cache": {
-       "read": 0.05
+       "read": 0.0425
       }
      },
      "output": {
-      "price": 0.3
+      "price": 0.255
      }
     }
    },
@@ -17096,7 +16900,8 @@
    "modalities": {
     "input": [
      "text",
-     "image"
+     "image",
+     "video"
     ],
     "output": [
      "text"
@@ -17151,7 +16956,8 @@
    "modalities": {
     "input": [
      "text",
-     "image"
+     "image",
+     "video"
     ],
     "output": [
      "text"
@@ -20396,7 +20202,7 @@
    "release_date": "2026-08-10",
    "limit": {
     "context": 131072,
-    "output": 16384
+    "output": 117964
    },
    "capabilities": {
     "temperature": true,
@@ -20421,13 +20227,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.3,
+      "price": 0.35,
       "cache": {
        "read": 0.04
       }
      },
      "output": {
-      "price": 1.2
+      "price": 1.5
      }
     }
    },
@@ -29118,7 +28924,7 @@
    "canonical_id": "nvidia/nemotron-3.5-lightning",
    "release_date": "2026-08-11",
    "limit": {
-    "context": 262144,
+    "context": 1048576,
     "output": 235929
    },
    "capabilities": {
@@ -37425,7 +37231,7 @@
    "release_date": "2025-08-05",
    "limit": {
     "context": 131072,
-    "output": 65536
+    "output": 117964
    },
    "capabilities": {
     "temperature": true,
@@ -37449,13 +37255,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.075,
+      "price": 0.03,
       "cache": {
-       "read": 0.0375
+       "read": 0.03
       }
      },
      "output": {
-      "price": 0.3
+      "price": 0.13
      }
     }
    },
@@ -42899,7 +42705,7 @@
    "release_date": "2026-02-15",
    "limit": {
     "context": 262144,
-    "output": 81920
+    "output": 64000
    },
    "capabilities": {
     "temperature": true,
@@ -42919,13 +42725,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.45,
+      "price": 0.6,
       "cache": {
-       "read": 0.22
+       "read": 0.12
       }
      },
      "output": {
-      "price": 3
+      "price": 3.6
      }
     }
    },
@@ -43039,13 +42845,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.122,
+      "price": 0.17,
       "cache": {
-       "read": 0.11
+       "read": 0.153
       }
      },
      "output": {
-      "price": 0.18
+      "price": 0.25
      }
     }
    },
@@ -45196,14 +45002,14 @@
    "cost": {
     "text": {
      "input": {
-      "price": 1.5,
+      "price": 1.425,
       "cache": {
-       "read": 0.075,
-       "write": 1.875
+       "read": 0.07125,
+       "write": 1.78125
       }
      },
      "output": {
-      "price": 4.5
+      "price": 4.275
      }
     }
    },
@@ -49310,9 +49116,9 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.0825,
+      "price": 0.132,
       "cache": {
-       "read": 0.020625
+       "read": 0.033
       },
       "overrides": [
        {
@@ -49340,7 +49146,7 @@
       ]
      },
      "output": {
-      "price": 0.33,
+      "price": 0.528,
       "overrides": [
        {
         "when": {
@@ -49802,9 +49608,9 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.7506,
+      "price": 0.834,
       "cache": {
-       "read": 0.0378
+       "read": 0.042
       },
       "overrides": [
        {
@@ -49832,7 +49638,7 @@
       ]
      },
      "output": {
-      "price": 2.2509,
+      "price": 2.501,
       "overrides": [
        {
         "when": {
@@ -55379,13 +55185,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 2.8,
+      "price": 1.68,
       "cache": {
-       "read": 0.56
+       "read": 0.336
       }
      },
      "output": {
-      "price": 8.8
+      "price": 5.28
      }
     }
    },
