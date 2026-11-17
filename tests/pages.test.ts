@@ -434,7 +434,7 @@ it("publishes new data without rebuilding the shell, while in-flight API reads s
   expect((await worker.fetch(new Request("https://providers.dev/api/v1/entries"), { ASSETS: assets })).headers.get("X-Dataset-Version")).toBe(current.meta.dataset_version);
 });
 
-it("sends plain http on the production host at the edge to https, and serves a local preview and any other host as they come", async () => {
+it("sends www and plain http at the edge to https://providers.dev in one step, and serves a local preview and any other host as they come", async () => {
   const destination = tempDataDir();
   mkdirSync(join(destination, "site-shell"));
   writeFileSync(join(destination, "site-shell", "index.html"), shell);
@@ -449,9 +449,15 @@ it("sends plain http on the production host at the edge to https, and serves a l
   // At the edge Cloudflare sets X-Forwarded-Proto to the protocol the visitor used.
   const get = (url: string, proto?: string) => worker.fetch(new Request(url, { headers: proto ? { "X-Forwarded-Proto": proto } : {} }), { ASSETS: assets });
   for (const path of ["/some/path?x=1", "/", "/api/v1/entries?limit=1&offset=2", "/favicon.svg"]) {
-    const redirect = await get(`http://providers.dev${path}`, "http");
-    expect([redirect.status, redirect.headers.get("Location")]).toEqual([301, `https://providers.dev${path}`]);
+    for (const [origin, proto] of [["http://providers.dev", "http"], ["https://www.providers.dev", "https"], ["http://www.providers.dev", "http"]] as const) {
+      const redirect = await get(`${origin}${path}`, proto);
+      // One step: www over http goes straight to the https apex, not to https://www first.
+      expect([origin, redirect.status, redirect.headers.get("Location")]).toEqual([origin, 301, `https://providers.dev${path}`]);
+    }
   }
+  // A path that looks like another host stays a path on providers.dev.
+  expect((await get("https://www.providers.dev//evil.example/x?y=1", "https")).headers.get("Location")).toBe("https://providers.dev//evil.example/x?y=1");
+  expect((await get("http://providers.dev//evil.example/x", "http")).headers.get("Location")).toBe("https://providers.dev//evil.example/x");
   // The redirect comes before anything else: no asset is read for it.
   expect(reads).toBe(0);
   const served: [string, string | undefined][] = [
@@ -462,7 +468,9 @@ it("sends plain http on the production host at the edge to https, and serves a l
     ["http://localhost:8787", "http"],
     ["http://127.0.0.1:8788", undefined],
     ["http://providers-dev.example.workers.dev", "http"],
-    ["http://www.providers.dev", "http"],
+    ["https://other.providers.dev", "https"],
+    // A local preview never sees an edge header, whatever host it is given.
+    ["http://www.providers.dev", undefined],
   ];
   for (const [origin, proto] of served) {
     const page = await get(`${origin}/providers/provider-02/`, proto);

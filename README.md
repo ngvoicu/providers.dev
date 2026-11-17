@@ -532,14 +532,24 @@ compiles one shared shell with CSS and scripts, plus authored methodology, licen
 enumerate entries, providers or models. `/docs/api/` renders the actual `/api/v1/openapi.json` response, including
 its guide, parameters, schemas and examples. Authored text is also public through `/api/v1/docs/{document}`.
 
-The site has one address, `https://providers.dev`. `wrangler.jsonc` attaches it as the Worker's custom domain and
-turns off the `workers.dev` address and the preview URLs:
+The site has one address, `https://providers.dev`. `wrangler.jsonc` attaches two custom domains to the Worker,
+`providers.dev` and `www.providers.dev`, and turns off the `workers.dev` address and the preview URLs:
 
 ```jsonc
-"routes": [{ "pattern": "providers.dev", "custom_domain": true }],
+"routes": [
+  { "pattern": "providers.dev", "custom_domain": true },
+  { "pattern": "www.providers.dev", "custom_domain": true }
+],
 "workers_dev": false,
 "preview_urls": false,
 ```
+
+The Worker redirects, not the zone (no Cloudflare setting does it, so every deploy carries the redirects): a request
+for `www.providers.dev`, over http or https, and a plain http request for `providers.dev` get one 301 to
+`https://providers.dev` with the same path and query (`canonicalLocation` in `worker/index.ts`). It acts only on
+requests from Cloudflare's edge, told apart by the `X-Forwarded-Proto` header the edge sets: `wrangler dev` with these
+routes hands the local Worker `http://providers.dev/…` too, but no such header, so a local preview is never
+redirected. HSTS is not set.
 
 A deploy takes its credentials from the environment, never from a file: `CLOUDFLARE_API_TOKEN` (an API token that
 can edit Workers scripts and their routes and custom domains on the zone) and `CLOUDFLARE_ACCOUNT_ID`. By hand:
