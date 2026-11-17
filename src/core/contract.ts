@@ -319,6 +319,7 @@ const canonicalModel = {
   input_window_min: ModelInputWindowEndSchema.nullable().describe("The smallest input window among its entries (input_window of each), with the entry it is on. At an equal number of tokens a value that is not a lower bound counts as the smaller. Null = no entry has one. Since 1.1.0."),
   input_window_max: ModelInputWindowEndSchema.nullable().describe("The largest input window among its entries, with the entry it is on. At an equal number of tokens a lower bound (bound at_least) counts as the larger: the real limit there can be more. Null = no entry has one. Since 1.1.0."),
   input_window_unknown_count: z.int().min(0).describe("Entries with no input window (input_window.tokens null). Since 1.1.0."),
+  input_window_reference: ModelInputWindowEndSchema.nullable().describe("The input window of the reference entry (reference_ref, the lab's own), with its scope: what the lab itself gives. Null where there is no reference entry, or where its input window is not known. Since 1.1.0."),
 };
 export const CanonicalModelSchema = z.strictObject(canonicalModel).describe("A model as its lab names it, and how its entries compare.") satisfies z.ZodType<CanonicalModel>;
 export const CanonicalModelDetailSchema = z

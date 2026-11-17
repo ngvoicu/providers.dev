@@ -370,8 +370,8 @@ removed or renamed, a changed type, a property that may become absent or null, o
 and belongs in `/api/v2`. Once the record has grown beyond 1.0.0, the version (`info.version` in
 `src/core/openapi.ts`) must be above it: a release that adds something takes a minor step. The version restarted at
 1.0.0 with the first public release; the numbers before it were never public. 1.1.0 (2026-11-17) added the input window
-range of a model: `input_window_min`, `input_window_max` and `input_window_unknown_count`, and the component
-`ModelInputWindowEnd`.
+range of a model: `input_window_min`, `input_window_max`, `input_window_unknown_count` and `input_window_reference`,
+and the component `ModelInputWindowEnd`.
 
 That promise holds for everything providers.dev makes itself: summaries, `providers_dev` records, evaluations,
 corrections, evidence, paths and parameters. The fields imported from models.dev (`limit`, `cost`, `capabilities`,
@@ -421,9 +421,10 @@ good copy stays.
 
 A model (`/api/v1/models`, `/api/v1/models/{lab}/{model}`) gives the two ends among its entries, since 1.1.0:
 `input_window_min` and `input_window_max`, each the entry it is on (`entry_ref`) with that entry's `tokens`, `bound`,
-`basis` and `scope`, and `input_window_unknown_count`, the entries with none. At an equal number of tokens a lower bound
-counts as the larger. `inputWindowRange` in `src/core/resources.ts` works them out, beside `context_min` and
-`context_max`, which stay `limit.context`.
+`basis` and `scope`, `input_window_unknown_count`, the entries with none, and `input_window_reference`, the same for
+the reference entry (`reference_ref`, the lab's own). At an equal number of tokens a lower bound counts as the larger.
+`src/core/resources.ts` works them out (`inputWindowRange`), beside `context_min` and `context_max`, which stay
+`limit.context`.
 
 The safe value, like every figure the site shows, is worked out once, when the data is built, and published in the
 API. A page never works anything out: it prints fields of the API, formatted. The site never shows anything that is

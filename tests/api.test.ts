@@ -570,14 +570,21 @@ describe("the input window of a model", () => {
     expect([low.input_window_min?.entry_ref, low.input_window_min?.bound, low.input_window_max?.entry_ref]).toEqual(["b/m", "at_least", "c/m"]);
   });
 
-  it("is on every model of the list and of the detail, always with the three keys, as the entries under it say", async () => {
+  it("gives the input window of the reference entry, the lab's own, and null where there is none or it is not known", () => {
+    const model = (windows: [string, Summary["input_window"]][]) => canonicalModels(windows.map(([provider, input_window]) => summaryOf({ ref: `${provider}/m`, provider, model: "m", canonical_id: "lab/m", input_window })))[0]!;
+    expect(model([["p", known(850000, "limit", "input")], ["lab", known(1000000, "limit")]])).toMatchObject({ reference_ref: "lab/m", input_window_reference: { entry_ref: "lab/m", tokens: 1000000, bound: "limit", basis: "documented", scope: "window" } });
+    expect(model([["p", known(850000, "limit", "input")], ["lab", summaryOf().input_window]])).toMatchObject({ reference_ref: "lab/m", input_window_reference: null });
+    expect(model([["p", known(850000, "limit", "input")], ["q", known(1000000, "limit")]])).toMatchObject({ reference_ref: null, input_window_reference: null });
+  });
+
+  it("is on every model of the list and of the detail, always with the four keys, as the entries under it say", async () => {
     const list = await json<{ data: Record<string, unknown>[] }>("/api/v1/models?limit=200");
-    for (const model of list.data) for (const key of ["input_window_min", "input_window_max", "input_window_unknown_count"]) expect(model, `${String(model.id)} ${key}`).toHaveProperty(key);
+    for (const model of list.data) for (const key of ["input_window_min", "input_window_max", "input_window_unknown_count", "input_window_reference"]) expect(model, `${String(model.id)} ${key}`).toHaveProperty(key);
     const detail = await json<{ data: { entries: Summary[] } & Record<string, unknown> }>("/api/v1/models/lab/model-2");
     expect(detail.data).toMatchObject(inputWindowRange(detail.data.entries));
     expect(detail.data.input_window_min).not.toBeNull();
     const document = await json<{ components: { schemas: Record<string, { properties?: Record<string, unknown>; required?: string[] }> } }>("/api/v1/openapi.json");
-    for (const name of ["CanonicalModel", "CanonicalModelDetail"]) expect(document.components.schemas[name]!.required).toEqual(expect.arrayContaining(["input_window_min", "input_window_max", "input_window_unknown_count"]));
+    for (const name of ["CanonicalModel", "CanonicalModelDetail"]) expect(document.components.schemas[name]!.required).toEqual(expect.arrayContaining(["input_window_min", "input_window_max", "input_window_unknown_count", "input_window_reference"]));
     expect(Object.keys(document.components.schemas.ModelInputWindowEnd!.properties!)).toEqual(["entry_ref", "tokens", "bound", "basis", "scope"]);
   });
 });

@@ -31,9 +31,9 @@ const windowWords = (w: { tokens: number; bound: WindowBound | null; basis: stri
 
 /**
  * The input window of a model, as the API publishes it: `input_window_min` to `input_window_max`, "≥" at an end that
- * is a lower bound, `input_window_unknown_count`, and the record of the lab's own entry (`reference_ref`) with what
- * kind of figure it is, which is what tells it from the context window beside it. It compares no values: the ends
- * are the API's.
+ * is a lower bound, `input_window_unknown_count`, and `input_window_reference`, the lab's own entry, with what kind of
+ * figure it is, which is what tells it from the context window beside it. It compares no values and looks up no
+ * entry: every figure is a field of the model.
  */
 function modelWindowTile(model: CanonicalModelDetail, providerNames: Record<string, string>): string {
   const { entry_count: entries, input_window_min: min, input_window_max: max, input_window_unknown_count: unknown } = model;
@@ -52,13 +52,12 @@ function modelWindowTile(model: CanonicalModelDetail, providerNames: Record<stri
     lines.push(unknown === 0 ? where : `${where}; unknown at ${exact(unknown)} of ${exact(entries)}`);
     if (min.bound === "at_least" || max.bound === "at_least") lines.push("≥ marks a lower bound");
   }
-  const reference = model.reference_ref === null ? undefined : model.entries.find((entry) => entry.ref === model.reference_ref);
-  if (reference) {
-    const w = reference.input_window;
-    const scope = w.scope ? `, ${SCOPE_WORD[w.scope].toLowerCase()}` : "";
-    const stated = w.tokens === null || w.basis === "none" ? null : { tokens: w.tokens, bound: w.bound, basis: w.basis };
-    const said = `The lab's own entry, ${reference.ref}: ${stated ? `${windowWords(stated)}${scope}` : "unknown"}.`;
-    lines.push(`<span title="${e(said)}">At ${e(providerNames[reference.provider] ?? reference.provider)}: ${stated ? `${windowFigure(stated)}${scope}` : "unknown"}</span>`);
+  // The lab's own entry, where the model has one: its input window as the API publishes it with the model.
+  if (model.reference_ref !== null) {
+    const w = model.input_window_reference;
+    const scope = w ? `, ${SCOPE_WORD[w.scope].toLowerCase()}` : "";
+    const said = `The lab's own entry, ${model.reference_ref}: ${w ? `${windowWords(w)}${scope}` : "unknown"}.`;
+    lines.push(`<span title="${e(said)}">At ${e(providerNames[model.lab] ?? model.lab)}: ${w ? `${windowFigure(w)}${scope}` : "unknown"}</span>`);
   }
   return `<div class="tile"><div class="label">Input window</div><div class="value small">${value}</div><div class="foot">${lines.map((line) => `<div>${line}</div>`).join("")}</div></div>`;
 }

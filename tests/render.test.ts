@@ -756,5 +756,9 @@ describe("the input window of a model", () => {
     // Whatever the fields say is what the tile says, whatever the entries under it hold.
     expect(html({ input_window_min: { entry_ref: "x/m", tokens: 128000, bound: "limit", basis: "documented", scope: "input" }, input_window_unknown_count: 5 })).toBe("Input window 128K to 1M tokens Smallest to largest among its entries; unknown at 5 of 2 At Lab: 1M, input and output together");
     expect(html({ input_window_min: null, input_window_max: null })).toBe("Input window Unknown Not documented or measured at any of its 2 entries At Lab: 1M, input and output together");
+    // The lab's line is input_window_reference, not the lab's entry looked up in entries.
+    expect(html({ input_window_reference: { entry_ref: "lab/m", tokens: 922000, bound: "limit", basis: "documented", scope: "input" } })).toBe("Input window 850K to 1M tokens Smallest to largest among its entries At Lab: 922K, input alone");
+    expect(html({ input_window_reference: null })).toBe("Input window 850K to 1M tokens Smallest to largest among its entries At Lab: unknown");
+    expect(html({ reference_ref: null })).toBe("Input window 850K to 1M tokens Smallest to largest among its entries");
   });
 });

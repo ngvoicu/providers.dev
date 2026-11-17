@@ -80,6 +80,8 @@ export interface CanonicalModel {
   input_window_max: ModelInputWindowEnd | null;
   /** Entries with no input window (`input_window.tokens` null). */
   input_window_unknown_count: number;
+  /** The input window of the reference entry (`reference_ref`). Null where there is none, or where its input window is not known. */
+  input_window_reference: ModelInputWindowEnd | null;
 }
 
 /** One end of the input windows of a model's entries: the entry, and its `input_window` as its summary publishes it. */
@@ -102,6 +104,13 @@ const range = (values: (number | null)[]): [number | null, number | null] => {
   return known.length === 0 ? [null, null] : [Math.min(...known), Math.max(...known)];
 };
 
+/** An entry's input window as an end of a model's: null where it is not known. */
+function windowEnd({ ref, input_window: w }: Summary): ModelInputWindowEnd | null {
+  // A record with a value has its bound, basis and scope (contract: null exactly with none).
+  if (w.tokens === null || w.basis === "none" || w.bound === null || w.scope === null) return null;
+  return { entry_ref: ref, tokens: w.tokens, bound: w.bound, basis: w.basis, scope: w.scope };
+}
+
 /**
  * The smallest and the largest input window among a model's entries, and how many have none, from `input_window` of
  * each summary: the published record, not worked out again. At an equal number of tokens a lower bound ranks above a
@@ -113,13 +122,12 @@ export function inputWindowRange(entries: readonly Summary[]): Pick<CanonicalMod
   let min: ModelInputWindowEnd | null = null;
   let max: ModelInputWindowEnd | null = null;
   let unknown = 0;
-  for (const { ref, input_window: w } of entries) {
-    // A record with a value has its bound, basis and scope (contract: null exactly with none).
-    if (w.tokens === null || w.basis === "none" || w.bound === null || w.scope === null) {
+  for (const entry of entries) {
+    const end = windowEnd(entry);
+    if (end === null) {
       unknown += 1;
       continue;
     }
-    const end: ModelInputWindowEnd = { entry_ref: ref, tokens: w.tokens, bound: w.bound, basis: w.basis, scope: w.scope };
     if (min === null || below(end, min)) min = end;
     if (max === null || below(max, end)) max = end;
   }
@@ -148,6 +156,7 @@ function describe(id: string, entries: Summary[]): CanonicalModelDetail {
     max_output_min: outputMin,
     max_output_max: outputMax,
     ...inputWindowRange(sorted),
+    input_window_reference: own ? windowEnd(own) : null,
     entries: sorted,
   };
 }

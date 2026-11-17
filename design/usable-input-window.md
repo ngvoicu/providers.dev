@@ -729,8 +729,9 @@ out a limit, and the record replaces it.
 `input_window_min` to `input_window_max` of the model, compact as in the table, "≥" and rounded down at an end whose
 `bound` is `at_least`; under it "Smallest to largest among its entries", with "unknown at N of M" from
 `input_window_unknown_count` and `entry_count`; "≥ marks a lower bound" where an end is one; and the record of the
-lab's own entry (`reference_ref`) with its `scope`, which tells it from the Context window tile beside it. The two ends
-and the count are worked out in `inputWindowRange` (`src/core/resources.ts`); the page compares nothing.
+lab's own entry, `input_window_reference`, with its `scope`, which tells it from the Context window tile beside it.
+The four fields are worked out in `src/core/resources.ts` (`inputWindowRange`, beside `context_min`); the page compares
+nothing and looks up no entry.
 
 **The look, as it was put to the designer.** It was decided and built: an "Input window" column before Context in the
 catalog, with the basis under the number and "≥" for a lower bound, and on the entry page a first tile and an
