@@ -4200,6 +4200,18 @@
         "max_output_max": {
           "type": "number",
           "nullable": true
+        },
+        "input_window_min": {
+          "ref": "ModelInputWindowEnd",
+          "nullable": true
+        },
+        "input_window_max": {
+          "ref": "ModelInputWindowEnd",
+          "nullable": true
+        },
+        "input_window_unknown_count": {
+          "type": "integer",
+          "minimum": 0
         }
       }
     },
@@ -4247,11 +4259,56 @@
           "type": "number",
           "nullable": true
         },
+        "input_window_min": {
+          "ref": "ModelInputWindowEnd",
+          "nullable": true
+        },
+        "input_window_max": {
+          "ref": "ModelInputWindowEnd",
+          "nullable": true
+        },
+        "input_window_unknown_count": {
+          "type": "integer",
+          "minimum": 0
+        },
         "entries": {
           "type": "array",
           "items": {
             "ref": "EntrySummary"
           }
+        }
+      }
+    },
+    "ModelInputWindowEnd": {
+      "type": "object",
+      "properties": {
+        "entry_ref": {
+          "type": "string"
+        },
+        "tokens": {
+          "type": "integer",
+          "exclusiveMinimum": 0
+        },
+        "bound": {
+          "type": "string",
+          "enum": [
+            "at_least",
+            "limit"
+          ]
+        },
+        "basis": {
+          "type": "string",
+          "enum": [
+            "documented",
+            "measured"
+          ]
+        },
+        "scope": {
+          "type": "string",
+          "enum": [
+            "input",
+            "window"
+          ]
         }
       }
     },

@@ -725,6 +725,13 @@ With it, the "Context" column prints `context` and nothing else. Today, where no
 "≥ 915K input" from `measured_input_accepted`, rounded by the page; that is the one place where a page still works
 out a limit, and the record replaces it.
 
+**A model's page.** Since API 1.1.0 it opens with an "Input window" tile, the first of five as on an entry's page:
+`input_window_min` to `input_window_max` of the model, compact as in the table, "≥" and rounded down at an end whose
+`bound` is `at_least`; under it "Smallest to largest among its entries", with "unknown at N of M" from
+`input_window_unknown_count` and `entry_count`; "≥ marks a lower bound" where an end is one; and the record of the
+lab's own entry (`reference_ref`) with its `scope`, which tells it from the Context window tile beside it. The two ends
+and the count are worked out in `inputWindowRange` (`src/core/resources.ts`); the page compares nothing.
+
 **The look, as it was put to the designer.** It was decided and built: an "Input window" column before Context in the
 catalog, with the basis under the number and "≥" for a lower bound, and on the entry page a first tile and an
 "Input window" table. The three points were:

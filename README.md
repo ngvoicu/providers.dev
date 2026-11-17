@@ -369,7 +369,9 @@ parameter, allowed value, property, component or enum value passes; a path, para
 removed or renamed, a changed type, a property that may become absent or null, or a new required parameter fails,
 and belongs in `/api/v2`. Once the record has grown beyond 1.0.0, the version (`info.version` in
 `src/core/openapi.ts`) must be above it: a release that adds something takes a minor step. The version restarted at
-1.0.0 with the first public release; the numbers before it were never public.
+1.0.0 with the first public release; the numbers before it were never public. 1.1.0 (2026-11-17) added the input window
+range of a model: `input_window_min`, `input_window_max` and `input_window_unknown_count`, and the component
+`ModelInputWindowEnd`.
 
 That promise holds for everything providers.dev makes itself: summaries, `providers_dev` records, evaluations,
 corrections, evidence, paths and parameters. The fields imported from models.dev (`limit`, `cost`, `capabilities`,
@@ -416,6 +418,12 @@ summary keep their meaning. A limits row of the measurements file may carry `dat
 the reply showed was read to the end); a file with two rows for one route, client and model, or a row whose numbers
 contradict each other, or a token count that is not a whole number of 0 or more, is refused when read and the last
 good copy stays.
+
+A model (`/api/v1/models`, `/api/v1/models/{lab}/{model}`) gives the two ends among its entries, since 1.1.0:
+`input_window_min` and `input_window_max`, each the entry it is on (`entry_ref`) with that entry's `tokens`, `bound`,
+`basis` and `scope`, and `input_window_unknown_count`, the entries with none. At an equal number of tokens a lower bound
+counts as the larger. `inputWindowRange` in `src/core/resources.ts` works them out, beside `context_min` and
+`context_max`, which stay `limit.context`.
 
 The safe value, like every figure the site shows, is worked out once, when the data is built, and published in the
 API. A page never works anything out: it prints fields of the API, formatted. The site never shows anything that is

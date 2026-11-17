@@ -4,6 +4,8 @@ import { buildIndex, type Summary } from "../src/core/entries.ts";
 import type { Json, JsonObject } from "../src/core/merge.ts";
 import { emptyInputWindow, inputWindow, type InputWindow } from "../src/core/limits.ts";
 import { entryHtml, evaluationStrip, rowHtml } from "../src/core/render.ts";
+import { modelHtml } from "../src/core/detail-view.ts";
+import { canonicalModels } from "../src/core/resources.ts";
 import { resolve } from "../src/core/resolve.ts";
 import { NS, UpstreamModel, type ModelExtension } from "../src/core/schema.ts";
 import { pricingOf } from "../src/core/policies.ts";
@@ -625,7 +627,7 @@ describe("the input window", () => {
     expect(tile(page(named))).toBe("Input window 1,000,000 tokens measured providers.dev · 2026-11-08 Input and output together");
     expect(tile(page(CASES.none))).toBe("Input window Unknown Not documented or measured");
     // The input window is the first of the tiles.
-    expect(page(CASES.measured)).toMatch(/<div class="tiles tiles-entry mt-6">\s*<div class="tile"><div class="label">Input window<\/div>/);
+    expect(page(CASES.measured)).toMatch(/<div class="tiles tiles-five mt-6">\s*<div class="tile"><div class="label">Input window<\/div>/);
   });
 
   it("shows the value in the entry table with its basis, and what it rests on in the hover text", () => {
@@ -665,5 +667,94 @@ describe("the input window", () => {
     ]);
     expect(lines(page(CASES.notContradicted, {}, later)).slice(0, 2).join(" ")).not.toContain("stale");
     expect(lines(page(CASES.notContradicted, {}, later))[2]).toContain("2026-11-13 · stale");
+  });
+});
+
+describe("the input window of a model", () => {
+  const sourceOf = () => ({ source: "models.dev" as const, date: "2026-11-15" });
+  const login = { route: "lab-subscription", route_label: "Lab plan", client: "cliproxyapi", client_label: "Requests sent through CLIProxyAPI" };
+  /** A window documented as the context window: input and output together. */
+  const window = (context: number): InputWindow => inputWindow({ context }, [], [], sourceOf);
+  /** An input limit documented under a larger context window: input alone. */
+  const input = (tokens: number, context = 1050000): InputWindow => inputWindow({ context, input: tokens }, [], [], sourceOf);
+  /** Nothing documented, a measurement that saw `accepted` taken and more refused: a lower bound. */
+  const atLeast = (accepted: number): InputWindow => inputWindow(undefined, [], [limitOf({ ...login, input_accepted: accepted, input_refused: accepted + 7500, date: "2026-11-11" })], sourceOf);
+  const none = emptyInputWindow();
+  /** A model of the lab "lab" with one entry per window and context, the API's own way (canonicalModels): the lab's entry first. */
+  const modelOf = (windows: [string, InputWindow, number?][]) =>
+    canonicalModels(windows.map(([provider, w, context]) => summaryOf({ ref: `${provider}/m`, provider, model: "m", canonical_id: "lab/m", input_window: w, context: context ?? w.documented_tokens })))[0]!;
+  const page = (windows: [string, InputWindow, number?][]): string => modelHtml(modelOf(windows), { lab: "Lab", p: "P", q: "Q", r: "R" }, "2026-11-15", { date: new Date("2026-11-16T00:00:00Z"), stale_after_days: 90 });
+  const text = (html: string): string => html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  const tiles = (html: string): string[] => html.slice(html.indexOf('<div class="tiles'), html.indexOf("</div>\n", html.indexOf('<div class="tiles'))).split('<div class="tile">').slice(1);
+  /** The text of the Input window tile, the first. */
+  const tile = (windows: [string, InputWindow, number?][]): string => text(tiles(page(windows))[0]!);
+  /** The hover text of the tile's value. */
+  const hover = (windows: [string, InputWindow, number?][]): string => /<div class="value small"><span title="([^"]*)"/.exec(tiles(page(windows))[0]!)?.[1] ?? "";
+
+  it("is the first of five tiles, the three limits together, then the two counts", () => {
+    const html = page([["lab", window(1000000)], ["p", input(850000)]]);
+    expect(html).toContain('<div class="tiles tiles-five');
+    expect(tiles(html).map((one) => text(one.split('<div class="value')[0]!))).toEqual(["Input window", "Context window", "Maximum output", "Entries", "With providers.dev evidence"]);
+  });
+
+  it("gives the smallest to the largest among its entries, and the lab's own entry with what kind of figure it is", () => {
+    expect(tile([["lab", window(1000000)], ["p", input(850000)], ["q", window(1000000)]])).toBe("Input window 850K to 1M tokens Smallest to largest among its entries At Lab: 1M, input and output together");
+    expect(hover([["lab", window(1000000)], ["p", input(850000)], ["q", window(1000000)]])).toBe("Smallest: 850,000 tokens, documented, p/m. Largest: 1,000,000 tokens, documented, lab/m.");
+  });
+
+  it("is not the context window: an input limit under a larger window shows beside it as what it is", () => {
+    const tiled = tiles(page([["lab", input(922000), 1050000], ["p", input(922000), 1050000], ["q", window(271999)]])).map(text);
+    expect(tiled[0]).toBe("Input window 272K to 922K tokens Smallest to largest among its entries At Lab: 922K, input alone");
+    expect(tiled[1]).toBe("Context window 272K to 1.05M tokens Smallest to largest among its entries");
+  });
+
+  it("counts the entries with no input window, and compares only the others", () => {
+    expect(tile([["lab", window(1000000)], ["p", none], ["q", input(850000)]])).toBe("Input window 850K to 1M tokens Smallest to largest among its entries; unknown at 1 of 3 At Lab: 1M, input and output together");
+    expect(tile([["lab", none], ["p", window(1000000)], ["q", input(850000)]])).toBe("Input window 850K to 1M tokens Smallest to largest among its entries; unknown at 1 of 3 At Lab: unknown");
+  });
+
+  it("marks an end that is a lower bound with ≥, rounded down, and says what ≥ is", () => {
+    // At the low end: devin/gpt-6-1-terra, at least 921,500 under documented 922,000.
+    expect(tile([["lab", input(922000)], ["p", atLeast(921500)], ["q", input(1050000)]])).toBe("Input window ≥ 921K to 1.05M tokens Smallest to largest among its entries ≥ marks a lower bound At Lab: 922K, input alone");
+    expect(hover([["lab", input(922000)], ["p", atLeast(921500)], ["q", input(1050000)]])).toBe("Smallest: at least 921,500 tokens, measured, p/m. Largest: 1,050,000 tokens, documented, q/m.");
+    // At the high end.
+    expect(tile([["lab", input(922000)], ["p", atLeast(1049999)]])).toBe("Input window 922K to ≥ 1.04M tokens Smallest to largest among its entries ≥ marks a lower bound At Lab: 922K, input alone");
+    // Between the ends a lower bound changes neither.
+    expect(tile([["lab", input(922000)], ["p", atLeast(950000)], ["q", input(1050000)]])).toBe("Input window 922K to 1.05M tokens Smallest to largest among its entries At Lab: 922K, input alone");
+    // The lab's own entry a lower bound.
+    expect(tile([["lab", atLeast(915011)], ["p", input(922000)]])).toBe("Input window ≥ 915K to 922K tokens Smallest to largest among its entries ≥ marks a lower bound At Lab: ≥ 915K, input alone");
+  });
+
+  it("ranks a lower bound above the same number that is not one: the smallest is the exact one, the largest the one that may be more", () => {
+    expect(tile([["lab", window(1000000)], ["p", atLeast(1000000)], ["q", input(850000)]])).toBe("Input window 850K to ≥ 1M tokens Smallest to largest among its entries ≥ marks a lower bound At Lab: 1M, input and output together");
+    expect(tile([["lab", input(922000)], ["p", atLeast(922000)], ["q", input(1050000)]])).toBe("Input window 922K to 1.05M tokens Smallest to largest among its entries At Lab: 922K, input alone");
+    expect(tile([["lab", window(1000000)], ["p", atLeast(1000000)]])).toBe("Input window 1M to ≥ 1M tokens Smallest to largest among its entries ≥ marks a lower bound At Lab: 1M, input and output together");
+  });
+
+  it("gives a single value once, and says at how many entries", () => {
+    expect(tile([["lab", window(1000000)], ["p", window(1000000)], ["q", window(1000000)]])).toBe("Input window 1M tokens The same at all 3 entries At Lab: 1M, input and output together");
+    expect(hover([["lab", window(1000000)], ["p", window(1000000)], ["q", window(1000000)]])).toBe("1,000,000 tokens, documented, lab/m, the same at every entry that has one.");
+    expect(tile([["p", window(1000000)], ["q", window(1000000)]])).toBe("Input window 1M tokens The same at both entries");
+    expect(tile([["lab", window(256000)]])).toBe("Input window 256K tokens Its only entry At Lab: 256K, input and output together");
+    expect(tile([["lab", none], ["p", window(1000000)], ["q", window(1000000)]])).toBe("Input window 1M tokens The same at every entry that has one; unknown at 1 of 3 At Lab: unknown");
+    expect(tile([["lab", atLeast(915011)], ["p", atLeast(915011)]])).toBe("Input window ≥ 915K tokens The same at both entries ≥ marks a lower bound At Lab: ≥ 915K, input alone");
+  });
+
+  it("says Unknown, never 0, where no entry has an input window", () => {
+    expect(tile([["lab", none], ["p", none], ["q", none]])).toBe("Input window Unknown Not documented or measured at any of its 3 entries At Lab: unknown");
+    expect(tile([["p", none]])).toBe("Input window Unknown Not documented or measured");
+  });
+
+  it("writes two values in full where they round to the same figure", () => {
+    expect(tile([["p", window(921600)], ["q", input(922000)]])).toBe("Input window 921,600 to 922,000 tokens Smallest to largest among its entries");
+  });
+
+  it("prints the ends and the count the API publishes, and compares nothing itself", () => {
+    const model = modelOf([["lab", window(1000000)], ["p", input(850000)]]);
+    const html = (more: Partial<typeof model>): string => text(tiles(modelHtml({ ...model, ...more }, { lab: "Lab" }, "2026-11-15", { date: new Date("2026-11-16T00:00:00Z"), stale_after_days: 90 }))[0]!);
+    expect(html({})).toBe("Input window 850K to 1M tokens Smallest to largest among its entries At Lab: 1M, input and output together");
+    // Whatever the fields say is what the tile says, whatever the entries under it hold.
+    expect(html({ input_window_min: { entry_ref: "x/m", tokens: 128000, bound: "limit", basis: "documented", scope: "input" }, input_window_unknown_count: 5 })).toBe("Input window 128K to 1M tokens Smallest to largest among its entries; unknown at 5 of 2 At Lab: 1M, input and output together");
+    expect(html({ input_window_min: null, input_window_max: null })).toBe("Input window Unknown Not documented or measured at any of its 2 entries At Lab: 1M, input and output together");
   });
 });

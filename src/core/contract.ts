@@ -13,7 +13,7 @@ import { ApiEndpointSchema, CapabilitiesSchema, CachePriceSchema, CostSchema, Do
 import { BillingUnitSchema, ConditionSchema, PolicyEvidenceSchema, PricingRuleSchema, PricingSchema, RequestBindingSchema, RequestControlSchema, RequestControlsSchema, RequestOptionSchema, RequestSettingSchema } from "./policy-contract.ts";
 import type { ProviderSummary, Summary } from "./entries.ts";
 import type { InputWindow, InputWindowMeasurement } from "./limits.ts";
-import type { CanonicalModel, CanonicalModelDetail, Correction, Documentation, Facets } from "./resources.ts";
+import type { CanonicalModel, CanonicalModelDetail, Correction, Documentation, Facets, ModelInputWindowEnd } from "./resources.ts";
 import { Access, type Exclusion, type MeasuredLimit, type ModelExtension, type ProviderExtension, type Provenance, type PublishedEvidence } from "./schema.ts";
 
 const date = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
@@ -294,6 +294,16 @@ export const ProviderSummarySchema = z
   })
   .describe("One provider.") satisfies z.ZodType<ProviderSummary>;
 
+export const ModelInputWindowEndSchema = z
+  .strictObject({
+    entry_ref: z.string().describe("The entry this input window is on, provider/model: its page is /entries/{entry_ref}."),
+    tokens: tokens.describe("input_window.tokens of that entry."),
+    bound: windowBound.describe("input_window.bound of that entry: limit, or at_least where the value is the largest input seen accepted and the real limit is this or more."),
+    basis: z.enum(["documented", "measured"]).describe("input_window.basis of that entry."),
+    scope: z.enum(["input", "window"]).describe("input_window.scope of that entry: input alone, or a window that input and output share."),
+  })
+  .describe("One end of the input windows of a model's entries: an entry and its input_window, as its summary has it.") satisfies z.ZodType<ModelInputWindowEnd>;
+
 const canonicalModel = {
   id: z.string().describe("lab/model: the canonical_id of its entries."),
   name: z.string(),
@@ -306,6 +316,9 @@ const canonicalModel = {
   context_max: z.number().nullable(),
   max_output_min: z.number().nullable(),
   max_output_max: z.number().nullable(),
+  input_window_min: ModelInputWindowEndSchema.nullable().describe("The smallest input window among its entries (input_window of each), with the entry it is on. At an equal number of tokens a value that is not a lower bound counts as the smaller. Null = no entry has one. Since 1.1.0."),
+  input_window_max: ModelInputWindowEndSchema.nullable().describe("The largest input window among its entries, with the entry it is on. At an equal number of tokens a lower bound (bound at_least) counts as the larger: the real limit there can be more. Null = no entry has one. Since 1.1.0."),
+  input_window_unknown_count: z.int().min(0).describe("Entries with no input window (input_window.tokens null). Since 1.1.0."),
 };
 export const CanonicalModelSchema = z.strictObject(canonicalModel).describe("A model as its lab names it, and how its entries compare.") satisfies z.ZodType<CanonicalModel>;
 export const CanonicalModelDetailSchema = z
@@ -497,6 +510,7 @@ export const COMPONENTS = {
   Provider: ProviderSchema,
   CanonicalModel: CanonicalModelSchema,
   CanonicalModelDetail: CanonicalModelDetailSchema,
+  ModelInputWindowEnd: ModelInputWindowEndSchema,
   CacheEvaluationRecord: CacheEvaluationRecordSchema,
   LimitEvaluationRecord: LimitEvaluationRecordSchema,
   Meta: MetaSchema,

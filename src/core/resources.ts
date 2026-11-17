@@ -2,6 +2,7 @@
 // index as everything else, by the same functions for the API and for the pages, so that a page shows what the API returns.
 import type { CacheEvaluation } from "./cache.ts";
 import type { Index, Summary } from "./entries.ts";
+import type { WindowBound } from "./limits.ts";
 import { NS, type Access, type Catalog, type MeasuredLimit, type ModelExtension, type Provenance } from "./schema.ts";
 
 export interface Facets {
@@ -71,6 +72,23 @@ export interface CanonicalModel {
   context_max: number | null;
   max_output_min: number | null;
   max_output_max: number | null;
+  /**
+   * The smallest and the largest input window among its entries (`input_window` of each), each with the entry it is
+   * on. At an equal number of tokens a lower bound (`at_least`) counts as the larger. Null = no entry has one.
+   */
+  input_window_min: ModelInputWindowEnd | null;
+  input_window_max: ModelInputWindowEnd | null;
+  /** Entries with no input window (`input_window.tokens` null). */
+  input_window_unknown_count: number;
+}
+
+/** One end of the input windows of a model's entries: the entry, and its `input_window` as its summary publishes it. */
+export interface ModelInputWindowEnd {
+  entry_ref: string;
+  tokens: number;
+  bound: WindowBound;
+  basis: "documented" | "measured";
+  scope: "input" | "window";
 }
 
 export interface CanonicalModelDetail extends CanonicalModel {
@@ -83,6 +101,30 @@ const range = (values: (number | null)[]): [number | null, number | null] => {
   const known = values.filter((value): value is number => value !== null);
   return known.length === 0 ? [null, null] : [Math.min(...known), Math.max(...known)];
 };
+
+/**
+ * The smallest and the largest input window among a model's entries, and how many have none, from `input_window` of
+ * each summary: the published record, not worked out again. At an equal number of tokens a lower bound ranks above a
+ * value that is not one: the smallest is then the one that is not a bound, the largest the one that may be more. Of
+ * records that rank the same, the first in the order given is taken (the model's own order: the lab's entry first).
+ */
+export function inputWindowRange(entries: readonly Summary[]): Pick<CanonicalModel, "input_window_min" | "input_window_max" | "input_window_unknown_count"> {
+  const below = (a: ModelInputWindowEnd, b: ModelInputWindowEnd): boolean => a.tokens < b.tokens || (a.tokens === b.tokens && a.bound !== "at_least" && b.bound === "at_least");
+  let min: ModelInputWindowEnd | null = null;
+  let max: ModelInputWindowEnd | null = null;
+  let unknown = 0;
+  for (const { ref, input_window: w } of entries) {
+    // A record with a value has its bound, basis and scope (contract: null exactly with none).
+    if (w.tokens === null || w.basis === "none" || w.bound === null || w.scope === null) {
+      unknown += 1;
+      continue;
+    }
+    const end: ModelInputWindowEnd = { entry_ref: ref, tokens: w.tokens, bound: w.bound, basis: w.basis, scope: w.scope };
+    if (min === null || below(end, min)) min = end;
+    if (max === null || below(max, end)) max = end;
+  }
+  return { input_window_min: min, input_window_max: max, input_window_unknown_count: unknown };
+}
 
 function describe(id: string, entries: Summary[]): CanonicalModelDetail {
   const lab = id.split("/")[0] as string;
@@ -105,6 +147,7 @@ function describe(id: string, entries: Summary[]): CanonicalModelDetail {
     context_max: contextMax,
     max_output_min: outputMin,
     max_output_max: outputMax,
+    ...inputWindowRange(sorted),
     entries: sorted,
   };
 }

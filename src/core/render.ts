@@ -85,7 +85,7 @@ const CACHE_MODE_TITLE = {
 // the published one is `basis`, whether it is a lower bound is `bound` ("at least", "≥"), what the rule found of the
 // documentation is `documented_status`, and what a measurement is, is its `kind`.
 
-const SCOPE_WORD = { input: "Input alone", window: "Input and output together" } as const;
+export const SCOPE_WORD = { input: "Input alone", window: "Input and output together" } as const;
 const SCOPE_TITLE = {
   input: "A figure for the input alone: the response is not counted against it.",
   window: "A context window: input and output together. The response is counted against the same figure.",
@@ -806,7 +806,7 @@ export function entryHtml(view: EntryView): string {
   }</p>
 </header>
 
-<div class="tiles tiles-entry mt-6">
+<div class="tiles tiles-five mt-6">
   ${windowTile()}
   ${tile("Context window", big(limit.context), "Exposed by this provider")}
   ${tile("Maximum output", big(limit.output), "Per response; not a default")}

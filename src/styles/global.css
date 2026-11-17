@@ -485,28 +485,29 @@
       grid-template-columns: repeat(4, minmax(0, 1fr));
     }
   }
-  /* An entry's five tiles: the input window first, across the whole width on a phone; from a tablet up the three limits
-     on one line and the two cache lifetimes under them; on a wide screen all five on one line */
-  .tiles.tiles-entry > .tile:first-child {
+  /* Five tiles, an entry's and a model's: the input window first, across the whole width on a phone; from a tablet up
+     the three limits on one line and the other two (an entry's cache lifetimes, a model's counts) under them; on a
+     wide screen all five on one line */
+  .tiles.tiles-five > .tile:first-child {
     grid-column: 1 / -1;
   }
   @media (min-width: 640px) {
-    .tiles.tiles-entry {
+    .tiles.tiles-five {
       grid-template-columns: repeat(6, minmax(0, 1fr));
     }
-    .tiles.tiles-entry > .tile {
+    .tiles.tiles-five > .tile {
       grid-column: span 3;
     }
-    .tiles.tiles-entry > .tile:nth-child(-n + 3) {
+    .tiles.tiles-five > .tile:nth-child(-n + 3) {
       grid-column: span 2;
     }
   }
   @media (min-width: 1200px) {
-    .tiles.tiles-entry {
+    .tiles.tiles-five {
       grid-template-columns: repeat(5, minmax(0, 1fr));
     }
-    .tiles.tiles-entry > .tile,
-    .tiles.tiles-entry > .tile:nth-child(-n + 3) {
+    .tiles.tiles-five > .tile,
+    .tiles.tiles-five > .tile:nth-child(-n + 3) {
       grid-column: auto;
     }
   }

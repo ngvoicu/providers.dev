@@ -30,7 +30,7 @@ import { ENDPOINTS, openapi } from "../src/core/openapi.ts";
 import { handlePage } from "../src/core/pages.ts";
 import { MARK } from "../src/core/page-shell.ts";
 import { CACHE_EVALUATION_PARAMS, LIMIT_EVALUATION_PARAMS, PARAMS, parseQuery, runQuery } from "../src/core/query.ts";
-import { canonicalModels, listEvaluations, withoutEntries } from "../src/core/resources.ts";
+import { canonicalModels, inputWindowRange, listEvaluations, withoutEntries } from "../src/core/resources.ts";
 import type { Catalog, ModelExtension } from "../src/core/schema.ts";
 import { depsFrom, fetchReturning, fixtureUpstream, inputWindowRuleBreaks, lifetimeRuleBreaks, ROOT, summaryOf, tempDataDir, writeAuthored } from "./helpers.ts";
 
@@ -495,7 +495,7 @@ describe("HTTP behaviour", () => {
 
   it("describes the cache lifetime record: its components and a guide section", async () => {
     const document = await json<{ info: { version: string; contact: unknown; license: unknown }; "x-guide": { id: string; title: string; paragraphs: string[] }[]; components: { schemas: Record<string, { properties?: Record<string, unknown> }> } }>("/api/v1/openapi.json");
-    expect(document.info.version).toBe("1.0.0");
+    expect(document.info.version).toBe("1.1.0");
     expect(document.info.contact).toEqual({ name: "providers.dev", email: "office@providers.dev", url: "https://providers.dev/docs/contributing/" });
     expect(document.info.license).toEqual({ name: "MIT", url: "https://providers.dev/docs/licensing/" });
     const schemas = document.components.schemas;
@@ -526,7 +526,7 @@ describe("HTTP behaviour", () => {
 describe("the input window in the OpenAPI document", () => {
   it("has the two components, the key on the entry and the summary, input_read on an evaluation, and a guide section after Unknown values", async () => {
     const document = await json<{ info: { version: string }; "x-guide": { id: string; title: string; paragraphs: string[] }[]; components: { schemas: Record<string, { properties?: Record<string, unknown>; required?: string[] }> } }>("/api/v1/openapi.json");
-    expect(document.info.version).toBe("1.0.0");
+    expect(document.info.version).toBe("1.1.0");
     const schemas = document.components.schemas;
     expect(Object.keys(schemas.InputWindow!.properties!)).toEqual([
       "tokens", "basis", "bound", "scope", "source", "date", "documented_tokens", "documented_field", "documented_source", "documented_date", "documented_status",
@@ -545,6 +545,40 @@ describe("the input window in the OpenAPI document", () => {
     for (const words of ["providers_dev.limits.input_window", "never 0", "system prompt", "99 %", "101 %", "912,780", "931,220", "lowest", "at_least", "measured_refused", "scope", "limit.input", "limit.context", "from_measurement", "none stated", "window", "bracket", "input_read", "limit-not-counted", "measured_input_accepted", "not contradicted is not confirmed", "probe's count"]) expect(text).toContain(words);
     expect(text).toContain("912,780 or less) above an accepted one");
     expect(text).not.toContain("below an accepted one");
+  });
+});
+
+describe("the input window of a model", () => {
+  const known = (tokens: number, bound: "limit" | "at_least", scope: "input" | "window" = "window") =>
+    ({ ...summaryOf().input_window, tokens, bound, scope, basis: bound === "at_least" ? "measured" : "documented" }) as Summary["input_window"];
+  const entries = (windows: [string, Summary["input_window"]][]): Summary[] => windows.map(([ref, input_window]) => summaryOf({ ref, input_window }));
+
+  it("gives the smallest and the largest input_window among its entries, each with its entry, and counts those with none", () => {
+    expect(inputWindowRange(entries([["a/m", known(1000000, "limit")], ["b/m", summaryOf().input_window], ["c/m", known(850000, "limit", "input")], ["d/m", known(921500, "at_least", "input")]]))).toEqual({
+      input_window_min: { entry_ref: "c/m", tokens: 850000, bound: "limit", basis: "documented", scope: "input" },
+      input_window_max: { entry_ref: "a/m", tokens: 1000000, bound: "limit", basis: "documented", scope: "window" },
+      input_window_unknown_count: 1,
+    });
+    expect(inputWindowRange(entries([["a/m", summaryOf().input_window], ["b/m", summaryOf().input_window]]))).toEqual({ input_window_min: null, input_window_max: null, input_window_unknown_count: 2 });
+    expect(inputWindowRange([])).toEqual({ input_window_min: null, input_window_max: null, input_window_unknown_count: 0 });
+  });
+
+  it("counts a lower bound as the larger at an equal number, and takes the first in the model's order where records rank the same", () => {
+    const tie = inputWindowRange(entries([["a/m", known(1000000, "limit")], ["b/m", known(1000000, "at_least", "input")], ["c/m", known(1000000, "limit")]]));
+    expect([tie.input_window_min?.entry_ref, tie.input_window_min?.bound, tie.input_window_max?.entry_ref, tie.input_window_max?.bound]).toEqual(["a/m", "limit", "b/m", "at_least"]);
+    const low = inputWindowRange(entries([["a/m", known(922000, "limit", "input")], ["b/m", known(921500, "at_least", "input")], ["c/m", known(1050000, "limit", "input")]]));
+    expect([low.input_window_min?.entry_ref, low.input_window_min?.bound, low.input_window_max?.entry_ref]).toEqual(["b/m", "at_least", "c/m"]);
+  });
+
+  it("is on every model of the list and of the detail, always with the three keys, as the entries under it say", async () => {
+    const list = await json<{ data: Record<string, unknown>[] }>("/api/v1/models?limit=200");
+    for (const model of list.data) for (const key of ["input_window_min", "input_window_max", "input_window_unknown_count"]) expect(model, `${String(model.id)} ${key}`).toHaveProperty(key);
+    const detail = await json<{ data: { entries: Summary[] } & Record<string, unknown> }>("/api/v1/models/lab/model-2");
+    expect(detail.data).toMatchObject(inputWindowRange(detail.data.entries));
+    expect(detail.data.input_window_min).not.toBeNull();
+    const document = await json<{ components: { schemas: Record<string, { properties?: Record<string, unknown>; required?: string[] }> } }>("/api/v1/openapi.json");
+    for (const name of ["CanonicalModel", "CanonicalModelDetail"]) expect(document.components.schemas[name]!.required).toEqual(expect.arrayContaining(["input_window_min", "input_window_max", "input_window_unknown_count"]));
+    expect(Object.keys(document.components.schemas.ModelInputWindowEnd!.properties!)).toEqual(["entry_ref", "tokens", "bound", "basis", "scope"]);
   });
 });
 
