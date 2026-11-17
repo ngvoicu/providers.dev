@@ -3,9 +3,9 @@ name: Publish
 # Daily: import models.dev once, rebuild, deploy. Also on every push to main and by hand.
 # A failed import never unpublishes anything: the build then uses the last good snapshot in the repository,
 # and the site says that the last sync failed.
-# Runs on GitHub only. A mirror that reads .github/workflows/ (Forgejo Actions on the NAS) skips the job, so only
-# one place commits a snapshot each day: on Forgejo the github context is the forgejo one, and its server_url is
-# the Forgejo instance's URL; on GitHub it is https://github.com.
+# Runs on GitHub only. A mirror that reads .github/workflows/ skips the job, so only one place commits a snapshot
+# each day: on Forgejo the github context is the forgejo one, and its server_url is the Forgejo instance's URL; on
+# GitHub it is https://github.com. The NAS reads .forgejo/workflows/ instead and runs only follow-github.yml there.
 on:
   schedule:
     - cron: "17 4 * * *"

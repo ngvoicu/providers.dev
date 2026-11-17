@@ -159,12 +159,17 @@ Before finishing a change: `npm run build && npm run check`, and look at the aff
 ## Copies of the repository
 
 The site is live at `https://providers.dev`. The repository has two remotes: `upstream` (GitHub
-`ngvoicu/providers.dev`) and `origin` (the owner's Forgejo server). The `Publish` workflow runs on GitHub only and
-commits the daily snapshot there (04:17 UTC), so GitHub is ahead of the others after a night with new data.
+`ngvoicu/providers.dev`) and `origin` (the owner's Forgejo server). GitHub is where work and the daily snapshot land:
+the `Publish` workflow runs on GitHub only and commits the snapshot there (04:17 UTC). The Forgejo server follows
+GitHub by itself: its workflow `Follow GitHub` (`.forgejo/workflows/follow-github.yml`) fast-forwards its `main` to
+GitHub's every hour. It never forces and never merges; if the server has a commit GitHub lacks, the run fails and
+changes nothing. It has followed when the two heads are equal (`git ls-remote upstream refs/heads/main` and the same
+for `origin`).
 
 - Before any work: `git pull --ff-only upstream main`.
-- After it: `git push upstream main`, then `git push origin main`. If GitHub refuses the push because a snapshot
-  landed meanwhile, pull again (`--ff-only` fails on parted histories: rebase your own commits, never the snapshot).
+- After it: `git push upstream main`. You no longer have to push to `origin`: the server takes the commit within
+  the hour (pushing there too does no harm). If GitHub refuses the push because a snapshot landed meanwhile, pull
+  again (`--ff-only` fails on parted histories: rebase your own commits, never the snapshot).
 - A push to `main` on GitHub starts `Publish`: build, check and deploy to `https://providers.dev` (no import). Pushing
   `main` is deploying.
 - Do not run `npm run sync` and commit its result outside the workflow unless asked: the workflow does the import.

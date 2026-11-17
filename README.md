@@ -276,6 +276,13 @@ reviewed; the site marks the rest "by default" or "by name".
   deploys to `https://providers.dev`. A push to `main` builds, tests and deploys what is in the repository, without an
   import. Only one run is active at a time. The daily snapshot is committed on GitHub, so a clone pulls from GitHub
   before any work.
+- **The copy on the owner's Forgejo server:** it follows GitHub by itself. `.forgejo/workflows/follow-github.yml`
+  ("Follow GitHub") runs there every hour, at minute 03 (UTC), and by hand. It fetches `main` from GitHub and
+  fast-forwards the server's `main` to it. It never forces and never merges: if the server has a commit GitHub lacks,
+  the run fails and changes nothing. GitHub reads only `.github/workflows/`, so it never runs this file; Forgejo reads
+  only `.forgejo/workflows/` once that folder exists, so the server runs neither `Publish` nor `Check`. Work is pushed
+  to GitHub only; nobody has to push it to the server (doing so does no harm). The copy has followed when the two heads are equal
+  (`git ls-remote` on both remotes, `refs/heads/main`).
 
 What the sync checks before it replaces the snapshot: the answer is JSON in the expected v2 structure; every
 provider and model id matches its key; the import is not empty and has not lost more than 40% of its providers or
@@ -286,6 +293,11 @@ in `data/upstream/`; everything else (the keys inside a model, every array) keep
 If any check fails or models.dev is down, `data/upstream/` is left exactly as it was, the command exits with an
 error, and the next build publishes the last good snapshot with a note that the last sync failed. A lock file
 (`data/.sync.lock`) stops two syncs on one machine from running at once.
+
+The import is not made tolerant of a change in models.dev's structure: that is the owner's decision. When models.dev
+changes the type of a field the site reads, the import fails on purpose: the site goes on serving the last good
+snapshot, `/api/v1/meta` says the last sync failed, and the `Publish` run is marked failed on GitHub. Someone then
+adapts the site to the new type, as was done on 2026-11-17 for `capabilities.tools.updates` (commit `1e5d380`).
 
 The sync reads the experimental v2 endpoint (`https://models.dev/experimental/v2.0/api.json`). If that endpoint
 goes away, the sync fails loudly; it does not fall back to the v1 file, which has no cache details.
@@ -571,8 +583,9 @@ can edit Workers scripts and their routes and custom domains on the zone) and `C
 The scheduled workflow uses the same token, from the repository secrets `CLOUDFLARE_API_TOKEN` and
 `CLOUDFLARE_ACCOUNT_ID` on GitHub, which are set, so each run deploys. Without them it would build and test but not
 deploy. It runs on GitHub only: its job has
-`if: github.server_url == 'https://github.com'`, so a mirror that also reads `.github/workflows/` (the Forgejo
-server holding a copy of the repository) skips it, and only GitHub commits the daily snapshot.
+`if: github.server_url == 'https://github.com'`, so a mirror that reads `.github/workflows/` would skip it. The
+Forgejo server holding a copy of the repository does not read that folder at all: it runs only
+`.forgejo/workflows/` (see [Syncing](#syncing)). Only GitHub commits the daily snapshot.
 
 A deployment publishes the Worker and assets together. Each request reads `current.json` and pins its API calls
 and data files to one immutable snapshot directory. The parsed index is cached by publication id, not bundled in
