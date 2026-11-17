@@ -1,0 +1,34 @@
+# NVIDIA: two Maxine video-analysis services that models.dev lists as chat models (video as the only input, a
+# context of 0) are left out. NVIDIA documents both as NIM services reached over gRPC, with video files as input.
+provider: nvidia
+rules:
+  - models: [nvidia/active-speaker-detection]
+    exclude: true
+    reason: >-
+      A video-analysis service without a token input, not a model a request with a prompt can be sent to. NVIDIA
+      documents Active Speaker Detection as a Maxine NIM reached over gRPC that takes a video, audio and a
+      diarization file and returns per-frame detection results.
+    evidence:
+      - kind: documented
+        url: https://docs.nvidia.com/nim/maxine/active-speaker-detection/latest/basic-inference.html
+        date: "2026-11-17"
+        note: >-
+          'After the NIM is running, confirm that the gRPC service is healthy, then send video, audio, and
+          diarization with the sample client to produce per-frame speaker results.' 'The NVIDIA Active Speaker
+          Detection NIM takes three types of input and produces per-frame detection results.' Inputs: Video (an MP4
+          file with H.264 video encoding), Audio (a WAV or MP3 file, or the audio of the video), Diarization (a file
+          in a supported diarization format).
+  - models: [nvidia/synthetic-video-detector]
+    exclude: true
+    reason: >-
+      A video-analysis service without a token input, not a model a request with a prompt can be sent to. NVIDIA
+      documents Synthetic Video Detector as a Maxine NIM reached over gRPC that takes a single video and returns a
+      synthetic probability.
+    evidence:
+      - kind: documented
+        url: https://docs.nvidia.com/nim/maxine/synthetic-video-detector/latest/basic-inference.html
+        date: "2026-11-17"
+        note: >-
+          'This guide demonstrates how to perform basic inference with the Synthetic Video Detector NIM over gRPC.'
+          'The Synthetic Video Detector NIM takes a single input video and returns an overall synthetic probability,
+          with optional per-frame results for analysis. Audio tracks, if present, are ignored.'
