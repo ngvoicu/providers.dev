@@ -1,0 +1,42 @@
+name: Follow GitHub
+
+# Runs on the owner's Forgejo server (the NAS) only, and brings the NAS's main up to GitHub's.
+# GitHub reads .github/workflows/ only, so it never sees this file. Forgejo reads .forgejo/workflows/ and, while this
+# folder exists, ignores .github/workflows/: on the NAS this is the only workflow (no Publish, no Check).
+# Fast-forward only. If the NAS has a commit that GitHub lacks, the job fails and changes nothing: no force push,
+# no merge commit.
+on:
+  schedule:
+    - cron: "3 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  follow:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Fast-forward main to GitHub's
+        run: |
+          git fetch --no-tags origin main
+          git fetch --no-tags https://github.com/ngvoicu/providers.dev.git main
+          here=$(git rev-parse origin/main)
+          github=$(git rev-parse FETCH_HEAD)
+          echo "NAS main: $here"
+          echo "GitHub main: $github"
+          if [ "$here" = "$github" ]; then
+            echo "Already equal."
+            exit 0
+          fi
+          if ! git merge-base --is-ancestor "$here" "$github"; then
+            echo "::error::The NAS's main has commits that GitHub's lacks: not a fast-forward. Nothing was changed."
+            exit 1
+          fi
+          git push origin "$github:refs/heads/main"
+          echo "The NAS's main is now $github."
