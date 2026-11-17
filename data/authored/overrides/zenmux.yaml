@@ -40,3 +40,27 @@ rules:
         default: { value: "5m" }
         conditions: []
         evidence: *source
+
+  # Qwen at ZenMux: models.dev documents explicit caching (cache_control) without a lifetime. ZenMux's guide gives
+  # the default lifetime for its explicit caching, which it names for Claude and Qwen. Its 1-hour extended lifetime
+  # is not set here: the page shows it with a Claude model and does not say it applies to Qwen.
+  - models:
+      - qwen/qwen3.5-flash
+      - qwen/qwen3.5-plus
+      - qwen/qwen3.6-plus
+      - qwen/qwen3.7-max
+      - qwen/qwen3.7-plus
+    set:
+      capabilities:
+        cache: { explicit: { ttl: ["5m"] } }
+    reason: >-
+      ZenMux's prompt cache guide gives a default lifetime of 5 minutes, refreshed on each use, for explicit caching,
+      which it documents for Anthropic Claude and Qwen series models.
+    evidence:
+      - kind: documented
+        url: https://zenmux.ai/docs/guide/advanced/prompt-cache.html
+        date: "2026-11-17"
+        note: >-
+          Type 2: Explicit Caching: 'Anthropic Claude and Qwen series models can explicitly specify caching strategies
+          through specific parameters.' Cache Validity Period: 'Default TTL: 5 minutes'. 'Cache automatically
+          refreshes with each use at no additional cost.' Minimum cache length: 'Qwen series models | 256 tokens'.
