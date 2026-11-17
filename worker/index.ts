@@ -5,10 +5,28 @@ import { readSnapshot, type AssetBinding } from "../src/core/snapshot.ts";
 
 interface Env { ASSETS: AssetBinding }
 const SITE = "https://providers.dev";
+const SITE_HOST = new URL(SITE).hostname;
+
+/**
+ * A visitor who reached the production host over plain http, at Cloudflare's edge. Three things together: the URL
+ * is http, its host is the production host, and the edge says the visitor used http (Cloudflare sets
+ * X-Forwarded-Proto to the client's protocol and overwrites any value the client sent). The header is what tells
+ * the edge from `wrangler dev`: with `routes` in wrangler.jsonc a local preview also sees http://providers.dev/… as
+ * the request URL and Host, but no X-Forwarded-Proto, so it is never redirected.
+ */
+export function plainHttpAtEdge(request: Request): boolean {
+  const url = new URL(request.url);
+  return url.protocol === "http:" && url.hostname === SITE_HOST && request.headers.get("X-Forwarded-Proto")?.toLowerCase() === "http";
+}
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
+    // The zone does not redirect plain http; the Worker does, before anything else, keeping path and query.
+    if (plainHttpAtEdge(request)) {
+      url.protocol = "https:";
+      return new Response(null, { status: 301, headers: { Location: url.toString() } });
+    }
     const api = url.pathname.startsWith("/api/v1/") || url.pathname === "/api.json" || url.pathname === "/data/catalog.json";
     const data = url.pathname.startsWith("/data/");
     const page = isPage(url.pathname);

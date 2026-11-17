@@ -434,6 +434,43 @@ it("publishes new data without rebuilding the shell, while in-flight API reads s
   expect((await worker.fetch(new Request("https://providers.dev/api/v1/entries"), { ASSETS: assets })).headers.get("X-Dataset-Version")).toBe(current.meta.dataset_version);
 });
 
+it("sends plain http on the production host at the edge to https, and serves a local preview and any other host as they come", async () => {
+  const destination = tempDataDir();
+  mkdirSync(join(destination, "site-shell"));
+  writeFileSync(join(destination, "site-shell", "index.html"), shell);
+  stageSnapshot(join(dataDir, "published"), destination);
+  let reads = 0;
+  const assets: AssetBinding = { async fetch(request) {
+    reads += 1;
+    const path = new URL(typeof request === "string" ? request : request.url).pathname;
+    const file = join(destination, path.endsWith("/") ? `${path}index.html` : path);
+    return existsSync(file) ? new Response(readFileSync(file)) : new Response(null, { status: 404 });
+  } };
+  // At the edge Cloudflare sets X-Forwarded-Proto to the protocol the visitor used.
+  const get = (url: string, proto?: string) => worker.fetch(new Request(url, { headers: proto ? { "X-Forwarded-Proto": proto } : {} }), { ASSETS: assets });
+  for (const path of ["/some/path?x=1", "/", "/api/v1/entries?limit=1&offset=2", "/favicon.svg"]) {
+    const redirect = await get(`http://providers.dev${path}`, "http");
+    expect([redirect.status, redirect.headers.get("Location")]).toEqual([301, `https://providers.dev${path}`]);
+  }
+  // The redirect comes before anything else: no asset is read for it.
+  expect(reads).toBe(0);
+  const served: [string, string | undefined][] = [
+    ["https://providers.dev", "https"],
+    // wrangler dev with `routes` in wrangler.jsonc: the local Worker sees the production host over http, no header.
+    ["http://providers.dev", undefined],
+    ["http://localhost:8787", undefined],
+    ["http://localhost:8787", "http"],
+    ["http://127.0.0.1:8788", undefined],
+    ["http://providers-dev.example.workers.dev", "http"],
+    ["http://www.providers.dev", "http"],
+  ];
+  for (const [origin, proto] of served) {
+    const page = await get(`${origin}/providers/provider-02/`, proto);
+    const api = await get(`${origin}/api/v1/entries?limit=1`, proto);
+    expect([origin, proto, page.status, page.headers.get("Location"), api.status, api.headers.get("Location")]).toEqual([origin, proto, 200, null, 200, null]);
+  }
+});
+
 it("keeps a provider whose every entry a catalog rule leaves out, with no entries, in the API and on the pages", async () => {
   const emptied = tempDataDir();
   const upstream = fixtureUpstream();
