@@ -1,7 +1,7 @@
 # What a request can ask of the prompt cache at DeepInfra.
 # models.dev documents two lifetimes (5m, 1h) for four entries. DeepInfra's page on prompt cache retention names the
 # request fields and lists the models that support them; of the four, only Kimi K2.7 Code is on that list. The
-# other three stay unknown.
+# other three stay unknown: no request control, and their lifetimes are corrected to unknown (the last rule).
 provider: deepinfra
 rules:
   - select:
@@ -45,3 +45,32 @@ rules:
           - Without ttl a request opens no retention window. It reuses a window that is open, or is cached best-effort.
           - Every request that sends ttl is charged a cache write, also when it only extends the window.
         evidence: *source
+
+  # DeepSeek V4 Flash, Kimi K3 and GLM 5.2: models.dev lists the two retention windows (5m, 1h) for them, but
+  # DeepInfra's own page does not list them as supporting retention, and says nothing of how long their ordinary
+  # prompt cache lasts. Their lifetimes are published as unknown. Explicit caching itself (min_tokens) is left as
+  # imported.
+  - models:
+      - deepseek-ai/DeepSeek-V4-Flash
+      - moonshotai/Kimi-K3
+      - zai-org/GLM-5.2
+    set:
+      capabilities:
+        cache: { explicit: { ttl: null } }
+    reason: >-
+      DeepInfra's page on prompt cache retention lists the models that support the 5-minute and 1-hour windows, and
+      these three are not among them; on a model without retention support the request field is ignored. No other
+      DeepInfra page states a lifetime for them, so the lifetimes models.dev lists are withheld as unknown.
+    evidence:
+      - kind: documented
+        url: https://docs.deepinfra.com/chat/prompt-cache-retention
+        date: "2026-11-17"
+        note: >-
+          Model support: '| nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B | 5m, 1h |' '| moonshotai/Kimi-K2.7-Code | 5m, 1h
+          |'. 'More models to follow. On a model without retention support, prompt_cache_options is ignored and the
+          request is billed as standard input.'
+      - kind: documented
+        url: https://docs.deepinfra.com/chat/prompt-caching
+        date: "2026-11-17"
+        note: >-
+          The page on ordinary prompt caching gives no duration: 'Cache entries expire after a period of inactivity'.
