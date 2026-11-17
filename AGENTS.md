@@ -156,6 +156,19 @@ The Worker reads versioned snapshot assets at runtime; no dataset is bundled int
 Run `npm run build` before previewing a fresh clone. Data updates can use `npm run refresh:data` afterward.
 Before finishing a change: `npm run build && npm run check`, and look at the affected page in a browser.
 
+## Copies of the repository
+
+The site is live at `https://providers.dev`. The repository has two remotes: `upstream` (GitHub
+`ngvoicu/providers.dev`) and `origin` (the owner's Forgejo server). The `Publish` workflow runs on GitHub only and
+commits the daily snapshot there (04:17 UTC), so GitHub is ahead of the others after a night with new data.
+
+- Before any work: `git pull --ff-only upstream main`.
+- After it: `git push upstream main`, then `git push origin main`. If GitHub refuses the push because a snapshot
+  landed meanwhile, pull again (`--ff-only` fails on parted histories: rebase your own commits, never the snapshot).
+- A push to `main` on GitHub starts `Publish`: build, check and deploy to `https://providers.dev` (no import). Pushing
+  `main` is deploying.
+- Do not run `npm run sync` and commit its result outside the workflow unless asked: the workflow does the import.
+
 ## Logo and icons
 
 - The mark is a "p" and a "d" sharing one bowl: the ring is a provider, the dot is the model inside it, the two stems

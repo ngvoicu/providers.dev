@@ -271,9 +271,11 @@ reviewed; the site marks the rest "by default" or "by name".
 ## Syncing
 
 - **By hand:** `npm run sync` (add `-- --force` to download again even if nothing changed), then `npm run build`.
-- **Scheduled:** `.github/workflows/publish.yml` runs daily, on every push to `main`, and from the Actions tab, on
-  GitHub only. It imports, builds, tests, commits the snapshot if the data changed, and deploys. Only one run is
-  active at a time.
+- **Scheduled:** `.github/workflows/publish.yml` ("Publish", on) runs daily at 04:17 UTC, on every push to `main`,
+  and from the Actions tab, on GitHub only. It imports, builds, tests, commits the snapshot if the data changed, and
+  deploys to `https://providers.dev`. A push to `main` builds, tests and deploys what is in the repository, without an
+  import. Only one run is active at a time. The daily snapshot is committed on GitHub, so a clone pulls from GitHub
+  before any work.
 
 What the sync checks before it replaces the snapshot: the answer is JSON in the expected v2 structure; every
 provider and model id matches its key; the import is not empty and has not lost more than 40% of its providers or
@@ -567,7 +569,8 @@ can edit Workers scripts and their routes and custom domains on the zone) and `C
 2. `CLOUDFLARE_API_TOKEN=… CLOUDFLARE_ACCOUNT_ID=… npm run deploy` (try `npx wrangler deploy --dry-run` first)
 
 The scheduled workflow uses the same token, from the repository secrets `CLOUDFLARE_API_TOKEN` and
-`CLOUDFLARE_ACCOUNT_ID`. Without them it builds and tests but does not deploy. It runs on GitHub only: its job has
+`CLOUDFLARE_ACCOUNT_ID` on GitHub, which are set, so each run deploys. Without them it would build and test but not
+deploy. It runs on GitHub only: its job has
 `if: github.server_url == 'https://github.com'`, so a mirror that also reads `.github/workflows/` (the Forgejo
 server holding a copy of the repository) skips it, and only GitHub commits the daily snapshot.
 
@@ -592,7 +595,8 @@ No model/provider HTML files are generated or maintained individually.
 `/api/v1/facets` exposes catalog filter options and counts. `/api/v1/corrections` exposes grouped corrections and
 their entry references. Evidence pages use those responses and independently paginated cache/limit evaluations.
 The scheduled workflow currently runs the full build on clean CI checkouts; local data refreshes can reuse built
-templates. Production still needs a publication/deployment step; editing a local source file does not update it.
+templates. The site is live at `https://providers.dev`; a change reaches it only through a deploy (the `Publish` run
+that a push to `main` on GitHub starts, or `npm run deploy` by hand), never by editing a local file.
 
 ## Contributing
 
