@@ -164,11 +164,11 @@ const seconds = (value: number): string => `${exact(value)} s`;
 
 /**
  * A lifetime as a page prints it, the exact seconds in its title. 0 is two statements, told apart by the basis:
- * documented, the source says the entry does not cache ("None"); measured, no tested age at which every check hit ("0 s").
+ * documented, the source says the entry does not cache ("None"); measured, a check missed at the immediate re-send or at the youngest tested age ("0 s").
  */
 function lifetimeText(value: number, basis: "documented" | "measured"): string {
   if (value === 0 && basis === "documented") return '<span title="Documented: the source says this entry does not cache prompts.">None</span>';
-  if (value === 0) return '<span title="Measured: 0 s. No tested age at which every check hit.">0 s</span>';
+  if (value === 0) return '<span title="Measured: 0 s. A check missed at the immediate re-send or at the youngest tested age.">0 s</span>';
   return `<span title="${seconds(value)}">${span(value)}</span>`;
 }
 
