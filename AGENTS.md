@@ -78,6 +78,9 @@ The baseline is imported from models.dev; our additions, corrections and measure
   Do not add a second filter implementation. Pages consume API responses through `PageDeps.api`; never import a
   catalog or index into a renderer. Browser filtering must call the public API.
 - Public requests never fetch upstream. Only `npm run sync` does.
+- The import address (`UPSTREAM_URL` in `scripts/lib/sync.ts`) asks for `openai-codex` (`?include=openai-codex`):
+  models.dev hides it by default since its commit `f648ddb` (2026-11-17), and the site lists it as a subscription.
+  Do not drop the parameter, and do not author the provider by hand. The README says why (Syncing).
 - Text on the site: plain, short, professional, no marketing. Say what a number means and where it comes from.
 - An entry page states values and their sources, in the same sections, tables and rows on every entry: a row with
   nothing in it says so (Unknown, Not evaluated, Not applicable, None) and is never left out. It carries no sentence

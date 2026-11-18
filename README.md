@@ -286,7 +286,8 @@ reviewed; the site marks the rest "by default" or "by name".
 
 What the sync checks before it replaces the snapshot: the answer is JSON in the expected v2 structure; every
 provider and model id matches its key; the import is not empty and has not lost more than 40% of its providers or
-entries since the last one. It sends the stored ETag, so an unchanged upstream costs one small request.
+entries since the last one. It sends the stored ETag, so an unchanged upstream costs one small request; an ETag
+stored for another address is not sent, so the first import after a change of address is a full one.
 The models of each provider are written sorted by id, so models.dev sending them in another order is not a change
 in `data/upstream/`; everything else (the keys inside a model, every array) keeps the order models.dev sends.
 
@@ -299,8 +300,17 @@ changes the type of a field the site reads, the import fails on purpose: the sit
 snapshot, `/api/v1/meta` says the last sync failed, and the `Publish` run is marked failed on GitHub. Someone then
 adapts the site to the new type, as was done on 2026-11-17 for `capabilities.tools.updates` (commit `1e5d380`).
 
-The sync reads the experimental v2 endpoint (`https://models.dev/experimental/v2.0/api.json`). If that endpoint
-goes away, the sync fails loudly; it does not fall back to the v1 file, which has no cache details.
+The sync reads the experimental v2 endpoint, asking for one provider that models.dev leaves out by default
+(`https://models.dev/experimental/v2.0/api.json?include=openai-codex`; the address is `UPSTREAM_URL` in
+`scripts/lib/sync.ts`, and `upstream.source` of `/api/v1/meta` shows it). If that endpoint goes away, the sync fails
+loudly; it does not fall back to the v1 file, which has no cache details.
+
+Why `include=openai-codex`: since models.dev commit `f648ddb` (2026-11-17, "require explicit inclusion of
+openai-codex"), its README says "`openai-codex` is hidden unless explicitly included", because "Its backend needs
+client-managed ChatGPT OAuth. Clients must opt in only when they support that setup." providers.dev lists the
+provider as what it is, a subscription login (`data/authored/access.yaml`), so it opts in. If models.dev withdraws
+the provider altogether, the import drops it, its entries leave the site, and `/api/v1/meta` lists the warning
+`unmapped-route` for `codex-subscription` (its measurements have no provider to land on).
 
 ## API
 

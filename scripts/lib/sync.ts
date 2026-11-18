@@ -6,7 +6,9 @@ import { deepEqual } from "../../src/core/merge.ts";
 import { ObservedFile, UPSTREAM_SCHEMA, UpstreamCatalog, type SourceMeta, type UpstreamMeta } from "../../src/core/schema.ts";
 import { pretty, readJson, readJsonIfExists, sha256, swapDir, writeFileAtomic } from "./files.ts";
 
-export const UPSTREAM_URL = "https://models.dev/experimental/v2.0/api.json";
+// models.dev hides `openai-codex` (a ChatGPT subscription login) unless a client asks for it (models.dev f648ddb,
+// 2026-11-17). providers.dev lists it as a subscription, so it asks. The README says more, under Syncing.
+export const UPSTREAM_URL = "https://models.dev/experimental/v2.0/api.json?include=openai-codex";
 export const UPSTREAM_COMMIT_URL = "https://api.github.com/repos/anomalyco/models.dev/commits/dev";
 export const OBSERVED_URL = "https://raw.githubusercontent.com/ngvoicu/groundtruth/main/observed.json";
 
@@ -119,11 +121,14 @@ async function syncUpstream(options: Required<Pick<SyncOptions, "dataDir" | "fet
   const previous = loadUpstream(options.dataDir);
   const now = options.now().toISOString();
 
+  // A stored ETag and digest belong to the address they were read from; after a change of address they are not sent
+  // or compared, so the first import from the new address is a full one.
+  const sameSource = previous?.meta.source === UPSTREAM_URL;
   const headers: Record<string, string> = { Accept: "application/json", "User-Agent": "providers.dev sync" };
-  if (previous?.meta.etag && !options.force) headers["If-None-Match"] = previous.meta.etag;
+  if (sameSource && previous?.meta.etag && !options.force) headers["If-None-Match"] = previous.meta.etag;
   const response = await options.fetch(UPSTREAM_URL, { headers });
 
-  if (response.status === 304 && previous) {
+  if (response.status === 304 && previous && sameSource) {
     writeFileAtomic(join(dir, "meta.json"), pretty({ ...previous.meta, checked_at: now }));
     return { status: "unchanged" };
   }
@@ -162,7 +167,7 @@ async function syncUpstream(options: Required<Pick<SyncOptions, "dataDir" | "fet
   }
 
   const digest = sha256(body);
-  if (previous && previous.meta.sha256 === digest && !options.force) {
+  if (previous && sameSource && previous.meta.sha256 === digest && !options.force) {
     writeFileAtomic(join(dir, "meta.json"), pretty({ ...previous.meta, checked_at: now, ...etagOf(response) }));
     return { status: "unchanged" };
   }

@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { publish } from "../scripts/lib/publish.ts";
 import { MetaSchema } from "../src/core/contract.ts";
 import { ObservedFile } from "../src/core/schema.ts";
-import { loadUpstream, sync, SyncBusyError } from "../scripts/lib/sync.ts";
+import { loadUpstream, sync, SyncBusyError, UPSTREAM_URL } from "../scripts/lib/sync.ts";
 import { stringify } from "yaml";
 import { fetchReturning, fixtureUpstream, ROOT, tempDataDir, writeAuthored } from "./helpers.ts";
 
@@ -93,6 +93,38 @@ describe("sync", () => {
     expect(sent).toBe('"v1"');
     expect(report.upstream.status).toBe("unchanged");
     expect(loadUpstream(dataDir)!.meta).toMatchObject({ fetched_at: "2026-11-13T00:00:00.000Z", checked_at: "2026-11-14T00:00:00.000Z" });
+  });
+
+  it("asks models.dev for openai-codex, which its default catalog leaves out since f648ddb", async () => {
+    expect(UPSTREAM_URL).toBe("https://models.dev/experimental/v2.0/api.json?include=openai-codex");
+    let asked: string | undefined;
+    const rest = fetchReturning(good);
+    const recording = (async (input: RequestInfo | URL, init?: RequestInit) => {
+      if (String(input).startsWith("https://models.dev/")) asked = String(input);
+      return rest(input, init);
+    }) as typeof fetch;
+    const dataDir = tempDataDir();
+    await sync({ dataDir, fetch: recording });
+    expect(asked).toBe(UPSTREAM_URL);
+    expect(loadUpstream(dataDir)!.meta.source).toBe(UPSTREAM_URL);
+  });
+
+  it("does not send or compare the ETag and digest of another address: the first import from a new address is a full one", async () => {
+    const dataDir = await firstImport();
+    const metaPath = join(dataDir, "upstream", "meta.json");
+    const old = JSON.parse(readFileSync(metaPath, "utf8"));
+    writeFileSync(metaPath, JSON.stringify({ ...old, source: "https://models.dev/experimental/v2.0/api.json" }));
+    let sent: string | undefined = "not asked";
+    const rest = fetchReturning(good, { status: 200, headers: { etag: '"v2"' } });
+    const recording = (async (input: RequestInfo | URL, init?: RequestInit) => {
+      if (String(input).startsWith("https://models.dev/")) sent = (init?.headers as Record<string, string>)["If-None-Match"];
+      return rest(input, init);
+    }) as typeof fetch;
+    // The same body as the stored snapshot: from the same address it would be "unchanged".
+    const report = await sync({ dataDir, fetch: recording, now: () => new Date("2026-11-18T00:00:00Z") });
+    expect(sent).toBeUndefined();
+    expect(report.upstream.status).toBe("updated");
+    expect(loadUpstream(dataDir)!.meta).toMatchObject({ source: UPSTREAM_URL, etag: '"v2"', fetched_at: "2026-11-18T00:00:00.000Z" });
   });
 
   it("summarizes what changed", async () => {
