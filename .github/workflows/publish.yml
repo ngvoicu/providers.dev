@@ -1,6 +1,9 @@
 name: Publish
 
-# Daily: import models.dev once, rebuild, deploy. Also on every push to main and by hand.
+# Daily, at 04:17 and 06:47 UTC: import models.dev once per run, rebuild, deploy. Also on every push to main and by
+# hand. The second time is a fallback: GitHub can delay or drop a scheduled run, and none fired at 04:17 on 2026-11-17
+# or 2026-11-18. Two runs a day are safe: a snapshot is committed only when the data changed, and one run is active
+# at a time.
 # A failed import never unpublishes anything: the build then uses the last good snapshot in the repository,
 # and the site says that the last sync failed.
 # Runs on GitHub only. A mirror that reads .github/workflows/ skips the job, so only one place commits a snapshot
@@ -9,6 +12,7 @@ name: Publish
 on:
   schedule:
     - cron: "17 4 * * *"
+    - cron: "47 6 * * *"
   workflow_dispatch:
     inputs:
       force:

@@ -224,7 +224,7 @@ import { IDENTITY_FIELDS } from "../../../core/resolve.ts";
 
     <h2 id="sync">Daily import</h2>
     <p>
-      Once a day a scheduled job fetches models.dev once, with a conditional request. The import is validated before it replaces anything: it must be valid JSON in the expected structure, ids
+      Each day a scheduled job, at 04:17 and 06:47 UTC, fetches models.dev once per run, with a conditional request; a run that finds nothing new changes nothing. The import is validated before it replaces anything: it must be valid JSON in the expected structure, ids
       must match their keys, and it must not be empty or have lost a large share of its entries since the previous import. If validation fails or models.dev is unavailable, the previous
       snapshot stays in place and keeps being served; the footer and <code>/api/v1/meta</code> report the failed import. Visitors and API requests never trigger a fetch.
     </p>

@@ -271,8 +271,10 @@ reviewed; the site marks the rest "by default" or "by name".
 ## Syncing
 
 - **By hand:** `npm run sync` (add `-- --force` to download again even if nothing changed), then `npm run build`.
-- **Scheduled:** `.github/workflows/publish.yml` ("Publish", on) runs daily at 04:17 UTC, on every push to `main`,
-  and from the Actions tab, on GitHub only. It imports, builds, tests, commits the snapshot if the data changed, and
+- **Scheduled:** `.github/workflows/publish.yml` ("Publish", on) runs daily at 04:17 and 06:47 UTC, on every push to
+  `main`, and from the Actions tab, on GitHub only. The second time is a fallback: GitHub can delay or drop a
+  scheduled run, and neither scheduled run had fired by 2026-11-18. A run whose import finds nothing new commits
+  nothing. It imports, builds, tests, commits the snapshot if the data changed, and
   deploys to `https://providers.dev`. A push to `main` builds, tests and deploys what is in the repository, without an
   import. Only one run is active at a time. The daily snapshot is committed on GitHub, so a clone pulls from GitHub
   before any work.
