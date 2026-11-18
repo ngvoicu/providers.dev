@@ -107,114 +107,6 @@
    "knowledge": "2025-04",
    "last_updated": "2025-04"
   },
-  "alibaba/qwen-3-235b": {
-   "id": "alibaba/qwen-3-235b",
-   "name": "Qwen3 235B A22B Instruct 2507",
-   "description": "Qwen instruction model for multilingual chat, reasoning, and tool use",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3-235b-a22b-instruct-2507",
-   "release_date": "2025-07-21",
-   "limit": {
-    "context": 262144,
-    "output": 16384
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.22
-     },
-     "output": {
-      "price": 0.88
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ai-gateway.vercel.sh/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/gateway",
-      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://ai-gateway.vercel.sh/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/open-responses",
-      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://ai-gateway.vercel.sh/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-07-21"
-  },
   "alibaba/qwen-3-30b": {
    "id": "alibaba/qwen-3-30b",
    "name": "Qwen3-30B-A3B",
@@ -426,157 +318,6 @@
    "open_weights": true,
    "knowledge": "2025-04",
    "last_updated": "2025-04-28"
-  },
-  "alibaba/qwen3-coder": {
-   "id": "alibaba/qwen3-coder",
-   "name": "Qwen3 Coder 480B A35B Instruct",
-   "description": "Qwen coding model for software agents, repository edits, and code reasoning",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3-coder-480b-a35b-instruct",
-   "release_date": "2025-07-22",
-   "limit": {
-    "context": 262144,
-    "output": 32768
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.22,
-      "cache": {
-       "read": 0.022
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 32001
-         }
-        },
-        "price": 2.7,
-        "cache": {
-         "read": 0.54
-        }
-       },
-       {
-        "when": {
-         "context": {
-          "gt": 128001
-         }
-        },
-        "price": 4.5,
-        "cache": {
-         "read": 0.9
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 1.8,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 32001
-         }
-        },
-        "price": 13.5
-       },
-       {
-        "when": {
-         "context": {
-          "gt": 128001
-         }
-        },
-        "price": 22.5
-       }
-      ]
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ai-gateway.vercel.sh/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/gateway",
-      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://ai-gateway.vercel.sh/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/open-responses",
-      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://ai-gateway.vercel.sh/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-07-22"
   },
   "alibaba/qwen3-coder-30b-a3b": {
    "id": "alibaba/qwen3-coder-30b-a3b",
@@ -1102,8 +843,8 @@
    "canonical_id": "alibaba/qwen3-next-80b-a3b-instruct",
    "release_date": "2025-09",
    "limit": {
-    "context": 262114,
-    "output": 262114
+    "context": 262144,
+    "output": 32768
    },
    "capabilities": {
     "temperature": true,
@@ -1121,116 +862,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.15
+      "price": 0.09
      },
      "output": {
-      "price": 1.2
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ai-gateway.vercel.sh/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/gateway",
-      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://ai-gateway.vercel.sh/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/open-responses",
-      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://ai-gateway.vercel.sh/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-09"
-  },
-  "alibaba/qwen3-next-80b-a3b-thinking": {
-   "id": "alibaba/qwen3-next-80b-a3b-thinking",
-   "name": "Qwen3 Next 80B A3B Thinking",
-   "description": "Efficient Qwen thinking model for local reasoning, math, and coding agents",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3-next-80b-a3b-thinking",
-   "release_date": "2025-09",
-   "limit": {
-    "context": 262144,
-    "output": 262144
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "budget": {
-      "min": 1
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.15
-     },
-     "output": {
-      "price": 1.2
+      "price": 1.1
      }
     }
    },
@@ -8834,19 +8469,6 @@
      "supported": false
     }
    },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.003
-     }
-    },
-    "image": {
-     "output": {
-      "unit": "image",
-      "price": 0.09
-     }
-    }
-   },
    "modalities": {
     "input": [
      "text",
@@ -8868,6 +8490,49 @@
    },
    "open_weights": false,
    "last_updated": "2026-07-11"
+  },
+  "bytedance/seedream-5.5": {
+   "id": "bytedance/seedream-5.5",
+   "name": "Seedream 5.5",
+   "description": "Image model for prompt-driven generation, editing, and visual design workflows",
+   "type": "image",
+   "release_date": "2026-11-17",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "image"
+    ]
+   },
+   "api": {
+    "images": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/images"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-17"
   },
   "callstack/apex": {
    "id": "callstack/apex",
@@ -16439,12 +16104,7 @@
     },
     "reasoning": {
      "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high"
-     ]
+     "toggle": true
     }
    },
    "cost": {
@@ -16666,12 +16326,7 @@
     },
     "reasoning": {
      "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high"
-     ]
+     "toggle": true
     }
    },
    "cost": {
@@ -16777,12 +16432,7 @@
     },
     "reasoning": {
      "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high"
-     ]
+     "toggle": true
     }
    },
    "cost": {
@@ -17838,6 +17488,108 @@
    },
    "open_weights": false,
    "last_updated": "2026-10-15"
+  },
+  "liquid/d1.2": {
+   "id": "liquid/d1.2",
+   "name": "Liquid d1.2",
+   "description": "Liquid d1.2 is a decision model for classification, routing, and scoring across text and images. It answers typed yes/no, multiple-choice, and scale questions about shared state in a single forward pass and returns structured answers with calibrated probabilities, without generating output tokens.",
+   "type": "decision",
+   "family": "liquid",
+   "release_date": "2026-11-16",
+   "limit": {
+    "context": 65536
+   },
+   "capabilities": {
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.02
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "decisions": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/decisions"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-16"
+  },
+  "liquid/d1.2-ultra": {
+   "id": "liquid/d1.2-ultra",
+   "name": "Liquid d1.2 Ultra",
+   "description": "Liquid d1.2-ultra is Liquid AI's most accurate decision model for classification, routing, and scoring across text and images. It answers typed yes/no, multiple-choice, and scale questions in a single forward pass and returns calibrated probabilities without generating output tokens, for demanding tasks such as document review and visual inspection.",
+   "type": "decision",
+   "family": "liquid",
+   "release_date": "2026-11-16",
+   "limit": {
+    "context": 65536
+   },
+   "capabilities": {
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.042
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "decisions": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/decisions"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-16"
   },
   "liquid/lfm2.5-24b-a2b": {
    "id": "liquid/lfm2.5-24b-a2b",
@@ -19718,6 +19470,55 @@
    "open_weights": false,
    "last_updated": "2026-10-12"
   },
+  "microsoft/decision-1.1": {
+   "id": "microsoft/decision-1.1",
+   "name": "Decision-1.1",
+   "description": "Microsoft Decision-1.1 is a text decision model from Microsoft AI for classification, routing, and evaluation. It answers yes/no questions, selects among predefined options, and scores inputs against custom criteria, returning calibrated probabilities and confidence values. With support for multiple questions per request and a 32,768-token context window, it helps developers triage support requests, guide automated workflows, and evaluate AI responses against a rubric.",
+   "type": "decision",
+   "release_date": "2026-11-17",
+   "limit": {
+    "context": 0
+   },
+   "capabilities": {
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.042
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "decisions": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/decisions"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-17"
+  },
   "microsoft/mai-image-2.6": {
    "id": "microsoft/mai-image-2.6",
    "name": "MAI-Image-2.6",
@@ -19831,6 +19632,118 @@
    },
    "open_weights": false,
    "last_updated": "2026-10-13"
+  },
+  "microsoft/mai-image-2.7": {
+   "id": "microsoft/mai-image-2.7",
+   "name": "MAI-Image-2.7",
+   "description": "Image model for prompt-driven generation, editing, and visual design workflows",
+   "type": "image",
+   "family": "mai",
+   "release_date": "2026-11-17",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5
+     }
+    },
+    "image": {
+     "output": {
+      "price": 34
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "image"
+    ]
+   },
+   "api": {
+    "images": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/images"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-17"
+  },
+  "microsoft/mai-image-2.7-flash": {
+   "id": "microsoft/mai-image-2.7-flash",
+   "name": "MAI-Image-2.7-Flash",
+   "description": "Image model for prompt-driven generation, editing, and visual design workflows",
+   "type": "image",
+   "family": "mai",
+   "release_date": "2026-11-17",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.75
+     }
+    },
+    "image": {
+     "output": {
+      "price": 10
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "image"
+    ]
+   },
+   "api": {
+    "images": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/images"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-17"
   },
   "microsoft/mai-transcribe-2": {
    "id": "microsoft/mai-transcribe-2",
@@ -20448,116 +20361,6 @@
    "open_weights": false,
    "last_updated": "2026-08-26"
   },
-  "minimax/minimax-m2": {
-   "id": "minimax/minimax-m2",
-   "name": "MiniMax M2",
-   "description": "Efficient open MiniMax model built for coding agents and tool-heavy workflows",
-   "type": "chat",
-   "family": "minimax",
-   "canonical_id": "minimax/MiniMax-M2",
-   "release_date": "2025-10-27",
-   "limit": {
-    "context": 205000,
-    "output": 196608
-   },
-   "capabilities": {
-    "cache": {
-     "explicit": true
-    },
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "budget": {}
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.3,
-      "cache": {
-       "read": 0.03,
-       "write": 0.375
-      }
-     },
-     "output": {
-      "price": 1.2
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ai-gateway.vercel.sh/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/gateway",
-      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://ai-gateway.vercel.sh/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/open-responses",
-      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://ai-gateway.vercel.sh/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-10-27"
-  },
   "minimax/minimax-m2.1": {
    "id": "minimax/minimax-m2.1",
    "name": "MiniMax M2.1",
@@ -20572,8 +20375,7 @@
    },
    "capabilities": {
     "cache": {
-     "implicit": true,
-     "explicit": true
+     "implicit": true
     },
     "temperature": true,
     "top_k": false,
@@ -20593,8 +20395,7 @@
      "input": {
       "price": 0.3,
       "cache": {
-       "read": 0.03,
-       "write": 0.375
+       "read": 0.15
       }
      },
      "output": {
@@ -20669,115 +20470,6 @@
    "open_weights": true,
    "last_updated": "2025-12-23"
   },
-  "minimax/minimax-m2.1-lightning": {
-   "id": "minimax/minimax-m2.1-lightning",
-   "name": "MiniMax M2.1 Lightning",
-   "description": "High-speed MiniMax model for low-latency coding and agent workflows",
-   "type": "chat",
-   "family": "minimax",
-   "release_date": "2025-12-23",
-   "limit": {
-    "context": 204800,
-    "output": 131072
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true,
-     "explicit": true
-    },
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "budget": {}
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.3,
-      "cache": {
-       "read": 0.03,
-       "write": 0.375
-      }
-     },
-     "output": {
-      "price": 2.4
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ai-gateway.vercel.sh/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/gateway",
-      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://ai-gateway.vercel.sh/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/open-responses",
-      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://ai-gateway.vercel.sh/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2024-10",
-   "last_updated": "2025-10-27"
-  },
   "minimax/minimax-m2.5": {
    "id": "minimax/minimax-m2.5",
    "name": "MiniMax M2.5",
@@ -20787,8 +20479,8 @@
    "canonical_id": "minimax/MiniMax-M2.5",
    "release_date": "2026-02-12",
    "limit": {
-    "context": 204800,
-    "output": 131000
+    "context": 1000000,
+    "output": 8192
    },
    "capabilities": {
     "cache": {
@@ -20811,11 +20503,7 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.3,
-      "cache": {
-       "read": 0.03,
-       "write": 0.375
-      }
+      "price": 0.3
      },
      "output": {
       "price": 1.2
@@ -20889,117 +20577,6 @@
    "open_weights": true,
    "last_updated": "2026-02-12"
   },
-  "minimax/minimax-m2.5-highspeed": {
-   "id": "minimax/minimax-m2.5-highspeed",
-   "name": "MiniMax M2.5 High Speed",
-   "description": "High-speed MiniMax model for low-latency coding and agent workflows",
-   "type": "chat",
-   "family": "minimax",
-   "canonical_id": "minimax/MiniMax-M2.5-highspeed",
-   "release_date": "2026-02-13",
-   "limit": {
-    "context": 204800,
-    "output": 131000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true,
-     "explicit": true
-    },
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "budget": {}
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.6,
-      "cache": {
-       "read": 0.03,
-       "write": 0.375
-      }
-     },
-     "output": {
-      "price": 2.4
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ai-gateway.vercel.sh/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/gateway",
-      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://ai-gateway.vercel.sh/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/open-responses",
-      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://ai-gateway.vercel.sh/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-02-13"
-  },
   "minimax/minimax-m2.7": {
    "id": "minimax/minimax-m2.7",
    "name": "Minimax M2.7",
@@ -21009,13 +20586,12 @@
    "canonical_id": "minimax/MiniMax-M2.7",
    "release_date": "2026-03-18",
    "limit": {
-    "context": 204800,
-    "output": 131000
+    "context": 196608,
+    "output": 196608
    },
    "capabilities": {
     "cache": {
-     "implicit": true,
-     "explicit": true
+     "implicit": true
     },
     "temperature": true,
     "top_k": false,
@@ -21027,131 +20603,23 @@
     },
     "reasoning": {
      "supported": true,
-     "budget": {}
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.3,
+      "price": 0.21,
       "cache": {
-       "read": 0.06,
-       "write": 0.375
+       "read": 0.042
       }
      },
      "output": {
-      "price": 1.2
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ai-gateway.vercel.sh/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/gateway",
-      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://ai-gateway.vercel.sh/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/open-responses",
-      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://ai-gateway.vercel.sh/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-03-18"
-  },
-  "minimax/minimax-m2.7-highspeed": {
-   "id": "minimax/minimax-m2.7-highspeed",
-   "name": "MiniMax M2.7 High Speed",
-   "description": "Low-latency M2.7 variant for interactive coding plans and agent loops",
-   "type": "chat",
-   "family": "minimax",
-   "canonical_id": "minimax/MiniMax-M2.7-highspeed",
-   "release_date": "2026-03-18",
-   "limit": {
-    "context": 204800,
-    "output": 131100
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true,
-     "explicit": true
-    },
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "budget": {}
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.6,
-      "cache": {
-       "read": 0.06,
-       "write": 0.375
-      }
-     },
-     "output": {
-      "price": 2.4
+      "price": 0.84
      }
     }
    },
@@ -32687,6 +32155,598 @@
    "knowledge": "2026-06-01",
    "last_updated": "2026-10-26"
   },
+  "openai/gpt-6.2-astra": {
+   "id": "openai/gpt-6.2-astra",
+   "name": "GPT-6.2 Astra",
+   "description": "A frontier reasoning model for coding, computer use, and professional work such as slides, spreadsheets, and documents.",
+   "type": "chat",
+   "family": "gpt-astra",
+   "canonical_id": "openai/gpt-6.2-astra",
+   "release_date": "2026-11-17",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true,
+     "explicit": true
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 8,
+      "cache": {
+       "read": 0.4,
+       "write": 10
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272001
+         }
+        },
+        "price": 16,
+        "cache": {
+         "read": 0.8,
+         "write": 20
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 40,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272001
+         }
+        },
+        "price": 60
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/gateway",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/open-responses",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-05-18",
+   "last_updated": "2026-11-17"
+  },
+  "openai/gpt-6.2-astra-fast": {
+   "id": "openai/gpt-6.2-astra-fast",
+   "name": "GPT-6.2 Astra (Fast)",
+   "description": "A frontier reasoning model for coding, computer use, and professional work such as slides, spreadsheets, and documents.",
+   "type": "chat",
+   "family": "gpt-astra",
+   "canonical_id": "openai/gpt-6.2-astra",
+   "release_date": "2026-11-17",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true,
+     "explicit": true
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 16,
+      "cache": {
+       "read": 0.8,
+       "write": 20
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272001
+         }
+        },
+        "price": 32,
+        "cache": {
+         "read": 1.6,
+         "write": 40
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 80,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272001
+         }
+        },
+        "price": 120
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/gateway",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/open-responses",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-05-18",
+   "last_updated": "2026-11-17"
+  },
+  "openai/gpt-6.2-sol": {
+   "id": "openai/gpt-6.2-sol",
+   "name": "GPT-6.2 Sol",
+   "description": "An efficient reasoning model for everyday work, multistep agentic workflows, and coding.",
+   "type": "chat",
+   "family": "gpt-sol",
+   "canonical_id": "openai/gpt-6.2-sol",
+   "release_date": "2026-11-17",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true,
+     "explicit": true
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.1,
+       "write": 2.5
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272001
+         }
+        },
+        "price": 4,
+        "cache": {
+         "read": 0.2,
+         "write": 5
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 10,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272001
+         }
+        },
+        "price": 15
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/gateway",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/open-responses",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-06-01",
+   "last_updated": "2026-11-17"
+  },
+  "openai/gpt-6.2-sol-fast": {
+   "id": "openai/gpt-6.2-sol-fast",
+   "name": "GPT-6.2 Sol (Fast)",
+   "description": "An efficient reasoning model for everyday work, multistep agentic workflows, and coding.",
+   "type": "chat",
+   "family": "gpt-sol",
+   "canonical_id": "openai/gpt-6.2-sol",
+   "release_date": "2026-11-17",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true,
+     "explicit": true
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 4,
+      "cache": {
+       "read": 0.2,
+       "write": 5
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272001
+         }
+        },
+        "price": 8,
+        "cache": {
+         "read": 0.4,
+         "write": 10
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 20,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272001
+         }
+        },
+        "price": 30
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/gateway",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/open-responses",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-06-01",
+   "last_updated": "2026-11-17"
+  },
   "openai/gpt-image-1-mini": {
    "id": "openai/gpt-image-1-mini",
    "name": "GPT Image 1 Mini",
@@ -36790,7 +36850,6 @@
     "reasoning": {
      "supported": true,
      "effort": [
-      "none",
       "low",
       "medium",
       "high"

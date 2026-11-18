@@ -4188,80 +4188,6 @@
    "knowledge": "2026-03",
    "last_updated": "2026-11-12"
   },
-  "gemma-4-uncensored": {
-   "id": "gemma-4-uncensored",
-   "name": "Gemma 4 Uncensored",
-   "description": "Open Gemma instruction model for efficient chat and self-hosted deployments",
-   "type": "chat",
-   "family": "gemma",
-   "status": "deprecated",
-   "release_date": "2026-04-13",
-   "limit": {
-    "context": 256000,
-    "output": 8192
-   },
-   "capabilities": {
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.1625
-     },
-     "output": {
-      "price": 0.5
-     }
-    },
-    "web_search": {
-     "price": 10
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.venice.ai/api/v1",
-     "sdk": {
-      "aisdk": "venice-ai-sdk-provider",
-      "opencodeai": "@opencode/ai/providers/venice"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": []
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://api.venice.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": []
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-06-11"
-  },
   "glm-5-3-flash-uncensored": {
    "id": "glm-5-3-flash-uncensored",
    "name": "GLM 5.3 Flash Uncensored",
@@ -5472,107 +5398,6 @@
    },
    "open_weights": true,
    "last_updated": "2026-08-28"
-  },
-  "kimi-k2-5": {
-   "id": "kimi-k2-5",
-   "name": "Kimi K2.5",
-   "description": "Earlier Kimi frontier model for long-context agents, coding, and multimodal work",
-   "type": "chat",
-   "family": "kimi-k2",
-   "canonical_id": "moonshotai/kimi-k2.5",
-   "status": "deprecated",
-   "release_date": "2026-01-27",
-   "limit": {
-    "context": 256000,
-    "output": 65536
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "prompt_cache_key": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.56,
-      "cache": {
-       "read": 0.22
-      }
-     },
-     "output": {
-      "price": 3.5
-     }
-    },
-    "web_search": {
-     "price": 10
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/heic",
-     "image/heif"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.venice.ai/api/v1",
-     "sdk": {
-      "aisdk": "venice-ai-sdk-provider",
-      "opencodeai": "@opencode/ai/providers/venice"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": []
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    },
-    "responses": {
-     "base_url": "https://api.venice.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": []
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2026-01-27"
   },
   "kimi-k2-6": {
    "id": "kimi-k2-6",
@@ -9825,6 +9650,450 @@
    "open_weights": false,
    "knowledge": "2026-06-01",
    "last_updated": "2026-10-26"
+  },
+  "openai-gpt-62-astra": {
+   "id": "openai-gpt-62-astra",
+   "name": "GPT-6.2 Astra",
+   "description": "A frontier reasoning model for coding, computer use, and professional work such as slides, spreadsheets, and documents.",
+   "type": "chat",
+   "family": "gpt-astra",
+   "canonical_id": "openai/gpt-6.2-astra",
+   "release_date": "2026-11-17",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 8,
+      "cache": {
+       "read": 0.4,
+       "write": 10
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 16,
+        "cache": {
+         "read": 0.8,
+         "write": 20
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 40,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 60
+       }
+      ]
+     }
+    },
+    "web_search": {
+     "price": 10
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.venice.ai/api/v1",
+     "sdk": {
+      "aisdk": "venice-ai-sdk-provider",
+      "opencodeai": "@opencode/ai/providers/venice"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://api.venice.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-05-18",
+   "last_updated": "2026-11-17"
+  },
+  "openai-gpt-62-astra-pro": {
+   "id": "openai-gpt-62-astra-pro",
+   "name": "GPT-6.2 Astra Pro",
+   "description": "Frontier GPT model for professional reasoning, coding, and multimodal work",
+   "type": "chat",
+   "family": "gpt",
+   "release_date": "2026-11-17",
+   "limit": {
+    "context": 1050000,
+    "output": 128000
+   },
+   "capabilities": {
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 8,
+      "cache": {
+       "read": 0.4,
+       "write": 10
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 16,
+        "cache": {
+         "read": 0.8,
+         "write": 20
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 40,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 60
+       }
+      ]
+     }
+    },
+    "web_search": {
+     "price": 10
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.venice.ai/api/v1",
+     "sdk": {
+      "aisdk": "venice-ai-sdk-provider",
+      "opencodeai": "@opencode/ai/providers/venice"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://api.venice.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-18"
+  },
+  "openai-gpt-62-sol": {
+   "id": "openai-gpt-62-sol",
+   "name": "GPT-6.2 Sol",
+   "description": "An efficient reasoning model for everyday work, multistep agentic workflows, and coding.",
+   "type": "chat",
+   "family": "gpt-sol",
+   "canonical_id": "openai/gpt-6.2-sol",
+   "release_date": "2026-11-17",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.1,
+       "write": 2.5
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 4,
+        "cache": {
+         "read": 0.2,
+         "write": 5
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 10,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 15
+       }
+      ]
+     }
+    },
+    "web_search": {
+     "price": 10
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.venice.ai/api/v1",
+     "sdk": {
+      "aisdk": "venice-ai-sdk-provider",
+      "opencodeai": "@opencode/ai/providers/venice"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://api.venice.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-06-01",
+   "last_updated": "2026-11-17"
+  },
+  "openai-gpt-62-sol-pro": {
+   "id": "openai-gpt-62-sol-pro",
+   "name": "GPT-6.2 Sol Pro",
+   "description": "Frontier GPT model for professional reasoning, coding, and multimodal work",
+   "type": "chat",
+   "family": "gpt",
+   "release_date": "2026-11-17",
+   "limit": {
+    "context": 1050000,
+    "output": 128000
+   },
+   "capabilities": {
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.1,
+       "write": 2.5
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 4,
+        "cache": {
+         "read": 0.2,
+         "write": 5
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 10,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 15
+       }
+      ]
+     }
+    },
+    "web_search": {
+     "price": 10
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.venice.ai/api/v1",
+     "sdk": {
+      "aisdk": "venice-ai-sdk-provider",
+      "opencodeai": "@opencode/ai/providers/venice"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://api.venice.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-18"
   },
   "openai-gpt-oss-120b": {
    "id": "openai-gpt-oss-120b",
