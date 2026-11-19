@@ -4613,6 +4613,8 @@
       "opencodeai": "@opencode/ai/providers/vercel-ai-gateway"
      },
      "capabilities": {
+      "system_updates": true,
+      "effort_updates": true,
       "tools": {
        "choice": [
         "auto",
@@ -4650,7 +4652,8 @@
         "auto",
         "none"
        ],
-       "updates": []
+       "updates": [],
+       "search": true
       }
      }
     }
@@ -4730,6 +4733,8 @@
       "opencodeai": "@opencode/ai/providers/vercel-ai-gateway"
      },
      "capabilities": {
+      "system_updates": true,
+      "effort_updates": true,
       "tools": {
        "choice": [
         "auto",
@@ -4767,7 +4772,8 @@
         "auto",
         "none"
        ],
-       "updates": []
+       "updates": [],
+       "search": true
       }
      }
     }
@@ -14625,6 +14631,124 @@
    "open_weights": false,
    "knowledge": "2026-03",
    "last_updated": "2026-11-12",
+   "recommended_api": "chat-completions"
+  },
+  "google/gemini-4-neon": {
+   "id": "google/gemini-4-neon",
+   "name": "Gemini 4 Neon",
+   "description": "Google's Gemini 4 model for fast, frontier-level coding, knowledge work and science workflows, with four thinking levels and a 1M-token context window",
+   "type": "chat",
+   "family": "gemini",
+   "canonical_id": "google/gemini-4-neon",
+   "release_date": "2026-11-18",
+   "limit": {
+    "context": 1000000,
+    "output": 1000000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 3,
+      "cache": {
+       "read": 0.15
+      }
+     },
+     "output": {
+      "price": 15
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/gateway",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/open-responses",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-03",
+   "last_updated": "2026-11-18",
    "recommended_api": "chat-completions"
   },
   "google/gemini-decision-1": {
@@ -32504,7 +32628,8 @@
     "temperature": false,
     "top_k": false,
     "top_p": false,
-    "system_updates": false,
+    "structured_output": true,
+    "system_updates": true,
     "effort_updates": false,
     "tools": {
      "supported": true
@@ -32579,6 +32704,7 @@
       "opencodeai": "@opencode/ai/providers/vercel-ai-gateway"
      },
      "capabilities": {
+      "effort_updates": true,
       "tools": {
        "choice": [
         "auto",
@@ -32586,7 +32712,14 @@
         "required",
         "tool"
        ],
-       "updates": []
+       "freeform": [
+        "text",
+        "lark",
+        "regex"
+       ],
+       "updates": [
+        "add"
+       ]
       }
      }
     },
@@ -32604,7 +32737,15 @@
         "required",
         "tool"
        ],
-       "updates": []
+       "freeform": [
+        "text",
+        "lark",
+        "regex"
+       ],
+       "updates": [
+        "add",
+        "remove"
+       ]
       }
      }
     },
@@ -32653,7 +32794,8 @@
     "temperature": false,
     "top_k": false,
     "top_p": false,
-    "system_updates": false,
+    "structured_output": true,
+    "system_updates": true,
     "effort_updates": false,
     "tools": {
      "supported": true
@@ -32728,6 +32870,7 @@
       "opencodeai": "@opencode/ai/providers/vercel-ai-gateway"
      },
      "capabilities": {
+      "effort_updates": true,
       "tools": {
        "choice": [
         "auto",
@@ -32735,7 +32878,14 @@
         "required",
         "tool"
        ],
-       "updates": []
+       "freeform": [
+        "text",
+        "lark",
+        "regex"
+       ],
+       "updates": [
+        "add"
+       ]
       }
      }
     },
@@ -32753,7 +32903,15 @@
         "required",
         "tool"
        ],
-       "updates": []
+       "freeform": [
+        "text",
+        "lark",
+        "regex"
+       ],
+       "updates": [
+        "add",
+        "remove"
+       ]
       }
      }
     },
@@ -32802,7 +32960,8 @@
     "temperature": false,
     "top_k": false,
     "top_p": false,
-    "system_updates": false,
+    "structured_output": true,
+    "system_updates": true,
     "effort_updates": false,
     "tools": {
      "supported": true
@@ -32877,6 +33036,7 @@
       "opencodeai": "@opencode/ai/providers/vercel-ai-gateway"
      },
      "capabilities": {
+      "effort_updates": true,
       "tools": {
        "choice": [
         "auto",
@@ -32884,7 +33044,14 @@
         "required",
         "tool"
        ],
-       "updates": []
+       "freeform": [
+        "text",
+        "lark",
+        "regex"
+       ],
+       "updates": [
+        "add"
+       ]
       }
      }
     },
@@ -32902,7 +33069,15 @@
         "required",
         "tool"
        ],
-       "updates": []
+       "freeform": [
+        "text",
+        "lark",
+        "regex"
+       ],
+       "updates": [
+        "add",
+        "remove"
+       ]
       }
      }
     },
@@ -32951,7 +33126,8 @@
     "temperature": false,
     "top_k": false,
     "top_p": false,
-    "system_updates": false,
+    "structured_output": true,
+    "system_updates": true,
     "effort_updates": false,
     "tools": {
      "supported": true
@@ -33026,6 +33202,7 @@
       "opencodeai": "@opencode/ai/providers/vercel-ai-gateway"
      },
      "capabilities": {
+      "effort_updates": true,
       "tools": {
        "choice": [
         "auto",
@@ -33033,7 +33210,14 @@
         "required",
         "tool"
        ],
-       "updates": []
+       "freeform": [
+        "text",
+        "lark",
+        "regex"
+       ],
+       "updates": [
+        "add"
+       ]
       }
      }
     },
@@ -33051,7 +33235,15 @@
         "required",
         "tool"
        ],
-       "updates": []
+       "freeform": [
+        "text",
+        "lark",
+        "regex"
+       ],
+       "updates": [
+        "add",
+        "remove"
+       ]
       }
      }
     },
@@ -38071,6 +38263,59 @@
    "last_updated": "2026-08-03",
    "recommended_api": "chat-completions"
   },
+  "scaledown/extract-1": {
+   "id": "scaledown/extract-1",
+   "name": "Extract-1",
+   "description": "Multimodal model for analyzing text, images, documents, and rich media",
+   "type": "chat",
+   "release_date": "2026-10-20",
+   "limit": {
+    "context": 1000000,
+    "output": 0
+   },
+   "capabilities": {
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.05
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/gateway",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-10-20",
+   "recommended_api": "chat-completions"
+  },
   "scaledown/scaledown-classify-1": {
    "id": "scaledown/scaledown-classify-1",
    "name": "Classify-1",
@@ -41005,6 +41250,7 @@
       "opencodeai": "@opencode/ai/providers/vercel-ai-gateway"
      },
      "capabilities": {
+      "system_updates": true,
       "tools": {
        "choice": [
         "auto",

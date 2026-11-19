@@ -196,6 +196,105 @@
    "last_updated": "2026-09-01",
    "recommended_api": "messages"
   },
+  "claude-fable-5-2": {
+   "id": "claude-fable-5-2",
+   "name": "Claude Fable 5.2",
+   "description": "Claude model for demanding reasoning and long-horizon agentic work",
+   "type": "chat",
+   "family": "claude-fable",
+   "canonical_id": "anthropic/claude-fable-5-2",
+   "release_date": "2026-11-09",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 8.8,
+      "cache": {
+       "read": 0.22,
+       "write": 11
+      }
+     },
+     "output": {
+      "price": 44
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://api.vivgrid.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "https://api.vivgrid.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-06",
+   "last_updated": "2026-11-09",
+   "recommended_api": "messages"
+  },
   "claude-haiku-5-5": {
    "id": "claude-haiku-5-5",
    "name": "Claude Haiku 5.5",
@@ -3244,6 +3343,323 @@
    "knowledge": "2026-06-01",
    "last_updated": "2026-10-26",
    "recommended_api": "responses"
+  },
+  "gpt-6.2-astra": {
+   "id": "gpt-6.2-astra",
+   "name": "GPT-6.2 Astra",
+   "description": "A frontier reasoning model for coding, computer use, and professional work such as slides, spreadsheets, and documents.",
+   "type": "chat",
+   "family": "gpt-astra",
+   "canonical_id": "openai/gpt-6.2-astra",
+   "release_date": "2026-11-17",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 8.8,
+      "cache": {
+       "read": 0.44,
+       "write": 11
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 17.6,
+        "cache": {
+         "read": 0.88,
+         "write": 22
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 44,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 66
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.vivgrid.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "freeform": [
+        "text",
+        "lark",
+        "regex"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "https://api.vivgrid.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-05-18",
+   "last_updated": "2026-11-17",
+   "recommended_api": "responses"
+  },
+  "gpt-6.2-sol": {
+   "id": "gpt-6.2-sol",
+   "name": "GPT-6.2 Sol",
+   "description": "An efficient reasoning model for everyday work, multistep agentic workflows, and coding.",
+   "type": "chat",
+   "family": "gpt-sol",
+   "canonical_id": "openai/gpt-6.2-sol",
+   "release_date": "2026-11-17",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2.2,
+      "cache": {
+       "read": 0.11,
+       "write": 2.75
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 4.4,
+        "cache": {
+         "read": 0.22,
+         "write": 5.5
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 11,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 16.5
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.vivgrid.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "freeform": [
+        "text",
+        "lark",
+        "regex"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "https://api.vivgrid.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-06-01",
+   "last_updated": "2026-11-17",
+   "recommended_api": "responses"
+  },
+  "hy4-flash": {
+   "id": "hy4-flash",
+   "name": "Hy4 flash",
+   "description": "Tencent's lower-cost Hy4 tier for everyday agent and productivity tasks, with image understanding and a 1M-token context window.",
+   "type": "chat",
+   "family": "Hy",
+   "canonical_id": "tencent/hy4-flash",
+   "release_date": "2026-11-16",
+   "limit": {
+    "context": 1048576,
+    "input": 983040,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.07,
+      "cache": {
+       "read": 0.01
+      }
+     },
+     "output": {
+      "price": 0.281
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp",
+     "image/gif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.vivgrid.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-16",
+   "recommended_api": "chat-completions"
   },
   "jev": {
    "id": "jev",

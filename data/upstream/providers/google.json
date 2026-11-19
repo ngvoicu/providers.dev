@@ -4831,6 +4831,199 @@
    "last_updated": "2026-11-12",
    "recommended_api": "interactions"
   },
+  "gemini-4-neon": {
+   "id": "gemini-4-neon",
+   "name": "Gemini 4 Neon",
+   "description": "Google's Gemini 4 model for fast, frontier-level coding, knowledge work and science workflows, with four thinking levels and a 1M-token context window",
+   "type": "chat",
+   "family": "gemini",
+   "canonical_id": "google/gemini-4-neon",
+   "release_date": "2026-11-18",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": {
+      "min_tokens": 4096
+     }
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "service_tier": [
+     "flex",
+     "priority"
+    ],
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ],
+     "default": {
+      "type": "effort",
+      "value": "high"
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 3,
+      "cache": {
+       "read": 0.15
+      }
+     },
+     "output": {
+      "price": 15
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 1.8,
+       "audio": 1.8
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": 0.5,
+       "audio": 0.5
+      }
+     }
+    ],
+    "audio": {
+     "input": {
+      "price": 3,
+      "cache": {
+       "read": 0.15
+      }
+     }
+    },
+    "web_search": {
+     "price": 14
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "generate-content": {
+     "base_url": "https://generativelanguage.googleapis.com/v1beta",
+     "sdk": {
+      "aisdk": "@ai-sdk/google",
+      "opencodeai": "@opencode/ai/providers/google"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "strict": true,
+       "updates": []
+      }
+     }
+    },
+    "chat-completions": {
+     "base_url": "https://generativelanguage.googleapis.com/v1beta/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "strict": true,
+       "updates": []
+      }
+     }
+    },
+    "interactions": {
+     "base_url": "https://generativelanguage.googleapis.com/v1beta",
+     "sdk": {
+      "aisdk": "@ai-sdk/google",
+      "opencodeai": "@opencode/ai/providers/google/interactions"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "strict": true,
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-03",
+   "last_updated": "2026-11-18",
+   "recommended_api": "interactions"
+  },
   "gemini-decision-1": {
    "id": "gemini-decision-1",
    "name": "Gemini Decision 1",

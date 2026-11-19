@@ -548,6 +548,9 @@
     "top_p": false,
     "system_updates": true,
     "effort_updates": true,
+    "service_tier": [
+     "fast"
+    ],
     "tools": {
      "supported": true
     },
@@ -574,7 +577,19 @@
      "output": {
       "price": 40
      }
-    }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "fast"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     }
+    ]
    },
    "modalities": {
     "input": [
@@ -1266,6 +1281,9 @@
     "top_p": false,
     "system_updates": true,
     "effort_updates": false,
+    "service_tier": [
+     "fast"
+    ],
     "tools": {
      "supported": true
     },
@@ -1292,7 +1310,19 @@
      "output": {
       "price": 25
      }
-    }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "fast"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     }
+    ]
    },
    "modalities": {
     "input": [
@@ -1371,6 +1401,9 @@
     "top_p": false,
     "system_updates": true,
     "effort_updates": true,
+    "service_tier": [
+     "fast"
+    ],
     "tools": {
      "supported": true
     },
@@ -1397,7 +1430,19 @@
      "output": {
       "price": 25
      }
-    }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "fast"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     }
+    ]
    },
    "modalities": {
     "input": [
@@ -1476,6 +1521,9 @@
     "top_p": false,
     "system_updates": true,
     "effort_updates": true,
+    "service_tier": [
+     "fast"
+    ],
     "tools": {
      "supported": true
     },
@@ -1502,7 +1550,19 @@
      "output": {
       "price": 20
      }
-    }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "fast"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     }
+    ]
    },
    "modalities": {
     "input": [
@@ -4170,6 +4230,127 @@
    "last_updated": "2026-11-12",
    "recommended_api": "generate-content"
   },
+  "gemini-4-neon": {
+   "id": "gemini-4-neon",
+   "name": "Gemini 4 Neon",
+   "description": "Google's Gemini 4 model for fast, frontier-level coding, knowledge work and science workflows, with four thinking levels and a 1M-token context window",
+   "type": "chat",
+   "family": "gemini",
+   "canonical_id": "google/gemini-4-neon",
+   "release_date": "2026-11-18",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ],
+     "default": {
+      "type": "effort",
+      "value": "high"
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 3,
+      "cache": {
+       "read": 0.15
+      }
+     },
+     "output": {
+      "price": 15
+     }
+    },
+    "audio": {
+     "input": {
+      "price": 3,
+      "cache": {
+       "read": 0.15
+      }
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "generate-content": {
+     "base_url": "https://opencode.ai/inference/google/v1beta",
+     "sdk": {
+      "aisdk": "@ai-sdk/google",
+      "opencodeai": "@opencode/ai/providers/google"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-03",
+   "last_updated": "2026-11-18",
+   "recommended_api": "generate-content"
+  },
   "gemini-decision-1": {
    "id": "gemini-decision-1",
    "name": "Gemini Decision 1",
@@ -4577,6 +4758,7 @@
    "type": "chat",
    "family": "glm",
    "canonical_id": "zhipuai/glm-5",
+   "status": "deprecated",
    "release_date": "2026-02-12",
    "limit": {
     "context": 204800,
@@ -4725,6 +4907,7 @@
    "type": "chat",
    "family": "glm",
    "canonical_id": "zhipuai/glm-5.1",
+   "status": "deprecated",
    "release_date": "2026-04-07",
    "limit": {
     "context": 204800,
@@ -4797,6 +4980,7 @@
    "type": "chat",
    "family": "glm",
    "canonical_id": "zhipuai/glm-5.2",
+   "status": "deprecated",
    "release_date": "2026-06-13",
    "limit": {
     "context": 1000000,
@@ -5130,6 +5314,10 @@
     "structured_output": true,
     "system_updates": true,
     "effort_updates": false,
+    "service_tier": [
+     "priority",
+     "flex"
+    ],
     "tools": {
      "supported": true
     },
@@ -5154,7 +5342,29 @@
      "output": {
       "price": 8.5
      }
-    }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": 0.5
+      }
+     }
+    ]
    },
    "modalities": {
     "input": [
@@ -5310,6 +5520,9 @@
     "structured_output": true,
     "system_updates": true,
     "effort_updates": false,
+    "service_tier": [
+     "flex"
+    ],
     "tools": {
      "supported": true
     },
@@ -5334,7 +5547,19 @@
      "output": {
       "price": 0.4
      }
-    }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": 0.5
+      }
+     }
+    ]
    },
    "modalities": {
     "input": [
@@ -5399,6 +5624,10 @@
     "structured_output": true,
     "system_updates": true,
     "effort_updates": false,
+    "service_tier": [
+     "priority",
+     "flex"
+    ],
     "tools": {
      "supported": true
     },
@@ -5423,7 +5652,29 @@
      "output": {
       "price": 8.5
      }
-    }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": 0.5
+      }
+     }
+    ]
    },
    "modalities": {
     "input": [
@@ -5753,6 +6004,10 @@
     "structured_output": true,
     "system_updates": true,
     "effort_updates": false,
+    "service_tier": [
+     "priority",
+     "flex"
+    ],
     "tools": {
      "supported": true
     },
@@ -5778,7 +6033,29 @@
      "output": {
       "price": 14
      }
-    }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": 0.5
+      }
+     }
+    ]
    },
    "modalities": {
     "input": [
@@ -6097,6 +6374,10 @@
     "structured_output": true,
     "system_updates": true,
     "effort_updates": false,
+    "service_tier": [
+     "priority",
+     "flex"
+    ],
     "tools": {
      "supported": true
     },
@@ -6145,7 +6426,29 @@
        }
       ]
      }
-    }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": 0.5
+      }
+     }
+    ]
    },
    "modalities": {
     "input": [
@@ -6212,6 +6515,10 @@
     "structured_output": true,
     "system_updates": true,
     "effort_updates": false,
+    "service_tier": [
+     "priority",
+     "flex"
+    ],
     "tools": {
      "supported": true
     },
@@ -6237,7 +6544,29 @@
      "output": {
       "price": 4.5
      }
-    }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": 0.5
+      }
+     }
+    ]
    },
    "modalities": {
     "input": [
@@ -6304,6 +6633,9 @@
     "structured_output": true,
     "system_updates": true,
     "effort_updates": false,
+    "service_tier": [
+     "flex"
+    ],
     "tools": {
      "supported": true
     },
@@ -6329,7 +6661,19 @@
      "output": {
       "price": 1.25
      }
-    }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": 0.5
+      }
+     }
+    ]
    },
    "modalities": {
     "input": [
@@ -6395,6 +6739,9 @@
     "structured_output": false,
     "system_updates": true,
     "effort_updates": false,
+    "service_tier": [
+     "flex"
+    ],
     "tools": {
      "supported": true
     },
@@ -6418,7 +6765,19 @@
      "output": {
       "price": 180
      }
-    }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": 0.5
+      }
+     }
+    ]
    },
    "modalities": {
     "input": [
@@ -6485,6 +6844,10 @@
     "structured_output": true,
     "system_updates": true,
     "effort_updates": false,
+    "service_tier": [
+     "priority",
+     "flex"
+    ],
     "tools": {
      "supported": true
     },
@@ -6533,7 +6896,29 @@
        }
       ]
      }
-    }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2.5
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": 0.5
+      }
+     }
+    ]
    },
    "modalities": {
     "input": [
@@ -6600,6 +6985,9 @@
     "structured_output": false,
     "system_updates": true,
     "effort_updates": false,
+    "service_tier": [
+     "flex"
+    ],
     "tools": {
      "supported": true
     },
@@ -6623,7 +7011,19 @@
      "output": {
       "price": 180
      }
-    }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": 0.5
+      }
+     }
+    ]
    },
    "modalities": {
     "input": [
@@ -6693,6 +7093,10 @@
     "structured_output": true,
     "system_updates": true,
     "effort_updates": true,
+    "service_tier": [
+     "priority",
+     "flex"
+    ],
     "tools": {
      "supported": true
     },
@@ -6750,7 +7154,29 @@
        }
       ]
      }
-    }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": 0.5
+      }
+     }
+    ]
    },
    "modalities": {
     "input": [
@@ -6824,6 +7250,10 @@
     "structured_output": true,
     "system_updates": true,
     "effort_updates": true,
+    "service_tier": [
+     "priority",
+     "flex"
+    ],
     "tools": {
      "supported": true
     },
@@ -6881,7 +7311,29 @@
        }
       ]
      }
-    }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": 0.5
+      }
+     }
+    ]
    },
    "modalities": {
     "input": [
@@ -6955,6 +7407,10 @@
     "structured_output": true,
     "system_updates": true,
     "effort_updates": true,
+    "service_tier": [
+     "priority",
+     "flex"
+    ],
     "tools": {
      "supported": true
     },
@@ -7012,7 +7468,29 @@
        }
       ]
      }
-    }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": 0.5
+      }
+     }
+    ]
    },
    "modalities": {
     "input": [
@@ -7086,6 +7564,11 @@
     "structured_output": true,
     "system_updates": true,
     "effort_updates": true,
+    "service_tier": [
+     "priority",
+     "flex",
+     "ultrafast"
+    ],
     "tools": {
      "supported": true
     },
@@ -7142,7 +7625,39 @@
        }
       ]
      }
-    }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "ultrafast"
+       }
+      },
+      "factor": {
+       "text": 6
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": 0.5
+      }
+     }
+    ]
    },
    "modalities": {
     "input": [
@@ -7216,6 +7731,10 @@
     "structured_output": true,
     "system_updates": true,
     "effort_updates": true,
+    "service_tier": [
+     "priority",
+     "flex"
+    ],
     "tools": {
      "supported": true
     },
@@ -7273,7 +7792,29 @@
        }
       ]
      }
-    }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": 0.5
+      }
+     }
+    ]
    },
    "modalities": {
     "input": [
@@ -7441,6 +7982,10 @@
     "structured_output": true,
     "system_updates": true,
     "effort_updates": true,
+    "service_tier": [
+     "priority",
+     "flex"
+    ],
     "tools": {
      "supported": true
     },
@@ -7498,7 +8043,29 @@
        }
       ]
      }
-    }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": 0.5
+      }
+     }
+    ]
    },
    "modalities": {
     "input": [
@@ -7572,6 +8139,11 @@
     "structured_output": true,
     "system_updates": true,
     "effort_updates": true,
+    "service_tier": [
+     "priority",
+     "flex",
+     "ultrafast"
+    ],
     "tools": {
      "supported": true
     },
@@ -7628,7 +8200,39 @@
        }
       ]
      }
-    }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "ultrafast"
+       }
+      },
+      "factor": {
+       "text": 6
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": 0.5
+      }
+     }
+    ]
    },
    "modalities": {
     "input": [
@@ -7702,6 +8306,10 @@
     "structured_output": true,
     "system_updates": true,
     "effort_updates": true,
+    "service_tier": [
+     "priority",
+     "ultrafast"
+    ],
     "tools": {
      "supported": true
     },
@@ -7758,7 +8366,45 @@
        }
       ]
      }
-    }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "ultrafast"
+       },
+       "date": {
+        "lt": "2027-03-01"
+       }
+      },
+      "factor": {
+       "text": 3
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "ultrafast"
+       },
+       "date": {
+        "gte": "2027-03-01"
+       }
+      },
+      "factor": {
+       "text": 6
+      }
+     }
+    ]
    },
    "modalities": {
     "input": [
@@ -7832,6 +8478,10 @@
     "structured_output": true,
     "system_updates": true,
     "effort_updates": true,
+    "service_tier": [
+     "priority",
+     "ultrafast"
+    ],
     "tools": {
      "supported": true
     },
@@ -7888,7 +8538,45 @@
        }
       ]
      }
-    }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "ultrafast"
+       },
+       "date": {
+        "lt": "2027-03-01"
+       }
+      },
+      "factor": {
+       "text": 3
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "ultrafast"
+       },
+       "date": {
+        "gte": "2027-03-01"
+       }
+      },
+      "factor": {
+       "text": 6
+      }
+     }
+    ]
    },
    "modalities": {
     "input": [
@@ -13193,6 +13881,77 @@
    },
    "open_weights": true,
    "last_updated": "2026-09-20",
+   "recommended_api": "chat-completions"
+  },
+  "tidepool-alpha-free": {
+   "id": "tidepool-alpha-free",
+   "name": "Tidepool Alpha Free",
+   "description": "Stealth reasoning model, free for a limited time",
+   "type": "chat",
+   "release_date": "2026-11-18",
+   "limit": {
+    "context": 1048576,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "minimal",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://opencode.ai/inference/openai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-18",
    "recommended_api": "chat-completions"
   },
   "trinity-large-preview-free": {

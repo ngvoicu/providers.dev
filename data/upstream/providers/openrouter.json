@@ -2068,12 +2068,22 @@
     "output": 128000
    },
    "capabilities": {
+    "cache": {
+     "explicit": {
+      "ttl": [
+       "5m",
+       "1h"
+      ],
+      "min_tokens": 512,
+      "max_breakpoints": 4
+     }
+    },
     "temperature": false,
     "top_k": false,
     "top_p": false,
     "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
+    "system_updates": true,
+    "effort_updates": true,
     "tools": {
      "supported": true
     },
@@ -2094,7 +2104,10 @@
       "price": 8,
       "cache": {
        "read": 0.2,
-       "write": 10
+       "write": {
+        "5m": 10,
+        "1h": 16
+       }
       }
      },
      "output": {
@@ -9110,7 +9123,7 @@
    "release_date": "2026-07-31",
    "limit": {
     "context": 1048576,
-    "output": 384000
+    "output": 943718
    },
    "capabilities": {
     "temperature": true,
@@ -9135,13 +9148,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.06,
+      "price": 0.062,
       "cache": {
-       "read": 0.015
+       "read": 0.035
       }
      },
      "output": {
-      "price": 0.18
+      "price": 0.3
      }
     }
    },
@@ -9571,7 +9584,7 @@
    "release_date": "2026-09-10",
    "limit": {
     "context": 1048576,
-    "output": 393216
+    "output": 943718
    },
    "capabilities": {
     "temperature": true,
@@ -9596,13 +9609,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.0507,
+      "price": 0.3,
       "cache": {
-       "read": 0.001014
+       "read": 0.006
       }
      },
      "output": {
-      "price": 0.2028
+      "price": 1.2
      }
     }
    },
@@ -9689,7 +9702,7 @@
    "release_date": "2026-10-17",
    "limit": {
     "context": 1048576,
-    "output": 943718
+    "output": 393216
    },
    "capabilities": {
     "temperature": true,
@@ -9714,13 +9727,281 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.036,
+      "price": 0.15,
       "cache": {
-       "read": 0.01
-      }
+       "read": 0.003
+      },
+      "overrides": [
+       {
+        "when": {
+         "utc_days": {
+          "in": [
+           "sat",
+           "sun"
+          ]
+         }
+        },
+        "price": 0.15,
+        "cache": {
+         "read": 0.003
+        }
+       },
+       {
+        "when": {
+         "utc_hours": {
+          "lt": "01:00"
+         },
+         "utc_days": {
+          "in": [
+           "mon",
+           "tue",
+           "wed",
+           "thu",
+           "fri"
+          ]
+         }
+        },
+        "price": 0.15,
+        "cache": {
+         "read": 0.003
+        }
+       },
+       {
+        "when": {
+         "utc_days": {
+          "in": [
+           "mon",
+           "tue",
+           "wed",
+           "thu",
+           "fri"
+          ]
+         },
+         "all": [
+          {
+           "utc_hours": {
+            "gte": "01:00"
+           }
+          },
+          {
+           "utc_hours": {
+            "lt": "04:00"
+           }
+          }
+         ]
+        },
+        "price": 0.3,
+        "cache": {
+         "read": 0.006
+        }
+       },
+       {
+        "when": {
+         "utc_days": {
+          "in": [
+           "mon",
+           "tue",
+           "wed",
+           "thu",
+           "fri"
+          ]
+         },
+         "all": [
+          {
+           "utc_hours": {
+            "gte": "04:00"
+           }
+          },
+          {
+           "utc_hours": {
+            "lt": "06:00"
+           }
+          }
+         ]
+        },
+        "price": 0.15,
+        "cache": {
+         "read": 0.003
+        }
+       },
+       {
+        "when": {
+         "utc_days": {
+          "in": [
+           "mon",
+           "tue",
+           "wed",
+           "thu",
+           "fri"
+          ]
+         },
+         "all": [
+          {
+           "utc_hours": {
+            "gte": "06:00"
+           }
+          },
+          {
+           "utc_hours": {
+            "lt": "10:00"
+           }
+          }
+         ]
+        },
+        "price": 0.3,
+        "cache": {
+         "read": 0.006
+        }
+       },
+       {
+        "when": {
+         "utc_hours": {
+          "gte": "10:00"
+         },
+         "utc_days": {
+          "in": [
+           "mon",
+           "tue",
+           "wed",
+           "thu",
+           "fri"
+          ]
+         }
+        },
+        "price": 0.15,
+        "cache": {
+         "read": 0.003
+        }
+       }
+      ]
      },
      "output": {
-      "price": 0.5
+      "price": 0.6,
+      "overrides": [
+       {
+        "when": {
+         "utc_days": {
+          "in": [
+           "sat",
+           "sun"
+          ]
+         }
+        },
+        "price": 0.6
+       },
+       {
+        "when": {
+         "utc_hours": {
+          "lt": "01:00"
+         },
+         "utc_days": {
+          "in": [
+           "mon",
+           "tue",
+           "wed",
+           "thu",
+           "fri"
+          ]
+         }
+        },
+        "price": 0.6
+       },
+       {
+        "when": {
+         "utc_days": {
+          "in": [
+           "mon",
+           "tue",
+           "wed",
+           "thu",
+           "fri"
+          ]
+         },
+         "all": [
+          {
+           "utc_hours": {
+            "gte": "01:00"
+           }
+          },
+          {
+           "utc_hours": {
+            "lt": "04:00"
+           }
+          }
+         ]
+        },
+        "price": 1.2
+       },
+       {
+        "when": {
+         "utc_days": {
+          "in": [
+           "mon",
+           "tue",
+           "wed",
+           "thu",
+           "fri"
+          ]
+         },
+         "all": [
+          {
+           "utc_hours": {
+            "gte": "04:00"
+           }
+          },
+          {
+           "utc_hours": {
+            "lt": "06:00"
+           }
+          }
+         ]
+        },
+        "price": 0.6
+       },
+       {
+        "when": {
+         "utc_days": {
+          "in": [
+           "mon",
+           "tue",
+           "wed",
+           "thu",
+           "fri"
+          ]
+         },
+         "all": [
+          {
+           "utc_hours": {
+            "gte": "06:00"
+           }
+          },
+          {
+           "utc_hours": {
+            "lt": "10:00"
+           }
+          }
+         ]
+        },
+        "price": 1.2
+       },
+       {
+        "when": {
+         "utc_hours": {
+          "gte": "10:00"
+         },
+         "utc_days": {
+          "in": [
+           "mon",
+           "tue",
+           "wed",
+           "thu",
+           "fri"
+          ]
+         }
+        },
+        "price": 0.6
+       }
+      ]
      }
     }
    },
@@ -14718,6 +14999,15 @@
     "output": 943718
    },
    "capabilities": {
+    "cache": {
+     "implicit": true,
+     "explicit": {
+      "ttl": [
+       "5m"
+      ],
+      "max_breakpoints": 1
+     }
+    },
     "temperature": true,
     "top_k": false,
     "top_p": false,
@@ -15022,6 +15312,166 @@
    "open_weights": false,
    "knowledge": "2026-03",
    "last_updated": "2026-11-12",
+   "recommended_api": "chat-completions"
+  },
+  "google/gemini-4-neon": {
+   "id": "google/gemini-4-neon",
+   "name": "Gemini 4 Neon",
+   "description": "Gemini multimodal model for text, image, audio, video, and document tasks",
+   "type": "chat",
+   "family": "gemini",
+   "canonical_id": "google/gemini-4-neon",
+   "release_date": "2026-11-18",
+   "limit": {
+    "context": 1048576,
+    "output": 943718
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 3,
+      "cache": {
+       "read": 0.15,
+       "write": 0.083333
+      }
+     },
+     "output": {
+      "price": 15,
+      "reasoning": 15
+     }
+    },
+    "image": {
+     "input": {
+      "price": 3
+     }
+    },
+    "audio": {
+     "input": {
+      "price": 3,
+      "cache": {
+       "read": 0.15
+      }
+     }
+    },
+    "web_search": {
+     "price": 14
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@openrouter/ai-sdk-provider",
+      "opencodeai": "@opencode/ai/providers/openrouter"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-03",
+   "last_updated": "2026-11-18",
    "recommended_api": "chat-completions"
   },
   "google/gemini-decision-1": {
@@ -15823,7 +16273,7 @@
    "release_date": "2025-03-12",
    "limit": {
     "context": 131072,
-    "output": 117964
+    "output": 16384
    },
    "capabilities": {
     "temperature": true,
@@ -15842,13 +16292,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.08,
-      "cache": {
-       "read": 0.04
-      }
+      "price": 0.08
      },
      "output": {
-      "price": 0.45
+      "price": 0.16
      }
     }
    },
@@ -16966,7 +17413,7 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.62,
+      "price": 0.99,
       "unit": "character"
      }
     }
@@ -22040,14 +22487,19 @@
   "microsoft/mai-image-2.7": {
    "id": "microsoft/mai-image-2.7",
    "name": "MAI-Image-2.7",
-   "description": "Image generation model",
+   "description": "Image generation and precise multi-reference editing model with transparent backgrounds",
    "type": "image",
+   "family": "mai",
+   "canonical_id": "microsoft/mai-image-2.7",
    "release_date": "2026-11-17",
    "limit": {
-    "context": 4096,
+    "context": 32000,
     "output": 0
    },
    "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -22075,10 +22527,8 @@
    "modalities": {
     "input": [
      "text",
-     "image/png",
      "image/jpeg",
-     "image/webp",
-     "image/gif"
+     "image/png"
     ],
     "output": [
      "image/png"
@@ -22099,15 +22549,20 @@
   },
   "microsoft/mai-image-2.7-flash": {
    "id": "microsoft/mai-image-2.7-flash",
-   "name": "MAI-Image-2.7 Flash",
-   "description": "Image generation model",
+   "name": "MAI-Image-2.7-Flash",
+   "description": "Faster, lower-cost MAI-Image-2.7 for high-throughput generation and editing",
    "type": "image",
+   "family": "mai",
+   "canonical_id": "microsoft/mai-image-2.7-flash",
    "release_date": "2026-11-17",
    "limit": {
-    "context": 4096,
+    "context": 32000,
     "output": 0
    },
    "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -22135,10 +22590,8 @@
    "modalities": {
     "input": [
      "text",
-     "image/png",
      "image/jpeg",
-     "image/webp",
-     "image/gif"
+     "image/png"
     ],
     "output": [
      "image/png"
@@ -22502,12 +22955,15 @@
    "name": "Microsoft-Decision-1",
    "description": "Decision model for typed evaluation of shared state",
    "type": "decision",
+   "canonical_id": "microsoft/microsoft-decision-1",
    "release_date": "2026-10-09",
    "limit": {
     "context": 32768
    },
    "capabilities": {
     "temperature": false,
+    "top_k": false,
+    "top_p": false,
     "structured_output": false,
     "system_updates": false,
     "effort_updates": false,
@@ -22533,7 +22989,7 @@
      "text"
     ],
     "output": [
-     "text"
+     "decision"
     ]
    },
    "api": {
@@ -22554,12 +23010,15 @@
    "name": "Microsoft-Decision-1.1",
    "description": "Decision model for typed evaluation of shared state",
    "type": "decision",
+   "canonical_id": "microsoft/microsoft-decision-1.1",
    "release_date": "2026-11-17",
    "limit": {
     "context": 32768
    },
    "capabilities": {
     "temperature": false,
+    "top_k": false,
+    "top_p": false,
     "structured_output": false,
     "system_updates": false,
     "effort_updates": false,
@@ -22583,10 +23042,10 @@
    "modalities": {
     "input": [
      "text",
-     "image"
+     "image/png"
     ],
     "output": [
-     "text"
+     "decision"
     ]
    },
    "api": {
@@ -23379,9 +23838,9 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.075,
+      "price": 0.15,
       "cache": {
-       "read": 0.0075
+       "read": 0.015
       },
       "overrides": [
        {
@@ -23427,7 +23886,7 @@
       ]
      },
      "output": {
-      "price": 0.3,
+      "price": 0.6,
       "overrides": [
        {
         "when": {
@@ -27559,7 +28018,7 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.6,
+      "price": 0.66,
       "cache": {
        "read": 0.16
       }
@@ -27807,13 +28266,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.2403,
+      "price": 0.253,
       "cache": {
-       "read": 0.2
+       "read": 0.18
       }
      },
      "output": {
-      "price": 8.4023
+      "price": 8.8
      }
     }
    },
@@ -37561,12 +38020,23 @@
     "output": 128000
    },
    "capabilities": {
+    "cache": {
+     "implicit": {
+      "min_tokens": 1024
+     },
+     "explicit": {
+      "ttl": [
+       "30m"
+      ],
+      "min_tokens": 1024
+     }
+    },
     "temperature": false,
     "top_k": false,
     "top_p": false,
     "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
+    "system_updates": true,
+    "effort_updates": true,
     "tools": {
      "supported": true
     },
@@ -37668,7 +38138,15 @@
         "required",
         "tool"
        ],
-       "updates": []
+       "freeform": [
+        "text",
+        "lark",
+        "regex"
+       ],
+       "updates": [
+        "add",
+        "remove"
+       ]
       }
      }
     },
@@ -44040,10 +44518,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.3
+      "price": 0.195
      },
      "output": {
-      "price": 2.4
+      "price": 1.56
      }
     }
    },
@@ -44398,13 +44876,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.17,
+      "price": 0.142,
       "cache": {
-       "read": 0.153
+       "read": 0.127
       }
      },
      "output": {
-      "price": 0.25
+      "price": 0.208
      }
     }
    },
@@ -47723,7 +48201,7 @@
    "release_date": "2026-10-05",
    "limit": {
     "context": 1048576,
-    "output": 943718
+    "output": 131072
    },
    "capabilities": {
     "temperature": true,
@@ -47749,9 +48227,9 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.3,
+      "price": 0.25,
       "cache": {
-       "read": 0.04
+       "read": 0.05
       }
      },
      "output": {
@@ -50747,9 +51225,9 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.0825,
+      "price": 0.132,
       "cache": {
-       "read": 0.020625
+       "read": 0.033
       },
       "overrides": [
        {
@@ -50777,7 +51255,7 @@
       ]
      },
      "output": {
-      "price": 0.33,
+      "price": 0.528,
       "overrides": [
        {
         "when": {
@@ -51044,6 +51522,7 @@
       "opencodeai": "@opencode/ai/providers/openrouter"
      },
      "capabilities": {
+      "system_updates": true,
       "tools": {
        "choice": [
         "auto",
@@ -51243,9 +51722,9 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.7506,
+      "price": 0.834,
       "cache": {
-       "read": 0.0378
+       "read": 0.042
       },
       "overrides": [
        {
@@ -51273,7 +51752,7 @@
       ]
      },
      "output": {
-      "price": 2.2509,
+      "price": 2.501,
       "overrides": [
        {
         "when": {
@@ -56169,7 +56648,7 @@
    "release_date": "2026-04-07",
    "limit": {
     "context": 204800,
-    "output": 182476
+    "output": 131072
    },
    "capabilities": {
     "temperature": true,
@@ -56189,13 +56668,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 1.4,
+      "price": 1.19,
       "cache": {
-       "read": 0.26
+       "read": 0.6
       }
      },
      "output": {
-      "price": 4.4
+      "price": 3.74
      }
     }
    },
@@ -56304,13 +56783,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.007,
+      "price": 0.62,
       "cache": {
-       "read": 0.006
+       "read": 0.14
       }
      },
      "output": {
-      "price": 6.8
+      "price": 2.42
      }
     }
    },
@@ -57659,13 +58138,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.036,
+      "price": 0.035,
       "cache": {
-       "read": 0.01
+       "read": 0.0015
       }
      },
      "output": {
-      "price": 0.5
+      "price": 0.15
      }
     }
    },
@@ -57861,7 +58340,7 @@
    "release_date": "2026-08-01",
    "limit": {
     "context": 1048576,
-    "output": 943718
+    "output": 384000
    },
    "capabilities": {
     "temperature": true,
@@ -57884,13 +58363,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.0434,
+      "price": 0.06,
       "cache": {
-       "read": 0.035
+       "read": 0.015
       }
      },
      "output": {
-      "price": 0.3
+      "price": 0.18
      }
     }
    },
