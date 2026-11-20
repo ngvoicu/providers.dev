@@ -43,6 +43,7 @@ If there is no snapshot, the build stops and says so; it never falls back to sam
 ```
 data/upstream/    the last good import of models.dev      written only by `npm run sync`
 data/sources/     the measurements file (observed.json)   written only by `npm run sync`
+data/pi/          the last good import of pi's catalog    written only by `npm run sync`
 data/authored/    our providers, overrides and rules      written by people
         │
         ▼  npm run data   (src/core/resolve.ts: deterministic, no network)
@@ -271,6 +272,7 @@ reviewed; the site marks the rest "by default" or "by name".
 ## Syncing
 
 - **By hand:** `npm run sync` (add `-- --force` to download again even if nothing changed), then `npm run build`.
+  `npm run sync -- --only=pi` imports pi's catalog alone and leaves models.dev and the measurements as they are.
 - **Scheduled:** `.github/workflows/publish.yml` ("Publish", on) runs daily at 04:17 and 06:47 UTC, on every push to
   `main`, and from the Actions tab, on GitHub only. The second time is a fallback: GitHub can delay or drop a
   scheduled run, and neither scheduled run had fired by 2026-11-18. A run whose import finds nothing new commits
@@ -286,6 +288,11 @@ reviewed; the site marks the rest "by default" or "by name".
   to GitHub only; nobody has to push it to the server (doing so does no harm). The copy has followed when the two heads are equal
   (`git ls-remote` on both remotes, `refs/heads/main`).
 
+`npm run sync` imports three sources, one after the other, each on its own: models.dev into `data/upstream/`, the
+measurements file into `data/sources/`, and [pi's model catalog](https://pi.dev/api/models) (MIT) into `data/pi/`.
+models.dev is the reference; pi's catalog is a second, extra source beside it. A failure of one source never touches
+another source's snapshot.
+
 What the sync checks before it replaces the snapshot: the answer is JSON in the expected v2 structure; every
 provider and model id matches its key; the import is not empty and has not lost more than 40% of its providers or
 entries since the last one. It sends the stored ETag, so an unchanged upstream costs one small request; an ETag
@@ -296,6 +303,31 @@ in `data/upstream/`; everything else (the keys inside a model, every array) keep
 If any check fails or models.dev is down, `data/upstream/` is left exactly as it was, the command exits with an
 error, and the next build publishes the last good snapshot with a note that the last sync failed. A lock file
 (`data/.sync.lock`) stops two syncs on one machine from running at once.
+
+pi's catalog (`PI_URL` in `scripts/lib/sync.ts`) is checked the same way: JSON in the expected structure
+(`PiFeed` in `src/core/pi.ts`), every provider key a valid provider id, every model's `id` its key and its
+`provider` its provider key, at least 10 providers and 300 models, and no more than 40% of either lost since the
+last import. It sends the stored ETag too, and an equal body counts as unchanged. `data/pi/` holds `meta.json` (the
+address, the times, the ETag, `Last-Modified` and pi's catalog revision as sent, the digest of the body and the
+counts) and one file per provider key, its models sorted by id, each model exactly as the feed gives it.
+
+The two kinds of failure are told apart:
+
+- **Only the pi import fails** (pi down, not JSON, another structure, a key and an id that disagree, too small, 40%
+  lost): `data/pi/` is left exactly as it was, `meta.json` included; models.dev and the measurements are imported as
+  usual; the command prints why and exits 0. `data/sync-status.json` records it under its own `pi` key
+  (`status: "failed"` and the error) and keeps `last_attempt_ok: true` with no `last_error`. The `Publish` run stays
+  green, with a warning on the run, and builds and deploys with the last good pi snapshot.
+- **models.dev or the measurements fail**: as described above, whatever pi did. `data/upstream/` stays as it was,
+  `last_attempt_ok` is `false`, the command exits with an error and the `Publish` run is marked failed. A good pi
+  import in the same run is still kept.
+
+`last_attempt_at`, `last_attempt_ok` and `last_error` in `data/sync-status.json` speak of models.dev and the
+measurements only; the `pi` key has its own time, status and error. `--only=pi` writes the `pi` key alone, exits with
+an error if the pi import failed, and exists so that a pi snapshot can be taken without moving `data/upstream/`.
+On GitHub the import step writes its outcome per source (`upstream`, `measurements`, `pi`) to the step's outputs,
+which the warning step reads, and a snapshot commit names what changed (`sync: models.dev <commit>`,
+`sync: pi <revision>`, both, or `sync: measurements`).
 
 The import is not made tolerant of a change in models.dev's structure: that is the owner's decision. When models.dev
 changes the type of a field the site reads, the import fails on purpose: the site goes on serving the last good

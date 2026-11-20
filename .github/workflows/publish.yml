@@ -16,7 +16,7 @@ on:
   workflow_dispatch:
     inputs:
       force:
-        description: Download again even if models.dev says nothing changed
+        description: Download again even if a source says nothing changed
         type: boolean
         default: false
   push:
@@ -43,11 +43,15 @@ jobs:
           cache: npm
       - run: npm ci
 
-      - name: Import models.dev and the measurements
+      - name: Import models.dev, the measurements and pi
         id: sync
         if: github.event_name != 'push'
         continue-on-error: true
         run: npm run sync -- ${{ inputs.force && '--force' || '' }}
+
+      - name: Warn about a failed pi import
+        if: steps.sync.outputs.pi == 'failed'
+        run: echo "::warning title=The pi import failed::The site is built and deployed with the last good pi snapshot; models.dev was imported as usual. See the 'Import' step for the reason."
 
       - name: Build the dataset and the site
         run: npm run build
@@ -59,11 +63,21 @@ jobs:
         if: steps.sync.outcome == 'success'
         run: |
           # Commit only when the imported data changed, not for a new "checked at" time.
-          if [ -n "$(git status --porcelain data/upstream/providers data/sources/observed.json)" ]; then
+          if [ -n "$(git status --porcelain data/upstream/providers data/sources/observed.json data/pi/providers)" ]; then
+            # The message names what changed: models.dev <commit7>, pi <revision7>, both, or the measurements.
+            upstream="$(git status --porcelain data/upstream/providers)"
+            pi="$(git status --porcelain data/pi/providers)"
+            if [ -n "$upstream" ]; then commit7="$(node -p "require('./data/upstream/meta.json').commit?.slice(0,7) ?? 'snapshot'")"; fi
+            if [ -n "$pi" ]; then revision7="$(node -p "require('./data/pi/meta.json').revision?.match(/^sha256-(.{7})/)?.[1] ?? 'snapshot'")"; fi
+            if [ -n "$upstream" ] && [ -n "$pi" ]; then message="sync: models.dev $commit7, pi $revision7"
+            elif [ -n "$upstream" ]; then message="sync: models.dev $commit7"
+            elif [ -n "$pi" ]; then message="sync: pi $revision7"
+            else message="sync: measurements"
+            fi
             git config user.name "providers.dev sync"
             git config user.email "actions@users.noreply.github.com"
-            git add data/upstream data/sources data/sync-status.json
-            git commit -m "sync: models.dev $(node -p "require('./data/upstream/meta.json').commit?.slice(0,7) ?? 'snapshot'")"
+            git add data/upstream data/sources data/pi data/sync-status.json
+            git commit -m "$message"
             git push
           fi
 
