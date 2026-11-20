@@ -128,39 +128,53 @@ function piTiers(model: PiModel): PiCostTier[] {
 }
 
 /**
- * The threshold of an override that is a tier by size of request: its `when` has the one key `context`, with the one
- * comparison `gt` (the number) or `gte` (the number less 1) on a number. Null for every other override.
+ * What an override is for the tiers. A tier by size of request: its `when` has the one key `context`, with the one
+ * comparison `gt: N` (N a whole number, 0 or more; the threshold is N) or `gte: N` (N a whole number, 1 or more; the
+ * threshold is N less 1), so that the threshold is a whole number of tokens, 0 or more. Any other override on the
+ * context alone cannot be read as a tier: "unreadable". Every other override (service tier, time of day, a composite)
+ * is not a tier: null.
  */
-function tierThreshold(override: unknown): number | null {
+function tierThreshold(override: unknown): number | "unreadable" | null {
   if (!isRecord(override) || !isRecord(override.when)) return null;
   const keys = Object.keys(override.when);
-  if (keys.length !== 1 || keys[0] !== "context" || !isRecord(override.when.context)) return null;
+  if (keys.length !== 1 || keys[0] !== "context") return null;
+  if (!isRecord(override.when.context)) return "unreadable";
   const comparison = Object.entries(override.when.context);
-  if (comparison.length !== 1) return null;
+  if (comparison.length !== 1) return "unreadable";
   const [operator, value] = comparison[0]!;
-  if (typeof value !== "number" || !Number.isFinite(value)) return null;
-  if (operator === "gt") return value;
-  if (operator === "gte") return value - 1;
-  return null;
+  if (typeof value !== "number" || !Number.isSafeInteger(value)) return "unreadable";
+  if (operator === "gt" && value >= 0) return value;
+  if (operator === "gte" && value >= 1) return value - 1;
+  return "unreadable";
 }
 
-/** The entry's tiers by size of request, read from `cost.text.input.overrides` and `cost.text.output.overrides`. */
-export function entryTiers(cost: unknown): PiCostTier[] {
+/**
+ * The entry's tiers by size of request, read from `cost.text.input.overrides` and `cost.text.output.overrides`, all in
+ * US dollars per million tokens. Null where they cannot be compared: a side priced in another unit (`unit`), a tier
+ * with a unit of its own, an override on the context that is not a tier of whole tokens, or a negative price.
+ */
+export function entryTiers(cost: unknown): PiCostTier[] | null {
   const text = isRecord(cost) && isRecord(cost.text) ? cost.text : {};
+  let comparable = true;
   const side = (name: "input" | "output"): Map<number, Record<string, unknown>> => {
     const found = new Map<number, Record<string, unknown>>();
     const own = isRecord(text[name]) ? text[name] : {};
+    if (own.unit !== undefined) comparable = false;
     for (const override of Array.isArray(own.overrides) ? own.overrides : []) {
       const threshold = tierThreshold(override);
+      if (threshold === "unreadable") comparable = false;
+      if (typeof threshold !== "number") continue;
+      if ((override as Record<string, unknown>).unit !== undefined) comparable = false;
       // Where two overrides of one side have the same threshold, the one listed last counts.
-      if (threshold !== null) found.set(threshold, override as Record<string, unknown>);
+      found.set(threshold, override as Record<string, unknown>);
     }
     return found;
   };
   const input = side("input");
   const output = side("output");
+  if (!comparable) return null;
   const thresholds = [...new Set([...input.keys(), ...output.keys()])].sort((a, b) => a - b);
-  return thresholds.map((threshold) => {
+  const tiers = thresholds.map((threshold) => {
     const inputOverride = input.get(threshold);
     const cache = isRecord(inputOverride?.cache) ? inputOverride.cache : {};
     return {
@@ -171,20 +185,21 @@ export function entryTiers(cost: unknown): PiCostTier[] {
       cache_write: numberOr(cache.write),
     };
   });
+  const negative = tiers.some((tier) => [tier.input, tier.output, tier.cache_read, tier.cache_write].some((price) => price !== null && price < 0));
+  return negative ? null : tiers;
 }
 
 /** pi's tiers and the entry's agree: the same thresholds, and every price that both state equal. */
-function tiersAgree(pi: PiCostTier[], published: PiCostTier[], compare: { input: boolean; output: boolean }): boolean {
+function tiersAgree(pi: PiCostTier[], published: PiCostTier[]): boolean {
   if (pi.length !== published.length) return false;
   return pi.every((tier, index) => {
     const other = published[index]!;
     if (tier.input_tokens_above !== other.input_tokens_above) return false;
-    const fields: [keyof PiCostTier, boolean][] = [["input", compare.input], ["output", compare.output], ["cache_read", compare.input], ["cache_write", compare.input]];
-    return fields.every(([field, compared]) => {
+    return (["input", "output", "cache_read", "cache_write"] as const).every((field) => {
       const a = tier[field];
       const b = other[field];
       // Both must state a value; pi's price of 0 is also its "no price recorded".
-      if (!compared || a === null || b === null || a === 0) return true;
+      if (a === null || b === null || a === 0) return true;
       return samePrice(a, b);
     });
   });
@@ -226,9 +241,10 @@ export function piDifferences(model: PiModel, entry: { limit?: unknown; cost?: u
   // A cache-write price keyed by lifetime is not compared: pi states one price and does not say for which lifetime.
   priceItem("cost.cache_write", "cost.text.input.cache.write", model.cost.cacheWrite, cache.write, inputCompared);
 
+  // Tiers that cannot be compared (another unit, a threshold that is not whole tokens) give no item.
   const pi = piTiers(model);
   const published = entryTiers(entry.cost);
-  if (!tiersAgree(pi, published, { input: inputCompared, output: outputCompared })) {
+  if (published !== null && !tiersAgree(pi, published)) {
     out.push({ field: "cost.tiers", entry_field: "cost.text", unit: "usd_per_million_tokens", pi: null, published: null, pi_tiers: pi, published_tiers: published });
   }
   return out;

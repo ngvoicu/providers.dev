@@ -8,10 +8,10 @@ import { piProviderFile, sync } from "../scripts/lib/sync.ts";
 import { pretty } from "../scripts/lib/files.ts";
 import { summarize, type Summary } from "../src/core/entries.ts";
 import type { JsonObject } from "../src/core/merge.ts";
-import { PiBlockSchema, PiSummarySchema } from "../src/core/contract.ts";
-import { PiAliases, piDifferences, type PiCatalog, type PiModel, type PiReport } from "../src/core/pi.ts";
+import { PiBlockSchema, PiDifferenceSchema, PiSummarySchema } from "../src/core/contract.ts";
+import { PiAliases, piBlock, piDifferences, PiFeed, type PiCatalog, type PiModel, type PiReport } from "../src/core/pi.ts";
 import { resolve, type ResolveInput } from "../src/core/resolve.ts";
-import { ext, type AccessRules, type Catalog, type CatalogRules, type Evidence, type Meta, type OverrideFile, type UpstreamCatalog } from "../src/core/schema.ts";
+import { ext, UpstreamModel, type AccessRules, type Catalog, type CatalogRules, type Evidence, type Meta, type OverrideFile, type UpstreamCatalog } from "../src/core/schema.ts";
 import { fetchReturning, fixturePi, fixtureUpstream, ROOT, tempDataDir, writeAuthored } from "./helpers.ts";
 
 const evidence: Evidence[] = [{ kind: "documented", url: "https://example.com/docs", date: "2026-11-01" }];
@@ -451,5 +451,84 @@ describe("the alias file and the report (step 5)", () => {
       "zai-coding-cn": "zhipuai-coding-plan", "ant-ling": "bailing", "qwen-token-plan": "alibaba-token-plan", "qwen-token-plan-cn": "alibaba-token-plan-cn",
     });
     for (const line of Object.values(file.providers)) for (const item of line.evidence ?? []) expect(item.date).toBe("2026-11-20");
+  });
+});
+
+describe("the release review: tiers that cannot be compared (blockers 1 and 5)", () => {
+  const plainPi = piModel("lab", "plain", { cost: { input: 2, output: 4, cacheRead: 0.1, cacheWrite: 0 } });
+
+  it.each<[string, JsonObject]>([
+    ["context.gte: 0", { text: { input: { price: 2, overrides: [{ when: { context: { gte: 0 } }, price: 7 }] } } }],
+    ["context.gt: 32.5", { text: { input: { price: 2, overrides: [{ when: { context: { gt: 32.5 } }, price: 7 }] } } }],
+    ["context.gt: 1e300, not a safe whole number", { text: { input: { price: 2, overrides: [{ when: { context: { gt: 1e300 } }, price: 7 }] } } }],
+    ["context.lt: 32000", { text: { input: { price: 2, overrides: [{ when: { context: { lt: 32000 } }, price: 7 }] } } }],
+    ["context with two comparisons", { text: { input: { price: 2, overrides: [{ when: { context: { gt: 1000, lt: 32000 } }, price: 7 }] } } }],
+    ["one good tier and one that is not whole tokens", { text: { input: { price: 2, overrides: [{ when: { context: { gt: 32000 } }, price: 7 }, { when: { context: { gt: 64000.5 } }, price: 9 }] }, output: { price: 4 } } }],
+  ])("1. an override on the context that is not a tier of whole tokens (%s) leaves the tiers uncompared, and the block fits the contract", (_name, cost) => {
+    expect(UpstreamModel.safeParse({ id: "plain", name: "Plain", cost }).success).toBe(true);
+    const block = piBlock("lab", plainPi, "id", { limit: { context: 200000, output: 8000 }, cost });
+    expect(block.differences.filter((item) => item.field === "cost.tiers")).toEqual([]);
+    expect(PiBlockSchema.safeParse(block).success).toBe(true);
+    // pi's tiers do not make an item either: the entry's cannot be read.
+    const tiered = piModel("lab", "plain", { cost: { input: 2, output: 4, cacheRead: 0.1, cacheWrite: 0, tiers: [{ inputTokensAbove: 31999, input: 7, output: 8, cacheRead: 0.2, cacheWrite: 0 }] } });
+    expect(piDifferences(tiered, { cost }).filter((item) => item.field === "cost.tiers")).toEqual([]);
+  });
+
+  it("1. gt: 0 and gte: 1 are tiers above 0 tokens", () => {
+    for (const when of [{ context: { gt: 0 } }, { context: { gte: 1 } }]) {
+      const cost = { text: { input: { price: 2, overrides: [{ when, price: 7 }] } } };
+      expect(piDifferences(plainPi, { cost })).toMatchObject([{ field: "cost.tiers", published_tiers: [{ input_tokens_above: 0, input: 7 }] }]);
+    }
+  });
+
+  it.each<[string, JsonObject]>([
+    ["an input side priced per character", { text: { input: { unit: "character", price: 2, overrides: [{ when: { context: { gt: 32000 } }, price: 7, cache: { read: 3 } }] }, output: { price: 4 } } }],
+    ["an output side priced per character", { text: { input: { price: 2 }, output: { unit: "character", price: 4, overrides: [{ when: { context: { gt: 32000 } }, price: 8 }] } } }],
+    ["a side per character with no tier of its own", { text: { input: { unit: "character", price: 2 }, output: { price: 4, overrides: [{ when: { context: { gt: 32000 } }, price: 8 }] } } }],
+    ["a tier with a unit of its own", { text: { input: { price: 2, overrides: [{ when: { context: { gt: 32000 } }, price: 7, unit: "character" }] }, output: { price: 4 } } }],
+  ])("5. %s: no value in another unit stands in a difference labelled USD per million tokens", (_name, cost) => {
+    expect(UpstreamModel.safeParse({ id: "plain", name: "Plain", cost }).success).toBe(true);
+    const tiered = piModel("lab", "plain", { cost: { input: 2, output: 4, cacheRead: 0.1, cacheWrite: 0, tiers: [{ inputTokensAbove: 128000, input: 9, output: 9, cacheRead: 0.9, cacheWrite: 0 }] } });
+    for (const model of [plainPi, tiered]) {
+      const differences = piDifferences(model, { cost });
+      expect(differences.filter((item) => item.field === "cost.tiers")).toEqual([]);
+      const text = JSON.stringify(differences);
+      expect(text).not.toContain(":7");
+      expect(text).not.toContain(":3");
+    }
+  });
+
+  it("1. no value models.dev's schema accepts, on either side of a grid of edge values, gives a block the contract refuses", () => {
+    // Each axis holds the edge values of a field the block reads: thresholds that are negative, zero, fractional, huge or
+    // unsafe; every comparison; prices negative, zero, many-decimal, huge; units; cache writes as a number, keyed by
+    // lifetime or negative; limits zero, fractional, huge. Every combination models.dev's schema accepts is built.
+    const thresholds = [-1, 0, 1, 32.5, 32000, 2 ** 53, 1e300];
+    const operators = ["gt", "gte", "lt", "lte", "equals"];
+    const prices = [-5, 0, 0.1234567, 1e308];
+    const units = [undefined, "character"];
+    const writes: unknown[] = [undefined, 1.25, -1, { "5m": 1.25, "1h": 2 }];
+    const limits = [undefined, 0, 0.5, 200000, 1e308];
+    const piTiers = [undefined, [], [{ inputTokensAbove: 0, input: 0, output: 0, cacheRead: 0, cacheWrite: 0 }], [{ inputTokensAbove: 31999, input: 1e308, output: 7, cacheRead: 0.1234567, cacheWrite: 2 }]];
+    let built = 0;
+    const refused: string[] = [];
+    for (const threshold of thresholds) for (const operator of operators) for (const price of prices) for (const unit of units) for (const write of writes) {
+      const input: JsonObject = { price, ...(unit ? { unit } : {}), cache: { read: price, ...(write === undefined ? {} : { write: write as number }) }, overrides: [{ when: { context: { [operator]: threshold } }, price, cache: { read: price } }] };
+      const cost: JsonObject = { text: { input, output: { price, ...(unit ? { unit } : {}), overrides: [{ when: { context: { [operator]: threshold } }, price }] } } };
+      for (const context of limits) {
+        const limit: JsonObject = context === undefined ? {} : { context, output: context };
+        if (!UpstreamModel.safeParse({ id: "m", name: "M", cost, limit }).success) continue;
+        for (const tiers of piTiers) {
+          const model = piModel("lab", "m", { contextWindow: 1000, maxTokens: 0, cost: { input: 2, output: 0, cacheRead: 0.5, cacheWrite: 3, ...(tiers ? { tiers } : {}) } });
+          expect(PiFeed.safeParse({ lab: { m: model } }).success).toBe(true);
+          const block = piBlock("lab", model, "id", { limit, cost });
+          built += 1;
+          const checked = PiBlockSchema.safeParse(block);
+          if (!checked.success) refused.push(`${operator} ${threshold}, price ${price}, unit ${unit}, write ${JSON.stringify(write)}, limit ${context}: ${checked.error.issues[0]?.path.join(".")}`);
+          for (const item of block.differences) expect(PiDifferenceSchema.safeParse(item).success).toBe(true);
+        }
+      }
+    }
+    expect(built).toBeGreaterThan(10000);
+    expect(refused.slice(0, 5)).toEqual([]);
   });
 });
