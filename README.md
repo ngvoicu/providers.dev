@@ -349,15 +349,17 @@ every model's `id` its key and its `provider` its provider key, no model id the 
 least 10 providers and 300 models, and no more than 40% of either lost since the last import. The request and the
 whole body must be done within 60 seconds, and the body is read from its stream and refused as soon as it passes
 16 MB (the feed is about 1 MB), without reading the rest. It sends the stored ETag too, and an equal body counts as
-unchanged. The new snapshot is swapped in as the very last step, so a pi import that fails never replaces it. `data/pi/` holds `meta.json` (the
+unchanged. The new snapshot is swapped in as the very last step of the import, so a feed that fails a check never
+replaces it. `data/pi/` holds `meta.json` (the
 address, the times, the ETag, `Last-Modified` and pi's catalog revision as sent, the digest of the body and the
 counts) and one file per provider key, its models sorted by id, each model exactly as the feed gives it.
 
 The two kinds of failure are told apart:
 
 - **Only the pi import fails** (pi down, not JSON, another structure, a key and an id that disagree, too small, 40%
-  lost, too slow, too large, or any fault in pi's own code): `data/pi/` is left exactly as it was, `meta.json` included; models.dev and the measurements are imported as
-  usual; the command prints why and exits 0. `data/sync-status.json` records it under its own `pi` key
+  lost, too slow, too large, or any fault in pi's own code): `data/pi/` is left as it was, `meta.json` included, or,
+  where pi's code failed after it had stored a good snapshot, as a healthy run leaves it; it is always a snapshot the
+  build can use. models.dev and the measurements are imported as usual; the command prints why and exits 0. `data/sync-status.json` records it under its own `pi` key
   (`status: "failed"` and the error) and keeps `last_attempt_ok: true` with no `last_error`. The `Publish` run stays
   green, with a warning on the run, and builds and deploys with the last good pi snapshot.
 - **models.dev or the measurements fail**: as described above, whatever pi did. `data/upstream/` stays as it was,
@@ -375,8 +377,11 @@ without moving `data/upstream/`.
 
 pi's part runs behind a fence (`scripts/lib/pi-fence.ts`, design section k): in the sync and in the build, pi's
 code is called in one guarded place each, and what it returns is taken only as plain data that fits the contract.
-Nothing on pi's side can stop the models.dev import, the build or the deploy. Two warnings say when pi's side
-went wrong:
+Nothing on pi's side can stop the models.dev import, the build or the deploy, within three limits: a pi part that
+is well-formed, agrees with itself and is wrong is published as pi's part (it shows in `pi.counts` of
+`/api/v1/meta` and in the line the build prints); a computation that never ends is bounded only by the import's
+deadline and size cap; and a broken commit of pi's code is caught by the push that brings it, whose run fails. Two
+warnings say when pi's side went wrong:
 
 - **The pi import failed** (the `Import` step's output `pi=failed`): the run stays green with the warning
   "The pi import failed", and the site is built with the last good pi snapshot.
