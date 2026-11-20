@@ -18,9 +18,13 @@ brief and this document disagree, this document is corrected first.
 - **No entry and no provider comes from pi alone.** A pi model that belongs to no entry is counted and listed in a
   report, nothing more (section g).
 - A run in which only the pi import fails stays green, with a warning on the run.
+- **Nothing on pi's side may ever stop the models.dev import, the build or the deploy.** This is the owner's first
+  requirement, and section k, the fence, is how the software holds it: by its structure, not case by case.
 
-Sections (a) to (j) keep the letters of the design task. Section 0 holds what was measured. Section 11 lists
-where the spec's first wording and the code did not fit, for the record.
+Sections (a) to (j) keep the letters of the design task. Section 0 holds what was measured. Section k is the
+fence around the pi part, written after the first build and its reviews; where an earlier section and section k
+speak of the same thing, section k decides. Section 11 lists where the spec's first wording and the code did not
+fit, for the record.
 
 ---
 
@@ -138,19 +142,28 @@ export interface PiMeta {
 
 ### The code
 
-`scripts/lib/sync.ts` gains a third part beside `syncUpstream` and `syncMeasurements`:
+The sync gains a third part beside `syncUpstream` and `syncMeasurements`. The part's own code is in
+`scripts/lib/pi-sync.ts`; `scripts/lib/sync.ts` keeps the types below and the one call into the fence (section k):
 
 ```ts
+// src/core/schema.ts
 export const PI_URL = "https://pi.dev/api/models";
 
+// scripts/lib/pi-sync.ts
 /** An import smaller than this is treated as broken, whatever the previous snapshot held. */
 const PI_MIN_PROVIDERS = 10;
 const PI_MIN_MODELS = 300;
+/** An import larger than this is treated as broken: it is not read to the end. */
+export const PI_MAX_BYTES = 16 * 1024 * 1024;
+/** The whole pi request, headers and body together, must be done within this. */
+export const PI_DEADLINE_MS = 60_000;
 // MIN_SHARE (0.6) is shared: an import that lost more than 40 % of its providers or models is broken.
 
-export function loadPi(dataDir: string): { catalog: PiCatalog; meta: PiMeta } | undefined;
+export function storedPi(dataDir: string): StoredPi;
 export function piProviderFile(id: string, models: Record<string, PiModel>): string;
-async function syncPi(options): Promise<PartReport>;
+export async function syncPi(options): Promise<{ status: "updated" | "unchanged"; summary?: string[] }>;
+
+// scripts/lib/sync.ts
 
 export interface SyncOptions { /* as today */ only?: "pi" }
 export interface PartReport {
@@ -183,11 +196,17 @@ export interface SyncStatus {
 `upstream` and `measurements` as `skipped`. It is never written to `data/sync-status.json` (whose part fields are
 typed `StoredStatus`), `writeStepOutputs` writes no line for a skipped part, and nothing published reads it.
 
-`sync()` runs the three parts in this order: models.dev, measurements, pi. Each runs inside the existing `part()`
-wrapper, so an exception in one never reaches another. One lock (`data/.sync.lock`) covers the run, as today.
+`sync()` runs the three parts in this order: models.dev, measurements, pi. One lock (`data/.sync.lock`) covers the
+run, as today. models.dev and the measurements run inside the existing `part()` wrapper. The pi part runs behind
+the fence (section k): everything pi does in the sync lives in `scripts/lib/pi-sync.ts` (`syncPi`, `storedPi`,
+`loadPi`, `piSnapshotFault`, `piProviderFile`, the constants above except `PI_URL`), and `sync()` reaches it through
+one call, `piOfSync`.
 
-`loadPi` returns `undefined` when `data/pi/meta.json` or `data/pi/providers/` is missing. It does not validate;
-the data build does (section i, "a snapshot the code cannot read").
+`storedPi` is the one answer to "is there a stored pi snapshot that can be used", for the sync and the build alike:
+**none** only where the folder `data/pi/` does not exist; **usable** where it loads, its `meta.json` fits `PiMeta`,
+it is whole (every provider file named by its id, every model's key its id and its provider the file's, the counts
+those of `meta.json`) and it fits `PiFeed`; **unusable**, with the reason, in every other case, a `data/pi/`
+without a `meta.json` or with one that holds `null` included.
 
 ### What `syncPi` does, in order
 
@@ -197,6 +216,10 @@ the data build does (section i, "a snapshot the code cannot read").
    its `meta.source` is `PI_URL`, it has an ETag and `--force` was not given. Headers: `Accept: application/json`,
    `User-Agent: providers.dev sync`. Node's `fetch` receives a weak ETag from the feed (`W/"2197505f…"`, where a
    plain `curl` gets the strong one); it is stored and sent back as received, and the feed answers 304 to it.
+   One deadline, `PI_DEADLINE_MS` (60 s), covers the request and the whole body: past it the request is aborted and
+   the part fails with `pi.dev did not answer in full within 60 s`. The body is read from its stream and the part
+   fails with `the pi feed is unexpectedly large: more than 16 MB` as soon as more than `PI_MAX_BYTES`
+   (16 × 1024 × 1024; the feed is 1 MB) have arrived, without reading the rest.
 2. `304` with a previous snapshot of the same source: rewrite `meta.json` with a new `checked_at`, return
    `unchanged`. Nothing else is written.
 3. Any other status that is not 2xx: fail with `pi.dev answered HTTP <status>`.
@@ -216,7 +239,9 @@ the data build does (section i, "a snapshot the code cannot read").
     (the parsed body); the copy checked against `PiFeed` is used only to validate, because the schema puts the keys
     of a model in its own order. Return `updated` with a summary in the
     same words as the models.dev one (`first import: …`, or providers added and removed and
-    `models: +a added, -r removed, c changed`).
+    `models: +a added, -r removed, c changed`). **The swap is the last thing `syncPi` does:** the summary and
+    everything else that can throw is worked out before it, so that a part that failed has not replaced the
+    snapshot.
 
 The structure the import accepts. Loose on purpose where pi may add keys, strict on every field the build reads:
 
@@ -274,7 +299,10 @@ named above, the pi import fails on purpose, the last good pi snapshot stays, an
 | measurements fail | as today | unaffected | as today; `pi` as its own part went | 1, as today |
 
 `last_attempt_at`, `last_attempt_ok` and `last_error` keep today's meaning word for word: the pi part never
-changes them. `pi.last_attempt_at` is the time the pi part ended.
+changes them. `pi.last_attempt_at` is the time the pi part ended. The `pi` record has one definition,
+`PiSyncRecord` (`{ last_attempt_at: string, status: "updated" | "unchanged" | "failed", error?: string }`, strict),
+and is written twice in a run, before the pi part and after it (section k, 2), so that it always speaks of this
+attempt.
 
 `scripts/sync.ts` prints one more line, `pi: <status>[ - <error>]`, with the summary lines under it. When pi alone
 failed it prints `The pi import failed. The last good pi snapshot is unchanged and is still what gets published.`
@@ -289,9 +317,9 @@ snapshot can be written into a branch without moving `data/upstream/`. `--force`
 
 ### A fresh clone without a pi snapshot
 
-`npm run build` works: `loadPi` returns `undefined`, no entry gets a pi block, and `/api/v1/meta` says so
-(`pi.snapshot: null`, every pi count 0). The build never stops for want of pi data. (It still stops, as today,
-for want of a models.dev snapshot.)
+`npm run build` works: there is no folder `data/pi/`, no entry gets a pi block, and `/api/v1/meta` says so
+(`pi.snapshot: null`, every pi count 0), with no warning: this is the one state without pi data that is not a
+fault. The build never stops for want of pi data. (It still stops, as today, for want of a models.dev snapshot.)
 
 ### The workflow (`.github/workflows/publish.yml`)
 
@@ -314,7 +342,9 @@ for want of a models.dev snapshot.)
   `data/pi` to `git add`, and the commit message names what changed: `sync: models.dev <commit7>` when
   `data/upstream/providers` changed, `sync: pi <revision7>` when only `data/pi/providers` did (the seven characters
   after `sha256-` of `meta.revision`, else `snapshot`), `sync: models.dev <commit7>, pi <revision7>` for both, and
-  `sync: measurements` when only the measurements file did.
+  `sync: measurements` when only the measurements file did. `data/pi` is added only where the folder exists. The
+  step reads no file of pi's: `<revision7>` is the step output `pi_revision7` of the import step (section k, 3).
+- A second warning step, **directly after the build step**, for a build that left pi data out (section k, 3).
 - The last step, `Report a failed import`, is **unchanged**: its condition stays `steps.sync.outcome == 'failure'`,
   which a pi failure alone never makes true.
 
@@ -550,7 +580,7 @@ file is checked against its schema and nothing else, and none of these is raised
 | `pi-alias-orphan` | warning | a `same_as` names a provider or an entry the catalog does not have; or a line names a pi provider or a pi model the snapshot does not have. |
 | `pi-alias-conflict` | warning | rule 3 took an entry away from a pi model. |
 | `pi-alias-redundant` | notice | a model line is no longer needed: the provider now has an entry with the pi model's own id. |
-| `pi-snapshot-unreadable` | warning | `data/pi/` is there and cannot be used, what the build would publish for pi does not fit the contract, or the pi record of `data/sync-status.json` does not fit (section i). |
+| `pi-snapshot-unreadable` | warning | the fence turned pi's data or the record of the last pi import away (section k): once per part turned away, with the reason. The one sign that a dataset is without pi data through a fault. |
 
 These are added to `Issue["code"]` in `src/core/schema.ts`. An unmatched pi model and an absent pi provider are
 **not** issues: they are the report's.
@@ -946,9 +976,13 @@ Rules:
 4. **A cache-write price keyed by lifetime** (`{ "5m": 5, "1h": 8 }`) is not compared: pi states one price and
    the feed does not say for which lifetime.
 5. **Tiers.** The entry's tiers are read from `cost.text.input.overrides` and `cost.text.output.overrides`. An
-   override is a tier when its `when` has the one key `context`, with the one comparison `gt` or `gte` on a number;
-   its threshold is that number for `gt`, that number less 1 for `gte`. Every other override (service tier, time of
-   day, a composite) and every multiplier is not a tier and is not compared. For each threshold, ascending:
+   override is a tier when its `when` has the one key `context`, with the one comparison `gt: N` (N a whole number,
+   0 or more; the threshold is N) or `gte: N` (N a whole number, 1 or more; the threshold is N less 1), so that a
+   threshold is always a whole number of tokens, 0 or more. Every other override (service tier, time of day, a
+   composite) and every multiplier is not a tier and is not compared. **The tiers are not compared at all, and no
+   `cost.tiers` item is listed,** where they cannot be read as such: an override on the context alone that is not
+   of that form (a fraction, a negative number, another comparison, two comparisons), a side or a tier priced in
+   another unit than per million tokens (rule 3), or a negative price in a tier. For each threshold, ascending:
    `{ input_tokens_above, input: the input override's price, output: the output override's price, cache_read: the
    input override's cache.read, cache_write: its cache.write where one number }`, `null` where the entry states
    none; where two overrides of one side have the same threshold, the one listed last counts. pi's tiers are
@@ -1041,26 +1075,17 @@ whether they do is the designer's.
 
 ## i. How the existing rules stay true
 
-**"The published dataset is computed from scratch."** `resolve()` stays pure: its new inputs are the pi snapshot
-and the alias file. Every block, every difference and the report are worked out again in each build; nothing is
-stored between builds or edited in place. Delete `data/pi/` and the dataset is today's, with `pi: null`
-everywhere. Delete a line of the alias file and what it did is gone in the next build. `dataset_version` covers
-the pi blocks, since they are in the catalog it hashes: new pi data gives a new version and new ETags.
+**"The published dataset is computed from scratch."** `resolve()` stays pure, and knows nothing of pi: it builds
+the whole dataset with `pi: null` on every entry. The pi part is worked out after it, in one place, from the pi
+snapshot, the alias file and plain facts `resolve()` hands on, and is laid over the finished dataset (section k,
+1). Every block, every difference and the report are worked out again in each build; nothing is stored between
+builds or edited in place. Delete `data/pi/` and the dataset is today's, with `pi: null` everywhere. Delete a line
+of the alias file and what it did is gone in the next build. `dataset_version` covers the pi blocks, since they
+are in the catalog it hashes: new pi data gives a new version and new ETags.
 
-```ts
-export interface ResolveInput {
-  // … as today
-  /** The pi snapshot and the alias file. Left out = the dataset is built without pi data. */
-  pi?: { catalog: PiCatalog; aliases?: PiAliases };
-}
-export interface ResolveResult { catalog: Catalog; issues: Issue[]; exclusions: Exclusion[]; pi: PiReport | null }
-```
-
-Where it happens in `resolve()`: after step 3 and before step 4, the match of every pi model (section c) is
-worked out against the catalog as it stands, with the set of refs present before any exclusion; nothing is
-changed there. In step 6, where every record is published with all of its keys, `pi` is set on every entry: the
-block with its differences where a pi model reached the entry, `null` everywhere else. The report is put together
-at the end. No other step is touched.
+The match of every pi model (section c) is worked out against the catalog as it stood after step 3 and before
+step 4 of `resolve()`, which `resolve()` records as plain rows for that purpose; the differences are worked out
+against the entries as published, after every override.
 
 **"A sync can never overwrite our work."** `npm run sync` writes `data/pi/` and nothing under `data/authored/`.
 
@@ -1097,21 +1122,9 @@ evaluation is a map with the client's.
 (`src/core/pages.ts`) reads `sync.last_attempt_ok` of `/meta`, whose meaning does not change: a pi failure never
 shows there. It shows in `meta.pi.sync`.
 
-**A snapshot the code cannot read.** `publish()` checks `data/pi/` against `PiFeed`. If it does not fit (an edit
-by hand, or the code's schema moved on), the dataset is built **without** pi data, `meta.pi.snapshot` is `null`,
-and the warning `pi-snapshot-unreadable` is raised. The build does not fail for pi.
-
-**The net under the pi part.** Before it writes anything, `publish()` checks what it is about to publish for pi
-(`meta.pi`, the `pi` of every entry and of every summary) against the contract's own schemas (`piMisfit`). Where
-anything does not fit, whatever its cause, the dataset is built without pi data as above, and
-`pi-snapshot-unreadable` names the first value that did not fit and where. It decides nothing else and repairs
-nothing: the contract test before a deploy cannot fail because of pi.
-
-**The record of the last pi import.** The `pi` key of `data/sync-status.json` has one definition, `PiSyncRecord`
-(`scripts/lib/sync.ts`), checked on what the sync writes and on what the build reads. A record that does not fit is
-published as no attempt recorded (`meta.pi.sync` all null), with `pi-snapshot-unreadable` targeting
-`data/sync-status.json`; the pi data itself stays. So all `meta.pi` is made of is checked before it is used, and what
-the net falls back to fits the contract too.
+**Nothing on pi's side stops the import, the build or the deploy.** Section k: a stored snapshot that cannot be
+used, a fault in pi's own code, a result the contract refuses and a record of the last import that does not fit
+all end the same way, in a dataset without that part of pi's and a warning that says why.
 
 **Licensing.** pi's licence text goes to `LICENSES/pi-MIT.txt` (copied from pi's repository), ships with the
 dataset as `/data/LICENSE-pi.txt`, and `NOTICE.txt` gains a paragraph naming pi, its address, MIT, the import time
@@ -1342,6 +1355,379 @@ The review (PIC-11) builds `main` as it was before step 1 and the branch after s
 `data/upstream/` and `data/sources/`, and runs the comparison once across everything: 0 differences,
 `entries with the key pi: 0 -> all`, `entries with a pi block: 0 -> meta.pi.counts.entries_with_block`. That one
 run is the third acceptance criterion.
+
+The fence (section k) was designed after these six steps were built. Its own steps, with what must be shown after
+each, are in section k, 6; where a test or a file named in the steps above is replaced there, section k decides.
+
+---
+
+## k. The fence
+
+**The requirement:** nothing on pi's side may ever stop the models.dev import, the build or the deploy.
+
+**Why it was not met by adding guards.** As first built, pi's code was called from four places of the build
+(`resolve()` for the match, the blocks and the report; `summarize()` for the short form; `publish()` for the stored
+snapshot and for `meta.pi`) and two of the sync, each with a guard of its own, and the fallback built the dataset
+a second time through the same pi code. Each review found a way past one guard.
+
+**The structure that meets it.** Three rules, and everything below follows from them:
+
+1. **The dataset is complete without pi before any pi code runs.** `resolve()` and `summarize()` know nothing of
+   pi and write `pi: null` themselves. Turning pi away is then *doing nothing*: there is no fallback path, no
+   second build and no code that produces "no pi data".
+2. **pi's code runs in one guarded place in the build and one in the sync.** It is handed copies and plain rows,
+   never the catalog; what it returns is turned into plain data and checked against the contract there, once.
+3. **Outside the fence only that checked, plain data is used.** No other module may import a value from pi's
+   modules, and a test holds that.
+
+### The modules
+
+| module | what it is | who may import a value from it |
+|---|---|---|
+| `src/core/pi.ts` | pi's pure code: the feed's schema, the match, the block, the differences, the report, and one entry point, `piPart` | `scripts/lib/pi-sync.ts`, `scripts/lib/pi-fence.ts` |
+| `scripts/lib/pi-sync.ts` | pi's code that touches files and the network: `storedPi`, `syncPi` and what they need (section b) | `scripts/lib/pi-fence.ts` |
+| `scripts/lib/pi-fence.ts` | the fence: `piOfBuild`, `piOfSync`, and nothing else exported but their types | `scripts/lib/publish.ts` (`piOfBuild`), `scripts/lib/sync.ts` (`piOfSync`) |
+
+`import type` from pi's modules is free everywhere (the contract, the pages and the tests name pi's types). What
+code outside the fence needs as a value leaves pi's modules: `PiAliases` with its two line schemas, and `PI_URL`,
+move to `src/core/schema.ts`, beside the other authored files' schemas and `PiMeta`; `PiSyncRecord` stays in
+`scripts/lib/sync.ts`, with the status file it belongs to.
+
+### The guard
+
+One function in `scripts/lib/pi-fence.ts`, used for every call into pi's code, with an `async` twin for the sync:
+
+```ts
+type Fenced<T> = { ok: true; value: T } | { ok: false; why: string };
+/** Run pi's code and take its result only as plain data that fits `schema`. Never throws. */
+function fenced<T>(compute: () => T, schema: z.ZodType<T>): Fenced<T>;
+async function fencedAsync<T>(compute: () => Promise<T>, schema: z.ZodType<T>): Promise<Fenced<T>>;
+```
+
+In order, all inside one `try`: call `compute`; make the result plain with `JSON.parse(JSON.stringify(result))`
+(a getter, a prototype, an `undefined`, a function or a cycle does not survive it, and key order does); check the
+plain copy with `schema.safeParse`; return **the plain copy**, not zod's output, whose keys the schema would
+reorder. Anything thrown at any of these, of any shape, and any misfit, gives `{ ok: false, why }`.
+
+`why` is made by one total function, `reasonOf(error: unknown): string`, that cannot throw itself: the `message`
+of an `Error` where that is a string, the first issue's path and message for a misfit, else
+`a fault without a description`; then every control character becomes a space and the text is cut to 300
+characters. So what crosses the fence as a reason is always one short line of text.
+
+### 1. The build
+
+**`resolve()`** (`src/core/resolve.ts`) imports nothing from pi. `ResolveInput.pi` and `ResolveResult.pi` go; step
+3b's match and the calls in step 6 go. It gains two plain results, recorded where step 3b was (after step 3,
+before step 4) and at the end:
+
+```ts
+/** One entry as it stood before any exclusion: plain facts for a part of the build that comes after resolve(). */
+export interface EntryBefore {
+  provider: string;
+  model: string;
+  /** The `base_url` of each endpoint of the entry's `api` that has one as a string, in the order of its keys. */
+  base_urls: string[];
+}
+export interface ResolveResult {
+  catalog: Catalog; issues: Issue[]; exclusions: Exclusion[];
+  before: EntryBefore[];                       // in the catalog's order then: providers, then their models
+  ruledOut: { ref: string; rule: string }[];   // every entry a catalog rule left out, with the rule's id
+}
+```
+
+Step 6 writes the literal `pi: null` as the last key of every entry's `providers_dev`, and `summarize()`
+(`src/core/entries.ts`) the literal `pi: null` as the last key of every summary. These two literals and
+`noPiMeta()` are the fixed values of "no pi data":
+
+```ts
+// src/core/schema.ts
+export const noPiMeta = (): Meta["pi"] => ({
+  source: PI_URL,
+  snapshot: null,
+  sync: { last_attempt_at: null, last_attempt_ok: null, last_error: null },
+  counts: { entries_with_block: 0, left_out_models: 0, unmatched_models: 0 },
+});
+```
+
+**pi's one entry point** (`src/core/pi.ts`), which holds what `resolve()` did with `matchPi`, `piBlock` and
+`piReport`. `piSummary` goes: the fence writes the short form from the checked block.
+
+```ts
+export interface PiPartInput {
+  pi: PiCatalog;
+  aliases: PiAliases | undefined;
+  before: EntryBefore[];
+  ruledOut: { ref: string; rule: string }[];
+  /** A copy of `limit` and `cost` of the entry as published; undefined where the ref is not published. */
+  entryOf: (ref: string) => { limit: unknown; cost: unknown } | undefined;
+}
+export interface PiPart {
+  /** One per pi model whose entry is published. `ref` is the entry's, provider/model of the catalog. */
+  blocks: { ref: string; block: PiBlock }[];
+  report: PiReport;
+  /** The alias issues of section c. */
+  issues: Issue[];
+}
+export function piPart(input: PiPartInput): PiPart;
+```
+
+`matchPi` takes `before` in place of the catalog. A pi model is *matched* where `entryOf` knows its entry's ref,
+*left out* where it does not, by `ruledOut`'s rule for that ref or else `"override"`.
+
+**Lookups by own property.** In pi's two modules no object is indexed by a key that comes from the feed, the alias
+file or the catalog, except through a `Map` or through one helper,
+`own(record, key)` = `Object.hasOwn(record, key) ? record[key] : undefined`; and an object keyed by such ids is
+built with `Object.fromEntries`, never by assignment. Today's places, all in `matchPi` and `piReport` unless
+named: `pi[piProvider]`, `pi[piProvider][piModel]`, `lines[piProvider]`, `line.models[piModel]`,
+`catalog[piProvider]`, `catalog[line.same_as]`, `models[piModel]`, `entries[piModel]`,
+`entries[modelLine.same_as]`, `pi[provider.pi_provider]`; `catalog[provider.id] = …` in `loadPi`; and the pi
+part's own copy of the import summary (`before[id]`, `old[modelId]`, `models[modelId]`), which it no longer shares
+with models.dev's.
+
+**The fence of the build:**
+
+```ts
+// scripts/lib/pi-fence.ts
+export interface PiOfBuildInput {
+  dataDir: string;
+  /** data/sync-status.json as publish() parsed it; undefined where there is none. */
+  status: unknown;
+  aliases: PiAliases | undefined;
+  catalog: Catalog;
+  before: EntryBefore[];
+  ruledOut: { ref: string; rule: string }[];
+}
+export interface PiOfBuild {
+  /** The entry's ref -> its block and the block in short. Empty = no pi data. */
+  entries: Map<string, { block: PiBlock; summary: PiSummary }>;
+  /** `meta.pi`, whole. */
+  meta: Meta["pi"];
+  /** The alias issues of a dataset with pi data, then one pi-snapshot-unreadable per part turned away. */
+  issues: Issue[];
+  /** The text of data/published/pi-report.json; null = no pi data. */
+  report: string | null;
+  state: "published" | "none" | "turned_away";
+}
+/** Everything the build publishes of pi. Never throws. */
+export function piOfBuild(input: PiOfBuildInput): PiOfBuild;
+```
+
+It has two parts, each through `fenced`, each all or nothing, neither depending on the other:
+
+- **The data.** First the fence asks, with code of its own, whether the folder `data/pi/` exists. Where it does
+  not, no pi code is called and the data is `null`: so the one state without pi data and without a warning does
+  not rest on pi's code. Where it does, `compute`: `storedPi(dataDir)`; unless its answer is *usable*, throw (its
+  reason where it is *unusable*; that it gave no usable answer otherwise, *none* for a folder that exists
+  included); then call `piPart`, with an `entryOf` that looks the ref up in a `Map` the fence made from `catalog`
+  and returns `structuredClone`s of `limit` and `cost`; return
+  `{ snapshot, counts, blocks, issues, report }`, where `snapshot` is `meta.pi.snapshot` made from the stored
+  `meta.json` (keys in the contract's order, an absent one `null`), `counts` the three of `meta.pi.counts` from the
+  report's totals, and `report` the report as text (`JSON.stringify(report, null, 1)` and a newline).
+  `schema`, nullable: `snapshot` and `counts` are those of `MetaSchema.shape.pi`; `blocks` an array of
+  `{ ref: string, block: PiBlockSchema }`; `issues` an array of strict
+  `{ level: "warning" | "notice", code: one of the four pi-alias and pi-provider codes, target: string, message: string }`
+  (so pi's code cannot hand the build an error); `report` a string.
+  After the check the fence, with code of its own, requires that every `ref` is an entry of `catalog` and occurs
+  once, and writes each summary: `{ ref: block.ref, api: block.api, match: block.match, difference_count:
+  block.differences.length }`.
+- **The record.** `compute`: where `status` is not an object with an own key `pi`, return the three `null`s; else
+  `PiSyncRecord.parse(status.pi)` and return
+  `{ last_attempt_at, last_attempt_ok: status !== "failed", last_error: error ?? null }`. `schema`:
+  `MetaSchema.shape.pi.shape.sync`.
+
+What comes out:
+
+| the data | the record | `entries`, `report` | `meta` | `issues` gains | `state` |
+|---|---|---|---|---|---|
+| fits | fits | the blocks; the report | snapshot and counts of the data, the record | pi's alias issues | `published` |
+| `null` (no `data/pi/`) | fits | empty; `null` | `noPiMeta()` with the record | nothing | `none` |
+| turned away | fits | empty; `null` | `noPiMeta()` with the record | one warning, target `data/pi` | `turned_away` |
+| any of the three | turned away | as its row says | as its row says, `sync` the three `null`s | one warning more, target `data/sync-status.json` | `turned_away` |
+
+The two warnings, code `pi-snapshot-unreadable`, level `warning`:
+`pi's data is left out of this dataset (<why>). No entry has a pi block.` and
+`The record of the last pi import is left out of this dataset (<why>). It is published as no attempt recorded.`
+
+**`publish()`** (`scripts/lib/publish.ts`), in this order:
+
+1. load everything as today; the alias file with the other authored files (`PiAliases` from `schema.ts`);
+2. `resolve()`, once; an error-level issue or an empty catalog ends the build here, as on `main`, before anything
+   of pi's is touched;
+3. read `data/sync-status.json` where `main` reads it; `const pi = piOfBuild({ … })`;
+4. for every entry of the catalog whose ref is in `pi.entries`: `ext(entry).pi = block` (the key is there already);
+5. `buildIndex`, both times followed by: for every summary whose ref is in `pi.entries`: `summary.pi = summary`
+   of that entry; the version is hashed from the catalog and the summaries after these two steps, as today;
+6. `meta.pi = pi.meta`; `issues = [...resolve's, ...pi.issues]`;
+7. write the snapshot; `pi-report.json` is written from `pi.report` where it is not `null`.
+
+`assemble(pi)` and its second call, `piMisfit`, `readPi`, `piUnreadable` and `piSync` are deleted from
+`publish.ts`: there is one build, the check is the fence's, and nothing in `publish.ts` knows how pi's data is
+read. `PublishReport` gains `pi: PiOfBuild["state"]`.
+
+### 2. The sync
+
+```ts
+// scripts/lib/pi-fence.ts
+export interface PiOfSync {
+  /** status "updated" or "unchanged" with pi's summary lines, or "failed" with a one-line error. */
+  report: PartReport;
+  /** For the commit message: 7 hexadecimal characters of the stored snapshot's revision, else "snapshot". */
+  revision7: string;
+}
+/** The whole pi part of the sync. Never rejects. */
+export async function piOfSync(options: SyncOptions): Promise<PiOfSync>;
+```
+
+`piOfSync` is `fencedAsync(() => syncPi(options), schema)` and nothing more: `syncPi` returns
+`{ status: "updated" | "unchanged", summary?: string[], revision?: string }` (the revision of the snapshot now
+stored) and `schema` is exactly that, strict. A failure of any shape, the deadline and the size cap included, is
+`report: { status: "failed", error: why }`. `revision7` is `/^sha256-([0-9a-f]{7})/` of `revision`, else
+`snapshot`.
+
+**`sync()`** (`scripts/lib/sync.ts`) after models.dev and the measurements have run and their five fields are
+worked out:
+
+1. write `data/sync-status.json` with the five fields and
+   `pi: { last_attempt_at: <now>, status: "failed", error: "The pi part did not finish." }`;
+2. `const pi = await piOfSync(options)`;
+3. write the file again with `pi: { last_attempt_at: <now>, status: pi.report.status }`, and `error` where the
+   report has one.
+
+The record is a literal of three checked strings, written by the shared writer; no pi code and no schema runs
+between the pi part and the file. Because of step 1, the five fields of models.dev never wait on pi, and a process
+that dies inside the pi part leaves a record that says the attempt did not finish, never the previous attempt's
+success. Under `--only=pi` the five fields are read from the file first; a file that does not parse counts there
+as absent, and `sync()` logs that it did. `SyncReport` gains `piRevision7: string`.
+
+`scripts/sync.ts` is unchanged but for one output line: `writeStepOutputs` also writes
+`pi_revision7=<revision7>` where the pi part ran.
+
+### 3. Being seen
+
+- **In the data.** Every time the fence turns a part away, `/api/v1/meta` lists the warning with its reason, and
+  the build prints it. There is no silent case: without a warning, a dataset has no pi data only where the folder
+  `data/pi/` does not exist, and no record only where the status file or its `pi` key does not exist.
+  The fence itself looks whether the folder is there, and `storedPi` is changed to agree (section b): a
+  `data/pi/` that is there and cannot be used, in any way, is *unusable*, never *none*.
+- **No new issue code.** `code` of an issue is an open string in the contract, and `pi-snapshot-unreadable` is
+  already in 1.2.0's code. The contract and `structure/api-v1.json` do not change.
+- **On the run.** `scripts/build-data.ts` appends `pi=<published|none|turned_away>` to `GITHUB_OUTPUT` where that
+  variable is set (`writeBuildOutputs(report, path)` in `scripts/lib/publish.ts`). In the workflow the build step
+  gets `id: build`, and directly after it:
+
+  ```yaml
+      - name: Warn about pi data left out of the build
+        if: steps.build.outputs.pi == 'turned_away'
+        run: echo "::warning title=The build left pi data out::The dataset is built and deployed without pi's data, or without the record of the last pi import. /api/v1/meta lists why, under issues (pi-snapshot-unreadable). The models.dev part is as usual."
+  ```
+
+  The text is fixed: nothing that came from pi is printed as a workflow command.
+- **The commit step reads no file of pi's.** In `Keep the new snapshot`, the line that reads
+  `./data/pi/meta.json` with `node -p` goes; the step gets `env: PI_REVISION7: ${{ steps.sync.outputs.pi_revision7 }}`
+  and uses `revision7="${PI_REVISION7:-snapshot}"`.
+
+### 4. What the fence does not do, and what stays outside it
+
+It does not repair, does not drop single blocks (a part is taken whole or not at all), and holds no rule about
+values: which prices differ, which ids match and what a feed must look like are pi's code's and the import's. Its
+two checks of its own are structural: each block's ref is a published entry, once.
+
+Outside the fence, on purpose:
+
+- **`data/authored/pi-aliases.yaml` against its schema.** It is an authored file: one that does not fit fails the
+  build, as every authored file does, and a pull request's check catches it. What its lines *do* is inside.
+- **`data/sync-status.json` as a file.** A file that does not parse stops the build today on `main`, wherever the
+  damaged byte is, and it stays so: pi cannot cause it (the sync writes the file whole, from a plain literal, by
+  an atomic rename, and a full sync replaces a damaged one), and what the build should say of models.dev's last
+  import when the file is unreadable is a question about the reference, not about pi. The `pi` key of a file that
+  does parse is inside the fence.
+- **The pages.** They draw checked, published data when a request comes; a fault there is not the import, the
+  build or the deploy.
+- **`LICENSES/pi-MIT.txt`**, a file of this repository, read by `writeSnapshot` like models.dev's.
+- **What no guard can catch:** a computation that does not end, or one that exhausts memory. They are bounded
+  where pi's side sets the size: the deadline and the size cap of the import (section b). The build's pi input is
+  a stored snapshot that passed them. And a promise pi's sync code leaves without a handler: `pi-sync.ts` awaits
+  every promise it creates inside `syncPi`.
+- **Tests on the built data.** `npm run check` stands between the build and the deploy, so a test may assert of
+  the real `data/published/` only what the fence guarantees: that it fits the contract. No test asserts a count,
+  a block or a difference of the real pi data.
+
+### 5. The tests that prove it
+
+`tests/pi-fence.test.ts` replaces `tests/pi-net.test.ts`. Each fixture build is made with a fixed `now`, three
+times: **healthy** (with pi), **without** (`data/pi/` absent, no `pi` key in the status file), and with a fault.
+
+1. **The table of faults, generated, not listed.** `vi.mock` wraps **every exported function** of `src/core/pi.ts`
+   and `scripts/lib/pi-sync.ts`, taken from the modules' own exports when the test runs, so that a function added
+   later is in the table without an edit. For each function and each of these faults: it throws an `Error`; it
+   throws an object whose `message` is a number and whose `toString` throws; it returns `undefined`; it returns
+   `{}`; it returns its true result with one key deleted, once for each key the result has, at every depth of the
+   first block, the first issue and the report's totals; it returns its true result with one value replaced by a
+   string, likewise. After each, for the build:
+   - `publish()` returns `ok: true` and does not throw;
+   - every answer of the published dataset fits the contract (the check `tests/api.test.ts` makes of a snapshot);
+   - **the dataset is one of two, byte for byte:** every file under `published/` is the *healthy* build's, or
+     every file is the *without* build's except `site/data/meta.json`, which differs from it in nothing but one
+     more item of `issues`, the `pi-snapshot-unreadable` warning for `data/pi`, with a reason of one line and at
+     most 300 characters; and `pi-report.json` is then absent. Nothing in between is ever published.
+   The same table for the record's part, with the `pi` key of the status file replaced by each of: a string, a
+   number, `null`, an array, the record with each key deleted, with each value of a wrong type, with an unknown
+   key: the files are the healthy build's except `meta.json`, whose `pi.sync` is the three `null`s and whose
+   `issues` has the warning for `data/sync-status.json`.
+2. **The sync, by the same table.** For each exported function of `scripts/lib/pi-sync.ts` and each fault, and for
+   a `fetch` that rejects with each of the thrown shapes above, answers with a body that never ends (the deadline shortened as the existing deadline test does), and answers
+   with a body over the size cap: `sync()` resolves; `report.ok` and the five fields of the status file are those
+   of a run with a healthy pi part; `data/upstream/` and `data/sources/` are byte for byte that run's; `data/pi/`
+   is byte for byte what it was; the `pi` record is `failed`, with this attempt's time and an error of one line;
+   `writeStepOutputs` writes `pi=failed`. And once, with a pi part held open: while it is pending, the status
+   file on disk already has this run's five fields and the record `The pi part did not finish.`
+3. **Nothing calls pi's code outside the fence.** `tests/pi-fence-imports.test.ts` reads every `.ts` and `.astro`
+   file under `src/`, `scripts/` and `worker/` and fails where an `import`, a dynamic `import()` or an
+   `export … from` that is not type-only names `src/core/pi.ts` or `scripts/lib/pi-sync.ts` from any file but the
+   ones the table of modules allows (an import that mixes values and inline `type` names counts as a value
+   import); where `scripts/lib/pi-fence.ts` exports anything but `piOfBuild`, `piOfSync` and types; and where
+   `piOfBuild(` or `piOfSync(` is called from more than the one file each.
+4. **The dataset is complete without pi.** `resolve()` on the fixture, with no pi anywhere, gives `pi: null` on
+   every entry, `buildIndex` `pi: null` on every summary, and both fit the contract; `noPiMeta()` fits
+   `MetaSchema.shape.pi`.
+5. **Own properties.** For each name of `Object.getOwnPropertyNames(Object.prototype)` (`constructor`, `toString`,
+   `__proto__`, `hasOwnProperty` and the rest) used as a pi provider id where the id's grammar allows it, as a pi
+   model id, as a provider key and a model key of the alias file and as a `same_as`: the build publishes the
+   healthy dataset's blocks for every other entry, and no block, no match and no fault for that name.
+6. **Being seen.** A `data/pi/` that is an empty folder, one without `meta.json`, one whose `meta.json` holds
+   `null`, one without `providers/`: each gives the warning and `state: "turned_away"`; no `data/pi/` gives none
+   and `state: "none"`. `writeBuildOutputs` writes the state. `tests/workflow.test.ts`: the warning step stands
+   directly after the build step with its condition; `Keep the new snapshot` names no path under `data/pi/` but in
+   `git status` and `git add`, and commits `sync: pi dd93eb2` from the step output and `sync: pi snapshot`
+   without one.
+
+`tests/pi-source.test.ts` keeps its cases; where it called `resolve()` with pi it calls `piPart` or builds through
+`publish()`. The real-data test of `tests/pi-net.test.ts` ("lets the committed data through") is not kept: the
+contract test of the real snapshot in `tests/api.test.ts` is the one test on the built data.
+
+### 6. The worker's steps
+
+One task each, in this order, on `pi-source`. **After every step, on the committed data, the result shows:**
+
+- with `generated_at` fixed (`publish()`'s `now`), all 740 files of `data/published/`, the private
+  `pi-report.json` included, have the SHA-256 of the same build at `adf67cd`; `dataset_version` is
+  `32f1de2adc92a2a8`; 813 entries have a block;
+- with `data/pi/` absent, in a copy of the data folder, all 739 files have the SHA-256 of the same build at
+  `adf67cd`, version `35bd94461a6b0269`;
+- `npm run compare:published` against a build of `6b95938`: 0 differing objects;
+- `npm run check` passes.
+
+| step | what | files | what else must be shown |
+|---|---|---|---|
+| F1 | **Move, change nothing.** pi's sync code into `scripts/lib/pi-sync.ts`; `PiAliases` and `PI_URL` into `src/core/schema.ts`; `scripts/lib/pi-fence.ts` created with `fenced`, `fencedAsync`, `reasonOf` and their tests alone | `scripts/lib/sync.ts`, `pi-sync.ts`, `pi-fence.ts`, `src/core/pi.ts`, `schema.ts`, the imports of the tests | the diff moves code and edits imports, nothing else; the replays of step F3 give the stored files of `adf67cd` |
+| F2 | **The build behind the fence.** `resolve()` without pi, with `before` and `ruledOut`; the two literals and `noPiMeta()`; `piPart`; lookups by own property; `piOfBuild`; `publish()` as in 1; `assemble`, `piMisfit`, `readPi`, `piUnreadable`, `piSync`, `piSummary` deleted | `src/core/resolve.ts`, `entries.ts`, `pi.ts`, `schema.ts`, `scripts/lib/pi-fence.ts`, `publish.ts` | tests 1 (the build's table), 3 for the build's modules, 4 and 5; the number of rows the table generated, and that each ended in one of the two datasets |
+| F3 | **The sync behind the fence.** `piOfSync`; the record written before and after; the swap last; the size cap; `pi_revision7` | `scripts/lib/pi-sync.ts`, `pi-fence.ts`, `sync.ts`, `scripts/sync.ts` | test 2 and the rest of 3; five offline replays (a first 200, a changed 200, a 304, an equal-body 200, a 503) leave every stored file under `data/`, `sync-status.json` included, byte for byte as the same replays at `adf67cd` |
+| F4 | **Being seen.** `storedPi`'s *none*; `PublishReport.pi` and `writeBuildOutputs`; the workflow's second warning step and the commit step without `node -p` on pi's file | `scripts/lib/pi-sync.ts`, `publish.ts`, `scripts/build-data.ts`, `.github/workflows/publish.yml` | test 6; the diff of the workflow in full |
+| F5 | **Words.** README ("Syncing": the two warnings, the record written twice, the size cap), `AGENTS.md` if it names the moved functions | `README.md`, `AGENTS.md` | nothing but the four lines above |
+
+F1 comes first so that the rule of the modules can be stated and tested from F2 on. If a step cannot keep the
+bytes of `adf67cd` on the committed data, it stops there and the reason goes to the chief: the fence changes
+where pi's code runs, not what it computes.
 
 ---
 
