@@ -667,6 +667,17 @@ describe("pi's catalog on the pages", () => {
     }
   });
 
+  it("the home page says nothing about differences in anything about pi: not in a row, not in a column's title", async () => {
+    for (const path of ["/", "/?q=model-4&limit=200"]) {
+      const html = await piPage(path);
+      // Every text and every attribute value of the page, and of them those that speak of pi.
+      const aboutPi = html.split(/[<>"]/).filter((piece) => /\bpi\b|pi\.dev|pi&#39;s/i.test(piece));
+      expect(aboutPi.length, path).toBeGreaterThan(2);
+      expect(aboutPi.filter((piece) => /differ/i.test(piece)), path).toEqual([]);
+      expect(html, path).toContain("imported beside models.dev and never merged into it. The entry&#39;s own page shows what pi states.");
+    }
+  });
+
   it("the pi.dev mark is a mark like the other sources, not a link, on rows and on the entry page", async () => {
     for (const path of ["/?q=model-4&limit=200", "/providers/provider-02/", "/entries/provider-02/lab/model-4", "/entries/provider-02/lab/model-0"]) {
       const html = await piPage(path);
