@@ -19,17 +19,23 @@ export function usd(value: number): string {
 }
 
 /**
- * Two prices that differ, each written as `usd` writes it, unless that writes them alike: then both with as many
- * decimals as it takes to tell them apart, up to 6 (the precision pi's differences are compared at). Used where a page
- * sets two prices side by side as different: the pi section of an entry.
+ * A price never rounded, for the pi section of an entry: as `usd` writes it where that reads back as the same number,
+ * otherwise the full number the API states, in plain decimals (no exponent). Each price is written on its own.
  */
-export function usdApart(a: number, b: number): [string, string] {
-  let pair: [string, string] = [usd(a), usd(b)];
-  for (let digits = 2; a !== b && pair[0] === pair[1] && digits <= 6; digits += 1) {
-    const write = (value: number): string => `$${value.toLocaleString("en-US", { minimumFractionDigits: Math.min(2, digits), maximumFractionDigits: digits })}`;
-    pair = [write(a), write(b)];
-  }
-  return pair;
+export function usdUnrounded(value: number): string {
+  const written = usd(value);
+  return Number(written.slice(1).replaceAll(",", "")) === value ? written : `$${plainDecimal(value)}`;
+}
+
+/** The number as JSON states it (the shortest that reads back as it), in plain decimals: 1e-7 -> "0.0000001". */
+function plainDecimal(value: number): string {
+  const [mantissa = "", exponent = "0"] = String(Math.abs(value)).split("e");
+  const [whole = "", fraction = ""] = mantissa.split(".");
+  const digits = whole + fraction;
+  const point = whole.length + Number(exponent);
+  const integer = point <= 0 ? "0" : digits.slice(0, point).padEnd(point, "0");
+  const decimals = (point <= 0 ? "0".repeat(-point) + digits : digits.slice(point)).replace(/0+$/, "");
+  return `${value < 0 ? "-" : ""}${BigInt(integer).toLocaleString("en-US")}${decimals ? `.${decimals}` : ""}`;
 }
 
 /** 1048576 -> "1.05M", 128000 -> "128K". Always pair it with the exact number. */

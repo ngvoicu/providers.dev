@@ -10,7 +10,7 @@ import { resolve } from "../src/core/resolve.ts";
 import { NS, UpstreamModel, type ModelExtension } from "../src/core/schema.ts";
 import { pricingOf } from "../src/core/policies.ts";
 import { limitOf, NO_CACHE, summaryOf } from "./helpers.ts";
-import { duration, usd, usdApart } from "../src/core/format.ts";
+import { duration, usd, usdUnrounded } from "../src/core/format.ts";
 import type { PiBlock, PiCatalog, PiModel } from "../src/core/pi.ts";
 import type { MetaPi } from "../src/core/schema.ts";
 
@@ -887,26 +887,39 @@ describe("pi's catalog on an entry's page and in a row", () => {
     expect(text(section(page("unlisted", meta({ last_attempt_ok: false }))))).toContain("failed: this is the last good one");
   });
 
-  it("6. two prices that differ beyond the usual decimals are written apart, in a price row and in the tiers; other prices as before", () => {
-    // The API tells 0.123451 from 0.123452 (six decimals); the row must too.
+  it("6. a price in the pi section is never rounded, pi's and this page's, plain and in a tier; no pairing decides how one is written", () => {
+    // The second review: 0.0156275 and 0.0156276 both read $0.015628, and tiers shifted by an extra tier were paired wrongly.
     const model = structuredClone(catalog.lab!.models.full!);
     const extension = model[NS] as unknown as ModelExtension;
     const block = extension.pi!;
     block.cost.input = 0.123451;
-    block.cost.tiers = [{ input_tokens_above: 199999, input: 2.000001, output: 8, cache_read: 0.2, cache_write: 0 }];
+    block.cost.output = 0.0156275;
+    block.cost.cache_read = 0.00123456;
+    block.cost.tiers = [{ input_tokens_above: 100, input: 0.123451, output: 3, cache_read: 0.2, cache_write: 0 }];
     block.differences = [
-      { field: "cost.input", entry_field: "cost.text.input.price", unit: "usd_per_million_tokens", pi: 0.123451, published: 0.123452, pi_tiers: null, published_tiers: null },
-      { field: "cost.tiers", entry_field: "cost.text", unit: "usd_per_million_tokens", pi: null, published: null, pi_tiers: block.cost.tiers, published_tiers: [{ input_tokens_above: 199999, input: 2.000002, output: 8, cache_read: 0.2, cache_write: null }] },
+      { field: "cost.output", entry_field: "cost.text.output.price", unit: "usd_per_million_tokens", pi: 0.0156275, published: 0.0156276, pi_tiers: null, published_tiers: null },
+      { field: "cost.cache_read", entry_field: "cost.text.input.cache.read", unit: "usd_per_million_tokens", pi: 0.00123456, published: 0.00123556, pi_tiers: null, published_tiers: null },
+      { field: "cost.tiers", entry_field: "cost.text", unit: "usd_per_million_tokens", pi: null, published: null, pi_tiers: block.cost.tiers, published_tiers: [{ input_tokens_above: 50, input: 2, output: null, cache_read: null, cache_write: null }, { input_tokens_above: 100, input: 0.123452, output: 3, cache_read: 0.2, cache_write: null }] },
     ];
-    const summary = { ...index.entries.find((entry) => entry.ref === "lab/full")!, pi: { ref: "lab/full", api: "openai-completions", match: "id" as const, difference_count: 2 } };
+    const summary = { ...index.entries.find((entry) => entry.ref === "lab/full")!, pi: { ref: "lab/full", api: "openai-completions", match: "id" as const, difference_count: 3 } };
     const shown = text(section(entryHtml({ summary, provider: index.providers[0]!, model, today: { date: new Date("2026-11-14T00:00:00Z"), stale_after_days: 90 }, cache_ages_s: CACHE_AGES_S, imported: "2026-11-13", pi: meta() })));
-    expect(shown).toMatch(/Input US dollars per 1M tokens \$0\.123451 \/ 1M Differs \$0\.123452 \/ 1M/);
-    expect(shown).toContain("Above 199,999 In $2.000001 Out $8 Cache read $0.20");
-    expect(shown).toContain("Above 199,999 In $2.000002 Out $8 Cache read $0.20");
-    // Elsewhere, and where the two read apart already, prices are written as before.
+    // pi's input differs from nothing here and is written in full all the same.
+    expect(shown).toMatch(/Input US dollars per 1M tokens \$0\.123451 \/ 1M No difference/);
+    expect(shown).toMatch(/Output US dollars per 1M tokens \$0\.0156275 \/ 1M Differs \$0\.0156276 \/ 1M/);
+    expect(shown).toMatch(/Cache read US dollars per 1M tokens \$0\.00123456 \/ 1M Differs \$0\.00123556 \/ 1M/);
+    expect(shown).toContain("Above 100 In $0.123451 Out $3 Cache read $0.20");
+    expect(shown).toContain("Above 50 In $2 Out Not stated");
+    expect(shown).toContain("Above 100 In $0.123452 Out $3 Cache read $0.20");
+    // As the site writes prices where that is the same number; the full number, in plain decimals, where it is not.
+    expect(usdUnrounded(12.5)).toBe("$12.50");
+    expect(usdUnrounded(0.075)).toBe("$0.075");
+    expect(usdUnrounded(0.123451)).toBe("$0.123451");
+    expect(usdUnrounded(1e-7)).toBe("$0.0000001");
+    expect(usdUnrounded(1.5e-9)).toBe("$0.0000000015");
+    expect(usdUnrounded(1234.56789)).toBe("$1,234.56789");
+    // Elsewhere prices are written as before.
     expect(usd(0.123451)).toBe("$0.1235");
-    expect(usdApart(1.32, 0.66)).toEqual(["$1.32", "$0.66"]);
-    expect(usdApart(0.123451, 0.123452)).toEqual(["$0.123451", "$0.123452"]);
+    expect(usd(0.0156275)).toBe("$0.0156");
   });
 
   it("7. says \"last checked, unchanged\" only after a check later than the fetch, and calls nothing the last good one without a snapshot", () => {
