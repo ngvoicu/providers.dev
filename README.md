@@ -343,17 +343,20 @@ If any check fails or models.dev is down, `data/upstream/` is left exactly as it
 error, and the next build publishes the last good snapshot with a note that the last sync failed. A lock file
 (`data/.sync.lock`) stops two syncs on one machine from running at once.
 
-pi's catalog (`PI_URL` in `scripts/lib/sync.ts`) is checked the same way: JSON in the expected structure
-(`PiFeed` in `src/core/pi.ts`), every provider key a valid provider id, every model's `id` its key and its
-`provider` its provider key, at least 10 providers and 300 models, and no more than 40% of either lost since the
-last import. It sends the stored ETag too, and an equal body counts as unchanged. `data/pi/` holds `meta.json` (the
+pi's catalog (`PI_URL` in `src/core/schema.ts`; pi's part of the sync is `scripts/lib/pi-sync.ts`) is checked the
+same way: JSON in the expected structure (`PiFeed` in `src/core/pi.ts`), every provider key a valid provider id,
+every model's `id` its key and its `provider` its provider key, no model id the build cannot hold (`__proto__`), at
+least 10 providers and 300 models, and no more than 40% of either lost since the last import. The request and the
+whole body must be done within 60 seconds, and the body is read from its stream and refused as soon as it passes
+16 MB (the feed is about 1 MB), without reading the rest. It sends the stored ETag too, and an equal body counts as
+unchanged. The new snapshot is swapped in as the very last step, so a pi import that fails never replaces it. `data/pi/` holds `meta.json` (the
 address, the times, the ETag, `Last-Modified` and pi's catalog revision as sent, the digest of the body and the
 counts) and one file per provider key, its models sorted by id, each model exactly as the feed gives it.
 
 The two kinds of failure are told apart:
 
 - **Only the pi import fails** (pi down, not JSON, another structure, a key and an id that disagree, too small, 40%
-  lost): `data/pi/` is left exactly as it was, `meta.json` included; models.dev and the measurements are imported as
+  lost, too slow, too large, or any fault in pi's own code): `data/pi/` is left exactly as it was, `meta.json` included; models.dev and the measurements are imported as
   usual; the command prints why and exits 0. `data/sync-status.json` records it under its own `pi` key
   (`status: "failed"` and the error) and keeps `last_attempt_ok: true` with no `last_error`. The `Publish` run stays
   green, with a warning on the run, and builds and deploys with the last good pi snapshot.
@@ -362,11 +365,33 @@ The two kinds of failure are told apart:
   import in the same run is still kept.
 
 `last_attempt_at`, `last_attempt_ok` and `last_error` in `data/sync-status.json` speak of models.dev and the
-measurements only; the `pi` key has its own time, status and error. `--only=pi` writes the `pi` key alone, exits with
-an error if the pi import failed, and exists so that a pi snapshot can be taken without moving `data/upstream/`.
-On GitHub the import step writes its outcome per source (`upstream`, `measurements`, `pi`) to the step's outputs,
-which the warning step reads, and a snapshot commit names what changed (`sync: models.dev <commit>`,
-`sync: pi <revision>`, both, or `sync: measurements`).
+measurements only; the `pi` key has its own time, status and error. The file is written twice in a run: once before
+the pi part, with the five fields of models.dev and the measurements and a `pi` record that says
+`The pi part did not finish.`, and once after it, with the pi part's outcome. So models.dev's result never waits on
+pi, and a run that dies inside the pi part leaves a record of an attempt that did not finish, never the previous
+attempt's success. `--only=pi` keeps the five fields as they were (a file that does not parse counts as having none),
+writes the `pi` key, exits with an error if the pi import failed, and exists so that a pi snapshot can be taken
+without moving `data/upstream/`.
+
+pi's part runs behind a fence (`scripts/lib/pi-fence.ts`, design section k): in the sync and in the build, pi's
+code is called in one guarded place each, and what it returns is taken only as plain data that fits the contract.
+Nothing on pi's side can stop the models.dev import, the build or the deploy. Two warnings say when pi's side
+went wrong:
+
+- **The pi import failed** (the `Import` step's output `pi=failed`): the run stays green with the warning
+  "The pi import failed", and the site is built with the last good pi snapshot.
+- **The build left pi data out** (the build step's output `pi=turned_away`): the stored pi snapshot cannot be used,
+  what pi's code gave does not fit the contract or does not agree with itself, or the `pi` record of
+  `data/sync-status.json` does not fit. The dataset is built and deployed without that part, with the warning
+  "The build left pi data out" on the run, and `/api/v1/meta` lists the reason under `issues`
+  (`pi-snapshot-unreadable`, one per part left out). Without a folder `data/pi/` at all, the dataset simply has no
+  pi data, with no warning.
+
+On GitHub the import step writes its outcome per source (`upstream`, `measurements`, `pi`) and `pi_revision7`, the
+first seven characters of the stored pi snapshot's revision, to the step's outputs; the build step writes `pi`
+(`published`, `none` or `turned_away`). The warning steps read them, and a snapshot commit names what changed
+(`sync: models.dev <commit>`, `sync: pi <revision>`, both, or `sync: measurements`) without reading any file of
+pi's.
 
 The import is not made tolerant of a change in models.dev's structure: that is the owner's decision. When models.dev
 changes the type of a field the site reads, the import fails on purpose: the site goes on serving the last good
