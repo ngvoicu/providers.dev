@@ -18,6 +18,20 @@ export function usd(value: number): string {
   return `$${text}`;
 }
 
+/**
+ * Two prices that differ, each written as `usd` writes it, unless that writes them alike: then both with as many
+ * decimals as it takes to tell them apart, up to 6 (the precision pi's differences are compared at). Used where a page
+ * sets two prices side by side as different: the pi section of an entry.
+ */
+export function usdApart(a: number, b: number): [string, string] {
+  let pair: [string, string] = [usd(a), usd(b)];
+  for (let digits = 2; a !== b && pair[0] === pair[1] && digits <= 6; digits += 1) {
+    const write = (value: number): string => `$${value.toLocaleString("en-US", { minimumFractionDigits: Math.min(2, digits), maximumFractionDigits: digits })}`;
+    pair = [write(a), write(b)];
+  }
+  return pair;
+}
+
 /** 1048576 -> "1.05M", 128000 -> "128K". Always pair it with the exact number. */
 export function compactTokens(value: number): string {
   if (value >= 1_000_000) return `${trim(value / 1_000_000)}M`;

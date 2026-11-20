@@ -18,6 +18,7 @@ import { readSnapshot, type AssetBinding } from "../src/core/snapshot.ts";
 import worker from "../worker/index.ts";
 import type { PiCatalog } from "../src/core/pi.ts";
 import type { JsonObject } from "../src/core/merge.ts";
+import type { Meta } from "../src/core/schema.ts";
 import { depsFrom, fetchReturning, fixturePi, fixtureUpstream, ROOT, tempDataDir, writeAuthored, writePiSnapshot } from "./helpers.ts";
 
 const shell = `<html><head><title>${MARK.title} · providers.dev</title><meta name="description" content="${MARK.description}"><link rel="canonical" href="${MARK.canonical}"></head><body><nav>${MARK.nav}</nav><main>${MARK.html}</main><footer>${MARK.dataset}</footer></body></html>`;
@@ -672,6 +673,25 @@ describe("pi's catalog on the pages", () => {
       expect(html, path).toContain('<span class="origin pi"');
       expect(html, path).not.toMatch(/<a [^>]*class="origin pi"|href="(?:\/entries\/[^"]*)?#pi"/);
     }
+  });
+
+  it("7. the footer says \"last checked\" only after a check later than the fetch, and no last good snapshot without one", async () => {
+    /** The pages read /api/v1/meta with `pi` replaced. */
+    const withMeta = (pi: (meta: Meta["pi"]) => Meta["pi"]) => async (path: string) => {
+      const response = await piApi(path);
+      if (!path.startsWith("/api/v1/meta")) return response;
+      const body = (await response.json()) as { meta: unknown; data: Meta };
+      return new Response(JSON.stringify({ ...body, data: { ...body.data, pi: pi(body.data.pi) } }), { status: 200, headers: { "Content-Type": "application/json" } });
+    };
+    const footer = async (read: (path: string) => Promise<Response>) => (await (await handlePage(new Request("https://providers.dev/providers/"), { api: read, shell: async () => new Response(shell), site: "https://providers.dev", now })).text()).split("<footer>")[1]!;
+    const fetchedOnly = await footer(withMeta((pi) => ({ ...pi, snapshot: { ...pi.snapshot!, checked_at: pi.snapshot!.fetched_at } })));
+    expect(fetchedOnly).toContain("<li>pi's catalog fetched 2026-11-20</li>");
+    expect(fetchedOnly).not.toContain("last checked");
+    const failedFirst = await footer(withMeta((pi) => ({ ...pi, snapshot: null, sync: { last_attempt_at: "2026-11-21T04:17:00.000Z", last_attempt_ok: false, last_error: "pi.dev answered HTTP 503" }, counts: { entries_with_block: 0, left_out_models: 0, unmatched_models: 0 } })));
+    expect(failedFirst).toContain('<li class="stale">The last import of pi\'s catalog failed. This dataset has no pi data.</li>');
+    expect(failedFirst).not.toContain("Its data is the last good snapshot");
+    const failedLater = await footer(withMeta((pi) => ({ ...pi, sync: { last_attempt_at: "2026-11-21T04:17:00.000Z", last_attempt_ok: false, last_error: "pi.dev answered HTTP 503" } })));
+    expect(failedLater).toContain("The last import of pi's catalog failed. Its data is the last good snapshot.");
   });
 
   it("dates pi's catalog in the footer of every page, and says when its last import failed", async () => {

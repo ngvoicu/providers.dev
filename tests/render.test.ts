@@ -10,7 +10,7 @@ import { resolve } from "../src/core/resolve.ts";
 import { NS, UpstreamModel, type ModelExtension } from "../src/core/schema.ts";
 import { pricingOf } from "../src/core/policies.ts";
 import { limitOf, NO_CACHE, summaryOf } from "./helpers.ts";
-import { duration, usd } from "../src/core/format.ts";
+import { duration, usd, usdApart } from "../src/core/format.ts";
 import type { PiBlock, PiCatalog, PiModel } from "../src/core/pi.ts";
 import type { MetaPi } from "../src/core/schema.ts";
 
@@ -885,6 +885,43 @@ describe("pi's catalog on an entry's page and in a row", () => {
     expect(text(section(failed))).toContain("The last import, 2026-11-15, failed: this is the last good one");
     expect(failed).toContain(">2026-11-12 · last import failed</span>");
     expect(text(section(page("unlisted", meta({ last_attempt_ok: false }))))).toContain("failed: this is the last good one");
+  });
+
+  it("6. two prices that differ beyond the usual decimals are written apart, in a price row and in the tiers; other prices as before", () => {
+    // The API tells 0.123451 from 0.123452 (six decimals); the row must too.
+    const model = structuredClone(catalog.lab!.models.full!);
+    const extension = model[NS] as unknown as ModelExtension;
+    const block = extension.pi!;
+    block.cost.input = 0.123451;
+    block.cost.tiers = [{ input_tokens_above: 199999, input: 2.000001, output: 8, cache_read: 0.2, cache_write: 0 }];
+    block.differences = [
+      { field: "cost.input", entry_field: "cost.text.input.price", unit: "usd_per_million_tokens", pi: 0.123451, published: 0.123452, pi_tiers: null, published_tiers: null },
+      { field: "cost.tiers", entry_field: "cost.text", unit: "usd_per_million_tokens", pi: null, published: null, pi_tiers: block.cost.tiers, published_tiers: [{ input_tokens_above: 199999, input: 2.000002, output: 8, cache_read: 0.2, cache_write: null }] },
+    ];
+    const summary = { ...index.entries.find((entry) => entry.ref === "lab/full")!, pi: { ref: "lab/full", api: "openai-completions", match: "id" as const, difference_count: 2 } };
+    const shown = text(section(entryHtml({ summary, provider: index.providers[0]!, model, today: { date: new Date("2026-11-14T00:00:00Z"), stale_after_days: 90 }, cache_ages_s: CACHE_AGES_S, imported: "2026-11-13", pi: meta() })));
+    expect(shown).toMatch(/Input US dollars per 1M tokens \$0\.123451 \/ 1M Differs \$0\.123452 \/ 1M/);
+    expect(shown).toContain("Above 199,999 In $2.000001 Out $8 Cache read $0.20");
+    expect(shown).toContain("Above 199,999 In $2.000002 Out $8 Cache read $0.20");
+    // Elsewhere, and where the two read apart already, prices are written as before.
+    expect(usd(0.123451)).toBe("$0.1235");
+    expect(usdApart(1.32, 0.66)).toEqual(["$1.32", "$0.66"]);
+    expect(usdApart(0.123451, 0.123452)).toEqual(["$0.123451", "$0.123452"]);
+  });
+
+  it("7. says \"last checked, unchanged\" only after a check later than the fetch, and calls nothing the last good one without a snapshot", () => {
+    const fetchedOnly: MetaPi = { ...meta(), snapshot: { ...meta().snapshot!, checked_at: "2026-11-12T14:19:45.000Z" } };
+    for (const model of ["full", "unlisted"]) {
+      const html = page(model, fetchedOnly);
+      expect(text(section(html))).toContain("Fetched 2026-11-12 from pi.dev/api/models");
+      expect(html).not.toMatch(/Last checked|unchanged|checked again/);
+    }
+    // A first import that failed: no snapshot, so nothing is the last good one.
+    const failedFirst: MetaPi = { source: "https://pi.dev/api/models", snapshot: null, sync: { last_attempt_at: "2026-11-15T04:17:00.000Z", last_attempt_ok: false, last_error: "pi.dev answered HTTP 503" }, counts: { entries_with_block: 0, left_out_models: 0, unmatched_models: 0 } };
+    const unlisted = page("unlisted", failedFirst);
+    expect(text(section(unlisted))).toContain("This dataset is built without pi's catalog ( pi.dev/api/models ). The last import, 2026-11-15, failed");
+    expect(unlisted).not.toMatch(/last good/);
+    expect(unlisted).toContain("This dataset has no pi data. The last import, 2026-11-15 04:17 UTC, failed.");
   });
 
   it("a row with a block has the pi.dev badge and nothing about differences; a row without one has none", () => {

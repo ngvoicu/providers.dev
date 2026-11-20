@@ -30,6 +30,7 @@ import {
   plural,
   shortAge,
   usd,
+  usdApart,
   type Today,
 } from "./format.ts";
 import { isObject, type Json, type JsonObject } from "./merge.ts";
@@ -73,14 +74,22 @@ export interface PiDates {
 }
 export function piDates(meta: MetaPi | undefined): PiDates {
   const day = (stamp: string | null | undefined): string | null => (stamp ? stamp.slice(0, 10) : null);
-  return { fetched: day(meta?.snapshot?.fetched_at), checked: day(meta?.snapshot?.checked_at), failed_at: day(meta?.sync.last_attempt_at), failed: meta?.sync.last_attempt_ok === false };
+  // A check is said only where there was one after the fetch: on the fetch itself, checked_at is fetched_at.
+  return { fetched: day(meta?.snapshot?.fetched_at), checked: piRechecked(meta) ? day(meta?.snapshot?.checked_at) : null, failed_at: day(meta?.sync.last_attempt_at), failed: meta?.sync.last_attempt_ok === false };
+}
+/** Whether pi's feed was checked again after the fetch: `checked_at` later than `fetched_at`. */
+export function piRechecked(meta: MetaPi | undefined): boolean {
+  const snapshot = meta?.snapshot;
+  return snapshot ? snapshot.checked_at > snapshot.fetched_at : false;
 }
 const UTC = (stamp: string): string => `${stamp.slice(0, 10)} ${stamp.slice(11, 16)} UTC`;
 function piDatesSaid(meta: MetaPi | undefined): string {
   const snapshot = meta?.snapshot;
-  if (!snapshot) return "pi's catalog is not in this dataset.";
-  const failed = meta.sync.last_attempt_ok === false ? ` The last import${meta.sync.last_attempt_at ? `, ${UTC(meta.sync.last_attempt_at)},` : ""} failed: this is the last good one.` : "";
-  return `Fetched from pi's catalog ${UTC(snapshot.fetched_at)}. Last checked ${UTC(snapshot.checked_at)}: unchanged since the fetch.${failed}`;
+  const lastFailed = meta?.sync.last_attempt_ok === false ? ` The last import${meta.sync.last_attempt_at ? `, ${UTC(meta.sync.last_attempt_at)},` : ""} failed` : "";
+  if (!snapshot) return `This dataset has no pi data.${lastFailed ? `${lastFailed}.` : ""}`;
+  const failed = lastFailed ? `${lastFailed}: this is the last good one.` : "";
+  const checked = piRechecked(meta) ? ` Last checked ${UTC(snapshot.checked_at)}: unchanged since the fetch.` : "";
+  return `Fetched from pi's catalog ${UTC(snapshot.fetched_at)}.${checked}${failed}`;
 }
 
 /**
@@ -810,35 +819,40 @@ const PI_ROWS: { field: PiDifferenceField; label: string; hint: string }[] = [
 const TIER_PRICES = [["input", "In"], ["output", "Out"], ["cache_read", "Cache read"], ["cache_write", "Cache write"]] as const;
 
 /** A price per 1M tokens as one side states it: pi's 0 is not a statement; the page's own null is unknown. */
-function piPrice(value: number | null, side: "pi" | "published", unit = true): string {
+function piPrice(value: number | null, side: "pi" | "published", unit = true, other: number | null = null): string {
   if (value === null) return NOT_STATED;
   if (value === 0 && side === "pi") return ZERO_PRICE;
-  return `${usd(value)}${unit ? ' <span class="muted">/ 1M</span>' : ""}`;
+  // Beside a price it differs from, written so that the two read differently (up to 6 decimals).
+  const written = other === null || other === value ? usd(value) : usdApart(value, other)[0];
+  return `${written}${unit ? ' <span class="muted">/ 1M</span>' : ""}`;
 }
 const piTokens = (value: number | null): string => (value === null || value === 0 ? NOT_STATED : `${exact(value)} <span class="muted">tokens</span>`);
 
 /** Tiers by size of request, each with its threshold and its four prices, laid out alike on both sides so that they read across. */
-function tiersHtml(tiers: readonly PiCostTier[], side: "pi" | "published"): string {
+function tiersHtml(tiers: readonly PiCostTier[], side: "pi" | "published", others: readonly PiCostTier[] = []): string {
   if (tiers.length === 0) return side === "pi" ? '<span class="unknown" title="pi\'s catalog states no tiers for this model.">None stated</span>' : '<span class="muted">None</span>';
-  return `<ul class="pi-tiers">${tiers.map((tier) => `<li><span class="tier-at" title="${exact(tier.input_tokens_above)} input tokens: input, cache reads and cache writes together.">Above ${exact(tier.input_tokens_above)}</span>${TIER_PRICES.map(([key, label]) => `<span><span class="muted">${label}</span> ${piPrice(tier[key], side, false)}</span>`).join("")}</li>`).join("")}</ul>`;
+  // A price is written against the same price of the other side's tier at the same place, where there is one.
+  const other = (index: number, key: (typeof TIER_PRICES)[number][0]): number | null => (others[index] && others[index].input_tokens_above === tiers[index]!.input_tokens_above ? others[index][key] : null);
+  return `<ul class="pi-tiers">${tiers.map((tier, index) => `<li><span class="tier-at" title="${exact(tier.input_tokens_above)} input tokens: input, cache reads and cache writes together.">Above ${exact(tier.input_tokens_above)}</span>${TIER_PRICES.map(([key, label]) => `<span><span class="muted">${label}</span> ${piPrice(tier[key], side, false, other(index, key))}</span>`).join("")}</li>`).join("")}</ul>`;
 }
 
 /** pi's value of a row, as the block states it. */
-function piValue(block: PiBlock, field: PiDifferenceField): string {
+function piValue(block: PiBlock, field: PiDifferenceField, item?: PiDifference): string {
+  const published = item?.published ?? null;
   switch (field) {
     case "context_window": return piTokens(block.context_window);
     case "max_tokens": return piTokens(block.max_tokens);
-    case "cost.input": return piPrice(block.cost.input, "pi");
-    case "cost.output": return piPrice(block.cost.output, "pi");
-    case "cost.cache_read": return piPrice(block.cost.cache_read, "pi");
-    case "cost.cache_write": return piPrice(block.cost.cache_write, "pi");
-    case "cost.tiers": return tiersHtml(block.cost.tiers, "pi");
+    case "cost.input": return piPrice(block.cost.input, "pi", true, published);
+    case "cost.output": return piPrice(block.cost.output, "pi", true, published);
+    case "cost.cache_read": return piPrice(block.cost.cache_read, "pi", true, published);
+    case "cost.cache_write": return piPrice(block.cost.cache_write, "pi", true, published);
+    case "cost.tiers": return tiersHtml(block.cost.tiers, "pi", item?.published_tiers ?? []);
   }
 }
 
 /** This page's value of a row where pi's differs: the item's `published` (or `published_tiers`), and the field it is. */
-function publishedValue(item: PiDifference): string {
-  const value = item.field === "cost.tiers" ? tiersHtml(item.published_tiers ?? [], "published") : item.unit === "tokens" ? piTokens(item.published) : piPrice(item.published, "published");
+function publishedValue(item: PiDifference, block: PiBlock): string {
+  const value = item.field === "cost.tiers" ? tiersHtml(item.published_tiers ?? [], "published", block.cost.tiers) : item.unit === "tokens" ? piTokens(item.published) : piPrice(item.published, "published", true, item.pi);
   const tag = `<span class="pi-differ" title="pi's catalog states this otherwise. This page publishes the value in ${e(item.entry_field)}.">Differs</span>`;
   // Tiers are a list: the tag goes under it, so that the two lists begin on the same line.
   return item.field === "cost.tiers" ? `${value}${tag}` : `${tag} ${value}`;
@@ -891,7 +905,8 @@ function piSection(block: PiBlock | null, meta: MetaPi | undefined): string {
   const source = `<a href="${e(meta?.source ?? "https://pi.dev/api/models")}" rel="noopener">${e(shortUrl(meta?.source ?? "https://pi.dev/api/models"))}</a>`;
   const fetched = dates.fetched ? `<span>Fetched <span class="date" title="${e(UTC(meta!.snapshot!.fetched_at))}">${e(dates.fetched)}</span> from ${source}</span>` : `<span>From ${source}</span>`;
   const checked = dates.checked ? `<span title="pi's feed was checked again on this date and had not changed since the fetch.">Last checked <span class="date" title="${e(UTC(meta!.snapshot!.checked_at))}">${e(dates.checked)}</span>, unchanged</span>` : "";
-  const failed = dates.failed ? `<span class="stale" title="${e(piDatesSaid(meta))}">The last import${dates.failed_at ? `, ${e(dates.failed_at)},` : ""} failed: this is the last good one</span>` : "";
+  // "The last good one" only where there is one: after a first import that failed, the dataset has no pi data.
+  const failed = dates.failed ? `<span class="stale" title="${e(piDatesSaid(meta))}">The last import${dates.failed_at ? `, ${e(dates.failed_at)},` : ""} failed${meta?.snapshot ? ": this is the last good one" : ""}</span>` : "";
   if (block === null) {
     if (meta && meta.snapshot === null) return `<p class="muted">This dataset is built without pi's catalog (${source}).${failed ? ` ${failed}` : ""}</p>`;
     return `<p class="muted">pi's model catalog does not list this entry.</p><p class="pi-facts muted">${fetched}${checked}${failed}</p>`;
@@ -899,8 +914,8 @@ function piSection(block: PiBlock | null, meta: MetaPi | undefined): string {
   const differs = new Map(block.differences.map((item) => [item.field, item]));
   const rows = PI_ROWS.map(({ field, label, hint }) => {
     const item = differs.get(field);
-    const published = item ? publishedValue(item) : '<span class="muted" title="pi states no other value here: the two agree, or one of them states none.">No difference</span>';
-    return `<tr${item ? ' class="differs"' : ""}><th scope="row">${label}<div class="hint">${hint}</div></th><td class="num" data-label="pi's catalog">${piValue(block, field)}</td><td class="num" data-label="This page">${published}</td></tr>`;
+    const published = item ? publishedValue(item, block) : '<span class="muted" title="pi states no other value here: the two agree, or one of them states none.">No difference</span>';
+    return `<tr${item ? ' class="differs"' : ""}><th scope="row">${label}<div class="hint">${hint}</div></th><td class="num" data-label="pi's catalog">${piValue(block, field, item)}</td><td class="num" data-label="This page">${published}</td></tr>`;
   }).join("");
   const count = block.differences.length;
   const list = `https://pi.dev/models?provider=${encodeURIComponent(block.provider)}`;
