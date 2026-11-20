@@ -5,8 +5,8 @@ import { IDENTITY_FIELDS } from "../../../core/resolve.ts";
 
 <Doc
   title="Methodology"
-  description="Where each value on providers.dev comes from, how the models.dev baseline is merged with corrections and evaluations, and what unknown means."
-  lead="The catalog is the latest verified import of models.dev, plus added providers, documented corrections and independent evaluations. This page explains how they are combined and what each label means."
+  description="Where each value on providers.dev comes from, how the models.dev baseline is merged with corrections and evaluations, how pi's catalog is shown beside it, and what unknown means."
+  lead="The catalog is the latest verified import of models.dev, plus added providers, documented corrections and independent evaluations; pi's model catalog is shown beside it. This page explains how they are combined and what each label means."
   toc={[
     { id: "kinds", label: "Kinds of value" },
     { id: "unknown", label: "Unknown values" },
@@ -16,6 +16,7 @@ import { IDENTITY_FIELDS } from "../../../core/resolve.ts";
     { id: "access", label: "Access methods" },
     { id: "merge", label: "Merge rules" },
     { id: "sync", label: "Daily import" },
+    { id: "pi", label: "pi's catalog" },
     { id: "caching", label: "Documented caching" },
     { id: "evaluations", label: "Cache evaluations" },
     { id: "lifetimes", label: "Cache lifetimes" },
@@ -28,6 +29,7 @@ import { IDENTITY_FIELDS } from "../../../core/resolve.ts";
       <li><span class="origin upstream">models.dev</span> <strong>Imported.</strong> Copied from models.dev and not independently checked. Imported values never carry a verification date.</li>
       <li><span class="badge documented">documented</span> <strong>Documented.</strong> Set because the provider's own documentation says so. The entry names the page and the date it was read.</li>
       <li><span class="badge measured">measured</span> <strong>Measured.</strong> Observed by sending requests. The entry names the access method, the client, the date and the raw result.</li>
+      <li><span class="origin pi">pi.dev</span> <strong>pi's catalog.</strong> What the model catalog of the coding agent pi states for an entry, imported and not independently checked. It is shown beside the entry's values and never replaces one (see <a href="#pi">pi's catalog</a>).</li>
       <li><strong>API price.</strong> The list price of the API entry of the same model, shown on a subscription entry and marked "API price". It is the only value an entry takes from another one (see <a href="#prices">Prices</a>).</li>
     </ul>
     <p>
@@ -194,6 +196,7 @@ import { IDENTITY_FIELDS } from "../../../core/resolve.ts";
       <li><strong>Additions</strong>: providers and entries that models.dev does not have.</li>
       <li><strong>Corrections</strong>: single fields set on upstream entries. They take precedence.</li>
     </ol>
+    <p>pi's catalog is a fourth input that sets no field: what it states for an entry is published beside the entry, under <code>providers_dev.pi</code> (see <a href="#pi">pi's catalog</a>).</p>
     <p>A correction is a patch applied field by field:</p>
   </div>
   <div class="scroll max-w-[62rem]">
@@ -228,7 +231,43 @@ import { IDENTITY_FIELDS } from "../../../core/resolve.ts";
       must match their keys, and it must not be empty or have lost a large share of its entries since the previous import. If validation fails or models.dev is unavailable, the previous
       snapshot stays in place and keeps being served; the footer and <code>/api/v1/meta</code> report the failed import. Visitors and API requests never trigger a fetch.
     </p>
-    <p>The current import, source commit and counts are published at <a href="/api/v1/meta"><code>/api/v1/meta</code></a>.</p>
+    <p>
+      The same run fetches pi's model catalog from <a href="https://pi.dev/api/models"><code>pi.dev/api/models</code></a>, automatically and on its own: it is checked in the same way, and a
+      failure of either source leaves the other's import and its own last good snapshot as they were.
+    </p>
+    <p>The current import, source commit and counts are published at <a href="/api/v1/meta"><code>/api/v1/meta</code></a>, pi's under <code>pi</code>.</p>
+
+    <h2 id="pi">pi's catalog</h2>
+    <p>
+      pi is a coding agent (<a href="https://github.com/earendil-works/pi">github.com/earendil-works/pi</a>, MIT License). Its model catalog, <a href="https://pi.dev/models">pi.dev/models</a>,
+      says how pi calls each model it supports and at what price and limits it reckons. providers.dev imports it as a second source, beside models.dev, and is not affiliated with pi.
+      models.dev stays the reference: every figure of an entry's page and every filter, sort and list follows models.dev and providers.dev's own corrections and evaluations, and nothing of pi's is merged
+      into <code>limit</code>, <code>cost</code> or <code>capabilities</code>. A model that only pi lists is not an entry.
+    </p>
+    <ul>
+      <li>
+        Where pi's catalog lists an entry, the entry carries pi's block (<code>providers_dev.pi</code>). In a list the entry is marked <span class="origin pi">pi.dev</span>, which says only
+        that pi lists it. The entry's page has a section <em>pi's catalog</em>: pi's limits and prices beside the page's, and how pi calls the model (the request format, the address,
+        the input, the thinking levels, pi's flags, the cache lifetimes pi reckons with and the request limits), each as pi states it.
+      </li>
+      <li>
+        What pi does not state is <em>Not stated</em>, never "no": a flag pi does not name follows pi's own default, which is not published. pi writes 0 both for a price it does not
+        charge and for a price it has not recorded, so a price of 0 in pi's catalog is shown as <em>Not stated</em>, never as free.
+      </li>
+      <li>
+        A value is listed as differing where pi's context window, output limit or a price is not the entry's published value: limits exactly, prices after rounding each to 6
+        decimals, tiers by size of request threshold by threshold. Nothing is compared where either side states no value, where pi's price is 0, where the entry prices per character,
+        or where the entry's cache write has one price per lifetime. The page shows both values and says which one it follows; it does not say which is right.
+      </li>
+      <li>
+        Where pi spells a provider or model id otherwise, providers.dev pairs the two by hand, and only where they are certainly the same; nothing is matched by similarity. The page
+        then shows pi's own spelling.
+      </li>
+      <li>
+        The page dates pi's data twice: when providers.dev fetched it, which moves only when pi's catalog changed, and when it was last checked and found unchanged. pi's values are
+        imported, so they are never marked stale. When the last import failed, the page and the footer say so, and the last good catalog stays published.
+      </li>
+    </ul>
 
     <h2 id="caching">Documented caching</h2>
     <ul>
@@ -338,6 +377,7 @@ import { IDENTITY_FIELDS } from "../../../core/resolve.ts";
       The number is <code>stale_after_days</code> of <a href="/api/v1/meta"><code>/api/v1/meta</code></a>, set once when the data is built. The API publishes the dates and this
       number; a page compares a published date with today's date using it, and that is the only thing a page works out. A reader of the API applies it to its own date.
     </p>
+    <p>Imported values, models.dev's and pi's, are never marked stale: their date is the date of the import, given next to the source.</p>
     <p>Licences and attribution are on the <a href="/docs/licensing/">licensing</a> page. How to propose a correction or a measurement is on the <a href="/docs/contributing/">contributing</a> page.</p>
   </div>
 </Doc>

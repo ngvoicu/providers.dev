@@ -15,10 +15,16 @@ The baseline is imported daily from [models.dev](https://models.dev) (MIT). On t
   documented one in two figures only, the safe cache lifetime and the input window, and only where a measurement
   clearly contradicts the documentation; the documented value stays beside it (and `limit` stays as imported).
 
+Beside it, a second catalog is imported with the same daily run: the model catalog of the coding agent pi
+([pi.dev/models](https://pi.dev/models), MIT, from `https://pi.dev/api/models`). What pi states for an entry (how pi
+calls the model, its limits and prices, and where they differ from the published values) is published on that entry
+under `providers_dev.pi`, and never merged into its fields: models.dev stays the reference. A model only pi lists is
+not an entry.
+
 It publishes metadata only. There is no chat and no inference proxy. List prices per token are shown as models.dev
 records them; a subscription entry shows the API list price of the same model, marked as an API price. Subscription
 plans, their prices and their quotas are not listed.
-It is not affiliated with models.dev.
+It is not affiliated with models.dev or pi.
 
 ## Run it
 
@@ -26,7 +32,7 @@ Needs Node 24 or newer.
 
 ```
 npm install
-npm run sync      # import models.dev and the measurements into data/ (needs the network)
+npm run sync      # import models.dev, pi's catalog and the measurements into data/ (needs the network)
 npm run build     # resolve the dataset and build the site into dist/
 npm run preview   # http://localhost:8787 : the site and the API, as on Cloudflare
 ```
@@ -399,7 +405,7 @@ method), **models** (canonical: a model as its lab names it) and **evaluations**
 | `GET /api/v1/evaluations/cache` | every cache evaluation, with the entry it was made on |
 | `GET /api/v1/evaluations/limits` | every limit evaluation, with the entry it was made on |
 | `GET /api/v1/catalog` | the complete merged catalog, `{ meta, data }` with `data` keyed by provider id |
-| `GET /api/v1/meta` | dataset version, counts, freshness, the stale threshold (`stale_after_days`), upstream commit, sync status, open issues |
+| `GET /api/v1/meta` | dataset version, counts, freshness, the stale threshold (`stale_after_days`), upstream commit, sync status, pi's catalog (`pi`), open issues |
 | `GET /api/v1/openapi.json` | the OpenAPI 3.1 document |
 | `GET /api.json` | the merged catalog keyed by provider id, in the models.dev v2 structure, no envelope |
 
@@ -448,7 +454,9 @@ and belongs in `/api/v2`. Once the record has grown beyond 1.0.0, the version (`
 `src/core/openapi.ts`) must be above it: a release that adds something takes a minor step. The version restarted at
 1.0.0 with the first public release; the numbers before it were never public. 1.1.0 (2026-11-17) added the input window
 range of a model: `input_window_min`, `input_window_max`, `input_window_unknown_count` and `input_window_reference`,
-and the component `ModelInputWindowEnd`.
+and the component `ModelInputWindowEnd`. 1.2.0 added pi's catalog: `providers_dev.pi` on every entry (the
+block, or `null` where pi does not list it), `pi` on every entry summary, `pi` in `/api/v1/meta` with the keys `pi` and
+`pi_notice` of its `license`, and the components `PiBlock`, `PiCost`, `PiCostTier`, `PiDifference` and `PiSummary`.
 
 That promise holds for everything providers.dev makes itself: summaries, `providers_dev` records, evaluations,
 corrections, evidence, paths and parameters. The fields imported from models.dev (`limit`, `cost`, `capabilities`,
@@ -712,7 +720,10 @@ For what does not fit an issue: [office@providers.dev](mailto:office@providers.d
 - The imported baseline: models.dev, MIT, Copyright (c) 2025 models.dev. The full text is in
   [`LICENSES/models.dev-MIT.txt`](./LICENSES/models.dev-MIT.txt) and ships with the dataset as
   `/data/LICENSE-models.dev.txt` and `/data/NOTICE.txt`.
-- In the data, everything under `providers_dev`, every entry with `providers_dev.origin: "added"` and every field
+- pi's model catalog: pi (https://github.com/earendil-works/pi), MIT, Copyright (c) 2025 Mario Zechner. The full text
+  is in [`LICENSES/pi-MIT.txt`](./LICENSES/pi-MIT.txt) and ships with the dataset as `/data/LICENSE-pi.txt`; `/data/NOTICE.txt`
+  names it. Every `providers_dev.pi` block is pi's.
+- In the data, everything else under `providers_dev`, every entry with `providers_dev.origin: "added"` and every field
   listed in a `providers_dev.provenance` array is ours; the rest is models.dev's.
 
-providers.dev is not affiliated with or endorsed by models.dev or any provider it lists.
+providers.dev is not affiliated with or endorsed by models.dev, pi or any provider it lists.

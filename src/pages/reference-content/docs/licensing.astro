@@ -4,17 +4,19 @@ import { join } from "node:path";
 import Doc from "../../../layouts/Doc.astro";
 
 const upstreamLicense = readFileSync(join(process.cwd(), "LICENSES", "models.dev-MIT.txt"), "utf8");
+const piLicense = readFileSync(join(process.cwd(), "LICENSES", "pi-MIT.txt"), "utf8");
 const ownLicense = readFileSync(join(process.cwd(), "LICENSE"), "utf8");
 ---
 
 <Doc
   title="Licensing and attribution"
-  description="Licences and attribution for the providers.dev dataset and the models.dev data it builds on."
-  lead="The baseline of this catalog is imported from models.dev, which is published under the MIT License. providers.dev is an independent project and is not affiliated with, sponsored by or endorsed by models.dev or any listed provider."
+  description="Licences and attribution for the providers.dev dataset, the models.dev data it builds on and pi's catalog shown beside it."
+  lead="The baseline of this catalog is imported from models.dev, and the model catalog of pi is imported beside it; both are published under the MIT License. providers.dev is an independent project and is not affiliated with, sponsored by or endorsed by models.dev, pi or any listed provider."
   toc={[
     { id: "attribution", label: "Attribution" },
     { id: "use", label: "Using the data" },
     { id: "upstream", label: "models.dev licence" },
+    { id: "pi", label: "pi licence" },
     { id: "own", label: "providers.dev licence" },
   ]}
 >
@@ -22,14 +24,16 @@ const ownLicense = readFileSync(join(process.cwd(), "LICENSE"), "utf8");
     <h2 id="attribution">Attribution</h2>
     <ul>
       <li>Every provider and entry whose <code>providers_dev.origin</code> is <code>upstream</code> comes from <a href="https://models.dev">models.dev</a> (<a href="https://github.com/anomalyco/models.dev">source</a>), except the fields listed in its <code>providers_dev.provenance</code>.</li>
-      <li>Everything under a <code>providers_dev</code> key, every entry whose origin is <code>added</code>, and every field listed in a <code>provenance</code> array is by providers.dev.</li>
+      <li>Every <code>providers_dev.pi</code> block of an entry comes from the model catalog of <a href="https://pi.dev/models">pi</a> (<a href="https://github.com/earendil-works/pi">source</a>), imported from <a href="https://pi.dev/api/models"><code>pi.dev/api/models</code></a>.</li>
+      <li>Everything else under a <code>providers_dev</code> key, every entry whose origin is <code>added</code>, and every field listed in a <code>provenance</code> array is by providers.dev.</li>
     </ul>
     <p>This marking is kept through every export, so a consumer of <code>/api.json</code> can always tell the two apart.</p>
 
     <h2 id="use">Using the data</h2>
     <p>
-      providers.dev additions, corrections and code are under the MIT License below. When redistributing the dataset, keep both notices. They ship with the dataset as{" "}
-      <a href="/data/LICENSE-models.dev.txt"><code>/data/LICENSE-models.dev.txt</code></a> and <a href="/data/NOTICE.txt"><code>/data/NOTICE.txt</code></a>.
+      providers.dev additions, corrections and code are under the MIT License below. When redistributing the dataset, keep every notice. They ship with the dataset as{" "}
+      <a href="/data/LICENSE-models.dev.txt"><code>/data/LICENSE-models.dev.txt</code></a>, <a href="/data/LICENSE-pi.txt"><code>/data/LICENSE-pi.txt</code></a> and{" "}
+      <a href="/data/NOTICE.txt"><code>/data/NOTICE.txt</code></a>.
     </p>
     <p>
       Model and provider names are trademarks of their owners and are used only to identify them. The data is provided as is; confirm a limit against the provider's own documentation before
@@ -38,6 +42,9 @@ const ownLicense = readFileSync(join(process.cwd(), "LICENSE"), "utf8");
 
     <h2 id="upstream">models.dev licence</h2>
     <pre style="white-space: pre-wrap">{upstreamLicense}</pre>
+
+    <h2 id="pi">pi licence</h2>
+    <pre style="white-space: pre-wrap">{piLicense}</pre>
 
     <h2 id="own">providers.dev licence</h2>
     <pre style="white-space: pre-wrap">{ownLicense}</pre>
