@@ -419,7 +419,15 @@ export function resolveWithPi(input: ResolveInput, pi?: { catalog: PiCatalog; al
     ruledOut: result.ruledOut,
     entryOf: (ref) => {
       const entry = lookup(ref);
-      return entry ? { limit: structuredClone(entry.limit), cost: structuredClone(entry.cost) } : undefined;
+      if (!entry) return undefined;
+      const own = ext(entry);
+      return structuredClone({
+        limit: entry.limit,
+        cost: entry.cost,
+        access: own.access,
+        corrections: own.provenance.map(({ path, op }) => ({ path, op })),
+        documented_s: { short: own.cache.lifetime.short.documented_s, long: own.cache.lifetime.long.documented_s },
+      });
     },
   });
   for (const { ref, block } of part.blocks) ext(lookup(ref)!).pi = block;

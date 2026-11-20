@@ -9,8 +9,8 @@ import { sync } from "../scripts/lib/sync.ts";
 import { pretty } from "../scripts/lib/files.ts";
 import { summarize, type Summary } from "../src/core/entries.ts";
 import type { JsonObject } from "../src/core/merge.ts";
-import { PiBlockSchema, PiDifferenceSchema, PiSummarySchema } from "../src/core/contract.ts";
-import { piBlock, piDifferences, PiFeed, type PiCatalog, type PiModel, type PiReport } from "../src/core/pi.ts";
+import { PiBlockSchema, PiDifferenceSchema, PiSummarySchema, PiValueSchema } from "../src/core/contract.ts";
+import { PI_DIFFERENCE_FIELDS, PI_VALUE_FIELDS, piBlock, piDifferences, PiFeed, piValues, type PiCatalog, type PiEntryFacts, type PiModel, type PiReport, type PiValue } from "../src/core/pi.ts";
 import type { ResolveInput } from "../src/core/resolve.ts";
 import { ext, PiAliases, UpstreamModel, type AccessRules, type Catalog, type CatalogRules, type Evidence, type Meta, type OverrideFile, type UpstreamCatalog } from "../src/core/schema.ts";
 import { fetchReturning, fixturePi, fixtureUpstream, piShort, resolveWithPi, ROOT, tempDataDir, writeAuthored } from "./helpers.ts";
@@ -57,8 +57,10 @@ const blockOf = (catalog: Catalog, provider: string, model: string) => ext(catal
 const summaryWithPi = (provider: string, model: Catalog[string]["models"][string]): Summary => ({ ...summarize(provider, model, 0), pi: piShort(ext(model).pi) });
 const summaries = (catalog: Catalog): Summary[] => Object.entries(catalog).flatMap(([id, provider]) => Object.values(provider.models).map((model) => summaryWithPi(id, model)));
 
-/** An entry for piDifferences: its limit and cost as published. */
-const entry = (limit: JsonObject | undefined, cost: JsonObject | undefined) => ({ limit, cost });
+/** The facts of an entry as pi's code is handed them: an API entry with no correction and no documented lifetime, unless `more` says otherwise. */
+const facts = (more: Partial<PiEntryFacts> = {}): PiEntryFacts => ({ limit: undefined, cost: undefined, access: "api", corrections: [], documented_s: { short: null, long: null }, ...more });
+/** An entry for piDifferences and piValues: its limit and cost as published. */
+const entry = (limit: JsonObject | undefined, cost: JsonObject | undefined, more: Partial<PiEntryFacts> = {}) => facts({ limit, cost, ...more });
 const plainCost = { text: { input: { price: 1, cache: { read: 0.1, write: 1.25 } }, output: { price: 4 } } };
 const agreeing = (more: Partial<PiModel> = {}) => piModel("lab", "plain", { cost: { input: 1, output: 4, cacheRead: 0.1, cacheWrite: 1.25 }, ...more });
 
@@ -251,6 +253,222 @@ describe("the pi block (step 4)", () => {
     const plain = (items: Summary[]) => items.map(({ pi: _pi, ...rest }) => rest);
     expect(plain(summaries(withPi.catalog))).toEqual(plain(summaries(without.catalog)));
     expect(summaries(withPi.catalog).filter((summary) => summary.pi !== null).length).toBe(withPi.pi!.totals.matched_id);
+  });
+});
+
+// ---- the values: where pi stands beside each value of the entry (design/pi-merged.md, sections 2 and 9)
+
+/** The item of `field` in `values`. */
+const valueOf = (values: PiValue[], field: PiValue["field"]): PiValue => values.find((item) => item.field === field)!;
+const standings = (values: PiValue[]) => Object.fromEntries(values.map((item) => [item.field, item.standing]));
+const PRICE_FIELDS = ["cost.input", "cost.output", "cost.cache_read", "cost.cache_write"] as const;
+
+/**
+ * The fixture build of the values: the fixture catalog with prices on the entries of four providers (some equal to
+ * pi's, some not, one with a tier, one priced 0), provider-02 a subscription provider, and two corrections that publish
+ * a field as unknown. With and without pi, from the same input.
+ */
+function valuesFixture() {
+  const upstreamCatalog = fixtureUpstream();
+  for (const p of [0, 1, 2, 3]) {
+    const provider = upstreamCatalog[`provider-0${p}`]!;
+    Object.values(provider.models).forEach((model, m) => {
+      const tier = m === 3 ? { overrides: [{ when: { context: { gt: 199999 } }, price: 6, cache: { read: 0.6, write: 7.5 } }] } : {};
+      model.cost = { text: { input: { price: m === 4 ? 0 : m, cache: { read: m / 10, ...(m % 3 === 0 ? { write: m } : {}) }, ...tier }, output: { price: m * 4 + (m % 2), ...(m === 3 ? { overrides: [{ when: { context: { gt: 199999 } }, price: 22.5 }] } : {}) } } };
+    });
+  }
+  const unknownContext: OverrideFile = { provider: "provider-01", rules: [{ models: ["model-1"], set: { limit: { context: null } }, reason: "Not documented", evidence }] };
+  const unknownCost: OverrideFile = { provider: "provider-03", rules: [{ models: ["model-5"], set: { cost: { text: null } }, reason: "Not documented", evidence }] };
+  const accessRules: AccessRules = { ...access, providers: { "provider-02": { access: "subscription", basis: "A coding plan" } } };
+  const base: ResolveInput = { upstream: upstreamCatalog, additions: [], overrides: [unknownContext, unknownCost], access: accessRules, routes: {} };
+  return { without: resolveWithPi(structuredClone(base)), withPi: resolveWithPi(structuredClone(base), { catalog: fixturePi(12, 30) }) };
+}
+
+describe("the values (design/pi-merged.md)", () => {
+  it("1. every block has nine items, in the order of PI_VALUE_FIELDS, each with the six keys and fitting the contract", () => {
+    const { withPi } = valuesFixture();
+    let blocksSeen = 0;
+    for (const provider of Object.values(withPi.catalog)) {
+      for (const model of Object.values(provider.models)) {
+        const block = ext(model).pi;
+        if (!block) continue;
+        blocksSeen += 1;
+        expect(block.values.map((item) => item.field)).toEqual([...PI_VALUE_FIELDS]);
+        for (const item of block.values) {
+          expect(Object.keys(item)).toEqual(["field", "entry_field", "unit", "standing", "pi", "pi_tiers"]);
+          expect(PiValueSchema.parse(item)).toEqual(item);
+        }
+        expect(Object.keys(block).at(-1)).toBe("values");
+      }
+    }
+    expect(blocksSeen).toBeGreaterThan(100);
+  });
+
+  it("2. one case per standing for a limit, a price and a lifetime; pi's 0 and an absent promptCache are silent with pi null", () => {
+    const lifetimes = { short: 300, long: null };
+    const at = (model: PiModel, limit: JsonObject | undefined, cost: JsonObject | undefined) => piValues(model, entry(limit, cost, { documented_s: lifetimes }));
+    // agrees
+    const agree = at(agreeing({ promptCache: { short: 300, long: 3600 } }), { context: 200000, output: 8000 }, plainCost);
+    expect([valueOf(agree, "context_window"), valueOf(agree, "cost.input"), valueOf(agree, "prompt_cache.short")]).toMatchObject([{ standing: "agrees", pi: 200000 }, { standing: "agrees", pi: 1 }, { standing: "agrees", pi: 300 }]);
+    // differs
+    const differ = at(agreeing({ contextWindow: 1000000, cost: { input: 2, output: 4, cacheRead: 0.1, cacheWrite: 1.25 }, promptCache: { short: 600 } }), { context: 200000, output: 8000 }, plainCost);
+    expect([valueOf(differ, "context_window"), valueOf(differ, "cost.input"), valueOf(differ, "prompt_cache.short")]).toMatchObject([{ standing: "differs", pi: 1000000 }, { standing: "differs", pi: 2 }, { standing: "differs", pi: 600 }]);
+    // only: the entry's field is absent (a lifetime: documented_s null)
+    const only = at(agreeing({ promptCache: { long: 3600 } }), {}, { text: { output: { price: 4 } } });
+    expect([valueOf(only, "context_window"), valueOf(only, "cost.input"), valueOf(only, "prompt_cache.long")]).toMatchObject([{ standing: "only", pi: 200000 }, { standing: "only", pi: 1 }, { standing: "only", pi: 3600 }]);
+    // silent: pi's limit of 0, pi's price of 0, no promptCache
+    const silent = at(agreeing({ contextWindow: 0, cost: { input: 0, output: 4, cacheRead: 0.1, cacheWrite: 1.25 } }), { context: 200000, output: 8000 }, plainCost);
+    expect([valueOf(silent, "context_window"), valueOf(silent, "cost.input"), valueOf(silent, "prompt_cache.short"), valueOf(silent, "prompt_cache.long")]).toEqual([
+      { field: "context_window", entry_field: "limit.context", unit: "tokens", standing: "silent", pi: null, pi_tiers: null },
+      { field: "cost.input", entry_field: "cost.text.input.price", unit: "usd_per_million_tokens", standing: "silent", pi: null, pi_tiers: null },
+      { field: "prompt_cache.short", entry_field: "providers_dev.cache.lifetime.short.documented_s", unit: "seconds", standing: "silent", pi: null, pi_tiers: null },
+      { field: "prompt_cache.long", entry_field: "providers_dev.cache.lifetime.long.documented_s", unit: "seconds", standing: "silent", pi: null, pi_tiers: null },
+    ]);
+  });
+
+  it("3. a limit of 0 on the entry's side is none stated: with pi's value above 0 the standing is only", () => {
+    const values = piValues(agreeing(), entry({ context: 0, output: 0 }, plainCost));
+    expect([valueOf(values, "context_window"), valueOf(values, "max_tokens")]).toMatchObject([{ standing: "only", pi: 200000 }, { standing: "only", pi: 8000 }]);
+  });
+
+  it("4. a listed price of 0 on an API entry is a price: pi's price above 0 differs, and differences lists it", () => {
+    const cost = { text: { input: { price: 0, cache: { read: 0.1, write: 1.25 } }, output: { price: 4 } } };
+    const facts_ = entry({ context: 200000, output: 8000 }, cost, { access: "api" });
+    expect(valueOf(piValues(agreeing(), facts_), "cost.input")).toMatchObject({ standing: "differs", pi: 1 });
+    expect(piDifferences(agreeing(), facts_)).toMatchObject([{ field: "cost.input", pi: 1, published: 0 }]);
+  });
+
+  it("5. on a subscription entry every price and the tiers are not_compared with pi's value, differences has no cost item, the limits are compared", () => {
+    const cost = { text: { input: { price: 0, cache: { read: 0, write: 0 } }, output: { price: 0 } } };
+    const model = agreeing({ contextWindow: 1000000, cost: { input: 1, output: 4, cacheRead: 0.1, cacheWrite: 1.25, tiers: [{ inputTokensAbove: 272000, input: 2, output: 8, cacheRead: 0.2, cacheWrite: 2.5 }] } });
+    const api = entry({ context: 200000, output: 8000 }, cost, { access: "api" });
+    const subscription = entry({ context: 200000, output: 8000 }, cost, { access: "subscription" });
+    // The same entry paid per token: every price and the tiers differ.
+    expect(piDifferences(model, api).map((item) => item.field)).toEqual(["context_window", ...PRICE_FIELDS, "cost.tiers"]);
+    const values = piValues(model, subscription);
+    expect(PRICE_FIELDS.map((field) => valueOf(values, field))).toMatchObject([{ standing: "not_compared", pi: 1 }, { standing: "not_compared", pi: 4 }, { standing: "not_compared", pi: 0.1 }, { standing: "not_compared", pi: 1.25 }]);
+    expect(valueOf(values, "cost.tiers")).toEqual({ field: "cost.tiers", entry_field: "cost.text", unit: "usd_per_million_tokens", standing: "not_compared", pi: null, pi_tiers: [{ input_tokens_above: 272000, input: 2, output: 8, cache_read: 0.2, cache_write: 2.5 }] });
+    expect(piDifferences(model, subscription).filter((item) => item.field.startsWith("cost."))).toEqual([]);
+    // The limits as on any entry.
+    expect(piDifferences(model, subscription)).toMatchObject([{ field: "context_window", pi: 1000000, published: 200000 }]);
+    expect([valueOf(values, "context_window").standing, valueOf(values, "max_tokens").standing]).toEqual(["differs", "agrees"]);
+    // pi's price of 0 stays silent there too.
+    expect(valueOf(piValues(agreeing({ cost: { input: 0, output: 4, cacheRead: 0.1, cacheWrite: 1.25 } }), subscription), "cost.input")).toMatchObject({ standing: "silent", pi: null });
+  });
+
+  it("6. not_compared, with pi's value, for a price in another unit, a cache write keyed by lifetime and tiers that cannot be read", () => {
+    const model = agreeing({ cost: { input: 9, output: 9, cacheRead: 0.9, cacheWrite: 9, tiers: [{ inputTokensAbove: 31999, input: 7, output: 8, cacheRead: 0.2, cacheWrite: 0 }] } });
+    const perCharacter = piValues(model, entry(undefined, { text: { input: { price: 1, unit: "character", cache: { read: 0.1 } }, output: { price: 4, unit: "character" } } }));
+    expect(["cost.input", "cost.output", "cost.cache_read"].map((field) => valueOf(perCharacter, field as PiValue["field"]))).toMatchObject([{ standing: "not_compared", pi: 9 }, { standing: "not_compared", pi: 9 }, { standing: "not_compared", pi: 0.9 }]);
+    const byLifetime = piValues(model, entry(undefined, { text: { input: { price: 9, cache: { read: 0.9, write: { "5m": 1.25, "1h": 2 } } }, output: { price: 9 } } }));
+    expect(valueOf(byLifetime, "cost.cache_write")).toMatchObject({ standing: "not_compared", pi: 9 });
+    expect(valueOf(byLifetime, "cost.input")).toMatchObject({ standing: "agrees", pi: 9 });
+    const unreadable = piValues(model, entry(undefined, { text: { input: { price: 9, overrides: [{ when: { context: { gt: 32.5 } }, price: 7 }] }, output: { price: 9 } } }));
+    expect(valueOf(unreadable, "cost.tiers")).toMatchObject({ standing: "not_compared", pi: null, pi_tiers: [{ input_tokens_above: 31999, input: 7 }] });
+  });
+
+  it("7. a field providers.dev publishes as unknown or removes is not_compared, never only; a correction that sets pi's number agrees", () => {
+    const pi: PiCatalog = { lab: { plain: piModel("lab", "plain", { contextWindow: 1000000 }) } };
+    const rule = (set: JsonObject): OverrideFile => ({ provider: "lab", rules: [{ models: ["plain"], set, reason: "documented", evidence }] });
+    const valuesWith = (set: JsonObject) => blockOf(withPi(pi, { overrides: [rule(set)] }).catalog, "lab", "plain")!.values;
+    // unknown on limit.context, and on limit as a whole
+    expect(valueOf(valuesWith({ limit: { context: null } }), "context_window")).toMatchObject({ standing: "not_compared", pi: 1000000 });
+    expect(valueOf(valuesWith({ limit: null }), "context_window")).toMatchObject({ standing: "not_compared", pi: 1000000 });
+    expect(valueOf(valuesWith({ limit: null }), "max_tokens")).toMatchObject({ standing: "not_compared", pi: 8000 });
+    // set to pi's number
+    expect(valueOf(valuesWith({ limit: { context: 1000000 } }), "context_window")).toMatchObject({ standing: "agrees", pi: 1000000 });
+    // cost removed: every price item (and the tiers, here stated by neither side) as the rule says
+    const deleted = valuesWith({ cost: "$delete" });
+    expect(PRICE_FIELDS.map((field) => valueOf(deleted, field).standing)).toEqual(["not_compared", "not_compared", "not_compared", "silent"]);
+    expect(valueOf(deleted, "cost.input").pi).toBe(1);
+    // The same entry without a correction: the prices are compared and the limit differs.
+    expect(standings(blockOf(withPi(pi).catalog, "lab", "plain")!.values)).toMatchObject({ context_window: "differs", "cost.input": "agrees", "cost.output": "agrees", "cost.cache_read": "agrees" });
+    // A correction of capabilities.cache to unknown: pi's lifetimes are not compared.
+    const cached: PiCatalog = { lab: { plain: piModel("lab", "plain", { promptCache: { short: 300, long: 3600 } }) } };
+    const lifetimes = blockOf(withPi(cached, { overrides: [rule({ capabilities: { cache: null } })] }).catalog, "lab", "plain")!.values;
+    expect([valueOf(lifetimes, "prompt_cache.short"), valueOf(lifetimes, "prompt_cache.long")]).toMatchObject([{ standing: "not_compared", pi: 300 }, { standing: "not_compared", pi: 3600 }]);
+  });
+
+  it("8. tiers: none on either side is silent; equal tiers agree; tiers on one side only differ, never only; pi is null on the tiers item", () => {
+    const tier = { inputTokensAbove: 32000, input: 2, output: 8, cacheRead: 0.2, cacheWrite: 2.5 };
+    const tiered = agreeing({ cost: { input: 1, output: 4, cacheRead: 0.1, cacheWrite: 1.25, tiers: [tier] } });
+    const entryTiered = { text: { input: { price: 1, cache: { read: 0.1, write: 1.25 }, overrides: [{ when: { context: { gt: 32000 } }, price: 2, cache: { read: 0.2, write: 2.5 } }] }, output: { price: 4, overrides: [{ when: { context: { gt: 32000 } }, price: 8 }] } } };
+    const cases: [PiModel, JsonObject, PiValue["standing"], PiValue["pi_tiers"]][] = [
+      [agreeing(), plainCost, "silent", null],
+      [tiered, entryTiered, "agrees", [{ input_tokens_above: 32000, input: 2, output: 8, cache_read: 0.2, cache_write: 2.5 }]],
+      [tiered, plainCost, "differs", [{ input_tokens_above: 32000, input: 2, output: 8, cache_read: 0.2, cache_write: 2.5 }]],
+      [agreeing(), entryTiered, "differs", []],
+    ];
+    for (const [model, cost, standing, piTiers] of cases) {
+      const item = valueOf(piValues(model, entry(undefined, cost)), "cost.tiers");
+      expect(item).toEqual({ field: "cost.tiers", entry_field: "cost.text", unit: "usd_per_million_tokens", standing, pi: null, pi_tiers: piTiers });
+      expect(piDifferences(model, entry(undefined, cost)).some((difference) => difference.field === "cost.tiers")).toBe(standing === "differs");
+    }
+  });
+
+  it("9. lifetimes against the documented lifetime: 300 agrees with 300, differs from 600, is only beside null; cache.lifetime is the record without pi", () => {
+    const model = agreeing({ promptCache: { short: 300 } });
+    expect(valueOf(piValues(model, entry(undefined, undefined, { documented_s: { short: 300, long: null } })), "prompt_cache.short")).toMatchObject({ standing: "agrees", pi: 300 });
+    expect(valueOf(piValues(model, entry(undefined, undefined, { documented_s: { short: 600, long: null } })), "prompt_cache.short")).toMatchObject({ standing: "differs", pi: 300 });
+    expect(valueOf(piValues(model, entry(undefined, undefined, { documented_s: { short: null, long: null } })), "prompt_cache.short")).toMatchObject({ standing: "only", pi: 300 });
+    // 0 is a lifetime on both sides: "does not cache".
+    expect(valueOf(piValues(agreeing({ promptCache: { short: 0 } }), entry(undefined, undefined, { documented_s: { short: 0, long: null } })), "prompt_cache.short")).toMatchObject({ standing: "agrees", pi: 0 });
+    // Through the build: lab/model-0 documents 300 and 3600; pi states 300 and 3600 for it, and 600 and none for model-1.
+    const upstreamCatalog = fixtureUpstream(1, 20);
+    const pi = fixturePi(1, 20);
+    pi["provider-00"]!["model-1"]!.promptCache = { short: 600 };
+    const base: ResolveInput = { upstream: upstreamCatalog, additions: [], overrides: [], access, routes: {} };
+    const without = resolveWithPi(structuredClone(base));
+    const withData = resolveWithPi(structuredClone(base), { catalog: pi });
+    const entryOf = (catalog: Catalog, model: string) => ext(catalog["provider-00"]!.models[model]!);
+    expect(standings(entryOf(withData.catalog, "lab/model-0").pi!.values)).toMatchObject({ "prompt_cache.short": "agrees", "prompt_cache.long": "agrees" });
+    expect(standings(entryOf(withData.catalog, "model-1").pi!.values)).toMatchObject({ "prompt_cache.short": "only", "prompt_cache.long": "silent" });
+    for (const model of Object.keys(withData.catalog["provider-00"]!.models)) expect(entryOf(withData.catalog, model).cache.lifetime, model).toEqual(entryOf(without.catalog, model).cache.lifetime);
+  });
+
+  it("10. one rule for both lists: over every entry of the fixture build, an item is differs exactly where differences has that field", () => {
+    const { withPi } = valuesFixture();
+    const seen = new Map<string, number>();
+    let blocksSeen = 0;
+    for (const [providerId, provider] of Object.entries(withPi.catalog)) {
+      for (const [modelId, model] of Object.entries(provider.models)) {
+        const own = ext(model);
+        const block = own.pi;
+        if (!block) continue;
+        blocksSeen += 1;
+        for (const field of PI_DIFFERENCE_FIELDS) {
+          const standing = valueOf(block.values, field).standing;
+          seen.set(standing, (seen.get(standing) ?? 0) + 1);
+          expect(standing === "differs", `${providerId}/${modelId} ${field}`).toBe(block.differences.some((item) => item.field === field));
+          // No price of a subscription entry is ever only, differs or agrees.
+          if (own.access === "subscription" && field.startsWith("cost.")) expect(["not_compared", "silent"], `${providerId}/${modelId} ${field}`).toContain(standing);
+        }
+      }
+    }
+    expect(blocksSeen).toBeGreaterThan(100);
+    // The fixture reaches every standing.
+    expect([...seen.keys()].sort()).toEqual(["agrees", "differs", "not_compared", "only", "silent"]);
+  });
+
+  it("11. nothing existing moves: without the pi block every entry and summary is the build without pi, an entry with an only item included", () => {
+    const { without, withPi } = valuesFixture();
+    const strip = (catalog: Catalog) => {
+      const copy = structuredClone(catalog);
+      for (const provider of Object.values(copy)) for (const model of Object.values(provider.models)) delete (model.providers_dev as JsonObject).pi;
+      return copy;
+    };
+    expect(strip(withPi.catalog)).toEqual(strip(without.catalog));
+    const plain = (items: Summary[]) => items.map(({ pi: _pi, ...rest }) => rest);
+    expect(plain(summaries(withPi.catalog))).toEqual(plain(summaries(without.catalog)));
+    // model-7 states no limit; pi states both: only, and the entry is as without pi.
+    const withEntry = withPi.catalog["provider-00"]!.models["model-7"]!;
+    const withoutEntry = without.catalog["provider-00"]!.models["model-7"]!;
+    expect(standings(ext(withEntry).pi!.values)).toMatchObject({ context_window: "only", max_tokens: "only" });
+    expect(withEntry.limit).toEqual(withoutEntry.limit);
+    expect(withEntry.cost).toEqual(withoutEntry.cost);
+    expect(ext(withEntry).limits.input_window).toEqual(ext(withoutEntry).limits.input_window);
+    expect(ext(withEntry).cache.lifetime).toEqual(ext(withoutEntry).cache.lifetime);
+    expect(ext(withEntry).limits.input_window.tokens).toBeNull();
   });
 });
 
@@ -503,18 +721,18 @@ describe("the release review: tiers that cannot be compared (blockers 1 and 5)",
     ["one good tier and one that is not whole tokens", { text: { input: { price: 2, overrides: [{ when: { context: { gt: 32000 } }, price: 7 }, { when: { context: { gt: 64000.5 } }, price: 9 }] }, output: { price: 4 } } }],
   ])("1. an override on the context that is not a tier of whole tokens (%s) leaves the tiers uncompared, and the block fits the contract", (_name, cost) => {
     expect(UpstreamModel.safeParse({ id: "plain", name: "Plain", cost }).success).toBe(true);
-    const block = piBlock("lab", plainPi, "id", { limit: { context: 200000, output: 8000 }, cost });
+    const block = piBlock("lab", plainPi, "id", facts({ limit: { context: 200000, output: 8000 }, cost }));
     expect(block.differences.filter((item) => item.field === "cost.tiers")).toEqual([]);
     expect(PiBlockSchema.safeParse(block).success).toBe(true);
     // pi's tiers do not make an item either: the entry's cannot be read.
     const tiered = piModel("lab", "plain", { cost: { input: 2, output: 4, cacheRead: 0.1, cacheWrite: 0, tiers: [{ inputTokensAbove: 31999, input: 7, output: 8, cacheRead: 0.2, cacheWrite: 0 }] } });
-    expect(piDifferences(tiered, { cost }).filter((item) => item.field === "cost.tiers")).toEqual([]);
+    expect(piDifferences(tiered, facts({ cost })).filter((item) => item.field === "cost.tiers")).toEqual([]);
   });
 
   it("1. gt: 0 and gte: 1 are tiers above 0 tokens", () => {
     for (const when of [{ context: { gt: 0 } }, { context: { gte: 1 } }]) {
       const cost = { text: { input: { price: 2, overrides: [{ when, price: 7 }] } } };
-      expect(piDifferences(plainPi, { cost })).toMatchObject([{ field: "cost.tiers", published_tiers: [{ input_tokens_above: 0, input: 7 }] }]);
+      expect(piDifferences(plainPi, facts({ cost }))).toMatchObject([{ field: "cost.tiers", published_tiers: [{ input_tokens_above: 0, input: 7 }] }]);
     }
   });
 
@@ -527,7 +745,7 @@ describe("the release review: tiers that cannot be compared (blockers 1 and 5)",
     expect(UpstreamModel.safeParse({ id: "plain", name: "Plain", cost }).success).toBe(true);
     const tiered = piModel("lab", "plain", { cost: { input: 2, output: 4, cacheRead: 0.1, cacheWrite: 0, tiers: [{ inputTokensAbove: 128000, input: 9, output: 9, cacheRead: 0.9, cacheWrite: 0 }] } });
     for (const model of [plainPi, tiered]) {
-      const differences = piDifferences(model, { cost });
+      const differences = piDifferences(model, facts({ cost }));
       expect(differences.filter((item) => item.field === "cost.tiers")).toEqual([]);
       const text = JSON.stringify(differences);
       expect(text).not.toContain(":7");
@@ -540,12 +758,12 @@ describe("the release review: tiers that cannot be compared (blockers 1 and 5)",
     const piTier = piModel("lab", "plain", { cost: { input: 1, output: 2, cacheRead: 0, cacheWrite: 0, tiers: [{ inputTokensAbove: 100, input: 3, output: 2, cacheRead: 0, cacheWrite: 0 }] } });
     const onTier = { text: { input: { price: 1, overrides: [{ when: { context: { gt: 100 } }, price: 7, unit: "token" }] }, output: { price: 2 } } };
     expect(UpstreamModel.safeParse({ id: "plain", name: "Plain", cost: onTier }).success).toBe(true);
-    expect(piDifferences(piTier, { cost: onTier })).toMatchObject([{ field: "cost.tiers", pi_tiers: [{ input_tokens_above: 100, input: 3 }], published_tiers: [{ input_tokens_above: 100, input: 7 }] }]);
+    expect(piDifferences(piTier, facts({ cost: onTier }))).toMatchObject([{ field: "cost.tiers", pi_tiers: [{ input_tokens_above: 100, input: 3 }], published_tiers: [{ input_tokens_above: 100, input: 7 }] }]);
     // `token` on the input side: a tier only the entry has is listed, and the side's plain price is compared.
     const piPlain = piModel("lab", "plain", { cost: { input: 5, output: 2, cacheRead: 0, cacheWrite: 0 } });
     const onSide = { text: { input: { unit: "token", price: 1, overrides: [{ when: { context: { gt: 100 } }, price: 7 }] }, output: { unit: "token", price: 2 } } };
     expect(UpstreamModel.safeParse({ id: "plain", name: "Plain", cost: onSide }).success).toBe(true);
-    expect(piDifferences(piPlain, { cost: onSide })).toMatchObject([{ field: "cost.input", pi: 5, published: 1 }, { field: "cost.tiers", pi_tiers: [], published_tiers: [{ input_tokens_above: 100, input: 7 }] }]);
+    expect(piDifferences(piPlain, facts({ cost: onSide }))).toMatchObject([{ field: "cost.input", pi: 5, published: 1 }, { field: "cost.tiers", pi_tiers: [], published_tiers: [{ input_tokens_above: 100, input: 7 }] }]);
   });
 
   it.each([undefined, "token", "character", "second"])("5, second review: a side's unit, a tier's unit and the plain prices decide alike, unit %s", (unit) => {
@@ -554,8 +772,8 @@ describe("the release review: tiers that cannot be compared (blockers 1 and 5)",
     const tier = { when: { context: { gt: 100 } }, price: 7 };
     const onSide = { text: { input: { price: 1, cache: { read: 0.1 }, ...(unit ? { unit } : {}), overrides: [tier] }, output: { price: 2, ...(unit ? { unit } : {}) } } };
     const onTier = { text: { input: { price: 5, cache: { read: 0.5 }, overrides: [{ ...tier, ...(unit ? { unit } : {}) }] }, output: { price: 6 } } };
-    expect(piDifferences(model, { cost: onSide }).map((item) => item.field)).toEqual(compared ? ["cost.input", "cost.output", "cost.cache_read", "cost.tiers"] : []);
-    expect(piDifferences(model, { cost: onTier }).map((item) => item.field)).toEqual(compared ? ["cost.tiers"] : []);
+    expect(piDifferences(model, facts({ cost: onSide })).map((item) => item.field)).toEqual(compared ? ["cost.input", "cost.output", "cost.cache_read", "cost.tiers"] : []);
+    expect(piDifferences(model, facts({ cost: onTier })).map((item) => item.field)).toEqual(compared ? ["cost.tiers"] : []);
   });
 
   it("1. no value models.dev's schema accepts, on either side of a grid of edge values, gives a block the contract refuses", () => {
@@ -580,7 +798,7 @@ describe("the release review: tiers that cannot be compared (blockers 1 and 5)",
         for (const tiers of piTiers) {
           const model = piModel("lab", "m", { contextWindow: 1000, maxTokens: 0, cost: { input: 2, output: 0, cacheRead: 0.5, cacheWrite: 3, ...(tiers ? { tiers } : {}) } });
           expect(PiFeed.safeParse({ lab: { m: model } }).success).toBe(true);
-          const block = piBlock("lab", model, "id", { limit, cost });
+          const block = piBlock("lab", model, "id", facts({ limit, cost }));
           built += 1;
           const checked = PiBlockSchema.safeParse(block);
           if (!checked.success) refused.push(`${operator} ${threshold}, price ${price}, unit ${unit}, write ${JSON.stringify(write)}, limit ${context}: ${checked.error.issues[0]?.path.join(".")}`);

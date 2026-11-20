@@ -348,10 +348,13 @@ describe("1. the table of faults of the build, generated from what the fence cal
     without = filesOf(withoutDir);
   });
 
-  it("the fixture is as the table needs it: a first block with a tier, a difference, compat, levels and cache lifetimes; one alias issue", () => {
-    const block = blocksOf(healthy).get("provider-00/lab/model-0") as { cost: { tiers: unknown[] }; differences: unknown[]; compat: object; thinking_level_map: object; prompt_cache: object };
+  it("the fixture is as the table needs it: a first block with a tier, a difference, compat, levels, cache lifetimes and values with a tiers item that has pi_tiers; one alias issue", () => {
+    const block = blocksOf(healthy).get("provider-00/lab/model-0") as { cost: { tiers: unknown[] }; differences: unknown[]; compat: object; thinking_level_map: object; prompt_cache: object; values: { field: string; standing: string; pi_tiers: unknown[] | null }[] };
     expect(block.cost.tiers.length).toBeGreaterThan(0);
     expect(block.differences.length).toBeGreaterThan(0);
+    expect(block.values).toHaveLength(9);
+    expect(block.values.find((item) => item.field === "cost.tiers")!.pi_tiers!.length).toBeGreaterThan(0);
+    expect(block.values[0]).toMatchObject({ field: "context_window", standing: "differs" });
     expect([block.compat, block.thinking_level_map, block.prompt_cache].every((value) => value !== null)).toBe(true);
     expect((trueResults.get("piPart") as { blocks: { ref: string }[] }).blocks[0]!.ref).toBe("provider-00/lab/model-0");
     expect(metaOf(healthy).issues.filter((issue) => issue.code.startsWith("pi-alias"))).toHaveLength(1);
@@ -416,9 +419,11 @@ describe("1. the table of faults of the build, generated from what the fence cal
   }, 600_000);
 
   /** A change to the first block that fits the contract and agrees with itself: published as pi's part. */
-  const notPromised: [string, (block: { name: string; thinking_level_map: Record<string, string | null> }) => void, (text: string) => string][] = [
+  const notPromised: [string, (block: { name: string; thinking_level_map: Record<string, string | null>; values: { standing: string }[] }) => void, (text: string) => string][] = [
     ["the first block's name changed", (block) => { block.name = "Model 0, renamed by the fault table"; }, (text) => text.replaceAll("Model 0, renamed by the fault table", "Model 0")],
     ["one level deleted from the first block's thinking_level_map", (block) => { delete block.thinking_level_map.minimal; }, (text) => text.replaceAll('"thinking_level_map":{"high":"high"}', '"thinking_level_map":{"minimal":null,"high":"high"}')],
+    // A wrong standing fits the contract: the fence publishes it, and it never changes the entry's own value.
+    ["the standing of the first block's first value changed from differs to agrees", (block) => { block.values[0]!.standing = "agrees"; }, (text) => text.replaceAll('"standing":"agrees","pi":123456,', '"standing":"differs","pi":123456,')],
   ];
   it.each(notPromised)("what the fence does not promise: %s is published as pi's part", async (_name, change, back) => {
     const dir = variant(piCatalog(), undefined);

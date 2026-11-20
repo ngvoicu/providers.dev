@@ -5,9 +5,9 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { z } from "zod";
 import { MetaSchema, PiBlockSchema } from "../../src/core/contract.ts";
-import { piPart, type PiBlock, type PiSummary } from "../../src/core/pi.ts";
+import { piPart, type PiBlock, type PiEntryFacts, type PiSummary } from "../../src/core/pi.ts";
 import type { CatalogBefore } from "../../src/core/resolve.ts";
-import { noPiMeta, PiSyncRecord, type Catalog, type Issue, type Meta, type PiAliases } from "../../src/core/schema.ts";
+import { ext, noPiMeta, PiSyncRecord, type Catalog, type Issue, type Meta, type PiAliases } from "../../src/core/schema.ts";
 import { fenced, fencedAsync, reasonOf } from "./fenced.ts";
 import { storedPi, syncPi } from "./pi-sync.ts";
 import type { RanPart } from "./sync.ts";
@@ -66,9 +66,18 @@ export function piOfBuild(input: PiOfBuildInput): PiOfBuild {
     const fencedData = fenced((): PiData => {
       const stored = storedPi(input.dataDir);
       if (stored.state !== "usable") throw new Error(stored.state === "unusable" ? stored.why : "the stored snapshot gave no usable answer");
-      const entries = new Map<string, { limit: unknown; cost: unknown }>();
+      const entries = new Map<string, PiEntryFacts>();
       for (const [providerId, provider] of Object.entries(input.catalog)) {
-        for (const [modelId, model] of Object.entries(provider.models)) entries.set(`${providerId}/${modelId}`, { limit: model.limit, cost: model.cost });
+        for (const [modelId, model] of Object.entries(provider.models)) {
+          const own = ext(model);
+          entries.set(`${providerId}/${modelId}`, {
+            limit: model.limit,
+            cost: model.cost,
+            access: own.access,
+            corrections: own.provenance.map(({ path, op }) => ({ path, op })),
+            documented_s: { short: own.cache.lifetime.short.documented_s, long: own.cache.lifetime.long.documented_s },
+          });
+        }
       }
       const part = piPart({
         pi: stored.catalog,
@@ -77,7 +86,7 @@ export function piOfBuild(input: PiOfBuildInput): PiOfBuild {
         ruledOut: structuredClone(input.ruledOut),
         entryOf: (ref) => {
           const entry = entries.get(ref);
-          return entry ? { limit: structuredClone(entry.limit), cost: structuredClone(entry.cost) } : undefined;
+          return entry ? structuredClone(entry) : undefined;
         },
       });
       const meta = stored.meta;

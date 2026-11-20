@@ -84,6 +84,31 @@ export interface PiDifference {
   published_tiers: PiCostTier[] | null;
 }
 
+export const PI_VALUE_FIELDS = [...PI_DIFFERENCE_FIELDS, "prompt_cache.short", "prompt_cache.long"] as const;
+export type PiValueField = (typeof PI_VALUE_FIELDS)[number];
+
+/** Where pi's catalog stands beside one value of the entry (design/pi-merged.md, section 2). */
+export interface PiValue {
+  field: PiValueField;
+  entry_field: string;
+  unit: "tokens" | "usd_per_million_tokens" | "seconds";
+  standing: "agrees" | "differs" | "only" | "not_compared" | "silent";
+  pi: number | null;
+  pi_tiers: PiCostTier[] | null;
+}
+
+/** The plain facts of a published entry that pi's code is handed, all copies (design/pi-merged.md, section 8). */
+export interface PiEntryFacts {
+  limit: unknown;
+  cost: unknown;
+  /** providers_dev.access of the entry. */
+  access: "api" | "subscription" | "unknown";
+  /** `path` and `op` of every item of providers_dev.provenance. */
+  corrections: { path: string; op: "set" | "unknown" | "delete" }[];
+  /** providers_dev.cache.lifetime.short.documented_s and .long.documented_s. */
+  documented_s: { short: number | null; long: number | null };
+}
+
 /** What pi's catalog states for an entry: `providers_dev.pi`. */
 export interface PiBlock {
   ref: string;
@@ -104,6 +129,7 @@ export interface PiBlock {
   prompt_cache: { short_s: number | null; long_s: number | null } | null;
   input_limits: { max_request_bytes: number | null; max_images_per_request: number | null; max_images_per_message: number | null };
   differences: PiDifference[];
+  values: PiValue[];
 }
 
 /** The pi block of an entry in short: `pi` of a summary. */
@@ -210,53 +236,114 @@ function tiersAgree(pi: PiCostTier[], published: PiCostTier[]): boolean {
   });
 }
 
+/** One value of pi's catalog read beside the entry's: what `values` and `differences` are both made of. */
+interface PiReading {
+  field: PiValueField;
+  entry_field: string;
+  unit: PiValue["unit"];
+  standing: PiValue["standing"];
+  pi: number | null;
+  /** The entry's value, where the standing is agrees or differs. Null for cost.tiers. */
+  published: number | null;
+  pi_tiers: PiCostTier[] | null;
+  published_tiers: PiCostTier[] | null;
+}
+
 /**
- * Where pi's price, context window or output limit is not the entry's published value (section e). `entry` is the
- * entry as published, after every override: its `limit` and `cost`, never `providers_dev.pricing`.
+ * Whether providers.dev published the field at `fieldPath` as unknown or removed it: a correction with `op` unknown
+ * or delete whose path is the field's, a path above it or a path below it.
  */
-export function piDifferences(model: PiModel, entry: { limit?: unknown; cost?: unknown }): PiDifference[] {
-  const out: PiDifference[] = [];
-  const limit = isRecord(entry.limit) ? entry.limit : {};
-  const text = isRecord(entry.cost) && isRecord(entry.cost.text) ? entry.cost.text : {};
+const unknownByUs = (corrections: PiEntryFacts["corrections"], fieldPath: string): boolean =>
+  corrections.some(({ path, op }) => op !== "set" && (path === fieldPath || fieldPath.startsWith(`${path}.`) || path.startsWith(`${fieldPath}.`)));
+
+/**
+ * The one reading of the nine values pi's catalog can state of an entry (design/pi-merged.md, section 2): for each,
+ * pi's value, the entry's, and the standing, the first line that holds deciding. `piValues` and `piDifferences` are
+ * both made from it, so a value is `differs` exactly where `differences` lists it. `facts` are of the entry as
+ * published, after every override: its `limit` and `cost`, never `providers_dev.pricing`.
+ */
+function piReadings(model: PiModel, facts: PiEntryFacts): PiReading[] {
+  const limit = isRecord(facts.limit) ? facts.limit : {};
+  const text = isRecord(facts.cost) && isRecord(facts.cost.text) ? facts.cost.text : {};
   const input = isRecord(text.input) ? text.input : {};
   const output = isRecord(text.output) ? text.output : {};
   const cache = isRecord(input.cache) ? input.cache : {};
-  // An entry price whose side has another unit (a price per character) is not a price per million tokens.
-  const inputCompared = perMillionTokens(input.unit);
-  const outputCompared = perMillionTokens(output.unit);
-  const item = (field: PiDifferenceField, entryField: string, unit: PiDifference["unit"], pi: number | null, published: number | null): PiDifference => ({ field, entry_field: entryField, unit, pi, published, pi_tiers: null, published_tiers: null });
+  const corrections = facts.corrections;
+  // A subscription entry is not paid per token: its own cost is not what a request costs, so no price is compared.
+  const subscription = facts.access === "subscription";
 
-  const limitItem = (field: PiDifferenceField, entryField: string, pi: number, published: unknown): void => {
-    const value = numberOr(published);
-    // In limit, 0 is "none stated"; pi's 0 is no value either.
-    if (value === null || value === 0 || pi === 0 || value === pi) return;
-    out.push(item(field, entryField, "tokens", pi, value));
+  /** The rule for one value: `pi` null = pi states none; `entry` null = the entry states none. */
+  const reading = (field: PiValueField, entryField: string, unit: PiValue["unit"], pi: number | null, entry: number | null, compared: boolean): PiReading => {
+    const standing: PiValue["standing"] = pi === null ? "silent" : !compared ? "not_compared" : entry === null ? "only" : pi === entry ? "agrees" : "differs";
+    const published = standing === "agrees" || standing === "differs" ? entry : null;
+    return { field, entry_field: entryField, unit, standing, pi, published, pi_tiers: null, published_tiers: null };
   };
-  limitItem("context_window", "limit.context", model.contextWindow, limit.context);
-  limitItem("max_tokens", "limit.output", model.maxTokens, limit.output);
 
-  const priceItem = (field: PiDifferenceField, entryField: string, pi: number, published: unknown, compared: boolean): void => {
-    const value = numberOr(published);
-    if (!compared || value === null || pi === 0 || pi === value) return;
-    out.push(item(field, entryField, "usd_per_million_tokens", pi, value));
+  // Limits: 0 is "none stated" on both sides.
+  const above0 = (value: unknown): number | null => {
+    const number = numberOr(value);
+    return number !== null && number > 0 ? number : null;
   };
-  priceItem("cost.input", "cost.text.input.price", model.cost.input, input.price, inputCompared);
-  priceItem("cost.output", "cost.text.output.price", model.cost.output, output.price, outputCompared);
-  priceItem("cost.cache_read", "cost.text.input.cache.read", model.cost.cacheRead, cache.read, inputCompared);
-  // A cache-write price keyed by lifetime is not compared: pi states one price and does not say for which lifetime.
-  priceItem("cost.cache_write", "cost.text.input.cache.write", model.cost.cacheWrite, cache.write, inputCompared);
+  const limitReading = (field: PiValueField, entryField: string, pi: number, entry: unknown): PiReading =>
+    reading(field, entryField, "tokens", pi > 0 ? pi : null, above0(entry), !unknownByUs(corrections, entryField));
 
-  // Tiers that cannot be compared (another unit, a threshold that is not whole tokens) give no item.
-  const pi = piTiers(model);
-  const published = entryTiers(entry.cost);
-  if (published !== null && !tiersAgree(pi, published)) {
-    out.push({ field: "cost.tiers", entry_field: "cost.text", unit: "usd_per_million_tokens", pi: null, published: null, pi_tiers: pi, published_tiers: published });
+  // Prices: the entry's listed 0 is a price; pi's 0 is also its "no price recorded". A side priced in another unit
+  // than per million tokens (a price per character) is not compared.
+  const priceReading = (field: PiValueField, entryField: string, pi: number, entry: unknown, sideUnit: unknown, keyedByLifetime = false): PiReading => {
+    const compared = !subscription && perMillionTokens(sideUnit) && !keyedByLifetime && !unknownByUs(corrections, entryField);
+    return reading(field, entryField, "usd_per_million_tokens", pi > 0 ? pi : null, numberOr(entry), compared);
+  };
+
+  // Tiers (section e, rule 5): both lists are statements, an empty one included, so they are never `only`.
+  const piList = piTiers(model);
+  const entryList = entryTiers(facts.cost);
+  let tiers: PiReading;
+  if (piList.length === 0 && entryList !== null && entryList.length === 0) {
+    tiers = { field: "cost.tiers", entry_field: "cost.text", unit: "usd_per_million_tokens", standing: "silent", pi: null, published: null, pi_tiers: null, published_tiers: null };
+  } else {
+    const compared = !subscription && entryList !== null && !unknownByUs(corrections, "cost.text");
+    const standing: PiValue["standing"] = !compared ? "not_compared" : tiersAgree(piList, entryList) ? "agrees" : "differs";
+    tiers = { field: "cost.tiers", entry_field: "cost.text", unit: "usd_per_million_tokens", standing, pi: null, published: null, pi_tiers: piList, published_tiers: standing === "not_compared" ? null : entryList };
   }
-  return out;
+
+  // Lifetimes: pi's against the documented lifetime of the profile, never the safe value. 0 is a value on both sides.
+  const lifetimeCompared = !unknownByUs(corrections, "capabilities.cache");
+  const lifetimeReading = (field: PiValueField, profile: "short" | "long", pi: number | undefined): PiReading =>
+    reading(field, `providers_dev.cache.lifetime.${profile}.documented_s`, "seconds", pi ?? null, facts.documented_s[profile], lifetimeCompared);
+
+  return [
+    limitReading("context_window", "limit.context", model.contextWindow, limit.context),
+    limitReading("max_tokens", "limit.output", model.maxTokens, limit.output),
+    priceReading("cost.input", "cost.text.input.price", model.cost.input, input.price, input.unit),
+    priceReading("cost.output", "cost.text.output.price", model.cost.output, output.price, output.unit),
+    priceReading("cost.cache_read", "cost.text.input.cache.read", model.cost.cacheRead, cache.read, input.unit),
+    // A cache-write price keyed by lifetime is not compared: pi states one price and does not say for which lifetime.
+    priceReading("cost.cache_write", "cost.text.input.cache.write", model.cost.cacheWrite, cache.write, input.unit, isRecord(cache.write)),
+    tiers,
+    lifetimeReading("prompt_cache.short", "short", model.promptCache?.short),
+    lifetimeReading("prompt_cache.long", "long", model.promptCache?.long),
+  ];
 }
 
-/** The pi block of an entry: what the feed states, in the block's words, with the differences (section f). */
-export function piBlock(provider: string, model: PiModel, match: PiBlock["match"], entry: { limit?: unknown; cost?: unknown }): PiBlock {
+const isDifferenceField = (field: PiValueField): field is PiDifferenceField => (PI_DIFFERENCE_FIELDS as readonly string[]).includes(field);
+
+/**
+ * Where pi's price, context window or output limit is not the entry's published value (section e): the items of
+ * `piReadings` that differ, so never a price or the tiers on a subscription entry.
+ */
+export function piDifferences(model: PiModel, facts: PiEntryFacts): PiDifference[] {
+  return piReadings(model, facts).flatMap(({ field, entry_field, unit, standing, pi, published, pi_tiers, published_tiers }) =>
+    standing === "differs" && isDifferenceField(field) && unit !== "seconds" ? [{ field, entry_field, unit, pi, published, pi_tiers, published_tiers }] : [],
+  );
+}
+
+/** Where pi's catalog stands beside each of the nine values of the entry, in the order of `PI_VALUE_FIELDS`. */
+export function piValues(model: PiModel, facts: PiEntryFacts): PiValue[] {
+  return piReadings(model, facts).map(({ field, entry_field, unit, standing, pi, pi_tiers }) => ({ field, entry_field, unit, standing, pi, pi_tiers }));
+}
+
+/** The pi block of an entry: what the feed states, in the block's words, with the differences (section f) and the values. */
+export function piBlock(provider: string, model: PiModel, match: PiBlock["match"], facts: PiEntryFacts): PiBlock {
   const limits = model.inputLimits;
   return {
     ref: `${provider}/${model.id}`,
@@ -280,7 +367,8 @@ export function piBlock(provider: string, model: PiModel, match: PiBlock["match"
       max_images_per_request: limits?.images?.maxPerRequest ?? null,
       max_images_per_message: limits?.images?.maxPerMessage ?? null,
     },
-    differences: piDifferences(model, entry),
+    differences: piDifferences(model, facts),
+    values: piValues(model, facts),
   };
 }
 
@@ -519,8 +607,8 @@ export interface PiPartInput {
   aliases: PiAliases | undefined;
   before: CatalogBefore;
   ruledOut: { ref: string; rule: string }[];
-  /** A copy of `limit` and `cost` of the entry as published; undefined where the ref is not published. */
-  entryOf: (ref: string) => { limit: unknown; cost: unknown } | undefined;
+  /** Copies of plain facts of the entry as published; undefined where the ref is not published. */
+  entryOf: (ref: string) => PiEntryFacts | undefined;
 }
 
 export interface PiPart {

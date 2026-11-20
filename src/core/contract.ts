@@ -14,7 +14,7 @@ import { BillingUnitSchema, ConditionSchema, PolicyEvidenceSchema, PricingRuleSc
 import type { ProviderSummary, Summary } from "./entries.ts";
 import type { InputWindow, InputWindowMeasurement } from "./limits.ts";
 import type { CanonicalModel, CanonicalModelDetail, Correction, Documentation, Facets, ModelInputWindowEnd } from "./resources.ts";
-import type { PiBlock, PiCost, PiCostTier, PiDifference, PiSummary } from "./pi.ts";
+import type { PiBlock, PiCost, PiCostTier, PiDifference, PiSummary, PiValue } from "./pi.ts";
 import { Access, type Exclusion, type MeasuredLimit, type ModelExtension, type ProviderExtension, type Provenance, type PublishedEvidence } from "./schema.ts";
 
 const date = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
@@ -237,7 +237,19 @@ export const PiDifferenceSchema = z
     pi_tiers: z.array(PiCostTierSchema).nullable().describe("For cost.tiers: pi's tiers. Null otherwise."),
     published_tiers: z.array(PiCostTierSchema).nullable().describe("For cost.tiers: the entry's tiers by size of request, read from its cost. Null otherwise."),
   })
-  .describe("One value that pi's catalog states otherwise than the entry publishes it.") satisfies z.ZodType<PiDifference>;
+  .describe("One value that pi's catalog states otherwise than the entry publishes it. No price and no tiers are listed on a subscription entry.") satisfies z.ZodType<PiDifference>;
+
+export const PiValueSchema = z
+  .strictObject({
+    // The list of PI_VALUE_FIELDS in src/core/pi.ts, spelled out: the contract imports only types from pi's modules.
+    field: z.enum(["context_window", "max_tokens", "cost.input", "cost.output", "cost.cache_read", "cost.cache_write", "cost.tiers", "prompt_cache.short", "prompt_cache.long"]).describe("The value of pi's catalog the item speaks of."),
+    entry_field: z.string().describe("The field of the entry it stands beside: limit.context, limit.output, cost.text.input.price, cost.text.output.price, cost.text.input.cache.read, cost.text.input.cache.write, cost.text for the tiers, providers_dev.cache.lifetime.short.documented_s, providers_dev.cache.lifetime.long.documented_s."),
+    unit: z.enum(["tokens", "usd_per_million_tokens", "seconds"]),
+    standing: z.enum(["agrees", "differs", "only", "not_compared", "silent"]).describe("agrees = pi and the entry state the same value. differs = they state different values: the entry's is published in its own field, pi's is here. only = pi states a value and the entry states none: pi's value is here and in no field of the entry. not_compared = pi states a value that is not compared with the entry's: a price on a subscription entry, a price in another unit, a cache-write price the entry keys by lifetime, tiers that cannot be read as tiers, or a field providers.dev publishes as unknown. silent = pi states no value: a limit or a price of 0 in pi's catalog is no statement."),
+    pi: z.number().min(0).nullable().describe("pi's value, where pi states one. Null with silent, and for cost.tiers."),
+    pi_tiers: z.array(PiCostTierSchema).nullable().describe("For cost.tiers, where the standing is not silent: pi's tiers, ascending; an empty list = pi states none. Null otherwise."),
+  })
+  .describe("Where pi's catalog stands beside one value of the entry. providers.dev's own value comes first, then models.dev's, then pi's: pi's value never replaces the entry's.") satisfies z.ZodType<PiValue>;
 
 export const PiBlockSchema = z
   .strictObject({
@@ -265,6 +277,7 @@ export const PiBlockSchema = z
       })
       .describe("The provider's limits on a request as pi states them. Each is null where pi states none."),
     differences: z.array(PiDifferenceSchema).describe("Where pi's price, context window or output limit is not the entry's published value, in a fixed order: context_window, max_tokens, cost.input, cost.output, cost.cache_read, cost.cache_write, cost.tiers. Empty = they agree wherever both state a value."),
+    values: z.array(PiValueSchema).length(9).describe("One item for each value pi's catalog can state of an entry, in a fixed order: context_window, max_tokens, cost.input, cost.output, cost.cache_read, cost.cache_write, cost.tiers, prompt_cache.short, prompt_cache.long. Since 1.3.0."),
   })
   .describe("What pi's model catalog (https://pi.dev/api/models) states for this entry. Imported, not checked by providers.dev, and never merged into the entry's own fields: models.dev stays the reference.") satisfies z.ZodType<PiBlock>;
 
@@ -590,6 +603,7 @@ export const COMPONENTS = {
   PiCostTier: PiCostTierSchema,
   PiDifference: PiDifferenceSchema,
   PiSummary: PiSummarySchema,
+  PiValue: PiValueSchema,
   CacheDocumentation: CacheDocumentationSchema,
   CacheModeDocumentation: CacheModeDocumentationSchema,
   CacheRetention: CacheRetentionSchema,
