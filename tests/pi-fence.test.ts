@@ -1,6 +1,7 @@
 // The fence around pi's part (design/pi-source.md, section k, 5): the tables of faults, generated from the functions
 // the fence calls, and what the dataset is after each; the dataset complete without pi; own properties; being seen.
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import type * as fs from "node:fs";
 import { join } from "node:path";
 import { gunzipSync } from "node:zlib";
 import { stringify } from "yaml";
@@ -26,7 +27,22 @@ const state = vi.hoisted(() => ({
   calls: new Set<string>(),
   fault: null as null | { name: string; apply: (callTrue: () => unknown, args: unknown[]) => unknown; fired: boolean },
   exported: { pi: [] as string[], piSync: [] as string[] },
+  /** Armed: every write of a file named pi-report.json throws, as a disk would (the report's write fault). */
+  reportWriteFails: false,
+  reportWrites: 0,
 }));
+
+vi.mock("node:fs", async (importOriginal) => {
+  const original = await importOriginal<typeof fs>();
+  const writeFileSync = (...args: Parameters<typeof original.writeFileSync>): void => {
+    if (typeof args[0] === "string" && args[0].endsWith("pi-report.json")) {
+      state.reportWrites += 1;
+      if (state.reportWriteFails) throw Object.assign(new Error("EIO: i/o error, write"), { code: "EIO" });
+    }
+    original.writeFileSync(...args);
+  };
+  return { ...original, default: { ...original, writeFileSync }, writeFileSync };
+});
 
 vi.mock("../src/core/pi.ts", async (importOriginal) => {
   const original = await importOriginal<Record<string, unknown>>();
@@ -430,6 +446,53 @@ describe("1. the table of faults of the build, generated from what the fence cal
     const changed = differing(files, healthy);
     expect(changed).toContain("site/data/entries/provider-00/0.json");
     for (const path of changed) expect(back(text(files.get(path)!, path).replaceAll(version, healthyVersion)), path).toBe(text(healthy.get(path)!, path));
+  });
+
+  describe("the private report's write", () => {
+    afterEach(() => {
+      state.reportWriteFails = false;
+    });
+
+    it("the report's write throws: the healthy build, published, with one warning; pi-report.json absent", async () => {
+      const dir = variant(piCatalog(), undefined);
+      state.reportWriteFails = true;
+      state.reportWrites = 0;
+      const report = build(dir);
+      expect(state.reportWrites).toBe(1);
+      state.reportWriteFails = false;
+      expect(report).toMatchObject({ ok: true, pi: "published" });
+      expect(await contractProblems(join(dir, "published"))).toEqual([]);
+      expect(comparePublished(join(healthyDir, "published"), join(dir, "published")).differences).toEqual([]);
+      const files = filesOf(dir);
+      expect(files.has("pi-report.json")).toBe(false);
+      expect(differing(files, healthy)).toEqual(["pi-report.json", "site/data/meta.json"]);
+      const meta = metaOf(files);
+      const expected = metaOf(healthy);
+      const warning = meta.issues.at(-1)!;
+      expect(warning).toEqual({
+        level: "warning",
+        code: "pi-snapshot-unreadable",
+        target: "data/published/pi-report.json",
+        message: "pi's report could not be written (EIO: i/o error, write). The dataset is published with pi's data as usual; only data/published/pi-report.json is missing.",
+      });
+      expected.issues = [...expected.issues, warning];
+      expect(meta).toEqual(expected);
+      const output = join(tempDataDir(), "github-output");
+      writeFileSync(output, "");
+      writeBuildOutputs(report, output);
+      expect(readFileSync(output, "utf8")).toBe("pi=published\n");
+    });
+
+    it("control: pi absent and the same write fault armed: nothing is written and nothing warns", () => {
+      const dir = variant(null, undefined);
+      state.reportWriteFails = true;
+      state.reportWrites = 0;
+      const report = build(dir);
+      expect(state.reportWrites).toBe(0);
+      state.reportWriteFails = false;
+      expect(report).toMatchObject({ ok: true, pi: "none" });
+      expect(differing(filesOf(dir), without)).toEqual([]);
+    });
   });
 
   describe("the record's part", () => {

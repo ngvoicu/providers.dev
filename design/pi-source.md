@@ -1603,6 +1603,8 @@ What comes out:
 The two warnings, code `pi-snapshot-unreadable`, level `warning`:
 `pi's data is left out of this dataset (<why>). No entry has a pi block.` and
 `The record of the last pi import is left out of this dataset (<why>). It is published as no attempt recorded.`
+A third, of `publish()` (step 7 below), target `data/published/pi-report.json`:
+`pi's report could not be written (<why>). The dataset is published with pi's data as usual; only data/published/pi-report.json is missing.`
 
 **`publish()`** (`scripts/lib/publish.ts`), in this order:
 
@@ -1614,7 +1616,16 @@ The two warnings, code `pi-snapshot-unreadable`, level `warning`:
 5. `buildIndex`, both times followed by: for every summary whose ref is in `pi.entries`: `summary.pi = summary`
    of that entry; the version is hashed from the catalog and the summaries after these two steps, as today;
 6. `meta.pi = pi.meta`; `issues = [...resolve's, ...pi.issues]`;
-7. write the snapshot; `pi-report.json` is written from `pi.report` where it is not `null`.
+7. where `pi.report` is not `null`, write it as `pi-report.json` into the temporary folder of the new snapshot,
+   **through `fenced()`**, before anything else is written there: the report is pi's file, so its write goes through
+   the guard like everything of pi's. It is no call into pi's code (the report is already plain text the fence
+   returned), so the rule of the modules is untouched; and it is the one use of the guard in `publish.ts`, for this
+   write of pi's own file and for nothing else. Where the write fails, the file is left out and the third warning
+   above (the reason through `reasonOf`) joins `issues`; the build goes on and publishes as usual, and `meta.json` is
+   written once, with it. The state stays what the fence made it: the step output says what became of pi's data
+   in the published dataset, and with the blocks and `meta.pi` there that is `published`; the report is a private
+   file outside the API, and its failure is said where every other pi warning is said;
+8. write the snapshot.
 
 `assemble(pi)` and its second call, `piMisfit`, `readPi`, `piUnreadable` and `piSync` are deleted from
 `publish.ts`: there is one build, the check is the fence's, and nothing in `publish.ts` knows how pi's data is
@@ -1675,7 +1686,8 @@ not parse counts there as absent, and `sync()` logs that it did. `SyncReport` ga
 ### 3. Being seen
 
 - **In the data.** Every time the fence turns a part away, `/api/v1/meta` lists the warning with its reason, and
-  the build prints it. There is no silent case: without a warning, a dataset has no pi data only where the folder
+  the build prints it; so too where only the private report could not be written (step 7 of `publish()`), which
+  leaves the step output `published` and the workflow unchanged. There is no silent case: without a warning, a dataset has no pi data only where the folder
   `data/pi/` does not exist, and no record only where the status file or its `pi` key does not exist.
   The fence itself looks whether the folder is there, and `storedPi` is changed to agree (section b): a
   `data/pi/` that is there and cannot be used, in any way, is *unusable*, never *none*.
@@ -1807,6 +1819,12 @@ absent) and with a fault.
    value of a wrong type, with an unknown key. After each: the first three points above; `pi` is `turned_away`;
    the files are the healthy build's except `meta.json`, whose `pi.sync` is the three `null`s and whose `issues`
    has the warning for `data/sync-status.json`.
+
+   *The private report's write.* Every write of a file named `pi-report.json` throws, as a disk would. `publish()`
+   gives `ok: true` and `pi` is `published` (so is the step output); every answer fits the contract; 0 differing
+   objects against the healthy build; the files are the healthy build's except `meta.json`, which gains only the
+   warning for `data/published/pi-report.json`; `pi-report.json` is absent. Control: with no `data/pi/` and the
+   same fault armed, nothing is written and nothing warns.
 2. **The sync, by the same table.** The boundary function is `syncPi`, with the faults of test 1 (the keys its
    schema requires: `status`). And through the one thing that reaches its inside, the `fetch` it is given: one
    that rejects with each of the thrown shapes, one whose body never ends (the deadline shortened as the existing

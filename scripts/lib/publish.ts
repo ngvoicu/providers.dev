@@ -4,7 +4,7 @@ import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSyn
 import { join } from "node:path";
 import { gzipSync } from "node:zlib";
 import { parse as parseYaml } from "yaml";
-import type { ZodType } from "zod";
+import { z, type ZodType } from "zod";
 import { CACHE_AGES_S } from "../../src/core/cache.ts";
 import { buildIndex, SHARD_SIZE, type Index } from "../../src/core/entries.ts";
 import { listCorrections, listEvaluations } from "../../src/core/resources.ts";
@@ -26,6 +26,7 @@ import {
   type SourceMeta,
 } from "../../src/core/schema.ts";
 import { readJsonIfExists, sha256, swapDir } from "./files.ts";
+import { fenced } from "./fenced.ts";
 import { piOfBuild, type PiOfBuild } from "./pi-fence.ts";
 import { loadUpstream, type SyncStatus } from "./sync.ts";
 
@@ -156,6 +157,28 @@ export function publish(input: PublishOptions): PublishReport {
     return index;
   };
   const issues = [...resolved, ...pi.issues];
+
+  // The private report is pi's file, so its write goes through the guard, the one use of it in this module, and
+  // before meta.json, so that a failure is a warning in it. Beside the published data, not under site/: never
+  // staged, served or part of the API. A failure leaves the file out; the dataset is published as usual.
+  const next = `${join(dataDir, "published")}.tmp-${process.pid}`;
+  rmSync(next, { recursive: true, force: true });
+  if (pi.report !== null) {
+    const text = pi.report;
+    const written = fenced(() => {
+      mkdirSync(next, { recursive: true });
+      try {
+        writeFileSync(join(next, "pi-report.json"), text);
+      } catch (error) {
+        rmSync(join(next, "pi-report.json"), { force: true });
+        throw error;
+      }
+      return true as const;
+    }, z.literal(true));
+    if (!written.ok) {
+      issues.push({ level: "warning", code: "pi-snapshot-unreadable", target: "data/published/pi-report.json", message: `pi's report could not be written (${written.why}). The dataset is published with pi's data as usual; only data/published/pi-report.json is missing.` });
+    }
+  }
   const generatedAt = options.now().toISOString();
 
   // The version covers everything a reader can get: the catalog and the summaries made from it. A new summary field
@@ -213,12 +236,8 @@ export function publish(input: PublishOptions): PublishReport {
     pi: pi.meta,
   };
 
-  const next = `${join(dataDir, "published")}.tmp-${process.pid}`;
-  rmSync(next, { recursive: true, force: true });
   try {
     writeSnapshot(next, catalog, index, meta, options.rootDir);
-    // Beside the published data, not under site/: never staged, served or part of the API.
-    if (pi.report !== null) writeFileSync(join(next, "pi-report.json"), pi.report);
     verifySnapshot(next, index);
   } catch (error) {
     rmSync(next, { recursive: true, force: true });
