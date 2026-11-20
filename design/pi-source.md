@@ -937,8 +937,9 @@ Rules:
    **pi's price is 0** (0 is also pi's "no price recorded", section 0). A price of 0 on the entry's side is a
    listed zero price and is compared.
 2. **Limits** are whole numbers of tokens and differ when they are not equal. No tolerance.
-3. **Prices** are both in US dollars per million tokens; an entry price whose side has a `unit`
-   (`cost.text.input.unit`, `cost.text.output.unit`: a price per character) is not compared. Two prices are equal
+3. **Prices** are both in US dollars per million tokens. An entry price is so when its `unit` (of its side, or of
+   its tier) is absent or is models.dev's per-token unit `token`; one question decides it for a side, a tier and a
+   plain price alike. A price in another unit (`character`, for instance) is not compared. Two prices are equal
    when they are equal after rounding each to 6 decimals. The values listed are the unrounded ones.
 4. **A cache-write price keyed by lifetime** (`{ "5m": 5, "1h": 8 }`) is not compared: pi states one price and
    the feed does not say for which lifetime.
@@ -1242,7 +1243,7 @@ counts), `src/core/resolve.ts` (section i; `ResolveInput.pi` without aliases), `
 3. a difference in each compared field, one test per row of the table in section e, each with both values;
 4. agreeing values give `differences: []`; so do prices that differ only beyond the sixth decimal;
 5. no difference where the entry has no value, where pi's price is 0, where a limit is 0, where the entry's
-   cache-write price is keyed by lifetime, where the entry's price has a `unit`;
+   cache-write price is keyed by lifetime, where the entry's price has a `unit` other than `token`;
 6. tiers: equal tiers written with `gt` on one side and `gte` on the other (32000 and `gte: 32001`) agree; a price
    that differs only in a tier gives exactly one `cost.tiers` item with both lists; thresholds one token apart
    give one; tiers on one side only give one; an override on service tier or time of day is not a tier;

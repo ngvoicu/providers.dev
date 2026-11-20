@@ -502,6 +502,29 @@ describe("the release review: tiers that cannot be compared (blockers 1 and 5)",
     }
   });
 
+  it("5, second review: `unit: \"token\"` is a price per million tokens, on a tier and on a side alike, and its differences are listed", () => {
+    // The reviewer's fixture: a tier above 100, pi 3, the entry 7, with the entry's tier marked `unit: "token"`.
+    const piTier = piModel("lab", "plain", { cost: { input: 1, output: 2, cacheRead: 0, cacheWrite: 0, tiers: [{ inputTokensAbove: 100, input: 3, output: 2, cacheRead: 0, cacheWrite: 0 }] } });
+    const onTier = { text: { input: { price: 1, overrides: [{ when: { context: { gt: 100 } }, price: 7, unit: "token" }] }, output: { price: 2 } } };
+    expect(UpstreamModel.safeParse({ id: "plain", name: "Plain", cost: onTier }).success).toBe(true);
+    expect(piDifferences(piTier, { cost: onTier })).toMatchObject([{ field: "cost.tiers", pi_tiers: [{ input_tokens_above: 100, input: 3 }], published_tiers: [{ input_tokens_above: 100, input: 7 }] }]);
+    // `token` on the input side: a tier only the entry has is listed, and the side's plain price is compared.
+    const piPlain = piModel("lab", "plain", { cost: { input: 5, output: 2, cacheRead: 0, cacheWrite: 0 } });
+    const onSide = { text: { input: { unit: "token", price: 1, overrides: [{ when: { context: { gt: 100 } }, price: 7 }] }, output: { unit: "token", price: 2 } } };
+    expect(UpstreamModel.safeParse({ id: "plain", name: "Plain", cost: onSide }).success).toBe(true);
+    expect(piDifferences(piPlain, { cost: onSide })).toMatchObject([{ field: "cost.input", pi: 5, published: 1 }, { field: "cost.tiers", pi_tiers: [], published_tiers: [{ input_tokens_above: 100, input: 7 }] }]);
+  });
+
+  it.each([undefined, "token", "character", "second"])("5, second review: a side's unit, a tier's unit and the plain prices decide alike, unit %s", (unit) => {
+    const compared = unit === undefined || unit === "token";
+    const model = piModel("lab", "plain", { cost: { input: 5, output: 6, cacheRead: 0.5, cacheWrite: 0, tiers: [{ inputTokensAbove: 100, input: 3, output: 6, cacheRead: 0, cacheWrite: 0 }] } });
+    const tier = { when: { context: { gt: 100 } }, price: 7 };
+    const onSide = { text: { input: { price: 1, cache: { read: 0.1 }, ...(unit ? { unit } : {}), overrides: [tier] }, output: { price: 2, ...(unit ? { unit } : {}) } } };
+    const onTier = { text: { input: { price: 5, cache: { read: 0.5 }, overrides: [{ ...tier, ...(unit ? { unit } : {}) }] }, output: { price: 6 } } };
+    expect(piDifferences(model, { cost: onSide }).map((item) => item.field)).toEqual(compared ? ["cost.input", "cost.output", "cost.cache_read", "cost.tiers"] : []);
+    expect(piDifferences(model, { cost: onTier }).map((item) => item.field)).toEqual(compared ? ["cost.tiers"] : []);
+  });
+
   it("1. no value models.dev's schema accepts, on either side of a grid of edge values, gives a block the contract refuses", () => {
     // Each axis holds the edge values of a field the block reads: thresholds that are negative, zero, fractional, huge or
     // unsafe; every comparison; prices negative, zero, many-decimal, huge; units; cache writes as a number, keyed by
@@ -509,7 +532,7 @@ describe("the release review: tiers that cannot be compared (blockers 1 and 5)",
     const thresholds = [-1, 0, 1, 32.5, 32000, 2 ** 53, 1e300];
     const operators = ["gt", "gte", "lt", "lte", "equals"];
     const prices = [-5, 0, 0.1234567, 1e308];
-    const units = [undefined, "character"];
+    const units = [undefined, "token", "character"];
     const writes: unknown[] = [undefined, 1.25, -1, { "5m": 1.25, "1h": 2 }];
     const limits = [undefined, 0, 0.5, 200000, 1e308];
     const piTiers = [undefined, [], [{ inputTokensAbove: 0, input: 0, output: 0, cacheRead: 0, cacheWrite: 0 }], [{ inputTokensAbove: 31999, input: 1e308, output: 7, cacheRead: 0.1234567, cacheWrite: 2 }]];

@@ -117,6 +117,12 @@ export interface PiSummary {
 
 const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null && !Array.isArray(value);
 const numberOr = (value: unknown): number | null => (typeof value === "number" && Number.isFinite(value) ? value : null);
+/**
+ * Whether a price of the entry is in US dollars per million tokens: its `unit` is absent, or is models.dev's unit of a
+ * price per token, `token` ("Prices are USD per 1M for `token` and `character`, and per 1 unit otherwise"). Asked of
+ * a side's own unit, of a tier's own unit and of the plain prices alike. A price in any other unit is not compared.
+ */
+const perMillionTokens = (unit: unknown): boolean => unit === undefined || unit === "token";
 /** Two prices are equal when they are equal after rounding each to 6 decimals. */
 const samePrice = (a: number, b: number): boolean => Math.round(a * 1e6) === Math.round(b * 1e6);
 
@@ -150,8 +156,8 @@ function tierThreshold(override: unknown): number | "unreadable" | null {
 
 /**
  * The entry's tiers by size of request, read from `cost.text.input.overrides` and `cost.text.output.overrides`, all in
- * US dollars per million tokens. Null where they cannot be compared: a side priced in another unit (`unit`), a tier
- * with a unit of its own, an override on the context that is not a tier of whole tokens, or a negative price.
+ * US dollars per million tokens. Null where they cannot be compared: a side or a tier priced in another unit than per
+ * million tokens (`perMillionTokens`), an override on the context that is not a tier of whole tokens, or a negative price.
  */
 export function entryTiers(cost: unknown): PiCostTier[] | null {
   const text = isRecord(cost) && isRecord(cost.text) ? cost.text : {};
@@ -159,12 +165,12 @@ export function entryTiers(cost: unknown): PiCostTier[] | null {
   const side = (name: "input" | "output"): Map<number, Record<string, unknown>> => {
     const found = new Map<number, Record<string, unknown>>();
     const own = isRecord(text[name]) ? text[name] : {};
-    if (own.unit !== undefined) comparable = false;
+    if (!perMillionTokens(own.unit)) comparable = false;
     for (const override of Array.isArray(own.overrides) ? own.overrides : []) {
       const threshold = tierThreshold(override);
       if (threshold === "unreadable") comparable = false;
       if (typeof threshold !== "number") continue;
-      if ((override as Record<string, unknown>).unit !== undefined) comparable = false;
+      if (!perMillionTokens((override as Record<string, unknown>).unit)) comparable = false;
       // Where two overrides of one side have the same threshold, the one listed last counts.
       found.set(threshold, override as Record<string, unknown>);
     }
@@ -216,9 +222,9 @@ export function piDifferences(model: PiModel, entry: { limit?: unknown; cost?: u
   const input = isRecord(text.input) ? text.input : {};
   const output = isRecord(text.output) ? text.output : {};
   const cache = isRecord(input.cache) ? input.cache : {};
-  // An entry price whose side has a unit (a price per character) is not a price per million tokens.
-  const inputCompared = input.unit === undefined;
-  const outputCompared = output.unit === undefined;
+  // An entry price whose side has another unit (a price per character) is not a price per million tokens.
+  const inputCompared = perMillionTokens(input.unit);
+  const outputCompared = perMillionTokens(output.unit);
   const item = (field: PiDifferenceField, entryField: string, unit: PiDifference["unit"], pi: number | null, published: number | null): PiDifference => ({ field, entry_field: entryField, unit, pi, published, pi_tiers: null, published_tiers: null });
 
   const limitItem = (field: PiDifferenceField, entryField: string, pi: number, published: unknown): void => {
