@@ -574,7 +574,7 @@ describe("pi's catalog in the API (design/pi-source.md, section d)", () => {
     expect(section.title).toBe("pi's catalog");
     expect(section.paragraphs).toHaveLength(5);
     const text = section.paragraphs.join(" ");
-    for (const words of ["Since 1.2.0", "models.dev stays the reference", "not an entry", "match", "alias", "not false", "0 stands for no charge and for no price recorded alike", "6 decimals", "cost.tiers", "/meta.pi", "unmatched_models"]) expect(text).toContain(words);
+    for (const words of ["Since 1.2.0", "models.dev stays the reference", "not an entry", "match", "alias", "not false", "0 stands for no charge and for no price recorded alike", "Prices are compared exactly, with no tolerance", "cost.tiers", "/meta.pi", "unmatched_models"]) expect(text).toContain(words);
   });
 
   it("still refuses an origin outside today's list on /entries and /providers", async () => {

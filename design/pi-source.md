@@ -942,7 +942,7 @@ Rules:
 3. **Prices** are both in US dollars per million tokens. An entry price is so when its `unit` (of its side, or of
    its tier) is absent or is models.dev's per-token unit `token`; one question decides it for a side, a tier and a
    plain price alike. A price in another unit (`character`, for instance) is not compared. Two prices are equal
-   when they are equal after rounding each to 6 decimals. The values listed are the unrounded ones.
+   exactly when they are the same number; there is no tolerance. The values listed are the ones the catalogs state.
 4. **A cache-write price keyed by lifetime** (`{ "5m": 5, "1h": 8 }`) is not compared: pi states one price and
    the feed does not say for which lifetime.
 5. **Tiers.** The entry's tiers are read from `cost.text.input.overrides` and `cost.text.output.overrides`. An
@@ -1243,7 +1243,7 @@ counts), `src/core/resolve.ts` (section i; `ResolveInput.pi` without aliases), `
 2. a pi model whose entry an override excludes, and one whose entry a catalog rule leaves out, are `left_out`, and
    no entry is published for them;
 3. a difference in each compared field, one test per row of the table in section e, each with both values;
-4. agreeing values give `differences: []`; so do prices that differ only beyond the sixth decimal;
+4. agreeing values give `differences: []`; prices that differ only beyond the sixth decimal differ;
 5. no difference where the entry has no value, where pi's price is 0, where a limit is 0, where the entry's
    cache-write price is keyed by lifetime, where the entry's price has a `unit` other than `token`;
 6. tiers: equal tiers written with `gt` on one side and `gte` on the other (32000 and `gte: 32001`) agree; a price

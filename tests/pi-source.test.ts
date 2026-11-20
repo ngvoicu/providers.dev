@@ -102,13 +102,41 @@ describe("the pi block (step 4)", () => {
     expect(piDifferences(model, entry({ context: 200000, output: 8000 }, plainCost)).map((item) => item.field)).toEqual(["context_window", "max_tokens", "cost.input", "cost.output", "cost.cache_read", "cost.cache_write", "cost.tiers"]);
   });
 
-  it("4. agreeing values give no difference; so do prices that differ only beyond the sixth decimal", () => {
+  it("4. agreeing values give no difference; prices that differ only beyond the sixth decimal differ (no tolerance)", () => {
     expect(piDifferences(agreeing(), entry({ context: 200000, output: 8000 }, plainCost))).toEqual([]);
     const close = agreeing({ cost: { input: 1.0000001, output: 3.9999999, cacheRead: 0.1000004, cacheWrite: 1.25 } });
-    expect(piDifferences(close, entry({ context: 200000, output: 8000 }, plainCost))).toEqual([]);
+    expect(piDifferences(close, entry({ context: 200000, output: 8000 }, plainCost))).toMatchObject([
+      { field: "cost.input", pi: 1.0000001, published: 1 },
+      { field: "cost.output", pi: 3.9999999, published: 4 },
+      { field: "cost.cache_read", pi: 0.1000004, published: 0.1 },
+    ]);
     // Unrounded values are listed where they do differ.
     const apart = agreeing({ cost: { input: 1.000001, output: 4, cacheRead: 0.1, cacheWrite: 1.25 } });
     expect(piDifferences(apart, entry({ context: 200000, output: 8000 }, plainCost))).toMatchObject([{ field: "cost.input", pi: 1.000001, published: 1 }]);
+  });
+
+  describe("4, third review: two prices agree exactly when they are the same number", () => {
+    // The reviewer's pairs. Rounded to 6 decimals the first would be 0.030037 and 0.030038, the second 0.030037 twice;
+    // `Math.round(x * 1e6)` called the first equal and the second different.
+    const pairs: [string, number, number][] = [
+      ["0.030037499999999998 and 0.0300376 are a difference: the numbers are not the same", 0.030037499999999998, 0.0300376],
+      ["0.0300374 and 0.030037499999999998 are a difference too: the numbers are not the same, equal at 6 decimals or not", 0.0300374, 0.030037499999999998],
+    ];
+    it.each(pairs)("as a plain price: %s", (_name, pi, published) => {
+      const model = agreeing({ cost: { input: pi, output: 4, cacheRead: 0.1, cacheWrite: 1.25 } });
+      expect(piDifferences(model, entry(undefined, { text: { input: { price: published, cache: { read: 0.1, write: 1.25 } }, output: { price: 4 } } }))).toEqual([
+        { field: "cost.input", entry_field: "cost.text.input.price", unit: "usd_per_million_tokens", pi, published, pi_tiers: null, published_tiers: null },
+      ]);
+    });
+    it.each(pairs)("inside a tier: %s", (_name, pi, published) => {
+      const model = agreeing({ cost: { input: 1, output: 4, cacheRead: 0.1, cacheWrite: 1.25, tiers: [{ inputTokensAbove: 32000, input: pi, output: 8, cacheRead: 0, cacheWrite: 0 }] } });
+      const cost = { text: { input: { price: 1, cache: { read: 0.1, write: 1.25 }, overrides: [{ when: { context: { gt: 32000 } }, price: published }] }, output: { price: 4, overrides: [{ when: { context: { gt: 32000 } }, price: 8 }] } } };
+      expect(piDifferences(model, entry(undefined, cost))).toMatchObject([{ field: "cost.tiers", pi_tiers: [{ input_tokens_above: 32000, input: pi }], published_tiers: [{ input_tokens_above: 32000, input: published }] }]);
+    });
+    it("1.50 in one feed and 1.5 in the other are the same number: no difference, plain or in a tier", () => {
+      const feeds = JSON.parse('{"pi": {"input": 1.50, "output": 4, "cacheRead": 0.1, "cacheWrite": 1.25, "tiers": [{"inputTokensAbove": 32000, "input": 1.50, "output": 8, "cacheRead": 0, "cacheWrite": 0}]}, "entry": {"text": {"input": {"price": 1.5, "cache": {"read": 0.1, "write": 1.25}, "overrides": [{"when": {"context": {"gt": 32000}}, "price": 1.5}]}, "output": {"price": 4, "overrides": [{"when": {"context": {"gt": 32000}}, "price": 8}]}}}}');
+      expect(piDifferences(agreeing({ cost: feeds.pi }), entry(undefined, feeds.entry))).toEqual([]);
+    });
   });
 
   it("5. no difference where the entry has no value, where pi's price or a limit is 0, where the cache write is keyed by lifetime, where the price has a unit", () => {

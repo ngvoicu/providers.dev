@@ -123,8 +123,6 @@ const numberOr = (value: unknown): number | null => (typeof value === "number" &
  * a side's own unit, of a tier's own unit and of the plain prices alike. A price in any other unit is not compared.
  */
 const perMillionTokens = (unit: unknown): boolean => unit === undefined || unit === "token";
-/** Two prices are equal when they are equal after rounding each to 6 decimals. */
-const samePrice = (a: number, b: number): boolean => Math.round(a * 1e6) === Math.round(b * 1e6);
 
 /** pi's tiers, sorted by `inputTokensAbove`, in the block's words. */
 function piTiers(model: PiModel): PiCostTier[] {
@@ -206,7 +204,7 @@ function tiersAgree(pi: PiCostTier[], published: PiCostTier[]): boolean {
       const b = other[field];
       // Both must state a value; pi's price of 0 is also its "no price recorded".
       if (a === null || b === null || a === 0) return true;
-      return samePrice(a, b);
+      return a === b;
     });
   });
 }
@@ -238,7 +236,7 @@ export function piDifferences(model: PiModel, entry: { limit?: unknown; cost?: u
 
   const priceItem = (field: PiDifferenceField, entryField: string, pi: number, published: unknown, compared: boolean): void => {
     const value = numberOr(published);
-    if (!compared || value === null || pi === 0 || samePrice(pi, value)) return;
+    if (!compared || value === null || pi === 0 || pi === value) return;
     out.push(item(field, entryField, "usd_per_million_tokens", pi, value));
   };
   priceItem("cost.input", "cost.text.input.price", model.cost.input, input.price, inputCompared);
