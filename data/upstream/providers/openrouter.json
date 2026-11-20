@@ -7759,112 +7759,6 @@
    "last_updated": "2026-09-30",
    "recommended_api": "embeddings"
   },
-  "cohere/north-mini-code:free": {
-   "id": "cohere/north-mini-code:free",
-   "name": "North Mini Code (free)",
-   "description": "Cohere coding model for practical software engineering and agentic edits",
-   "type": "chat",
-   "family": "north",
-   "canonical_id": "cohere/north-mini-code-1-0",
-   "release_date": "2026-06-09",
-   "limit": {
-    "context": 256000,
-    "output": 64000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@openrouter/ai-sdk-provider",
-      "opencodeai": "@opencode/ai/providers/openrouter"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-09-23",
-   "last_updated": "2026-06-09",
-   "recommended_api": "chat-completions"
-  },
   "cohere/rerank-4-fast": {
    "id": "cohere/rerank-4-fast",
    "name": "Rerank 4 Fast",
@@ -9148,7 +9042,7 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.062,
+      "price": 0.047,
       "cache": {
        "read": 0.035
       }
@@ -9381,7 +9275,7 @@
      "input": {
       "price": 0.9,
       "cache": {
-       "read": 0.25
+       "read": 0.2
       }
      },
      "output": {
@@ -9496,13 +9390,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.111,
+      "price": 1.32,
       "cache": {
-       "read": 0.097
+       "read": 0.044
       }
      },
      "output": {
-      "price": 4.44
+      "price": 3.96
      }
     }
    },
@@ -11929,6 +11823,66 @@
    "last_updated": "2025-06-17",
    "recommended_api": "chat-completions"
   },
+  "google/gemini-2.5-flash-tts": {
+   "id": "google/gemini-2.5-flash-tts",
+   "name": "Gemini 2.5 Flash TTS",
+   "description": "Speech generation model for controllable voice, narration, and audio delivery",
+   "type": "speech",
+   "family": "gemini-flash",
+   "canonical_id": "google/gemini-2.5-flash-tts",
+   "release_date": "2025-09-30",
+   "limit": {
+    "context": 32768,
+    "output": 16384
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.5
+     }
+    },
+    "audio": {
+     "output": {
+      "price": 10
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "audio/mpeg",
+     "audio/pcm"
+    ]
+   },
+   "api": {
+    "speech": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/protocols/openai-speech"
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2025-12-10",
+   "recommended_api": "speech"
+  },
   "google/gemini-2.5-pro": {
    "id": "google/gemini-2.5-pro",
    "name": "Gemini 2.5 Pro",
@@ -12332,6 +12286,66 @@
    "knowledge": "2025-01-31",
    "last_updated": "2025-06-05",
    "recommended_api": "chat-completions"
+  },
+  "google/gemini-2.5-pro-tts": {
+   "id": "google/gemini-2.5-pro-tts",
+   "name": "Gemini 2.5 Pro TTS",
+   "description": "Speech generation model for controllable voice, narration, and audio delivery",
+   "type": "speech",
+   "family": "gemini-pro",
+   "canonical_id": "google/gemini-2.5-pro-tts",
+   "release_date": "2025-09-30",
+   "limit": {
+    "context": 32768,
+    "output": 16384
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1
+     }
+    },
+    "audio": {
+     "output": {
+      "price": 20
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "audio/mpeg",
+     "audio/pcm"
+    ]
+   },
+   "api": {
+    "speech": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/protocols/openai-speech"
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2025-12-10",
+   "recommended_api": "speech"
   },
   "google/gemini-3-flash-preview": {
    "id": "google/gemini-3-flash-preview",
@@ -18436,13 +18450,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.045,
+      "price": 0.06,
       "cache": {
-       "read": 0.009
+       "read": 0.012
       }
      },
      "output": {
-      "price": 0.135
+      "price": 0.18
      }
     }
    },
@@ -20461,78 +20475,6 @@
    "last_updated": "2024-07-23",
    "recommended_api": "chat-completions"
   },
-  "meta-llama/llama-3.2-1b-instruct": {
-   "id": "meta-llama/llama-3.2-1b-instruct",
-   "name": "Llama 3.2 1B Instruct",
-   "description": "Open Llama instruction model for multilingual chat, reasoning, and coding",
-   "type": "chat",
-   "family": "llama",
-   "canonical_id": "meta/llama-3.2-1b-instruct",
-   "release_date": "2024-09-25",
-   "limit": {
-    "context": 60000,
-    "output": 54000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.027
-     },
-     "output": {
-      "price": 0.201
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@openrouter/ai-sdk-provider",
-      "opencodeai": "@opencode/ai/providers/openrouter"
-     }
-    },
-    "responses": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     }
-    },
-    "messages": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2023-12",
-   "last_updated": "2024-09-25",
-   "recommended_api": "chat-completions"
-  },
   "meta-llama/llama-3.2-3b-instruct": {
    "id": "meta-llama/llama-3.2-3b-instruct",
    "name": "Llama 3.2 3B Instruct",
@@ -20543,7 +20485,7 @@
    "release_date": "2024-09-25",
    "limit": {
     "context": 131072,
-    "output": 72000
+    "output": 117964
    },
    "capabilities": {
     "temperature": true,
@@ -20562,10 +20504,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.0509
+      "price": 0.05
      },
      "output": {
-      "price": 0.335
+      "price": 0.33
      }
     }
    },
@@ -26285,6 +26227,81 @@
    "last_updated": "2024-04-17",
    "recommended_api": "chat-completions"
   },
+  "mistralai/pixtral-large-2502": {
+   "id": "mistralai/pixtral-large-2502",
+   "name": "Pixtral Large (25.02)",
+   "description": "Mistral vision-language model for image understanding and multimodal chat",
+   "type": "chat",
+   "family": "pixtral",
+   "canonical_id": "mistral/pixtral-large-2502",
+   "release_date": "2025-04-08",
+   "limit": {
+    "context": 128000,
+    "output": 102400
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2
+     },
+     "output": {
+      "price": 6
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/gif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@openrouter/ai-sdk-provider",
+      "opencodeai": "@opencode/ai/providers/openrouter"
+     }
+    },
+    "responses": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     }
+    },
+    "messages": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-04-08",
+   "recommended_api": "chat-completions"
+  },
   "mistralai/voxtral-mini-3b-2507": {
    "id": "mistralai/voxtral-mini-3b-2507",
    "name": "Voxtral Mini 3B 2507",
@@ -28018,13 +28035,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.66,
+      "price": 0.6,
       "cache": {
-       "read": 0.16
+       "read": 0.12
       }
      },
      "output": {
-      "price": 3.5
+      "price": 3
      }
     }
    },
@@ -39078,7 +39095,7 @@
    "release_date": "2025-08-05",
    "limit": {
     "context": 131072,
-    "output": 65536
+    "output": 117964
    },
    "capabilities": {
     "temperature": true,
@@ -39102,13 +39119,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.15,
-      "cache": {
-       "read": 0.075
-      }
+      "price": 0.09
      },
      "output": {
-      "price": 0.6
+      "price": 0.36
      }
     }
    },
@@ -40429,9 +40443,9 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.06,
+      "price": 0.07,
       "cache": {
-       "read": 0.003
+       "read": 0.006
       }
      },
      "output": {
@@ -44498,7 +44512,7 @@
    "release_date": "2026-02-23",
    "limit": {
     "context": 262144,
-    "output": 65536
+    "output": 81920
    },
    "capabilities": {
     "temperature": true,
@@ -44518,10 +44532,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.195
+      "price": 0.26
      },
      "output": {
-      "price": 1.56
+      "price": 2.6
      }
     }
    },
@@ -44856,7 +44870,7 @@
    "release_date": "2026-02-23",
    "limit": {
     "context": 262144,
-    "output": 40960
+    "output": 235929
    },
    "capabilities": {
     "temperature": true,
@@ -44876,13 +44890,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.142,
-      "cache": {
-       "read": 0.127
-      }
+      "price": 0.17
      },
      "output": {
-      "price": 0.208
+      "price": 0.25
      }
     }
    },
@@ -50544,7 +50555,7 @@
    "cost": {
     "text": {
      "input": {
-      "price": 15,
+      "price": 11.25,
       "unit": "character"
      }
     }
@@ -52399,100 +52410,6 @@
         "required",
         "tool"
        ],
-       "updates": []
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-11-12",
-   "recommended_api": "chat-completions"
-  },
-  "thinkingmachines/inkling-2-small:free": {
-   "id": "thinkingmachines/inkling-2-small:free",
-   "name": "Inkling 2 Small (free)",
-   "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
-   "type": "chat",
-   "family": "ling",
-   "canonical_id": "thinkingmachines/inkling-2-small",
-   "release_date": "2026-11-05",
-   "limit": {
-    "context": 1048576,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "minimal",
-      "low",
-      "medium",
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@openrouter/ai-sdk-provider",
-      "opencodeai": "@opencode/ai/providers/openrouter"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": []
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": []
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
        "updates": []
       }
      }
@@ -54444,146 +54361,6 @@
    "open_weights": false,
    "knowledge": "2026-05",
    "last_updated": "2026-09-21",
-   "recommended_api": "chat-completions"
-  },
-  "x-ai/grok-build-0.1": {
-   "id": "x-ai/grok-build-0.1",
-   "name": "Grok Build 0.1",
-   "description": "Fast Grok coding model tuned for agentic engineering and iterative edits",
-   "type": "chat",
-   "family": "grok-build",
-   "canonical_id": "xai/grok-build-0.1",
-   "release_date": "2026-04-16",
-   "limit": {
-    "context": 256000,
-    "output": 230400
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1,
-      "cache": {
-       "read": 0.2
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 200000
-         }
-        },
-        "price": 2,
-        "cache": {
-         "read": 0.4
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 2,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 200000
-         }
-        },
-        "price": 4
-       }
-      ]
-     }
-    },
-    "web_search": {
-     "price": 5
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@openrouter/ai-sdk-provider",
-      "opencodeai": "@opencode/ai/providers/openrouter"
-     },
-     "capabilities": {
-      "system_updates": true,
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-04-16",
    "recommended_api": "chat-completions"
   },
   "x-ai/grok-imagine-image-2.0": {
@@ -56988,7 +56765,7 @@
    "release_date": "2026-08-26",
    "limit": {
     "context": 1048576,
-    "output": 943717
+    "output": 131072
    },
    "capabilities": {
     "temperature": true,
@@ -57012,13 +56789,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.15,
+      "price": 0.0399,
       "cache": {
        "read": 0.03
       }
      },
      "output": {
-      "price": 0.5
+      "price": 0.0784
      }
     }
    },
@@ -58138,13 +57915,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.035,
+      "price": 0.036,
       "cache": {
-       "read": 0.0015
+       "read": 0.01
       }
      },
      "output": {
-      "price": 0.15
+      "price": 0.5
      }
     }
    },
@@ -58253,9 +58030,9 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.0999,
+      "price": 0.2565,
       "cache": {
-       "read": 0.0999
+       "read": 0.26
       }
      },
      "output": {
@@ -58340,7 +58117,7 @@
    "release_date": "2026-08-01",
    "limit": {
     "context": 1048576,
-    "output": 384000
+    "output": 943718
    },
    "capabilities": {
     "temperature": true,
@@ -58363,13 +58140,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.06,
+      "price": 0.047,
       "cache": {
-       "read": 0.015
+       "read": 0.035
       }
      },
      "output": {
-      "price": 0.18
+      "price": 0.3
      }
     }
    },
@@ -58917,7 +58694,7 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.1824,
+      "price": 0.1805,
       "cache": {
        "read": 0.18
       }
