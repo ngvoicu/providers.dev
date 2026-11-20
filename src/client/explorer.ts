@@ -4,6 +4,7 @@ import type { Envelope } from "../core/catalog-view.ts";
 import { exact, type Today } from "../core/format.ts";
 import { parseQuery, serializeQuery, SITE_DEFAULT, type Query, type SortKey } from "../core/query.ts";
 import { rowHtml, tableHead } from "../core/render.ts";
+import type { MetaPi } from "../core/schema.ts";
 
 const form = document.getElementById("filters") as HTMLFormElement;
 const table = document.getElementById("entries") as HTMLTableElement;
@@ -20,6 +21,8 @@ const apiCopy = document.getElementById("api-copy") as HTMLButtonElement;
 // Today and the published stale threshold (`stale_after_days` of /api/v1/meta), as the server wrote them from the meta it
 // read for this page. A new publication reloads the page, so the threshold is always the one of the rows' publication.
 const today: Today = { date: new Date(table.dataset.now ?? Date.now()), stale_after_days: Number(table.dataset.staleAfterDays) };
+// pi's catalog (`pi` of /api/v1/meta), written by the server in the same way: the date beside the pi.dev mark of a row.
+const pi = table.dataset.pi ? (JSON.parse(table.dataset.pi) as MetaPi) : undefined;
 
 const FIELDS = ["q", "provider", "access", "type", "cache", "cache_mode", "origin", "min_context", "min_output", "max_age_months", "evaluated"] as const;
 
@@ -135,7 +138,7 @@ async function render(): Promise<void> {
       location.reload();
       return;
     }
-    rows.innerHTML = result.data.map((entry) => rowHtml(entry, { today, providerNames, imported: result.meta.upstream_fetched_at.slice(0, 10) })).join("");
+    rows.innerHTML = result.data.map((entry) => rowHtml(entry, { today, providerNames, imported: result.meta.upstream_fetched_at.slice(0, 10), pi })).join("");
     count.textContent = `${exact(result.total)} entries`;
     page.textContent = `Page ${Math.floor(result.offset / result.limit) + 1} of ${exact(Math.max(1, Math.ceil(result.total / result.limit)))}`;
     const linkTo = (link: HTMLAnchorElement, offset: number | null): void => {

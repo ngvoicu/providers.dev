@@ -1081,7 +1081,10 @@ page works nothing out.
 4. **On an entry pi does not list** (`pi: null`): nothing about pi, or one plain line; the designer's choice.
 
 Lists (`/`, a provider's page, a model's page) show, on a row whose entry pi lists, that pi lists it, and nothing about
-differences: the owner settled it so. Only the entry's own page shows the differences.
+differences: the owner settled it so. Only the entry's own page shows the differences. The row's pi.dev mark carries the
+date of pi's import (`meta.pi.snapshot.fetched_at`), on a line of its own as the models.dev and providers.dev marks
+carry theirs: the owner asked for it on 2026-11-20. `checked_at` is not that date: it moves on every check, while the
+models.dev date beside it moves only when models.dev's data changed.
 
 ---
 

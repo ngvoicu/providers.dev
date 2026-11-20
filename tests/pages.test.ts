@@ -655,16 +655,38 @@ describe("pi's catalog on the pages", () => {
     expect(html).not.toContain('class="origin pi"');
   });
 
-  it("a catalog row with a block has the pi.dev badge and nothing about differences; a row without one has no badge", async () => {
-    for (const path of ["/?q=model-4&limit=200", "/providers/provider-02/"]) {
+  it("a catalog row with a block has the pi.dev badge with its date and nothing about differences; a row without one has neither", async () => {
+    const { snapshot } = (await (await piApi("/api/v1/meta")).json() as { data: Meta }).data.pi;
+    // The date of the import that wrote pi's data (fetched_at), the kind of date the models.dev mark has; not the check.
+    const [fetched, checked] = [snapshot!.fetched_at.slice(0, 10), snapshot!.checked_at.slice(0, 10)];
+    expect(fetched).not.toBe(checked);
+    for (const path of ["/?q=model-4&limit=200", "/providers/provider-02/", "/models/lab/model-4/"]) {
       const html = await piPage(path);
       const listed = rowOf(html, "provider-02/lab/model-4");
       expect(listed, path).toContain('<span class="origin pi" title="pi&#39;s model catalog (pi.dev) also lists this entry.');
-      expect(listed).toMatch(/>pi\.dev<\/span><\/span><\/td>/);
+      // Three sources, each a mark and its date, pi's last.
+      const sources = listed.split('<td class="nowrap source-col" data-label="Source">')[1]!.split("</td>")[0]!;
+      expect(sources.replace(/<[^>]+>/g, " ").trim().split(/\s+/), path).toEqual(["models.dev", expect.stringMatching(/^\d{4}-\d\d-\d\d$/), "providers.dev", "2026-11-01", "pi.dev", fetched]);
+      expect(sources, path).toMatch(new RegExp(`>pi\\.dev</span><span class="muted date" title="Fetched from pi&#39;s catalog ${fetched} \\d\\d:\\d\\d UTC\\. Last checked ${checked} \\d\\d:\\d\\d UTC: unchanged since the fetch\\.">${fetched}</span></span>$`));
       expect(listed).not.toMatch(/differ|otherwise|agree/i);
       expect(listed).not.toContain("pi-differ");
-      if (path.startsWith("/?")) expect(rowOf(html, "provider-20/lab/model-4")).not.toContain("pi.dev");
+      expect(listed).not.toContain(`>${checked}<`);
+      if (!path.startsWith("/providers/")) {
+        const unlisted = rowOf(html, "provider-20/lab/model-4");
+        expect(unlisted, path).not.toContain("pi.dev");
+        expect(unlisted, path).not.toContain("pi&#39;s catalog");
+        // One source, one date: the models.dev import's.
+        const own = unlisted.split('<td class="nowrap source-col" data-label="Source">')[1]!.split("</td>")[0]!;
+        expect(own, path).toMatch(/^<span class="sources"><span class="origin upstream"[^>]*>models\.dev<\/span><span class="muted date" title="Imported from models\.dev on this date\.">\d{4}-\d\d-\d\d<\/span><\/span>$/);
+      }
     }
+  });
+
+  it("the home page hands the browser pi's part of /api/v1/meta, from which the rows it draws take their date", async () => {
+    const { pi } = (await (await piApi("/api/v1/meta")).json() as { data: Meta }).data;
+    const html = await piPage("/");
+    const attribute = html.match(/<table class="entries stack-tablet" id="entries"[^>]* data-pi="([^"]*)"/)![1]!;
+    expect(JSON.parse(attribute.replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&"))).toEqual(pi);
   });
 
   it("the home page says nothing about differences in anything about pi: not in a row, not in a column's title", async () => {

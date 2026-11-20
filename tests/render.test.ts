@@ -960,4 +960,44 @@ describe("pi's catalog on an entry's page and in a row", () => {
     expect(paired).toContain("also lists this entry, as lab-pi/Full.");
     expect(row({})).not.toContain("pi.dev");
   });
+
+  it("a row's sources: a mark and its date each, pi.dev dated by the import of pi's catalog as models.dev is by its own", () => {
+    const today = { date: new Date("2026-11-14T00:00:00Z"), stale_after_days: 90 };
+    const listed = { ref: "lab/full", provider: "lab", model: "full", pi: { ref: "lab/full", api: "openai-completions", match: "id", difference_count: 2 } } as const;
+    /** The source cell of a row, and what a reader sees in it. */
+    const cell = (more: Partial<Summary>, pi?: MetaPi): string => rowHtml(summaryOf(more), { today, imported: "2026-11-13", pi }).split('data-label="Source">')[1]!.split("</td>")[0]!;
+    const seen = (html: string): string[] => html.replace(/<[^>]+>/g, " ").trim().split(/\s+/);
+    const said = "Fetched from pi&#39;s catalog 2026-11-12 14:19 UTC. Last checked 2026-11-14 04:17 UTC: unchanged since the fetch.";
+
+    // models.dev and pi: the date of pi's data is fetched_at (2026-11-12), not the last check (2026-11-14).
+    const two = cell(listed, meta());
+    expect(seen(two)).toEqual(["models.dev", "2026-11-13", "pi.dev", "2026-11-12"]);
+    expect(two).toContain(`>pi.dev</span><span class="muted date" title="${said}">2026-11-12</span></span>`);
+    expect(two).not.toMatch(/differ|otherwise|agree/i);
+    expect(two).not.toMatch(/<a /);
+    // All three sources, in their order; the providers.dev date as before.
+    const three = cell({ ...listed, origin: "modified", verified: "2026-11-01", overridden_fields: ["limit.context"] }, meta());
+    expect(seen(three)).toEqual(["models.dev", "2026-11-13", "providers.dev", "2026-11-01", "pi.dev", "2026-11-12"]);
+    expect(three).not.toMatch(/differ|otherwise|agree/i);
+    // An entry providers.dev added, which pi lists.
+    expect(seen(cell({ ...listed, origin: "added", verified: "2026-11-01" }, meta()))).toEqual(["providers.dev", "2026-11-01", "pi.dev", "2026-11-12"]);
+    // No pi block: no mark and no date of pi's, with or without pi's data.
+    for (const pi of [meta(), undefined]) {
+      expect(seen(cell({ ref: "lab/full", provider: "lab", model: "full" }, pi))).toEqual(["models.dev", "2026-11-13"]);
+      expect(cell({ ref: "lab/full", provider: "lab", model: "full" }, pi)).not.toContain("pi&#39;s catalog");
+    }
+    // No pi data in the answer: the mark, no date; nothing is made up.
+    expect(seen(cell(listed))).toEqual(["models.dev", "2026-11-13", "pi.dev"]);
+    expect(seen(cell(listed, { ...meta(), snapshot: null }))).toEqual(["models.dev", "2026-11-13", "pi.dev"]);
+    // No check after the fetch: the title says the fetch only.
+    const once = { ...meta(), snapshot: { ...meta().snapshot!, checked_at: meta().snapshot!.fetched_at } };
+    expect(cell(listed, once)).toContain('title="Fetched from pi&#39;s catalog 2026-11-12 14:19 UTC.">2026-11-12</span>');
+    // The last import failed: in a row the date stays as plain as the models.dev one, and its title says so; the
+    // entry's page says it in words beside the date.
+    const failed = meta({ last_attempt_at: "2026-11-15T04:17:00.000Z", last_attempt_ok: false, last_error: "pi.dev answered HTTP 503" });
+    const after = cell(listed, failed);
+    expect(seen(after)).toEqual(["models.dev", "2026-11-13", "pi.dev", "2026-11-12"]);
+    expect(after).toContain(`<span class="muted date" title="${said} The last import, 2026-11-15 04:17 UTC, failed: this is the last good one.">2026-11-12</span>`);
+    expect(page("full", failed).split('<p class="id">')[1]!.split("</p>")[0]).toContain(">2026-11-12 · last import failed</span>");
+  });
 });

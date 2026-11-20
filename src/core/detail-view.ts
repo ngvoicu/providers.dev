@@ -5,9 +5,9 @@ import { compactTokens, compactTokensDown, entryHref, escapeHtml as e, exact, is
 import type { WindowBound } from "./limits.ts";
 import { evaluationStrip, rowHtml, SCOPE_WORD, stripHead, tableHead } from "./render.ts";
 import type { CacheEvaluationRecord, CanonicalModelDetail, Correction, LimitEvaluationRecord } from "./resources.ts";
-import type { Meta } from "./schema.ts";
+import type { Meta, MetaPi } from "./schema.ts";
 
-export function providerHtml(provider: ProviderSummary, entries: Summary[], imported: string, today: Today): string {
+export function providerHtml(provider: ProviderSummary, entries: Summary[], imported: string, today: Today, pi?: MetaPi): string {
   const extension = provider.providers_dev;
   const access = { api: "API key, billed by use", subscription: "Subscription login", unknown: "Unclassified" };
   return `<p class="crumbs"><a href="/providers/">Providers</a> / ${e(provider.name)}</p><h1>${e(provider.name)}</h1>
@@ -17,7 +17,7 @@ export function providerHtml(provider: ProviderSummary, entries: Summary[], impo
     ${extension.note ? `<dt class="muted">Note</dt><dd>${e(extension.note)}</dd>` : ""}
     ${extension.evidence.length ? `<dt class="muted">Evidence</dt><dd>${extension.evidence.map((item) => `<div><span class="badge ${item.kind}">${e(item.kind)}</span> <a href="${e(item.url)}">Source</a> <span class="muted">${e(item.date)}</span></div>`).join("")}</dd>` : ""}</dl>
     <div class="mt-8 flex flex-wrap items-end justify-between gap-3"><h2 class="!m-0">Entries</h2><p class="hint"><a href="/?provider=${e(provider.id)}">Filter and sort in the catalog</a> · ${apiLink(`/api/v1/providers/${encodeURIComponent(provider.id)}`)}</p></div>
-    <div class="scroll mt-3"><table class="entries stack-tablet"><caption class="sr-only">Entries at ${e(provider.name)}</caption><thead>${tableHead({ hideProvider: true })}</thead><tbody>${entries.map((entry) => rowHtml(entry, { today, imported, hideProvider: true })).join("")}</tbody></table></div>${entries.length === 0 ? '<p class="empty">No entries are listed for this provider. What providers.dev leaves out of the catalog is listed under <a href="/evidence/#issues">Dataset issues</a>.</p>' : ""}`;
+    <div class="scroll mt-3"><table class="entries stack-tablet"><caption class="sr-only">Entries at ${e(provider.name)}</caption><thead>${tableHead({ hideProvider: true })}</thead><tbody>${entries.map((entry) => rowHtml(entry, { today, imported, pi, hideProvider: true })).join("")}</tbody></table></div>${entries.length === 0 ? '<p class="empty">No entries are listed for this provider. What providers.dev leaves out of the catalog is listed under <a href="/evidence/#issues">Dataset issues</a>.</p>' : ""}`;
 }
 
 /** An input window as the entry table prints it: "≥" before it and rounded down where it is a lower bound; or in full. */
@@ -62,14 +62,14 @@ function modelWindowTile(model: CanonicalModelDetail, providerNames: Record<stri
   return `<div class="tile"><div class="label">Input window</div><div class="value small">${value}</div><div class="foot">${lines.map((line) => `<div>${line}</div>`).join("")}</div></div>`;
 }
 
-export function modelHtml(model: CanonicalModelDetail, providerNames: Record<string, string>, imported: string, today: Today): string {
+export function modelHtml(model: CanonicalModelDetail, providerNames: Record<string, string>, imported: string, today: Today, pi?: MetaPi): string {
   const range = (low: number | null, high: number | null): string => low === null || high === null ? "Unknown" : low === high ? compactTokens(low) : `${compactTokens(low)} to ${compactTokens(high)}`;
   const tile = (label: string, value: string, foot: string): string => `<div class="tile"><div class="label">${label}</div><div class="value small">${value}</div><div class="foot">${foot}</div></div>`;
   // The input window first, as on an entry's page: the three limits together, then the two counts.
   return `<p class="crumbs"><a href="/models/">Models</a> / ${e(model.name)}</p><h1>${e(model.name)}</h1><p class="id mt-1"><code>${e(model.id)}</code><button type="button" class="copy" data-copy="${e(model.id)}">Copy</button></p>
     <div class="tiles tiles-five mt-6">${modelWindowTile(model, providerNames)}${tile("Context window", `${range(model.context_min, model.context_max)} <span class="unit">tokens</span>`, "Smallest to largest among its entries")}${tile("Maximum output", `${range(model.max_output_min, model.max_output_max)} <span class="unit">tokens</span>`, "Smallest to largest among its entries")}${tile("Entries", exact(model.entry_count), `${exact(model.subscription_entry_count)} by subscription`)}${tile("With providers.dev evidence", exact(model.evidence_entry_count), "Corrections or evaluations")}</div>
     ${model.reference_ref ? `<p class="note mt-5">Reference entry: <a href="${e(entryHref(model.reference_ref))}"><code>${e(model.reference_ref)}</code></a>. Values below are specific to each provider and access method.</p>` : ""}
-    <div class="scroll mt-5"><table class="entries stack-tablet"><caption class="sr-only">Entries for ${e(model.name)}</caption><thead>${tableHead({})}</thead><tbody>${model.entries.map((entry) => rowHtml(entry, { today, imported, providerNames })).join("")}</tbody></table></div><p class="hint mt-3">${apiLink(`/api/v1/models/${model.id.split("/").map(encodeURIComponent).join("/")}`)}</p>`;
+    <div class="scroll mt-5"><table class="entries stack-tablet"><caption class="sr-only">Entries for ${e(model.name)}</caption><thead>${tableHead({})}</thead><tbody>${model.entries.map((entry) => rowHtml(entry, { today, imported, pi, providerNames })).join("")}</tbody></table></div><p class="hint mt-3">${apiLink(`/api/v1/models/${model.id.split("/").map(encodeURIComponent).join("/")}`)}</p>`;
 }
 
 export function evidenceHtml(meta: Meta, corrections: Envelope<Correction>, added: ProviderSummary[], cache: Envelope<CacheEvaluationRecord>, measured: Envelope<LimitEvaluationRecord>, url: URL, today: Today): string {

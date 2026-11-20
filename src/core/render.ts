@@ -111,11 +111,14 @@ function piMark(pi: PiSummary, differences: boolean): string {
 }
 
 /**
- * One line per source with its own date: the models.dev import, and the newest providers.dev evidence. Where pi's
- * catalog lists the entry, the pi.dev mark under them. On the entry's own page (`pi` given) the mark carries the
- * differences and the date providers.dev fetched pi's catalog; in a row it carries neither.
+ * One line per source with its own date: the models.dev import, the newest providers.dev evidence, and, where pi's
+ * catalog lists the entry, the pi.dev mark with the import of pi's catalog (`fetched_at` of `pi.snapshot` in
+ * /api/v1/meta: like the models.dev date, it moves only when the data changed). The date is there wherever `pi` is
+ * given: in a row and on the entry's own page. Only the entry's page (`entry`) has the mark say how many values pi
+ * states otherwise and the date say that the last import failed; in a row the date is plain like the models.dev one,
+ * and its title says the rest.
  */
-function sourcesHtml(entry: Pick<Summary, "origin" | "verified" | "overridden_fields" | "pi">, options: { today: Today; imported?: string; pi?: MetaPi }, inline = false): string {
+function sourcesHtml(entry: Pick<Summary, "origin" | "verified" | "overridden_fields" | "pi">, options: { today: Today; imported?: string; pi?: MetaPi; entry?: boolean }, inline = false): string {
   const parts: string[] = [];
   if (entry.origin !== "added") {
     const date = options.imported ? `<span class="muted date" title="Imported from models.dev on this date.">${e(options.imported)}</span>` : "<span></span>";
@@ -126,12 +129,13 @@ function sourcesHtml(entry: Pick<Summary, "origin" | "verified" | "overridden_fi
     parts.push(`<span class="origin added" title="${e(ORIGIN_TITLE[entry.origin] + corrected)}">${ORIGIN_LABEL.added}</span>${dateTag(entry.verified, options.today) || "<span></span>"}`);
   }
   if (entry.pi) {
-    // Last in the list, so in a row it needs no empty cell for a date: the mark can sit beside the first source.
+    // Without pi's data in /api/v1/meta there is no date, and the mark ends the list.
     const dates = piDates(options.pi);
+    const failed = options.entry === true && dates.failed;
     const date = !options.pi || dates.fetched === null
       ? ""
-      : `<span class="${dates.failed ? "stale" : "muted date"}" title="${e(piDatesSaid(options.pi))}">${e(dates.fetched)}${dates.failed ? " · last import failed" : ""}</span>`;
-    parts.push(`${piMark(entry.pi, options.pi !== undefined)}${date}`);
+      : `<span class="${failed ? "stale" : "muted date"}" title="${e(piDatesSaid(options.pi))}">${e(dates.fetched)}${failed ? " · last import failed" : ""}</span>`;
+    parts.push(`${piMark(entry.pi, options.entry === true)}${date}`);
   }
   return `<span class="sources${inline ? " side" : ""}">${parts.join("")}</span>`;
 }
@@ -355,6 +359,8 @@ export interface RowOptions {
   today: Today;
   /** The date of the models.dev import, shown next to the models.dev source. */
   imported?: string;
+  /** pi's catalog as /api/v1/meta describes it (`pi`): its import date is shown next to the pi.dev mark. */
+  pi?: MetaPi;
   /** Leave the provider column out (on a provider's own page). */
   hideProvider?: boolean;
   providerNames?: Record<string, string>;
@@ -381,7 +387,7 @@ ${column("max_output", COLUMN.max_output, "Largest single response in tokens (li
 ${column("price_in", COLUMN.price, "Base list price in US dollars per million tokens, input then output, as models.dev records it. Conditional rates marks an entry whose price changes with context size, service tier, region, date or the time of day: open the entry for those. A subscription is not paid per token: it shows the API list price of the same model, marked API price, or In plan where the catalog has no API entry of that model.", "num mid-only")}
 ${column("release_date", COLUMN.released, "When the model was released, as models.dev records it. It is the model's date: the same at every provider.", "wide-only")}
 ${column(null, COLUMN.lifetime, "How long a cached prompt can be relied on (cache_lifetime): for short retention, what a request gets without asking for a lifetime; for long, what it gets when it asks for a longer one. Each value says whether it is documented or measured by providers.dev, and names the other of the two where there is one. Hover a value for its source and date; the entry's page lists every lifetime.", "life-col")}
-${column("verified", COLUMN.source,"Where the entry comes from, with a date per source: the import from models.dev, and the newest providers.dev evidence. pi.dev marks an entry that pi's model catalog also lists, imported beside models.dev and never merged into it. The entry's own page shows what pi states.")}
+${column("verified", COLUMN.source,"Where the entry comes from, with a date per source: the import from models.dev, the newest providers.dev evidence, and the import of pi's catalog. pi.dev marks an entry that pi's model catalog also lists, imported beside models.dev and never merged into it. The entry's own page shows what pi states.")}
 </tr>`;
 }
 
@@ -952,7 +958,7 @@ export function entryHtml(view: EntryView): string {
   const big = (value: Json | undefined): string => (typeof value === "number" ? `${exact(value)} <span class="unit">tokens</span>` : '<span class="muted">Unknown</span>');
   const api = `/api/v1${entryHref(summary.ref)}`;
   // The sources of the entry, the pi.dev mark among them where pi lists it, dated by the pi import.
-  const sources = sourcesHtml(summary, { today, imported: view.imported, pi: view.pi }, true);
+  const sources = sourcesHtml(summary, { today, imported: view.imported, pi: view.pi, entry: true }, true);
   // The safe lifetime of each profile, at the top of the page: the value, its basis, and whose it is as of when.
   const lifetimeTile = (profile: RetentionProfile): string => {
     const p = cache.lifetime[profile];

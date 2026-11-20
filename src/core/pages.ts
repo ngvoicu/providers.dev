@@ -72,13 +72,13 @@ export async function handlePage(request: Request, deps: PageDeps): Promise<Resp
       view = { title: "Providers", description: "Providers and access methods in the catalog.", html: providersHtml(await read<Envelope<ProviderSummary>>(`/api/v1/providers${url.search}`), url) };
     } else if (path.startsWith("/providers/")) {
       const { provider, entries } = await one<{ provider: ProviderSummary; entries: Summary[] }>(`/api/v1${path}`);
-      view = { title: provider.name, description: `${provider.name}: ${provider.entry_count} model entries.`, html: providerHtml(provider, entries, imported, today) };
+      view = { title: provider.name, description: `${provider.name}: ${provider.entry_count} model entries.`, html: providerHtml(provider, entries, imported, today, meta.pi) };
     } else if (path === "/models") {
       view = { title: "Models", description: "Canonical models and the providers that serve them.", html: modelsHtml(await read<Envelope<CanonicalModel>>(`/api/v1/models${url.search}`), url) };
     } else if (path.startsWith("/models/")) {
       if (!refFromPath(path.slice("/models/".length))) throw new ApiError(404);
       const [model, facets] = await Promise.all([one<CanonicalModelDetail>(`/api/v1${path}`), one<Facets>("/api/v1/facets")]);
-      view = { title: model.name, description: `${model.name}: ${model.entry_count} entries across providers and access methods.`, html: modelHtml(model, Object.fromEntries(facets.providers.map((provider) => [provider.id, provider.name])), imported, today) };
+      view = { title: model.name, description: `${model.name}: ${model.entry_count} entries across providers and access methods.`, html: modelHtml(model, Object.fromEntries(facets.providers.map((provider) => [provider.id, provider.name])), imported, today, meta.pi) };
     } else if (path.startsWith("/entries/")) {
       if (!refFromPath(path.slice("/entries/".length))) throw new ApiError(404);
       const { provider, summary, entry } = await one<{ provider: ProviderSummary; summary: Summary; entry: JsonObject }>(`/api/v1${path}`);

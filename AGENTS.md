@@ -133,7 +133,8 @@ The baseline is imported from models.dev; our additions, corrections and measure
   says a condition in words with `src/core/conditions.ts`.
 - Measured limits use numeric columns, not generated sentences. Free-text evaluation notes belong in raw evidence.
 - Each source carries its own date: the import date next to `models.dev`, the newest evidence next to
-  `providers.dev`.
+  `providers.dev`, and next to `pi.dev` the import of pi's catalog (`pi.snapshot.fetched_at` of `/api/v1/meta`, which
+  like the models.dev date moves only when the data changed).
 - A measurement names the client it went through: the provider directly, CLIProxyAPI, or a vendor's own CLI. The
   coding agent used on top of CLIProxyAPI is not named ("A coding agent, through CLIProxyAPI"). The public names
   are in `data/authored/measurement-labels.yaml`; a new client id must be added there (the build warns and publishes
