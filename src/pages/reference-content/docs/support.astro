@@ -1,0 +1,164 @@
+---
+import Doc from "../../../layouts/Doc.astro";
+
+const provimux = "https://github.com/ngvoicu/provimux";
+const cliproxyapi = "https://github.com/router-for-me/CLIProxyAPI";
+const email = "office@providers.dev";
+const ask = (plan?: string) => `mailto:${email}?subject=${encodeURIComponent(plan ? `Provimux support: ${plan}` : "Provimux support")}`;
+---
+
+<Doc
+  title="Support"
+  description="Support plans for companies that run Provimux, by providers.dev: prices, reply times, what is covered and how to buy."
+  lead="Provimux is free and stays open source (MIT). For companies that run it, providers.dev offers support plans: a private channel to the maintainer and a first reply within a stated number of business days."
+  toc={[
+    { id: "plans", label: "Plans" },
+    { id: "promises", label: "What a plan promises" },
+    { id: "covered", label: "What support covers" },
+    { id: "buy", label: "How to buy" },
+    { id: "faq", label: "Questions" },
+  ]}
+>
+  <div class="prose">
+    <p>
+      <a href={provimux}>Provimux</a> is one local endpoint for your AI accounts that keeps your prompt cache in use and shows which account answered each request. It is an
+      open-source (MIT) distribution of <a href={cliproxyapi}>CLIProxyAPI</a> by router-for-me, and runs on your own machines.
+    </p>
+
+    <h2 id="plans">Plans</h2>
+    <p>Prices are approximate, per month, in US dollars. Prices in euros on request. Prices are before VAT; VAT is added where it applies.</p>
+  </div>
+
+  <div class="plans">
+    <section class="plan" aria-labelledby="plan-community">
+      <h3 id="plan-community">Community</h3>
+      <p class="plan-price">Free</p>
+      <ul>
+        <li>GitHub issues and discussions, in public</li>
+        <li>Best effort: no reply time</li>
+      </ul>
+      <p class="plan-action"><a class="button" href={`${provimux}/issues`}>Open an issue</a></p>
+    </section>
+    <section class="plan" aria-labelledby="plan-team">
+      <h3 id="plan-team">Team</h3>
+      <p class="plan-price">about $149 <span>/ month</span></p>
+      <ul>
+        <li>First reply within 3 business days</li>
+        <li>1 hour of help a month</li>
+        <li>A private email channel</li>
+      </ul>
+      <p class="plan-action"><a class="button primary" href={ask("Team")}>Ask for Team</a></p>
+    </section>
+    <section class="plan" aria-labelledby="plan-business">
+      <h3 id="plan-business">Business</h3>
+      <p class="plan-price">about $499 <span>/ month</span></p>
+      <ul>
+        <li>First reply within 2 business days</li>
+        <li>3 hours of help a month</li>
+        <li>An onboarding call</li>
+        <li>A vendor pack on request: company details, VAT number, tax forms</li>
+      </ul>
+      <p class="plan-action"><a class="button primary" href={ask("Business")}>Ask for Business</a></p>
+    </section>
+    <section class="plan" aria-labelledby="plan-priority">
+      <h3 id="plan-priority">Priority</h3>
+      <p class="plan-price">about $1,499 <span>/ month, billed yearly</span></p>
+      <ul>
+        <li>First reply the next business day</li>
+        <li>8 hours of help a month</li>
+        <li>Everything in Business</li>
+        <li>At most three customers at a time: ask whether a place is free</li>
+      </ul>
+      <p class="plan-action"><a class="button primary" href={ask("Priority")}>Ask for Priority</a></p>
+    </section>
+  </div>
+
+  <div class="prose">
+    <p>
+      <strong>Extra work</strong>, beyond a plan's hours or without a plan: $150 to $200 an hour, quoted before it starts.
+    </p>
+
+    <h2 id="promises">What a plan promises</h2>
+    <ul>
+      <li>
+        <strong>A first reply, not a fix.</strong> The days a plan names are the time to a first reply from the maintainer. Many questions are settled in that reply. A bug can take
+        longer, and no date for a fix is promised.
+      </li>
+      <li>
+        <strong>Business days.</strong> Monday to Friday, 09:00 to 17:00 Central European Time (CET, and CEST in summer). A request sent outside those hours counts from the next
+        business morning. Holidays are announced to customers in advance and pause the clock.
+      </li>
+      <li>
+        <strong>One maintainer.</strong> Provimux is maintained by one person, working with AI agents. That person reads every support request and is responsible for every reply.
+        There is no 24/7 cover, and no uptime promise for software you host yourself.
+      </li>
+      <li>
+        <strong>If support ends.</strong> Should providers.dev stop offering support, the unused part of what you paid is refunded, prorated. The code stays MIT: you can keep running
+        it, or fork it.
+      </li>
+      <li>
+        <strong>Security fixes, early.</strong> Customers on a paid plan hear about a security fix before it is announced in public.
+      </li>
+    </ul>
+
+    <h2 id="covered">What support covers</h2>
+    <ul>
+      <li><strong>Setup and upgrades.</strong> Installing Provimux, and moving to a new release.</li>
+      <li><strong>A review of your configuration.</strong> Accounts, priorities, model routes and cache settings.</li>
+      <li><strong>Moving from CLIProxyAPI.</strong> Taking an existing CLIProxyAPI setup over to Provimux.</li>
+      <li><strong>Debugging.</strong> A request that fails, a route that is paused, a prompt cache that is not read.</li>
+      <li><strong>Priority on bugs.</strong> A bug you report goes ahead of the public queue. The fix is published in the open code, for everyone.</li>
+    </ul>
+    <h3>What it does not cover</h3>
+    <ul>
+      <li>
+        <strong>Access to models or accounts.</strong> providers.dev does not sell, pool, share or resell access to any model or account. You bring your own API keys or cloud
+        accounts (for example Vertex), billed to your company under its own agreement with the provider.
+      </li>
+      <li><strong>Running Provimux for you.</strong> It runs on your machines, and nothing goes through providers.dev.</li>
+      <li><strong>One person's subscription login shared by a team.</strong> For a company, use API keys and cloud accounts.</li>
+    </ul>
+
+    <h2 id="buy">How to buy</h2>
+    <ol>
+      <li>
+        Write to <a href={ask()}>{email}</a> with the plan, your company's name and country, and whether you need a vendor pack. Each plan above has a button that starts
+        the email.
+      </li>
+      <li>
+        You get an invoice, paid by bank transfer or by card (a Stripe invoice). Invoices come from a VAT-registered business in Romania. An EU business with a VAT number is
+        invoiced under the reverse charge.
+      </li>
+      <li>Support starts when the first invoice is paid.</li>
+    </ol>
+    {/* The GitHub Sponsors line goes here once the profile exists: "Or pick the matching tier on GitHub Sponsors." */}
+    <p>The company details, the VAT number and the tax forms are in the vendor pack, sent on request from Business up.</p>
+
+    <h2 id="faq">Questions</h2>
+    <h3>How fast is a reply?</h3>
+    <p>
+      Within the business days of your plan: three on Team, two on Business, the next business day on Priority. That is the first reply from the maintainer, not a fix. Community
+      questions on GitHub are answered when there is time.
+    </p>
+    <h3>We are in another time zone.</h3>
+    <p>
+      Business hours are 09:00 to 17:00 Central European Time, Monday to Friday. For a team on US Eastern time that is about 03:00 to 11:00. Send a request at any hour; it is read
+      on the next business day. Calls are booked within those hours.
+    </p>
+    <h3>What counts as an hour?</h3>
+    <p>
+      Time spent on your requests: calls, reading your configuration and logs, reproducing a problem, writing the reply. It is counted in quarter hours. Hours left unused do not
+      carry over to the next month. Fixing a bug in Provimux itself is not counted: the fix is public.
+    </p>
+    <h3>Can we cancel?</h3>
+    <p>
+      Team and Business are monthly: cancel by email at any time, and the plan ends with the month already paid. Priority is billed yearly and runs to the end of the paid year. If
+      providers.dev ends support, the unused part is refunded, prorated.
+    </p>
+    <h3>Do you need our API keys or access to our systems?</h3>
+    <p>
+      No. We never ask for your API keys, logins or prompts, and never need access to your machines. Send configuration and logs with the keys removed; on a call, you share your
+      screen and keep control. Provimux runs on your machines, and nothing goes through providers.dev.
+    </p>
+  </div>
+</Doc>

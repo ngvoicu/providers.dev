@@ -62,6 +62,7 @@ describe("API response boundary", () => {
       ["/docs/methodology/", "/api/v1/docs/methodology"],
       ["/docs/licensing/", "/api/v1/docs/licensing"],
       ["/docs/contributing/", "/api/v1/docs/contributing"],
+      ["/support/", "/api/v1/docs/support"],
     ];
     for (const [path, endpoint] of routes) {
       const calls: string[] = [];
@@ -156,9 +157,10 @@ describe("API response boundary", () => {
     expect(source).not.toContain("limit-value");
   });
 
-  it("serves the three reference documents, and only those, in the API, the OpenAPI document and on the site", async () => {
-    expect([...DOCUMENTS]).toEqual(["methodology", "licensing", "contributing"]);
-    for (const name of DOCUMENTS) {
+  it("serves the four reference documents, and only those, in the API, the OpenAPI document and on the site", async () => {
+    expect([...DOCUMENTS]).toEqual(["methodology", "licensing", "contributing", "support"]);
+    for (const name of DOCUMENTS) expect((await api(`/api/v1/docs/${name}`)).status, name).toBe(200);
+    for (const name of DOCUMENTS.filter((name) => name !== "support")) {
       expect((await api(`/api/v1/docs/${name}`)).status, name).toBe(200);
       const response = await page(`/docs/${name}/`);
       expect(response.status, name).toBe(200);
@@ -170,8 +172,41 @@ describe("API response boundary", () => {
     for (const name of ["api", "contributors", "CONTRIBUTING"]) expect((await api(`/api/v1/docs/${name}`)).status, name).toBe(404);
     expect((await page("/docs/contributors/")).status).toBe(404);
     const operation = (openapi() as unknown as { paths: Record<string, { get: { description: string; parameters: { name: string; description: string }[] } }> }).paths["/api/v1/docs/{document}"]!.get;
-    expect(operation.parameters.find((param) => param.name === "document")!.description).toBe("methodology, licensing or contributing.");
-    expect(operation.description).toContain("The methodology, licensing and contributing text");
+    expect(operation.parameters.find((param) => param.name === "document")!.description).toBe("methodology, licensing, contributing or support.");
+    expect(operation.description).toContain("The methodology, licensing, contributing and support text");
+  });
+
+  it("serves the support document at /support/ only, outside the main navigation", async () => {
+    const response = await page("/support/");
+    expect(response.status).toBe(200);
+    const nav = (await response.text()).match(/<nav>(.*?)<\/nav>/)![1]!;
+    expect(nav).not.toContain('aria-current="page"');
+    expect(nav).not.toContain("Support");
+    const moved = await page("/docs/support/");
+    expect(moved.status).toBe(301);
+    expect(moved.headers.get("Location")).toBe("https://providers.dev/support/");
+    expect((await page("/support/plans/")).status).toBe(404);
+  });
+
+  it("says on the support page what a company can buy, with the owner's decisions as written", () => {
+    const source = readFileSync(join(ROOT, "src", "pages", "reference-content", "docs", "support.astro"), "utf8").replace(/\s+/g, " ");
+    for (const words of [
+      "Prices are approximate, per month, in US dollars. Prices in euros on request. Prices are before VAT; VAT is added where it applies.",
+      "GitHub issues and discussions, in public", "Best effort: no reply time",
+      "about $149 <span>/ month</span>", "First reply within 3 business days", "1 hour of help a month",
+      "about $499 <span>/ month</span>", "First reply within 2 business days", "3 hours of help a month", "An onboarding call", "A vendor pack on request: company details, VAT number, tax forms",
+      "about $1,499 <span>/ month, billed yearly</span>", "First reply the next business day", "8 hours of help a month", "At most three customers at a time",
+      "$150 to $200 an hour",
+      "<strong>A first reply, not a fix.</strong>", "Monday to Friday, 09:00 to 17:00 Central European Time (CET, and CEST in summer).",
+      "Provimux is maintained by one person, working with AI agents.", "the unused part of what you paid is refunded, prorated. The code stays MIT",
+      "Customers on a paid plan hear about a security fix before it is announced in public.",
+      "Setup and upgrades.", "A review of your configuration.", "Moving from CLIProxyAPI.", "Debugging.", "Priority on bugs.",
+      "providers.dev does not sell, pool, share or resell access to any model or account. You bring your own API keys or cloud accounts",
+      'const email = "office@providers.dev";', "mailto:${email}?subject=", "bank transfer or by card (a Stripe invoice)", "a VAT-registered business in Romania", "reverse charge",
+      "We never ask for your API keys, logins or prompts",
+    ]) expect(source, words).toContain(words);
+    // The business name and VAT number go in the vendor pack, never on the page; no referral, affiliate or sponsor link.
+    for (const words of ["SRL", "S.R.L", "RO1", "RO2", "RO3", "RO4", "RO5", "RO6", "RO7", "RO8", "RO9", "github.com/sponsors", "referral", "affiliate", "cheapest", "compliant"]) expect(source, words).not.toContain(words);
   });
 
   it("says on the contributing page how to contribute, with the owner's decisions as written", () => {
@@ -192,7 +227,7 @@ describe("API response boundary", () => {
     ]) expect(source, words).toContain(words);
     // Astro drops a line break before a tag: a word at the end of a line and a tag at the start of the next would run together.
     // The same holds on the methodology ("an<em>Input window", "an<em>at least", ":<code>contradicted") and the licensing page ("as<a").
-    for (const name of ["contributing", "methodology", "licensing"]) {
+    for (const name of ["contributing", "methodology", "licensing", "support"]) {
       const raw = readFileSync(join(ROOT, "src", "pages", "reference-content", "docs", `${name}.astro`), "utf8");
       expect(raw, name).not.toMatch(/[\w,.;:)]\n\s*<(a|code|em|strong|span)\b/);
     }
@@ -209,7 +244,7 @@ describe("API response boundary", () => {
     expect(methodology).toContain("providers.dev takes no payment for listing, correcting or measuring an entry. A provider may supply documentation, or access for a measurement; the result is published whatever it shows.");
     expect(methodology.match(/<a href="\/docs\/contributing\/">contributing<\/a>/g)).toHaveLength(2);
     const layout = readFileSync(join(ROOT, "src", "layouts", "Base.astro"), "utf8");
-    expect(layout).toMatch(/<li><a href="\/docs\/licensing\/">Licensing and attribution<\/a><\/li>\s*<li><a href="\/docs\/contributing\/">Contributing<\/a><\/li>\s*<li><a href="mailto:office@providers\.dev">Contact<\/a><\/li>/);
+    expect(layout).toMatch(/<li><a href="\/docs\/licensing\/">Licensing and attribution<\/a><\/li>\s*<li><a href="\/docs\/contributing\/">Contributing<\/a><\/li>\s*<li><a href="\/support\/">Provimux support<\/a><\/li>\s*<li><a href="mailto:office@providers\.dev">Contact<\/a><\/li>/);
     expect(methodology).toContain('A provider can write to <a href="mailto:office@providers.dev">office@providers.dev</a>.');
     const evidence = await (await page("/evidence/")).text();
     expect(evidence).toContain('To propose a correction or ask for an evaluation, see <a href="/docs/contributing/">Contributing</a>.');

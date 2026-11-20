@@ -26,13 +26,15 @@ class ApiError extends Error {
 }
 
 export function isPage(path: string): boolean {
-  return path === "/" || /^(\/providers|\/models|\/entries|\/entry|\/evidence|\/docs)(\/|$)/.test(path);
+  return path === "/" || /^(\/providers|\/models|\/entries|\/entry|\/evidence|\/docs|\/support)(\/|$)/.test(path);
 }
 
 export async function handlePage(request: Request, deps: PageDeps): Promise<Response> {
   if (request.method !== "GET" && request.method !== "HEAD") return new Response(null, { status: 405, headers: { Allow: "GET, HEAD" } });
   const url = new URL(request.url);
   const path = url.pathname.replace(/\/+$/, "") || "/";
+  // The support document has one address, /support/, not /docs/support/.
+  if (path === "/docs/support") return Response.redirect(new URL("/support/", url.origin).toString(), 301);
   if (path === "/entry" && url.searchParams.get("ref")?.includes("/")) return Response.redirect(new URL(entryHref(url.searchParams.get("ref")!), url.origin).toString(), 301);
   const read = async <T>(api: string): Promise<T> => {
     const response = await deps.api(api);
@@ -92,8 +94,8 @@ export async function handlePage(request: Request, deps: PageDeps): Promise<Resp
       view = { title: "Evidence", description: "Corrections and evaluations with sources and dates.", html: evidenceHtml(meta, corrections, added, cache, measured, url, today) };
     } else if (path === "/docs/api") {
       view = { title: "API", description: "The providers.dev API: endpoints, parameters, response schemas and examples.", html: openapiHtml(await read<OpenApiDocument>("/api/v1/openapi.json")) };
-    } else if (path.startsWith("/docs/") && (DOCUMENTS as readonly string[]).includes(path.slice("/docs/".length))) {
-      const document = await one<Documentation>(`/api/v1${path}`);
+    } else if (path === "/support" || (path.startsWith("/docs/") && (DOCUMENTS as readonly string[]).includes(path.slice("/docs/".length)))) {
+      const document = await one<Documentation>(`/api/v1/docs/${path.split("/").at(-1)}`);
       view = { title: document.title, description: document.description, html: documentHtml(fillMetaSlots(document, meta)) };
     } else throw new ApiError(404);
   } catch (error) {

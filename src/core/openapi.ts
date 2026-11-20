@@ -93,7 +93,7 @@ export const ENDPOINTS: { path: string; summary: string; description?: string; p
   // What the pages of the website are drawn from, beyond the resources above.
   { path: "/api/v1/facets", summary: "Catalog filter options and counts", params: [], returns: "Facets" },
   { path: "/api/v1/corrections", summary: "Corrections grouped by identical change and evidence", params: CORRECTION_PARAMS, returns: "A page of Correction" },
-  { path: "/api/v1/docs/{document}", summary: "Authored reference documentation", description: "The methodology, licensing and contributing text shown by the website. Compiled with the templates; contains no dataset values. API documentation is generated from /api/v1/openapi.json.", params: [], returns: "Documentation" },
+  { path: "/api/v1/docs/{document}", summary: "Authored reference documentation", description: "The methodology, licensing, contributing and support text shown by the website. Compiled with the templates; contains no dataset values. API documentation is generated from /api/v1/openapi.json.", params: [], returns: "Documentation" },
 ];
 
 export function openapi(): Record<string, unknown> {
@@ -235,7 +235,7 @@ export function openapi(): Record<string, unknown> {
       "/api/v1/openapi.json": get("/api/v1/openapi.json", { 200: ok("OpenAPI 3.1", { type: "object" }) }),
       "/api/v1/facets": get("/api/v1/facets", { 200: ok("Filter options and counts", oneOf(ref("Facets"))), 304: notModified, 400: badParams }),
       "/api/v1/corrections": get("/api/v1/corrections", { 200: ok("A page of corrections", pageOf(ref("Correction"))), 304: notModified, 400: badParams }),
-      "/api/v1/docs/{document}": get("/api/v1/docs/{document}", { 200: ok("Reference text", oneOf(ref("Documentation"))), 304: notModified, 400: badParams, 404: errorResponse("No such document") }, [pathParam("document", "methodology, licensing or contributing.", "methodology")]),
+      "/api/v1/docs/{document}": get("/api/v1/docs/{document}", { 200: ok("Reference text", oneOf(ref("Documentation"))), 304: notModified, 400: badParams, 404: errorResponse("No such document") }, [pathParam("document", "methodology, licensing, contributing or support.", "methodology")]),
       "/api.json": {
         get: {
           summary: "Compatibility export",
