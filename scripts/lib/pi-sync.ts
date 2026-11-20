@@ -7,18 +7,30 @@ import { PI_URL, PiMeta, PROVIDER_ID } from "../../src/core/schema.ts";
 import { deepEqual } from "../../src/core/merge.ts";
 import { pretty, readJson, readJsonIfExists, sha256, swapDir, writeFileAtomic } from "./files.ts";
 // Types only: pi's code imports no value from the modules that reach it through the fence (design/pi-source.md, k).
-import type { RanPart, SyncOptions } from "./sync.ts";
+import type { SyncOptions } from "./sync.ts";
+
+/** What syncPi hands back across the fence: no failure (a failure is thrown), and the revision of the snapshot now stored. */
+export interface PiSyncResult {
+  status: "updated" | "unchanged";
+  summary?: string[];
+  revision?: string;
+}
 
 /** A pi import smaller than this is treated as broken, whatever the previous snapshot held. */
 const PI_MIN_PROVIDERS = 10;
 const PI_MIN_MODELS = 300;
 /** The whole pi request, headers and body together, must be done within this. Passing it is a pi failure. */
 export const PI_DEADLINE_MS = 60_000;
+/** An import larger than this is treated as broken: it is not read to the end. */
+export const PI_MAX_BYTES = 16 * 1024 * 1024;
 /** An import that kept less than this share of the previous snapshot's providers or models is treated as broken. */
 const PI_MIN_SHARE = 0.6;
 
 /** The value of `record` under `key`, only where it is the record's own (an id is never one of Object.prototype's). */
 const own = <T>(record: Record<string, T>, key: string): T | undefined => (Object.hasOwn(record, key) ? record[key] : undefined);
+
+/** The revision of a stored snapshot, where it has one. */
+const revisionOf = (meta: PiMeta): { revision?: string } => (meta.revision ? { revision: meta.revision } : {});
 
 /** The response's ETag, where it has one. */
 function etagOf(response: Response): { etag?: string } {
@@ -67,6 +79,34 @@ async function withDeadline<T>(ms: number, work: (signal: AbortSignal) => Promis
   } finally {
     clearTimeout(timer);
   }
+}
+
+/**
+ * The body of an answer, read from its stream: past PI_MAX_BYTES the part fails at once, without reading the rest.
+ * Decoded as UTF-8, as Response.text() decodes it.
+ */
+async function cappedText(answer: Response): Promise<string> {
+  if (!answer.body) return "";
+  const reader = answer.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    size += value.byteLength;
+    if (size > PI_MAX_BYTES) {
+      await reader.cancel().catch(() => undefined);
+      throw new Error(`the pi feed is unexpectedly large: more than ${PI_MAX_BYTES / 1024 / 1024} MB`);
+    }
+    chunks.push(value);
+  }
+  const bytes = new Uint8Array(size);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return new TextDecoder().decode(bytes);
 }
 
 /** The last good pi snapshot, or undefined where data/pi/meta.json or data/pi/providers/ is missing. Not validated. */
@@ -162,7 +202,7 @@ export function piProviderFile(id: string, models: Record<string, PiModel>): str
   return pretty({ id, models: sorted });
 }
 
-export async function syncPi(options: Required<Pick<SyncOptions, "dataDir" | "fetch" | "now">> & SyncOptions): Promise<RanPart> {
+export async function syncPi(options: Required<Pick<SyncOptions, "dataDir" | "fetch" | "now">> & SyncOptions): Promise<PiSyncResult> {
   const dir = join(options.dataDir, "pi");
   // A stored snapshot that cannot be used is no snapshot: the import is in every respect a first import.
   const stored = storedPi(options.dataDir);
@@ -176,12 +216,12 @@ export async function syncPi(options: Required<Pick<SyncOptions, "dataDir" | "fe
   // One deadline over the request and the whole body: a slow feed fails the pi part, not the job.
   const { response, body } = await withDeadline(PI_DEADLINE_MS, async (signal) => {
     const answer = await options.fetch(PI_URL, { headers, signal });
-    return { response: answer, body: answer.ok ? await answer.text() : null };
+    return { response: answer, body: answer.ok ? await cappedText(answer) : null };
   });
 
   if (response.status === 304 && previous && sameSource) {
     writeFileAtomic(join(dir, "meta.json"), pretty(PiMeta.parse({ ...previous.meta, checked_at: now })));
-    return { status: "unchanged" };
+    return { status: "unchanged", ...revisionOf(previous.meta) };
   }
   if (!response.ok || body === null) throw new Error(`pi.dev answered HTTP ${response.status}`);
 
@@ -206,6 +246,9 @@ export async function syncPi(options: Required<Pick<SyncOptions, "dataDir" | "fe
       if (model.provider !== key) throw new Error(`pi model "${key}/${modelKey}" names the provider "${model.provider}", not its provider key`);
     }
   }
+  // Every model of the body is a model of the checked copy: zod's record drops the key `__proto__`.
+  const count = (feed: PiCatalog): number => Object.values(feed).reduce((sum, items) => sum + Object.keys(items).length, 0);
+  if (count(checked.data) !== count(catalog)) throw new Error("the pi feed has a model id the build cannot hold");
 
   const providers = Object.keys(catalog).length;
   const models = Object.values(catalog).reduce((sum, items) => sum + Object.keys(items).length, 0);
@@ -220,8 +263,9 @@ export async function syncPi(options: Required<Pick<SyncOptions, "dataDir" | "fe
 
   const digest = sha256(body);
   if (previous && sameSource && previous.meta.sha256 === digest && !options.force) {
-    writeFileAtomic(join(dir, "meta.json"), pretty(PiMeta.parse({ ...previous.meta, checked_at: now, ...etagOf(response) })));
-    return { status: "unchanged" };
+    const kept = PiMeta.parse({ ...previous.meta, checked_at: now, ...etagOf(response) });
+    writeFileAtomic(join(dir, "meta.json"), pretty(kept));
+    return { status: "unchanged", ...revisionOf(kept) };
   }
 
   const lastModified = response.headers.get("last-modified");
@@ -239,12 +283,14 @@ export async function syncPi(options: Required<Pick<SyncOptions, "dataDir" | "fe
     models,
   });
 
+  // Everything that can throw is worked out before the swap: a part that failed has not replaced the snapshot.
+  const result: PiSyncResult = { status: "updated", summary: summarize(previous?.catalog, catalog), ...revisionOf(meta) };
   const next = `${dir}.tmp-${process.pid}`;
   rmSync(next, { recursive: true, force: true });
   mkdirSync(join(next, "providers"), { recursive: true });
   for (const [id, items] of Object.entries(catalog)) writeFileSync(join(next, "providers", `${id}.json`), piProviderFile(id, items));
   writeFileSync(join(next, "meta.json"), pretty(meta));
+  // The swap is the last thing syncPi does.
   swapDir(next, dir);
-
-  return { status: "updated", summary: summarize(previous?.catalog, catalog) };
+  return result;
 }

@@ -181,6 +181,10 @@ describe("the pi import", () => {
     ["too small", ok(JSON.stringify(fixturePi(12, 20))), /^the pi feed is unexpectedly small: 12 providers, 240 models$/],
     ["40 % of the models lost", ok(JSON.stringify(fixturePi(20, 17))), /^the pi feed shrank too much to trust: 20 providers and 340 models, from 20 and 600$/],
     ["40 % of the providers lost", ok(JSON.stringify(fixturePi(11, 30))), /^the pi feed shrank too much to trust: 11 providers and 330 models, from 20 and 600$/],
+    // zod's record drops the key `__proto__`: the build could not hold the model, so the import refuses it.
+    ["a model id the build cannot hold (__proto__)", ok(withModel((c) => (c["provider-04"] = Object.fromEntries([...Object.entries(c["provider-04"]!), ["__proto__", { ...c["provider-04"]!["model-3"]!, id: "__proto__" }]])))), /^the pi feed has a model id the build cannot hold$/],
+    // A body that never ends, 1 MB at a time: the part fails past 16 MB without reading the rest.
+    ["over the size cap", () => new Response(new ReadableStream<Uint8Array>({ pull: (controller) => controller.enqueue(new Uint8Array(1024 * 1024).fill(32)) }), { status: 200 }), /^the pi feed is unexpectedly large: more than 16 MB$/],
   ])("5. a pi feed that is %s fails the pi part alone: data/pi/ as it was, the run ok, models.dev imported", async (_name, answer, words) => {
     const dataDir = await firstImport();
     const before = filesUnder(join(dataDir, "pi"));
@@ -293,15 +297,15 @@ describe("the pi import", () => {
     expect(filesUnder(join(dataDir, "pi"))).toEqual(piBefore);
   });
 
-  it("12. writeStepOutputs appends upstream=, measurements= and pi= to the file and keeps what it held; a skipped part gets no line", () => {
+  it("12. writeStepOutputs appends upstream=, measurements=, pi= and pi_revision7= to the file and keeps what it held; a skipped part gets no line", () => {
     const path = join(tempDataDir(), "github-output");
     writeFileSync(path, "earlier=1\n");
-    writeStepOutputs({ ok: true, upstream: { status: "updated" }, measurements: { status: "unchanged" }, pi: { status: "failed", error: "pi.dev answered HTTP 503" } }, path);
-    expect(readFileSync(path, "utf8")).toBe("earlier=1\nupstream=updated\nmeasurements=unchanged\npi=failed\n");
+    writeStepOutputs({ ok: true, upstream: { status: "updated" }, measurements: { status: "unchanged" }, pi: { status: "failed", error: "pi.dev answered HTTP 503" }, piRevision7: "snapshot" }, path);
+    expect(readFileSync(path, "utf8")).toBe("earlier=1\nupstream=updated\nmeasurements=unchanged\npi=failed\npi_revision7=snapshot\n");
 
     // A part that did not run (`only: "pi"`) gets no line.
-    writeStepOutputs({ ok: true, upstream: { status: "skipped" }, measurements: { status: "skipped" }, pi: { status: "unchanged" } }, path);
-    expect(readFileSync(path, "utf8")).toBe("earlier=1\nupstream=updated\nmeasurements=unchanged\npi=failed\npi=unchanged\n");
+    writeStepOutputs({ ok: true, upstream: { status: "skipped" }, measurements: { status: "skipped" }, pi: { status: "unchanged" }, piRevision7: "dd93eb2" }, path);
+    expect(readFileSync(path, "utf8")).toBe("earlier=1\nupstream=updated\nmeasurements=unchanged\npi=failed\npi_revision7=snapshot\npi=unchanged\npi_revision7=dd93eb2\n");
   });
 });
 

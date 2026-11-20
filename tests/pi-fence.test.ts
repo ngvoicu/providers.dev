@@ -4,16 +4,17 @@ import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, write
 import { join } from "node:path";
 import { gunzipSync } from "node:zlib";
 import { stringify } from "yaml";
-import { beforeAll, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { EntrySummarySchema, MetaSchema, PiBlockSchema, ProviderSchema } from "../src/core/contract.ts";
 import { buildIndex } from "../src/core/entries.ts";
 import type { PiCatalog, PiModel } from "../src/core/pi.ts";
 import { resolve } from "../src/core/resolve.ts";
-import { ext, noPiMeta, PROVIDER_ID, type Catalog, type Meta } from "../src/core/schema.ts";
+import { ext, noPiMeta, PI_URL, PROVIDER_ID, type Catalog, type Meta } from "../src/core/schema.ts";
 import { comparePublished } from "../scripts/lib/compare-published.ts";
 import { pretty } from "../scripts/lib/files.ts";
+import { PI_DEADLINE_MS, storedPi } from "../scripts/lib/pi-sync.ts";
 import { publish, type PublishReport } from "../scripts/lib/publish.ts";
-import { sync } from "../scripts/lib/sync.ts";
+import { OBSERVED_URL, sync, UPSTREAM_COMMIT_URL, UPSTREAM_URL, writeStepOutputs, type SyncReport, type SyncStatus } from "../scripts/lib/sync.ts";
 import { contractProblems, fetchByAddress, fixturePi, fixtureUpstream, ROOT, tempDataDir, writeAuthored } from "./helpers.ts";
 
 // ---- the wrappers: every exported function of pi's two modules, counted, and the one fault of the row in hand.
@@ -160,6 +161,12 @@ const replaced = (path: Path, value: unknown) => (result: unknown) => {
   return copy;
 };
 
+/**
+ * The top-level keys a boundary function's result schema requires, where not all of them: syncPi's `summary` and
+ * `revision` are optional (design/pi-source.md, section k, 5, test 2: "the keys its schema requires: `status`").
+ */
+const REQUIRED_TOP: Record<string, string[]> = { syncPi: ["status"] };
+
 /** The faults of a boundary function, from its true result in the healthy run. */
 function faultsOf(name: string, trueResult: unknown): Fault[] {
   const faults: Fault[] = [
@@ -176,6 +183,8 @@ function faultsOf(name: string, trueResult: unknown): Fault[] {
     { name, label: "returns an object that contains itself", apply: (callTrue) => after(callTrue, (result) => { const copy: Record<string, unknown> = { ...(result as object) }; copy[Object.keys(copy)[0]!] = copy; return copy; }) },
   );
   const paths = faultPaths(trueResult);
+  const required = REQUIRED_TOP[name];
+  if (required) for (const list of [paths.delete, paths.replace]) list.splice(0, list.length, ...list.filter((path) => path.length > 1 || required.includes(String(path[0]))));
   for (const path of paths.delete) faults.push({ name, label: `the true result without ${path.join(".")}`, apply: (callTrue) => after(callTrue, deleted(path)) });
   for (const path of paths.replace) {
     const value = refused(trueResult, path);
@@ -556,5 +565,194 @@ describe("6. a data/pi/ that is there and cannot be used is never none", () => {
     const report = build(variant(null, undefined));
     expect(report).toMatchObject({ ok: true, pi: "none" });
     expect(report.issues.filter((issue) => issue.code.startsWith("pi-"))).toEqual([]);
+  });
+});
+
+// ---- 2. the sync, by the same table
+
+describe("2. the sync, by the same table", () => {
+  const OBSERVED = JSON.stringify({
+    schema: 1, repository: "https://github.com/example/probe", routes: {}, clients: {},
+    cache: [{ id: "probe/R1", route: "provider-00", client: "direct", model: "model-1", date: "2026-11-12", source: "results/r1.json", latest: true, control: { warm: 1, total: 1 }, checks: [{ age_s: 150, warm: 1, total: 1 }, { age_s: 300, warm: 0, total: 1 }] }],
+  });
+  const FIRST = JSON.stringify(fixturePi(20, 30));
+  const CHANGED = (() => {
+    const catalog = fixturePi(20, 30);
+    catalog["provider-03"]!["model-1"]!.name = "Model 1, renamed";
+    return JSON.stringify(catalog);
+  })();
+  const REVISION = "sha256-dd93eb2741d05a80";
+  const SYNC_NOW = () => new Date("2026-11-21T04:17:00.000Z");
+
+  /** models.dev, its commit and the measurements as on the first import (304 after it); pi as `pi` answers. */
+  const fetchWith = (pi: (init?: RequestInit) => Promise<Response> | Response): typeof fetch =>
+    (async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input);
+      if (url === PI_URL) return pi(init);
+      if (url === UPSTREAM_URL) return init?.headers && (init.headers as Record<string, string>)["If-None-Match"] ? new Response(null, { status: 304 }) : new Response(JSON.stringify(fixtureUpstream()), { headers: { etag: '"u1"' } });
+      if (url === UPSTREAM_COMMIT_URL) return new Response(JSON.stringify({ sha: "abc123", commit: { committer: { date: "2026-11-12T00:00:00Z" } } }));
+      if (url === OBSERVED_URL) return init?.headers && (init.headers as Record<string, string>)["If-None-Match"] ? new Response(null, { status: 304 }) : new Response(OBSERVED, { headers: { etag: '"o1"' } });
+      return new Response("not found", { status: 404 });
+    }) as typeof fetch;
+  const changedFeed = () => new Response(CHANGED, { headers: { etag: '"p2"', "x-pi-model-catalog-revision": REVISION } });
+
+  /** Every file under `dir` (relative path -> bytes). */
+  const under = (dir: string): Map<string, Buffer> => {
+    const out = new Map<string, Buffer>();
+    if (!existsSync(dir)) return out;
+    for (const entry of readdirSync(dir, { recursive: true, withFileTypes: true })) if (entry.isFile()) out.set(join(entry.parentPath, entry.name).slice(dir.length + 1), readFileSync(join(entry.parentPath, entry.name)));
+    return out;
+  };
+  const same = (a: Map<string, Buffer>, b: Map<string, Buffer>): boolean => a.size === b.size && [...a].every(([path, bytes]) => b.get(path)?.equals(bytes) === true);
+  const statusOf = (dir: string): SyncStatus => JSON.parse(readFileSync(join(dir, "sync-status.json"), "utf8")) as SyncStatus;
+  const fiveOf = (status: SyncStatus) => ({ ...status, pi: undefined });
+
+  let base: string;
+  let healthy: { report: SyncReport; status: SyncStatus; upstream: Map<string, Buffer>; sources: Map<string, Buffer>; pi: Map<string, Buffer> };
+  let piBefore: Map<string, Buffer>;
+  const copy = (): string => {
+    const dir = tempDataDir();
+    cpSync(base, dir, { recursive: true });
+    return dir;
+  };
+
+  beforeAll(async () => {
+    base = tempDataDir();
+    const first = await sync({ dataDir: base, now: () => new Date("2026-11-20T04:17:00.000Z"), fetch: fetchWith(() => new Response(FIRST, { headers: { etag: '"p1"', "x-pi-model-catalog-revision": "sha256-0123456789" } })) });
+    expect([first.ok, first.pi.status]).toEqual([true, "updated"]);
+    piBefore = under(join(base, "pi"));
+    const dir = copy();
+    const report = await sync({ dataDir: dir, now: SYNC_NOW, fetch: fetchWith(changedFeed) });
+    expect(report).toMatchObject({ ok: true, pi: { status: "updated" }, piRevision7: "dd93eb2" });
+    healthy = { report, status: statusOf(dir), upstream: under(join(dir, "upstream")), sources: under(join(dir, "sources")), pi: under(join(dir, "pi")) };
+    expect(same(healthy.pi, piBefore)).toBe(false);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    state.fault = null;
+  });
+
+  /** What must hold after a pi part that failed: everything of models.dev as a healthy run leaves it; data/pi/ usable. */
+  const holds = (dir: string, report: SyncReport, pi: "as it was" | "as a healthy run leaves it"): void => {
+    expect(report.ok).toBe(healthy.report.ok);
+    expect(report.pi.status).toBe("failed");
+    expect(report.piRevision7).toBe("snapshot");
+    const status = statusOf(dir);
+    expect(fiveOf(status)).toEqual(fiveOf(healthy.status));
+    expect(same(under(join(dir, "upstream")), healthy.upstream)).toBe(true);
+    expect(same(under(join(dir, "sources")), healthy.sources)).toBe(true);
+    expect(status.pi).toMatchObject({ last_attempt_at: SYNC_NOW().toISOString(), status: "failed" });
+    expect(status.pi!.error).toMatch(/^[^\r\n]{1,300}$/);
+    expect(Object.keys(status.pi!)).toEqual(["last_attempt_at", "status", "error"]);
+    const output = join(tempDataDir(), "github-output");
+    writeFileSync(output, "");
+    writeStepOutputs(report, output);
+    expect(readFileSync(output, "utf8")).toContain("pi=failed\n");
+    expect(storedPi(dir).state).toBe("usable");
+    expect(same(under(join(dir, "pi")), pi === "as it was" ? piBefore : healthy.pi)).toBe(true);
+    expect(readdirSync(dir).filter((name) => name.startsWith("pi.tmp")).length).toBe(0);
+  };
+
+  /** The boundary functions of the sync: the ones a healthy first import, a 304 and a failed import call through the wrappers. */
+  let syncCalls: string[] | null = null;
+  async function syncBoundary(): Promise<string[]> {
+    if (syncCalls) return syncCalls;
+    state.calls.clear();
+    const dir = tempDataDir();
+    await sync({ dataDir: dir, now: SYNC_NOW, fetch: fetchWith(() => new Response(FIRST, { headers: { etag: '"p1"' } })) });
+    await sync({ dataDir: dir, now: SYNC_NOW, fetch: fetchWith(() => new Response(null, { status: 304 })) });
+    await sync({ dataDir: dir, now: SYNC_NOW, fetch: fetchWith(() => new Response("down", { status: 503 })) });
+    syncCalls = [...state.calls].sort();
+    return syncCalls;
+  }
+
+  it("the boundary function of the sync is syncPi, and every row of its faults fires and fails the pi part alone", async () => {
+    const names = await syncBoundary();
+    expect(names).toEqual(["syncPi"]);
+    // The true result of syncPi in a healthy run, for the faults that need it.
+    let trueResult: unknown;
+    state.fault = { name: "syncPi", fired: false, apply: (callTrue) => after(callTrue, (result) => { trueResult = structuredClone(result); return result; }) };
+    await sync({ dataDir: copy(), now: SYNC_NOW, fetch: fetchWith(changedFeed) });
+    state.fault = null;
+    expect(trueResult).toMatchObject({ status: "updated", revision: REVISION });
+    const rows = names.flatMap((name) => faultsOf(name, trueResult));
+    const fired: string[] = [];
+    for (const row of rows) {
+      const dir = copy();
+      state.fault = { name: row.name, apply: row.apply, fired: false };
+      // A fault that runs the true function first leaves data/pi/ as a healthy run leaves it; one that does not, as it was.
+      let ranTrue = false;
+      const apply = row.apply;
+      state.fault.apply = (callTrue) => apply(() => { ranTrue = true; return callTrue(); });
+      const report = await sync({ dataDir: dir, now: SYNC_NOW, fetch: fetchWith(changedFeed) });
+      if (state.fault.fired) fired.push(row.label);
+      state.fault = null;
+      holds(dir, report, ranTrue ? "as a healthy run leaves it" : "as it was");
+    }
+    console.log(`the sync's table: ${names.join(", ")}, ${rows.length} rows, ${fired.length} fired`);
+    expect(fired).toHaveLength(rows.length);
+  }, 120_000);
+
+  it.each<[string, () => unknown]>([
+    ["an Error", () => new Error("broken on purpose")],
+    ["an object whose message is a number and whose toString throws", hostile],
+    ["an Error with line breaks, control characters and 1,000 characters", () => new Error(`one\ntwo\r\u0000${"x".repeat(1000)}`)],
+  ])("a fetch that rejects with %s fails the pi part alone", async (_name, thrown) => {
+    const dir = copy();
+    const report = await sync({ dataDir: dir, now: SYNC_NOW, fetch: fetchWith(() => Promise.reject(thrown())) });
+    holds(dir, report, "as it was");
+  });
+
+  it("a body that never ends fails the pi part at the deadline", async () => {
+    const dir = copy();
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    let signal: AbortSignal | undefined;
+    const pending = sync({
+      dataDir: dir,
+      now: SYNC_NOW,
+      fetch: fetchWith((init) => {
+        signal = init?.signal ?? undefined;
+        const body = new ReadableStream<Uint8Array>({
+          start(controller) {
+            controller.enqueue(new TextEncoder().encode("{"));
+            signal?.addEventListener("abort", () => controller.error(new Error("aborted")));
+          },
+        });
+        return new Response(body, { headers: { etag: '"p2"' } });
+      }),
+    });
+    while (!signal) await new Promise((resolve) => setImmediate(resolve));
+    await vi.advanceTimersByTimeAsync(PI_DEADLINE_MS);
+    const report = await pending;
+    expect(report.pi.error).toBe("pi.dev did not answer in full within 60 s");
+    holds(dir, report, "as it was");
+  });
+
+  it("a body over the size cap fails the pi part without being read to the end", async () => {
+    const dir = copy();
+    let pulled = 0;
+    const report = await sync({
+      dataDir: dir,
+      now: SYNC_NOW,
+      fetch: fetchWith(() => new Response(new ReadableStream<Uint8Array>({ pull: (controller) => { pulled += 1; controller.enqueue(new Uint8Array(1024 * 1024).fill(32)); } }), { headers: { etag: '"p2"' } })),
+    });
+    expect(report.pi.error).toBe("the pi feed is unexpectedly large: more than 16 MB");
+    expect(pulled).toBeLessThanOrEqual(20);
+    holds(dir, report, "as it was");
+  });
+
+  it("while the pi part is held open, the status file already has this run's five fields and the record that it did not finish", async () => {
+    const dir = copy();
+    let answer: ((response: Response) => void) | undefined;
+    const pending = sync({ dataDir: dir, now: SYNC_NOW, fetch: fetchWith(() => new Promise<Response>((resolve) => { answer = resolve; })) });
+    while (!answer) await new Promise((resolve) => setImmediate(resolve));
+    const during = statusOf(dir);
+    expect(fiveOf(during)).toEqual(fiveOf(healthy.status));
+    expect(during.pi).toEqual({ last_attempt_at: SYNC_NOW().toISOString(), status: "failed", error: "The pi part did not finish." });
+    answer(changedFeed());
+    const report = await pending;
+    expect(report.pi.status).toBe("updated");
+    expect(statusOf(dir)).toEqual(healthy.status);
   });
 });

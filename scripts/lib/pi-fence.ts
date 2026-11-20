@@ -161,13 +161,17 @@ function misplaced(data: PiData, catalog: Catalog): string | null {
 export interface PiOfSync {
   /** status "updated" or "unchanged" with pi's summary lines, or "failed" with a one-line error. */
   report: RanPart;
+  /** For the commit message: 7 hexadecimal characters of the stored snapshot's revision, else "snapshot". */
+  revision7: string;
 }
 
 /** What syncPi may hand back across the fence. */
-const PiSyncResult = z.strictObject({ status: z.enum(["updated", "unchanged"]), summary: z.array(z.string()).optional() });
+const PiSyncResultSchema = z.strictObject({ status: z.enum(["updated", "unchanged"]), summary: z.array(z.string()).optional(), revision: z.string().optional() });
 
 /** The whole pi part of the sync. Never rejects. */
 export async function piOfSync(options: Parameters<typeof syncPi>[0]): Promise<PiOfSync> {
-  const result = await fencedAsync(() => syncPi(options), PiSyncResult);
-  return { report: result.ok ? result.value : { status: "failed", error: result.why } };
+  const result = await fencedAsync(() => syncPi(options), PiSyncResultSchema);
+  if (!result.ok) return { report: { status: "failed", error: result.why }, revision7: "snapshot" };
+  const { revision, ...report } = result.value;
+  return { report, revision7: /^sha256-([0-9a-f]{7})/.exec(revision ?? "")?.[1] ?? "snapshot" };
 }

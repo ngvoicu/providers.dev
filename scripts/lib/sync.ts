@@ -46,6 +46,8 @@ export interface SyncReport {
   upstream: PartReport;
   measurements: PartReport;
   pi: PartReport;
+  /** For the commit message: 7 hexadecimal characters of the stored pi snapshot's revision, else "snapshot". */
+  piRevision7: string;
 }
 
 /** What data/sync-status.json can hold for a part: a part that did not run is never recorded there. */
@@ -290,45 +292,66 @@ export async function sync(input: SyncOptions): Promise<SyncReport> {
       }
     };
     const statusPath = join(options.dataDir, "sync-status.json");
+    let five: FiveFields;
+    let upstream: PartReport = { status: "skipped" };
+    let measurements: PartReport = { status: "skipped" };
+    let ok = true;
     if (options.only === "pi") {
-      const { report: pi } = await piOfSync(options);
-      // The five fields of models.dev and the measurements stay as they were (absent where there were none).
-      const previous = readJsonIfExists<Partial<SyncStatus>>(statusPath) ?? {};
-      writeFileAtomic(statusPath, pretty({ ...previous, pi: piStatus(pi, options.now()) }));
-      return { ok: true, upstream: { status: "skipped" }, measurements: { status: "skipped" }, pi };
+      // The five fields of models.dev and the measurements, and nothing else, are kept from the file as it was
+      // (absent where there were none). A file that does not parse counts as absent here.
+      five = {};
+      try {
+        five = fiveFieldsOf(readJsonIfExists<unknown>(statusPath));
+      } catch (error) {
+        options.log?.(`${statusPath} does not parse (${error instanceof Error ? error.message : String(error)}): it counts as absent, and its five fields are not kept.`);
+      }
+    } else {
+      const ranUpstream = await part(() => syncUpstream(options));
+      const ranMeasurements = await part(() => syncMeasurements(options));
+      upstream = ranUpstream;
+      measurements = ranMeasurements;
+      ok = ranUpstream.status !== "failed" && ranMeasurements.status !== "failed";
+      const errors = [ranUpstream, ranMeasurements].map((item) => item.error).filter(Boolean);
+      five = {
+        last_attempt_at: options.now().toISOString(),
+        last_attempt_ok: ok,
+        ...(errors.length > 0 ? { last_error: errors.join(" | ") } : {}),
+        upstream: ranUpstream.status,
+        measurements: ranMeasurements.status,
+      };
     }
-    const upstream = await part(() => syncUpstream(options));
-    const measurements = await part(() => syncMeasurements(options));
-    const ok = upstream.status !== "failed" && measurements.status !== "failed";
-    const errors = [upstream, measurements].map((item) => item.error).filter(Boolean);
-    const lastAttemptAt = options.now().toISOString();
-    const { report: pi } = await piOfSync(options);
-    const status: SyncStatus = {
-      last_attempt_at: lastAttemptAt,
-      last_attempt_ok: ok,
-      ...(errors.length > 0 ? { last_error: errors.join(" | ") } : {}),
-      upstream: upstream.status,
-      measurements: measurements.status,
-      pi: piStatus(pi, options.now()),
-    };
-    writeFileAtomic(statusPath, pretty(status));
-    return { ok, upstream, measurements, pi };
+    // Written before the pi part: models.dev's five fields never wait on pi, and a process that dies inside the pi part
+    // leaves a record that says the attempt did not finish, never the previous attempt's success.
+    writeFileAtomic(statusPath, pretty({ ...five, pi: { last_attempt_at: options.now().toISOString(), status: "failed", error: "The pi part did not finish." } }));
+    const pi = await piOfSync(options);
+    // And after it: a literal of three checked strings; no pi code and no schema runs between the part and the file.
+    const record: PiSyncRecord = { last_attempt_at: options.now().toISOString(), status: pi.report.status, ...(pi.report.error ? { error: pi.report.error } : {}) };
+    writeFileAtomic(statusPath, pretty({ ...five, pi: record }));
+    return { ok, upstream, measurements, pi: pi.report, piRevision7: pi.revision7 };
   } finally {
     release();
   }
 }
 
-/** The `pi` key of data/sync-status.json; its time is when the pi part ended. */
-function piStatus(pi: RanPart, at: Date): PiSyncRecord {
-  return PiSyncRecord.parse({ last_attempt_at: at.toISOString(), status: pi.status, ...(pi.error ? { error: pi.error } : {}) });
+/** The five fields of models.dev and the measurements in data/sync-status.json, without the `pi` record. */
+type FiveFields = Partial<Omit<SyncStatus, "pi">>;
+
+/** The five fields of a parsed status file, where it has them, in their order. */
+function fiveFieldsOf(previous: unknown): FiveFields {
+  if (typeof previous !== "object" || previous === null || Array.isArray(previous)) return {};
+  const keys = ["last_attempt_at", "last_attempt_ok", "last_error", "upstream", "measurements"] as const;
+  return Object.fromEntries(keys.filter((key) => Object.hasOwn(previous, key)).map((key) => [key, (previous as Record<string, unknown>)[key]])) as FiveFields;
 }
 
 /**
- * The step outputs of the `Import` step of the Publish workflow: `upstream=…`, `measurements=…` and `pi=…`, one line
- * each, appended to the file GitHub names in GITHUB_OUTPUT. A part that did not run (`--only=pi`) gets no line.
+ * The step outputs of the `Import` step of the Publish workflow: `upstream=…`, `measurements=…`, `pi=…` and
+ * `pi_revision7=…`, one line each, appended to the file GitHub names in GITHUB_OUTPUT. A part that did not run
+ * (`--only=pi`) gets no line.
  */
 export function writeStepOutputs(report: SyncReport, path: string): void {
   const parts: [string, PartReport][] = [["upstream", report.upstream], ["measurements", report.measurements], ["pi", report.pi]];
   const lines = parts.flatMap(([name, part]) => (part.status === "skipped" ? [] : [`${name}=${part.status}\n`]));
+  // The pi part always runs: the seven characters of the stored snapshot's revision, for the commit message.
+  lines.push(`pi_revision7=${report.piRevision7}\n`);
   appendFileSync(path, lines.join(""));
 }
