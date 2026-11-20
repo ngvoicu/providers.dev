@@ -1,12 +1,13 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { beforeAll, describe, expect, it } from "vitest";
-import { parse } from "yaml";
+import { parse, stringify } from "yaml";
 import { publish } from "../scripts/lib/publish.ts";
 import { stageSnapshot } from "../scripts/lib/stage.ts";
 import { sync } from "../scripts/lib/sync.ts";
 import { handleApi, type ApiDeps } from "../src/core/api.ts";
 import { CorrectionSchema, DocumentationSchema, FacetsSchema, one, pageOf } from "../src/core/contract.ts";
+import { escapeHtml } from "../src/core/format.ts";
 import { fillShell, MARK } from "../src/core/page-shell.ts";
 import { emptyInputWindow } from "../src/core/limits.ts";
 import { handlePage, type PageDeps } from "../src/core/pages.ts";
@@ -15,7 +16,9 @@ import { PARAMS } from "../src/core/query.ts";
 import { DOCUMENTS } from "../src/core/resources.ts";
 import { readSnapshot, type AssetBinding } from "../src/core/snapshot.ts";
 import worker from "../worker/index.ts";
-import { depsFrom, fetchReturning, fixtureUpstream, ROOT, tempDataDir, writeAuthored } from "./helpers.ts";
+import type { PiCatalog } from "../src/core/pi.ts";
+import type { JsonObject } from "../src/core/merge.ts";
+import { depsFrom, fetchReturning, fixturePi, fixtureUpstream, ROOT, tempDataDir, writeAuthored, writePiSnapshot } from "./helpers.ts";
 
 const shell = `<html><head><title>${MARK.title} · providers.dev</title><meta name="description" content="${MARK.description}"><link rel="canonical" href="${MARK.canonical}"></head><body><nav>${MARK.nav}</nav><main>${MARK.html}</main><footer>${MARK.dataset}</footer></body></html>`;
 const now = () => new Date("2026-11-14T12:00:00Z");
@@ -547,4 +550,133 @@ it("keeps a provider whose every entry a catalog rule leaves out, with no entrie
   expect(catalog.status).toBe(200);
   expect(await catalog.text()).toMatch(/<div id="empty" class="empty">/);
   expect((await get("/providers/")).status).toBe(200);
+});
+
+// pi's catalog on the pages (design/pi-source.md, section h; step 6). A data directory of its own, with a pi snapshot:
+// at provider-02, lab/model-0 is listed by pi and agrees; lab/model-4 differs in its context window, output limit and
+// input price (an override gives the entry a price); model-9 is listed by pi as "Model-Nine", paired in the alias file.
+// provider-20 is not in pi's catalog at all.
+describe("pi's catalog on the pages", () => {
+  let piDeps: ApiDeps;
+  const piApi = (path: string) => handleApi(new Request(`https://providers.dev${path}`), piDeps);
+  const piPage = async (path: string) => {
+    const response = await handlePage(new Request(`https://providers.dev${path}`), { api: piApi, shell: async () => new Response(shell), site: "https://providers.dev", now });
+    expect(response.status, path).toBe(200);
+    return response.text();
+  };
+  /** The pi section of an entry's page, and the header line with the entry's sources. */
+  const parts = (html: string) => ({ section: html.split('<section aria-labelledby="pi">')[1]!.split("</section>")[0]!, head: html.split('<p class="id">')[1]!.split("</p>")[0]! });
+  /** The row of the entry whose id is `ref`, in a table of entries (each row's copy button carries its entry id). */
+  const rowOf = (html: string, ref: string) => html.split("<tr>").find((row) => row.includes(`data-copy="${ref}"`))!;
+
+  beforeAll(async () => {
+    const dir = tempDataDir();
+    await sync({ dataDir: dir, fetch: fetchReturning(JSON.stringify(fixtureUpstream())) });
+    writeAuthored(dir);
+    writeFileSync(join(dir, "authored", "overrides", "provider-02.yaml"), stringify({
+      provider: "provider-02",
+      rules: [{ models: ["lab/model-4"], set: { cost: { text: { input: { price: 2 }, output: { price: 16 } } } }, reason: "listed price", evidence: [{ kind: "documented", url: "https://example.com/prices", date: "2026-11-01" }] }],
+    }));
+    writeFileSync(join(dir, "authored", "pi-aliases.yaml"), stringify({ providers: { "provider-02": { checked: "2026-11-20", models: { "Model-Nine": { same_as: "model-9" } } } } }));
+    const pi: PiCatalog = fixturePi(12, 30);
+    const own = pi["provider-02"]!;
+    own["lab/model-4"] = { ...own["lab/model-4"]!, contextWindow: 450000, maxTokens: 4000, compat: { supportsLongCacheRetention: false, thinkingFormat: "openai" }, thinkingLevelMap: { minimal: null, high: "high" } };
+    own["Model-Nine"] = { ...own["model-9"]!, id: "Model-Nine", name: "Model Nine" };
+    delete own["model-9"];
+    writePiSnapshot(dir, pi);
+    const report = publish({ dataDir: dir, rootDir: ROOT, now });
+    expect(report.errors).toEqual([]);
+    piDeps = depsFrom(join(dir, "published"));
+    expect(piDeps.meta.pi.snapshot?.fetched_at).toBe("2026-11-20T14:19:45.000Z");
+  });
+
+  it("an entry page with a block: the request format, the address, each stated flag and level, whose data it is and when it was fetched and checked", async () => {
+    const { entry } = (await (await piApi("/api/v1/entries/provider-02/lab/model-0")).json() as { data: { entry: JsonObject } }).data;
+    const block = (entry.providers_dev as JsonObject).pi as JsonObject;
+    expect(block).toMatchObject({ api: "anthropic-messages", base_url: "https://api.provider-02.example/v1", differences: [] });
+    const { section, head } = parts(await piPage("/entries/provider-02/lab/model-0"));
+    expect(section).toContain("<code>anthropic-messages</code>");
+    expect(section).toContain("<code class=\"break\">https://api.provider-02.example/v1</code>");
+    for (const [name, value] of Object.entries(block.compat as JsonObject)) expect(section).toContain(`<dt><code>${name}</code></dt><dd><code>${escapeHtml(JSON.stringify(value))}</code></dd>`);
+    for (const [level, value] of Object.entries(block.thinking_level_map as JsonObject)) expect(section).toContain(`<dt>${level}</dt><dd>${value === null ? '<span class="muted" title="pi marks this level as not supported.">not supported</span>' : `<code>${value}</code>`}</dd>`);
+    // Whose data it is, and as of when: fetched from pi, last checked unchanged, the page following models.dev, pi's list.
+    expect(section).toContain("Fetched <span class=\"date\" title=\"2026-11-20 14:19 UTC\">2026-11-20</span> from <a href=\"https://pi.dev/api/models\"");
+    expect(section).toContain("Last checked <span class=\"date\" title=\"2026-11-21 04:17 UTC\">2026-11-21</span>, unchanged");
+    expect(section).toContain("Not verified by providers.dev");
+    expect(section).toContain("This page follows models.dev");
+    expect(section).toContain('href="https://pi.dev/models?provider=provider-02"');
+    expect(section).toContain("The same provider and model id as this entry.");
+    expect(section).not.toContain("The last import");
+    // Agreeing everywhere: seven rows, each "No difference"; the mark in the heading says no more than pi.dev.
+    expect(section.split(">No difference<").length - 1).toBe(7);
+    expect(section).not.toContain("Differs");
+    expect(head).toContain('<span class="origin pi" title="pi&#39;s model catalog (pi.dev) also lists this entry. Its price, context window and output limit agree with this page wherever both state one.');
+    expect(head).toMatch(/>pi\.dev<\/span><span class="muted date" title="[^"]*">2026-11-20<\/span>/);
+    expect(head).not.toContain("differ");
+  });
+
+  it("an entry page with differences: both values of each, and pi's price of 0 is not stated, never free", async () => {
+    const { entry, summary } = (await (await piApi("/api/v1/entries/provider-02/lab/model-4")).json() as { data: { entry: JsonObject; summary: { pi: { difference_count: number } } } }).data;
+    const differences = ((entry.providers_dev as JsonObject).pi as JsonObject).differences as { field: string; pi: number; published: number }[];
+    expect(differences.map((item) => [item.field, item.pi, item.published])).toEqual([["context_window", 450000, 500000], ["max_tokens", 4000, 5000], ["cost.input", 4, 2]]);
+    expect(summary.pi.difference_count).toBe(3);
+    const { section, head } = parts(await piPage("/entries/provider-02/lab/model-4"));
+    expect(head).toContain('<span class="pi-differ">3 differ<span class="sr-only"> from this page</span></span>');
+    const row = (label: string) => section.split(`<th scope="row">${label}<`)[1]!.split("</tr>")[0]!;
+    expect(row("Context window")).toMatch(/450,000 <span class="muted">tokens<\/span>.*Differs<\/span> 500,000 <span class="muted">tokens/);
+    expect(row("Maximum output")).toMatch(/4,000 <span class="muted">tokens<\/span>.*Differs<\/span> 5,000 <span class="muted">tokens/);
+    expect(row("Input")).toMatch(/\$4 <span class="muted">\/ 1M<\/span>.*Differs<\/span> \$2 <span class="muted">\/ 1M/);
+    expect(section.split('<tr class="differs">').length - 1).toBe(3);
+    // The output price agrees (16 and 16); pi's cache write is 0, which is not a statement.
+    expect(row("Output")).toContain("No difference");
+    expect(row("Cache write")).toContain(">Not stated</span>");
+    expect(section.replace(/title="[^"]*"/g, "")).not.toMatch(/\bfree\b/i);
+    for (const flag of ["supportsLongCacheRetention", "thinkingFormat"]) expect(section).toContain(`<code>${flag}</code>`);
+  });
+
+  it("an entry paired through the alias file shows pi's own spelling", async () => {
+    const { section, head } = parts(await piPage("/entries/provider-02/model-9"));
+    expect(section).toContain("<code>provider-02/Model-Nine</code>");
+    expect(section).toContain("<strong>Model Nine</strong>");
+    expect(section).toContain("Paired by providers.dev: pi spells the provider or model id otherwise than this entry.");
+    expect(head).toContain("as provider-02/Model-Nine");
+  });
+
+  it("an entry page without a block: one line, the same section, no mark", async () => {
+    const { entry } = (await (await piApi("/api/v1/entries/provider-20/lab/model-4")).json() as { data: { entry: JsonObject } }).data;
+    expect((entry.providers_dev as JsonObject).pi).toBeNull();
+    const html = await piPage("/entries/provider-20/lab/model-4");
+    const { section, head } = parts(html);
+    expect(section).toContain("pi's model catalog does not list this entry.");
+    expect(section).toContain("Fetched <span class=\"date\"");
+    expect(section).not.toContain("<table");
+    expect(head).not.toContain("pi.dev");
+    expect(html).not.toContain('class="origin pi"');
+  });
+
+  it("a catalog row with a block has the pi.dev badge and nothing about differences; a row without one has no badge", async () => {
+    for (const path of ["/?q=model-4&limit=200", "/providers/provider-02/"]) {
+      const html = await piPage(path);
+      const listed = rowOf(html, "provider-02/lab/model-4");
+      expect(listed, path).toContain('<span class="origin pi" title="pi&#39;s model catalog (pi.dev) also lists this entry.');
+      expect(listed).toMatch(/>pi\.dev<\/span><\/span><\/td>/);
+      expect(listed).not.toMatch(/differ|otherwise|agree/i);
+      expect(listed).not.toContain("pi-differ");
+      if (path.startsWith("/?")) expect(rowOf(html, "provider-20/lab/model-4")).not.toContain("pi.dev");
+    }
+  });
+
+  it("the pi.dev mark is a mark like the other sources, not a link, on rows and on the entry page", async () => {
+    for (const path of ["/?q=model-4&limit=200", "/providers/provider-02/", "/entries/provider-02/lab/model-4", "/entries/provider-02/lab/model-0"]) {
+      const html = await piPage(path);
+      expect(html, path).toContain('<span class="origin pi"');
+      expect(html, path).not.toMatch(/<a [^>]*class="origin pi"|href="(?:\/entries\/[^"]*)?#pi"/);
+    }
+  });
+
+  it("dates pi's catalog in the footer of every page, and says when its last import failed", async () => {
+    const html = await piPage("/providers/");
+    expect(html).toContain("<li>pi's catalog fetched 2026-11-20, last checked 2026-11-21</li>");
+    expect(html).not.toContain("The last import of pi's catalog failed");
+  });
 });

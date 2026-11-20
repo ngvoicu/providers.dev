@@ -33,7 +33,8 @@ import {
   type Today,
 } from "./format.ts";
 import { isObject, type Json, type JsonObject } from "./merge.ts";
-import { NS, type MeasuredLimit, type ModelExtension, type Provenance, type PublishedEvidence } from "./schema.ts";
+import type { PiBlock, PiCostTier, PiDifference, PiDifferenceField, PiSummary } from "./pi.ts";
+import { NS, type MeasuredLimit, type MetaPi, type ModelExtension, type Provenance, type PublishedEvidence } from "./schema.ts";
 
 const UNKNOWN = '<span class="unknown" title="The source does not say. Unknown is not zero and not unlimited.">Unknown</span>';
 const DASH = '<span class="muted">–</span>';
@@ -59,8 +60,53 @@ function dateTag(date: string | null, today: Today): string {
     : `<span class="muted date" title="Date of the newest providers.dev evidence.">${e(date)}</span>`;
 }
 
-/** One line per source with its own date: the models.dev import, and the newest providers.dev evidence. */
-function sourcesHtml(entry: Pick<Summary, "origin" | "verified" | "overridden_fields">, options: { today: Today; imported?: string }, inline = false): string {
+/**
+ * When providers.dev fetched pi's catalog, and when it last found it unchanged: `meta.pi.snapshot.fetched_at` moves only
+ * when pi's feed changed, `checked_at` on every successful check, so the second says the data is current as of then.
+ * Whether the last import failed is `meta.pi.sync`. All three are the API's; nothing here compares them.
+ */
+export interface PiDates {
+  fetched: string | null;
+  checked: string | null;
+  failed_at: string | null;
+  failed: boolean;
+}
+export function piDates(meta: MetaPi | undefined): PiDates {
+  const day = (stamp: string | null | undefined): string | null => (stamp ? stamp.slice(0, 10) : null);
+  return { fetched: day(meta?.snapshot?.fetched_at), checked: day(meta?.snapshot?.checked_at), failed_at: day(meta?.sync.last_attempt_at), failed: meta?.sync.last_attempt_ok === false };
+}
+const UTC = (stamp: string): string => `${stamp.slice(0, 10)} ${stamp.slice(11, 16)} UTC`;
+function piDatesSaid(meta: MetaPi | undefined): string {
+  const snapshot = meta?.snapshot;
+  if (!snapshot) return "pi's catalog is not in this dataset.";
+  const failed = meta.sync.last_attempt_ok === false ? ` The last import${meta.sync.last_attempt_at ? `, ${UTC(meta.sync.last_attempt_at)},` : ""} failed: this is the last good one.` : "";
+  return `Fetched from pi's catalog ${UTC(snapshot.fetched_at)}. Last checked ${UTC(snapshot.checked_at)}: unchanged since the fetch.${failed}`;
+}
+
+/**
+ * The pi.dev mark of an entry pi's catalog also lists (`pi` of a summary): a mark like the models.dev and providers.dev
+ * ones beside it, saying what it means in its title, not a link. In a row it says only that pi lists the entry; on the
+ * entry's own page it also says how many values pi states otherwise, as the API counts them (`difference_count`), in
+ * words. pi is not a source of the entry: its origin stays as it is.
+ */
+function piMark(pi: PiSummary, differences: boolean): string {
+  const n = pi.difference_count;
+  const named = pi.match === "alias" ? `, as ${pi.ref}` : "";
+  const said = !differences
+    ? `pi's model catalog (pi.dev) also lists this entry${named}. Imported beside models.dev, not verified by providers.dev. The entry's page shows what pi states.`
+    : n === 0
+      ? `pi's model catalog (pi.dev) also lists this entry${named}. Its price, context window and output limit agree with this page wherever both state one. Imported, not verified by providers.dev.`
+      : `pi's model catalog (pi.dev) also lists this entry${named}, and states ${plural(n, "value")} otherwise than this page, which follows models.dev. Imported, not verified by providers.dev.`;
+  const differ = differences && n > 0 ? `<span class="pi-differ">${exact(n)} ${n === 1 ? "differs" : "differ"}<span class="sr-only"> from this page</span></span>` : "";
+  return `<span class="origin pi" title="${e(said)}">pi.dev${differ}</span>`;
+}
+
+/**
+ * One line per source with its own date: the models.dev import, and the newest providers.dev evidence. Where pi's
+ * catalog lists the entry, the pi.dev mark under them. On the entry's own page (`pi` given) the mark carries the
+ * differences and the date providers.dev fetched pi's catalog; in a row it carries neither.
+ */
+function sourcesHtml(entry: Pick<Summary, "origin" | "verified" | "overridden_fields" | "pi">, options: { today: Today; imported?: string; pi?: MetaPi }, inline = false): string {
   const parts: string[] = [];
   if (entry.origin !== "added") {
     const date = options.imported ? `<span class="muted date" title="Imported from models.dev on this date.">${e(options.imported)}</span>` : "<span></span>";
@@ -69,6 +115,14 @@ function sourcesHtml(entry: Pick<Summary, "origin" | "verified" | "overridden_fi
   if (entry.origin !== "upstream") {
     const corrected = entry.overridden_fields.length > 0 ? ` Corrected fields: ${entry.overridden_fields.join(", ")}.` : "";
     parts.push(`<span class="origin added" title="${e(ORIGIN_TITLE[entry.origin] + corrected)}">${ORIGIN_LABEL.added}</span>${dateTag(entry.verified, options.today) || "<span></span>"}`);
+  }
+  if (entry.pi) {
+    // Last in the list, so in a row it needs no empty cell for a date: the mark can sit beside the first source.
+    const dates = piDates(options.pi);
+    const date = !options.pi || dates.fetched === null
+      ? ""
+      : `<span class="${dates.failed ? "stale" : "muted date"}" title="${e(piDatesSaid(options.pi))}">${e(dates.fetched)}${dates.failed ? " · last import failed" : ""}</span>`;
+    parts.push(`${piMark(entry.pi, options.pi !== undefined)}${date}`);
   }
   return `<span class="sources${inline ? " side" : ""}">${parts.join("")}</span>`;
 }
@@ -318,7 +372,7 @@ ${column("max_output", COLUMN.max_output, "Largest single response in tokens (li
 ${column("price_in", COLUMN.price, "Base list price in US dollars per million tokens, input then output, as models.dev records it. Conditional rates marks an entry whose price changes with context size, service tier, region, date or the time of day: open the entry for those. A subscription is not paid per token: it shows the API list price of the same model, marked API price, or In plan where the catalog has no API entry of that model.", "num mid-only")}
 ${column("release_date", COLUMN.released, "When the model was released, as models.dev records it. It is the model's date: the same at every provider.", "wide-only")}
 ${column(null, COLUMN.lifetime, "How long a cached prompt can be relied on (cache_lifetime): for short retention, what a request gets without asking for a lifetime; for long, what it gets when it asks for a longer one. Each value says whether it is documented or measured by providers.dev, and names the other of the two where there is one. Hover a value for its source and date; the entry's page lists every lifetime.", "life-col")}
-${column("verified", COLUMN.source,"Where the entry comes from, with a date per source: the import from models.dev, and the newest providers.dev evidence.")}
+${column("verified", COLUMN.source,"Where the entry comes from, with a date per source: the import from models.dev, and the newest providers.dev evidence. pi.dev marks an entry that pi's model catalog also lists, imported beside models.dev and never merged into it; \"2 differ\" counts the prices and limits pi states otherwise than this page.")}
 </tr>`;
 }
 
@@ -735,6 +789,129 @@ function cacheDocumented(documented: CacheDocumentation, source: string): string
 <p class="hint">Source: ${source} · <a href="/docs/methodology/#caching">Cache modes</a></p>`;
 }
 
+// ---- pi's catalog: `providers_dev.pi` of an entry and `pi` of /api/v1/meta, as the API publishes them. Printed as
+// the block has it: which values differ is `differences`, and nothing here compares, converts or fills in a default.
+// What pi does not state says so, never "no": a flag absent from `compat` is not false.
+
+const NOT_STATED = '<span class="unknown" title="pi\'s catalog does not state it.">Not stated</span>';
+/** pi writes 0 for a price it does not charge and for a price it has not recorded alike (the contract, PiCost). */
+const ZERO_PRICE = '<span class="unknown" title="pi\'s catalog writes 0 here. It writes 0 both for no charge and for no price recorded, so it is not shown as free.">Not stated</span>';
+
+/** The rows of pi's limits and prices: one per field of `differences`, in its order, on every entry pi lists. */
+const PI_ROWS: { field: PiDifferenceField; label: string; hint: string }[] = [
+  { field: "context_window", label: "Context window", hint: "<code>context_window</code>; here <code>limit.context</code>" },
+  { field: "max_tokens", label: "Maximum output", hint: "<code>max_tokens</code>: the most pi asks for in one response; here <code>limit.output</code>" },
+  { field: "cost.input", label: "Input", hint: "US dollars per 1M tokens" },
+  { field: "cost.output", label: "Output", hint: "US dollars per 1M tokens" },
+  { field: "cost.cache_read", label: "Cache read", hint: "US dollars per 1M tokens" },
+  { field: "cost.cache_write", label: "Cache write", hint: "pi states one price: a write of the short lifetime" },
+  { field: "cost.tiers", label: "Price tiers", hint: "By size of request, in US dollars per 1M tokens: the whole request is priced at a tier once its input is above the threshold" },
+];
+const TIER_PRICES = [["input", "In"], ["output", "Out"], ["cache_read", "Cache read"], ["cache_write", "Cache write"]] as const;
+
+/** A price per 1M tokens as one side states it: pi's 0 is not a statement; the page's own null is unknown. */
+function piPrice(value: number | null, side: "pi" | "published", unit = true): string {
+  if (value === null) return NOT_STATED;
+  if (value === 0 && side === "pi") return ZERO_PRICE;
+  return `${usd(value)}${unit ? ' <span class="muted">/ 1M</span>' : ""}`;
+}
+const piTokens = (value: number | null): string => (value === null || value === 0 ? NOT_STATED : `${exact(value)} <span class="muted">tokens</span>`);
+
+/** Tiers by size of request, each with its threshold and its four prices, laid out alike on both sides so that they read across. */
+function tiersHtml(tiers: readonly PiCostTier[], side: "pi" | "published"): string {
+  if (tiers.length === 0) return side === "pi" ? '<span class="unknown" title="pi\'s catalog states no tiers for this model.">None stated</span>' : '<span class="muted">None</span>';
+  return `<ul class="pi-tiers">${tiers.map((tier) => `<li><span class="tier-at" title="${exact(tier.input_tokens_above)} input tokens: input, cache reads and cache writes together.">Above ${exact(tier.input_tokens_above)}</span>${TIER_PRICES.map(([key, label]) => `<span><span class="muted">${label}</span> ${piPrice(tier[key], side, false)}</span>`).join("")}</li>`).join("")}</ul>`;
+}
+
+/** pi's value of a row, as the block states it. */
+function piValue(block: PiBlock, field: PiDifferenceField): string {
+  switch (field) {
+    case "context_window": return piTokens(block.context_window);
+    case "max_tokens": return piTokens(block.max_tokens);
+    case "cost.input": return piPrice(block.cost.input, "pi");
+    case "cost.output": return piPrice(block.cost.output, "pi");
+    case "cost.cache_read": return piPrice(block.cost.cache_read, "pi");
+    case "cost.cache_write": return piPrice(block.cost.cache_write, "pi");
+    case "cost.tiers": return tiersHtml(block.cost.tiers, "pi");
+  }
+}
+
+/** This page's value of a row where pi's differs: the item's `published` (or `published_tiers`), and the field it is. */
+function publishedValue(item: PiDifference): string {
+  const value = item.field === "cost.tiers" ? tiersHtml(item.published_tiers ?? [], "published") : item.unit === "tokens" ? piTokens(item.published) : piPrice(item.published, "published");
+  const tag = `<span class="pi-differ" title="pi's catalog states this otherwise. This page publishes the value in ${e(item.entry_field)}.">Differs</span>`;
+  // Tiers are a list: the tag goes under it, so that the two lists begin on the same line.
+  return item.field === "cost.tiers" ? `${value}${tag}` : `${tag} ${value}`;
+}
+
+/** A map pi states, a name and a value per line, values as written in pi's catalog. */
+function piPairs(pairs: [string, string][], className: string): string {
+  return `<dl class="pi-pairs ${className}">${pairs.map(([name, value]) => `<div><dt>${name}</dt><dd>${value}</dd></div>`).join("")}</dl>`;
+}
+
+/** How pi calls the model: the request format, the address, the input, reasoning, the flags, the cache and the request limits. */
+function piCallTable(block: PiBlock): string {
+  const row = (label: string, hint: string, value: string): string => `<tr><th scope="row">${label}<div class="hint">${hint}</div></th><td>${value}</td></tr>`;
+  const levels = block.thinking_level_map === null
+    ? NOT_STATED
+    : piPairs(Object.entries(block.thinking_level_map).map(([level, value]) => [e(level), value === null ? '<span class="muted" title="pi marks this level as not supported.">not supported</span>' : `<code>${e(value)}</code>`]), "levels");
+  const flags = block.compat === null || Object.keys(block.compat).length === 0
+    ? '<span class="unknown" title="pi\'s catalog states no flags for this model. It is not the same as every flag false.">None stated</span>'
+    : piPairs(Object.entries(block.compat).map(([name, value]) => [`<code>${e(name)}</code>`, `<code>${e(JSON.stringify(value))}</code>`]), "flags");
+  const cache = block.prompt_cache === null
+    ? NOT_STATED
+    : piPairs([["Short", block.prompt_cache.short_s === null ? NOT_STATED : `<span title="${seconds(block.prompt_cache.short_s)}">${span(block.prompt_cache.short_s)}</span>`], ["Long", block.prompt_cache.long_s === null ? NOT_STATED : `<span title="${seconds(block.prompt_cache.long_s)}">${span(block.prompt_cache.long_s)}</span>`]], "cache");
+  const limits = block.input_limits;
+  const limit = (value: number | null, unit: string): string => (value === null ? NOT_STATED : `${exact(value)} <span class="muted">${unit}</span>`);
+  const requestLimits = limits.max_request_bytes === null && limits.max_images_per_request === null && limits.max_images_per_message === null
+    ? '<span class="unknown" title="pi\'s catalog states no request limits for this model.">None stated</span>'
+    : piPairs([["Request size", limit(limits.max_request_bytes, "bytes")], ["Images per request", limit(limits.max_images_per_request, "")], ["Images per message", limit(limits.max_images_per_message, "")]], "limits");
+  const named = block.match === "alias"
+    ? "Paired by providers.dev: pi spells the provider or model id otherwise than this entry."
+    : "The same provider and model id as this entry.";
+  return `<div class="scroll"><table class="facts pairs pi-call stack-phone"><thead><tr><th scope="col">In pi's catalog</th><th scope="col">As pi states it</th></tr></thead><tbody>
+${row("Model", named, `<strong>${e(block.name)}</strong><div class="id"><code>${e(block.ref)}</code>${copyButton(block.ref, "pi's id")}</div>`)}
+${row("Request format", "<code>api</code>: the API pi speaks to this model", `<code>${e(block.api)}</code>`)}
+${row("Address", "<code>base_url</code>: where pi sends requests, placeholders as written", block.base_url === null ? NOT_STATED : `<code class="break">${e(block.base_url)}</code> ${copyButton(block.base_url, "address")}`)}
+${row("Input", "What pi sends to the model, in pi's words", block.input.length ? block.input.map((kind) => `<span class="chip">${e(kind)}</span>`).join(" ") : NOT_STATED)}
+${row("Reasoning", "Whether pi treats the model as one that reasons", block.reasoning ? "Yes" : "No")}
+${row("Thinking levels", "The value pi sends for each level. A level not named follows pi's own default", levels)}
+${row("Flags", "<code>compat</code>, in pi's words. A flag not named follows pi's own default: it is not false", flags)}
+${row("Cache lifetimes", "What pi's own cache timer reckons with. Not this page's lifetimes", cache)}
+${row("Request limits", "The provider's limits on one request, as pi states them", requestLimits)}
+</tbody></table></div>`;
+}
+
+/**
+ * The pi section of an entry's page, the same on every entry pi lists: pi's limits and prices beside this page's where
+ * they differ, then how pi calls the model. On an entry pi does not list, one line. Whose data it is, and as of when, first.
+ */
+function piSection(block: PiBlock | null, meta: MetaPi | undefined): string {
+  const dates = piDates(meta);
+  const source = `<a href="${e(meta?.source ?? "https://pi.dev/api/models")}" rel="noopener">${e(shortUrl(meta?.source ?? "https://pi.dev/api/models"))}</a>`;
+  const fetched = dates.fetched ? `<span>Fetched <span class="date" title="${e(UTC(meta!.snapshot!.fetched_at))}">${e(dates.fetched)}</span> from ${source}</span>` : `<span>From ${source}</span>`;
+  const checked = dates.checked ? `<span title="pi's feed was checked again on this date and had not changed since the fetch.">Last checked <span class="date" title="${e(UTC(meta!.snapshot!.checked_at))}">${e(dates.checked)}</span>, unchanged</span>` : "";
+  const failed = dates.failed ? `<span class="stale" title="${e(piDatesSaid(meta))}">The last import${dates.failed_at ? `, ${e(dates.failed_at)},` : ""} failed: this is the last good one</span>` : "";
+  if (block === null) {
+    if (meta && meta.snapshot === null) return `<p class="muted">This dataset is built without pi's catalog (${source}).${failed ? ` ${failed}` : ""}</p>`;
+    return `<p class="muted">pi's model catalog does not list this entry.</p><p class="pi-facts muted">${fetched}${checked}${failed}</p>`;
+  }
+  const differs = new Map(block.differences.map((item) => [item.field, item]));
+  const rows = PI_ROWS.map(({ field, label, hint }) => {
+    const item = differs.get(field);
+    const published = item ? publishedValue(item) : '<span class="muted" title="pi states no other value here: the two agree, or one of them states none.">No difference</span>';
+    return `<tr${item ? ' class="differs"' : ""}><th scope="row">${label}<div class="hint">${hint}</div></th><td class="num" data-label="pi's catalog">${piValue(block, field)}</td><td class="num" data-label="This page">${published}</td></tr>`;
+  }).join("");
+  const count = block.differences.length;
+  const list = `https://pi.dev/models?provider=${encodeURIComponent(block.provider)}`;
+  return `<p class="pi-facts"><span class="origin pi" title="pi's model catalog, a second source imported beside models.dev.">pi.dev</span>${fetched}${checked}${failed}<span>Not verified by providers.dev</span><span>This page follows models.dev</span><span><a href="${e(list)}" rel="noopener">pi's list for <code>${e(block.provider)}</code></a></span></p>
+<h3 id="pi-prices">Limits and prices <span class="hint">${count === 0 ? "no difference" : `${plural(count, "difference")}`}</span></h3>
+<div class="scroll"><table class="facts pi-compare stack-phone"><thead><tr><th scope="col">Value</th><th scope="col" class="num">pi's catalog</th><th scope="col" class="num" title="The value this page publishes: models.dev's, or a providers.dev correction.">This page</th></tr></thead><tbody>${rows}</tbody></table></div>
+<h3 id="pi-call">How pi calls the model</h3>
+${piCallTable(block)}
+<p class="hint"><a href="/docs/methodology/#pi">How pi's catalog is used, and how its values are compared</a></p>`;
+}
+
 function tile(label: string, value: string, foot: string, small = false): string {
   return `<div class="tile"><div class="label">${label}</div><div class="value${small ? " small" : ""}">${value}</div><div class="foot">${foot}</div></div>`;
 }
@@ -748,6 +925,8 @@ export interface EntryView {
   cache_ages_s: CacheAges;
   /** The date of the models.dev import. */
   imported?: string;
+  /** pi's catalog as /api/v1/meta describes it (`pi`): where it came from, when, and whether the last import worked. */
+  pi?: MetaPi;
 }
 
 export function entryHtml(view: EntryView): string {
@@ -761,6 +940,8 @@ export function entryHtml(view: EntryView): string {
   const number = (value: Json | undefined): string => (typeof value === "number" ? `${exact(value)} <span class="muted">tokens</span>` : UNKNOWN);
   const big = (value: Json | undefined): string => (typeof value === "number" ? `${exact(value)} <span class="unit">tokens</span>` : '<span class="muted">Unknown</span>');
   const api = `/api/v1${entryHref(summary.ref)}`;
+  // The sources of the entry, the pi.dev mark among them where pi lists it, dated by the pi import.
+  const sources = sourcesHtml(summary, { today, imported: view.imported, pi: view.pi }, true);
   // The safe lifetime of each profile, at the top of the page: the value, its basis, and whose it is as of when.
   const lifetimeTile = (profile: RetentionProfile): string => {
     const p = cache.lifetime[profile];
@@ -798,7 +979,7 @@ export function entryHtml(view: EntryView): string {
   <p class="crumbs"><a href="/providers/">Providers</a> / <a href="/providers/${e(provider.id)}/">${e(provider.name)}</a>${summary.canonical_id ? ` · <a href="${e(modelHref(summary.canonical_id))}">All access methods for ${e(summary.canonical_id)}</a>` : ""}</p>
   <h1>${e(summary.name)}</h1>
   <p class="id"><code>${e(summary.ref)}</code>${copyButton(summary.ref, "entry id")} <span class="badge ${summary.access}">${ACCESS_LABEL[summary.access]}</span>
-  ${sourcesHtml(summary, view, true)}${summary.status ? ` <span class="badge">${e(summary.status)}</span>` : ""}</p>
+  ${sources}${summary.status ? ` <span class="badge">${e(summary.status)}</span>` : ""}</p>
   <p class="released muted">Type <span title="The kind of model, as models.dev records it.">${summary.type ? e(summary.type) : "unknown"}</span> · ${
     summary.release_date
       ? `Released <span class="date" title="The model's release date, as models.dev records it. It is the same at every provider.">${e(summary.release_date)}</span>`
@@ -850,12 +1031,17 @@ export function entryHtml(view: EntryView): string {
   ${requestControlTable(summary.request_controls.items.filter((control) => control.id === "cache.retention"))}
 </section>
 
+<section aria-labelledby="pi">
+  <h2 id="pi">pi's catalog</h2>
+  ${piSection(extension.pi, view.pi)}
+</section>
+
 <section aria-labelledby="provenance">
   <h2 id="provenance">Provenance</h2>
   <div class="scroll"><table class="facts pairs stack-phone">
     <thead><tr><th scope="col">Provenance</th><th scope="col">Value</th></tr></thead>
     <tbody>
-      <tr><th scope="row">Source</th><td>${sourcesHtml(summary, view, true)}</td></tr>
+      <tr><th scope="row">Source</th><td>${sources}</td></tr>
       <tr><th scope="row">Inherited from</th><td>${
         extension.inherited
           ? `<a href="${e(entryHref(extension.inherited.from))}"><code>${e(extension.inherited.from)}</code></a><div class="hint">${extension.inherited.fields.map((field) => `<code>${e(field)}</code>`).join(", ")}</div>`

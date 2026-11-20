@@ -10,6 +10,9 @@ import { resolve } from "../src/core/resolve.ts";
 import { NS, UpstreamModel, type ModelExtension } from "../src/core/schema.ts";
 import { pricingOf } from "../src/core/policies.ts";
 import { limitOf, NO_CACHE, summaryOf } from "./helpers.ts";
+import { duration, usd } from "../src/core/format.ts";
+import type { PiBlock, PiCatalog, PiModel } from "../src/core/pi.ts";
+import type { MetaPi } from "../src/core/schema.ts";
 
 const row = (more: Partial<Summary>): string => rowHtml(summaryOf(more), { today: { date: new Date("2026-11-13T00:00:00Z"), stale_after_days: 90 } });
 const count = (html: string, part: string): number => html.split(part).length - 1;
@@ -111,7 +114,7 @@ describe("the entry page", () => {
 
   it("has the same sections, tables and rows whatever is known about the entry", () => {
     const bare = skeleton(pages.bare);
-    expect(bare.filter((item) => item.startsWith("h"))).toEqual(["h2 Limits", "h3 Input window", "h3 Documented", "h3 Measured tokens", "h2 Price", "h3 Conditional rates", "h3 Request controls", "h2 Prompt caching", "h3 Lifetimes", "h3 Cache modes", "h3 Retention", "h2 Provenance", "h2 Data"]);
+    expect(bare.filter((item) => item.startsWith("h"))).toEqual(["h2 Limits", "h3 Input window", "h3 Documented", "h3 Measured tokens", "h2 Price", "h3 Conditional rates", "h3 Request controls", "h2 Prompt caching", "h3 Lifetimes", "h3 Cache modes", "h3 Retention", "h2 pi's catalog", "h2 Provenance", "h2 Data"]);
     expect(bare.filter((item) => item.startsWith("row"))).toEqual([
       "row Input window", "row Documented", "row Measured",
       "row Context window", "row Largest input", "row Maximum output",
@@ -760,5 +763,137 @@ describe("the input window of a model", () => {
     expect(html({ input_window_reference: { entry_ref: "lab/m", tokens: 922000, bound: "limit", basis: "documented", scope: "input" } })).toBe("Input window 850K to 1M tokens Smallest to largest among its entries At Lab: 922K, input alone");
     expect(html({ input_window_reference: null })).toBe("Input window 850K to 1M tokens Smallest to largest among its entries At Lab: unknown");
     expect(html({ reference_ref: null })).toBe("Input window 850K to 1M tokens Smallest to largest among its entries");
+  });
+});
+
+// pi's block on an entry's page and in a row (design/pi-source.md, section h; step 6). The page prints the block and
+// /api/v1/meta.pi as they are: every number it shows is one of theirs, and what pi does not state says so.
+describe("pi's catalog on an entry's page and in a row", () => {
+  const piModel = (id: string, more: Partial<PiModel> = {}): PiModel => ({
+    id, name: `Pi ${id}`, api: "openai-completions", provider: "lab", baseUrl: "https://api.lab.example/v1", reasoning: true, input: ["text", "image"],
+    cost: { input: 1, output: 4, cacheRead: 0.1, cacheWrite: 1.25 }, contextWindow: 190000, maxTokens: 8000, type: "chat", ...more,
+  }) as PiModel;
+  const pi: PiCatalog = {
+    lab: {
+      // Differs in its context window and in its tiers; every optional field stated.
+      full: piModel("full", {
+        cost: { input: 1, output: 4, cacheRead: 0.1, cacheWrite: 1.25, tiers: [{ inputTokensAbove: 199999, input: 2, output: 8, cacheRead: 0.2, cacheWrite: 0 }] },
+        compat: { supportsStore: false, thinkingFormat: "openai", chatTemplateArgs: { enable_thinking: { $var: "thinking.enabled" } } },
+        thinkingLevelMap: { off: "none", minimal: null, high: "high" },
+        promptCache: { short: 300, long: 3600 },
+        inputLimits: { maxRequestBytes: 20971520, images: { maxPerRequest: 3600 } },
+      }),
+      // Nothing optional stated, and every price 0.
+      bare: piModel("bare", { cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 }, contextWindow: 100000, maxTokens: 4000 }),
+    },
+  };
+  const { catalog } = resolve({
+    upstream: {
+      lab: {
+        id: "lab", name: "Lab",
+        models: {
+          full: UpstreamModel.parse({ id: "full", name: "Full", limit: { context: 200000, output: 8000 }, cost: { text: { input: { price: 1, cache: { read: 0.1, write: 1.25 }, overrides: [{ when: { context: { gt: 200000 } }, price: 2, cache: { read: 0.2 } }] }, output: { price: 4, overrides: [{ when: { context: { gt: 200000 } }, price: 8 }] } } } }),
+          bare: UpstreamModel.parse({ id: "bare", name: "Bare", limit: { context: 100000, output: 4000 } }),
+          unlisted: UpstreamModel.parse({ id: "unlisted", name: "Unlisted" }),
+        },
+      },
+    },
+    additions: [], overrides: [], routes: {}, access: { default: "api", default_basis: "fixture", patterns: [], providers: {} }, upstreamDate: "2026-11-13",
+    pi: { catalog: pi },
+  });
+  const index = buildIndex(catalog, "fixture", "2026-11-14T00:00:00Z", "2026-11-14T00:00:00Z");
+  const meta = (more: Partial<MetaPi["sync"]> = {}): MetaPi => ({
+    source: "https://pi.dev/api/models",
+    snapshot: { fetched_at: "2026-11-12T14:19:45.000Z", checked_at: "2026-11-14T04:17:12.000Z", etag: '"p1"', last_modified: null, revision: null, sha256: "ab".repeat(32), providers: 1, models: 2 },
+    sync: { last_attempt_at: "2026-11-14T04:17:12.000Z", last_attempt_ok: true, last_error: null, ...more },
+    counts: { entries_with_block: 2, left_out_models: 0, unmatched_models: 0 },
+  });
+  const page = (model: string, piMeta: MetaPi = meta()): string => {
+    const summary = index.entries.find((entry) => entry.ref === `lab/${model}`)!;
+    return entryHtml({ summary, provider: index.providers[0]!, model: catalog.lab!.models[model]!, today: { date: new Date("2026-11-14T00:00:00Z"), stale_after_days: 90 }, cache_ages_s: CACHE_AGES_S, imported: "2026-11-13", pi: piMeta });
+  };
+  const section = (html: string): string => html.split('<section aria-labelledby="pi">')[1]!.split("</section>")[0]!;
+  const blockOf = (model: string): PiBlock => (catalog.lab!.models[model]![NS] as unknown as ModelExtension).pi!;
+  /** What a reader sees: the text of the HTML, without its tags and the hover texts. */
+  const text = (html: string): string => html.replace(/<[^>]+>/g, " ").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, "&").replace(/\s+/g, " ");
+  const numbersOf = (value: unknown): number[] => (typeof value === "number" ? [value] : value && typeof value === "object" ? Object.values(value).flatMap(numbersOf) : []);
+
+  it("the blocks are as the cases need them: one with differences and every field, one with nothing optional", () => {
+    expect(blockOf("full").differences.map((item) => item.field)).toEqual(["context_window", "cost.tiers"]);
+    expect(blockOf("bare")).toMatchObject({ compat: null, thinking_level_map: null, prompt_cache: null, differences: [] });
+    expect(blockOf("bare").input_limits).toEqual({ max_request_bytes: null, max_images_per_request: null, max_images_per_message: null });
+    expect(index.entries.find((entry) => entry.ref === "lab/unlisted")!.pi).toBeNull();
+  });
+
+  it("every value on the page is in the API answers it was drawn from", () => {
+    for (const model of ["full", "bare"]) {
+      const block = blockOf(model);
+      const shown = text(section(page(model)));
+      // Every date is the fetch, the check or the last attempt of /meta.pi.
+      const dates = [...shown.matchAll(/\d{4}-\d{2}-\d{2}/g)].map((match) => match[0]);
+      expect(dates.length).toBeGreaterThan(0);
+      for (const date of dates) expect(["2026-11-12", "2026-11-14"]).toContain(date);
+      // Every number is one of the block's, written as the page writes it; "1M" is the unit of a price.
+      const allowed = new Set<string>();
+      for (const value of numbersOf(block)) for (const written of [value.toLocaleString("en-US"), usd(value).slice(1)]) allowed.add(written);
+      for (const value of numbersOf(block.prompt_cache)) allowed.add(duration(value).split(" ")[0]!);
+      const rest = shown.replace(/\d{4}-\d{2}-\d{2}/g, " ").replace(/\/ 1M\b/g, " ").replace(/per 1M tokens/g, " ").replace(/<code>[^<]*<\/code>/g, " ");
+      const names = [block.ref, block.provider, block.model, block.name, block.base_url ?? "", ...Object.keys(block.compat ?? {}), ...Object.values(block.compat ?? {}).map((value) => JSON.stringify(value)), ...Object.entries(block.thinking_level_map ?? {}).flat().map(String)].sort((x, y) => y.length - x.length);
+      const numbers = [...names.reduce((left, name) => left.replaceAll(name, " "), rest).matchAll(/\$?(\d[\d,]*(?:\.\d+)?)/g)].map((match) => match[1]!);
+      expect(numbers.length).toBeGreaterThanOrEqual(model === "full" ? 20 : 2);
+      for (const number of numbers) expect(allowed, `${model}: ${number}`).toContain(number);
+    }
+    // And each stated value is on the page.
+    const full = section(page("full"));
+    for (const value of ["190,000", "200,000", "199,999", "20,971,520", "3,600", "5 min", "1 h", "openai-completions", "https://api.lab.example/v1"]) expect(text(full)).toContain(value);
+  });
+
+  it("a flag absent from compat is not shown as false, and nothing pi does not state is shown as no", () => {
+    // The values pi states, without the hints under the row names (one of which says that an absent flag is not false).
+    const values = (html: string): string => text([...section(html).matchAll(/<td[^>]*>([\s\S]*?)<\/td>/g)].map((match) => match[1]).join(" | "));
+    const bare = section(page("bare"));
+    expect(values(page("bare"))).not.toMatch(/\bfalse\b/);
+    expect(bare).toContain("None stated");
+    expect(text(bare)).not.toContain("supportsStore");
+    // Thinking levels, cache lifetimes and every price 0: not stated, never "no", never free.
+    expect(text(bare).match(/Not stated/g)!.length).toBeGreaterThanOrEqual(6);
+    expect(text(bare)).not.toMatch(/\bfree\b|\$0\b/i);
+    // On the other block, false is shown only where pi states it, by its flag's name.
+    const full = section(page("full"));
+    expect(values(page("full")).match(/\bfalse\b/g)).toEqual(["false"]);
+    expect(full).toContain("<dt><code>supportsStore</code></dt><dd><code>false</code></dd>");
+    expect(full).toContain("<dt>minimal</dt><dd><span class=\"muted\" title=\"pi marks this level as not supported.\">not supported</span></dd>");
+    // pi's tier cache-write of 0 is not stated; the entry's tier, which states none, says so too.
+    expect(text(full)).toMatch(/Above 199,999 In \$2 Out \$8 Cache read \$0\.20 Cache write Not stated/);
+    expect(text(full)).toMatch(/Above 200,000 In \$2 Out \$8 Cache read \$0\.20 Cache write Not stated/);
+  });
+
+  it("has the same tables and rows on every entry pi lists, and one line on an entry it does not", () => {
+    const skeleton = (html: string): string[] => [...section(html).matchAll(/<h3[^>]*>(.*?)<\/h3>|<th scope="(?:col|row)"[^>]*>(.*?)(?:<div|<\/th>)/gs)].map((match) => (match[1] ?? match[2]!).replace(/<[^>]+>/g, "").trim());
+    expect(skeleton(page("bare"))).toEqual(skeleton(page("full")).map((item) => item.replace("2 differences", "no difference")));
+    expect(skeleton(page("full"))).toContain("Request limits");
+    const unlisted = section(page("unlisted"));
+    expect(text(unlisted).trim()).toBe("pi's catalog pi's model catalog does not list this entry. Fetched 2026-11-12 from pi.dev/api/models Last checked 2026-11-14 , unchanged");
+  });
+
+  it("says when pi's catalog was fetched and last checked, and that the last import failed when /meta says so", () => {
+    const fine = page("full");
+    expect(text(section(fine))).toContain("Fetched 2026-11-12 from pi.dev/api/models Last checked 2026-11-14 , unchanged");
+    expect(fine).toMatch(/>pi\.dev<span class="pi-differ">2 differ<span class="sr-only"> from this page<\/span><\/span><\/span><span class="muted date" title="Fetched from pi&#39;s catalog 2026-11-12 14:19 UTC\. Last checked 2026-11-14 04:17 UTC: unchanged since the fetch\.">2026-11-12<\/span>/);
+    expect(fine).not.toContain("failed");
+    const failed = page("full", meta({ last_attempt_at: "2026-11-15T04:17:00.000Z", last_attempt_ok: false, last_error: "pi.dev answered HTTP 503" }));
+    expect(text(section(failed))).toContain("The last import, 2026-11-15, failed: this is the last good one");
+    expect(failed).toContain(">2026-11-12 · last import failed</span>");
+    expect(text(section(page("unlisted", meta({ last_attempt_ok: false }))))).toContain("failed: this is the last good one");
+  });
+
+  it("a row with a block has the pi.dev badge and nothing about differences; a row without one has none", () => {
+    const listed = row({ ref: "lab/full", provider: "lab", model: "full", pi: { ref: "lab/full", api: "openai-completions", match: "id", difference_count: 2 } });
+    expect(listed).toContain('<span class="origin pi" title="pi&#39;s model catalog (pi.dev) also lists this entry. Imported beside models.dev, not verified by providers.dev. The entry&#39;s page shows what pi states.">pi.dev</span>');
+    expect(listed).not.toContain("<a class=\"origin");
+    expect(listed).not.toMatch(/differ|otherwise|agree/i);
+    const paired = row({ ref: "lab/full", provider: "lab", model: "full", pi: { ref: "lab-pi/Full", api: "openai-completions", match: "alias", difference_count: 0 } });
+    expect(paired).toContain("also lists this entry, as lab-pi/Full.");
+    expect(row({})).not.toContain("pi.dev");
   });
 });

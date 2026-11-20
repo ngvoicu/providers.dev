@@ -9,7 +9,8 @@ import { controlsOf, pricingOf } from "../src/core/policies.ts";
 import { emptyInputWindow, type InputWindow } from "../src/core/limits.ts";
 import type { MeasuredLimit, Meta, ModelExtension, UpstreamCatalog } from "../src/core/schema.ts";
 import type { PiCatalog, PiModel } from "../src/core/pi.ts";
-import { ROOT } from "../scripts/lib/files.ts";
+import { pretty, ROOT } from "../scripts/lib/files.ts";
+import { piProviderFile } from "../scripts/lib/sync.ts";
 
 /** The cache record of an entry nothing is known about. */
 export const NO_CACHE: EntryCache = { documented: documentedCache({}), retention: { support: "unknown", parameter: null, accepted_values: null, default: null, profiles: [], conditions: [], evidence: [] }, lifetime: emptyCacheLifetime(), evaluations: [] };
@@ -284,6 +285,19 @@ export function fixturePi(providers = 12, modelsEach = 30): PiCatalog {
     catalog[provider] = models;
   }
   return catalog;
+}
+
+/**
+ * Write data/pi/ as `npm run sync` writes it, and the pi key of sync-status.json (which must exist: run `sync` first).
+ * Fetched and checked on the given times; `status` is the pi part of the last sync.
+ */
+export function writePiSnapshot(dataDir: string, catalog: PiCatalog, times = { fetched_at: "2026-11-20T14:19:45.000Z", checked_at: "2026-11-21T04:17:12.000Z" }, status: object = { last_attempt_at: "2026-11-21T04:17:12.000Z", status: "unchanged" }): void {
+  mkdirSync(join(dataDir, "pi", "providers"), { recursive: true });
+  for (const [id, models] of Object.entries(catalog)) writeFileSync(join(dataDir, "pi", "providers", `${id}.json`), piProviderFile(id, models));
+  const models = Object.values(catalog).reduce((sum, items) => sum + Object.keys(items).length, 0);
+  writeFileSync(join(dataDir, "pi", "meta.json"), pretty({ source: "https://pi.dev/api/models", ...times, etag: '"p1"', revision: "sha256-dd93eb27", sha256: "ab".repeat(32), providers: Object.keys(catalog).length, models }));
+  const path = join(dataDir, "sync-status.json");
+  writeFileSync(path, pretty({ ...JSON.parse(readFileSync(path, "utf8")), pi: status }));
 }
 
 /** One request a `fetchByAddress` stand-in received. */

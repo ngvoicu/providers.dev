@@ -854,6 +854,90 @@
     margin-left: 0.45rem;
   }
 
+  /* pi's catalog on an entry's page: whose data it is in one line of short facts, then pi's figures beside the page's,
+     a differing row marked at its edge and in words, then how pi calls the model */
+  .pi-facts {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem 1.1rem;
+    margin-top: 0.75rem;
+    font-size: 0.84rem;
+    color: var(--fg-soft);
+  }
+  /* The name takes the slack, so that pi's value and the page's stand next to each other (where the table is a table:
+     stacked, its head is out of sight and keeps the size the site gives it) */
+  @media (min-width: 640px) {
+    table.pi-compare > thead th:first-child {
+      width: 100%;
+    }
+  }
+  .pi-tiers li > span {
+    white-space: nowrap;
+  }
+  .pi-tiers + .pi-differ {
+    margin-top: 0.35rem;
+  }
+  table.pi-compare tr.differs > th {
+    box-shadow: inset 2px 0 0 var(--warn);
+  }
+  table.pi-compare td.num .pi-differ {
+    margin-right: 0.35rem;
+    vertical-align: 0.05rem;
+  }
+  table.pi-compare td.num:has(.pi-tiers) {
+    white-space: normal;
+  }
+  .pi-tiers {
+    display: grid;
+    gap: 0.3rem;
+    margin-top: 0.15rem;
+    list-style: none;
+    padding: 0;
+  }
+  .pi-tiers li {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.1rem 0.8rem;
+  }
+  @media (min-width: 640px) {
+    .pi-tiers li {
+      flex-wrap: nowrap;
+    }
+  }
+  .pi-tiers .tier-at {
+    font-weight: 520;
+    color: var(--fg);
+  }
+  .pi-pairs {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: 0.2rem 1rem;
+    margin: 0;
+  }
+  .pi-pairs > div {
+    display: contents;
+  }
+  .pi-pairs dt {
+    color: var(--muted);
+  }
+  .pi-pairs dd {
+    margin: 0;
+  }
+  .pi-pairs dt,
+  .pi-pairs dd {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .pi-pairs code,
+  table.pi-call code {
+    font-size: 0.8rem;
+  }
+  code.break {
+    overflow-wrap: anywhere;
+  }
+
   /* Cache evaluations as a heat map: one row per evaluation, one column per age. */
   table.heat th,
   table.heat td {
@@ -1591,6 +1675,31 @@
     background: var(--documented-bg);
     border-color: transparent;
   }
+  /* pi.dev: a second imported source, neutral like models.dev but drawn with a firmer line so that it is told apart in a
+     column of sources. Where pi states a price or limit otherwise than the page, the count follows in the colour the site
+     gives a contradicted value, and in words. */
+  .origin.pi {
+    color: var(--fg-soft);
+    border-color: var(--line-strong);
+  }
+  .pi-differ {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-sans);
+    font-size: 0.72rem;
+    font-weight: 500;
+    line-height: 1.6;
+    padding: 0 0.45rem;
+    border-radius: 999px;
+    color: var(--warn);
+    background: var(--warn-bg);
+    white-space: nowrap;
+  }
+  .origin.pi .pi-differ {
+    margin: -1px -0.5rem -1px auto;
+    border: 1px solid transparent;
+    line-height: inherit;
+  }
 
   /* Forms */
   .panel {
@@ -1931,6 +2040,11 @@
     table.entries.stack-tablet .sources > :is(.date, .stale, span:empty) {
       display: block;
     }
+    /* The pi.dev mark beside the first source and its date, so that a listed entry takes no more lines than another */
+    table.entries.stack-tablet .sources > .origin.pi {
+      grid-row: 1;
+      grid-column: 3;
+    }
     /* Sorting: the column heads that sort stay, as a line of buttons over the list */
     table.entries.stack-tablet > thead:has(button) {
       border-bottom: 1px solid var(--line);
@@ -2113,6 +2227,26 @@
     table.pairs.stack-phone > tbody > tr > td.num {
       text-align: right;
       white-space: normal;
+    }
+    /* How pi calls the model: a flag list or an address needs the width; the value goes under its name */
+    table.pi-call.stack-phone > tbody > tr > td {
+      flex-basis: 100%;
+      margin-left: 0;
+    }
+    /* pi's figures beside the page's: stacked, both under their names, left-aligned like the other stacked numbers; a
+       value and its tag may wrap, and a differing row is marked along its whole edge */
+    .pi-tiers li {
+      justify-content: flex-start;
+    }
+    table.pi-compare.stack-phone > tbody > tr > td.num {
+      flex: 1 1 9rem;
+      white-space: normal;
+    }
+    table.pi-compare tr.differs > th {
+      box-shadow: none;
+    }
+    table.pi-compare.stack-phone > tbody > tr.differs {
+      box-shadow: inset 2px 0 0 var(--warn);
     }
     /* Request controls: support and default side by side, then the field, the values and the conditions */
     table.controls.stack-phone > tbody > tr > th {
