@@ -3,7 +3,7 @@
 import { existsSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { loadPi, loadUpstream, OBSERVED_URL, PI_DEADLINE_MS, PI_URL, piSnapshotFault, sync, SyncBusyError, UPSTREAM_COMMIT_URL, UPSTREAM_URL, writeStepOutputs, type SyncOptions, type SyncStatus } from "../scripts/lib/sync.ts";
+import { loadPi, loadUpstream, OBSERVED_URL, PI_DEADLINE_MS, PI_URL, piSnapshotFault, storedPi, sync, SyncBusyError, UPSTREAM_COMMIT_URL, UPSTREAM_URL, writeStepOutputs, type SyncOptions, type SyncStatus } from "../scripts/lib/sync.ts";
 import { sha256 } from "../scripts/lib/files.ts";
 import type { PiCatalog } from "../src/core/pi.ts";
 import { fetchByAddress, fixturePi, fixtureUpstream, tempDataDir, type RecordedRequest } from "./helpers.ts";
@@ -358,7 +358,7 @@ describe("the pi deadline (release review, blocker 2)", () => {
   });
 });
 
-describe("a stored pi snapshot that is not whole (release review, blocker 4)", () => {
+describe("a stored pi snapshot that cannot be used is no snapshot (release reviews, blocker 4)", () => {
   const damages: [string, (dataDir: string) => void][] = [
     ["a model whose id is not its key", (dataDir) => {
       const path = join(dataDir, "pi", "providers", "provider-03.json");
@@ -367,14 +367,29 @@ describe("a stored pi snapshot that is not whole (release review, blocker 4)", (
       writeFileSync(path, JSON.stringify(provider));
     }],
     ["a provider file missing", (dataDir) => rmSync(join(dataDir, "pi", "providers", "provider-05.json"))],
+    // The second review: three damages that never recovered.
+    ["a provider file that cannot be parsed", (dataDir) => {
+      const path = join(dataDir, "pi", "providers", "provider-03.json");
+      writeFileSync(path, readFileSync(path, "utf8").slice(0, 200));
+    }],
+    ["a stored model count too high", (dataDir) => {
+      const path = join(dataDir, "pi", "meta.json");
+      writeFileSync(path, JSON.stringify({ ...JSON.parse(readFileSync(path, "utf8")), models: 4000 }));
+    }],
+    ["a stored model that does not fit the schema", (dataDir) => {
+      const path = join(dataDir, "pi", "providers", "provider-03.json");
+      const provider = JSON.parse(readFileSync(path, "utf8"));
+      provider.models["model-1"].reasoning = "yes";
+      writeFileSync(path, JSON.stringify(provider));
+    }],
   ];
 
   it.each(damages)("%s: no If-None-Match is sent, and the same body is written again in full (no equal-digest shortcut)", async (_name, damage) => {
     const dataDir = await firstImport();
     const whole = filesUnder(join(dataDir, "pi", "providers"));
-    expect(piSnapshotFault(dataDir)).toBeNull();
+    expect(storedPi(dataDir).state).toBe("usable");
     damage(dataDir);
-    expect(piSnapshotFault(dataDir)).not.toBeNull();
+    expect(storedPi(dataDir).state).toBe("unusable");
     const requests: RecordedRequest[] = [];
     const report = await run(dataDir, stand({}, requests));
     expect(requests.find(isPi)?.headers["If-None-Match"]).toBeUndefined();
@@ -382,6 +397,29 @@ describe("a stored pi snapshot that is not whole (release review, blocker 4)", (
     expect(piSnapshotFault(dataDir)).toBeNull();
     expect(filesUnder(join(dataDir, "pi", "providers"))).toEqual(whole);
     expect(piMeta(dataDir)).toMatchObject({ fetched_at: "2026-11-14T00:00:00.000Z", checked_at: "2026-11-14T00:00:00.000Z", providers: 20, models: 600 });
+    // As on a first import: nothing stored is compared with.
+    expect(report.pi.summary).toEqual(["first import: 20 providers, 600 models"]);
+    expect(storedPi(dataDir).state).toBe("usable");
+  });
+
+  it.each(damages)("%s: a forced run recovers it the same way", async (_name, damage) => {
+    const dataDir = await firstImport();
+    const whole = filesUnder(join(dataDir, "pi", "providers"));
+    damage(dataDir);
+    expect(storedPi(dataDir).state).toBe("unusable");
+    const report = await run(dataDir, stand(), { force: true });
+    expect(report.pi).toEqual({ status: "updated", summary: ["first import: 20 providers, 600 models"] });
+    expect(filesUnder(join(dataDir, "pi", "providers"))).toEqual(whole);
+  });
+
+  it.each(damages)("%s: a feed that fails all the same is a pi failure, and data/pi/ is left as it was", async (_name, damage) => {
+    const dataDir = await firstImport();
+    damage(dataDir);
+    const before = filesUnder(join(dataDir, "pi"));
+    const report = await run(dataDir, stand({ pi: status(500) }));
+    expect(report.pi).toEqual({ status: "failed", error: "pi.dev answered HTTP 500" });
+    expect(report.ok).toBe(true);
+    expect(filesUnder(join(dataDir, "pi"))).toEqual(before);
   });
 
   it.each(damages)("%s: a 304 all the same keeps nothing; the pi part fails and data/pi/ is left as it was", async (_name, damage) => {

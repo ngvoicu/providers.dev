@@ -8,7 +8,7 @@ import type { ZodType } from "zod";
 import { CACHE_AGES_S } from "../../src/core/cache.ts";
 import { buildIndex, SHARD_SIZE, type Index } from "../../src/core/entries.ts";
 import { listCorrections, listEvaluations } from "../../src/core/resources.ts";
-import { PiAliases, PiFeed, type PiCatalog } from "../../src/core/pi.ts";
+import { PiAliases, type PiCatalog } from "../../src/core/pi.ts";
 import { resolve } from "../../src/core/resolve.ts";
 import {
   AccessRules,
@@ -26,7 +26,7 @@ import {
   type SourceMeta,
 } from "../../src/core/schema.ts";
 import { readJsonIfExists, sha256, swapDir } from "./files.ts";
-import { loadPi, loadUpstream, PI_URL, piSnapshotFault, type SyncStatus } from "./sync.ts";
+import { loadUpstream, PI_URL, storedPi, type SyncStatus } from "./sync.ts";
 
 /**
  * providers.dev evidence (a correction, an evaluation, a measured lifetime) whose date is more than this many days before
@@ -85,33 +85,15 @@ const compact = (value: unknown): string => JSON.stringify(value);
 const PI_LICENSE = "pi (https://github.com/earendil-works/pi), MIT License, Copyright (c) 2025 Mario Zechner";
 
 /**
- * The pi snapshot in data/pi/, checked against PiFeed. Undefined where there is none, and where it does not fit
- * (an edit by hand, or a schema that moved on): then the warning pi-snapshot-unreadable is raised.
+ * The pi snapshot in data/pi/, where it is usable (`storedPi`, the sync's answer too). Undefined where there is none,
+ * and where it cannot be used (an edit by hand, or a schema that moved on): then the warning pi-snapshot-unreadable is raised.
  */
 function readPi(dataDir: string, issues: Issue[]): { catalog: PiCatalog; meta: PiMeta } | undefined {
-  const unreadable = (why: string): undefined => {
-    issues.push({ level: "warning", code: "pi-snapshot-unreadable", target: "data/pi", message: `The pi snapshot in data/pi/ cannot be read (${why}). The dataset is built without pi data: no entry has a pi block.` });
-    return undefined;
-  };
-  let loaded: ReturnType<typeof loadPi>;
-  try {
-    loaded = loadPi(dataDir);
-  } catch (error) {
-    return unreadable(error instanceof Error ? error.message : String(error));
+  const stored = storedPi(dataDir);
+  if (stored.state === "unusable") {
+    issues.push({ level: "warning", code: "pi-snapshot-unreadable", target: "data/pi", message: `The pi snapshot in data/pi/ cannot be read (${stored.why}). The dataset is built without pi data: no entry has a pi block.` });
   }
-  if (!loaded) return undefined;
-  const fault = piSnapshotFault(dataDir);
-  if (fault) return unreadable(`not whole: ${fault}`);
-  const checked = PiFeed.safeParse(loaded.catalog);
-  if (!checked.success) {
-    const first = checked.error.issues[0];
-    return unreadable(`${checked.error.issues.length} problems; first: ${first ? `${first.path.join(".")}: ${first.message}` : "unknown"}`);
-  }
-  const meta = loaded.meta as Partial<PiMeta>;
-  if (typeof meta.fetched_at !== "string" || typeof meta.checked_at !== "string" || typeof meta.sha256 !== "string" || typeof meta.providers !== "number" || typeof meta.models !== "number") {
-    return unreadable("meta.json lacks fetched_at, checked_at, sha256, providers or models");
-  }
-  return { catalog: checked.data, meta: loaded.meta };
+  return stored.state === "usable" ? { catalog: stored.catalog, meta: stored.meta } : undefined;
 }
 
 /** The last attempt to import pi's catalog, from the `pi` key of data/sync-status.json. All null = none is recorded. */

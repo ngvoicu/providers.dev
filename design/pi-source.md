@@ -191,7 +191,9 @@ the data build does (section i, "a snapshot the code cannot read").
 
 ### What `syncPi` does, in order
 
-1. Read the previous snapshot (`loadPi`). Send `If-None-Match: <stored etag>` when there is a previous snapshot,
+1. Read the previous snapshot (`storedPi`, the build's answer too). A stored snapshot that cannot be used (it does
+   not load, is not whole or does not fit `PiFeed`) counts as none: the import is then in every respect a first
+   import. Send `If-None-Match: <stored etag>` when there is a previous snapshot,
    its `meta.source` is `PI_URL`, it has an ETag and `--force` was not given. Headers: `Accept: application/json`,
    `User-Agent: providers.dev sync`. Node's `fetch` receives a weak ETag from the feed (`W/"2197505f…"`, where a
    plain `curl` gets the strong one); it is stored and sent back as received, and the feed answers 304 to it.

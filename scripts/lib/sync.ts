@@ -301,6 +301,38 @@ export function piSnapshotFault(dataDir: string): string | null {
   }
 }
 
+/** The pi snapshot stored in data/pi/: none, one that cannot be used (and why), or one that can. */
+export type StoredPi = { state: "none" } | { state: "unusable"; why: string } | { state: "usable"; catalog: PiCatalog; meta: PiMeta };
+
+/**
+ * The one answer to "is there a usable stored pi snapshot", for the build and the sync alike. None where
+ * data/pi/meta.json or data/pi/providers/ is missing. Usable where it loads, is whole (`piSnapshotFault`), fits PiFeed
+ * and its meta.json states what the snapshot is. Anything else is unusable: the build takes no pi data, and the sync
+ * imports as on a first import.
+ */
+export function storedPi(dataDir: string): StoredPi {
+  const unusable = (why: string): StoredPi => ({ state: "unusable", why });
+  let loaded: ReturnType<typeof loadPi>;
+  try {
+    loaded = loadPi(dataDir);
+  } catch (error) {
+    return unusable(error instanceof Error ? error.message : String(error));
+  }
+  if (!loaded) return { state: "none" };
+  const fault = piSnapshotFault(dataDir);
+  if (fault) return unusable(`not whole: ${fault}`);
+  const checked = PiFeed.safeParse(loaded.catalog);
+  if (!checked.success) {
+    const first = checked.error.issues[0];
+    return unusable(`${checked.error.issues.length} problems; first: ${first ? `${first.path.join(".")}: ${first.message}` : "unknown"}`);
+  }
+  const meta = loaded.meta as Partial<PiMeta>;
+  if (typeof meta.fetched_at !== "string" || typeof meta.checked_at !== "string" || typeof meta.sha256 !== "string" || typeof meta.providers !== "number" || typeof meta.models !== "number") {
+    return unusable("meta.json lacks fetched_at, checked_at, sha256, providers or models");
+  }
+  return { state: "usable", catalog: checked.data, meta: loaded.meta };
+}
+
 /**
  * The file a pi provider is stored in: `{ id, models }`, the models sorted by id (plain character order), each model
  * as the feed gives it, every key in the feed's order, `headers` included.
@@ -312,22 +344,22 @@ export function piProviderFile(id: string, models: Record<string, PiModel>): str
 
 async function syncPi(options: Required<Pick<SyncOptions, "dataDir" | "fetch" | "now">> & SyncOptions): Promise<RanPart> {
   const dir = join(options.dataDir, "pi");
-  const previous = loadPi(options.dataDir);
+  // A stored snapshot that cannot be used is no snapshot: the import is in every respect a first import.
+  const stored = storedPi(options.dataDir);
+  const previous = stored.state === "usable" ? stored : undefined;
   const now = options.now().toISOString();
 
   // As for models.dev: a stored ETag and digest belong to the address they were read from.
   const sameSource = previous?.meta.source === PI_URL;
-  // A stored snapshot that is not whole is not kept on a 304: the feed is fetched again in full.
-  const whole = previous !== undefined && piSnapshotFault(options.dataDir) === null;
   const headers: Record<string, string> = { Accept: "application/json", "User-Agent": "providers.dev sync" };
-  if (sameSource && whole && previous?.meta.etag && !options.force) headers["If-None-Match"] = previous.meta.etag;
+  if (sameSource && previous?.meta.etag && !options.force) headers["If-None-Match"] = previous.meta.etag;
   // One deadline over the request and the whole body: a slow feed fails the pi part, not the job.
   const { response, body } = await withDeadline(PI_DEADLINE_MS, async (signal) => {
     const answer = await options.fetch(PI_URL, { headers, signal });
     return { response: answer, body: answer.ok ? await answer.text() : null };
   });
 
-  if (response.status === 304 && previous && sameSource && whole) {
+  if (response.status === 304 && previous && sameSource) {
     writeFileAtomic(join(dir, "meta.json"), pretty({ ...previous.meta, checked_at: now }));
     return { status: "unchanged" };
   }
@@ -367,8 +399,7 @@ async function syncPi(options: Required<Pick<SyncOptions, "dataDir" | "fetch" | 
   }
 
   const digest = sha256(body);
-  // An equal digest keeps the stored files only where they are whole; otherwise they are written again from the body.
-  if (previous && sameSource && whole && previous.meta.sha256 === digest && !options.force) {
+  if (previous && sameSource && previous.meta.sha256 === digest && !options.force) {
     writeFileAtomic(join(dir, "meta.json"), pretty({ ...previous.meta, checked_at: now, ...etagOf(response) }));
     return { status: "unchanged" };
   }
