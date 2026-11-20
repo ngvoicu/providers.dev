@@ -291,6 +291,10 @@ describe("the pi snapshot in the data build (step 4)", () => {
     expect(out.meta.pi.sync).toEqual({ last_attempt_at: "2026-11-20T14:19:45.000Z", last_attempt_ok: true, last_error: null });
     expect(readFileSync(join(dir, "published", "site", "data", "LICENSE-pi.txt"), "utf8")).toContain("Copyright (c) 2025 Mario Zechner");
     expect(readFileSync(join(dir, "published", "site", "data", "NOTICE.txt"), "utf8")).toMatch(/pi\.dev\/api\/models[\s\S]*Imported 2026-11-20T14:19:45\.000Z at catalog revision sha256-dd93eb27[\s\S]*not affiliated with or endorsed by pi/);
+    // One credit per part (release review, blocker 8): the providers.dev statement excepts providers_dev.pi.
+    const notice = readFileSync(join(dir, "published", "site", "data", "NOTICE.txt"), "utf8").replace(/\n/g, " ");
+    expect(notice).toContain("Everything under a `providers_dev` key except `providers_dev.pi`, every entry whose `providers_dev.origin` is \"added\" (its `providers_dev.pi` excepted), and every field listed in a `providers_dev.provenance` array is by providers.dev");
+    expect(notice).toContain("The pi block of an entry (providers_dev.pi) is imported from the model catalog of pi");
 
     // A failed pi attempt: last_attempt_ok false with its error; the top-level sync is left alone.
     const topBefore = out.meta.sync;
