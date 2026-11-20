@@ -162,7 +162,7 @@ const PI_MIN_SHARE = 0.6;
 
 export function storedPi(dataDir: string): StoredPi;
 export function piProviderFile(id: string, models: Record<string, PiModel>): string;
-export async function syncPi(options): Promise<{ status: "updated" | "unchanged"; summary?: string[] }>;
+export async function syncPi(options): Promise<{ status: "updated" | "unchanged"; summary?: string[]; revision?: string }>;
 
 // scripts/lib/sync.ts
 
@@ -212,7 +212,7 @@ again private to it, as on `main`.
 `storedPi` is the one answer to "is there a stored pi snapshot that can be used", for the sync and the build alike:
 **none** only where the folder `data/pi/` does not exist; **usable** where it loads, its `meta.json` fits `PiMeta`,
 it is whole (every provider file named by its id, every model's key its id and its provider the file's, the counts
-those of `meta.json`) it fits `PiFeed`, and the copy checked against `PiFeed` holds every model of the files (the same count); **unusable**, with the reason, in every other case, a `data/pi/`
+those of `meta.json`), it fits `PiFeed`, and the copy checked against `PiFeed` holds every model of the files (the same count); **unusable**, with the reason, in every other case, a `data/pi/`
 without a `meta.json` or with one that holds `null` included.
 
 ### What `syncPi` does, in order
@@ -1267,7 +1267,9 @@ refused.
 
 Files: `src/core/pi.ts` (`piBlock`, `piDifferences`, the tier reading of section e, matching by equal ids, the
 counts), `src/core/resolve.ts` (section i; `ResolveInput.pi` without aliases), `src/core/entries.ts`
-(`summary.pi` from the block), `scripts/lib/publish.ts` (load `data/pi/`, check it against `PiFeed`, pass it,
+(`summary.pi` from the block), *superseded by section k: `resolve()` has no `pi` in its input or result and
+`summarize()` writes `pi: null`; the fence lays the blocks and the short forms over the finished dataset*,
+`scripts/lib/publish.ts` (load `data/pi/`, check it against `PiFeed`, pass it,
 `meta.pi`, `license`, `LICENSE-pi.txt` and the `NOTICE.txt` paragraph), `LICENSES/pi-MIT.txt`,
 `scripts/build-data.ts` (the pi line).
 
@@ -1309,7 +1311,8 @@ counts), `src/core/resolve.ts` (section i; `ResolveInput.pi` without aliases), `
 ### Step 5 (PIC-07): the alias file and the report
 
 Files: `src/core/pi.ts` (`PiAliases`, the rule of section c in full, the four alias issues, `PiReport`),
-`src/core/resolve.ts` (`ResolveInput.pi.aliases`, `ResolveResult.pi`), `scripts/lib/publish.ts` (load the alias
+`src/core/resolve.ts` (`ResolveInput.pi.aliases`, `ResolveResult.pi`; *superseded by section k: the alias file
+goes to `piPart` through the fence, and the report is `piPart`'s*), `scripts/lib/publish.ts` (load the alias
 file, write `data/published/pi-report.json`), `data/authored/pi-aliases.yaml` with **the first content of
 section c as it stands there**, and the README's "Authoring" (a short part on the file).
 
@@ -1550,8 +1553,9 @@ It has two parts, each through `fenced`, each all or nothing, neither depending 
   not, no pi code is called and the data is `null`: so the one state without pi data and without a warning does
   not rest on pi's code. Where it does, `compute`: `storedPi(dataDir)`; unless its answer is *usable*, throw (its
   reason where it is *unusable*; that it gave no usable answer otherwise, *none* for a folder that exists
-  included); then call `piPart`, with an `entryOf` that looks the ref up in a `Map` the fence made from `catalog`
-  and returns `structuredClone`s of `limit` and `cost`; return
+  included); then call `piPart`, with `structuredClone`s of the alias file, of `before` and of `ruledOut`, and an
+  `entryOf` that looks the ref up in a `Map` the fence made from `catalog` and returns `structuredClone`s of `limit`
+  and `cost`; so pi's code is handed copies only, never an object the build goes on to use; return
   `{ snapshot, counts, blocks, issues, report }`, where `snapshot` is `meta.pi.snapshot` made from the stored
   `meta.json` (keys in the contract's order, an absent one `null`), `counts` the three of `meta.pi.counts` from the
   report's totals, and `report` the report as text (`JSON.stringify(report, null, 1)` and a newline).
@@ -1623,13 +1627,13 @@ catalog), because pi was not looked at then, which is not the same as *none*.
 ```ts
 // scripts/lib/pi-fence.ts
 export interface PiOfSync {
-  /** status "updated" or "unchanged" with pi's summary lines, or "failed" with a one-line error. */
-  report: PartReport;
+  /** status "updated" or "unchanged" with pi's summary lines, or "failed" with a one-line error: a part that ran. */
+  report: RanPart;   // PartReport without "skipped" (scripts/lib/sync.ts)
   /** For the commit message: 7 hexadecimal characters of the stored snapshot's revision, else "snapshot". */
   revision7: string;
 }
 /** The whole pi part of the sync. Never rejects. */
-export async function piOfSync(options: SyncOptions): Promise<PiOfSync>;
+export async function piOfSync(options: Parameters<typeof syncPi>[0]): Promise<PiOfSync>;   // syncPi's own parameter type: SyncOptions with dataDir, fetch and now required
 ```
 
 `piOfSync` is `fencedAsync(() => syncPi({ ...options }), schema)` and nothing more: `syncPi` returns
@@ -1874,10 +1878,10 @@ One task each, in this order, on `pi-source`. **After every step, on the committ
 | step | what | files | what else must be shown |
 |---|---|---|---|
 | F1 | **Move, change nothing.** pi's sync code into `scripts/lib/pi-sync.ts`; `PiAliases` and `PI_URL` into `src/core/schema.ts`; the guard and its tests written. *Done at `d3605ec`.* | `scripts/lib/sync.ts`, `pi-sync.ts`, `pi-fence.ts`, `src/core/pi.ts`, `schema.ts`, the imports of the tests | the diff moves code and edits imports, nothing else; the replays of step F3 give the stored files of `adf67cd` |
-| F2 | **The build behind the fence, and the sync through it.** The guard to its own module: `fenced`, `fencedAsync`, `reasonOf` in `scripts/lib/fenced.ts`, their direct tests in `tests/fenced.test.ts`, unchanged. `resolve()` without pi, with `before` and `ruledOut`; the two literals and `noPiMeta()`; `piPart`; lookups by own property in `src/core/pi.ts` and `scripts/lib/pi-sync.ts`; `storedPi`'s *none* only for a folder that does not exist; `piOfBuild` with its four checks; `publish()` as in 1, with `PublishReport.pi`; `assemble`, `piMisfit`, `readPi`, `piUnreadable`, `piSync`, `piSummary` deleted. `piOfSync` as one line, called by `sync()` in place of `syncPi`; `pi-sync.ts` without a value import from `sync.ts` (its own share, ETag reading and summary) | `scripts/lib/fenced.ts`, `pi-fence.ts`, `pi-sync.ts`, `sync.ts`, `publish.ts`, `src/core/resolve.ts`, `entries.ts`, `pi.ts`, `schema.ts` | tests 1 (the build's and the record's tables), 3 whole, 4, 5 and the folder cases of 6; the boundary functions the test found (`storedPi`, `piPart`, `syncPi`); the number of rows generated, that every fault fired and every row ended turned away, the two rows of "does not promise" apart; the five replays of F3 give the stored files of `adf67cd` |
-| F3 | **The rest of the sync.** The record written before and after; the swap last; the size cap; `revision` from `syncPi` and `revision7`, `pi_revision7` | `scripts/lib/pi-sync.ts`, `pi-fence.ts`, `sync.ts`, `scripts/sync.ts` | test 2; five offline replays (a first 200, a changed 200, a 304, an equal-body 200, a 503) leave every stored file under `data/`, `sync-status.json` included, byte for byte as the same replays at `adf67cd` |
-| F4 | **Being seen on the run.** `writeBuildOutputs`; the workflow's second warning step and the commit step without `node -p` on pi's file | `scripts/lib/publish.ts`, `scripts/build-data.ts`, `.github/workflows/publish.yml` | the rest of test 6; the diff of the workflow in full |
-| F5 | **Words.** README ("Syncing": the two warnings, the record written twice, the size cap), `AGENTS.md` if it names the moved functions | `README.md`, `AGENTS.md` | nothing but the four lines above |
+| F2 | **The build behind the fence, and the sync through it.** The guard to its own module: `fenced`, `fencedAsync`, `reasonOf` in `scripts/lib/fenced.ts`, their direct tests in `tests/fenced.test.ts`, unchanged. `resolve()` without pi, with `before` and `ruledOut`; the two literals and `noPiMeta()`; `piPart`; lookups by own property in `src/core/pi.ts` and `scripts/lib/pi-sync.ts`; `storedPi`'s *none* only for a folder that does not exist; `piOfBuild` with its four checks; `publish()` as in 1, with `PublishReport.pi`; `assemble`, `piMisfit`, `readPi`, `piUnreadable`, `piSync`, `piSummary` deleted. `piOfSync` as one line, called by `sync()` in place of `syncPi`; `pi-sync.ts` without a value import from `sync.ts` (its own share, ETag reading and summary) *Done at `ffea5ee`.* | `scripts/lib/fenced.ts`, `pi-fence.ts`, `pi-sync.ts`, `sync.ts`, `publish.ts`, `src/core/resolve.ts`, `entries.ts`, `pi.ts`, `schema.ts` | tests 1 (the build's and the record's tables), 3 whole, 4, 5 and the folder cases of 6; the boundary functions the test found (`storedPi`, `piPart`, `syncPi`); the number of rows generated, that every fault fired and every row ended turned away, the two rows of "does not promise" apart; the five replays of F3 give the stored files of `adf67cd` |
+| F3 | **The rest of the sync.** The record written before and after; the swap last; the size cap; `revision` from `syncPi` and `revision7`, `pi_revision7` *Done at `84e7b49`.* | `scripts/lib/pi-sync.ts`, `pi-fence.ts`, `sync.ts`, `scripts/sync.ts` | test 2; five offline replays (a first 200, a changed 200, a 304, an equal-body 200, a 503) leave every stored file under `data/`, `sync-status.json` included, byte for byte as the same replays at `adf67cd` |
+| F4 | **Being seen on the run.** `writeBuildOutputs`; the workflow's second warning step and the commit step without `node -p` on pi's file *Done at `110dca6`.* | `scripts/lib/publish.ts`, `scripts/build-data.ts`, `.github/workflows/publish.yml` | the rest of test 6; the diff of the workflow in full |
+| F5 | **Words.** README ("Syncing": the two warnings, the record written twice, the size cap), `AGENTS.md` if it names the moved functions *Done at `8c01d3d`.* | `README.md`, `AGENTS.md` | nothing but the four lines above |
 
 F1 comes first so that the rule of the modules can be stated and tested from F2 on. If a step cannot keep the
 bytes of `adf67cd` on the committed data, it stops there and the reason goes to the chief: the fence changes
