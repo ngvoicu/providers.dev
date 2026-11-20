@@ -27,6 +27,7 @@ export function extensionOf(more: Partial<ModelExtension> = {}): ModelExtension 
     limits: { measured: [], from_measurement: [], input_window: emptyInputWindow() },
     evidence: [],
     verified: null,
+    pi: null,
     ...more,
   };
 }
@@ -44,7 +45,7 @@ export function summaryOf(more: Partial<Summary> = {}): Summary {
     cache: "unknown", cache_modes: [], cache_mode_support: { implicit: "unknown", explicit: "unknown" },
     cache_retention: "unknown", cache_lifetime: emptyCacheLifetime(), evaluation_count: 0,
     price_in: null, price_out: null, price_from: null, pricing: pricingOf({}, "api", null, []), request_controls: controlsOf({}, NO_CACHE.retention, []),
-    measured_input_accepted: null, measured_input_refused: null, measured_limit_count: 0, overridden_fields: [], verified: null, shard: 0,
+    measured_input_accepted: null, measured_input_refused: null, measured_limit_count: 0, overridden_fields: [], verified: null, shard: 0, pi: null,
     ...more,
   };
 }

@@ -859,6 +859,7 @@ export function resolve(input: ResolveInput): ResolveResult {
         limits: { measured: measuredLimits, from_measurement: fromMeasurement, input_window: entryWindow },
         evidence: publishEvidence(evidence),
         verified: verified ?? null,
+        pi: null,
       };
       model[NS] = published as unknown as Json;
     }

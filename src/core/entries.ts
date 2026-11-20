@@ -3,6 +3,7 @@
 import { cacheFacts, type CacheLifetimeRecord, type CacheMode, type CacheRetention, type CacheSupport, type Support } from "./cache.ts";
 import type { InputWindow } from "./limits.ts";
 import { isObject, type JsonObject } from "./merge.ts";
+import type { PiSummary } from "./pi.ts";
 import type { Pricing, RequestControls } from "./policy-contract.ts";
 import { NS, type Access, type Catalog, type ModelExtension, type ProviderExtension } from "./schema.ts";
 
@@ -64,6 +65,8 @@ export interface Summary {
   verified: string | null;
   /** Which file under /data/entries/<provider>/ holds the full entry. */
   shard: number;
+  /** The pi block of the entry in short. Null = pi's catalog does not list the entry. */
+  pi: PiSummary | null;
 }
 
 export interface ProviderSummary {
@@ -145,6 +148,7 @@ export function summarize(providerId: string, model: JsonObject, shard: number):
     overridden_fields: overridden,
     verified: extension.verified,
     shard,
+    pi: null,
   };
 }
 

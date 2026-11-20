@@ -7,6 +7,7 @@ import { CacheRetentionDeclarationSchema } from "./cache-contract.ts";
 import { ModelMetadataShape } from "./metadata-contract.ts";
 import { PricingDeclarationSchema, RequestControlDeclarationsSchema, type Pricing, type RequestControls } from "./policy-contract.ts";
 import type { Change, Json, JsonObject } from "./merge.ts";
+import type { PiBlock } from "./pi.ts";
 
 export const UPSTREAM_SCHEMA = "models.dev v2 (experimental)";
 /** Everything we add to a provider or model lives under this one key. */
@@ -469,6 +470,8 @@ export interface ModelExtension {
   evidence: PublishedEvidence[];
   /** The newest date among our evidence and measurements for this entry. Null = none. */
   verified: string | null;
+  /** What pi's model catalog states for this entry, never merged into its own fields. Null = pi does not list it. */
+  pi: PiBlock | null;
 }
 
 export interface ProviderExtension {
@@ -505,7 +508,12 @@ export interface Issue {
     | "lifetime-differs"
     | "unparsed-lifetime"
     | "retention-lifetime-differs"
-    | "limit-not-counted";
+    | "limit-not-counted"
+    | "pi-provider-collides"
+    | "pi-alias-orphan"
+    | "pi-alias-conflict"
+    | "pi-alias-redundant"
+    | "pi-snapshot-unreadable";
   target: string;
   message: string;
 }
@@ -558,7 +566,19 @@ export interface Meta {
   sync: { last_attempt_at: string | null; last_attempt_ok: boolean | null; last_error: string | null };
   exclusions: Exclusion[];
   issues: Issue[];
-  license: { data: string; upstream: string; notice: string };
+  license: { data: string; upstream: string; notice: string; pi: string; pi_notice: string };
+  /** pi's model catalog, the second imported source. Always there: without a snapshot, `snapshot` is null and the counts 0. */
+  pi: MetaPi;
+}
+
+export interface MetaPi {
+  source: string;
+  /** The pi import this dataset is built on. Null = built without pi data. */
+  snapshot: Omit<Nulled<PiMeta>, "source"> | null;
+  /** The last attempt to import pi's catalog. All null = none is recorded. */
+  sync: { last_attempt_at: string | null; last_attempt_ok: boolean | null; last_error: string | null };
+  /** The three add up to snapshot.models. */
+  counts: { entries_with_block: number; left_out_models: number; unmatched_models: number };
 }
 
 export function ext(model: JsonObject): ModelExtension {

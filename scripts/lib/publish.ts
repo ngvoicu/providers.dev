@@ -24,7 +24,7 @@ import {
   type SourceMeta,
 } from "../../src/core/schema.ts";
 import { readJsonIfExists, sha256, swapDir } from "./files.ts";
-import { loadUpstream, type SyncStatus } from "./sync.ts";
+import { loadUpstream, PI_URL, type SyncStatus } from "./sync.ts";
 
 /**
  * providers.dev evidence (a correction, an evaluation, a measured lifetime) whose date is more than this many days before
@@ -78,6 +78,16 @@ function loadYaml<T>(path: string, schema: ZodType<T>, errors: string[]): T | un
 }
 
 const compact = (value: unknown): string => JSON.stringify(value);
+
+/** pi's project, licence and the copyright line of its LICENSE file (LICENSES/pi-MIT.txt). */
+const PI_LICENSE = "pi (https://github.com/earendil-works/pi), MIT License, Copyright (c) 2025 Mario Zechner";
+
+/** The last attempt to import pi's catalog, from the `pi` key of data/sync-status.json. All null = none is recorded. */
+function piSync(status: SyncStatus | undefined): Meta["pi"]["sync"] {
+  const pi = status?.pi;
+  if (!pi) return { last_attempt_at: null, last_attempt_ok: null, last_error: null };
+  return { last_attempt_at: pi.last_attempt_at, last_attempt_ok: pi.status !== "failed", last_error: pi.error ?? null };
+}
 
 export function publish(input: PublishOptions): PublishReport {
   const options = { now: () => new Date(), ...input };
@@ -173,6 +183,14 @@ export function publish(input: PublishOptions): PublishReport {
       data: "MIT",
       upstream: "models.dev, MIT License, Copyright (c) 2025 models.dev",
       notice: "Baseline imported from https://models.dev. providers.dev is not affiliated with or endorsed by models.dev.",
+      pi: PI_LICENSE,
+      pi_notice: "The pi block of an entry (providers_dev.pi) is imported from https://pi.dev/api/models. providers.dev is not affiliated with or endorsed by pi.",
+    },
+    pi: {
+      source: PI_URL,
+      snapshot: null,
+      sync: piSync(status),
+      counts: { entries_with_block: 0, left_out_models: 0, unmatched_models: 0 },
     },
   };
 

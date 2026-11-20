@@ -1637,6 +1637,10 @@
         "shard": {
           "type": "integer",
           "minimum": 0
+        },
+        "pi": {
+          "ref": "PiSummary",
+          "nullable": true
         }
       }
     },
@@ -1827,6 +1831,10 @@
           "type": "string",
           "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
           "nullable": true
+        },
+        "pi": {
+          "ref": "PiBlock",
+          "nullable": true
         }
       }
     },
@@ -1847,6 +1855,244 @@
           "items": {
             "ref": "CacheEvaluation"
           }
+        }
+      }
+    },
+    "PiBlock": {
+      "type": "object",
+      "properties": {
+        "ref": {
+          "type": "string"
+        },
+        "provider": {
+          "type": "string"
+        },
+        "model": {
+          "type": "string"
+        },
+        "match": {
+          "type": "string",
+          "enum": [
+            "alias",
+            "id"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "api": {
+          "type": "string"
+        },
+        "base_url": {
+          "type": "string",
+          "nullable": true
+        },
+        "reasoning": {
+          "type": "boolean"
+        },
+        "input": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "context_window": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "max_tokens": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "cost": {
+          "ref": "PiCost"
+        },
+        "thinking_level_map": {
+          "type": "object",
+          "additional": {
+            "type": "string",
+            "nullable": true
+          },
+          "nullable": true
+        },
+        "compat": {
+          "type": "object",
+          "additional": {
+            "type": "json"
+          },
+          "nullable": true
+        },
+        "prompt_cache": {
+          "type": "object",
+          "properties": {
+            "short_s": {
+              "type": "integer",
+              "minimum": 0,
+              "nullable": true
+            },
+            "long_s": {
+              "type": "integer",
+              "minimum": 0,
+              "nullable": true
+            }
+          },
+          "nullable": true
+        },
+        "input_limits": {
+          "type": "object",
+          "properties": {
+            "max_request_bytes": {
+              "type": "integer",
+              "minimum": 0,
+              "nullable": true
+            },
+            "max_images_per_request": {
+              "type": "integer",
+              "minimum": 0,
+              "nullable": true
+            },
+            "max_images_per_message": {
+              "type": "integer",
+              "minimum": 0,
+              "nullable": true
+            }
+          }
+        },
+        "differences": {
+          "type": "array",
+          "items": {
+            "ref": "PiDifference"
+          }
+        }
+      }
+    },
+    "PiCost": {
+      "type": "object",
+      "properties": {
+        "input": {
+          "type": "number",
+          "minimum": 0
+        },
+        "output": {
+          "type": "number",
+          "minimum": 0
+        },
+        "cache_read": {
+          "type": "number",
+          "minimum": 0
+        },
+        "cache_write": {
+          "type": "number",
+          "minimum": 0
+        },
+        "tiers": {
+          "type": "array",
+          "items": {
+            "ref": "PiCostTier"
+          }
+        }
+      }
+    },
+    "PiCostTier": {
+      "type": "object",
+      "properties": {
+        "input_tokens_above": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "input": {
+          "type": "number",
+          "minimum": 0,
+          "nullable": true
+        },
+        "output": {
+          "type": "number",
+          "minimum": 0,
+          "nullable": true
+        },
+        "cache_read": {
+          "type": "number",
+          "minimum": 0,
+          "nullable": true
+        },
+        "cache_write": {
+          "type": "number",
+          "minimum": 0,
+          "nullable": true
+        }
+      }
+    },
+    "PiDifference": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "type": "string",
+          "enum": [
+            "context_window",
+            "cost.cache_read",
+            "cost.cache_write",
+            "cost.input",
+            "cost.output",
+            "cost.tiers",
+            "max_tokens"
+          ]
+        },
+        "entry_field": {
+          "type": "string"
+        },
+        "unit": {
+          "type": "string",
+          "enum": [
+            "tokens",
+            "usd_per_million_tokens"
+          ]
+        },
+        "pi": {
+          "type": "number",
+          "nullable": true
+        },
+        "published": {
+          "type": "number",
+          "nullable": true
+        },
+        "pi_tiers": {
+          "type": "array",
+          "items": {
+            "ref": "PiCostTier"
+          },
+          "nullable": true
+        },
+        "published_tiers": {
+          "type": "array",
+          "items": {
+            "ref": "PiCostTier"
+          },
+          "nullable": true
+        }
+      }
+    },
+    "PiSummary": {
+      "type": "object",
+      "properties": {
+        "ref": {
+          "type": "string"
+        },
+        "api": {
+          "type": "string"
+        },
+        "match": {
+          "type": "string",
+          "enum": [
+            "alias",
+            "id"
+          ]
+        },
+        "difference_count": {
+          "type": "integer",
+          "minimum": 0
         }
       }
     },
@@ -4693,10 +4939,88 @@
             },
             "notice": {
               "type": "string"
+            },
+            "pi": {
+              "type": "string"
+            },
+            "pi_notice": {
+              "type": "string"
             }
           },
           "additional": {
             "type": "any"
+          }
+        },
+        "pi": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string"
+            },
+            "snapshot": {
+              "type": "object",
+              "properties": {
+                "fetched_at": {
+                  "type": "string"
+                },
+                "checked_at": {
+                  "type": "string"
+                },
+                "etag": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "last_modified": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "revision": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "sha256": {
+                  "type": "string"
+                },
+                "providers": {
+                  "type": "integer"
+                },
+                "models": {
+                  "type": "integer"
+                }
+              },
+              "nullable": true
+            },
+            "sync": {
+              "type": "object",
+              "properties": {
+                "last_attempt_at": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "last_attempt_ok": {
+                  "type": "boolean",
+                  "nullable": true
+                },
+                "last_error": {
+                  "type": "string",
+                  "nullable": true
+                }
+              }
+            },
+            "counts": {
+              "type": "object",
+              "properties": {
+                "entries_with_block": {
+                  "type": "integer"
+                },
+                "left_out_models": {
+                  "type": "integer"
+                },
+                "unmatched_models": {
+                  "type": "integer"
+                }
+              }
+            }
           }
         }
       },
