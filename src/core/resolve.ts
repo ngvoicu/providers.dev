@@ -19,7 +19,7 @@ import {
 } from "./cache.ts";
 import { inputWindow, windowMeasurement, type DocumentedField, type LimitSource } from "./limits.ts";
 import { clone, isObject, mergePatch, type Change, type Json, type JsonObject } from "./merge.ts";
-import { piBlock, type PiBlock, type PiCatalog, type PiModel } from "./pi.ts";
+import { matchPi, piBlock, piReport, type PiAliases, type PiBlock, type PiCatalog, type PiModel, type PiReport } from "./pi.ts";
 import { controlsOf, pricingOf, retentionFromControl } from "./policies.ts";
 import {
   NS,
@@ -61,25 +61,16 @@ export interface ResolveInput {
   catalogRules?: CatalogRules;
   /** The date of the models.dev import (YYYY-MM-DD): the date of what is taken from its documentation. */
   upstreamDate?: string;
-  /** The pi snapshot. Left out = the dataset is built without pi data. */
-  pi?: { catalog: PiCatalog };
-}
-
-/** What became of the pi models of the snapshot. The three kinds add up to `models`. */
-export interface PiTotals {
-  models: number;
-  matched_id: number;
-  matched_alias: number;
-  left_out: number;
-  unmatched: number;
+  /** The pi snapshot and the alias file. Left out = the dataset is built without pi data. */
+  pi?: { catalog: PiCatalog; aliases?: PiAliases };
 }
 
 export interface ResolveResult {
   catalog: Catalog;
   issues: Issue[];
   exclusions: Exclusion[];
-  /** Null = built without pi data. */
-  pi: { totals: PiTotals } | null;
+  /** What became of every pi model of the snapshot (data/published/pi-report.json). Null = built without pi data. */
+  pi: PiReport | null;
 }
 
 /**
@@ -377,17 +368,17 @@ export function resolve(input: ResolveInput): ResolveResult {
 
   // 3b. pi's catalog (design/pi-source.md, section c): which entry each pi model speaks of, worked out against the
   // catalog before any exclusion, so that a pi model whose entry is then left out counts as left out, not as one
-  // that belongs to no entry. Nothing is changed here; the block is set in step 6 on the entries still published.
-  // Matching is by equal provider id and equal model id only. Nothing is ever matched by similarity.
+  // that belongs to no entry. Equal ids first, then the alias file; nothing is ever matched by similarity. Nothing is
+  // changed here; the block is set in step 6 on the entries still published.
+  const piMatching = input.pi ? matchPi(input.pi.catalog, input.pi.aliases, catalog) : null;
   const piMatches = new Map<PublishedModel, { provider: string; model: PiModel; match: PiBlock["match"] }>();
-  let piModels = 0;
-  for (const [piProvider, models] of Object.entries(input.pi?.catalog ?? {})) {
-    for (const [piModelId, piModel] of Object.entries(models)) {
-      piModels += 1;
-      const entry = catalog[piProvider]?.models[piModelId];
-      if (entry) piMatches.set(entry, { provider: piProvider, model: piModel, match: "id" });
-    }
+  const piAssigned = new Map<PublishedModel, NonNullable<typeof piMatching>["assignments"][number]>();
+  for (const assignment of piMatching?.assignments ?? []) {
+    const entry = catalog[assignment.provider]!.models[assignment.entry]!;
+    piMatches.set(entry, { provider: assignment.piProvider, model: assignment.model, match: assignment.match });
+    piAssigned.set(entry, assignment);
   }
+  if (piMatching) issues.push(...piMatching.issues);
 
   // 4. Our overrides and tombstones.
   for (const file of input.overrides) {
@@ -742,11 +733,11 @@ export function resolve(input: ResolveInput): ResolveResult {
   };
 
   // 6. Deterministic order, and every record published with all of its keys.
-  let piBlocks = 0;
+  const piPublished = new Set<NonNullable<typeof piMatching>["assignments"][number]>();
   const piOf = (model: PublishedModel): PiBlock | null => {
     const matched = piMatches.get(model);
     if (!matched) return null;
-    piBlocks += 1;
+    piPublished.add(piAssigned.get(model)!);
     return piBlock(matched.provider, matched.model, matched.match, { limit: model.limit, cost: model.cost });
   };
   const sorted: Catalog = {};
@@ -925,9 +916,9 @@ export function resolve(input: ResolveInput): ResolveResult {
     }
   }
 
-  // A pi model reached an entry that an override or a catalog rule then left out: left out. The rest reached none.
-  const leftOut = piMatches.size - piBlocks;
-  const pi = input.pi ? { totals: { models: piModels, matched_id: piBlocks, matched_alias: 0, left_out: leftOut, unmatched: piModels - piBlocks - leftOut } } : null;
+  // A pi model reached an entry that an override or a catalog rule then left out: left out, by the rule or the
+  // override. The rest reached no entry. The report is put together here, at the end.
+  const pi = input.pi && piMatching ? piReport(input.pi.catalog, piMatching, (assignment) => piPublished.has(assignment), (ref) => ruledOut.get(ref) ?? "override") : null;
   return { catalog: sorted, issues, exclusions, pi };
 }
 

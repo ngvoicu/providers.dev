@@ -4,6 +4,7 @@
 // snapshot stays, and someone adapts `PiModel`.
 import { z } from "zod";
 import type { Json } from "./merge.ts";
+import { Evidence, PROVIDER_ID, type Catalog, type Issue } from "./schema.ts";
 
 export const PiModel = z.looseObject({
   id: z.string().min(1),
@@ -265,4 +266,263 @@ export function piBlock(provider: string, model: PiModel, match: PiBlock["match"
 /** The block in short, for a summary. */
 export function piSummary(block: PiBlock | null): PiSummary | null {
   return block ? { ref: block.ref, api: block.api, match: block.match, difference_count: block.differences.length } : null;
+}
+
+// ---- matching: which entry each pi model speaks of (section c)
+
+const PiModelLine = z.strictObject({
+  /** The model id of the entry, at the catalog's provider, that is this pi model under another spelling. */
+  same_as: z.string().min(1),
+  note: z.string().optional(),
+});
+
+const PiProviderLine = z
+  .strictObject({
+    /** The provider of the catalog that this pi provider id is. Left out where the catalog has the pi id itself. */
+    same_as: z.string().regex(PROVIDER_ID).optional(),
+    reason: z.string().min(1).optional(),
+    evidence: z.array(Evidence).min(1).optional(),
+    /** The day the model lines were checked against the report. Required when `models` has a line. */
+    checked: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+    models: z.record(z.string().min(1), PiModelLine).default({}),
+  })
+  .superRefine((line, context) => {
+    if (line.same_as !== undefined && line.reason === undefined) context.addIssue({ code: "custom", path: ["reason"], message: "A provider line with same_as needs a reason." });
+    if (line.same_as !== undefined && line.evidence === undefined) context.addIssue({ code: "custom", path: ["evidence"], message: "A provider line with same_as needs evidence." });
+    const lines = Object.keys(line.models).length;
+    if (lines > 0 && line.checked === undefined) context.addIssue({ code: "custom", path: ["checked"], message: "A provider line with model lines needs checked, the day they were checked against the report." });
+    if (line.same_as === undefined && lines === 0) context.addIssue({ code: "custom", path: [], message: "A provider line needs same_as or at least one model line." });
+  });
+
+/** data/authored/pi-aliases.yaml: the adapter between pi's spelling and the catalog's. Only `same_as`, nothing else. */
+export const PiAliases = z
+  .strictObject({ providers: z.record(z.string().regex(PROVIDER_ID), PiProviderLine).default({}) })
+  .superRefine((file, context) => {
+    const seen = new Map<string, string>();
+    for (const [id, line] of Object.entries(file.providers)) {
+      if (line.same_as === undefined) continue;
+      const first = seen.get(line.same_as);
+      if (first !== undefined) context.addIssue({ code: "custom", path: ["providers", id, "same_as"], message: `Two pi provider ids, ${first} and ${id}, have the same same_as ${line.same_as}. One provider of the catalog is one pi provider.` });
+      else seen.set(line.same_as, id);
+    }
+  });
+export type PiAliases = z.infer<typeof PiAliases>;
+
+/** What became of the pi models of the snapshot: data/published/pi-report.json. Not part of the API. */
+export interface PiReport {
+  totals: { models: number; matched_id: number; matched_alias: number; left_out: number; unmatched: number };
+  providers: {
+    pi_provider: string;
+    state: "shared" | "paired" | "absent";
+    catalog_provider: string | null;
+    models: number;
+    matched: number;
+    left_out: number;
+    unmatched: number;
+    /** A hint for a person: providers of the catalog with an entry whose api base_url has the host of this provider's baseUrl. */
+    same_host: string[];
+  }[];
+  unmatched: {
+    pi_provider: string;
+    pi_model: string;
+    name: string;
+    why: "provider-absent" | "no-entry" | "alias-orphan" | "alias-conflict";
+    /** A hint for a person: ids of the provider's entries equal to pi_model once both are lower-cased and every character that is not a letter or a digit is dropped. */
+    alike: string[];
+  }[];
+  left_out: { pi_provider: string; pi_model: string; entry: string; by: string }[];
+}
+
+/** Plain character order, never the locale's. */
+const byText = (a: string, b: string): number => (a < b ? -1 : a > b ? 1 : 0);
+
+const hostOf = (url: unknown): string | null => {
+  if (typeof url !== "string" || !url) return null;
+  try {
+    return new URL(url.replace(/\{[^}]*\}/g, "x")).host.toLowerCase() || null;
+  } catch {
+    return null;
+  }
+};
+const squeezed = (id: string): string => id.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+/** A pi model and the entry it reached. */
+export interface PiAssignment {
+  piProvider: string;
+  piModel: string;
+  model: PiModel;
+  /** The entry: the catalog's provider id and model id. */
+  provider: string;
+  entry: string;
+  match: PiBlock["match"];
+}
+
+/** The match of every pi model, before any exclusion, and what the report needs of the catalog as it was then. */
+export interface PiMatching {
+  assignments: PiAssignment[];
+  providers: Pick<PiReport["providers"][number], "pi_provider" | "state" | "catalog_provider" | "same_host">[];
+  unmatched: PiReport["unmatched"];
+  issues: Issue[];
+}
+
+/**
+ * The rule of section c. `catalog` is the catalog before any exclusion: the models.dev snapshot, our additions and the
+ * entries that exist because we measured them. Equal ids always come first; then the alias file. Nothing is matched by
+ * similarity: `alike` and `same_host` are hints for the person who writes the alias file, read by nothing else.
+ */
+export function matchPi(pi: PiCatalog, aliases: PiAliases | undefined, catalog: Catalog): PiMatching {
+  const issues: Issue[] = [];
+  const lines = aliases?.providers ?? {};
+  const where = (piProvider: string, piModel?: string): string => `pi/${piProvider}${piModel === undefined ? "" : `/${piModel}`}`;
+
+  // Lines that name a pi provider or a pi model the snapshot does not have.
+  for (const [piProvider, line] of Object.entries(lines)) {
+    if (!pi[piProvider]) {
+      issues.push({ level: "warning", code: "pi-alias-orphan", target: where(piProvider), message: `data/authored/pi-aliases.yaml has a line for the pi provider ${piProvider}, which pi's catalog no longer has. Delete the line.` });
+      continue;
+    }
+    for (const piModel of Object.keys(line.models)) {
+      if (pi[piProvider][piModel]) continue;
+      issues.push({ level: "warning", code: "pi-alias-orphan", target: where(piProvider, piModel), message: `data/authored/pi-aliases.yaml has a line for the pi model ${piProvider}/${piModel}, which pi's catalog no longer has. Delete the line.` });
+    }
+  }
+
+  // The hosts each catalog provider's entries are reached at, for same_host.
+  const hostsOf = new Map<string, Set<string>>();
+  for (const [id, provider] of Object.entries(catalog)) {
+    const hosts = new Set<string>();
+    for (const model of Object.values(provider.models)) {
+      const api = model.api;
+      if (typeof api !== "object" || api === null || Array.isArray(api)) continue;
+      for (const endpoint of Object.values(api)) {
+        if (typeof endpoint !== "object" || endpoint === null || Array.isArray(endpoint)) continue;
+        const host = hostOf((endpoint as Record<string, unknown>).base_url);
+        if (host) hosts.add(host);
+      }
+    }
+    hostsOf.set(id, hosts);
+  }
+
+  const providers: PiMatching["providers"] = [];
+  const unmatched: PiReport["unmatched"] = [];
+  const candidates: PiAssignment[] = [];
+  for (const piProvider of Object.keys(pi).sort(byText)) {
+    const models = pi[piProvider]!;
+    const line = lines[piProvider];
+    let target: string | null = null;
+    let state: PiReport["providers"][number]["state"] = "absent";
+    let orphaned = false;
+    if (catalog[piProvider]) {
+      target = piProvider;
+      state = "shared";
+      if (line?.same_as !== undefined) {
+        issues.push({ level: "warning", code: "pi-provider-collides", target: where(piProvider), message: `data/authored/pi-aliases.yaml pairs the pi provider ${piProvider} with ${line.same_as}, but the catalog has a provider ${piProvider} itself. The catalog's own provider is used and the same_as is ignored.` });
+      }
+    } else if (line?.same_as !== undefined) {
+      if (catalog[line.same_as]) {
+        target = line.same_as;
+        state = "paired";
+      } else {
+        orphaned = true;
+        issues.push({ level: "warning", code: "pi-alias-orphan", target: where(piProvider), message: `data/authored/pi-aliases.yaml pairs the pi provider ${piProvider} with ${line.same_as}, which the catalog does not have. Its models belong to no entry.` });
+      }
+    } else if (line && Object.keys(line.models).length > 0) {
+      for (const piModel of Object.keys(line.models)) {
+        if (!models[piModel]) continue;
+        issues.push({ level: "warning", code: "pi-alias-orphan", target: where(piProvider, piModel), message: `data/authored/pi-aliases.yaml pairs the pi model ${piProvider}/${piModel}, but the catalog has no provider ${piProvider} and the file pairs it with none.` });
+      }
+    }
+    const piHosts = new Set(Object.values(models).map((model) => hostOf(model.baseUrl)).filter((host): host is string => host !== null));
+    const sameHost = [...hostsOf].filter(([, hosts]) => [...hosts].some((host) => piHosts.has(host))).map(([id]) => id).sort(byText);
+    providers.push({ pi_provider: piProvider, state, catalog_provider: target, same_host: sameHost });
+
+    const entries = target ? catalog[target]!.models : {};
+    const entryIds = Object.keys(entries);
+    const alike = (piModel: string): string[] => entryIds.filter((id) => squeezed(id) === squeezed(piModel)).sort(byText);
+    for (const piModel of Object.keys(models).sort(byText)) {
+      const model = models[piModel]!;
+      const modelLine = line?.models[piModel];
+      if (!target) {
+        unmatched.push({ pi_provider: piProvider, pi_model: piModel, name: model.name, why: orphaned || modelLine ? "alias-orphan" : "provider-absent", alike: [] });
+        continue;
+      }
+      if (entries[piModel]) {
+        if (modelLine) {
+          issues.push({ level: "notice", code: "pi-alias-redundant", target: where(piProvider, piModel), message: `The model line for ${piProvider}/${piModel} in data/authored/pi-aliases.yaml is no longer needed: ${target} now has an entry with the pi model's own id. Delete the line.` });
+        }
+        candidates.push({ piProvider, piModel, model, provider: target, entry: piModel, match: state === "shared" ? "id" : "alias" });
+        continue;
+      }
+      if (modelLine) {
+        if (entries[modelLine.same_as]) {
+          candidates.push({ piProvider, piModel, model, provider: target, entry: modelLine.same_as, match: "alias" });
+        } else {
+          issues.push({ level: "warning", code: "pi-alias-orphan", target: where(piProvider, piModel), message: `data/authored/pi-aliases.yaml pairs the pi model ${piProvider}/${piModel} with ${target}/${modelLine.same_as}, which the catalog does not have.` });
+          unmatched.push({ pi_provider: piProvider, pi_model: piModel, name: model.name, why: "alias-orphan", alike: alike(piModel) });
+        }
+        continue;
+      }
+      unmatched.push({ pi_provider: piProvider, pi_model: piModel, name: model.name, why: "no-entry", alike: alike(piModel) });
+    }
+  }
+
+  // One pi model per entry: the one whose provider id and model id are both the entry's keeps it, else the first by
+  // pi provider id and then pi model id. The candidates are in that order already.
+  const byEntry = new Map<string, PiAssignment[]>();
+  for (const candidate of candidates) {
+    const ref = `${candidate.provider}/${candidate.entry}`;
+    (byEntry.get(ref) ?? byEntry.set(ref, []).get(ref)!).push(candidate);
+  }
+  const assignments: PiAssignment[] = [];
+  for (const [ref, group] of byEntry) {
+    const winner = group.find((candidate) => candidate.match === "id") ?? group[0]!;
+    assignments.push(winner);
+    for (const loser of group) {
+      if (loser === winner) continue;
+      issues.push({ level: "warning", code: "pi-alias-conflict", target: where(loser.piProvider, loser.piModel), message: `The pi models ${winner.piProvider}/${winner.piModel} and ${loser.piProvider}/${loser.piModel} both reach the entry ${ref}. ${winner.piProvider}/${winner.piModel} keeps it; ${loser.piProvider}/${loser.piModel} belongs to no entry.` });
+      unmatched.push({ pi_provider: loser.piProvider, pi_model: loser.piModel, name: loser.model.name, why: "alias-conflict", alike: [] });
+    }
+  }
+  const order = (a: { pi_provider: string; pi_model: string }, b: { pi_provider: string; pi_model: string }): number => byText(a.pi_provider, b.pi_provider) || byText(a.pi_model, b.pi_model);
+  unmatched.sort(order);
+  assignments.sort((a, b) => byText(a.piProvider, b.piProvider) || byText(a.piModel, b.piModel));
+  return { assignments, providers, unmatched, issues };
+}
+
+/** The report, once the build knows which entries are published and what left the others out. */
+export function piReport(pi: PiCatalog, matching: PiMatching, published: (assignment: PiAssignment) => boolean, leftOutBy: (ref: string) => string): PiReport {
+  const leftOut: PiReport["left_out"] = [];
+  let matchedId = 0;
+  let matchedAlias = 0;
+  const perProvider = new Map<string, { matched: number; left_out: number }>();
+  for (const assignment of matching.assignments) {
+    const counts = perProvider.get(assignment.piProvider) ?? perProvider.set(assignment.piProvider, { matched: 0, left_out: 0 }).get(assignment.piProvider)!;
+    if (published(assignment)) {
+      counts.matched += 1;
+      if (assignment.match === "id") matchedId += 1;
+      else matchedAlias += 1;
+    } else {
+      counts.left_out += 1;
+      const ref = `${assignment.provider}/${assignment.entry}`;
+      leftOut.push({ pi_provider: assignment.piProvider, pi_model: assignment.piModel, entry: ref, by: leftOutBy(ref) });
+    }
+  }
+  const unmatchedOf = new Map<string, number>();
+  for (const item of matching.unmatched) unmatchedOf.set(item.pi_provider, (unmatchedOf.get(item.pi_provider) ?? 0) + 1);
+  const models = Object.values(pi).reduce((sum, items) => sum + Object.keys(items).length, 0);
+  return {
+    totals: { models, matched_id: matchedId, matched_alias: matchedAlias, left_out: leftOut.length, unmatched: matching.unmatched.length },
+    providers: matching.providers.map((provider) => ({
+      pi_provider: provider.pi_provider,
+      state: provider.state,
+      catalog_provider: provider.catalog_provider,
+      models: Object.keys(pi[provider.pi_provider] ?? {}).length,
+      matched: perProvider.get(provider.pi_provider)?.matched ?? 0,
+      left_out: perProvider.get(provider.pi_provider)?.left_out ?? 0,
+      unmatched: unmatchedOf.get(provider.pi_provider) ?? 0,
+      same_host: provider.same_host,
+    })),
+    unmatched: matching.unmatched,
+    left_out: leftOut,
+  };
 }

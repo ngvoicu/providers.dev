@@ -1,0 +1,116 @@
+# data/authored/pi-aliases.yaml
+# The adapter between pi's model catalog (https://pi.dev/api/models) and this catalog: which pi provider id is
+# which provider here, and which pi model id is which entry. Only pairs that are certain. Nothing is matched by
+# similarity when the data is built; a pi model with no pair and no equal id belongs to no entry and is listed in
+# data/published/pi-report.json.
+providers:
+  fireworks:
+    same_as: fireworks-ai
+    reason: Both catalogs give the same base URL for the provider.
+    evidence:
+      - kind: listed
+        url: https://pi.dev/api/models
+        date: "2026-11-20"
+        note: 'fireworks: baseUrl "https://api.fireworks.ai/inference/v1" (11 models) and "https://api.fireworks.ai/inference" (16).'
+      - kind: listed
+        url: https://models.dev/experimental/v2.0/api.json?include=openai-codex
+        date: "2026-11-20"
+        note: 'fireworks-ai ("Fireworks AI"): base_url "https://api.fireworks.ai/inference/v1". All 27 pi model ids are ids of it.'
+
+  together:
+    same_as: togetherai
+    reason: >-
+      pi's base URL is the one Together AI's own documentation gives, and that documentation is the one models.dev
+      links for togetherai.
+    evidence:
+      - kind: documented
+        url: https://docs.together.ai/docs/openai-api-compatibility
+        date: "2026-11-20"
+        note: 'The page gives the base URL "https://api.together.ai/v1", which is pi''s baseUrl for together.'
+      - kind: listed
+        url: https://models.dev/experimental/v2.0/api.json?include=openai-codex
+        date: "2026-11-20"
+        note: 'togetherai ("Together AI"): doc "https://docs.together.ai/docs/serverless-models", env TOGETHER_API_KEY, base_url "https://api.together.xyz/v1". All 16 pi model ids are ids of it.'
+
+  vercel-ai-gateway:
+    same_as: vercel
+    reason: models.dev's vercel is the Vercel AI Gateway, on the host pi names.
+    evidence:
+      - kind: listed
+        url: https://pi.dev/api/models
+        date: "2026-11-20"
+        note: 'vercel-ai-gateway: baseUrl "https://ai-gateway.vercel.sh" on all 305 models.'
+      - kind: listed
+        url: https://models.dev/experimental/v2.0/api.json?include=openai-codex
+        date: "2026-11-20"
+        note: 'vercel is named "Vercel AI Gateway", base_url "https://ai-gateway.vercel.sh/v1". 257 of the 305 pi model ids are ids of it.'
+
+  kimi-coding:
+    same_as: kimi-code-plan-cn
+    reason: Both catalogs give the same base URL; models.dev's other Kimi coding plan is on another host.
+    evidence:
+      - kind: listed
+        url: https://pi.dev/api/models
+        date: "2026-11-20"
+        note: 'kimi-coding: baseUrl "https://api.kimi.com/coding/v1".'
+      - kind: listed
+        url: https://models.dev/experimental/v2.0/api.json?include=openai-codex
+        date: "2026-11-20"
+        note: 'kimi-code-plan-cn ("Kimi For Coding (kimi.com)"): base_url "https://api.kimi.com/coding/v1"; kimi-code-plan-global is "https://api.kimi.ai/coding/v1". All 6 pi model ids are ids of it.'
+
+  zai-coding-cn:
+    same_as: zhipuai-coding-plan
+    reason: Both catalogs give the same base URL for the provider.
+    evidence:
+      - kind: listed
+        url: https://pi.dev/api/models
+        date: "2026-11-20"
+        note: 'zai-coding-cn: baseUrl "https://open.bigmodel.cn/api/coding/paas/v4".'
+      - kind: listed
+        url: https://models.dev/experimental/v2.0/api.json?include=openai-codex
+        date: "2026-11-20"
+        note: 'zhipuai-coding-plan ("Zhipu AI Coding Plan"): base_url "https://open.bigmodel.cn/api/coding/paas/v4". All 4 pi model ids are ids of it.'
+
+  ant-ling:
+    same_as: bailing
+    reason: Both catalogs give the same base URL for the provider.
+    evidence:
+      - kind: listed
+        url: https://pi.dev/api/models
+        date: "2026-11-20"
+        note: 'ant-ling: baseUrl "https://api.ant-ling.com/v1".'
+      - kind: listed
+        url: https://models.dev/experimental/v2.0/api.json?include=openai-codex
+        date: "2026-11-20"
+        note: 'bailing ("Bailing"): base_url "https://api.ant-ling.com/v1". No model id is in both: pi lists Ling-2.6-1T, Ling-2.6-flash and Ring-2.6-1T, models.dev the 3.x models.'
+
+  qwen-token-plan:
+    same_as: alibaba-token-plan
+    reason: models.dev's own record of alibaba-token-plan names the host pi sends this provider's requests to.
+    evidence:
+      - kind: listed
+        url: https://pi.dev/api/models
+        date: "2026-11-20"
+        note: 'qwen-token-plan: baseUrl "https://token-plan.maas.qwencloudapi.com/compatible-mode/v1".'
+      - kind: listed
+        url: https://models.dev/experimental/v2.0/api.json?include=openai-codex
+        date: "2026-11-20"
+        note: 'alibaba-token-plan ("Alibaba Token Plan"): base_url "https://token-plan.maas.qwencloudapi.com/api/v1" on qwen-image-3.0-pro and qwen-audio-3.0-asr-flash. All 20 pi model ids are ids of it.'
+
+  qwen-token-plan-cn:
+    same_as: alibaba-token-plan-cn
+    reason: models.dev's own record of alibaba-token-plan-cn names the host pi sends this provider's requests to.
+    evidence:
+      - kind: listed
+        url: https://pi.dev/api/models
+        date: "2026-11-20"
+        note: 'qwen-token-plan-cn: baseUrl "https://token-plan.maas.qianwenaiapi.com/compatible-mode/v1".'
+      - kind: listed
+        url: https://models.dev/experimental/v2.0/api.json?include=openai-codex
+        date: "2026-11-20"
+        note: 'alibaba-token-plan-cn ("Alibaba Token Plan (China)"): base_url "https://token-plan.maas.qianwenaiapi.com/api/v1" on qwen-image-3.0-pro and qwen-audio-3.0-asr-flash. All 20 pi model ids are ids of it.'
+
+# Not paired on purpose:
+#   qwen-token-plan-individual, qwen-token-plan-individual-cn: in pi the same host and key as qwen-token-plan(-cn),
+#     13 of its 20 models at the same prices. One entry carries one pi block.
+#   radius: pi's own gateway. The catalog has no such provider.

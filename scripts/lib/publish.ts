@@ -8,7 +8,7 @@ import type { ZodType } from "zod";
 import { CACHE_AGES_S } from "../../src/core/cache.ts";
 import { buildIndex, SHARD_SIZE, type Index } from "../../src/core/entries.ts";
 import { listCorrections, listEvaluations } from "../../src/core/resources.ts";
-import { PiFeed, type PiCatalog } from "../../src/core/pi.ts";
+import { PiAliases, PiFeed, type PiCatalog } from "../../src/core/pi.ts";
 import { resolve } from "../../src/core/resolve.ts";
 import {
   AccessRules,
@@ -138,6 +138,9 @@ export function publish(input: PublishOptions): PublishReport {
   const labels = existsSync(labelsPath) ? loadYaml(labelsPath, MeasurementLabels, errors) : undefined;
   const rulesPath = join(authored, "catalog-rules.yaml");
   const catalogRules = existsSync(rulesPath) ? loadYaml(rulesPath, CatalogRules, errors) : undefined;
+  // The adapter between pi's spelling and the catalog's. May be absent: then only equal ids match.
+  const aliasesPath = join(authored, "pi-aliases.yaml");
+  const piAliases = existsSync(aliasesPath) ? loadYaml(aliasesPath, PiAliases, errors) : undefined;
 
   const observedPath = join(dataDir, "sources", "observed.json");
   let observed: ObservedFile | undefined;
@@ -163,7 +166,7 @@ export function publish(input: PublishOptions): PublishReport {
     ...(labels ? { labels } : {}),
     ...(catalogRules ? { catalogRules } : {}),
     ...(observed ? { observed } : {}),
-    ...(pi ? { pi: { catalog: pi.catalog } } : {}),
+    ...(pi ? { pi: { catalog: pi.catalog, ...(piAliases ? { aliases: piAliases } : {}) } } : {}),
   });
   const issues = [...resolved, ...piIssues];
   for (const issue of issues) if (issue.level === "error") errors.push(`${issue.target}: ${issue.message}`);
@@ -252,6 +255,8 @@ export function publish(input: PublishOptions): PublishReport {
   rmSync(next, { recursive: true, force: true });
   try {
     writeSnapshot(next, catalog, index, meta, options.rootDir);
+    // Beside the published data, not under site/: never staged, served or part of the API.
+    if (piResult) writeFileSync(join(next, "pi-report.json"), `${JSON.stringify(piResult, null, 1)}\n`);
     verifySnapshot(next, index);
   } catch (error) {
     rmSync(next, { recursive: true, force: true });

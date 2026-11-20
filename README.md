@@ -269,6 +269,39 @@ the published threshold, and that is the only thing a page works out.
 then the first matching id pattern, then the default. Only providers named there, and the ones we add, count as
 reviewed; the site marks the rest "by default" or "by name".
 
+### Pair pi's spelling with the catalog's
+
+A pi model reaches the entry with its own provider id and model id. Where pi spells a provider or a model otherwise,
+`data/authored/pi-aliases.yaml` pairs the two, and says nothing else:
+
+```yaml
+providers:
+  fireworks:                       # pi's provider id
+    same_as: fireworks-ai          # the provider of the catalog it is
+    reason: Both catalogs give the same base URL for the provider.
+    evidence:
+      - { kind: listed, url: https://pi.dev/api/models, date: "2026-11-20", note: '...' }
+  openrouter:                      # a pi provider id the catalog has itself: no same_as, only models
+    checked: "2026-11-21"          # the day the model lines were checked against the report
+    models:
+      "vendor/model-v2": { same_as: "vendor/model-2" }   # pi's model id: the entry's model id
+```
+
+A provider line with `same_as` needs a `reason` and `evidence`, and is written only where the two ids name the same
+service: the same base URL in both catalogs, or the provider's own documentation or models.dev's own record showing
+pi's address. Equal model ids alone are not enough. A model line is written only where the two ids name the same model
+at the same provider, the same deployment and price class; a `:batch` or `-batch` id is not the id without it. Equal
+ids always win over a line, and where two pi models reach one entry, the one with the entry's own ids keeps it.
+Nothing is matched by similarity. The file is checked like every authored file: a key it does not know, or a
+`same_as` without its evidence, fails `npm run data`.
+
+Matching is done before the catalog rules and the overrides leave entries out. `npm run data` writes
+`data/published/pi-report.json` (beside the published data, never served): each pi model is matched, left out (its
+entry is left out, by which rule) or unmatched (with the reason, and `alike` and `same_host` as hints for this file).
+A line that no longer fits is reported in `/api/v1/meta`: `pi-alias-orphan` (it names a provider, entry or pi model
+that is gone), `pi-provider-collides` (the catalog now has the pi provider id itself), `pi-alias-conflict`,
+`pi-alias-redundant` (the entry now has the pi model's own id). None of them fails the build.
+
 ## Syncing
 
 - **By hand:** `npm run sync` (add `-- --force` to download again even if nothing changed), then `npm run build`.

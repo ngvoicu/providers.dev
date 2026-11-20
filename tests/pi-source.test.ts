@@ -1,7 +1,7 @@
 // pi's catalog in the dataset (design/pi-source.md, sections c to f and i): the block, its differences, /meta.pi.
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { stringify } from "yaml";
+import { parse as parseYaml, stringify } from "yaml";
 import { describe, expect, it } from "vitest";
 import { publish } from "../scripts/lib/publish.ts";
 import { piProviderFile, sync } from "../scripts/lib/sync.ts";
@@ -9,7 +9,7 @@ import { pretty } from "../scripts/lib/files.ts";
 import { summarize, type Summary } from "../src/core/entries.ts";
 import type { JsonObject } from "../src/core/merge.ts";
 import { PiBlockSchema, PiSummarySchema } from "../src/core/contract.ts";
-import { piDifferences, type PiCatalog, type PiModel } from "../src/core/pi.ts";
+import { PiAliases, piDifferences, type PiCatalog, type PiModel, type PiReport } from "../src/core/pi.ts";
 import { resolve, type ResolveInput } from "../src/core/resolve.ts";
 import { ext, type AccessRules, type Catalog, type CatalogRules, type Evidence, type Meta, type OverrideFile, type UpstreamCatalog } from "../src/core/schema.ts";
 import { fetchReturning, fixturePi, fixtureUpstream, ROOT, tempDataDir, writeAuthored } from "./helpers.ts";
@@ -221,30 +221,30 @@ describe("the pi block (step 4)", () => {
   });
 });
 
-describe("the pi snapshot in the data build (step 4)", () => {
-  /** A data directory after a sync of models.dev (pi answered with models.dev's body, so it failed) and our authored files. */
-  async function dataDir(): Promise<string> {
-    const dir = tempDataDir();
-    await sync({ dataDir: dir, fetch: fetchReturning(JSON.stringify(fixtureUpstream())) });
-    writeAuthored(dir);
-    return dir;
-  }
-  /** Write data/pi/ as the sync would, and the pi key of sync-status.json. */
-  function writePi(dir: string, catalog: PiCatalog, status: object = { last_attempt_at: "2026-11-20T14:19:45.000Z", status: "updated" }): void {
-    mkdirSync(join(dir, "pi", "providers"), { recursive: true });
-    for (const [id, models] of Object.entries(catalog)) writeFileSync(join(dir, "pi", "providers", `${id}.json`), piProviderFile(id, models));
-    const models = Object.values(catalog).reduce((sum, items) => sum + Object.keys(items).length, 0);
-    writeFileSync(join(dir, "pi", "meta.json"), pretty({ source: "https://pi.dev/api/models", fetched_at: "2026-11-20T14:19:45.000Z", checked_at: "2026-11-20T14:19:45.000Z", etag: '"p1"', revision: "sha256-dd93eb27", sha256: "ab".repeat(32), providers: Object.keys(catalog).length, models }));
-    const path = join(dir, "sync-status.json");
-    writeFileSync(path, pretty({ ...JSON.parse(readFileSync(path, "utf8")), pi: status }));
-  }
-  const published = (dir: string) => ({
-    meta: JSON.parse(readFileSync(join(dir, "published", "site", "data", "meta.json"), "utf8")) as Meta,
-    catalog: JSON.parse(readFileSync(join(dir, "published", "site", "api.json"), "utf8")) as Catalog,
-    index: JSON.parse(readFileSync(join(dir, "published", "site", "data", "index.json"), "utf8")) as { entries: Summary[] },
-  });
-  const blocks = (catalog: Catalog) => Object.values(catalog).flatMap((provider) => Object.values(provider.models)).filter((model) => (model.providers_dev as JsonObject).pi !== null).length;
+/** A data directory after a sync of models.dev (pi answered with models.dev's body, so it failed) and our authored files. */
+async function dataDir(): Promise<string> {
+  const dir = tempDataDir();
+  await sync({ dataDir: dir, fetch: fetchReturning(JSON.stringify(fixtureUpstream())) });
+  writeAuthored(dir);
+  return dir;
+}
+/** Write data/pi/ as the sync would, and the pi key of sync-status.json. */
+function writePi(dir: string, catalog: PiCatalog, status: object = { last_attempt_at: "2026-11-20T14:19:45.000Z", status: "updated" }): void {
+  mkdirSync(join(dir, "pi", "providers"), { recursive: true });
+  for (const [id, models] of Object.entries(catalog)) writeFileSync(join(dir, "pi", "providers", `${id}.json`), piProviderFile(id, models));
+  const models = Object.values(catalog).reduce((sum, items) => sum + Object.keys(items).length, 0);
+  writeFileSync(join(dir, "pi", "meta.json"), pretty({ source: "https://pi.dev/api/models", fetched_at: "2026-11-20T14:19:45.000Z", checked_at: "2026-11-20T14:19:45.000Z", etag: '"p1"', revision: "sha256-dd93eb27", sha256: "ab".repeat(32), providers: Object.keys(catalog).length, models }));
+  const path = join(dir, "sync-status.json");
+  writeFileSync(path, pretty({ ...JSON.parse(readFileSync(path, "utf8")), pi: status }));
+}
+const published = (dir: string) => ({
+  meta: JSON.parse(readFileSync(join(dir, "published", "site", "data", "meta.json"), "utf8")) as Meta,
+  catalog: JSON.parse(readFileSync(join(dir, "published", "site", "api.json"), "utf8")) as Catalog,
+  index: JSON.parse(readFileSync(join(dir, "published", "site", "data", "index.json"), "utf8")) as { entries: Summary[] },
+});
+const blocks = (catalog: Catalog) => Object.values(catalog).flatMap((provider) => Object.values(provider.models)).filter((model) => (model.providers_dev as JsonObject).pi !== null).length;
 
+describe("the pi snapshot in the data build (step 4)", () => {
   it("11. without a pi snapshot the dataset builds with pi null everywhere; a snapshot that does not fit PiFeed does the same, with a warning", async () => {
     const dir = await dataDir();
     expect(publish({ dataDir: dir, rootDir: ROOT }).errors).toEqual([]);
@@ -300,5 +300,156 @@ describe("the pi snapshot in the data build (step 4)", () => {
     expect(failed.pi.sync).toEqual({ last_attempt_at: "2026-11-21T04:17:00.000Z", last_attempt_ok: false, last_error: "pi.dev answered HTTP 503" });
     expect(failed.sync).toEqual(topBefore);
     expect(failed.pi.counts).toEqual(counts);
+  });
+});
+
+describe("the alias file and the report (step 5)", () => {
+  const listed = (note: string): Evidence[] => [{ kind: "listed", url: "https://pi.dev/api/models", date: "2026-11-20", note }];
+  const aliases = (providers: object) => PiAliases.parse({ providers });
+  /** The catalog of these cases: lab (as above) with one more entry, and a second provider. */
+  const catalogWith = (): UpstreamCatalog => {
+    const catalog = upstream();
+    catalog.lab!.models["gpt-6-1-sol"] = { id: "gpt-6-1-sol", name: "GPT 6.1 Sol" };
+    catalog.acme = { id: "acme", name: "Acme", models: { "model-x": { id: "model-x", name: "X" } } };
+    return catalog;
+  };
+  const run = (pi: PiCatalog, file?: PiAliases, more: Partial<ResolveInput> = {}) => resolve({ upstream: catalogWith(), additions: [], overrides: [], access, routes: {}, pi: { catalog: pi, ...(file ? { aliases: file } : {}) }, ...more });
+  const piCodes = (issues: { code: string }[]) => issues.filter((issue) => issue.code.startsWith("pi-")).map((issue) => issue.code);
+
+  it("13. a provider same_as: its models reach the paired provider's entries by equal model id, with pi's spelling and match alias", () => {
+    const pi: PiCatalog = { "lab-pi": { plain: piModel("lab-pi", "plain"), other: piModel("lab-pi", "other"), nothing: piModel("lab-pi", "nothing") } };
+    const result = run(pi, aliases({ "lab-pi": { same_as: "lab", reason: "The same base URL.", evidence: listed("lab-pi: https://api.lab.example/v1") } }));
+    expect(blockOf(result.catalog, "lab", "plain")).toMatchObject({ ref: "lab-pi/plain", provider: "lab-pi", model: "plain", match: "alias" });
+    expect(blockOf(result.catalog, "lab", "other")).toMatchObject({ ref: "lab-pi/other", match: "alias" });
+    expect(result.catalog["lab-pi"]).toBeUndefined();
+    expect(result.pi!.totals).toEqual({ models: 3, matched_id: 0, matched_alias: 2, left_out: 0, unmatched: 1 });
+    expect(result.pi!.providers).toMatchObject([{ pi_provider: "lab-pi", state: "paired", catalog_provider: "lab", models: 3, matched: 2, unmatched: 1 }]);
+    expect(piCodes(result.issues)).toEqual([]);
+  });
+
+  it("14. a model same_as gives match alias; a pi model with the entry's own id keeps the entry against an alias that points at it", () => {
+    const line = aliases({ lab: { checked: "2026-11-21", models: { "plain-v1": { same_as: "plain" } } } });
+    const alone = run({ lab: { "plain-v1": piModel("lab", "plain-v1") } }, line);
+    expect(blockOf(alone.catalog, "lab", "plain")).toMatchObject({ ref: "lab/plain-v1", provider: "lab", model: "plain-v1", match: "alias" });
+
+    const both = run({ lab: { plain: piModel("lab", "plain"), "plain-v1": piModel("lab", "plain-v1") } }, line);
+    expect(blockOf(both.catalog, "lab", "plain")).toMatchObject({ ref: "lab/plain", match: "id" });
+    expect(both.issues.filter((issue) => issue.code === "pi-alias-conflict")).toMatchObject([{ level: "warning", target: "pi/lab/plain-v1" }]);
+    expect(both.pi!.unmatched).toEqual([{ pi_provider: "lab", pi_model: "plain-v1", name: "Pi plain-v1", why: "alias-conflict", alike: [] }]);
+    expect(both.pi!.totals).toEqual({ models: 2, matched_id: 1, matched_alias: 0, left_out: 0, unmatched: 1 });
+
+    // Two aliases at one entry, neither with its ids: the first by pi provider id, then pi model id, keeps it.
+    const two = run({ lab: { "plain-a": piModel("lab", "plain-a"), "plain-b": piModel("lab", "plain-b") } }, aliases({ lab: { checked: "2026-11-21", models: { "plain-b": { same_as: "plain" }, "plain-a": { same_as: "plain" } } } }));
+    expect(blockOf(two.catalog, "lab", "plain")).toMatchObject({ ref: "lab/plain-a" });
+    expect(two.pi!.unmatched.map((item) => [item.pi_model, item.why])).toEqual([["plain-b", "alias-conflict"]]);
+  });
+
+  it("15. orphans, a collision and a redundant line are reported, none as an error, and the build succeeds with each", async () => {
+    const pi: PiCatalog = {
+      lab: { plain: piModel("lab", "plain"), "other-v2": piModel("lab", "other-v2") },
+      "lab-pi": { plain: piModel("lab-pi", "plain") },
+      "ghost-pi": { m: piModel("ghost-pi", "m") },
+    };
+    const file = aliases({
+      lab: { same_as: "acme", reason: "r", evidence: listed("x"), checked: "2026-11-21", models: { plain: { same_as: "plain" }, "other-v2": { same_as: "missing" }, "gone-model": { same_as: "other" } } },
+      "ghost-pi": { same_as: "nowhere", reason: "r", evidence: listed("x") },
+      "gone-pi": { same_as: "acme-two", reason: "r", evidence: listed("x") },
+    });
+    const result = run(pi, file);
+    const codes = result.issues.filter((issue) => issue.code.startsWith("pi-")).map((issue) => `${issue.code} ${issue.target}`).sort();
+    expect(codes).toEqual([
+      "pi-alias-orphan pi/ghost-pi",
+      "pi-alias-orphan pi/gone-pi",
+      "pi-alias-orphan pi/lab/gone-model",
+      "pi-alias-orphan pi/lab/other-v2",
+      "pi-alias-redundant pi/lab/plain",
+      "pi-provider-collides pi/lab",
+    ]);
+    expect(result.issues.filter((issue) => issue.code.startsWith("pi-")).every((issue) => issue.level !== "error")).toBe(true);
+    expect(result.issues.find((issue) => issue.code === "pi-alias-redundant")!.level).toBe("notice");
+    // The catalog's own provider is used: lab/plain is matched by equal ids, and acme gets nothing.
+    expect(blockOf(result.catalog, "lab", "plain")).toMatchObject({ match: "id" });
+    expect(blockOf(result.catalog, "acme", "model-x")).toBeNull();
+    expect(result.pi!.unmatched.map((item) => [item.pi_provider, item.pi_model, item.why])).toEqual([["ghost-pi", "m", "alias-orphan"], ["lab", "other-v2", "alias-orphan"], ["lab-pi", "plain", "provider-absent"]]);
+
+    // The build succeeds with all of them.
+    const dir = await dataDir();
+    writePi(dir, fixturePi(12, 30));
+    writeFileSync(join(dir, "authored", "pi-aliases.yaml"), stringify({ providers: { "provider-00": { same_as: "provider-01", reason: "r", evidence: listed("x"), checked: "2026-11-21", models: { "lab/model-0": { same_as: "lab/model-0" }, "model-1": { same_as: "missing" }, "not-in-pi": { same_as: "model-3" } } }, "provider-99": { same_as: "nowhere", reason: "r", evidence: listed("x") } } }));
+    const report = publish({ dataDir: dir, rootDir: ROOT });
+    expect(report.errors).toEqual([]);
+    expect(report.ok).toBe(true);
+    expect(new Set(report.issues.filter((issue) => issue.code.startsWith("pi-")).map((issue) => issue.code))).toEqual(new Set(["pi-provider-collides", "pi-alias-orphan", "pi-alias-redundant"]));
+  });
+
+  it("16. nothing by similarity: gpt-6.1-sol is not gpt-6-1-sol, and is unmatched with the entry's id under alike", () => {
+    const result = run({ lab: { "gpt-6.1-sol": piModel("lab", "gpt-6.1-sol") } });
+    expect(blockOf(result.catalog, "lab", "gpt-6-1-sol")).toBeNull();
+    expect(result.pi!.unmatched).toEqual([{ pi_provider: "lab", pi_model: "gpt-6.1-sol", name: "Pi gpt-6.1-sol", why: "no-entry", alike: ["gpt-6-1-sol"] }]);
+  });
+
+  it("17. a pi provider the catalog does not have and the file does not pair: nothing published, no issue, its models provider-absent", () => {
+    const pi: PiCatalog = { radius: { a: piModel("radius", "a", { baseUrl: "https://api.lab.example/v1" }), b: piModel("radius", "b") } };
+    const result = run(pi);
+    const plain = run({});
+    expect(Object.keys(result.catalog)).toEqual(Object.keys(plain.catalog));
+    expect(piCodes(result.issues)).toEqual([]);
+    expect(result.pi!.unmatched.map((item) => [item.pi_model, item.why])).toEqual([["a", "provider-absent"], ["b", "provider-absent"]]);
+    expect(result.pi!.providers).toEqual([{ pi_provider: "radius", state: "absent", catalog_provider: null, models: 2, matched: 0, left_out: 0, unmatched: 2, same_host: [] }]);
+  });
+
+  it("18. the report adds up, sits beside site/, is named by nothing under it, and is not written without a pi snapshot", async () => {
+    const dir = await dataDir();
+    expect(publish({ dataDir: dir, rootDir: ROOT }).errors).toEqual([]);
+    expect(existsSync(join(dir, "published", "pi-report.json"))).toBe(false);
+
+    writePi(dir, fixturePi(12, 30));
+    writeFileSync(join(dir, "authored", "catalog-rules.yaml"), stringify({ exclude: [], exclude_released: [{ id: "early-2026", from: "2026-01-01", before: "2026-03-01", leaves_out: "Early 2026", reason: "Editorial choice.", date: "2026-11-16" }], placeholder_release_dates: [] }));
+    expect(publish({ dataDir: dir, rootDir: ROOT }).errors).toEqual([]);
+    const report = JSON.parse(readFileSync(join(dir, "published", "pi-report.json"), "utf8")) as PiReport;
+    const meta = published(dir).meta;
+    const { totals } = report;
+    expect(totals.matched_id + totals.matched_alias + totals.left_out + totals.unmatched).toBe(totals.models);
+    expect(totals.models).toBe(meta.pi.snapshot!.models);
+    expect(meta.pi.counts).toEqual({ entries_with_block: totals.matched_id + totals.matched_alias, left_out_models: totals.left_out, unmatched_models: totals.unmatched });
+    expect(totals.left_out).toBeGreaterThan(0);
+    expect(report.left_out.every((item) => item.by === "early-2026")).toBe(true);
+    expect(report.providers.reduce((sum, provider) => sum + provider.models, 0)).toBe(totals.models);
+    expect(report.unmatched.length).toBe(totals.unmatched);
+    const sorted = [...report.unmatched].sort((a, b) => (a.pi_provider === b.pi_provider ? (a.pi_model < b.pi_model ? -1 : 1) : a.pi_provider < b.pi_provider ? -1 : 1));
+    expect(report.unmatched).toEqual(sorted);
+    // Nothing under site/ is the report or names it.
+    const files = readdirSync(join(dir, "published", "site"), { recursive: true }).map(String);
+    expect(files.some((file) => file.includes("pi-report"))).toBe(false);
+    for (const file of ["api.json", "data/meta.json", "data/index.json", "_headers"]) expect(readFileSync(join(dir, "published", "site", file), "utf8")).not.toContain("pi-report");
+  });
+
+  it.each<[string, object, RegExp]>([
+    ["an unknown key on the file", { providers: {}, only_pi: true }, /pi-aliases\.yaml: \(file\): Unrecognized key: "only_pi"/],
+    ["an unknown key on a provider line", { providers: { fireworks: { same_as: "fireworks-ai", reason: "r", evidence: [{ kind: "listed", url: "https://pi.dev/api/models", date: "2026-11-20" }], new: true } } }, /pi-aliases\.yaml: providers\.fireworks: Unrecognized key: "new"/],
+    ["an unknown key on a model line", { providers: { openrouter: { checked: "2026-11-21", models: { "a/b": { same_as: "a/c", inherits: "x" } } } } }, /pi-aliases\.yaml: providers\.openrouter\.models\.a\/b: Unrecognized key: "inherits"/],
+    ["a provider same_as without evidence", { providers: { fireworks: { same_as: "fireworks-ai", reason: "r" } } }, /pi-aliases\.yaml: providers\.fireworks\.evidence: A provider line with same_as needs evidence\./],
+    ["two pi provider ids with one same_as", { providers: { a: { same_as: "x", reason: "r", evidence: [{ kind: "listed", url: "https://pi.dev/api/models", date: "2026-11-20" }] }, b: { same_as: "x", reason: "r", evidence: [{ kind: "listed", url: "https://pi.dev/api/models", date: "2026-11-20" }] } } }, /pi-aliases\.yaml: providers\.b\.same_as: Two pi provider ids, a and b, have the same same_as x\./],
+    ["model lines without checked", { providers: { openrouter: { models: { "a/b": { same_as: "a/c" } } } } }, /pi-aliases\.yaml: providers\.openrouter\.checked: /],
+    ["a line with neither same_as nor a model", { providers: { openrouter: {} } }, /pi-aliases\.yaml: providers\.openrouter: A provider line needs same_as or at least one model line\./],
+  ])("19. a pi-aliases.yaml with %s fails publish(), naming the file and the path", async (_name, content, words) => {
+    const dir = await dataDir();
+    writePi(dir, fixturePi(12, 30));
+    expect(publish({ dataDir: dir, rootDir: ROOT }).errors).toEqual([]);
+    const before = readFileSync(join(dir, "published", "site", "data", "meta.json"), "utf8");
+    writeFileSync(join(dir, "authored", "pi-aliases.yaml"), stringify(content));
+    const report = publish({ dataDir: dir, rootDir: ROOT });
+    expect(report.ok).toBe(false);
+    expect(report.errors.some((error) => words.test(error)), report.errors.join("\n")).toBe(true);
+    expect(readFileSync(join(dir, "published", "site", "data", "meta.json"), "utf8")).toBe(before);
+  });
+
+  it("20. the file in the repository parses against PiAliases, with the eight pairings of the design", () => {
+    const file = PiAliases.parse(parseYaml(readFileSync(join(ROOT, "data", "authored", "pi-aliases.yaml"), "utf8")));
+    expect(Object.fromEntries(Object.entries(file.providers).filter(([, line]) => line.same_as).map(([id, line]) => [id, line.same_as]))).toEqual({
+      fireworks: "fireworks-ai", together: "togetherai", "vercel-ai-gateway": "vercel", "kimi-coding": "kimi-code-plan-cn",
+      "zai-coding-cn": "zhipuai-coding-plan", "ant-ling": "bailing", "qwen-token-plan": "alibaba-token-plan", "qwen-token-plan-cn": "alibaba-token-plan-cn",
+    });
+    for (const line of Object.values(file.providers)) for (const item of line.evidence ?? []) expect(item.date).toBe("2026-11-20");
   });
 });
