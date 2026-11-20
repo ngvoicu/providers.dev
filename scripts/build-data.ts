@@ -1,9 +1,11 @@
 // npm run data
 // Resolve upstream + our additions + our overrides + our measurements into data/published/.
 import { DATA, ROOT } from "./lib/files.ts";
-import { publish } from "./lib/publish.ts";
+import { publish, writeBuildOutputs } from "./lib/publish.ts";
 
 const report = publish({ dataDir: DATA, rootDir: ROOT });
+// For the Publish workflow: whether pi's data is in this dataset (its warning step reads it).
+if (process.env.GITHUB_OUTPUT) writeBuildOutputs(report, process.env.GITHUB_OUTPUT);
 for (const issue of report.issues) console.log(`${issue.level}: [${issue.code}] ${issue.message}`);
 if (!report.ok || !report.meta) {
   for (const error of report.errors) console.error(`error: ${error}`);

@@ -54,13 +54,20 @@ jobs:
         run: echo "::warning title=The pi import failed::The site is built and deployed with the last good pi snapshot; models.dev was imported as usual. See the 'Import' step for the reason."
 
       - name: Build the dataset and the site
+        id: build
         run: npm run build
+
+      - name: Warn about pi data left out of the build
+        if: steps.build.outputs.pi == 'turned_away'
+        run: echo "::warning title=The build left pi data out::The dataset is built and deployed without pi's data, or without the record of the last pi import. /api/v1/meta lists why, under issues (pi-snapshot-unreadable). The models.dev part is as usual."
 
       - name: Lint, type-check and test
         run: npm run check
 
       - name: Keep the new snapshot
         if: steps.sync.outcome == 'success'
+        env:
+          PI_REVISION7: ${{ steps.sync.outputs.pi_revision7 }}
         run: |
           # Commit only when the imported data changed, not for a new "checked at" time.
           if [ -n "$(git status --porcelain data/upstream/providers data/sources/observed.json data/pi/providers)" ]; then
@@ -68,7 +75,7 @@ jobs:
             upstream="$(git status --porcelain data/upstream/providers)"
             pi="$(git status --porcelain data/pi/providers)"
             if [ -n "$upstream" ]; then commit7="$(node -p "require('./data/upstream/meta.json').commit?.slice(0,7) ?? 'snapshot'")"; fi
-            if [ -n "$pi" ]; then revision7="$(node -p "require('./data/pi/meta.json').revision?.match(/^sha256-(.{7})/)?.[1] ?? 'snapshot'")"; fi
+            revision7="${PI_REVISION7:-snapshot}"
             if [ -n "$upstream" ] && [ -n "$pi" ]; then message="sync: models.dev $commit7, pi $revision7"
             elif [ -n "$upstream" ]; then message="sync: models.dev $commit7"
             elif [ -n "$pi" ]; then message="sync: pi $revision7"

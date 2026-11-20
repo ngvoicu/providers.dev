@@ -1,6 +1,6 @@
 // The data build: read the three kinds of input, resolve them, check the result, and publish it in one step.
 // data/published/ is replaced only when everything succeeded; otherwise the last good publication stays.
-import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { gzipSync } from "node:zlib";
 import { parse as parseYaml } from "yaml";
@@ -226,6 +226,15 @@ export function publish(input: PublishOptions): PublishReport {
   }
   swapDir(next, join(dataDir, "published"));
   return { ok: true, errors: [], issues, meta, pi: pi.state };
+}
+
+/**
+ * The step output of the build step of the Publish workflow: `pi=<published|none|turned_away>`, appended to the file
+ * GitHub names in GITHUB_OUTPUT. No line where the report has no `pi` (the build ended before pi was looked at).
+ */
+export function writeBuildOutputs(report: PublishReport, path: string): void {
+  if (report.pi === undefined) return;
+  appendFileSync(path, `pi=${report.pi}\n`);
 }
 
 function writeSnapshot(dir: string, catalog: Catalog, index: Index, meta: Meta, rootDir: string): void {

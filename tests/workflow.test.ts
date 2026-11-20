@@ -7,8 +7,11 @@ import { parse } from "yaml";
 import { describe, expect, it } from "vitest";
 import { ROOT, tempDataDir } from "./helpers.ts";
 
-const workflow = parse(readFileSync(join(ROOT, ".github", "workflows", "publish.yml"), "utf8")) as { jobs: { publish: { steps: { name?: string; run?: string }[] } } };
-const keep = workflow.jobs.publish.steps.find((step) => step.name === "Keep the new snapshot")!.run!;
+type Step = { name?: string; id?: string; if?: string; run?: string; env?: Record<string, string> };
+const workflow = parse(readFileSync(join(ROOT, ".github", "workflows", "publish.yml"), "utf8")) as { jobs: { publish: { steps: Step[] } } };
+const steps = workflow.jobs.publish.steps;
+const keepStep = steps.find((step) => step.name === "Keep the new snapshot")!;
+const keep = keepStep.run!;
 
 function git(dir: string, ...args: string[]): string {
   return execFileSync("git", args, { cwd: dir, encoding: "utf8", env: { ...process.env, GIT_CONFIG_GLOBAL: "/dev/null", GIT_CONFIG_NOSYSTEM: "1" } });
@@ -44,7 +47,11 @@ function checkout(withPi: boolean): string {
   return dir;
 }
 
-const runKeep = (dir: string) => spawnSync("bash", ["-e", "-c", keep], { cwd: dir, encoding: "utf8", env: { ...process.env, GIT_CONFIG_GLOBAL: "/dev/null", GIT_CONFIG_NOSYSTEM: "1" } });
+/** The step as GitHub runs it; `revision7` is the import step's output pi_revision7, absent where it gave none. */
+const runKeep = (dir: string, revision7?: string) => {
+  const env: Record<string, string | undefined> = { ...process.env, GIT_CONFIG_GLOBAL: "/dev/null", GIT_CONFIG_NOSYSTEM: "1", PI_REVISION7: revision7 ?? "" };
+  return spawnSync("bash", ["-e", "-c", keep], { cwd: dir, encoding: "utf8", env });
+};
 
 describe("Keep the new snapshot (release review, blocker 3)", () => {
   it("commits a changed models.dev in a repository that never held data/pi/", () => {
@@ -59,13 +66,31 @@ describe("Keep the new snapshot (release review, blocker 3)", () => {
     expect(git(dir, "rev-parse", "HEAD")).toBe(git(dir, "rev-parse", "origin/main"));
   });
 
-  it("still commits data/pi/ where it exists, and names what changed", () => {
+  it("still commits data/pi/ where it exists, and names what changed from the import step's output", () => {
+    const dir = checkout(true);
+    write(dir, "data/pi/providers/p.json", '{"changed":true}\n');
+    const result = runKeep(dir, "dd93eb2");
+    expect(result.status).toBe(0);
+    expect(git(dir, "log", "-1", "--format=%s").trim()).toBe("sync: pi dd93eb2");
+    expect(git(dir, "status", "--porcelain")).toBe("");
+  });
+
+  it("without the step output the message says snapshot, whatever data/pi/meta.json holds", () => {
     const dir = checkout(true);
     write(dir, "data/pi/providers/p.json", '{"changed":true}\n');
     const result = runKeep(dir);
     expect(result.status).toBe(0);
-    expect(git(dir, "log", "-1", "--format=%s").trim()).toBe("sync: pi dd93eb2");
-    expect(git(dir, "status", "--porcelain")).toBe("");
+    expect(git(dir, "log", "-1", "--format=%s").trim()).toBe("sync: pi snapshot");
+  });
+
+  it("reads no file of pi's: no path under data/pi/ but in git status and git add; the revision from the import step", () => {
+    expect(keepStep.env).toEqual({ PI_REVISION7: "${{ steps.sync.outputs.pi_revision7 }}" });
+    expect(keep).toContain('revision7="${PI_REVISION7:-snapshot}"');
+    expect(keep).not.toContain("node -p \"require('./data/pi");
+    // Comments read nothing.
+    const named = keep.split("\n").filter((line) => /data\/pi\//.test(line) && !line.trim().startsWith("#"));
+    expect(named.length).toBeGreaterThan(0);
+    for (const line of named) expect(line, line).toMatch(/git (status|add)\b/);
   });
 
   it("commits nothing when only a time moved", () => {
@@ -73,5 +98,15 @@ describe("Keep the new snapshot (release review, blocker 3)", () => {
     write(dir, "data/upstream/meta.json", JSON.stringify({ commit: "e06a33eb4d", checked_at: "later" }));
     expect(runKeep(dir).status).toBe(0);
     expect(git(dir, "log", "-1", "--format=%s").trim()).toBe("start");
+  });
+});
+
+describe("the warning about pi data left out of the build", () => {
+  it("stands directly after the build step, which has the id build, with its condition", () => {
+    const build = steps.findIndex((step) => step.name === "Build the dataset and the site");
+    expect(steps[build]!.id).toBe("build");
+    expect(steps[build + 1]).toMatchObject({ name: "Warn about pi data left out of the build", if: "steps.build.outputs.pi == 'turned_away'" });
+    // Fixed text: nothing that came from pi is printed as a workflow command.
+    expect(steps[build + 1]!.run).toBe(`echo "::warning title=The build left pi data out::The dataset is built and deployed without pi's data, or without the record of the last pi import. /api/v1/meta lists why, under issues (pi-snapshot-unreadable). The models.dev part is as usual."`);
   });
 });

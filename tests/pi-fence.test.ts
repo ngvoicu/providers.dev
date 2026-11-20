@@ -13,7 +13,7 @@ import { ext, noPiMeta, PI_URL, PROVIDER_ID, type Catalog, type Meta } from "../
 import { comparePublished } from "../scripts/lib/compare-published.ts";
 import { pretty } from "../scripts/lib/files.ts";
 import { PI_DEADLINE_MS, storedPi } from "../scripts/lib/pi-sync.ts";
-import { publish, type PublishReport } from "../scripts/lib/publish.ts";
+import { publish, writeBuildOutputs, type PublishReport } from "../scripts/lib/publish.ts";
 import { OBSERVED_URL, sync, UPSTREAM_COMMIT_URL, UPSTREAM_URL, writeStepOutputs, type SyncReport, type SyncStatus } from "../scripts/lib/sync.ts";
 import { contractProblems, fetchByAddress, fixturePi, fixtureUpstream, ROOT, tempDataDir, writeAuthored } from "./helpers.ts";
 
@@ -559,6 +559,17 @@ describe("6. a data/pi/ that is there and cannot be used is never none", () => {
     const report = build(folder(setup));
     expect(report).toMatchObject({ ok: true, pi: "turned_away" });
     expect(report.issues.filter((issue) => issue.code === "pi-snapshot-unreadable")).toMatchObject([{ level: "warning", target: "data/pi" }]);
+  });
+
+  it("writeBuildOutputs writes the state for the workflow, and no line where the report has none", () => {
+    const path = join(tempDataDir(), "github-output");
+    writeFileSync(path, "earlier=1\n");
+    for (const pi of ["published", "none", "turned_away"] as const) writeBuildOutputs({ ok: true, errors: [], issues: [], pi }, path);
+    writeBuildOutputs({ ok: false, errors: ["No upstream snapshot"], issues: [] }, path);
+    expect(readFileSync(path, "utf8")).toBe("earlier=1\npi=published\npi=none\npi=turned_away\n");
+    const dir = variant(null, undefined);
+    rmSync(join(dir, "upstream"), { recursive: true });
+    expect(build(dir).pi).toBeUndefined();
   });
 
   it("no data/pi/ gives no warning and none", () => {
