@@ -26,7 +26,7 @@ import {
   type SourceMeta,
 } from "../../src/core/schema.ts";
 import { readJsonIfExists, sha256, swapDir } from "./files.ts";
-import { loadPi, loadUpstream, PI_URL, type SyncStatus } from "./sync.ts";
+import { loadPi, loadUpstream, PI_URL, piSnapshotFault, type SyncStatus } from "./sync.ts";
 
 /**
  * providers.dev evidence (a correction, an evaluation, a measured lifetime) whose date is more than this many days before
@@ -100,6 +100,8 @@ function readPi(dataDir: string, issues: Issue[]): { catalog: PiCatalog; meta: P
     return unreadable(error instanceof Error ? error.message : String(error));
   }
   if (!loaded) return undefined;
+  const fault = piSnapshotFault(dataDir);
+  if (fault) return unreadable(`not whole: ${fault}`);
   const checked = PiFeed.safeParse(loaded.catalog);
   if (!checked.success) {
     const first = checked.error.issues[0];

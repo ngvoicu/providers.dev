@@ -1,9 +1,9 @@
 // The pi import, the third part of `npm run sync` (design/pi-source.md, sections a and b; step 1, PIC-03).
 // Every case runs on a temp data directory with a first good import of all three sources behind it.
-import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { loadPi, loadUpstream, OBSERVED_URL, PI_DEADLINE_MS, PI_URL, sync, SyncBusyError, UPSTREAM_COMMIT_URL, UPSTREAM_URL, writeStepOutputs, type SyncOptions, type SyncStatus } from "../scripts/lib/sync.ts";
+import { loadPi, loadUpstream, OBSERVED_URL, PI_DEADLINE_MS, PI_URL, piSnapshotFault, sync, SyncBusyError, UPSTREAM_COMMIT_URL, UPSTREAM_URL, writeStepOutputs, type SyncOptions, type SyncStatus } from "../scripts/lib/sync.ts";
 import { sha256 } from "../scripts/lib/files.ts";
 import type { PiCatalog } from "../src/core/pi.ts";
 import { fetchByAddress, fixturePi, fixtureUpstream, tempDataDir, type RecordedRequest } from "./helpers.ts";
@@ -355,5 +355,42 @@ describe("the pi deadline (release review, blocker 2)", () => {
     // Only the pi request has a deadline: the models.dev and measurements downloads are as they were.
     expect(otherSignals.length).toBeGreaterThan(0);
     expect(otherSignals.every((signal) => signal === undefined)).toBe(true);
+  });
+});
+
+describe("a stored pi snapshot that is not whole (release review, blocker 4)", () => {
+  const damages: [string, (dataDir: string) => void][] = [
+    ["a model whose id is not its key", (dataDir) => {
+      const path = join(dataDir, "pi", "providers", "provider-03.json");
+      const provider = JSON.parse(readFileSync(path, "utf8"));
+      provider.models["model-1"].id = "model-2";
+      writeFileSync(path, JSON.stringify(provider));
+    }],
+    ["a provider file missing", (dataDir) => rmSync(join(dataDir, "pi", "providers", "provider-05.json"))],
+  ];
+
+  it.each(damages)("%s: no If-None-Match is sent, and the same body is written again in full (no equal-digest shortcut)", async (_name, damage) => {
+    const dataDir = await firstImport();
+    const whole = filesUnder(join(dataDir, "pi", "providers"));
+    expect(piSnapshotFault(dataDir)).toBeNull();
+    damage(dataDir);
+    expect(piSnapshotFault(dataDir)).not.toBeNull();
+    const requests: RecordedRequest[] = [];
+    const report = await run(dataDir, stand({}, requests));
+    expect(requests.find(isPi)?.headers["If-None-Match"]).toBeUndefined();
+    expect(report.pi.status).toBe("updated");
+    expect(piSnapshotFault(dataDir)).toBeNull();
+    expect(filesUnder(join(dataDir, "pi", "providers"))).toEqual(whole);
+    expect(piMeta(dataDir)).toMatchObject({ fetched_at: "2026-11-14T00:00:00.000Z", checked_at: "2026-11-14T00:00:00.000Z", providers: 20, models: 600 });
+  });
+
+  it.each(damages)("%s: a 304 all the same keeps nothing; the pi part fails and data/pi/ is left as it was", async (_name, damage) => {
+    const dataDir = await firstImport();
+    damage(dataDir);
+    const before = filesUnder(join(dataDir, "pi"));
+    const report = await run(dataDir, stand({ pi: status(304) }));
+    expect(report.pi.status).toBe("failed");
+    expect(report.ok).toBe(true);
+    expect(filesUnder(join(dataDir, "pi"))).toEqual(before);
   });
 });

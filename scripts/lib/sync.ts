@@ -271,6 +271,37 @@ export function loadPi(dataDir: string): { catalog: PiCatalog; meta: PiMeta } | 
 }
 
 /**
+ * Why the pi snapshot in data/pi/ is not whole, or null where it is (and where there is none). Whole: every provider
+ * file is named by its id, every model's key is its id and its provider the file's id, the provider files number
+ * meta.json's `providers` and their models meta.json's `models`. It cannot tell a file exchanged for another with
+ * the same counts; the sync never writes one (it writes the whole folder and swaps it in).
+ */
+export function piSnapshotFault(dataDir: string): string | null {
+  const dir = join(dataDir, "pi");
+  try {
+    const meta = readJsonIfExists<Partial<PiMeta>>(join(dir, "meta.json"));
+    if (!meta || !existsSync(join(dir, "providers"))) return null;
+    const files = readdirSync(join(dir, "providers")).filter((file) => file.endsWith(".json")).sort();
+    let models = 0;
+    for (const file of files) {
+      const provider = readJson<{ id?: unknown; models?: unknown }>(join(dir, "providers", file));
+      if (`${String(provider.id)}.json` !== file) return `providers/${file} holds the provider "${String(provider.id)}"`;
+      if (!provider.models || typeof provider.models !== "object") return `providers/${file} has no models`;
+      for (const [key, model] of Object.entries(provider.models as Record<string, Partial<PiModel>>)) {
+        if (model?.id !== key) return `the model "${String(provider.id)}/${key}" has the id "${String(model?.id)}"`;
+        if (model.provider !== provider.id) return `the model "${String(provider.id)}/${key}" names the provider "${String(model.provider)}"`;
+        models += 1;
+      }
+    }
+    if (files.length !== meta.providers) return `${files.length} provider files, meta.json says ${String(meta.providers)}`;
+    if (models !== meta.models) return `${models} models, meta.json says ${String(meta.models)}`;
+    return null;
+  } catch (error) {
+    return error instanceof Error ? error.message : String(error);
+  }
+}
+
+/**
  * The file a pi provider is stored in: `{ id, models }`, the models sorted by id (plain character order), each model
  * as the feed gives it, every key in the feed's order, `headers` included.
  */
@@ -286,15 +317,17 @@ async function syncPi(options: Required<Pick<SyncOptions, "dataDir" | "fetch" | 
 
   // As for models.dev: a stored ETag and digest belong to the address they were read from.
   const sameSource = previous?.meta.source === PI_URL;
+  // A stored snapshot that is not whole is not kept on a 304: the feed is fetched again in full.
+  const whole = previous !== undefined && piSnapshotFault(options.dataDir) === null;
   const headers: Record<string, string> = { Accept: "application/json", "User-Agent": "providers.dev sync" };
-  if (sameSource && previous?.meta.etag && !options.force) headers["If-None-Match"] = previous.meta.etag;
+  if (sameSource && whole && previous?.meta.etag && !options.force) headers["If-None-Match"] = previous.meta.etag;
   // One deadline over the request and the whole body: a slow feed fails the pi part, not the job.
   const { response, body } = await withDeadline(PI_DEADLINE_MS, async (signal) => {
     const answer = await options.fetch(PI_URL, { headers, signal });
     return { response: answer, body: answer.ok ? await answer.text() : null };
   });
 
-  if (response.status === 304 && previous && sameSource) {
+  if (response.status === 304 && previous && sameSource && whole) {
     writeFileAtomic(join(dir, "meta.json"), pretty({ ...previous.meta, checked_at: now }));
     return { status: "unchanged" };
   }
@@ -334,7 +367,8 @@ async function syncPi(options: Required<Pick<SyncOptions, "dataDir" | "fetch" | 
   }
 
   const digest = sha256(body);
-  if (previous && sameSource && previous.meta.sha256 === digest && !options.force) {
+  // An equal digest keeps the stored files only where they are whole; otherwise they are written again from the body.
+  if (previous && sameSource && whole && previous.meta.sha256 === digest && !options.force) {
     writeFileAtomic(join(dir, "meta.json"), pretty({ ...previous.meta, checked_at: now, ...etagOf(response) }));
     return { status: "unchanged" };
   }

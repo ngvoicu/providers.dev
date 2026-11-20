@@ -1,5 +1,5 @@
 // pi's catalog in the dataset (design/pi-source.md, sections c to f and i): the block, its differences, /meta.pi.
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { parse as parseYaml, stringify } from "yaml";
 import { describe, expect, it } from "vitest";
@@ -534,5 +534,46 @@ describe("the release review: tiers that cannot be compared (blockers 1 and 5)",
     }
     expect(built).toBeGreaterThan(10000);
     expect(refused.slice(0, 5)).toEqual([]);
+  });
+});
+
+describe("the release review: a saved snapshot that is not whole (blocker 4)", () => {
+  /** A whole snapshot of 12 providers of 30 models, then damaged by `damage`. */
+  const damaged = async (damage: (pi: string) => void) => {
+    const dir = await dataDir();
+    writePi(dir, fixturePi(12, 30));
+    damage(join(dir, "pi"));
+    return dir;
+  };
+  const file = (pi: string, id: string) => join(pi, "providers", `${id}.json`);
+  const edit = (pi: string, id: string, change: (provider: { id: string; models: Record<string, PiModel> }) => void) => {
+    const provider = JSON.parse(readFileSync(file(pi, id), "utf8"));
+    change(provider);
+    writeFileSync(file(pi, id), JSON.stringify(provider));
+  };
+
+  it("a whole snapshot is taken", async () => {
+    const dir = await damaged(() => {});
+    expect(publish({ dataDir: dir, rootDir: ROOT }).issues.map((issue) => issue.code)).not.toContain("pi-snapshot-unreadable");
+    expect(published(dir).meta.pi.snapshot).toMatchObject({ providers: 12, models: 360 });
+  });
+
+  it.each([
+    ["a model whose id is not its key (the review's Flash and Pro)", (pi: string) => edit(pi, "provider-03", (provider) => { provider.models["model-1"]!.id = "model-2"; }), 'the model "provider-03/model-1" has the id "model-2"'],
+    ["a model whose provider is not its file's", (pi: string) => edit(pi, "provider-03", (provider) => { provider.models["model-1"]!.provider = "provider-04"; }), 'names the provider "provider-04"'],
+    ["a provider file missing (the review's deepseek.json)", (pi: string) => rmSync(file(pi, "provider-05")), "11 provider files, meta.json says 12"],
+    ["a provider file named otherwise than its id", (pi: string) => writeFileSync(join(pi, "providers", "provider-99.json"), readFileSync(file(pi, "provider-05"))), 'providers/provider-99.json holds the provider "provider-05"'],
+    ["a model missing", (pi: string) => edit(pi, "provider-03", (provider) => { delete provider.models["model-1"]; }), "359 models, meta.json says 360"],
+  ])("%s: the build takes no pi data and warns pi-snapshot-unreadable", async (_name, damage, why) => {
+    const dir = await damaged(damage);
+    const report = publish({ dataDir: dir, rootDir: ROOT });
+    expect(report.ok).toBe(true);
+    const out = published(dir);
+    expect(blocks(out.catalog)).toBe(0);
+    expect(out.meta.pi.snapshot).toBeNull();
+    expect(out.meta.pi.counts).toEqual({ entries_with_block: 0, left_out_models: 0, unmatched_models: 0 });
+    const warnings = out.meta.issues.filter((issue) => issue.code.startsWith("pi-"));
+    expect(warnings).toMatchObject([{ level: "warning", code: "pi-snapshot-unreadable", target: "data/pi" }]);
+    expect(warnings[0]!.message).toContain(why);
   });
 });
