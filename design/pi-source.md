@@ -550,7 +550,7 @@ file is checked against its schema and nothing else, and none of these is raised
 | `pi-alias-orphan` | warning | a `same_as` names a provider or an entry the catalog does not have; or a line names a pi provider or a pi model the snapshot does not have. |
 | `pi-alias-conflict` | warning | rule 3 took an entry away from a pi model. |
 | `pi-alias-redundant` | notice | a model line is no longer needed: the provider now has an entry with the pi model's own id. |
-| `pi-snapshot-unreadable` | warning | `data/pi/` is there and does not fit `PiFeed` (section i). |
+| `pi-snapshot-unreadable` | warning | `data/pi/` is there and cannot be used, or what the build would publish for pi does not fit the contract (section i). |
 
 These are added to `Issue["code"]` in `src/core/schema.ts`. An unmatched pi model and an absent pi provider are
 **not** issues: they are the report's.
@@ -1100,6 +1100,12 @@ shows there. It shows in `meta.pi.sync`.
 **A snapshot the code cannot read.** `publish()` checks `data/pi/` against `PiFeed`. If it does not fit (an edit
 by hand, or the code's schema moved on), the dataset is built **without** pi data, `meta.pi.snapshot` is `null`,
 and the warning `pi-snapshot-unreadable` is raised. The build does not fail for pi.
+
+**The net under the pi part.** Before it writes anything, `publish()` checks what it is about to publish for pi
+(`meta.pi`, the `pi` of every entry and of every summary) against the contract's own schemas (`piMisfit`). Where
+anything does not fit, whatever its cause, the dataset is built without pi data as above, and
+`pi-snapshot-unreadable` names the first value that did not fit and where. It decides nothing else and repairs
+nothing: the contract test before a deploy cannot fail because of pi.
 
 **Licensing.** pi's licence text goes to `LICENSES/pi-MIT.txt` (copied from pi's repository), ships with the
 dataset as `/data/LICENSE-pi.txt`, and `NOTICE.txt` gains a paragraph naming pi, its address, MIT, the import time
