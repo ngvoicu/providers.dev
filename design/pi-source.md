@@ -153,6 +153,14 @@ export function piProviderFile(id: string, models: Record<string, PiModel>): str
 async function syncPi(options): Promise<PartReport>;
 
 export interface SyncOptions { /* as today */ only?: "pi" }
+export interface PartReport {
+  /** "skipped": the report's word for a part that did not run (`only: "pi"`). Never stored, never published. */
+  status: "updated" | "unchanged" | "failed" | "skipped";
+  error?: string;
+  summary?: string[];
+}
+/** What data/sync-status.json can hold for a part: never "skipped". */
+export type StoredStatus = Exclude<PartReport["status"], "skipped">;
 export interface SyncReport {
   ok: boolean;               // unchanged meaning: models.dev and the measurements did not fail
   upstream: PartReport;
@@ -164,12 +172,16 @@ export interface SyncStatus {
   last_attempt_at: string;
   last_attempt_ok: boolean;
   last_error?: string;
-  upstream: PartReport["status"];
-  measurements: PartReport["status"];
+  upstream: StoredStatus;
+  measurements: StoredStatus;
   // new
-  pi?: { last_attempt_at: string; status: PartReport["status"]; error?: string };
+  pi?: { last_attempt_at: string; status: StoredStatus; error?: string };
 }
 ```
+
+`skipped` is the report's word for a part that did not run, and nothing else's: under `--only=pi` the report gives
+`upstream` and `measurements` as `skipped`. It is never written to `data/sync-status.json` (whose part fields are
+typed `StoredStatus`), `writeStepOutputs` writes no line for a skipped part, and nothing published reads it.
 
 `sync()` runs the three parts in this order: models.dev, measurements, pi. Each runs inside the existing `part()`
 wrapper, so an exception in one never reaches another. One lock (`data/.sync.lock`) covers the run, as today.
@@ -181,7 +193,8 @@ the data build does (section i, "a snapshot the code cannot read").
 
 1. Read the previous snapshot (`loadPi`). Send `If-None-Match: <stored etag>` when there is a previous snapshot,
    its `meta.source` is `PI_URL`, it has an ETag and `--force` was not given. Headers: `Accept: application/json`,
-   `User-Agent: providers.dev sync`.
+   `User-Agent: providers.dev sync`. Node's `fetch` receives a weak ETag from the feed (`W/"2197505f…"`, where a
+   plain `curl` gets the strong one); it is stored and sent back as received, and the feed answers 304 to it.
 2. `304` with a previous snapshot of the same source: rewrite `meta.json` with a new `checked_at`, return
    `unchanged`. Nothing else is written.
 3. Any other status that is not 2xx: fail with `pi.dev answered HTTP <status>`.
@@ -197,7 +210,9 @@ the data build does (section i, "a snapshot the code cannot read").
    `the pi feed shrank too much to trust: …`, as the models.dev import words it.
 9. Digest: where the body's sha256 equals the previous one, same source, no `--force`: rewrite `meta.json` with a
    new `checked_at` and the new ETag, return `unchanged`.
-10. Write `data/pi.tmp-<pid>/` in full, then `swapDir` it over `data/pi/`. Return `updated` with a summary in the
+10. Write `data/pi.tmp-<pid>/` in full, then `swapDir` it over `data/pi/`. What is written is the feed as it arrived
+    (the parsed body); the copy checked against `PiFeed` is used only to validate, because the schema puts the keys
+    of a model in its own order. Return `updated` with a summary in the
     same words as the models.dev one (`first import: …`, or providers added and removed and
     `models: +a added, -r removed, c changed`).
 
