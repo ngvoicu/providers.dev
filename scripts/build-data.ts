@@ -15,3 +15,5 @@ console.log(
   `published ${dataset_version}: ${counts.providers} providers, ${counts.entries} entries ` +
     `(${counts.added_providers} providers and ${counts.added_entries} entries added, ${counts.corrected_entries} corrected, ${counts.evaluated_entries} evaluated)`,
 );
+const pi = report.meta.pi.counts;
+console.log(`pi: ${pi.entries_with_block} entries with a pi block, ${pi.left_out_models} pi models left out, ${pi.unmatched_models} unmatched`);

@@ -19,6 +19,7 @@ import {
 } from "./cache.ts";
 import { inputWindow, windowMeasurement, type DocumentedField, type LimitSource } from "./limits.ts";
 import { clone, isObject, mergePatch, type Change, type Json, type JsonObject } from "./merge.ts";
+import { piBlock, type PiBlock, type PiCatalog, type PiModel } from "./pi.ts";
 import { controlsOf, pricingOf, retentionFromControl } from "./policies.ts";
 import {
   NS,
@@ -60,12 +61,25 @@ export interface ResolveInput {
   catalogRules?: CatalogRules;
   /** The date of the models.dev import (YYYY-MM-DD): the date of what is taken from its documentation. */
   upstreamDate?: string;
+  /** The pi snapshot. Left out = the dataset is built without pi data. */
+  pi?: { catalog: PiCatalog };
+}
+
+/** What became of the pi models of the snapshot. The three kinds add up to `models`. */
+export interface PiTotals {
+  models: number;
+  matched_id: number;
+  matched_alias: number;
+  left_out: number;
+  unmatched: number;
 }
 
 export interface ResolveResult {
   catalog: Catalog;
   issues: Issue[];
   exclusions: Exclusion[];
+  /** Null = built without pi data. */
+  pi: { totals: PiTotals } | null;
 }
 
 /**
@@ -358,6 +372,20 @@ export function resolve(input: ResolveInput): ResolveResult {
       if (limit.models_dev) continue;
       const date = limitDate(limit);
       if (date) ensureMeasuredModel(limit.route, limit.model, limit.base_model, { kind: "measured", url: sourceUrl(limit.source), date });
+    }
+  }
+
+  // 3b. pi's catalog (design/pi-source.md, section c): which entry each pi model speaks of, worked out against the
+  // catalog before any exclusion, so that a pi model whose entry is then left out counts as left out, not as one
+  // that belongs to no entry. Nothing is changed here; the block is set in step 6 on the entries still published.
+  // Matching is by equal provider id and equal model id only. Nothing is ever matched by similarity.
+  const piMatches = new Map<PublishedModel, { provider: string; model: PiModel; match: PiBlock["match"] }>();
+  let piModels = 0;
+  for (const [piProvider, models] of Object.entries(input.pi?.catalog ?? {})) {
+    for (const [piModelId, piModel] of Object.entries(models)) {
+      piModels += 1;
+      const entry = catalog[piProvider]?.models[piModelId];
+      if (entry) piMatches.set(entry, { provider: piProvider, model: piModel, match: "id" });
     }
   }
 
@@ -714,6 +742,13 @@ export function resolve(input: ResolveInput): ResolveResult {
   };
 
   // 6. Deterministic order, and every record published with all of its keys.
+  let piBlocks = 0;
+  const piOf = (model: PublishedModel): PiBlock | null => {
+    const matched = piMatches.get(model);
+    if (!matched) return null;
+    piBlocks += 1;
+    return piBlock(matched.provider, matched.model, matched.match, { limit: model.limit, cost: model.cost });
+  };
   const sorted: Catalog = {};
   for (const id of Object.keys(catalog).sort()) {
     const provider = catalog[id] as PublishedProvider;
@@ -859,7 +894,9 @@ export function resolve(input: ResolveInput): ResolveResult {
         limits: { measured: measuredLimits, from_measurement: fromMeasurement, input_window: entryWindow },
         evidence: publishEvidence(evidence),
         verified: verified ?? null,
-        pi: null,
+        // What pi's catalog states for the entry, beside its own fields and never merged into them. The differences
+        // are worked out against the entry as published, after every override.
+        pi: piOf(model),
       };
       model[NS] = published as unknown as Json;
     }
@@ -888,7 +925,10 @@ export function resolve(input: ResolveInput): ResolveResult {
     }
   }
 
-  return { catalog: sorted, issues, exclusions };
+  // A pi model reached an entry that an override or a catalog rule then left out: left out. The rest reached none.
+  const leftOut = piMatches.size - piBlocks;
+  const pi = input.pi ? { totals: { models: piModels, matched_id: piBlocks, matched_alias: 0, left_out: leftOut, unmatched: piModels - piBlocks - leftOut } } : null;
+  return { catalog: sorted, issues, exclusions, pi };
 }
 
 function applyPatch(

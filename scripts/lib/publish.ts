@@ -8,6 +8,7 @@ import type { ZodType } from "zod";
 import { CACHE_AGES_S } from "../../src/core/cache.ts";
 import { buildIndex, SHARD_SIZE, type Index } from "../../src/core/entries.ts";
 import { listCorrections, listEvaluations } from "../../src/core/resources.ts";
+import { PiFeed, type PiCatalog } from "../../src/core/pi.ts";
 import { resolve } from "../../src/core/resolve.ts";
 import {
   AccessRules,
@@ -21,10 +22,11 @@ import {
   type Catalog,
   type Issue,
   type Meta,
+  type PiMeta,
   type SourceMeta,
 } from "../../src/core/schema.ts";
 import { readJsonIfExists, sha256, swapDir } from "./files.ts";
-import { loadUpstream, PI_URL, type SyncStatus } from "./sync.ts";
+import { loadPi, loadUpstream, PI_URL, type SyncStatus } from "./sync.ts";
 
 /**
  * providers.dev evidence (a correction, an evaluation, a measured lifetime) whose date is more than this many days before
@@ -82,6 +84,34 @@ const compact = (value: unknown): string => JSON.stringify(value);
 /** pi's project, licence and the copyright line of its LICENSE file (LICENSES/pi-MIT.txt). */
 const PI_LICENSE = "pi (https://github.com/earendil-works/pi), MIT License, Copyright (c) 2025 Mario Zechner";
 
+/**
+ * The pi snapshot in data/pi/, checked against PiFeed. Undefined where there is none, and where it does not fit
+ * (an edit by hand, or a schema that moved on): then the warning pi-snapshot-unreadable is raised.
+ */
+function readPi(dataDir: string, issues: Issue[]): { catalog: PiCatalog; meta: PiMeta } | undefined {
+  const unreadable = (why: string): undefined => {
+    issues.push({ level: "warning", code: "pi-snapshot-unreadable", target: "data/pi", message: `The pi snapshot in data/pi/ cannot be read (${why}). The dataset is built without pi data: no entry has a pi block.` });
+    return undefined;
+  };
+  let loaded: ReturnType<typeof loadPi>;
+  try {
+    loaded = loadPi(dataDir);
+  } catch (error) {
+    return unreadable(error instanceof Error ? error.message : String(error));
+  }
+  if (!loaded) return undefined;
+  const checked = PiFeed.safeParse(loaded.catalog);
+  if (!checked.success) {
+    const first = checked.error.issues[0];
+    return unreadable(`${checked.error.issues.length} problems; first: ${first ? `${first.path.join(".")}: ${first.message}` : "unknown"}`);
+  }
+  const meta = loaded.meta as Partial<PiMeta>;
+  if (typeof meta.fetched_at !== "string" || typeof meta.checked_at !== "string" || typeof meta.sha256 !== "string" || typeof meta.providers !== "number" || typeof meta.models !== "number") {
+    return unreadable("meta.json lacks fetched_at, checked_at, sha256, providers or models");
+  }
+  return { catalog: checked.data, meta: loaded.meta };
+}
+
 /** The last attempt to import pi's catalog, from the `pi` key of data/sync-status.json. All null = none is recorded. */
 function piSync(status: SyncStatus | undefined): Meta["pi"]["sync"] {
   const pi = status?.pi;
@@ -118,7 +148,12 @@ export function publish(input: PublishOptions): PublishReport {
   }
   if (errors.length > 0 || !access || !routes) return { ok: false, errors, issues: [] };
 
-  const { catalog, issues, exclusions } = resolve({
+  // The pi snapshot, checked against PiFeed. A snapshot that is missing builds the dataset without pi data; one that
+  // the code cannot read does too, with a warning. The build never fails for pi.
+  const piIssues: Issue[] = [];
+  const pi = readPi(dataDir, piIssues);
+
+  const { catalog, issues: resolved, exclusions, pi: piResult } = resolve({
     upstream: upstream.catalog,
     additions,
     overrides,
@@ -128,7 +163,9 @@ export function publish(input: PublishOptions): PublishReport {
     ...(labels ? { labels } : {}),
     ...(catalogRules ? { catalogRules } : {}),
     ...(observed ? { observed } : {}),
+    ...(pi ? { pi: { catalog: pi.catalog } } : {}),
   });
+  const issues = [...resolved, ...piIssues];
   for (const issue of issues) if (issue.level === "error") errors.push(`${issue.target}: ${issue.message}`);
   if (errors.length > 0) return { ok: false, errors, issues };
 
@@ -188,9 +225,24 @@ export function publish(input: PublishOptions): PublishReport {
     },
     pi: {
       source: PI_URL,
-      snapshot: null,
+      snapshot: pi
+        ? {
+            fetched_at: pi.meta.fetched_at,
+            checked_at: pi.meta.checked_at,
+            etag: pi.meta.etag ?? null,
+            last_modified: pi.meta.last_modified ?? null,
+            revision: pi.meta.revision ?? null,
+            sha256: pi.meta.sha256,
+            providers: pi.meta.providers,
+            models: pi.meta.models,
+          }
+        : null,
       sync: piSync(status),
-      counts: { entries_with_block: 0, left_out_models: 0, unmatched_models: 0 },
+      counts: {
+        entries_with_block: piResult ? piResult.totals.matched_id + piResult.totals.matched_alias : 0,
+        left_out_models: piResult?.totals.left_out ?? 0,
+        unmatched_models: piResult?.totals.unmatched ?? 0,
+      },
     },
   };
 
@@ -238,6 +290,8 @@ function writeSnapshot(dir: string, catalog: Catalog, index: Index, meta: Meta, 
 
   const license = readFileSync(join(rootDir, "LICENSES", "models.dev-MIT.txt"), "utf8");
   writeFileSync(join(site, "data", "LICENSE-models.dev.txt"), license);
+  writeFileSync(join(site, "data", "LICENSE-pi.txt"), readFileSync(join(rootDir, "LICENSES", "pi-MIT.txt"), "utf8"));
+  const piSnapshot = meta.pi.snapshot;
   writeFileSync(
     join(site, "data", "NOTICE.txt"),
     [
@@ -251,6 +305,13 @@ function writeSnapshot(dir: string, catalog: Catalog, index: Index, meta: Meta, 
       "Everything under a `providers_dev` key, every entry whose `providers_dev.origin` is \"added\", and every field listed",
       "in a `providers_dev.provenance` array is by providers.dev and is not part of models.dev.",
       "providers.dev is not affiliated with or endorsed by models.dev.",
+      "",
+      "The pi block of an entry (providers_dev.pi) is imported from the model catalog of pi",
+      "(https://pi.dev/api/models, https://github.com/earendil-works/pi), MIT License, Copyright (c) 2025 Mario Zechner.",
+      piSnapshot
+        ? `Imported ${piSnapshot.fetched_at}${piSnapshot.revision ? ` at catalog revision ${piSnapshot.revision}` : ""}. The full license is in LICENSE-pi.txt.`
+        : "This dataset holds no pi data. The full license is in LICENSE-pi.txt.",
+      "providers.dev is not affiliated with or endorsed by pi.",
       "",
     ].join("\n"),
   );
