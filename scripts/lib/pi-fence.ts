@@ -168,9 +168,12 @@ export interface PiOfSync {
 /** What syncPi may hand back across the fence. */
 const PiSyncResultSchema = z.strictObject({ status: z.enum(["updated", "unchanged"]), summary: z.array(z.string()).optional(), revision: z.string().optional() });
 
-/** The whole pi part of the sync. Never rejects. */
+/**
+ * The whole pi part of the sync. Never rejects. syncPi is handed an options object of its own: nothing pi's code
+ * assigns on it (a clock, a fetch, a folder) reaches the caller, whose status write comes after.
+ */
 export async function piOfSync(options: Parameters<typeof syncPi>[0]): Promise<PiOfSync> {
-  const result = await fencedAsync(() => syncPi(options), PiSyncResultSchema);
+  const result = await fencedAsync(() => syncPi({ ...options }), PiSyncResultSchema);
   if (!result.ok) return { report: { status: "failed", error: result.why }, revision7: "snapshot" };
   const { revision, ...report } = result.value;
   return { report, revision7: /^sha256-([0-9a-f]{7})/.exec(revision ?? "")?.[1] ?? "snapshot" };

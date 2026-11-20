@@ -1630,11 +1630,17 @@ export interface PiOfSync {
 export async function piOfSync(options: SyncOptions): Promise<PiOfSync>;
 ```
 
-`piOfSync` is `fencedAsync(() => syncPi(options), schema)` and nothing more: `syncPi` returns
+`piOfSync` is `fencedAsync(() => syncPi({ ...options }), schema)` and nothing more: `syncPi` returns
 `{ status: "updated" | "unchanged", summary?: string[], revision?: string }` (the revision of the snapshot now
 stored) and `schema` is exactly that, strict. A failure of any shape, the deadline and the size cap included, is
 `report: { status: "failed", error: why }`. `revision7` is `/^sha256-([0-9a-f]{7})/` of `revision`, else
 `snapshot`.
+
+**pi's code gets an options object of its own.** As in the build, where pi's code is handed copies, `piOfSync`
+hands `syncPi` a copy of the caller's options, not the caller's object: nothing pi's code assigns on it (its clock,
+its `fetch`, its folder) reaches `sync()`, whose status write after the pi part uses `sync()`'s own clock. (The
+second review made pi replace `now` with a clock returning an invalid date; `sync()`'s last write then threw outside
+the guard.)
 
 `piOfSync` exists from step F2 on, as exactly that one line, returning `{ report }`; `sync()` calls it from F2 on
 in both places where it called `syncPi` (the full run and `--only=pi`), and no longer imports `syncPi`. Step F3
@@ -1803,7 +1809,10 @@ absent) and with a fault.
    are byte for byte that run's; the `pi` record is `failed`, with this attempt's time and an error of one line;
    `writeStepOutputs` writes `pi=failed`; and `data/pi/` is a snapshot `storedPi` calls usable, byte for byte
    **what it was** where the true `syncPi` did not run or did not get to its swap, and what a healthy run leaves
-   where the fault came after it. It is never anything else. And once, with a pi part held open: while it is
+   where the fault came after it. It is never anything else. One row more: `syncPi` assigns each of its options
+   (`dataDir`, `fetch`, `now`, `log`, `force`, `only`) on the object it is handed, a clock returning an invalid date
+   among them, and then runs: the run ends as a healthy run, with the pi part's own outcome (here `failed`,
+   `Invalid time value`) recorded by `sync()`'s clock. And once, with a pi part held open: while it is
    pending, the status file on disk already has this run's five fields and the record
    `The pi part did not finish.`
 3. **Nothing calls pi's code outside the fence, and nothing leads back.** `tests/pi-fence-imports.test.ts` reads

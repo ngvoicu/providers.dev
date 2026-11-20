@@ -24,7 +24,7 @@ type Fault = { name: string; label: string; apply: (callTrue: () => unknown) => 
 
 const state = vi.hoisted(() => ({
   calls: new Set<string>(),
-  fault: null as null | { name: string; apply: (callTrue: () => unknown) => unknown; fired: boolean },
+  fault: null as null | { name: string; apply: (callTrue: () => unknown, args: unknown[]) => unknown; fired: boolean },
   exported: { pi: [] as string[], piSync: [] as string[] },
 }));
 
@@ -39,7 +39,7 @@ vi.mock("../src/core/pi.ts", async (importOriginal) => {
       const callTrue = () => (value as (...a: unknown[]) => unknown).apply(this, args);
       if (state.fault?.name !== name) return callTrue();
       state.fault.fired = true;
-      return state.fault.apply(callTrue);
+      return state.fault.apply(callTrue, args);
     };
   }
   return out;
@@ -57,14 +57,14 @@ vi.mock("../scripts/lib/pi-sync.ts", async (importOriginal) => {
           const callTrue = () => (value as (...a: unknown[]) => Promise<unknown>).apply(this, args);
           if (state.fault?.name !== name) return callTrue();
           state.fault.fired = true;
-          return state.fault.apply(callTrue);
+          return state.fault.apply(callTrue, args);
         }
       : function (this: unknown, ...args: unknown[]) {
           state.calls.add(name);
           const callTrue = () => (value as (...a: unknown[]) => unknown).apply(this, args);
           if (state.fault?.name !== name) return callTrue();
           state.fault.fired = true;
-          return state.fault.apply(callTrue);
+          return state.fault.apply(callTrue, args);
         };
   }
   return out;
@@ -704,6 +704,39 @@ describe("2. the sync, by the same table", () => {
     console.log(`the sync's table: ${names.join(", ")}, ${rows.length} rows, ${fired.length} fired`);
     expect(fired).toHaveLength(rows.length);
   }, 120_000);
+
+  it("syncPi assigns each of its options: the run ends as a healthy run, with the pi part's own outcome", async () => {
+    const dir = copy();
+    const elsewhere = join(tempDataDir(), "not-the-data-folder");
+    // Every option of SyncOptions, assigned on the object syncPi receives, before the true function runs with it.
+    const assigned: Record<string, unknown> = {
+      dataDir: elsewhere,
+      fetch: () => Promise.reject(new Error("an assigned fetch")),
+      now: () => new Date(Number.NaN),
+      log: () => {
+        throw new Error("an assigned log");
+      },
+      force: true,
+      only: "pi",
+    };
+    state.fault = {
+      name: "syncPi",
+      fired: false,
+      apply: (callTrue, args) => {
+        Object.assign(args[0] as object, assigned);
+        return callTrue();
+      },
+    };
+    const report = await sync({ dataDir: dir, now: SYNC_NOW, fetch: fetchWith(changedFeed) });
+    expect(state.fault.fired).toBe(true);
+    state.fault = null;
+    // The pi part's own outcome: its clock is invalid, so it fails; the caller's clock wrote the record.
+    expect(report.pi).toEqual({ status: "failed", error: "Invalid time value" });
+    holds(dir, report, "as it was");
+    expect(report.upstream).toEqual(healthy.report.upstream);
+    expect(report.measurements).toEqual(healthy.report.measurements);
+    expect(existsSync(elsewhere)).toBe(false);
+  });
 
   it.each<[string, () => unknown]>([
     ["an Error", () => new Error("broken on purpose")],
