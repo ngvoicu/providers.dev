@@ -1080,8 +1080,8 @@ page works nothing out.
    (`meta.pi.snapshot.fetched_at`) and, if so, that the last import failed (`meta.pi.sync`).
 4. **On an entry pi does not list** (`pi: null`): nothing about pi, or one plain line; the designer's choice.
 
-Lists (`/`, a provider's page, a model's page) can show `summary.pi` (the request format, a mark for differences);
-whether they do is the designer's.
+Lists (`/`, a provider's page, a model's page) show, on a row whose entry pi lists, that pi lists it, and nothing about
+differences: the owner settled it so. Only the entry's own page shows the differences.
 
 ---
 
@@ -1700,11 +1700,11 @@ not parse counts there as absent, and `sync()` logs that it did. `SyncReport` ga
   or its `pi` key does not exist. The fence itself looks whether the folder is there, and `storedPi` is changed to
   agree (section b): a `data/pi/` that is there and cannot be used, in any way, is *unusable*, never *none*.
 - **Two codes, both the fence's own.** `pi-snapshot-unreadable` says that something of pi's was left out: the data,
-  the record or the report, with the reason. `pi-no-blocks` says that nothing was left out and no entry has a block.
-  Neither can come from pi's code: the data's schema takes the four alias and provider codes from `piPart` and no
-  other, so a part that hands in one of the fence's codes is a misfit and is turned away. `pi-no-blocks` joins
-  `Issue["code"]` in `src/core/schema.ts`. `code` of an issue is an open string in the contract: the contract and
-  `structure/api-v1.json` do not change.
+  the record or the report, with the reason. `pi-no-blocks` says that pi's data was taken whole and no entry has a
+  block; it says nothing of the record, which has its own warning. Neither can come from pi's code: the data's schema
+  takes the four alias and provider codes from `piPart` and no other, so a part that hands in one of the fence's
+  codes is a misfit and is turned away. `pi-no-blocks` joins `Issue["code"]` in `src/core/schema.ts`. `code` of an
+  issue is an open string in the contract: the contract and `structure/api-v1.json` do not change.
 - **On the run.** `scripts/build-data.ts` appends `pi=<published|published_without_blocks|none|turned_away>` to `GITHUB_OUTPUT` where that
   variable is set (`writeBuildOutputs(report, path)` in `scripts/lib/publish.ts`), and no line where the report
   has no `pi`. In the workflow the build step

@@ -397,7 +397,8 @@ warnings say when pi's side went wrong:
     published as pi's code gave it: nothing is turned away or repaired.
 
   Either way the run carries the warning "pi data missing from the build". Without a folder `data/pi/` at all, the
-  dataset simply has no pi data, with no warning.
+  dataset simply has no pi data, with no warning about the data; a record of the last pi import in
+  `data/sync-status.json` that cannot be used still gives its own warning, folder or not.
 
 On GitHub the import step writes its outcome per source (`upstream`, `measurements`, `pi`) and `pi_revision7`, the
 first seven characters of the stored pi snapshot's revision, to the step's outputs; the build step writes `pi`
