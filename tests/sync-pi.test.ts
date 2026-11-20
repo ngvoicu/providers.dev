@@ -2,8 +2,8 @@
 // Every case runs on a temp data directory with a first good import of all three sources behind it.
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { describe, expect, it } from "vitest";
-import { loadPi, loadUpstream, OBSERVED_URL, PI_URL, sync, SyncBusyError, UPSTREAM_COMMIT_URL, UPSTREAM_URL, writeStepOutputs, type SyncOptions, type SyncStatus } from "../scripts/lib/sync.ts";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { loadPi, loadUpstream, OBSERVED_URL, PI_DEADLINE_MS, PI_URL, sync, SyncBusyError, UPSTREAM_COMMIT_URL, UPSTREAM_URL, writeStepOutputs, type SyncOptions, type SyncStatus } from "../scripts/lib/sync.ts";
 import { sha256 } from "../scripts/lib/files.ts";
 import type { PiCatalog } from "../src/core/pi.ts";
 import { fetchByAddress, fixturePi, fixtureUpstream, tempDataDir, type RecordedRequest } from "./helpers.ts";
@@ -300,5 +300,60 @@ describe("the pi import", () => {
     // A part that did not run (`only: "pi"`) gets no line.
     writeStepOutputs({ ok: true, upstream: { status: "skipped" }, measurements: { status: "skipped" }, pi: { status: "unchanged" } }, path);
     expect(readFileSync(path, "utf8")).toBe("earlier=1\nupstream=updated\nmeasurements=unchanged\npi=failed\npi=unchanged\n");
+  });
+});
+
+describe("the pi deadline (release review, blocker 2)", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  const turn = () => new Promise((resolve) => setImmediate(resolve));
+
+  it.each([
+    ["a body that trickles in, one byte a minute", "body"],
+    ["headers that never come", "headers"],
+  ])("%s fails the pi part after 60 s; models.dev is imported as usual and data/pi/ stays as it was", async (_name, slow) => {
+    const dataDir = await firstImport();
+    const piBefore = filesUnder(join(dataDir, "pi"));
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    let piSignal: AbortSignal | undefined;
+    const otherSignals: (AbortSignal | undefined)[] = [];
+    const answers = stand({ upstream: ok(changedUpstream(), { etag: '"u2"' }) });
+    const slowFetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
+      if (String(input) !== PI_URL) {
+        otherSignals.push(init?.signal ?? undefined);
+        return answers(input, init);
+      }
+      piSignal = init?.signal ?? undefined;
+      if (slow === "headers") return new Promise<Response>(() => {});
+      const body = new ReadableStream<Uint8Array>({
+        start(controller) {
+          controller.enqueue(new TextEncoder().encode("{"));
+          piSignal?.addEventListener("abort", () => controller.error(new Error("aborted")));
+        },
+      });
+      return new Response(body, { status: 200, headers: { etag: '"p2"' } });
+    }) as typeof fetch;
+    let settled = false;
+    const pending = run(dataDir, slowFetch).then((report) => {
+      settled = true;
+      return report;
+    });
+    while (!piSignal) await turn();
+    await vi.advanceTimersByTimeAsync(PI_DEADLINE_MS - 1000);
+    expect(settled).toBe(false);
+    await vi.advanceTimersByTimeAsync(1000);
+    const report = await pending;
+    expect(PI_DEADLINE_MS).toBe(60_000);
+    expect(piSignal.aborted).toBe(true);
+    expect(report.pi).toEqual({ status: "failed", error: "pi.dev did not answer in full within 60 s" });
+    expect([report.ok, report.upstream.status]).toEqual([true, "updated"]);
+    expect(filesUnder(join(dataDir, "pi"))).toEqual(piBefore);
+    expect(statusOf(dataDir)).toMatchObject({ last_attempt_ok: true, pi: { status: "failed", error: "pi.dev did not answer in full within 60 s" } });
+    expect(existsSync(join(dataDir, ".sync.lock"))).toBe(false);
+    // Only the pi request has a deadline: the models.dev and measurements downloads are as they were.
+    expect(otherSignals.length).toBeGreaterThan(0);
+    expect(otherSignals.every((signal) => signal === undefined)).toBe(true);
   });
 });

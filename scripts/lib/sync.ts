@@ -22,6 +22,8 @@ const MIN_MODELS = 500;
 /** A pi import smaller than this is treated as broken, whatever the previous snapshot held. */
 const PI_MIN_PROVIDERS = 10;
 const PI_MIN_MODELS = 300;
+/** The whole pi request, headers and body together, must be done within this. Passing it is a pi failure. */
+export const PI_DEADLINE_MS = 60_000;
 /** An import that lost more than this share of the previous snapshot is treated as broken. Shared by every part. */
 const MIN_SHARE = 0.6;
 const LOCK_STALE_MS = 30 * 60 * 1000;
@@ -237,6 +239,23 @@ function etagOf(response: Response): { etag?: string } {
   return etag ? { etag } : {};
 }
 
+/** Run `work` with an abort signal; abort it and fail once `ms` milliseconds have passed. */
+async function withDeadline<T>(ms: number, work: (signal: AbortSignal) => Promise<T>): Promise<T> {
+  const controller = new AbortController();
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const deadline = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => {
+      controller.abort();
+      reject(new Error(`pi.dev did not answer in full within ${ms / 1000} s`));
+    }, ms);
+  });
+  try {
+    return await Promise.race([work(controller.signal), deadline]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 /** The last good pi snapshot, or undefined where data/pi/meta.json or data/pi/providers/ is missing. Not validated. */
 export function loadPi(dataDir: string): { catalog: PiCatalog; meta: PiMeta } | undefined {
   const dir = join(dataDir, "pi");
@@ -269,15 +288,18 @@ async function syncPi(options: Required<Pick<SyncOptions, "dataDir" | "fetch" | 
   const sameSource = previous?.meta.source === PI_URL;
   const headers: Record<string, string> = { Accept: "application/json", "User-Agent": "providers.dev sync" };
   if (sameSource && previous?.meta.etag && !options.force) headers["If-None-Match"] = previous.meta.etag;
-  const response = await options.fetch(PI_URL, { headers });
+  // One deadline over the request and the whole body: a slow feed fails the pi part, not the job.
+  const { response, body } = await withDeadline(PI_DEADLINE_MS, async (signal) => {
+    const answer = await options.fetch(PI_URL, { headers, signal });
+    return { response: answer, body: answer.ok ? await answer.text() : null };
+  });
 
   if (response.status === 304 && previous && sameSource) {
     writeFileAtomic(join(dir, "meta.json"), pretty({ ...previous.meta, checked_at: now }));
     return { status: "unchanged" };
   }
-  if (!response.ok) throw new Error(`pi.dev answered HTTP ${response.status}`);
+  if (!response.ok || body === null) throw new Error(`pi.dev answered HTTP ${response.status}`);
 
-  const body = await response.text();
   let parsed: unknown;
   try {
     parsed = JSON.parse(body);
