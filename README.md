@@ -379,24 +379,31 @@ pi's part runs behind a fence (`scripts/lib/pi-fence.ts`, design section k): in 
 code is called in one guarded place each, and what it returns is taken only as plain data that fits the contract.
 Nothing on pi's side can stop the models.dev import, the build or the deploy, within three limits: a pi part that
 is well-formed, agrees with itself and is wrong is published as pi's part (it shows in `pi.counts` of
-`/api/v1/meta` and in the line the build prints); a computation that never ends is bounded only by the import's
+`/api/v1/meta` and in the line the build prints, and where it gives no entry a pi block at all, the build says so
+with a warning); a computation that never ends is bounded only by the import's
 deadline and size cap; and a broken commit of pi's code is caught by the push that brings it, whose run fails. Two
 warnings say when pi's side went wrong:
 
 - **The pi import failed** (the `Import` step's output `pi=failed`): the run stays green with the warning
   "The pi import failed", and the site is built with the last good pi snapshot.
-- **The build left pi data out** (the build step's output `pi=turned_away`): the stored pi snapshot cannot be used,
-  what pi's code gave does not fit the contract or does not agree with itself, or the `pi` record of
-  `data/sync-status.json` does not fit. The dataset is built and deployed without that part, with the warning
-  "The build left pi data out" on the run, and `/api/v1/meta` lists the reason under `issues`
-  (`pi-snapshot-unreadable`, one per part left out). Without a folder `data/pi/` at all, the dataset simply has no
-  pi data, with no warning.
+- **pi data missing from the build** (the build step's output `pi=turned_away` or `pi=published_without_blocks`):
+  - `turned_away`: the stored pi snapshot cannot be used, what pi's code gave does not fit the contract or does not
+    agree with itself, or the `pi` record of `data/sync-status.json` does not fit. The dataset is built and deployed
+    without that part, and `/api/v1/meta` lists the reason under `issues` (`pi-snapshot-unreadable`, one per part
+    left out).
+  - `published_without_blocks`: pi's data is usable and fits, and no entry has a pi block. When a usable pi
+    snapshot gives no block at all, the build says so: `/api/v1/meta` lists a `pi-no-blocks` warning with the
+    snapshot's number of models and how many were left out and unmatched, and the build prints it. The data is
+    published as pi's code gave it: nothing is turned away or repaired.
+
+  Either way the run carries the warning "pi data missing from the build". Without a folder `data/pi/` at all, the
+  dataset simply has no pi data, with no warning.
 
 On GitHub the import step writes its outcome per source (`upstream`, `measurements`, `pi`) and `pi_revision7`, the
 first seven characters of the stored pi snapshot's revision, to the step's outputs; the build step writes `pi`
-(`published`, `none` or `turned_away`). The warning steps read them, and a snapshot commit names what changed
-(`sync: models.dev <commit>`, `sync: pi <revision>`, both, or `sync: measurements`) without reading any file of
-pi's.
+(`published`, `published_without_blocks`, `none` or `turned_away`). The warning steps read them, and a snapshot
+commit names what changed (`sync: models.dev <commit>`, `sync: pi <revision>`, both, or `sync: measurements`)
+without reading any file of pi's.
 
 The import is not made tolerant of a change in models.dev's structure: that is the owner's decision. When models.dev
 changes the type of a field the site reads, the import fails on purpose: the site goes on serving the last good

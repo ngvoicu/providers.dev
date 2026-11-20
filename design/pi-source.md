@@ -354,7 +354,8 @@ fault. The build never stops for want of pi data. (It still stops, as today, for
   after `sha256-` of `meta.revision`, else `snapshot`), `sync: models.dev <commit7>, pi <revision7>` for both, and
   `sync: measurements` when only the measurements file did. `data/pi` is added only where the folder exists. The
   step reads no file of pi's: `<revision7>` is the step output `pi_revision7` of the import step (section k, 3).
-- A second warning step, **directly after the build step**, for a build that left pi data out (section k, 3).
+- A second warning step, **directly after the build step**, for a build that left pi data out or published it with no
+  block (section k, 3).
 - The last step, `Report a failed import`, is **unchanged**: its condition stays `steps.sync.outcome == 'failure'`,
   which a pi failure alone never makes true.
 
@@ -591,6 +592,7 @@ file is checked against its schema and nothing else, and none of these is raised
 | `pi-alias-conflict` | warning | rule 3 took an entry away from a pi model. |
 | `pi-alias-redundant` | notice | a model line is no longer needed: the provider now has an entry with the pi model's own id. |
 | `pi-snapshot-unreadable` | warning | the fence turned pi's data or the record of the last pi import away (section k): once per part turned away, with the reason. The one sign that a dataset is without pi data through a fault. |
+| `pi-no-blocks` | warning | the fence took pi's data and no entry has a pi block (section k): once, with the snapshot's models and the two other counts. The data is published as pi's code gave it. |
 
 These are added to `Issue["code"]` in `src/core/schema.ts`. An unmatched pi model and an absent pi provider are
 **not** issues: they are the report's.
@@ -1537,11 +1539,11 @@ export interface PiOfBuild {
   entries: Map<string, { block: PiBlock; summary: PiSummary }>;
   /** `meta.pi`, whole. */
   meta: Meta["pi"];
-  /** The alias issues of a dataset with pi data, then one pi-snapshot-unreadable per part turned away. */
+  /** The alias issues of a dataset with pi data, then the fence's own: pi-no-blocks, and one pi-snapshot-unreadable per part turned away. */
   issues: Issue[];
   /** The text of data/published/pi-report.json; null = no pi data. */
   report: string | null;
-  state: "published" | "none" | "turned_away";
+  state: "published" | "published_without_blocks" | "none" | "turned_away";
 }
 /** Everything the build publishes of pi. Never throws. */
 export function piOfBuild(input: PiOfBuildInput): PiOfBuild;
@@ -1596,9 +1598,10 @@ What comes out:
 | the data | the record | `entries`, `report` | `meta` | `issues` gains | `state` |
 |---|---|---|---|---|---|
 | fits | fits | the blocks; the report | snapshot and counts of the data, the record | pi's alias issues | `published` |
+| fits, no block | fits | empty; the report | snapshot and counts of the data, the record | pi's alias issues, then the warning pi-no-blocks, target data/pi | published_without_blocks |
 | `null` (no `data/pi/`) | fits | empty; `null` | `noPiMeta()` with the record | nothing | `none` |
 | turned away | fits | empty; `null` | `noPiMeta()` with the record | one warning, target `data/pi` | `turned_away` |
-| any of the three | turned away | as its row says | as its row says, `sync` the three `null`s | one warning more, target `data/sync-status.json` | `turned_away` |
+| any of the four | turned away | as its row says | as its row says, `sync` the three `null`s | one warning more, target `data/sync-status.json` | `turned_away` |
 
 The two warnings, code `pi-snapshot-unreadable`, level `warning`:
 `pi's data is left out of this dataset (<why>). No entry has a pi block.` and
@@ -1687,21 +1690,30 @@ not parse counts there as absent, and `sync()` logs that it did. `SyncReport` ga
 
 - **In the data.** Every time the fence turns a part away, `/api/v1/meta` lists the warning with its reason, and
   the build prints it; so too where only the private report could not be written (step 7 of `publish()`), which
-  leaves the step output `published` and the workflow unchanged. There is no silent case: without a warning, a dataset has no pi data only where the folder
-  `data/pi/` does not exist, and no record only where the status file or its `pi` key does not exist.
-  The fence itself looks whether the folder is there, and `storedPi` is changed to agree (section b): a
-  `data/pi/` that is there and cannot be used, in any way, is *unusable*, never *none*.
-- **No new issue code.** `code` of an issue is an open string in the contract, and `pi-snapshot-unreadable` is
-  already in 1.2.0's code. The contract and `structure/api-v1.json` do not change.
-- **On the run.** `scripts/build-data.ts` appends `pi=<published|none|turned_away>` to `GITHUB_OUTPUT` where that
+  leaves the step output `published` and the workflow unchanged. And where the data fits and has no block: after its
+  four checks the fence, with code of its own, counts the blocks of the part it has taken, and where there is none it
+  adds one warning, code `pi-no-blocks`, level `warning`, target `data/pi`: `pi's snapshot has <n> models and no
+  entry has a pi block (left out: <l>, unmatched: <u>). pi's data is published as pi's code gave it.` Nothing is
+  turned away for it: `meta.pi` has the snapshot and the counts, the report is written, pi's alias issues are
+  listed, and the state is `published_without_blocks`. There is no silent case: without a warning, no entry has a
+  pi block only where the folder `data/pi/` does not exist, and a dataset has no record only where the status file
+  or its `pi` key does not exist. The fence itself looks whether the folder is there, and `storedPi` is changed to
+  agree (section b): a `data/pi/` that is there and cannot be used, in any way, is *unusable*, never *none*.
+- **Two codes, both the fence's own.** `pi-snapshot-unreadable` says that something of pi's was left out: the data,
+  the record or the report, with the reason. `pi-no-blocks` says that nothing was left out and no entry has a block.
+  Neither can come from pi's code: the data's schema takes the four alias and provider codes from `piPart` and no
+  other, so a part that hands in one of the fence's codes is a misfit and is turned away. `pi-no-blocks` joins
+  `Issue["code"]` in `src/core/schema.ts`. `code` of an issue is an open string in the contract: the contract and
+  `structure/api-v1.json` do not change.
+- **On the run.** `scripts/build-data.ts` appends `pi=<published|published_without_blocks|none|turned_away>` to `GITHUB_OUTPUT` where that
   variable is set (`writeBuildOutputs(report, path)` in `scripts/lib/publish.ts`), and no line where the report
   has no `pi`. In the workflow the build step
   gets `id: build`, and directly after it:
 
   ```yaml
-      - name: Warn about pi data left out of the build
-        if: steps.build.outputs.pi == 'turned_away'
-        run: echo "::warning title=The build left pi data out::The dataset is built and deployed without pi's data, or without the record of the last pi import. /api/v1/meta lists why, under issues (pi-snapshot-unreadable). The models.dev part is as usual."
+      - name: Warn about pi data missing from the build
+        if: steps.build.outputs.pi == 'turned_away' || steps.build.outputs.pi == 'published_without_blocks'
+        run: echo "::warning title=pi data missing from the build::The dataset is built and deployed without pi's data, with pi's data but no pi block on any entry, or without the record of the last pi import. /api/v1/meta lists which and why, under issues (pi-snapshot-unreadable, pi-no-blocks). The models.dev part is as usual."
   ```
 
   The text is fixed: nothing that came from pi is printed as a workflow command.
@@ -1711,17 +1723,22 @@ not parse counts there as absent, and `sync()` logs that it did. `SyncReport` ga
 
 ### 4. What the fence does not do, and what stays outside it
 
-It does not repair, does not drop single blocks (a part is taken whole or not at all), and holds no rule about
-what pi says of the world: which prices differ, which ids match and what a feed must look like are pi's code's
-and the import's. Its checks of its own are four (1, "The fence of the build"): each block's ref is a published
-entry, once; and pi's part agrees with itself in the two sentences the contract states of its numbers.
+It does not repair, does not drop single blocks (a part is taken whole or not at all), and turns nothing away for
+what pi says of the world: which prices differ, which ids match and what a feed must look like are pi's code's and
+the import's. Its checks of its own are four (1, "The fence of the build"): each block's ref is a published entry,
+once; and pi's part agrees with itself in the two sentences the contract states of its numbers. Beside them it says
+one thing of a part it has taken, and that one is about the world: a part with no block at all is published whole,
+with the `pi-no-blocks` warning (3). The fence does not call such a part wrong. A catalog that shares no model with
+pi's gives the same part, rightly; the warning is there because a fault is by far the likelier cause, and it rests
+on the fence's own count of the blocks, not on anything pi's code says of itself.
 
 It does not check pi's code's results on their way to pi's code, and it cannot tell a part that fits the contract
-and agrees with itself from a right one. A fault in pi's own code that gives a coherent, wrong part (a matcher
-that matches nothing: no block, every model counted unmatched) is published as pi's part, with no warning. The
-build does not stop and the reference is untouched, which is what the fence promises; that pi's part is right is
-held by pi's own tests (`tests/pi-source.test.ts`), and what it holds is always in `/api/v1/meta`
-(`pi.counts`) and in the line the build prints.
+and agrees with itself from a right one. A fault in pi's own code that gives a coherent, wrong part is published as
+pi's part. One such part is seen: the one with no block (a matcher that matches nothing: no block, every model
+counted unmatched) carries the warning. Every other is published with no warning: a matcher that matches one model
+in a thousand, a block with a wrong name. The build does not stop and the reference is untouched, which is what the
+fence promises; that pi's part is right is held by pi's own tests (`tests/pi-source.test.ts`), and what it holds is
+always in `/api/v1/meta` (`pi.counts`) and in the line the build prints.
 
 Outside the fence, on purpose:
 
@@ -1867,7 +1884,15 @@ absent) and with a fault.
    healthy blocks.
 6. **Being seen.** A `data/pi/` that is an empty folder, one without `meta.json`, one whose `meta.json` holds
    `null`, one without `providers/`: each gives the warning and `state: "turned_away"`; no `data/pi/` gives none
-   and `state: "none"`. `writeBuildOutputs` writes the state. `tests/workflow.test.ts`: the warning step stands
+   and `state: "none"`. One case more: `piPart` returns its true result with `blocks` emptied, `matched_id` and
+   `matched_alias` set to 0 and their sum added to `unmatched`. After it:
+   - `pi` is `published_without_blocks`;
+   - `meta.json` has the healthy build's `pi.snapshot`, the changed counts and one `pi-no-blocks` warning for
+     `data/pi`;
+   - `pi-report.json` is written, and 0 objects differ in the reference.
+
+   This row shows why the rule is the fence's: pi's code said nothing and the alarm fired. `writeBuildOutputs`
+   writes the four states. `tests/workflow.test.ts`: the warning step stands
    directly after the build step with its condition; `Keep the new snapshot` names no path under `data/pi/` but in
    `git status` and `git add`, and commits `sync: pi dd93eb2` from the step output and `sync: pi snapshot`
    without one.

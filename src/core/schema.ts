@@ -570,7 +570,8 @@ export interface Issue {
     | "pi-alias-orphan"
     | "pi-alias-conflict"
     | "pi-alias-redundant"
-    | "pi-snapshot-unreadable";
+    | "pi-snapshot-unreadable"
+    | "pi-no-blocks";
   target: string;
   message: string;
 }

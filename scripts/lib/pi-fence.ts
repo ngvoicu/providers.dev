@@ -27,11 +27,11 @@ export interface PiOfBuild {
   entries: Map<string, { block: PiBlock; summary: PiSummary }>;
   /** `meta.pi`, whole. */
   meta: Meta["pi"];
-  /** The alias issues of a dataset with pi data, then one pi-snapshot-unreadable per part turned away. */
+  /** The alias issues of a dataset with pi data, then the fence's own: pi-no-blocks, and one pi-snapshot-unreadable per part turned away. */
   issues: Issue[];
   /** The text of data/published/pi-report.json; null = no pi data. */
   report: string | null;
-  state: "published" | "none" | "turned_away";
+  state: "published" | "published_without_blocks" | "none" | "turned_away";
 }
 
 const piMetaShape = MetaSchema.shape.pi.shape;
@@ -101,8 +101,14 @@ export function piOfBuild(input: PiOfBuildInput): PiOfBuild {
     }, PiData);
     // The fence's own four checks.
     const why = fencedData.ok ? misplaced(fencedData.value, input.catalog) : fencedData.why;
-    if (why === null && fencedData.ok) data = fencedData.value;
-    else {
+    if (why === null && fencedData.ok) {
+      data = fencedData.value;
+      // The fence's own count of the blocks of the part it has taken: a part with none is published whole, and said.
+      if (data.blocks.length === 0) {
+        const { snapshot, counts } = data;
+        issues.push({ level: "warning", code: "pi-no-blocks", target: "data/pi", message: `pi's snapshot has ${snapshot.models} models and no entry has a pi block (left out: ${counts.left_out_models}, unmatched: ${counts.unmatched_models}). pi's data is published as pi's code gave it.` });
+      }
+    } else {
       turnedAway = true;
       issues.push({ level: "warning", code: "pi-snapshot-unreadable", target: "data/pi", message: `pi's data is left out of this dataset (${why}). No entry has a pi block.` });
     }
@@ -122,7 +128,7 @@ export function piOfBuild(input: PiOfBuildInput): PiOfBuild {
     issues.push({ level: "warning", code: "pi-snapshot-unreadable", target: "data/sync-status.json", message: `The record of the last pi import is left out of this dataset (${record.why}). It is published as no attempt recorded.` });
   }
 
-  const state: PiOfBuild["state"] = turnedAway ? "turned_away" : data ? "published" : "none";
+  const state: PiOfBuild["state"] = turnedAway ? "turned_away" : !data ? "none" : data.blocks.length === 0 ? "published_without_blocks" : "published";
   if (!data) return { entries: new Map(), meta: { ...noPiMeta(), sync }, issues, report: null, state };
   const entries = new Map<string, { block: PiBlock; summary: PiSummary }>();
   for (const { ref, block } of data.blocks) entries.set(ref, { block, summary: { ref: block.ref, api: block.api, match: block.match, difference_count: block.differences.length } });

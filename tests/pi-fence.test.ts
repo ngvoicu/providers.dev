@@ -627,9 +627,9 @@ describe("6. a data/pi/ that is there and cannot be used is never none", () => {
   it("writeBuildOutputs writes the state for the workflow, and no line where the report has none", () => {
     const path = join(tempDataDir(), "github-output");
     writeFileSync(path, "earlier=1\n");
-    for (const pi of ["published", "none", "turned_away"] as const) writeBuildOutputs({ ok: true, errors: [], issues: [], pi }, path);
+    for (const pi of ["published", "published_without_blocks", "none", "turned_away"] as const) writeBuildOutputs({ ok: true, errors: [], issues: [], pi }, path);
     writeBuildOutputs({ ok: false, errors: ["No upstream snapshot"], issues: [] }, path);
-    expect(readFileSync(path, "utf8")).toBe("earlier=1\npi=published\npi=none\npi=turned_away\n");
+    expect(readFileSync(path, "utf8")).toBe("earlier=1\npi=published\npi=published_without_blocks\npi=none\npi=turned_away\n");
     const dir = variant(null, undefined);
     rmSync(join(dir, "upstream"), { recursive: true });
     expect(build(dir).pi).toBeUndefined();
@@ -639,6 +639,116 @@ describe("6. a data/pi/ that is there and cannot be used is never none", () => {
     const report = build(variant(null, undefined));
     expect(report).toMatchObject({ ok: true, pi: "none" });
     expect(report.issues.filter((issue) => issue.code.startsWith("pi-"))).toEqual([]);
+  });
+});
+
+// ---- 6. being seen: a part that fits and has no block
+
+describe("6. a part that fits and has no block is published whole, with the fence's pi-no-blocks warning", () => {
+  const noBlock = (issue: { code: string }) => issue.code === "pi-no-blocks";
+  /** piPart's true result as a matcher that matches nothing gives it: no block, every match counted unmatched. */
+  const matchingNothing = (result: unknown) => {
+    const copy = structuredClone(result) as { blocks: unknown[]; report: { totals: { matched_id: number; matched_alias: number; unmatched: number } }; issues: { code: string }[] };
+    const totals = copy.report.totals;
+    copy.blocks = [];
+    totals.unmatched += totals.matched_id + totals.matched_alias;
+    totals.matched_id = 0;
+    totals.matched_alias = 0;
+    return copy;
+  };
+  let healthyDir: string;
+  let withoutDir: string;
+
+  beforeAll(() => {
+    healthyDir = variant(piCatalog(), undefined);
+    withoutDir = variant(null, undefined);
+    expect(build(healthyDir)).toMatchObject({ ok: true, pi: "published" });
+    expect(build(withoutDir)).toMatchObject({ ok: true, pi: "none" });
+  });
+
+  it("piPart's true result with no block and every match counted unmatched: pi's code says nothing, the fence warns, the data is published", async () => {
+    const dir = variant(piCatalog(), undefined);
+    state.fault = {
+      name: "piPart",
+      fired: false,
+      apply: (callTrue) => after(callTrue, (result) => {
+        const copy = matchingNothing(result);
+        // pi's code says nothing of it: no issue but its alias issues.
+        expect(copy.issues.every((issue) => issue.code.startsWith("pi-alias") || issue.code === "pi-provider-collides")).toBe(true);
+        return copy;
+      }),
+    };
+    const report = build(dir);
+    expect(state.fault.fired).toBe(true);
+    state.fault = null;
+
+    expect(report).toMatchObject({ ok: true, pi: "published_without_blocks" });
+    // The contract fits, and the reference is untouched.
+    expect(await contractProblems(join(dir, "published"))).toEqual([]);
+    expect(comparePublished(join(healthyDir, "published"), join(dir, "published")).differences).toEqual([]);
+
+    const files = filesOf(dir);
+    const healthy = filesOf(healthyDir);
+    const without = filesOf(withoutDir);
+    const meta = metaOf(files);
+    const healthyMeta = metaOf(healthy);
+    // meta.pi: the healthy build's snapshot and record; the counts as pi's code gave them.
+    expect(meta.pi.snapshot).toEqual(healthyMeta.pi.snapshot);
+    expect(meta.pi.sync).toEqual(healthyMeta.pi.sync);
+    const { entries_with_block, left_out_models, unmatched_models } = healthyMeta.pi.counts;
+    expect(entries_with_block).toBeGreaterThan(0);
+    expect(meta.pi.counts).toEqual({ entries_with_block: 0, left_out_models, unmatched_models: unmatched_models + entries_with_block });
+    // Issues: the healthy build's (pi's alias issue first), then the one warning of the fence.
+    const models = meta.pi.snapshot!.models;
+    expect(meta.issues).toEqual([
+      ...healthyMeta.issues,
+      { level: "warning", code: "pi-no-blocks", target: "data/pi", message: `pi's snapshot has ${models} models and no entry has a pi block (left out: ${left_out_models}, unmatched: ${unmatched_models + entries_with_block}). pi's data is published as pi's code gave it.` },
+    ]);
+    expect(report.issues.filter(noBlock)).toHaveLength(1);
+    expect(report.issues.filter((issue) => issue.code === "pi-snapshot-unreadable")).toEqual([]);
+    // Published as it is: no entry has a block, pi's report is written, the notice names pi's snapshot as the healthy
+    // build's does, and every other file is the without build's.
+    expect(blocksOf(files).size).toBe(0);
+    expect(files.has("pi-report.json")).toBe(true);
+    expect(JSON.parse(files.get("pi-report.json")!.toString("utf8")).totals).toMatchObject({ matched_id: 0, matched_alias: 0 });
+    // No entry has a block, so the dataset's version is the without build's.
+    expect(meta.dataset_version).toBe(metaOf(without).dataset_version);
+    expect(files.get("site/data/NOTICE.txt")!.toString("utf8")).toBe(healthy.get("site/data/NOTICE.txt")!.toString("utf8").replaceAll(healthyMeta.dataset_version, meta.dataset_version));
+    expect(differing(files, without)).toEqual(["pi-report.json", "site/data/NOTICE.txt", "site/data/meta.json"]);
+    // meta.json is the without build's but for meta.pi and the issues.
+    const withoutMeta = metaOf(without);
+    expect({ ...meta, pi: null, issues: null }).toEqual({ ...withoutMeta, pi: null, issues: null });
+  });
+
+  it("a record turned away beside a part with no block gives turned_away, with both warnings", () => {
+    const dir = variant(piCatalog(), "not a record");
+    state.fault = { name: "piPart", fired: false, apply: (callTrue) => after(callTrue, matchingNothing) };
+    const report = build(dir);
+    expect(state.fault.fired).toBe(true);
+    state.fault = null;
+    expect(report).toMatchObject({ ok: true, pi: "turned_away" });
+    expect(report.issues.filter((issue) => issue.code === "pi-no-blocks" || issue.code === "pi-snapshot-unreadable").map((issue) => [issue.code, issue.target])).toEqual([
+      ["pi-no-blocks", "data/pi"],
+      ["pi-snapshot-unreadable", "data/sync-status.json"],
+    ]);
+  });
+
+  it("a healthy build has no such warning; no data/pi/ and an unusable one have none either", () => {
+    expect(build(variant(piCatalog(), undefined)).issues.filter(noBlock)).toEqual([]);
+    expect(build(variant(null, undefined)).issues.filter(noBlock)).toEqual([]);
+    const dir = variant(piCatalog(), undefined);
+    rmSync(join(dir, "pi", "meta.json"));
+    const unusable = build(dir);
+    expect(unusable.pi).toBe("turned_away");
+    expect(unusable.issues.filter(noBlock)).toEqual([]);
+  });
+
+  it("a usable snapshot with no models fits and has no block: the rule as decided warns there too", () => {
+    const report = build(variant({}, undefined));
+    expect(report).toMatchObject({ ok: true, pi: "published_without_blocks" });
+    expect(report.issues.filter(noBlock)).toEqual([
+      { level: "warning", code: "pi-no-blocks", target: "data/pi", message: "pi's snapshot has 0 models and no entry has a pi block (left out: 0, unmatched: 0). pi's data is published as pi's code gave it." },
+    ]);
   });
 });
 

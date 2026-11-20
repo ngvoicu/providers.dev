@@ -248,7 +248,7 @@ export function publish(input: PublishOptions): PublishReport {
 }
 
 /**
- * The step output of the build step of the Publish workflow: `pi=<published|none|turned_away>`, appended to the file
+ * The step output of the build step of the Publish workflow: `pi=<published|published_without_blocks|none|turned_away>`, appended to the file
  * GitHub names in GITHUB_OUTPUT. No line where the report has no `pi` (the build ended before pi was looked at).
  */
 export function writeBuildOutputs(report: PublishReport, path: string): void {
