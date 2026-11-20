@@ -106,6 +106,11 @@ The baseline is imported from models.dev; our additions, corrections and measure
   unknown and there is no `0`: a window of 0 is "none stated". The rule "A measurement never replaces a documented
   value on an upstream entry" holds: `limit` is untouched, and the documented value stays in the record beside the
   measured one. Vendors' own model lists are not values of an entry; they stay in evaluation notes.
+- pi's values stand third, after providers.dev's own and models.dev's. They are never written into a field of the
+  entry (`limit`, `cost` or any other) or into a safe value (`providers_dev.cache.lifetime`,
+  `providers_dev.limits.input_window`); a value only pi states stays in pi's block. Where pi stands beside each value
+  is worked out once, in `piValues` (`src/core/pi.ts`), into `providers_dev.pi.values`, from the same reading as
+  `differences`; a page prints the `standing` and compares nothing (`design/pi-merged.md`).
 - The safe value, like every figure the site shows, is worked out once, when the data is built, and published in the
   API. A page never works anything out: it prints fields of the API, formatted. The site never shows anything that is
   not from the API. One exception, the only thing a page works out: it marks providers.dev evidence stale by comparing

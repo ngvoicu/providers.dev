@@ -14,7 +14,8 @@ brief and this document disagree, this document is corrected first.
 
 - models.dev stays the reference; pi is an extra source beside it, imported automatically.
 - What pi states for an entry is published on that entry, as a block of its own. Nothing of pi's is merged into
-  an entry's existing fields.
+  an entry's existing fields. The entry page shows one set of values, with pi's standing beside each
+  (`design/pi-merged.md`).
 - **No entry and no provider comes from pi alone.** A pi model that belongs to no entry is counted and listed in a
   report, nothing more (section g).
 - A run in which only the pi import fails stays green, with a warning on the run.
@@ -639,7 +640,8 @@ The OpenAPI document is generated: its component schemas come from `COMPONENTS` 
 types from `src/core/schema.ts` and `src/core/entries.ts`. `src/core/openapi.ts` itself only gets the version, one
 sentence and one guide section.
 
-**Version:** `info.version` becomes `1.2.0`.
+**Version:** `info.version` becomes `1.2.0`. Version 1.3.0 adds one key to the block, `values`: where pi stands
+beside each value of the entry (`design/pi-merged.md`, sections 2 and 8).
 
 Three additions, and no other: a key on every entry, a key on every entry summary, a key in `/meta` (with two
 keys of `license`). Nothing that exists is renamed, retyped or removed; **no existing enumerated field gets a new
@@ -979,7 +981,8 @@ Rules:
 1. **Both must state a value.** No difference is listed where the entry has no value for the field (the block
    shows pi's value, that is all), where a limit is 0 on either side (in `limit`, 0 is "none stated"), or where
    **pi's price is 0** (0 is also pi's "no price recorded", section 0). A price of 0 on the entry's side is a
-   listed zero price and is compared.
+   listed zero price and is compared. No price and no tiers item is listed on an entry whose
+   `providers_dev.access` is `subscription`: the entry is not paid per token.
 2. **Limits** are whole numbers of tokens and differ when they are not equal. No tolerance.
 3. **Prices** are both in US dollars per million tokens. An entry price is so when its `unit` (of its side, or of
    its tier) is absent or is models.dev's per-token unit `token`; one question decides it for a side, a tier and a
@@ -1005,6 +1008,8 @@ Rules:
    are compared on their own, tiers or not.
 6. **What is listed:** one item per differing field, in the order of the table, each with the two values. Nothing
    else: no percentage, no verdict on who is right. `differences: []` means agreement wherever both state a value.
+
+The standing of every value, the differing ones included, is `values` (`design/pi-merged.md`, section 2).
 
 ---
 
@@ -1069,12 +1074,12 @@ page works nothing out.
 1. **How pi calls the model**, for a reader who wants to call it through an agent: the request format (`api`),
    the address (`base_url`), what pi sends as input (`input`), whether it reasons and at which levels
    (`reasoning`, `thinking_level_map`), the flags pi states (`compat`: the 1-hour cache request, the kind of cache
-   markers, cache markers on tools, the kind of thinking, strict tools), the cache lifetimes pi reckons with
-   (`prompt_cache`), the request limits (`input_limits`). What pi does not state shows as not stated, never as
+   markers, cache markers on tools, the kind of thinking, strict tools), the request limits (`input_limits`).
+   The cache lifetimes pi reckons with (`prompt_cache`) are said beside the entry's own lifetimes:
+   `design/pi-merged.md`, section 7. What pi does not state shows as not stated, never as
    "no": a flag absent from `compat` is not `false`.
-2. **Where pi differs from the reference**, at a glance: each item of `differences` with pi's value beside the
-   published one, tiers included; and plainly "agrees" when the list is empty. pi's price of 0 is not shown as
-   "free".
+2. **Where pi stands beside the entry's values**: replaced by `design/pi-merged.md`, section 7, which says what
+   each row of the page says of pi, from `values`.
 3. **Whose data it is**: that the block is pi's, imported and not checked by providers.dev; pi's own name for the
    provider and the model where it spells them otherwise (`ref`, `match: "alias"`); when it was imported
    (`meta.pi.snapshot.fetched_at`) and, if so, that the last import failed (`meta.pi.sync`).
@@ -1497,8 +1502,12 @@ export interface PiPartInput {
   aliases: PiAliases | undefined;
   before: CatalogBefore;
   ruledOut: { ref: string; rule: string }[];
-  /** A copy of `limit` and `cost` of the entry as published; undefined where the ref is not published. */
-  entryOf: (ref: string) => { limit: unknown; cost: unknown } | undefined;
+  /**
+   * Copies of plain facts of the entry as published (`PiEntryFacts`, design/pi-merged.md, section 8): `limit`,
+   * `cost`, the access, the corrections' paths and kinds, and the two documented lifetimes. Undefined where the ref
+   * is not published.
+   */
+  entryOf: (ref: string) => PiEntryFacts | undefined;
 }
 export interface PiPart {
   /** One per pi model whose entry is published. `ref` is the entry's, provider/model of the catalog. */
@@ -1559,8 +1568,8 @@ It has two parts, each through `fenced`, each all or nothing, neither depending 
   not rest on pi's code. Where it does, `compute`: `storedPi(dataDir)`; unless its answer is *usable*, throw (its
   reason where it is *unusable*; that it gave no usable answer otherwise, *none* for a folder that exists
   included); then call `piPart`, with `structuredClone`s of the alias file, of `before` and of `ruledOut`, and an
-  `entryOf` that looks the ref up in a `Map` the fence made from `catalog` and returns `structuredClone`s of `limit`
-  and `cost`; so pi's code is handed copies only, never an object the build goes on to use; return
+  `entryOf` that looks the ref up in a `Map` the fence made from `catalog` and returns `structuredClone`s of the
+  entry's facts (`limit`, `cost`, the access, the corrections' paths and kinds, the two documented lifetimes); so pi's code is handed copies only, never an object the build goes on to use; return
   `{ snapshot, counts, blocks, issues, report }`, where `snapshot` is `meta.pi.snapshot` made from the stored
   `meta.json` (keys in the contract's order, an absent one `null`), `counts` the three of `meta.pi.counts` from the
   report's totals, and `report` the report as text (`JSON.stringify(report, null, 1)` and a newline).

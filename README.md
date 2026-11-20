@@ -495,6 +495,11 @@ range of a model: `input_window_min`, `input_window_max`, `input_window_unknown_
 and the component `ModelInputWindowEnd`. 1.2.0 added pi's catalog: `providers_dev.pi` on every entry (the
 block, or `null` where pi does not list it), `pi` on every entry summary, `pi` in `/api/v1/meta` with the keys `pi` and
 `pi_notice` of its `license`, and the components `PiBlock`, `PiCost`, `PiCostTier`, `PiDifference` and `PiSummary`.
+1.3.0 added `values` to the pi block, and the component `PiValue`: for each of the nine values pi's catalog can
+state of an entry (its two limits, four prices, tiers and two cache lifetimes), pi's value and its standing beside
+the entry's own (`agrees`, `differs`, `only`, `not_compared`, `silent`). A value only pi states is there and in no
+field of the entry. With it, `differences` lists no price and no tiers on a subscription entry
+(`design/pi-merged.md`).
 
 That promise holds for everything providers.dev makes itself: summaries, `providers_dev` records, evaluations,
 corrections, evidence, paths and parameters. The fields imported from models.dev (`limit`, `cost`, `capabilities`,
