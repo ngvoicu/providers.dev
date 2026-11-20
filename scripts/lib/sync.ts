@@ -5,7 +5,7 @@ import { appendFileSync, closeSync, existsSync, mkdirSync, openSync, readdirSync
 import { join } from "node:path";
 import { deepEqual } from "../../src/core/merge.ts";
 import { PiFeed, type PiCatalog, type PiModel } from "../../src/core/pi.ts";
-import { ObservedFile, PROVIDER_ID, UPSTREAM_SCHEMA, UpstreamCatalog, type PiMeta, type SourceMeta, type UpstreamMeta } from "../../src/core/schema.ts";
+import { ObservedFile, PiMeta, PROVIDER_ID, UPSTREAM_SCHEMA, UpstreamCatalog, type SourceMeta, type UpstreamMeta } from "../../src/core/schema.ts";
 import { pretty, readJson, readJsonIfExists, sha256, swapDir, writeFileAtomic } from "./files.ts";
 
 // models.dev hides `openai-codex` (a ChatGPT subscription login) unless a client asks for it (models.dev f648ddb,
@@ -306,8 +306,8 @@ export type StoredPi = { state: "none" } | { state: "unusable"; why: string } | 
 
 /**
  * The one answer to "is there a usable stored pi snapshot", for the build and the sync alike. None where
- * data/pi/meta.json or data/pi/providers/ is missing. Usable where it loads, is whole (`piSnapshotFault`), fits PiFeed
- * and its meta.json states what the snapshot is. Anything else is unusable: the build takes no pi data, and the sync
+ * data/pi/meta.json or data/pi/providers/ is missing. Usable where it loads, its meta.json fits PiMeta, it is whole
+ * (`piSnapshotFault`) and it fits PiFeed. Anything else is unusable: the build takes no pi data, and the sync
  * imports as on a first import.
  */
 export function storedPi(dataDir: string): StoredPi {
@@ -319,6 +319,11 @@ export function storedPi(dataDir: string): StoredPi {
     return unusable(error instanceof Error ? error.message : String(error));
   }
   if (!loaded) return { state: "none" };
+  const meta = PiMeta.safeParse(loaded.meta);
+  if (!meta.success) {
+    const first = meta.error.issues[0];
+    return unusable(`meta.json does not fit: ${first ? `${first.path.join(".") || "(the file)"}: ${first.message}` : "unknown"}`);
+  }
   const fault = piSnapshotFault(dataDir);
   if (fault) return unusable(`not whole: ${fault}`);
   const checked = PiFeed.safeParse(loaded.catalog);
@@ -326,11 +331,7 @@ export function storedPi(dataDir: string): StoredPi {
     const first = checked.error.issues[0];
     return unusable(`${checked.error.issues.length} problems; first: ${first ? `${first.path.join(".")}: ${first.message}` : "unknown"}`);
   }
-  const meta = loaded.meta as Partial<PiMeta>;
-  if (typeof meta.fetched_at !== "string" || typeof meta.checked_at !== "string" || typeof meta.sha256 !== "string" || typeof meta.providers !== "number" || typeof meta.models !== "number") {
-    return unusable("meta.json lacks fetched_at, checked_at, sha256, providers or models");
-  }
-  return { state: "usable", catalog: checked.data, meta: loaded.meta };
+  return { state: "usable", catalog: checked.data, meta: meta.data };
 }
 
 /**
@@ -360,7 +361,7 @@ async function syncPi(options: Required<Pick<SyncOptions, "dataDir" | "fetch" | 
   });
 
   if (response.status === 304 && previous && sameSource) {
-    writeFileAtomic(join(dir, "meta.json"), pretty({ ...previous.meta, checked_at: now }));
+    writeFileAtomic(join(dir, "meta.json"), pretty(PiMeta.parse({ ...previous.meta, checked_at: now })));
     return { status: "unchanged" };
   }
   if (!response.ok || body === null) throw new Error(`pi.dev answered HTTP ${response.status}`);
@@ -400,13 +401,14 @@ async function syncPi(options: Required<Pick<SyncOptions, "dataDir" | "fetch" | 
 
   const digest = sha256(body);
   if (previous && sameSource && previous.meta.sha256 === digest && !options.force) {
-    writeFileAtomic(join(dir, "meta.json"), pretty({ ...previous.meta, checked_at: now, ...etagOf(response) }));
+    writeFileAtomic(join(dir, "meta.json"), pretty(PiMeta.parse({ ...previous.meta, checked_at: now, ...etagOf(response) })));
     return { status: "unchanged" };
   }
 
   const lastModified = response.headers.get("last-modified");
   const revision = response.headers.get("x-pi-model-catalog-revision");
-  const meta: PiMeta = {
+  // What is written fits the one definition the sync and the build read it back by.
+  const meta = PiMeta.parse({
     source: PI_URL,
     fetched_at: now,
     checked_at: now,
@@ -416,7 +418,7 @@ async function syncPi(options: Required<Pick<SyncOptions, "dataDir" | "fetch" | 
     sha256: digest,
     providers,
     models,
-  };
+  });
 
   const next = `${dir}.tmp-${process.pid}`;
   rmSync(next, { recursive: true, force: true });

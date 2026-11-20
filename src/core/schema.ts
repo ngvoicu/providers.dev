@@ -43,18 +43,22 @@ export interface UpstreamMeta {
   models: number;
 }
 
-/** data/pi/meta.json: where the pi snapshot came from and when (design/pi-source.md, section a). */
-export interface PiMeta {
-  source: string; // PI_URL, the address the snapshot was read from
-  fetched_at: string; // ISO time of the import that wrote the snapshot
-  checked_at: string; // ISO time of the last request that confirmed it (a 304 or an equal digest)
-  etag?: string; // the response's ETag
-  last_modified?: string; // the response's Last-Modified, as sent
-  revision?: string; // the response's x-pi-model-catalog-revision, as sent
-  sha256: string; // of the response body
-  providers: number; // provider keys in the feed
-  models: number; // models in the feed
-}
+/**
+ * data/pi/meta.json: where the pi snapshot came from and when (design/pi-source.md, section a). One definition, checked
+ * on what the sync writes and on what it and the build read back: a stored meta that does not fit it is not usable.
+ */
+export const PiMeta = z.strictObject({
+  source: z.string(), // PI_URL, the address the snapshot was read from
+  fetched_at: z.string(), // ISO time of the import that wrote the snapshot
+  checked_at: z.string(), // ISO time of the last request that confirmed it (a 304 or an equal digest)
+  etag: z.string().optional(), // the response's ETag
+  last_modified: z.string().optional(), // the response's Last-Modified, as sent
+  revision: z.string().optional(), // the response's x-pi-model-catalog-revision, as sent
+  sha256: z.string(), // of the response body
+  providers: z.int().min(0), // provider keys in the feed
+  models: z.int().min(0), // models in the feed
+});
+export type PiMeta = z.infer<typeof PiMeta>;
 
 // ---- authored: evidence
 export const Evidence = z.strictObject({

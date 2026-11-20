@@ -615,6 +615,13 @@ describe("the release review: a saved snapshot that is not whole (blocker 4)", (
     ["a provider file missing (the review's deepseek.json)", (pi: string) => rmSync(file(pi, "provider-05")), "11 provider files, meta.json says 12"],
     ["a provider file named otherwise than its id", (pi: string) => writeFileSync(join(pi, "providers", "provider-99.json"), readFileSync(file(pi, "provider-05"))), 'providers/provider-99.json holds the provider "provider-05"'],
     ["a model missing", (pi: string) => edit(pi, "provider-03", (provider) => { delete provider.models["model-1"]; }), "359 models, meta.json says 360"],
+    // The third review: meta.json that does not fit PiMeta. Its revision a number would have reached /api/v1/meta.
+    ...([["revision", 123], ["source", 1], ["fetched_at", 1], ["checked_at", null], ["etag", 1], ["last_modified", false], ["sha256", 1], ["providers", "12"], ["models", 360.5], ["extra", "key"]] as const).map(
+      ([field, value]): [string, (pi: string) => void, string] => [`a meta.json whose ${field} is ${JSON.stringify(value)}`, (pi: string) => {
+        const path = join(pi, "meta.json");
+        writeFileSync(path, JSON.stringify({ ...JSON.parse(readFileSync(path, "utf8")), [field]: value }));
+      }, "meta.json does not fit"],
+    ),
   ])("%s: the build takes no pi data and warns pi-snapshot-unreadable", async (_name, damage, why) => {
     const dir = await damaged(damage);
     const report = publish({ dataDir: dir, rootDir: ROOT });

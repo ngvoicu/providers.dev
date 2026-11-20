@@ -382,6 +382,13 @@ describe("a stored pi snapshot that cannot be used is no snapshot (release revie
       provider.models["model-1"].reasoning = "yes";
       writeFileSync(path, JSON.stringify(provider));
     }],
+    // The third review: a stored meta that does not fit PiMeta, its revision a number first, then each other field.
+    ...([["revision", 123], ["source", 1], ["fetched_at", 1], ["checked_at", null], ["etag", 1], ["last_modified", false], ["sha256", 1], ["providers", "20"], ["models", 600.5]] as const).map(
+      ([field, value]): [string, (dataDir: string) => void] => [`a stored meta whose ${field} is ${JSON.stringify(value)}`, (dataDir) => {
+        const path = join(dataDir, "pi", "meta.json");
+        writeFileSync(path, JSON.stringify({ ...JSON.parse(readFileSync(path, "utf8")), [field]: value }));
+      }],
+    ),
   ];
 
   it.each(damages)("%s: no If-None-Match is sent, and the same body is written again in full (no equal-digest shortcut)", async (_name, damage) => {
