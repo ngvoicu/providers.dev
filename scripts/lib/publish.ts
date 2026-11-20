@@ -9,7 +9,7 @@ import { CACHE_AGES_S } from "../../src/core/cache.ts";
 import { MetaSchema, PiBlockSchema, PiSummarySchema } from "../../src/core/contract.ts";
 import { buildIndex, SHARD_SIZE, type Index } from "../../src/core/entries.ts";
 import { listCorrections, listEvaluations } from "../../src/core/resources.ts";
-import { PiAliases, type PiCatalog } from "../../src/core/pi.ts";
+import type { PiCatalog } from "../../src/core/pi.ts";
 import { resolve } from "../../src/core/resolve.ts";
 import {
   AccessRules,
@@ -19,6 +19,8 @@ import {
   MeasurementLabels,
   ObservedFile,
   OverrideFile,
+  PI_URL,
+  PiAliases,
   RouteMap,
   UPSTREAM_SCHEMA,
   type Catalog,
@@ -28,7 +30,8 @@ import {
   type SourceMeta,
 } from "../../src/core/schema.ts";
 import { readJsonIfExists, sha256, swapDir } from "./files.ts";
-import { loadUpstream, PI_URL, PiSyncRecord, storedPi, type SyncStatus } from "./sync.ts";
+import { storedPi } from "./pi-sync.ts";
+import { loadUpstream, PiSyncRecord, type SyncStatus } from "./sync.ts";
 
 /**
  * providers.dev evidence (a correction, an evaluation, a measured lifetime) whose date is more than this many days before

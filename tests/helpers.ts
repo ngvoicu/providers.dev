@@ -10,7 +10,7 @@ import { emptyInputWindow, type InputWindow } from "../src/core/limits.ts";
 import type { MeasuredLimit, Meta, ModelExtension, UpstreamCatalog } from "../src/core/schema.ts";
 import type { PiCatalog, PiModel } from "../src/core/pi.ts";
 import { pretty, ROOT } from "../scripts/lib/files.ts";
-import { piProviderFile } from "../scripts/lib/sync.ts";
+import { piProviderFile } from "../scripts/lib/pi-sync.ts";
 
 /** The cache record of an entry nothing is known about. */
 export const NO_CACHE: EntryCache = { documented: documentedCache({}), retention: { support: "unknown", parameter: null, accepted_values: null, default: null, profiles: [], conditions: [], evidence: [] }, lifetime: emptyCacheLifetime(), evaluations: [] };

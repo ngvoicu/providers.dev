@@ -19,7 +19,7 @@ import {
 } from "./cache.ts";
 import { inputWindow, windowMeasurement, type DocumentedField, type LimitSource } from "./limits.ts";
 import { clone, isObject, mergePatch, type Change, type Json, type JsonObject } from "./merge.ts";
-import { matchPi, piBlock, piReport, type PiAliases, type PiBlock, type PiCatalog, type PiModel, type PiReport } from "./pi.ts";
+import { matchPi, piBlock, piReport, type PiBlock, type PiCatalog, type PiModel, type PiReport } from "./pi.ts";
 import { controlsOf, pricingOf, retentionFromControl } from "./policies.ts";
 import {
   NS,
@@ -39,6 +39,7 @@ import {
   type ModelExtension,
   type ObservedFile,
   type OverrideFile,
+  type PiAliases,
   type ProviderExtension,
   type Provenance,
   type PublishedEvidence,

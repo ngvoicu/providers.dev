@@ -4,14 +4,15 @@ import { join } from "node:path";
 import { parse as parseYaml, stringify } from "yaml";
 import { describe, expect, it } from "vitest";
 import { publish } from "../scripts/lib/publish.ts";
-import { piProviderFile, sync } from "../scripts/lib/sync.ts";
+import { piProviderFile } from "../scripts/lib/pi-sync.ts";
+import { sync } from "../scripts/lib/sync.ts";
 import { pretty } from "../scripts/lib/files.ts";
 import { summarize, type Summary } from "../src/core/entries.ts";
 import type { JsonObject } from "../src/core/merge.ts";
 import { PiBlockSchema, PiDifferenceSchema, PiSummarySchema } from "../src/core/contract.ts";
-import { PiAliases, piBlock, piDifferences, PiFeed, type PiCatalog, type PiModel, type PiReport } from "../src/core/pi.ts";
+import { piBlock, piDifferences, PiFeed, type PiCatalog, type PiModel, type PiReport } from "../src/core/pi.ts";
 import { resolve, type ResolveInput } from "../src/core/resolve.ts";
-import { ext, UpstreamModel, type AccessRules, type Catalog, type CatalogRules, type Evidence, type Meta, type OverrideFile, type UpstreamCatalog } from "../src/core/schema.ts";
+import { ext, PiAliases, UpstreamModel, type AccessRules, type Catalog, type CatalogRules, type Evidence, type Meta, type OverrideFile, type UpstreamCatalog } from "../src/core/schema.ts";
 import { fetchReturning, fixturePi, fixtureUpstream, ROOT, tempDataDir, writeAuthored } from "./helpers.ts";
 
 const evidence: Evidence[] = [{ kind: "documented", url: "https://example.com/docs", date: "2026-11-01" }];

@@ -43,6 +43,9 @@ export interface UpstreamMeta {
   models: number;
 }
 
+/** pi's model catalog, the second imported source (design/pi-source.md). */
+export const PI_URL = "https://pi.dev/api/models";
+
 /**
  * data/pi/meta.json: where the pi snapshot came from and when (design/pi-source.md, section a). One definition, checked
  * on what the sync writes and on what it and the build read back: a stored meta that does not fit it is not usable.
@@ -241,6 +244,45 @@ export type AccessRules = z.infer<typeof AccessRules>;
 // ---- authored: where each measured route lands (data/authored/routes.yaml)
 export const RouteMap = z.record(z.string(), z.strictObject({ provider: z.string().regex(PROVIDER_ID) }));
 export type RouteMap = z.infer<typeof RouteMap>;
+
+// ---- authored: data/authored/pi-aliases.yaml (design/pi-source.md, section c)
+const PiModelLine = z.strictObject({
+  /** The model id of the entry, at the catalog's provider, that is this pi model under another spelling. */
+  same_as: z.string().min(1),
+  note: z.string().optional(),
+});
+
+const PiProviderLine = z
+  .strictObject({
+    /** The provider of the catalog that this pi provider id is. Left out where the catalog has the pi id itself. */
+    same_as: z.string().regex(PROVIDER_ID).optional(),
+    reason: z.string().min(1).optional(),
+    evidence: z.array(Evidence).min(1).optional(),
+    /** The day the model lines were checked against the report. Required when `models` has a line. */
+    checked: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+    models: z.record(z.string().min(1), PiModelLine).default({}),
+  })
+  .superRefine((line, context) => {
+    if (line.same_as !== undefined && line.reason === undefined) context.addIssue({ code: "custom", path: ["reason"], message: "A provider line with same_as needs a reason." });
+    if (line.same_as !== undefined && line.evidence === undefined) context.addIssue({ code: "custom", path: ["evidence"], message: "A provider line with same_as needs evidence." });
+    const lines = Object.keys(line.models).length;
+    if (lines > 0 && line.checked === undefined) context.addIssue({ code: "custom", path: ["checked"], message: "A provider line with model lines needs checked, the day they were checked against the report." });
+    if (line.same_as === undefined && lines === 0) context.addIssue({ code: "custom", path: [], message: "A provider line needs same_as or at least one model line." });
+  });
+
+/** data/authored/pi-aliases.yaml: the adapter between pi's spelling and the catalog's. Only `same_as`, nothing else. */
+export const PiAliases = z
+  .strictObject({ providers: z.record(z.string().regex(PROVIDER_ID), PiProviderLine).default({}) })
+  .superRefine((file, context) => {
+    const seen = new Map<string, string>();
+    for (const [id, line] of Object.entries(file.providers)) {
+      if (line.same_as === undefined) continue;
+      const first = seen.get(line.same_as);
+      if (first !== undefined) context.addIssue({ code: "custom", path: ["providers", id, "same_as"], message: `Two pi provider ids, ${first} and ${id}, have the same same_as ${line.same_as}. One provider of the catalog is one pi provider.` });
+      else seen.set(line.same_as, id);
+    }
+  });
+export type PiAliases = z.infer<typeof PiAliases>;
 
 // ---- authored: public names for the measurement file's clients (data/authored/measurement-labels.yaml)
 /** What a client the labels file does not describe is published as. */

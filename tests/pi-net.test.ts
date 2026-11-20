@@ -12,7 +12,8 @@ import type { PiBlock, PiReport, PiSummary } from "../src/core/pi.ts";
 import type { Catalog, Meta } from "../src/core/schema.ts";
 import { piMisfit, publish } from "../scripts/lib/publish.ts";
 import { pretty } from "../scripts/lib/files.ts";
-import { piProviderFile, sync } from "../scripts/lib/sync.ts";
+import { piProviderFile } from "../scripts/lib/pi-sync.ts";
+import { sync } from "../scripts/lib/sync.ts";
 import { depsFrom, fetchReturning, fixturePi, fixtureUpstream, ROOT, tempDataDir, writeAuthored } from "./helpers.ts";
 
 /** Which output of src/core/pi.ts is made not to fit the contract. */
