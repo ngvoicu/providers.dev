@@ -85,7 +85,7 @@ describe("sync", () => {
     const dataDir = await firstImport();
     let sent: string | undefined;
     const conditional = (async (input: RequestInfo | URL, init?: RequestInit) => {
-      if (String(input).includes("observed.json")) return new Response("x", { status: 404 });
+      if (String(input).includes("observed.json") || String(input).startsWith("https://pi.dev/")) return new Response("x", { status: 404 });
       sent = (init?.headers as Record<string, string>)["If-None-Match"];
       return new Response(null, { status: 304 });
     }) as typeof fetch;

@@ -1,9 +1,11 @@
-// The upstream sync. It fetches models.dev once, checks what came back, and only then replaces the snapshot
-// in data/upstream/. Anything that goes wrong leaves the previous snapshot exactly as it was.
-import { closeSync, existsSync, mkdirSync, openSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
+// The sync. It fetches models.dev, the measurements file and pi's model catalog once each, checks what came back,
+// and only then replaces that source's snapshot (data/upstream/, data/sources/, data/pi/). Anything that goes wrong
+// with a source leaves its previous snapshot exactly as it was; the three parts never affect one another.
+import { appendFileSync, closeSync, existsSync, mkdirSync, openSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { deepEqual } from "../../src/core/merge.ts";
-import { ObservedFile, UPSTREAM_SCHEMA, UpstreamCatalog, type SourceMeta, type UpstreamMeta } from "../../src/core/schema.ts";
+import { PiFeed, type PiCatalog, type PiModel } from "../../src/core/pi.ts";
+import { ObservedFile, PROVIDER_ID, UPSTREAM_SCHEMA, UpstreamCatalog, type PiMeta, type SourceMeta, type UpstreamMeta } from "../../src/core/schema.ts";
 import { pretty, readJson, readJsonIfExists, sha256, swapDir, writeFileAtomic } from "./files.ts";
 
 // models.dev hides `openai-codex` (a ChatGPT subscription login) unless a client asks for it (models.dev f648ddb,
@@ -11,11 +13,16 @@ import { pretty, readJson, readJsonIfExists, sha256, swapDir, writeFileAtomic } 
 export const UPSTREAM_URL = "https://models.dev/experimental/v2.0/api.json?include=openai-codex";
 export const UPSTREAM_COMMIT_URL = "https://api.github.com/repos/anomalyco/models.dev/commits/dev";
 export const OBSERVED_URL = "https://raw.githubusercontent.com/ngvoicu/groundtruth/main/observed.json";
+/** pi's model catalog, the second imported source (design/pi-source.md). */
+export const PI_URL = "https://pi.dev/api/models";
 
 /** An import smaller than this is treated as broken, whatever the previous snapshot held. */
 const MIN_PROVIDERS = 20;
 const MIN_MODELS = 500;
-/** An import that lost more than this share of the previous snapshot is treated as broken. */
+/** A pi import smaller than this is treated as broken, whatever the previous snapshot held. */
+const PI_MIN_PROVIDERS = 10;
+const PI_MIN_MODELS = 300;
+/** An import that lost more than this share of the previous snapshot is treated as broken. Shared by every part. */
 const MIN_SHARE = 0.6;
 const LOCK_STALE_MS = 30 * 60 * 1000;
 
@@ -24,28 +31,41 @@ export interface SyncOptions {
   fetch: typeof fetch;
   now?: () => Date;
   log?: (line: string) => void;
-  /** Ignore the stored ETag and download again. */
+  /** Ignore the stored ETag and download again. Applies to every part that runs. */
   force?: boolean;
+  /** Run the pi part alone: models.dev and the measurements are not requested and their status is left as it was. */
+  only?: "pi";
 }
 
 export interface PartReport {
-  status: "updated" | "unchanged" | "failed";
+  /** `skipped`: the part did not run (`only`). Never written to data/sync-status.json. */
+  status: "updated" | "unchanged" | "failed" | "skipped";
   error?: string;
   summary?: string[];
 }
 
 export interface SyncReport {
+  /** models.dev and the measurements did not fail. The pi part never changes it. */
   ok: boolean;
   upstream: PartReport;
   measurements: PartReport;
+  pi: PartReport;
 }
 
+/** What data/sync-status.json can hold for a part: a part that did not run is never recorded there. */
+export type StoredStatus = Exclude<PartReport["status"], "skipped">;
+/** The report of a part that ran. */
+type RanPart = PartReport & { status: StoredStatus };
+
 export interface SyncStatus {
+  // These five speak of models.dev and the measurements only.
   last_attempt_at: string;
   last_attempt_ok: boolean;
   last_error?: string;
-  upstream: PartReport["status"];
-  measurements: PartReport["status"];
+  upstream: StoredStatus;
+  measurements: StoredStatus;
+  /** The last attempt to import pi's catalog. */
+  pi?: { last_attempt_at: string; status: StoredStatus; error?: string };
 }
 
 export class SyncBusyError extends Error {}
@@ -93,30 +113,36 @@ function countModels(catalog: UpstreamCatalog): number {
   return Object.values(catalog).reduce((sum, provider) => sum + Object.keys(provider.models).length, 0);
 }
 
-function summarize(before: UpstreamCatalog | undefined, after: UpstreamCatalog): string[] {
-  if (!before) return [`first import: ${Object.keys(after).length} providers, ${countModels(after)} models`];
+/** The models of each provider: provider id -> model id -> model. */
+type ModelsByProvider = Record<string, Record<string, unknown>>;
+
+const modelsOf = (catalog: UpstreamCatalog): ModelsByProvider => Object.fromEntries(Object.entries(catalog).map(([id, provider]) => [id, provider.models]));
+
+function summarize(before: ModelsByProvider | undefined, after: ModelsByProvider): string[] {
+  const total = (catalog: ModelsByProvider): number => Object.values(catalog).reduce((sum, models) => sum + Object.keys(models).length, 0);
+  if (!before) return [`first import: ${Object.keys(after).length} providers, ${total(after)} models`];
   const lines: string[] = [];
   const addedProviders = Object.keys(after).filter((id) => !before[id]);
   const removedProviders = Object.keys(before).filter((id) => !after[id]);
   let added = 0;
   let removed = 0;
   let changed = 0;
-  for (const [id, provider] of Object.entries(after)) {
-    const old = before[id]?.models ?? {};
-    for (const [modelId, model] of Object.entries(provider.models)) {
+  for (const [id, models] of Object.entries(after)) {
+    const old = before[id] ?? {};
+    for (const [modelId, model] of Object.entries(models)) {
       if (!old[modelId]) added += 1;
       else if (!deepEqual(old[modelId], model)) changed += 1;
     }
-    removed += Object.keys(old).filter((modelId) => !provider.models[modelId]).length;
+    removed += Object.keys(old).filter((modelId) => !models[modelId]).length;
   }
-  for (const id of removedProviders) removed += Object.keys(before[id]?.models ?? {}).length;
+  for (const id of removedProviders) removed += Object.keys(before[id] ?? {}).length;
   if (addedProviders.length) lines.push(`providers added: ${addedProviders.join(", ")}`);
   if (removedProviders.length) lines.push(`providers removed: ${removedProviders.join(", ")}`);
   lines.push(`models: +${added} added, -${removed} removed, ${changed} changed`);
   return lines;
 }
 
-async function syncUpstream(options: Required<Pick<SyncOptions, "dataDir" | "fetch" | "now">> & SyncOptions): Promise<PartReport> {
+async function syncUpstream(options: Required<Pick<SyncOptions, "dataDir" | "fetch" | "now">> & SyncOptions): Promise<RanPart> {
   const dir = join(options.dataDir, "upstream");
   const previous = loadUpstream(options.dataDir);
   const now = options.now().toISOString();
@@ -203,7 +229,7 @@ async function syncUpstream(options: Required<Pick<SyncOptions, "dataDir" | "fet
   writeFileSync(join(next, "meta.json"), pretty(meta));
   swapDir(next, dir);
 
-  return { status: "updated", summary: summarize(previous?.catalog, catalog) };
+  return { status: "updated", summary: summarize(previous ? modelsOf(previous.catalog) : undefined, modelsOf(catalog)) };
 }
 
 function etagOf(response: Response): { etag?: string } {
@@ -211,7 +237,111 @@ function etagOf(response: Response): { etag?: string } {
   return etag ? { etag } : {};
 }
 
-async function syncMeasurements(options: Required<Pick<SyncOptions, "dataDir" | "fetch" | "now">> & SyncOptions): Promise<PartReport> {
+/** The last good pi snapshot, or undefined where data/pi/meta.json or data/pi/providers/ is missing. Not validated. */
+export function loadPi(dataDir: string): { catalog: PiCatalog; meta: PiMeta } | undefined {
+  const dir = join(dataDir, "pi");
+  const meta = readJsonIfExists<PiMeta>(join(dir, "meta.json"));
+  if (!meta || !existsSync(join(dir, "providers"))) return undefined;
+  const catalog: PiCatalog = {};
+  for (const file of readdirSync(join(dir, "providers")).sort()) {
+    if (!file.endsWith(".json")) continue;
+    const provider = readJson<{ id: string; models: Record<string, PiModel> }>(join(dir, "providers", file));
+    catalog[provider.id] = provider.models;
+  }
+  return { catalog, meta };
+}
+
+/**
+ * The file a pi provider is stored in: `{ id, models }`, the models sorted by id (plain character order), each model
+ * as the feed gives it, every key in the feed's order, `headers` included.
+ */
+export function piProviderFile(id: string, models: Record<string, PiModel>): string {
+  const sorted = Object.fromEntries(Object.keys(models).sort().map((modelId) => [modelId, models[modelId]]));
+  return pretty({ id, models: sorted });
+}
+
+async function syncPi(options: Required<Pick<SyncOptions, "dataDir" | "fetch" | "now">> & SyncOptions): Promise<RanPart> {
+  const dir = join(options.dataDir, "pi");
+  const previous = loadPi(options.dataDir);
+  const now = options.now().toISOString();
+
+  // As for models.dev: a stored ETag and digest belong to the address they were read from.
+  const sameSource = previous?.meta.source === PI_URL;
+  const headers: Record<string, string> = { Accept: "application/json", "User-Agent": "providers.dev sync" };
+  if (sameSource && previous?.meta.etag && !options.force) headers["If-None-Match"] = previous.meta.etag;
+  const response = await options.fetch(PI_URL, { headers });
+
+  if (response.status === 304 && previous && sameSource) {
+    writeFileAtomic(join(dir, "meta.json"), pretty({ ...previous.meta, checked_at: now }));
+    return { status: "unchanged" };
+  }
+  if (!response.ok) throw new Error(`pi.dev answered HTTP ${response.status}`);
+
+  const body = await response.text();
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(body);
+  } catch {
+    throw new Error("pi.dev did not return JSON");
+  }
+  const checked = PiFeed.safeParse(parsed);
+  if (!checked.success) {
+    const first = checked.error.issues.slice(0, 5).map((issue) => `${issue.path.join(".")}: ${issue.message}`);
+    throw new Error(`the pi feed does not match the expected structure (${checked.error.issues.length} problems; first: ${first.join("; ")})`);
+  }
+  // Written as the feed gives it: the parsed body, not the checked copy, whose keys the schema has put in its own order.
+  const catalog = parsed as PiCatalog;
+
+  for (const [key, models] of Object.entries(catalog)) {
+    if (!PROVIDER_ID.test(key)) throw new Error(`pi provider key "${key}" is not a valid provider id`);
+    for (const [modelKey, model] of Object.entries(models)) {
+      if (model.id !== modelKey) throw new Error(`pi model key "${key}/${modelKey}" does not match its id "${model.id}"`);
+      if (model.provider !== key) throw new Error(`pi model "${key}/${modelKey}" names the provider "${model.provider}", not its provider key`);
+    }
+  }
+
+  const providers = Object.keys(catalog).length;
+  const models = Object.values(catalog).reduce((sum, items) => sum + Object.keys(items).length, 0);
+  if (providers < PI_MIN_PROVIDERS || models < PI_MIN_MODELS) {
+    throw new Error(`the pi feed is unexpectedly small: ${providers} providers, ${models} models`);
+  }
+  if (previous && (providers < previous.meta.providers * MIN_SHARE || models < previous.meta.models * MIN_SHARE)) {
+    throw new Error(
+      `the pi feed shrank too much to trust: ${providers} providers and ${models} models, from ${previous.meta.providers} and ${previous.meta.models}`,
+    );
+  }
+
+  const digest = sha256(body);
+  if (previous && sameSource && previous.meta.sha256 === digest && !options.force) {
+    writeFileAtomic(join(dir, "meta.json"), pretty({ ...previous.meta, checked_at: now, ...etagOf(response) }));
+    return { status: "unchanged" };
+  }
+
+  const lastModified = response.headers.get("last-modified");
+  const revision = response.headers.get("x-pi-model-catalog-revision");
+  const meta: PiMeta = {
+    source: PI_URL,
+    fetched_at: now,
+    checked_at: now,
+    ...etagOf(response),
+    ...(lastModified ? { last_modified: lastModified } : {}),
+    ...(revision ? { revision } : {}),
+    sha256: digest,
+    providers,
+    models,
+  };
+
+  const next = `${dir}.tmp-${process.pid}`;
+  rmSync(next, { recursive: true, force: true });
+  mkdirSync(join(next, "providers"), { recursive: true });
+  for (const [id, items] of Object.entries(catalog)) writeFileSync(join(next, "providers", `${id}.json`), piProviderFile(id, items));
+  writeFileSync(join(next, "meta.json"), pretty(meta));
+  swapDir(next, dir);
+
+  return { status: "updated", summary: summarize(previous?.catalog, catalog) };
+}
+
+async function syncMeasurements(options: Required<Pick<SyncOptions, "dataDir" | "fetch" | "now">> & SyncOptions): Promise<RanPart> {
   const dir = join(options.dataDir, "sources");
   const previous = readJsonIfExists<SourceMeta>(join(dir, "observed.meta.json"));
   const now = options.now().toISOString();
@@ -249,27 +379,53 @@ export async function sync(input: SyncOptions): Promise<SyncReport> {
   mkdirSync(options.dataDir, { recursive: true });
   const release = acquireLock(join(options.dataDir, ".sync.lock"));
   try {
-    const part = async (run: () => Promise<PartReport>): Promise<PartReport> => {
+    const part = async (run: () => Promise<RanPart>): Promise<RanPart> => {
       try {
         return await run();
       } catch (error) {
         return { status: "failed", error: error instanceof Error ? error.message : String(error) };
       }
     };
+    const statusPath = join(options.dataDir, "sync-status.json");
+    if (options.only === "pi") {
+      const pi = await part(() => syncPi(options));
+      // The five fields of models.dev and the measurements stay as they were (absent where there were none).
+      const previous = readJsonIfExists<Partial<SyncStatus>>(statusPath) ?? {};
+      writeFileAtomic(statusPath, pretty({ ...previous, pi: piStatus(pi, options.now()) }));
+      return { ok: true, upstream: { status: "skipped" }, measurements: { status: "skipped" }, pi };
+    }
     const upstream = await part(() => syncUpstream(options));
     const measurements = await part(() => syncMeasurements(options));
     const ok = upstream.status !== "failed" && measurements.status !== "failed";
     const errors = [upstream, measurements].map((item) => item.error).filter(Boolean);
+    const lastAttemptAt = options.now().toISOString();
+    const pi = await part(() => syncPi(options));
     const status: SyncStatus = {
-      last_attempt_at: options.now().toISOString(),
+      last_attempt_at: lastAttemptAt,
       last_attempt_ok: ok,
       ...(errors.length > 0 ? { last_error: errors.join(" | ") } : {}),
       upstream: upstream.status,
       measurements: measurements.status,
+      pi: piStatus(pi, options.now()),
     };
-    writeFileAtomic(join(options.dataDir, "sync-status.json"), pretty(status));
-    return { ok, upstream, measurements };
+    writeFileAtomic(statusPath, pretty(status));
+    return { ok, upstream, measurements, pi };
   } finally {
     release();
   }
+}
+
+/** The `pi` key of data/sync-status.json; its time is when the pi part ended. */
+function piStatus(pi: RanPart, at: Date): NonNullable<SyncStatus["pi"]> {
+  return { last_attempt_at: at.toISOString(), status: pi.status, ...(pi.error ? { error: pi.error } : {}) };
+}
+
+/**
+ * The step outputs of the `Import` step of the Publish workflow: `upstream=…`, `measurements=…` and `pi=…`, one line
+ * each, appended to the file GitHub names in GITHUB_OUTPUT. A part that did not run (`--only=pi`) gets no line.
+ */
+export function writeStepOutputs(report: SyncReport, path: string): void {
+  const parts: [string, PartReport][] = [["upstream", report.upstream], ["measurements", report.measurements], ["pi", report.pi]];
+  const lines = parts.flatMap(([name, part]) => (part.status === "skipped" ? [] : [`${name}=${part.status}\n`]));
+  appendFileSync(path, lines.join(""));
 }

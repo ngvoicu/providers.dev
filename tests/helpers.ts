@@ -8,6 +8,7 @@ import type { Index, Summary } from "../src/core/entries.ts";
 import { controlsOf, pricingOf } from "../src/core/policies.ts";
 import { emptyInputWindow, type InputWindow } from "../src/core/limits.ts";
 import type { MeasuredLimit, Meta, ModelExtension, UpstreamCatalog } from "../src/core/schema.ts";
+import type { PiCatalog, PiModel } from "../src/core/pi.ts";
 import { ROOT } from "../scripts/lib/files.ts";
 
 /** The cache record of an entry nothing is known about. */
@@ -248,6 +249,59 @@ export function fixtureUpstream(providers = 30, modelsEach = 20): UpstreamCatalo
     catalog[id] = { id, name: `Provider ${p}`, doc: "https://example.com", models };
   }
   return catalog;
+}
+
+/**
+ * A small pi catalog in the feed's shape: provider ids `provider-00`… and the model ids of `fixtureUpstream`, so that
+ * equal ids match. Every model has every field the import requires; some have the optional ones, `headers` included.
+ */
+export function fixturePi(providers = 12, modelsEach = 30): PiCatalog {
+  const catalog: PiCatalog = {};
+  for (let p = 0; p < providers; p += 1) {
+    const provider = `provider-${String(p).padStart(2, "0")}`;
+    const models: Record<string, PiModel> = {};
+    for (let m = 0; m < modelsEach; m += 1) {
+      const id = m % 2 === 0 ? `lab/model-${m}` : `model-${m}`;
+      models[id] = {
+        id,
+        name: `Model ${m}`,
+        api: m % 3 === 0 ? "anthropic-messages" : "openai-completions",
+        provider,
+        baseUrl: m === 5 ? "" : `https://api.${provider}.example/v1`,
+        reasoning: m % 2 === 0,
+        input: m % 4 === 0 ? ["text", "image"] : ["text"],
+        cost: { input: m, output: m * 4, cacheRead: m / 10, cacheWrite: 0, ...(m === 3 ? { tiers: [{ inputTokensAbove: 199999, input: 6, output: 22.5, cacheRead: 0.6, cacheWrite: 7.5 }] } : {}) },
+        contextWindow: (m + 1) * 100000,
+        maxTokens: (m + 1) * 1000,
+        type: "chat",
+        ...(m % 5 === 0 ? { compat: { supportsStore: false, maxTokensField: "max_tokens" } } : {}),
+        ...(m % 6 === 0 ? { thinkingLevelMap: { minimal: null, high: "high" } } : {}),
+        ...(m % 7 === 0 ? { promptCache: { short: 300, long: 3600 } } : {}),
+        ...(m === 1 ? { headers: { "X-Example": "1" } } : {}),
+      };
+    }
+    catalog[provider] = models;
+  }
+  return catalog;
+}
+
+/** One request a `fetchByAddress` stand-in received. */
+export interface RecordedRequest {
+  url: string;
+  headers: Record<string, string>;
+}
+
+/**
+ * A `fetch` stand-in that answers per address: the answer of the first key that the requested address starts with.
+ * Every request is pushed to `requests`. An address no key covers is answered 404.
+ */
+export function fetchByAddress(answers: Record<string, () => Response>, requests: RecordedRequest[] = []): typeof fetch {
+  return (async (input: RequestInfo | URL, init?: RequestInit) => {
+    const url = String(input);
+    requests.push({ url, headers: { ...((init?.headers as Record<string, string> | undefined) ?? {}) } });
+    const key = Object.keys(answers).find((address) => url.startsWith(address));
+    return key ? answers[key]!() : new Response("not found", { status: 404 });
+  }) as typeof fetch;
 }
 
 /** Folders made by `tempDataDir`; `tests/setup.ts` removes them when each test file is over, passed or failed. */

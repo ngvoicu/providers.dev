@@ -42,6 +42,19 @@ export interface UpstreamMeta {
   models: number;
 }
 
+/** data/pi/meta.json: where the pi snapshot came from and when (design/pi-source.md, section a). */
+export interface PiMeta {
+  source: string; // PI_URL, the address the snapshot was read from
+  fetched_at: string; // ISO time of the import that wrote the snapshot
+  checked_at: string; // ISO time of the last request that confirmed it (a 304 or an equal digest)
+  etag?: string; // the response's ETag
+  last_modified?: string; // the response's Last-Modified, as sent
+  revision?: string; // the response's x-pi-model-catalog-revision, as sent
+  sha256: string; // of the response body
+  providers: number; // provider keys in the feed
+  models: number; // models in the feed
+}
+
 // ---- authored: evidence
 export const Evidence = z.strictObject({
   /** documented = the provider says so; measured = we ran it; listed = the provider's own model list reports it. */
