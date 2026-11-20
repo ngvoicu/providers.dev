@@ -63,6 +63,17 @@ export const PiMeta = z.strictObject({
 });
 export type PiMeta = z.infer<typeof PiMeta>;
 
+/**
+ * The `pi` key of data/sync-status.json: the last attempt to import pi's catalog. One definition, checked on what the
+ * sync writes and on what the build reads: a record that does not fit counts as no attempt recorded.
+ */
+export const PiSyncRecord = z.strictObject({
+  last_attempt_at: z.string(),
+  status: z.enum(["updated", "unchanged", "failed"]),
+  error: z.string().optional(),
+});
+export type PiSyncRecord = z.infer<typeof PiSyncRecord>;
+
 // ---- authored: evidence
 export const Evidence = z.strictObject({
   /** documented = the provider says so; measured = we ran it; listed = the provider's own model list reports it. */

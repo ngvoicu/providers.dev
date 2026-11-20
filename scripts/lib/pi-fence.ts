@@ -7,10 +7,10 @@ import { z } from "zod";
 import { MetaSchema, PiBlockSchema } from "../../src/core/contract.ts";
 import { piPart, type PiBlock, type PiSummary } from "../../src/core/pi.ts";
 import type { CatalogBefore } from "../../src/core/resolve.ts";
-import { noPiMeta, type Catalog, type Issue, type Meta, type PiAliases } from "../../src/core/schema.ts";
+import { noPiMeta, PiSyncRecord, type Catalog, type Issue, type Meta, type PiAliases } from "../../src/core/schema.ts";
 import { fenced, fencedAsync, reasonOf } from "./fenced.ts";
 import { storedPi, syncPi } from "./pi-sync.ts";
-import { PiSyncRecord, type RanPart } from "./sync.ts";
+import type { RanPart } from "./sync.ts";
 
 export interface PiOfBuildInput {
   dataDir: string;

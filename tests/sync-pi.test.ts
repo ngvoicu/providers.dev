@@ -4,8 +4,8 @@ import { existsSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync 
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { loadPi, PI_DEADLINE_MS, piSnapshotFault, storedPi } from "../scripts/lib/pi-sync.ts";
-import { loadUpstream, OBSERVED_URL, PiSyncRecord, sync, SyncBusyError, UPSTREAM_COMMIT_URL, UPSTREAM_URL, writeStepOutputs, type SyncOptions, type SyncStatus } from "../scripts/lib/sync.ts";
-import { PI_URL } from "../src/core/schema.ts";
+import { loadUpstream, OBSERVED_URL, sync, SyncBusyError, UPSTREAM_COMMIT_URL, UPSTREAM_URL, writeStepOutputs, type SyncOptions, type SyncStatus } from "../scripts/lib/sync.ts";
+import { PI_URL, PiSyncRecord } from "../src/core/schema.ts";
 import { sha256 } from "../scripts/lib/files.ts";
 import type { PiCatalog } from "../src/core/pi.ts";
 import { fetchByAddress, fixturePi, fixtureUpstream, tempDataDir, type RecordedRequest } from "./helpers.ts";

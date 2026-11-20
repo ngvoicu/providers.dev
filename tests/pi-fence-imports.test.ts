@@ -66,6 +66,11 @@ describe("3. nothing calls pi's code outside the fence", () => {
     expect(back.map((reference) => `${reference.file}: ${reference.text}`)).toEqual([]);
   });
 
+  it("no cycle at the fence: scripts/lib/pi-fence.ts imports no value from scripts/lib/sync.ts", () => {
+    const fromSync = references(FENCE).filter((reference) => !reference.typeOnly && reference.target === "scripts/lib/sync.ts");
+    expect(fromSync.map((reference) => reference.text)).toEqual([]);
+  });
+
   it("scripts/lib/fenced.ts imports nothing of pi's", () => {
     const own = references(GUARD).filter((reference) => /(^|\/)pi[-.]|pi\.ts$/.test(reference.target));
     expect(own).toEqual([]);

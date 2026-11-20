@@ -1408,8 +1408,10 @@ around it, and a test of the fence can then pass, or fail, by the order in which
 
 `import type` from pi's modules is free everywhere (the contract, the pages and the tests name pi's types). What
 code outside the fence needs as a value leaves pi's modules: `PiAliases` with its two line schemas, and `PI_URL`,
-move to `src/core/schema.ts`, beside the other authored files' schemas and `PiMeta`; `PiSyncRecord` stays in
-`scripts/lib/sync.ts`, with the status file it belongs to.
+move to `src/core/schema.ts`, beside the other authored files' schemas and `PiMeta`. `PiSyncRecord`, the one
+definition of the `pi` key of the status file, is there too, beside `PiMeta`: the sync writes the record and the
+fence reads it, and with it in `sync.ts` the fence imported a value from the module that imports the fence. No
+cycle is left at the fence: `pi-fence.ts` imports no value from `sync.ts` (only the type `RanPart`).
 
 ### The guard
 
@@ -1824,6 +1826,7 @@ absent) and with a fault.
      the module;
    - where `src/core/pi.ts` or `scripts/lib/pi-sync.ts` imports a value from `scripts/lib/sync.ts`,
      `scripts/lib/publish.ts`, `scripts/lib/pi-fence.ts` or `scripts/lib/fenced.ts`;
+   - where `scripts/lib/pi-fence.ts` imports a value from `scripts/lib/sync.ts` (no cycle at the fence);
    - where `scripts/lib/fenced.ts` imports anything of pi's at all;
    - where `scripts/lib/pi-fence.ts` exports anything but `piOfBuild`, `piOfSync` and types;
    - where `piOfBuild(` or `piOfSync(` is called from more than the one file each.
