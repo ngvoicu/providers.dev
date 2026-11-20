@@ -11,9 +11,9 @@ import { summarize, type Summary } from "../src/core/entries.ts";
 import type { JsonObject } from "../src/core/merge.ts";
 import { PiBlockSchema, PiDifferenceSchema, PiSummarySchema } from "../src/core/contract.ts";
 import { piBlock, piDifferences, PiFeed, type PiCatalog, type PiModel, type PiReport } from "../src/core/pi.ts";
-import { resolve, type ResolveInput } from "../src/core/resolve.ts";
+import type { ResolveInput } from "../src/core/resolve.ts";
 import { ext, PiAliases, UpstreamModel, type AccessRules, type Catalog, type CatalogRules, type Evidence, type Meta, type OverrideFile, type UpstreamCatalog } from "../src/core/schema.ts";
-import { fetchReturning, fixturePi, fixtureUpstream, ROOT, tempDataDir, writeAuthored } from "./helpers.ts";
+import { fetchReturning, fixturePi, fixtureUpstream, piShort, resolveWithPi, ROOT, tempDataDir, writeAuthored } from "./helpers.ts";
 
 const evidence: Evidence[] = [{ kind: "documented", url: "https://example.com/docs", date: "2026-11-01" }];
 const access: AccessRules = { default: "api", default_basis: "default", patterns: [], providers: {} };
@@ -46,12 +46,16 @@ function upstream(): UpstreamCatalog {
 const releasedBefore2026: CatalogRules = { exclude: [], exclude_released: [{ id: "released-2025", from: "2025-01-01", before: "2026-01-01", leaves_out: "Models released in 2025", reason: "Editorial choice.", date: "2026-11-16" }], placeholder_release_dates: [] };
 const excludeGone: OverrideFile = { provider: "lab", rules: [{ models: ["gone"], exclude: true, reason: "Withdrawn", evidence }] };
 
-function input(pi: PiCatalog | undefined, more: Partial<ResolveInput> = {}): ResolveInput {
-  return { upstream: upstream(), additions: [], overrides: [], access, routes: {}, ...(pi ? { pi: { catalog: pi } } : {}), ...more };
+function input(more: Partial<ResolveInput> = {}): ResolveInput {
+  return { upstream: upstream(), additions: [], overrides: [], access, routes: {}, ...more };
 }
+/** resolve() and pi's part laid over it, as the build does. */
+const withPi = (pi: PiCatalog, more: Partial<ResolveInput> = {}) => resolveWithPi(input(more), { catalog: pi });
 
 const blockOf = (catalog: Catalog, provider: string, model: string) => ext(catalog[provider]!.models[model]!).pi;
-const summaries = (catalog: Catalog): Summary[] => Object.entries(catalog).flatMap(([id, provider]) => Object.values(provider.models).map((model) => summarize(id, model, 0)));
+/** A summary as the build publishes it: summarize() writes pi null, the build the block in short. */
+const summaryWithPi = (provider: string, model: Catalog[string]["models"][string]): Summary => ({ ...summarize(provider, model, 0), pi: piShort(ext(model).pi) });
+const summaries = (catalog: Catalog): Summary[] => Object.entries(catalog).flatMap(([id, provider]) => Object.values(provider.models).map((model) => summaryWithPi(id, model)));
 
 /** An entry for piDifferences: its limit and cost as published. */
 const entry = (limit: JsonObject | undefined, cost: JsonObject | undefined) => ({ limit, cost });
@@ -61,24 +65,24 @@ const agreeing = (more: Partial<PiModel> = {}) => piModel("lab", "plain", { cost
 describe("the pi block (step 4)", () => {
   it("1. a matched entry carries the block with every key and match id; its summary the short form; an unlisted entry has null", () => {
     const pi: PiCatalog = { lab: { plain: piModel("lab", "plain"), stray: piModel("lab", "stray") } };
-    const result = resolve(input(pi));
+    const result = withPi(pi);
     const block = blockOf(result.catalog, "lab", "plain")!;
     expect(PiBlockSchema.parse(block)).toEqual(block);
     expect(Object.keys(block)).toEqual(Object.keys(PiBlockSchema.shape));
     expect(block).toMatchObject({ ref: "lab/plain", provider: "lab", model: "plain", match: "id", name: "Pi plain", api: "openai-completions" });
-    const summary = summarize("lab", result.catalog.lab!.models.plain!, 0);
+    const summary = summaryWithPi("lab", result.catalog.lab!.models.plain!);
     expect(summary.pi).toEqual({ ref: "lab/plain", api: "openai-completions", match: "id", difference_count: 0 });
     expect(PiSummarySchema.parse(summary.pi)).toEqual(summary.pi);
     // A pi model with no entry adds nothing and is counted unmatched; an entry pi does not list has null.
     expect(result.catalog.lab!.models.stray).toBeUndefined();
     expect(blockOf(result.catalog, "lab", "other")).toBeNull();
-    expect(summarize("lab", result.catalog.lab!.models.other!, 0).pi).toBeNull();
+    expect(summaryWithPi("lab", result.catalog.lab!.models.other!).pi).toBeNull();
     expect(result.pi!.totals).toEqual({ models: 2, matched_id: 1, matched_alias: 0, left_out: 0, unmatched: 1 });
   });
 
   it("2. a pi model whose entry an override or a catalog rule leaves out is left out, and nothing is published for it", () => {
     const pi: PiCatalog = { lab: { gone: piModel("lab", "gone"), old: piModel("lab", "old"), plain: piModel("lab", "plain") } };
-    const result = resolve(input(pi, { overrides: [excludeGone], catalogRules: releasedBefore2026 }));
+    const result = withPi(pi, { overrides: [excludeGone], catalogRules: releasedBefore2026 });
     expect(Object.keys(result.catalog.lab!.models).sort()).toEqual(["other", "plain"]);
     expect(result.pi!.totals).toEqual({ models: 3, matched_id: 1, matched_alias: 0, left_out: 2, unmatched: 0 });
   });
@@ -197,10 +201,10 @@ describe("the pi block (step 4)", () => {
 
   it("7. a difference follows the published value, after every override", () => {
     const pi: PiCatalog = { lab: { plain: piModel("lab", "plain", { contextWindow: 1000000 }) } };
-    expect(blockOf(resolve(input(pi)).catalog, "lab", "plain")!.differences).toMatchObject([{ field: "context_window", pi: 1000000, published: 200000 }]);
+    expect(blockOf(withPi(pi).catalog, "lab", "plain")!.differences).toMatchObject([{ field: "context_window", pi: 1000000, published: 200000 }]);
     const to = (context: number): OverrideFile => ({ provider: "lab", rules: [{ models: ["plain"], set: { limit: { context } }, reason: "documented", evidence }] });
-    expect(blockOf(resolve(input(pi, { overrides: [to(1000000)] })).catalog, "lab", "plain")!.differences).toEqual([]);
-    expect(blockOf(resolve(input(pi, { overrides: [to(500000)] })).catalog, "lab", "plain")!.differences).toMatchObject([{ field: "context_window", pi: 1000000, published: 500000 }]);
+    expect(blockOf(withPi(pi, { overrides: [to(1000000)] }).catalog, "lab", "plain")!.differences).toEqual([]);
+    expect(blockOf(withPi(pi, { overrides: [to(500000)] }).catalog, "lab", "plain")!.differences).toMatchObject([{ field: "context_window", pi: 1000000, published: 500000 }]);
   });
 
   it("8. headers, inputLimits.images.resize, lab, enabled, providers and free appear nowhere in the published catalog", () => {
@@ -209,7 +213,7 @@ describe("the pi block (step 4)", () => {
         plain: piModel("lab", "plain", { headers: { "X-Secret-Header": "1" }, inputLimits: { maxRequestBytes: 10, images: { maxPerRequest: 5, resize: { maxWidth: 2000, maxHeight: 2000, maxBytes: 5, jpegQuality: 80 } } }, lab: "PiLabName", enabled: true, providers: ["a"], free: true, another: 1 } as Partial<PiModel> & Record<string, unknown>),
       },
     };
-    const { catalog } = resolve(input(pi));
+    const { catalog } = withPi(pi);
     const text = JSON.stringify(catalog) + JSON.stringify(summaries(catalog));
     for (const key of ["headers", "X-Secret-Header", "resize", "jpegQuality", "PiLabName", "enabled", "\"providers\":", "\"free\":", "another"]) expect(text, key).not.toContain(key);
     expect(blockOf(catalog, "lab", "plain")!.input_limits).toEqual({ max_request_bytes: 10, max_images_per_request: 5, max_images_per_message: null });
@@ -217,7 +221,7 @@ describe("the pi block (step 4)", () => {
 
   it("9. what the feed does not state is null, \"\" as base_url is null, absent tiers are [], and no flag is filled in", () => {
     const pi: PiCatalog = { lab: { plain: piModel("lab", "plain", { baseUrl: "" }), other: piModel("lab", "other", { compat: { supportsStore: false }, thinkingLevelMap: { minimal: null, high: "high" }, promptCache: { short: 300 } }) } };
-    const { catalog } = resolve(input(pi));
+    const { catalog } = withPi(pi);
     expect(blockOf(catalog, "lab", "plain")).toMatchObject({ base_url: null, compat: null, thinking_level_map: null, prompt_cache: null, input_limits: { max_request_bytes: null, max_images_per_request: null, max_images_per_message: null }, cost: { tiers: [] } });
     expect(blockOf(catalog, "lab", "other")).toMatchObject({ base_url: "https://api.lab.example/v1", compat: { supportsStore: false }, thinking_level_map: { minimal: null, high: "high" }, prompt_cache: { short_s: 300, long_s: null } });
     expect(Object.keys(blockOf(catalog, "lab", "other")!.compat!)).toEqual(["supportsStore"]);
@@ -230,8 +234,8 @@ describe("the pi block (step 4)", () => {
     const exclude: OverrideFile = { provider: "provider-01", rules: [{ models: ["model-3"], exclude: true, reason: "Withdrawn", evidence }] };
     const early: CatalogRules = { exclude: [], exclude_released: [{ id: "early-2026", from: "2026-01-01", before: "2026-03-01", leaves_out: "Early 2026", reason: "Editorial choice.", date: "2026-11-16" }], placeholder_release_dates: [] };
     const base: ResolveInput = { upstream: upstreamCatalog, additions: [], overrides: [exclude], access, routes: {}, catalogRules: early };
-    const without = resolve(structuredClone(base));
-    const withPi = resolve({ ...structuredClone(base), pi: { catalog: pi } });
+    const without = resolveWithPi(structuredClone(base));
+    const withPi = resolveWithPi(structuredClone(base), { catalog: pi });
     expect(withPi.pi!.totals.matched_id).toBeGreaterThan(0);
     expect(withPi.pi!.totals.left_out).toBeGreaterThan(0);
     expect(withPi.exclusions).toEqual(without.exclusions);
@@ -346,7 +350,7 @@ describe("the alias file and the report (step 5)", () => {
     catalog.acme = { id: "acme", name: "Acme", models: { "model-x": { id: "model-x", name: "X" } } };
     return catalog;
   };
-  const run = (pi: PiCatalog, file?: PiAliases, more: Partial<ResolveInput> = {}) => resolve({ upstream: catalogWith(), additions: [], overrides: [], access, routes: {}, pi: { catalog: pi, ...(file ? { aliases: file } : {}) }, ...more });
+  const run = (pi: PiCatalog, file?: PiAliases, more: Partial<ResolveInput> = {}) => resolveWithPi({ upstream: catalogWith(), additions: [], overrides: [], access, routes: {}, ...more }, { catalog: pi, ...(file ? { aliases: file } : {}) });
   const piCodes = (issues: { code: string }[]) => issues.filter((issue) => issue.code.startsWith("pi-")).map((issue) => issue.code);
 
   it("13. a provider same_as: its models reach the paired provider's entries by equal model id, with pi's spelling and match alias", () => {

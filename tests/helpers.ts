@@ -2,13 +2,30 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { stringify } from "yaml";
-import type { ApiDeps } from "../src/core/api.ts";
+import type { z } from "zod";
+import { handleApi, modelsFor, type ApiDeps } from "../src/core/api.ts";
+import {
+  CacheEvaluationRecordSchema,
+  CanonicalModelDetailSchema,
+  CanonicalModelSchema,
+  EntryDetailSchema,
+  EntrySummarySchema,
+  LimitEvaluationRecordSchema,
+  MetaSchema,
+  one,
+  pageOf,
+  ProviderDetailSchema,
+  ProviderSchema,
+  ProviderSummarySchema,
+} from "../src/core/contract.ts";
+import { entryHref } from "../src/core/format.ts";
 import { addResults, documentedCache, emptyCacheLifetime, RETENTION_PROFILES, type CacheDocumentation, type CacheEvaluation, type CacheLifetimeRecord, type CacheResult, type EntryCache } from "../src/core/cache.ts";
 import type { Index, Summary } from "../src/core/entries.ts";
 import { controlsOf, pricingOf } from "../src/core/policies.ts";
 import { emptyInputWindow, type InputWindow } from "../src/core/limits.ts";
-import type { MeasuredLimit, Meta, ModelExtension, UpstreamCatalog } from "../src/core/schema.ts";
-import type { PiCatalog, PiModel } from "../src/core/pi.ts";
+import { ext, type Catalog, type MeasuredLimit, type Meta, type ModelExtension, type PiAliases, type UpstreamCatalog } from "../src/core/schema.ts";
+import { piPart, type PiBlock, type PiCatalog, type PiModel, type PiReport, type PiSummary } from "../src/core/pi.ts";
+import { resolve, type ResolveInput, type ResolveResult } from "../src/core/resolve.ts";
 import { pretty, ROOT } from "../scripts/lib/files.ts";
 import { piProviderFile } from "../scripts/lib/pi-sync.ts";
 
@@ -382,6 +399,69 @@ export function depsFrom(publishedDir: string): ApiDeps {
       return existsSync(file) ? new Response(readFileSync(file)) : null;
     },
   };
+}
+
+/**
+ * resolve() and then pi's part over the finished dataset, as the build lays it (scripts/lib/pi-fence.ts), without the
+ * fence: for the cases of pi's own code. `pi` is the report; null without a pi catalog.
+ */
+export function resolveWithPi(input: ResolveInput, pi?: { catalog: PiCatalog; aliases?: PiAliases }): ResolveResult & { pi: PiReport | null } {
+  const result = resolve(input);
+  if (!pi) return { ...result, pi: null };
+  const lookup = (ref: string) => {
+    const slash = ref.indexOf("/");
+    return result.catalog[ref.slice(0, slash)]?.models[ref.slice(slash + 1)];
+  };
+  const part = piPart({
+    pi: pi.catalog,
+    aliases: pi.aliases,
+    before: result.before,
+    ruledOut: result.ruledOut,
+    entryOf: (ref) => {
+      const entry = lookup(ref);
+      return entry ? { limit: structuredClone(entry.limit), cost: structuredClone(entry.cost) } : undefined;
+    },
+  });
+  for (const { ref, block } of part.blocks) ext(lookup(ref)!).pi = block;
+  return { ...result, issues: [...result.issues, ...part.issues], pi: part.report };
+}
+
+/** The pi block in short, as the build writes it into a summary. */
+export const piShort = (block: PiBlock | null): PiSummary | null => (block ? { ref: block.ref, api: block.api, match: block.match, difference_count: block.differences.length } : null);
+
+/**
+ * Every answer of the API from a published snapshot, checked against the definition the OpenAPI document is generated
+ * from: the problems found, none = the snapshot fits the contract. The check of "the contract" in tests/api.test.ts.
+ */
+export async function contractProblems(dir: string): Promise<string[]> {
+  const local = depsFrom(dir);
+  const ask = async (path: string): Promise<unknown> => (await handleApi(new Request(`https://providers.dev${path}`), local)).json();
+  const problems: string[] = [];
+  const valid = (schema: z.ZodType, value: unknown, what: string): void => {
+    const result = schema.safeParse(value);
+    if (!result.success) problems.push(...result.error.issues.slice(0, 3).map((issue) => `${what}: ${issue.path.join(".")}: ${issue.message}`));
+  };
+  valid(one(MetaSchema), await ask("/api/v1/meta"), "meta");
+  for (const entry of local.index.entries) valid(EntrySummarySchema, entry, entry.ref);
+  for (const provider of local.index.providers) valid(ProviderSummarySchema, provider, provider.id);
+  valid(pageOf(EntrySummarySchema), await ask("/api/v1/entries?limit=200"), "entries");
+  valid(pageOf(ProviderSummarySchema), await ask("/api/v1/providers?limit=200"), "providers");
+  valid(pageOf(CanonicalModelSchema), await ask("/api/v1/models?limit=200"), "models");
+  valid(pageOf(CacheEvaluationRecordSchema), await ask("/api/v1/evaluations/cache?limit=200"), "cache evaluations");
+  valid(pageOf(LimitEvaluationRecordSchema), await ask("/api/v1/evaluations/limits?limit=200"), "limit evaluations");
+  const model = modelsFor(local.index)[0]!;
+  valid(one(CanonicalModelDetailSchema), await ask(`/api/v1/models/${model.id}`), model.id);
+  // Every entry in full, straight from the export: thousands of them, so no request each.
+  const exported = JSON.parse(readFileSync(join(dir, "site", "api.json"), "utf8")) as Catalog;
+  for (const [id, provider] of Object.entries(exported)) valid(ProviderSchema, provider, id);
+  // The entries that carry the most: one with evaluations where there is one, and the first.
+  const picks = [local.index.entries.find((entry) => entry.evaluation_count > 0), local.index.entries.find((entry) => entry.measured_limit_count > 0), local.index.entries[0]].filter((entry) => entry !== undefined);
+  for (const entry of picks) {
+    valid(one(EntryDetailSchema), await ask(`/api/v1${entryHref(entry.ref)}`), entry.ref);
+    valid(one(ProviderDetailSchema), await ask(`/api/v1/providers/${entry.provider}?view=full`), entry.provider);
+    valid(one(ProviderDetailSchema), await ask(`/api/v1/providers/${entry.provider}`), entry.provider);
+  }
+  return problems;
 }
 
 export { ROOT };

@@ -19,7 +19,6 @@ import {
 } from "./cache.ts";
 import { inputWindow, windowMeasurement, type DocumentedField, type LimitSource } from "./limits.ts";
 import { clone, isObject, mergePatch, type Change, type Json, type JsonObject } from "./merge.ts";
-import { matchPi, piBlock, piReport, type PiBlock, type PiCatalog, type PiModel, type PiReport } from "./pi.ts";
 import { controlsOf, pricingOf, retentionFromControl } from "./policies.ts";
 import {
   NS,
@@ -39,7 +38,6 @@ import {
   type ModelExtension,
   type ObservedFile,
   type OverrideFile,
-  type PiAliases,
   type ProviderExtension,
   type Provenance,
   type PublishedEvidence,
@@ -62,16 +60,32 @@ export interface ResolveInput {
   catalogRules?: CatalogRules;
   /** The date of the models.dev import (YYYY-MM-DD): the date of what is taken from its documentation. */
   upstreamDate?: string;
-  /** The pi snapshot and the alias file. Left out = the dataset is built without pi data. */
-  pi?: { catalog: PiCatalog; aliases?: PiAliases };
+}
+
+/** One entry as it stood before any exclusion: plain facts for a part of the build that comes after resolve(). */
+export interface EntryBefore {
+  provider: string;
+  model: string;
+  /** The `base_url` of each endpoint of the entry's `api` that has one as a string, in the order of its keys. */
+  base_urls: string[];
+}
+
+/** The catalog as it stood then. A provider without an entry is in `providers` and has no row in `entries`. */
+export interface CatalogBefore {
+  /** Every provider id, in the catalog's order. */
+  providers: string[];
+  /** In the catalog's order: providers, then their models. */
+  entries: EntryBefore[];
 }
 
 export interface ResolveResult {
   catalog: Catalog;
   issues: Issue[];
   exclusions: Exclusion[];
-  /** What became of every pi model of the snapshot (data/published/pi-report.json). Null = built without pi data. */
-  pi: PiReport | null;
+  /** The catalog after step 3, before any exclusion (design/pi-source.md, section k): what pi's part is matched against. */
+  before: CatalogBefore;
+  /** Every entry a catalog rule left out, with the rule's id. */
+  ruledOut: { ref: string; rule: string }[];
 }
 
 /**
@@ -367,19 +381,21 @@ export function resolve(input: ResolveInput): ResolveResult {
     }
   }
 
-  // 3b. pi's catalog (design/pi-source.md, section c): which entry each pi model speaks of, worked out against the
-  // catalog before any exclusion, so that a pi model whose entry is then left out counts as left out, not as one
-  // that belongs to no entry. Equal ids first, then the alias file; nothing is ever matched by similarity. Nothing is
-  // changed here; the block is set in step 6 on the entries still published.
-  const piMatching = input.pi ? matchPi(input.pi.catalog, input.pi.aliases, catalog) : null;
-  const piMatches = new Map<PublishedModel, { provider: string; model: PiModel; match: PiBlock["match"] }>();
-  const piAssigned = new Map<PublishedModel, NonNullable<typeof piMatching>["assignments"][number]>();
-  for (const assignment of piMatching?.assignments ?? []) {
-    const entry = catalog[assignment.provider]!.models[assignment.entry]!;
-    piMatches.set(entry, { provider: assignment.piProvider, model: assignment.model, match: assignment.match });
-    piAssigned.set(entry, assignment);
+  // 3b. The catalog as it stands now, before any exclusion, recorded as plain rows for a part of the build that comes
+  // after resolve() (design/pi-source.md, section k): pi's catalog is matched against it.
+  const before: CatalogBefore = { providers: Object.keys(catalog), entries: [] };
+  for (const [providerId, provider] of Object.entries(catalog)) {
+    for (const [modelId, model] of Object.entries(provider.models)) {
+      const api = model.api;
+      const endpoints = typeof api === "object" && api !== null && !Array.isArray(api) ? Object.values(api) : [];
+      const baseUrls = endpoints.flatMap((endpoint) => {
+        if (typeof endpoint !== "object" || endpoint === null || Array.isArray(endpoint)) return [];
+        const url = (endpoint as Record<string, unknown>).base_url;
+        return typeof url === "string" ? [url] : [];
+      });
+      before.entries.push({ provider: providerId, model: modelId, base_urls: baseUrls });
+    }
   }
-  if (piMatching) issues.push(...piMatching.issues);
 
   // 4. Our overrides and tombstones.
   for (const file of input.overrides) {
@@ -734,13 +750,6 @@ export function resolve(input: ResolveInput): ResolveResult {
   };
 
   // 6. Deterministic order, and every record published with all of its keys.
-  const piPublished = new Set<NonNullable<typeof piMatching>["assignments"][number]>();
-  const piOf = (model: PublishedModel): PiBlock | null => {
-    const matched = piMatches.get(model);
-    if (!matched) return null;
-    piPublished.add(piAssigned.get(model)!);
-    return piBlock(matched.provider, matched.model, matched.match, { limit: model.limit, cost: model.cost });
-  };
   const sorted: Catalog = {};
   for (const id of Object.keys(catalog).sort()) {
     const provider = catalog[id] as PublishedProvider;
@@ -886,9 +895,9 @@ export function resolve(input: ResolveInput): ResolveResult {
         limits: { measured: measuredLimits, from_measurement: fromMeasurement, input_window: entryWindow },
         evidence: publishEvidence(evidence),
         verified: verified ?? null,
-        // What pi's catalog states for the entry, beside its own fields and never merged into them. The differences
-        // are worked out against the entry as published, after every override.
-        pi: piOf(model),
+        // What pi's catalog states for the entry: null here, always. The build lays pi's checked part over the finished
+        // dataset afterwards (scripts/lib/pi-fence.ts).
+        pi: null,
       };
       model[NS] = published as unknown as Json;
     }
@@ -917,10 +926,7 @@ export function resolve(input: ResolveInput): ResolveResult {
     }
   }
 
-  // A pi model reached an entry that an override or a catalog rule then left out: left out, by the rule or the
-  // override. The rest reached no entry. The report is put together here, at the end.
-  const pi = input.pi && piMatching ? piReport(input.pi.catalog, piMatching, (assignment) => piPublished.has(assignment), (ref) => ruledOut.get(ref) ?? "override") : null;
-  return { catalog: sorted, issues, exclusions, pi };
+  return { catalog: sorted, issues, exclusions, before, ruledOut: [...ruledOut].map(([ref, rule]) => ({ ref, rule })) };
 }
 
 function applyPatch(

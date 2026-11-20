@@ -5,23 +5,16 @@ import { isDeepStrictEqual } from "node:util";
 import { beforeAll, describe, expect, it } from "vitest";
 import { publish } from "../scripts/lib/publish.ts";
 import { loadUpstream, sync } from "../scripts/lib/sync.ts";
-import type { z } from "zod";
 import { handleApi, modelsFor, type ApiDeps } from "../src/core/api.ts";
 import { snapshotAsset } from "../src/core/assets.ts";
 import {
   CanonicalModelDetailSchema,
-  CanonicalModelSchema,
   EntryDetailSchema,
   EntrySummarySchema,
-  CacheEvaluationRecordSchema,
-  LimitEvaluationRecordSchema,
   MeasuredLimitSchema,
-  MetaSchema,
   one,
   pageOf,
   ProviderDetailSchema,
-  ProviderSchema,
-  ProviderSummarySchema,
 } from "../src/core/contract.ts";
 import { emptyCacheLifetime, lifetimeSeconds } from "../src/core/cache.ts";
 import { summarize, type Summary } from "../src/core/entries.ts";
@@ -31,8 +24,8 @@ import { handlePage } from "../src/core/pages.ts";
 import { MARK } from "../src/core/page-shell.ts";
 import { CACHE_EVALUATION_PARAMS, LIMIT_EVALUATION_PARAMS, PARAMS, parseQuery, runQuery } from "../src/core/query.ts";
 import { canonicalModels, inputWindowRange, listEvaluations, withoutEntries } from "../src/core/resources.ts";
-import type { Catalog, Meta, ModelExtension } from "../src/core/schema.ts";
-import { depsFrom, fetchReturning, fixtureUpstream, inputWindowRuleBreaks, lifetimeRuleBreaks, ROOT, summaryOf, tempDataDir, writeAuthored } from "./helpers.ts";
+import { ext, type Catalog, type Meta, type ModelExtension } from "../src/core/schema.ts";
+import { depsFrom, fetchReturning, fixtureUpstream, contractProblems, inputWindowRuleBreaks, lifetimeRuleBreaks, piShort, ROOT, summaryOf, tempDataDir, writeAuthored } from "./helpers.ts";
 
 let deps: ApiDeps;
 let published: string;
@@ -663,30 +656,8 @@ describe("the contract", () => {
   const holds = async (dir: string): Promise<void> => {
     const local = depsFrom(dir);
     const ask = async (path: string): Promise<unknown> => (await handleApi(new Request(`https://providers.dev${path}`), local)).json();
-    const valid = (schema: z.ZodType, value: unknown, what: string): void => {
-      const result = schema.safeParse(value);
-      expect(result.success ? [] : result.error.issues.slice(0, 3).map((issue) => `${issue.path.join(".")}: ${issue.message}`), what).toEqual([]);
-    };
-    valid(one(MetaSchema), await ask("/api/v1/meta"), "meta");
-    for (const entry of local.index.entries) valid(EntrySummarySchema, entry, entry.ref);
-    for (const provider of local.index.providers) valid(ProviderSummarySchema, provider, provider.id);
-    valid(pageOf(EntrySummarySchema), await ask("/api/v1/entries?limit=200"), "entries");
-    valid(pageOf(ProviderSummarySchema), await ask("/api/v1/providers?limit=200"), "providers");
-    valid(pageOf(CanonicalModelSchema), await ask("/api/v1/models?limit=200"), "models");
-    valid(pageOf(CacheEvaluationRecordSchema), await ask("/api/v1/evaluations/cache?limit=200"), "cache evaluations");
-    valid(pageOf(LimitEvaluationRecordSchema), await ask("/api/v1/evaluations/limits?limit=200"), "limit evaluations");
-    const model = modelsFor(local.index)[0]!;
-    valid(one(CanonicalModelDetailSchema), await ask(`/api/v1/models/${model.id}`), model.id);
-    // Every entry in full, straight from the export: thousands of them, so no request each.
+    expect(await contractProblems(dir)).toEqual([]);
     const exported = JSON.parse(readFileSync(join(dir, "site", "api.json"), "utf8")) as Catalog;
-    for (const [id, provider] of Object.entries(exported)) valid(ProviderSchema, provider, id);
-    // The entries that carry the most: one with evaluations where there is one, and the first.
-    const picks = [local.index.entries.find((entry) => entry.evaluation_count > 0), local.index.entries.find((entry) => entry.measured_limit_count > 0), local.index.entries[0]].filter((entry) => entry !== undefined);
-    for (const entry of picks) {
-      valid(one(EntryDetailSchema), await ask(`/api/v1${entryHref(entry.ref)}`), entry.ref);
-      valid(one(ProviderDetailSchema), await ask(`/api/v1/providers/${entry.provider}?view=full`), entry.provider);
-      valid(one(ProviderDetailSchema), await ask(`/api/v1/providers/${entry.provider}`), entry.provider);
-    }
 
     // One structure. Everything providers.dev publishes of its own has the same keys on every object of its kind:
     // what is not known is null, what is empty is an empty list, and nothing is left out.
@@ -939,7 +910,8 @@ describe("one dataset for the website and the API", () => {
     for (const entry of local.index.entries) {
       refs.add(entry.ref);
       const model = exported[entry.provider]!.models[entry.model]!;
-      expect(summarize(entry.provider, model, entry.shard)).toEqual(entry);
+      // summarize() writes pi null; the build writes the block in short from the entry's checked block.
+      expect({ ...summarize(entry.provider, model, entry.shard), pi: piShort(ext(model).pi) }).toEqual(entry);
     }
     const total = Object.values(exported).reduce((sum, provider) => sum + Object.keys(provider.models).length, 0);
     expect(refs.size).toBe(total);

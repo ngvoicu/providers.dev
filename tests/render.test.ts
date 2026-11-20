@@ -9,7 +9,7 @@ import { canonicalModels } from "../src/core/resources.ts";
 import { resolve } from "../src/core/resolve.ts";
 import { NS, UpstreamModel, type ModelExtension } from "../src/core/schema.ts";
 import { pricingOf } from "../src/core/policies.ts";
-import { limitOf, NO_CACHE, summaryOf } from "./helpers.ts";
+import { limitOf, NO_CACHE, piShort, resolveWithPi, summaryOf } from "./helpers.ts";
 import { duration, usd, usdUnrounded } from "../src/core/format.ts";
 import type { PiBlock, PiCatalog, PiModel } from "../src/core/pi.ts";
 import type { MetaPi } from "../src/core/schema.ts";
@@ -787,7 +787,7 @@ describe("pi's catalog on an entry's page and in a row", () => {
       bare: piModel("bare", { cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 }, contextWindow: 100000, maxTokens: 4000 }),
     },
   };
-  const { catalog } = resolve({
+  const { catalog } = resolveWithPi({
     upstream: {
       lab: {
         id: "lab", name: "Lab",
@@ -799,9 +799,10 @@ describe("pi's catalog on an entry's page and in a row", () => {
       },
     },
     additions: [], overrides: [], routes: {}, access: { default: "api", default_basis: "fixture", patterns: [], providers: {} }, upstreamDate: "2026-11-13",
-    pi: { catalog: pi },
-  });
+  }, { catalog: pi });
   const index = buildIndex(catalog, "fixture", "2026-11-14T00:00:00Z", "2026-11-14T00:00:00Z");
+  // The build writes each summary's pi from the checked block (scripts/lib/pi-fence.ts).
+  for (const summary of index.entries) summary.pi = piShort((catalog.lab!.models[summary.model]![NS] as unknown as ModelExtension).pi);
   const meta = (more: Partial<MetaPi["sync"]> = {}): MetaPi => ({
     source: "https://pi.dev/api/models",
     snapshot: { fetched_at: "2026-11-12T14:19:45.000Z", checked_at: "2026-11-14T04:17:12.000Z", etag: '"p1"', last_modified: null, revision: null, sha256: "ab".repeat(32), providers: 1, models: 2 },

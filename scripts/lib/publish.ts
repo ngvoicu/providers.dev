@@ -6,10 +6,8 @@ import { gzipSync } from "node:zlib";
 import { parse as parseYaml } from "yaml";
 import type { ZodType } from "zod";
 import { CACHE_AGES_S } from "../../src/core/cache.ts";
-import { MetaSchema, PiBlockSchema, PiSummarySchema } from "../../src/core/contract.ts";
 import { buildIndex, SHARD_SIZE, type Index } from "../../src/core/entries.ts";
 import { listCorrections, listEvaluations } from "../../src/core/resources.ts";
-import type { PiCatalog } from "../../src/core/pi.ts";
 import { resolve } from "../../src/core/resolve.ts";
 import {
   AccessRules,
@@ -19,19 +17,17 @@ import {
   MeasurementLabels,
   ObservedFile,
   OverrideFile,
-  PI_URL,
   PiAliases,
   RouteMap,
   UPSTREAM_SCHEMA,
   type Catalog,
   type Issue,
   type Meta,
-  type PiMeta,
   type SourceMeta,
 } from "../../src/core/schema.ts";
 import { readJsonIfExists, sha256, swapDir } from "./files.ts";
-import { storedPi } from "./pi-sync.ts";
-import { loadUpstream, PiSyncRecord, type SyncStatus } from "./sync.ts";
+import { piOfBuild, type PiOfBuild } from "./pi-fence.ts";
+import { loadUpstream, type SyncStatus } from "./sync.ts";
 
 /**
  * providers.dev evidence (a correction, an evaluation, a measured lifetime) whose date is more than this many days before
@@ -52,6 +48,8 @@ export interface PublishReport {
   errors: string[];
   issues: Issue[];
   meta?: Meta;
+  /** What became of pi's part (scripts/lib/pi-fence.ts). Absent on every return before it was looked at. */
+  pi?: PiOfBuild["state"];
 }
 
 function loadYamlDir<T>(dir: string, schema: ZodType<T>, errors: string[], idOf: (value: T) => string): T[] {
@@ -89,63 +87,6 @@ const compact = (value: unknown): string => JSON.stringify(value);
 /** pi's project, licence and the copyright line of its LICENSE file (LICENSES/pi-MIT.txt). */
 const PI_LICENSE = "pi (https://github.com/earendil-works/pi), MIT License, Copyright (c) 2025 Mario Zechner";
 
-/**
- * The pi snapshot in data/pi/, where it is usable (`storedPi`, the sync's answer too). Undefined where there is none,
- * and where it cannot be used (an edit by hand, or a schema that moved on): then the warning pi-snapshot-unreadable is raised.
- */
-function readPi(dataDir: string, issues: Issue[]): { catalog: PiCatalog; meta: PiMeta } | undefined {
-  const stored = storedPi(dataDir);
-  if (stored.state === "unusable") issues.push(piUnreadable(stored.why));
-  return stored.state === "usable" ? { catalog: stored.catalog, meta: stored.meta } : undefined;
-}
-
-/** The warning of a dataset built without pi data because what came from pi cannot be used. */
-function piUnreadable(why: string): Issue {
-  return { level: "warning", code: "pi-snapshot-unreadable", target: "data/pi", message: `The pi snapshot in data/pi/ cannot be read (${why}). The dataset is built without pi data: no entry has a pi block.` };
-}
-
-/**
- * The first value the build would publish for pi that the contract refuses, and where, or null where all fit:
- * `meta.pi`, the `pi` of every entry and the `pi` of every summary, each against the contract's own schema.
- */
-export function piMisfit(catalog: Catalog, index: Index, meta: Meta): string | null {
-  const first = (result: { success: boolean; error?: { issues: { path: PropertyKey[]; message: string }[] } }, where: string): string | null => {
-    if (result.success) return null;
-    const issue = result.error?.issues[0];
-    return `${where}${issue && issue.path.length > 0 ? `.${issue.path.map(String).join(".")}` : ""}: ${issue?.message ?? "does not fit"}`;
-  };
-  const found = first(MetaSchema.shape.pi.safeParse(meta.pi), "meta.pi");
-  if (found) return found;
-  for (const [provider, record] of Object.entries(catalog)) {
-    for (const [model, entry] of Object.entries(record.models)) {
-      const block = first(PiBlockSchema.nullable().safeParse(ext(entry).pi), `providers_dev.pi of the entry ${provider}/${model}`);
-      if (block) return block;
-    }
-  }
-  for (const summary of index.entries) {
-    const short = first(PiSummarySchema.nullable().safeParse(summary.pi), `pi of the summary ${summary.ref}`);
-    if (short) return short;
-  }
-  return null;
-}
-
-/**
- * The last attempt to import pi's catalog, from the `pi` key of data/sync-status.json. All null = none is recorded, or
- * the record does not fit PiSyncRecord: then the warning pi-snapshot-unreadable says so.
- */
-function piSync(status: Partial<SyncStatus> | undefined, issues: Issue[]): Meta["pi"]["sync"] {
-  const none = { last_attempt_at: null, last_attempt_ok: null, last_error: null };
-  if (status?.pi === undefined) return none;
-  const checked = PiSyncRecord.safeParse(status.pi);
-  if (!checked.success) {
-    const first = checked.error.issues[0];
-    issues.push({ level: "warning", code: "pi-snapshot-unreadable", target: "data/sync-status.json", message: `The record of the last pi import in data/sync-status.json cannot be read (${first ? `pi${first.path.length > 0 ? `.${first.path.join(".")}` : ""}: ${first.message}` : "unknown"}). It is published as no attempt recorded.` });
-    return none;
-  }
-  const pi = checked.data;
-  return { last_attempt_at: pi.last_attempt_at, last_attempt_ok: pi.status !== "failed", last_error: pi.error ?? null };
-}
-
 export function publish(input: PublishOptions): PublishReport {
   const options = { now: () => new Date(), ...input };
   const { dataDir } = options;
@@ -178,133 +119,113 @@ export function publish(input: PublishOptions): PublishReport {
   }
   if (errors.length > 0 || !access || !routes) return { ok: false, errors, issues: [] };
 
-  // The pi snapshot, checked against PiFeed. A snapshot that is missing builds the dataset without pi data; one that
-  // the code cannot read does too, with a warning. The build never fails for pi.
-  const piIssues: Issue[] = [];
-  const stored = readPi(dataDir, piIssues);
+
+  // The dataset, complete without pi: every entry and summary has `pi: null`.
+  const { catalog, issues: resolved, exclusions, before, ruledOut } = resolve({
+    upstream: upstream.catalog,
+    additions,
+    overrides,
+    access,
+    routes,
+    upstreamDate: upstream.meta.fetched_at.slice(0, 10),
+    ...(labels ? { labels } : {}),
+    ...(catalogRules ? { catalogRules } : {}),
+    ...(observed ? { observed } : {}),
+  });
+  // An error or an empty catalog ends the build here, before anything of pi's is touched.
+  for (const issue of resolved) if (issue.level === "error") errors.push(`${issue.target}: ${issue.message}`);
+  if (errors.length > 0) return { ok: false, errors, issues: resolved };
+  if (Object.keys(catalog).length === 0 || Object.values(catalog).every((provider) => Object.keys(provider.models).length === 0)) {
+    return { ok: false, errors: ["The resolved catalog is empty."], issues: resolved };
+  }
+
   const status = readJsonIfExists<Partial<SyncStatus>>(join(dataDir, "sync-status.json"));
-  const piRecord = piSync(status, piIssues);
+  // pi's part, behind the fence: checked, plain data, or nothing and a warning that says why.
+  const pi = piOfBuild({ dataDir, status, aliases: piAliases, catalog, before, ruledOut });
+  for (const [providerId, provider] of Object.entries(catalog)) {
+    for (const [modelId, model] of Object.entries(provider.models)) {
+      const found = pi.entries.get(`${providerId}/${modelId}`);
+      if (found) ext(model).pi = found.block;
+    }
+  }
+  const withPi = (index: Index): Index => {
+    for (const summary of index.entries) {
+      const found = pi.entries.get(summary.ref);
+      if (found) summary.pi = found.summary;
+    }
+    return index;
+  };
+  const issues = [...resolved, ...pi.issues];
   const generatedAt = options.now().toISOString();
 
-  /** The dataset from the catalog's sources and `pi`, the pi snapshot or none. */
-  const assemble = (pi: ReturnType<typeof readPi>) => {
-    const { catalog, issues: resolved, exclusions, pi: piResult } = resolve({
-      upstream: upstream.catalog,
-      additions,
-      overrides,
-      access,
-      routes,
-      upstreamDate: upstream.meta.fetched_at.slice(0, 10),
-      ...(labels ? { labels } : {}),
-      ...(catalogRules ? { catalogRules } : {}),
-      ...(observed ? { observed } : {}),
-      ...(pi ? { pi: { catalog: pi.catalog, ...(piAliases ? { aliases: piAliases } : {}) } } : {}),
-    });
-    const issues = [...resolved, ...piIssues];
-    // The version covers everything a reader can get: the catalog and the summaries made from it. A new summary field
-    // changes the version (and with it every ETag) also when the catalog itself did not change.
-    const draft = buildIndex(catalog, "", generatedAt, upstream.meta.fetched_at);
-    const datasetVersion = sha256(compact({ catalog, exclusions, providers: draft.providers, entries: draft.entries })).slice(0, 16);
-    const index = buildIndex(catalog, datasetVersion, generatedAt, upstream.meta.fetched_at);
-    const observedMeta = readJsonIfExists<SourceMeta>(join(dataDir, "sources", "observed.meta.json"));
+  // The version covers everything a reader can get: the catalog and the summaries made from it. A new summary field
+  // changes the version (and with it every ETag) also when the catalog itself did not change.
+  const draft = withPi(buildIndex(catalog, "", generatedAt, upstream.meta.fetched_at));
+  const datasetVersion = sha256(compact({ catalog, exclusions, providers: draft.providers, entries: draft.entries })).slice(0, 16);
+  const index = withPi(buildIndex(catalog, datasetVersion, generatedAt, upstream.meta.fetched_at));
+  const observedMeta = readJsonIfExists<SourceMeta>(join(dataDir, "sources", "observed.meta.json"));
 
-    const meta: Meta = {
-      api_version: "v1",
-      upstream_schema: UPSTREAM_SCHEMA,
-      dataset_version: datasetVersion,
-      generated_at: generatedAt,
-      counts: {
-        providers: index.providers.length,
-        entries: index.entries.length,
-        models: new Set(index.entries.map((entry) => entry.canonical_id).filter(Boolean)).size,
-        added_providers: index.providers.filter((provider) => provider.origin === "added").length,
-        added_entries: index.entries.filter((entry) => entry.origin === "added").length,
-        corrected_entries: index.entries.filter((entry) => entry.overridden_fields.length > 0).length,
-        evaluated_entries: index.entries.filter((entry) => entry.evaluation_count > 0).length,
-        cache_evaluations: index.entries.reduce((sum, entry) => sum + entry.evaluation_count, 0),
-        limit_evaluations: index.entries.reduce((sum, entry) => sum + entry.measured_limit_count, 0),
-      },
-      cache_ages_s: [...CACHE_AGES_S],
-      stale_after_days: STALE_AFTER_DAYS,
-      // Every key is always there: what is not known is null.
-      upstream: {
-        source: upstream.meta.source,
-        schema: upstream.meta.schema,
-        fetched_at: upstream.meta.fetched_at,
-        checked_at: upstream.meta.checked_at,
-        etag: upstream.meta.etag ?? null,
-        commit: upstream.meta.commit ?? null,
-        commit_date: upstream.meta.commit_date ?? null,
-        sha256: upstream.meta.sha256,
-        providers: upstream.meta.providers,
-        models: upstream.meta.models,
-      },
-      measurements:
-        observed && observedMeta
-          ? { source: observedMeta.source, fetched_at: observedMeta.fetched_at, checked_at: observedMeta.checked_at, etag: observedMeta.etag ?? null, sha256: observedMeta.sha256, repository: observed.repository }
-          : null,
-      sync: { last_attempt_at: status?.last_attempt_at ?? null, last_attempt_ok: status?.last_attempt_ok ?? null, last_error: status?.last_error ?? null },
-      exclusions,
-      issues,
-      license: {
-        data: "MIT",
-        upstream: "models.dev, MIT License, Copyright (c) 2025 models.dev",
-        notice: "Baseline imported from https://models.dev. providers.dev is not affiliated with or endorsed by models.dev.",
-        pi: PI_LICENSE,
-        pi_notice: "The pi block of an entry (providers_dev.pi) is imported from https://pi.dev/api/models. providers.dev is not affiliated with or endorsed by pi.",
-      },
-      pi: {
-        source: PI_URL,
-        snapshot: pi
-          ? {
-              fetched_at: pi.meta.fetched_at,
-              checked_at: pi.meta.checked_at,
-              etag: pi.meta.etag ?? null,
-              last_modified: pi.meta.last_modified ?? null,
-              revision: pi.meta.revision ?? null,
-              sha256: pi.meta.sha256,
-              providers: pi.meta.providers,
-              models: pi.meta.models,
-            }
-          : null,
-        sync: piRecord,
-        counts: {
-          entries_with_block: piResult ? piResult.totals.matched_id + piResult.totals.matched_alias : 0,
-          left_out_models: piResult?.totals.left_out ?? 0,
-          unmatched_models: piResult?.totals.unmatched ?? 0,
-        },
-      },
-    };
-
-    return { catalog, issues, exclusions, piResult, index, meta };
+  const meta: Meta = {
+    api_version: "v1",
+    upstream_schema: UPSTREAM_SCHEMA,
+    dataset_version: datasetVersion,
+    generated_at: generatedAt,
+    counts: {
+      providers: index.providers.length,
+      entries: index.entries.length,
+      models: new Set(index.entries.map((entry) => entry.canonical_id).filter(Boolean)).size,
+      added_providers: index.providers.filter((provider) => provider.origin === "added").length,
+      added_entries: index.entries.filter((entry) => entry.origin === "added").length,
+      corrected_entries: index.entries.filter((entry) => entry.overridden_fields.length > 0).length,
+      evaluated_entries: index.entries.filter((entry) => entry.evaluation_count > 0).length,
+      cache_evaluations: index.entries.reduce((sum, entry) => sum + entry.evaluation_count, 0),
+      limit_evaluations: index.entries.reduce((sum, entry) => sum + entry.measured_limit_count, 0),
+    },
+    cache_ages_s: [...CACHE_AGES_S],
+    stale_after_days: STALE_AFTER_DAYS,
+    // Every key is always there: what is not known is null.
+    upstream: {
+      source: upstream.meta.source,
+      schema: upstream.meta.schema,
+      fetched_at: upstream.meta.fetched_at,
+      checked_at: upstream.meta.checked_at,
+      etag: upstream.meta.etag ?? null,
+      commit: upstream.meta.commit ?? null,
+      commit_date: upstream.meta.commit_date ?? null,
+      sha256: upstream.meta.sha256,
+      providers: upstream.meta.providers,
+      models: upstream.meta.models,
+    },
+    measurements:
+      observed && observedMeta
+        ? { source: observedMeta.source, fetched_at: observedMeta.fetched_at, checked_at: observedMeta.checked_at, etag: observedMeta.etag ?? null, sha256: observedMeta.sha256, repository: observed.repository }
+        : null,
+    sync: { last_attempt_at: status?.last_attempt_at ?? null, last_attempt_ok: status?.last_attempt_ok ?? null, last_error: status?.last_error ?? null },
+    exclusions,
+    issues,
+    license: {
+      data: "MIT",
+      upstream: "models.dev, MIT License, Copyright (c) 2025 models.dev",
+      notice: "Baseline imported from https://models.dev. providers.dev is not affiliated with or endorsed by models.dev.",
+      pi: PI_LICENSE,
+      pi_notice: "The pi block of an entry (providers_dev.pi) is imported from https://pi.dev/api/models. providers.dev is not affiliated with or endorsed by pi.",
+    },
+    pi: pi.meta,
   };
-  let built = assemble(stored);
-  // The net under the pi part: what the build is about to publish for pi must fit the contract. Where it does not, the
-  // dataset is built without pi data, as for a snapshot that cannot be used. It decides nothing else and repairs nothing.
-  const misfit = stored ? piMisfit(built.catalog, built.index, built.meta) : null;
-  if (misfit) {
-    piIssues.push(piUnreadable(`what the build would publish for pi does not fit the contract: ${misfit}`));
-    built = assemble(undefined);
-  }
-  const { catalog, issues, index, meta, piResult } = built;
-  for (const issue of issues) if (issue.level === "error") errors.push(`${issue.target}: ${issue.message}`);
-  if (errors.length > 0) return { ok: false, errors, issues };
-
-  if (index.providers.length === 0 || index.entries.length === 0) return { ok: false, errors: ["The resolved catalog is empty."], issues };
 
   const next = `${join(dataDir, "published")}.tmp-${process.pid}`;
   rmSync(next, { recursive: true, force: true });
   try {
     writeSnapshot(next, catalog, index, meta, options.rootDir);
     // Beside the published data, not under site/: never staged, served or part of the API.
-    if (piResult) writeFileSync(join(next, "pi-report.json"), `${JSON.stringify(piResult, null, 1)}\n`);
+    if (pi.report !== null) writeFileSync(join(next, "pi-report.json"), pi.report);
     verifySnapshot(next, index);
   } catch (error) {
     rmSync(next, { recursive: true, force: true });
-    return { ok: false, errors: [`Writing the snapshot failed: ${error instanceof Error ? error.message : String(error)}`], issues };
+    return { ok: false, errors: [`Writing the snapshot failed: ${error instanceof Error ? error.message : String(error)}`], issues, pi: pi.state };
   }
   swapDir(next, join(dataDir, "published"));
-  return { ok: true, errors: [], issues, meta };
+  return { ok: true, errors: [], issues, meta, pi: pi.state };
 }
 
 function writeSnapshot(dir: string, catalog: Catalog, index: Index, meta: Meta, rootDir: string): void {

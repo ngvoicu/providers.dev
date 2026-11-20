@@ -3,7 +3,7 @@
 import { cacheFacts, type CacheLifetimeRecord, type CacheMode, type CacheRetention, type CacheSupport, type Support } from "./cache.ts";
 import type { InputWindow } from "./limits.ts";
 import { isObject, type JsonObject } from "./merge.ts";
-import { piSummary, type PiSummary } from "./pi.ts";
+import type { PiSummary } from "./pi.ts";
 import type { Pricing, RequestControls } from "./policy-contract.ts";
 import { NS, type Access, type Catalog, type ModelExtension, type ProviderExtension } from "./schema.ts";
 
@@ -148,7 +148,8 @@ export function summarize(providerId: string, model: JsonObject, shard: number):
     overridden_fields: overridden,
     verified: extension.verified,
     shard,
-    pi: piSummary(extension.pi),
+    // The pi block in short: null here, always. The build writes it from the checked block (scripts/lib/pi-fence.ts).
+    pi: null,
   };
 }
 

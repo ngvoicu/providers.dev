@@ -7,7 +7,7 @@ import { z } from "zod";
 import { deepEqual } from "../../src/core/merge.ts";
 import { ObservedFile, UPSTREAM_SCHEMA, UpstreamCatalog, type SourceMeta, type UpstreamMeta } from "../../src/core/schema.ts";
 import { pretty, readJson, readJsonIfExists, sha256, swapDir, writeFileAtomic } from "./files.ts";
-import { syncPi } from "./pi-sync.ts";
+import { piOfSync } from "./pi-fence.ts";
 
 // models.dev hides `openai-codex` (a ChatGPT subscription login) unless a client asks for it (models.dev f648ddb,
 // 2026-11-17). providers.dev lists it as a subscription, so it asks. The README says more, under Syncing.
@@ -19,7 +19,7 @@ export const OBSERVED_URL = "https://raw.githubusercontent.com/ngvoicu/groundtru
 const MIN_PROVIDERS = 20;
 const MIN_MODELS = 500;
 /** An import that lost more than this share of the previous snapshot is treated as broken. Shared by every part. */
-export const MIN_SHARE = 0.6;
+const MIN_SHARE = 0.6;
 const LOCK_STALE_MS = 30 * 60 * 1000;
 
 export interface SyncOptions {
@@ -125,7 +125,7 @@ type ModelsByProvider = Record<string, Record<string, unknown>>;
 
 const modelsOf = (catalog: UpstreamCatalog): ModelsByProvider => Object.fromEntries(Object.entries(catalog).map(([id, provider]) => [id, provider.models]));
 
-export function summarize(before: ModelsByProvider | undefined, after: ModelsByProvider): string[] {
+function summarize(before: ModelsByProvider | undefined, after: ModelsByProvider): string[] {
   const total = (catalog: ModelsByProvider): number => Object.values(catalog).reduce((sum, models) => sum + Object.keys(models).length, 0);
   if (!before) return [`first import: ${Object.keys(after).length} providers, ${total(after)} models`];
   const lines: string[] = [];
@@ -239,7 +239,7 @@ async function syncUpstream(options: Required<Pick<SyncOptions, "dataDir" | "fet
   return { status: "updated", summary: summarize(previous ? modelsOf(previous.catalog) : undefined, modelsOf(catalog)) };
 }
 
-export function etagOf(response: Response): { etag?: string } {
+function etagOf(response: Response): { etag?: string } {
   const etag = response.headers.get("etag");
   return etag ? { etag } : {};
 }
@@ -291,7 +291,7 @@ export async function sync(input: SyncOptions): Promise<SyncReport> {
     };
     const statusPath = join(options.dataDir, "sync-status.json");
     if (options.only === "pi") {
-      const pi = await part(() => syncPi(options));
+      const { report: pi } = await piOfSync(options);
       // The five fields of models.dev and the measurements stay as they were (absent where there were none).
       const previous = readJsonIfExists<Partial<SyncStatus>>(statusPath) ?? {};
       writeFileAtomic(statusPath, pretty({ ...previous, pi: piStatus(pi, options.now()) }));
@@ -302,7 +302,7 @@ export async function sync(input: SyncOptions): Promise<SyncReport> {
     const ok = upstream.status !== "failed" && measurements.status !== "failed";
     const errors = [upstream, measurements].map((item) => item.error).filter(Boolean);
     const lastAttemptAt = options.now().toISOString();
-    const pi = await part(() => syncPi(options));
+    const { report: pi } = await piOfSync(options);
     const status: SyncStatus = {
       last_attempt_at: lastAttemptAt,
       last_attempt_ok: ok,

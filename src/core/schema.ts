@@ -633,4 +633,12 @@ export function ext(model: JsonObject): ModelExtension {
 export function providerExt(provider: JsonObject): ProviderExtension {
   return provider[NS] as unknown as ProviderExtension;
 }
+/** `meta.pi` of a dataset without pi data: one of the fixed values of "no pi data" (design/pi-source.md, section k). */
+export const noPiMeta = (): Meta["pi"] => ({
+  source: PI_URL,
+  snapshot: null,
+  sync: { last_attempt_at: null, last_attempt_ok: null, last_error: null },
+  counts: { entries_with_block: 0, left_out_models: 0, unmatched_models: 0 },
+});
+
 export type { Json, JsonObject };
