@@ -3,6 +3,7 @@
 // with a source leaves its previous snapshot exactly as it was; the three parts never affect one another.
 import { appendFileSync, closeSync, existsSync, mkdirSync, openSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { z } from "zod";
 import { deepEqual } from "../../src/core/merge.ts";
 import { PiFeed, type PiCatalog, type PiModel } from "../../src/core/pi.ts";
 import { ObservedFile, PiMeta, PROVIDER_ID, UPSTREAM_SCHEMA, UpstreamCatalog, type SourceMeta, type UpstreamMeta } from "../../src/core/schema.ts";
@@ -59,6 +60,17 @@ export type StoredStatus = Exclude<PartReport["status"], "skipped">;
 /** The report of a part that ran. */
 type RanPart = PartReport & { status: StoredStatus };
 
+/**
+ * The `pi` key of data/sync-status.json: the last attempt to import pi's catalog. One definition, checked on what the
+ * sync writes and on what the build reads: a record that does not fit counts as no attempt recorded.
+ */
+export const PiSyncRecord = z.strictObject({
+  last_attempt_at: z.string(),
+  status: z.enum(["updated", "unchanged", "failed"]),
+  error: z.string().optional(),
+});
+export type PiSyncRecord = z.infer<typeof PiSyncRecord>;
+
 export interface SyncStatus {
   // These five speak of models.dev and the measurements only.
   last_attempt_at: string;
@@ -67,7 +79,7 @@ export interface SyncStatus {
   upstream: StoredStatus;
   measurements: StoredStatus;
   /** The last attempt to import pi's catalog. */
-  pi?: { last_attempt_at: string; status: StoredStatus; error?: string };
+  pi?: PiSyncRecord;
 }
 
 export class SyncBusyError extends Error {}
@@ -505,8 +517,8 @@ export async function sync(input: SyncOptions): Promise<SyncReport> {
 }
 
 /** The `pi` key of data/sync-status.json; its time is when the pi part ended. */
-function piStatus(pi: RanPart, at: Date): NonNullable<SyncStatus["pi"]> {
-  return { last_attempt_at: at.toISOString(), status: pi.status, ...(pi.error ? { error: pi.error } : {}) };
+function piStatus(pi: RanPart, at: Date): PiSyncRecord {
+  return PiSyncRecord.parse({ last_attempt_at: at.toISOString(), status: pi.status, ...(pi.error ? { error: pi.error } : {}) });
 }
 
 /**

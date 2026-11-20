@@ -110,6 +110,63 @@ describe("the net under the pi part of the build", () => {
     expect(await contractProblems(published)).toEqual([]);
   });
 
+  /** The data directory with the `pi` record of data/sync-status.json replaced by `record`. */
+  const withRecord = async (record: unknown): Promise<string> => {
+    const dir = await dataDir();
+    const path = join(dir, "sync-status.json");
+    writeFileSync(path, pretty({ ...JSON.parse(readFileSync(path, "utf8")), pi: record }));
+    return dir;
+  };
+  const good = { last_attempt_at: "2026-11-20T14:19:45.000Z", status: "updated" };
+
+  it.each<[string, unknown, string]>([
+    ["last_attempt_at 5 (the reproduction)", { ...good, last_attempt_at: 5 }, "pi.last_attempt_at"],
+    ["last_attempt_at missing", { status: "updated" }, "pi.last_attempt_at"],
+    ["status a word the sync never writes", { ...good, status: "done" }, "pi.status"],
+    ["status a number", { ...good, status: 1 }, "pi.status"],
+    ["error a number", { ...good, status: "failed", error: 503 }, "pi.error"],
+    ["a key the record does not have", { ...good, at: "x" }, "pi"],
+    ["not a record at all", "updated", "pi"],
+    ["null", null, "pi"],
+  ])("a pi sync record with %s counts as no attempt recorded, with a warning; the pi data stays and /meta fits the contract", async (_name, record, where) => {
+    const dir = await withRecord(record);
+    const report = publish({ dataDir: dir, rootDir: ROOT });
+    expect(report.ok).toBe(true);
+    const published = join(dir, "published");
+    const meta = JSON.parse(readFileSync(join(published, "site", "data", "meta.json"), "utf8")) as Meta;
+    expect(meta.pi.sync).toEqual({ last_attempt_at: null, last_attempt_ok: null, last_error: null });
+    expect(meta.pi.snapshot).not.toBeNull();
+    expect(blocks(published)).toBeGreaterThan(0);
+    const warnings = meta.issues.filter((issue) => issue.code.startsWith("pi-"));
+    expect(warnings).toMatchObject([{ level: "warning", code: "pi-snapshot-unreadable", target: "data/sync-status.json" }]);
+    expect(warnings[0]!.message).toContain(`cannot be read (${where}`);
+    expect(warnings[0]!.message).toContain("published as no attempt recorded");
+    expect(await contractProblems(published)).toEqual([]);
+  });
+
+  it("a bad sync record and a block the contract refuses together: the fallback of the net fits the contract too", async () => {
+    const dir = await withRecord({ ...good, last_attempt_at: 5 });
+    fault.in = "block";
+    expect(publish({ dataDir: dir, rootDir: ROOT }).ok).toBe(true);
+    const published = join(dir, "published");
+    expect(blocks(published)).toBe(0);
+    const meta = JSON.parse(readFileSync(join(published, "site", "data", "meta.json"), "utf8")) as Meta;
+    expect(meta.issues.filter((issue) => issue.code === "pi-snapshot-unreadable").map((issue) => issue.target)).toEqual(["data/sync-status.json", "data/pi"]);
+    expect(await contractProblems(published)).toEqual([]);
+  });
+
+  it("a good record is published as before", async () => {
+    for (const [record, expected] of [
+      [good, { last_attempt_at: "2026-11-20T14:19:45.000Z", last_attempt_ok: true, last_error: null }],
+      [{ last_attempt_at: "2026-11-21T04:17:00.000Z", status: "failed", error: "pi.dev answered HTTP 503" }, { last_attempt_at: "2026-11-21T04:17:00.000Z", last_attempt_ok: false, last_error: "pi.dev answered HTTP 503" }],
+    ] as const) {
+      const dir = await withRecord(record);
+      const report = publish({ dataDir: dir, rootDir: ROOT });
+      expect(report.issues.map((issue) => issue.code)).not.toContain("pi-snapshot-unreadable");
+      expect((JSON.parse(readFileSync(join(dir, "published", "site", "data", "meta.json"), "utf8")) as Meta).pi.sync).toEqual(expected);
+    }
+  });
+
   const real = join(ROOT, "data", "published", "site");
   it.skipIf(!existsSync(join(real, "api.json")))("lets the committed data through", () => {
     const read = (path: string) => JSON.parse(readFileSync(join(real, path), "utf8"));

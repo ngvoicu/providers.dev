@@ -3,7 +3,7 @@
 import { existsSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { loadPi, loadUpstream, OBSERVED_URL, PI_DEADLINE_MS, PI_URL, piSnapshotFault, storedPi, sync, SyncBusyError, UPSTREAM_COMMIT_URL, UPSTREAM_URL, writeStepOutputs, type SyncOptions, type SyncStatus } from "../scripts/lib/sync.ts";
+import { loadPi, loadUpstream, OBSERVED_URL, PI_DEADLINE_MS, PI_URL, piSnapshotFault, PiSyncRecord, storedPi, sync, SyncBusyError, UPSTREAM_COMMIT_URL, UPSTREAM_URL, writeStepOutputs, type SyncOptions, type SyncStatus } from "../scripts/lib/sync.ts";
 import { sha256 } from "../scripts/lib/files.ts";
 import type { PiCatalog } from "../src/core/pi.ts";
 import { fetchByAddress, fixturePi, fixtureUpstream, tempDataDir, type RecordedRequest } from "./helpers.ts";
@@ -355,6 +355,19 @@ describe("the pi deadline (release review, blocker 2)", () => {
     // Only the pi request has a deadline: the models.dev and measurements downloads are as they were.
     expect(otherSignals.length).toBeGreaterThan(0);
     expect(otherSignals.every((signal) => signal === undefined)).toBe(true);
+  });
+});
+
+describe("the pi record of data/sync-status.json", () => {
+  it("is written as before, and every record the sync writes fits PiSyncRecord", async () => {
+    const dataDir = await firstImport();
+    expect(statusOf(dataDir).pi).toEqual({ last_attempt_at: "2026-11-13T00:00:00.000Z", status: "updated" });
+    await run(dataDir, stand({ pi: status(304) }));
+    expect(statusOf(dataDir).pi).toEqual({ last_attempt_at: "2026-11-14T00:00:00.000Z", status: "unchanged" });
+    expect(PiSyncRecord.safeParse(statusOf(dataDir).pi).success).toBe(true);
+    await run(dataDir, stand({ pi: status(503) }));
+    expect(statusOf(dataDir).pi).toEqual({ last_attempt_at: "2026-11-14T00:00:00.000Z", status: "failed", error: "pi.dev answered HTTP 503" });
+    expect(PiSyncRecord.safeParse(statusOf(dataDir).pi).success).toBe(true);
   });
 });
 

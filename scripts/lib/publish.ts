@@ -28,7 +28,7 @@ import {
   type SourceMeta,
 } from "../../src/core/schema.ts";
 import { readJsonIfExists, sha256, swapDir } from "./files.ts";
-import { loadUpstream, PI_URL, storedPi, type SyncStatus } from "./sync.ts";
+import { loadUpstream, PI_URL, PiSyncRecord, storedPi, type SyncStatus } from "./sync.ts";
 
 /**
  * providers.dev evidence (a correction, an evaluation, a measured lifetime) whose date is more than this many days before
@@ -126,10 +126,20 @@ export function piMisfit(catalog: Catalog, index: Index, meta: Meta): string | n
   return null;
 }
 
-/** The last attempt to import pi's catalog, from the `pi` key of data/sync-status.json. All null = none is recorded. */
-function piSync(status: SyncStatus | undefined): Meta["pi"]["sync"] {
-  const pi = status?.pi;
-  if (!pi) return { last_attempt_at: null, last_attempt_ok: null, last_error: null };
+/**
+ * The last attempt to import pi's catalog, from the `pi` key of data/sync-status.json. All null = none is recorded, or
+ * the record does not fit PiSyncRecord: then the warning pi-snapshot-unreadable says so.
+ */
+function piSync(status: Partial<SyncStatus> | undefined, issues: Issue[]): Meta["pi"]["sync"] {
+  const none = { last_attempt_at: null, last_attempt_ok: null, last_error: null };
+  if (status?.pi === undefined) return none;
+  const checked = PiSyncRecord.safeParse(status.pi);
+  if (!checked.success) {
+    const first = checked.error.issues[0];
+    issues.push({ level: "warning", code: "pi-snapshot-unreadable", target: "data/sync-status.json", message: `The record of the last pi import in data/sync-status.json cannot be read (${first ? `pi${first.path.length > 0 ? `.${first.path.join(".")}` : ""}: ${first.message}` : "unknown"}). It is published as no attempt recorded.` });
+    return none;
+  }
+  const pi = checked.data;
   return { last_attempt_at: pi.last_attempt_at, last_attempt_ok: pi.status !== "failed", last_error: pi.error ?? null };
 }
 
@@ -169,6 +179,8 @@ export function publish(input: PublishOptions): PublishReport {
   // the code cannot read does too, with a warning. The build never fails for pi.
   const piIssues: Issue[] = [];
   const stored = readPi(dataDir, piIssues);
+  const status = readJsonIfExists<Partial<SyncStatus>>(join(dataDir, "sync-status.json"));
+  const piRecord = piSync(status, piIssues);
   const generatedAt = options.now().toISOString();
 
   /** The dataset from the catalog's sources and `pi`, the pi snapshot or none. */
@@ -192,7 +204,6 @@ export function publish(input: PublishOptions): PublishReport {
     const datasetVersion = sha256(compact({ catalog, exclusions, providers: draft.providers, entries: draft.entries })).slice(0, 16);
     const index = buildIndex(catalog, datasetVersion, generatedAt, upstream.meta.fetched_at);
     const observedMeta = readJsonIfExists<SourceMeta>(join(dataDir, "sources", "observed.meta.json"));
-    const status = readJsonIfExists<SyncStatus>(join(dataDir, "sync-status.json"));
 
     const meta: Meta = {
       api_version: "v1",
@@ -253,7 +264,7 @@ export function publish(input: PublishOptions): PublishReport {
               models: pi.meta.models,
             }
           : null,
-        sync: piSync(status),
+        sync: piRecord,
         counts: {
           entries_with_block: piResult ? piResult.totals.matched_id + piResult.totals.matched_alias : 0,
           left_out_models: piResult?.totals.left_out ?? 0,

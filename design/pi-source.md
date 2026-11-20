@@ -550,7 +550,7 @@ file is checked against its schema and nothing else, and none of these is raised
 | `pi-alias-orphan` | warning | a `same_as` names a provider or an entry the catalog does not have; or a line names a pi provider or a pi model the snapshot does not have. |
 | `pi-alias-conflict` | warning | rule 3 took an entry away from a pi model. |
 | `pi-alias-redundant` | notice | a model line is no longer needed: the provider now has an entry with the pi model's own id. |
-| `pi-snapshot-unreadable` | warning | `data/pi/` is there and cannot be used, or what the build would publish for pi does not fit the contract (section i). |
+| `pi-snapshot-unreadable` | warning | `data/pi/` is there and cannot be used, what the build would publish for pi does not fit the contract, or the pi record of `data/sync-status.json` does not fit (section i). |
 
 These are added to `Issue["code"]` in `src/core/schema.ts`. An unmatched pi model and an absent pi provider are
 **not** issues: they are the report's.
@@ -1106,6 +1106,12 @@ and the warning `pi-snapshot-unreadable` is raised. The build does not fail for 
 anything does not fit, whatever its cause, the dataset is built without pi data as above, and
 `pi-snapshot-unreadable` names the first value that did not fit and where. It decides nothing else and repairs
 nothing: the contract test before a deploy cannot fail because of pi.
+
+**The record of the last pi import.** The `pi` key of `data/sync-status.json` has one definition, `PiSyncRecord`
+(`scripts/lib/sync.ts`), checked on what the sync writes and on what the build reads. A record that does not fit is
+published as no attempt recorded (`meta.pi.sync` all null), with `pi-snapshot-unreadable` targeting
+`data/sync-status.json`; the pi data itself stays. So all `meta.pi` is made of is checked before it is used, and what
+the net falls back to fits the contract too.
 
 **Licensing.** pi's licence text goes to `LICENSES/pi-MIT.txt` (copied from pi's repository), ships with the
 dataset as `/data/LICENSE-pi.txt`, and `NOTICE.txt` gains a paragraph naming pi, its address, MIT, the import time
