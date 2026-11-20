@@ -77,10 +77,10 @@ export function piDates(meta: MetaPi | undefined): PiDates {
   // A check is said only where there was one after the fetch: on the fetch itself, checked_at is fetched_at.
   return { fetched: day(meta?.snapshot?.fetched_at), checked: piRechecked(meta) ? day(meta?.snapshot?.checked_at) : null, failed_at: day(meta?.sync.last_attempt_at), failed: meta?.sync.last_attempt_ok === false };
 }
-/** Whether pi's feed was checked again after the fetch: `checked_at` later than `fetched_at`. */
+/** Whether pi's feed was checked again after the fetch: `checked_at` a later instant than `fetched_at`, however spelled. */
 export function piRechecked(meta: MetaPi | undefined): boolean {
   const snapshot = meta?.snapshot;
-  return snapshot ? snapshot.checked_at > snapshot.fetched_at : false;
+  return snapshot ? Date.parse(snapshot.checked_at) > Date.parse(snapshot.fetched_at) : false;
 }
 const UTC = (stamp: string): string => `${stamp.slice(0, 10)} ${stamp.slice(11, 16)} UTC`;
 function piDatesSaid(meta: MetaPi | undefined): string {

@@ -3,7 +3,7 @@ import { CACHE_AGES_S, cacheLifetime, cacheResult, documentedCaching, type Cache
 import { buildIndex, type Summary } from "../src/core/entries.ts";
 import type { Json, JsonObject } from "../src/core/merge.ts";
 import { emptyInputWindow, inputWindow, type InputWindow } from "../src/core/limits.ts";
-import { entryHtml, evaluationStrip, rowHtml } from "../src/core/render.ts";
+import { entryHtml, evaluationStrip, piRechecked, rowHtml } from "../src/core/render.ts";
 import { modelHtml } from "../src/core/detail-view.ts";
 import { canonicalModels } from "../src/core/resources.ts";
 import { resolve } from "../src/core/resolve.ts";
@@ -935,6 +935,19 @@ describe("pi's catalog on an entry's page and in a row", () => {
     expect(text(section(unlisted))).toContain("This dataset is built without pi's catalog ( pi.dev/api/models ). The last import, 2026-11-15, failed");
     expect(unlisted).not.toMatch(/last good/);
     expect(unlisted).toContain("This dataset has no pi data. The last import, 2026-11-15 04:17 UTC, failed.");
+  });
+
+  it("7, second review: a check is later by time, not by spelling", () => {
+    const at = (fetched: string, checked: string): MetaPi => ({ ...meta(), snapshot: { ...meta().snapshot!, fetched_at: fetched, checked_at: checked } });
+    // The same instant, and an earlier one, spelled so that they sort after the fetch as text.
+    for (const said of [at("2026-11-21T05:00:00.000Z", "2026-11-21T05:00:00Z"), at("2026-11-21T05:00:00.418Z", "2026-11-21T05:00:00Z")]) {
+      expect(piRechecked(said)).toBe(false);
+      expect(page("full", said)).not.toMatch(/Last checked|unchanged since the fetch/);
+    }
+    // A later instant (05:00:01 UTC) that sorts before the fetch as text.
+    const later = at("2026-11-21T05:00:00.000Z", "2026-11-21T03:00:01-02:00");
+    expect(piRechecked(later)).toBe(true);
+    expect(text(section(page("full", later)))).toContain("Last checked 2026-11-21 , unchanged");
   });
 
   it("a row with a block has the pi.dev badge and nothing about differences; a row without one has none", () => {

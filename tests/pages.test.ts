@@ -692,6 +692,13 @@ describe("pi's catalog on the pages", () => {
     expect(failedFirst).not.toContain("Its data is the last good snapshot");
     const failedLater = await footer(withMeta((pi) => ({ ...pi, sync: { last_attempt_at: "2026-11-21T04:17:00.000Z", last_attempt_ok: false, last_error: "pi.dev answered HTTP 503" } })));
     expect(failedLater).toContain("The last import of pi's catalog failed. Its data is the last good snapshot.");
+    // The second review: by time, not by spelling. The same instant, and an earlier one, spelled to sort later as text.
+    for (const [fetched, checked] of [["2026-11-21T05:00:00.000Z", "2026-11-21T05:00:00Z"], ["2026-11-21T05:00:00.418Z", "2026-11-21T05:00:00Z"]]) {
+      const html = await footer(withMeta((pi) => ({ ...pi, snapshot: { ...pi.snapshot!, fetched_at: fetched!, checked_at: checked! } })));
+      expect(html).toContain("<li>pi's catalog fetched 2026-11-21</li>");
+    }
+    const later = await footer(withMeta((pi) => ({ ...pi, snapshot: { ...pi.snapshot!, fetched_at: "2026-11-21T05:00:00.000Z", checked_at: "2026-11-22T05:00:00Z" } })));
+    expect(later).toContain("<li>pi's catalog fetched 2026-11-21, last checked 2026-11-22</li>");
   });
 
   it("dates pi's catalog in the footer of every page, and says when its last import failed", async () => {
