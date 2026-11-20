@@ -1387,6 +1387,7 @@ a second time through the same pi code. Each review found a way past one guard.
 | `src/core/pi.ts` | pi's pure code: the feed's schema, the match, the block, the differences, the report, and one entry point, `piPart` | `scripts/lib/pi-sync.ts`, `scripts/lib/pi-fence.ts` |
 | `scripts/lib/pi-sync.ts` | pi's code that touches files and the network: `storedPi`, `syncPi` and what they need (section b) | `scripts/lib/pi-fence.ts` |
 | `scripts/lib/pi-fence.ts` | the fence: `piOfBuild`, `piOfSync`, and nothing else exported but their types | `scripts/lib/publish.ts` (`piOfBuild`), `scripts/lib/sync.ts` (`piOfSync`) |
+| `scripts/lib/fenced.ts` | the guard: `fenced`, `fencedAsync`, `reasonOf`. It knows nothing of pi and imports nothing of pi's | anyone; today `scripts/lib/pi-fence.ts` |
 
 `import type` from pi's modules is free everywhere (the contract, the pages and the tests name pi's types). What
 code outside the fence needs as a value leaves pi's modules: `PiAliases` with its two line schemas, and `PI_URL`,
@@ -1395,7 +1396,9 @@ move to `src/core/schema.ts`, beside the other authored files' schemas and `PiMe
 
 ### The guard
 
-One function in `scripts/lib/pi-fence.ts`, used for every call into pi's code, with an `async` twin for the sync:
+One function, used for every call into pi's code, with an `async` twin for the sync. It lives in a module of its
+own, `scripts/lib/fenced.ts`, because it is not pi's code and not the fence's two doors: it is exported there and
+tested directly (`tests/fenced.test.ts`), while `scripts/lib/pi-fence.ts` exports the two doors and nothing else.
 
 ```ts
 type Fenced<T> = { ok: true; value: T } | { ok: false; why: string };
@@ -1410,8 +1413,8 @@ plain copy with `schema.safeParse`; return **the plain copy**, not zod's output,
 reorder. Anything thrown at any of these, of any shape, and any misfit, gives `{ ok: false, why }`.
 
 `why` is made by one total function, `reasonOf(error: unknown): string`, that cannot throw itself: the `message`
-of an `Error` where that is a string, the first issue's path and message for a misfit, else
-`a fault without a description`; then every control character becomes a space and the text is cut to 300
+of an `Error` where that is a string, the first issue's path and message for a misfit (and for a `ZodError` that
+pi's own code throws: its message is a dump of many lines), else `a fault without a description`; then every control character becomes a space and the text is cut to 300
 characters. So what crosses the fence as a reason is always one short line of text.
 
 ### 1. The build
@@ -1428,12 +1431,21 @@ export interface EntryBefore {
   /** The `base_url` of each endpoint of the entry's `api` that has one as a string, in the order of its keys. */
   base_urls: string[];
 }
+/** The catalog as it stood then. A provider without an entry is in `providers` and has no row in `entries`. */
+export interface CatalogBefore {
+  providers: string[];        // every provider id, in the catalog's order
+  entries: EntryBefore[];     // in the catalog's order: providers, then their models
+}
 export interface ResolveResult {
   catalog: Catalog; issues: Issue[]; exclusions: Exclusion[];
-  before: EntryBefore[];                       // in the catalog's order then: providers, then their models
+  before: CatalogBefore;
   ruledOut: { ref: string; rule: string }[];   // every entry a catalog rule left out, with the rule's id
 }
 ```
+
+`providers` is there so that the match keeps its meaning: a pi provider id is *shared* or *paired* where the
+catalog has that provider, with or without entries (a provider we add can list no model of its own), and is never
+*absent* because a provider happens to be empty.
 
 Step 6 writes the literal `pi: null` as the last key of every entry's `providers_dev`, and `summarize()`
 (`src/core/entries.ts`) the literal `pi: null` as the last key of every summary. These two literals and
@@ -1456,7 +1468,7 @@ export const noPiMeta = (): Meta["pi"] => ({
 export interface PiPartInput {
   pi: PiCatalog;
   aliases: PiAliases | undefined;
-  before: EntryBefore[];
+  before: CatalogBefore;
   ruledOut: { ref: string; rule: string }[];
   /** A copy of `limit` and `cost` of the entry as published; undefined where the ref is not published. */
   entryOf: (ref: string) => { limit: unknown; cost: unknown } | undefined;
@@ -1482,7 +1494,8 @@ named: `pi[piProvider]`, `pi[piProvider][piModel]`, `lines[piProvider]`, `line.m
 `catalog[piProvider]`, `catalog[line.same_as]`, `models[piModel]`, `entries[piModel]`,
 `entries[modelLine.same_as]`, `pi[provider.pi_provider]`; `catalog[provider.id] = …` in `loadPi`; and the pi
 part's own copy of the import summary (`before[id]`, `old[modelId]`, `models[modelId]`), which it no longer shares
-with models.dev's.
+with models.dev's. The ones the build reads through are changed with the build (step F2: `src/core/pi.ts` and
+`loadPi`), the summary, which only the sync runs, with the sync (step F3).
 
 **The fence of the build:**
 
@@ -1494,7 +1507,7 @@ export interface PiOfBuildInput {
   status: unknown;
   aliases: PiAliases | undefined;
   catalog: Catalog;
-  before: EntryBefore[];
+  before: CatalogBefore;
   ruledOut: { ref: string; rule: string }[];
 }
 export interface PiOfBuild {
@@ -1562,7 +1575,9 @@ The two warnings, code `pi-snapshot-unreadable`, level `warning`:
 
 `assemble(pi)` and its second call, `piMisfit`, `readPi`, `piUnreadable` and `piSync` are deleted from
 `publish.ts`: there is one build, the check is the fence's, and nothing in `publish.ts` knows how pi's data is
-read. `PublishReport` gains `pi: PiOfBuild["state"]`.
+read. `PublishReport` gains `pi?: PiOfBuild["state"]`: it is absent on every return that comes before
+`piOfBuild` runs (no models.dev snapshot, an authored file that does not fit, an error-level issue, an empty
+catalog), because pi was not looked at then, which is not the same as *none*.
 
 ### 2. The sync
 
@@ -1596,8 +1611,8 @@ worked out:
 The record is a literal of three checked strings, written by the shared writer; no pi code and no schema runs
 between the pi part and the file. Because of step 1, the five fields of models.dev never wait on pi, and a process
 that dies inside the pi part leaves a record that says the attempt did not finish, never the previous attempt's
-success. Under `--only=pi` the five fields are read from the file first; a file that does not parse counts there
-as absent, and `sync()` logs that it did. `SyncReport` gains `piRevision7: string`.
+success. Under `--only=pi` the five fields, and nothing else, are kept from the file as it was; a file that does
+not parse counts there as absent, and `sync()` logs that it did. `SyncReport` gains `piRevision7: string`.
 
 `scripts/sync.ts` is unchanged but for one output line: `writeStepOutputs` also writes
 `pi_revision7=<revision7>` where the pi part ran.
@@ -1612,7 +1627,8 @@ as absent, and `sync()` logs that it did. `SyncReport` gains `piRevision7: strin
 - **No new issue code.** `code` of an issue is an open string in the contract, and `pi-snapshot-unreadable` is
   already in 1.2.0's code. The contract and `structure/api-v1.json` do not change.
 - **On the run.** `scripts/build-data.ts` appends `pi=<published|none|turned_away>` to `GITHUB_OUTPUT` where that
-  variable is set (`writeBuildOutputs(report, path)` in `scripts/lib/publish.ts`). In the workflow the build step
+  variable is set (`writeBuildOutputs(report, path)` in `scripts/lib/publish.ts`), and no line where the report
+  has no `pi`. In the workflow the build step
   gets `id: build`, and directly after it:
 
   ```yaml
@@ -1654,39 +1670,86 @@ Outside the fence, on purpose:
 
 ### 5. The tests that prove it
 
-`tests/pi-fence.test.ts` replaces `tests/pi-net.test.ts`. Each fixture build is made with a fixed `now`, three
-times: **healthy** (with pi), **without** (`data/pi/` absent, no `pi` key in the status file), and with a fault.
+`tests/pi-fence.test.ts` holds the fault tables and replaces `tests/pi-net.test.ts`; `tests/fenced.test.ts` holds
+the guard's direct tests (what F1 wrote: control characters, 300 characters, hostile throws, getters, cycles).
+Each fixture build is made with a fixed `now`, three times: **healthy** (with pi), **without** (`data/pi/`
+absent) and with a fault.
 
-1. **The table of faults, generated, not listed.** `vi.mock` wraps **every exported function** of `src/core/pi.ts`
-   and `scripts/lib/pi-sync.ts`, taken from the modules' own exports when the test runs, so that a function added
-   later is in the table without an edit. For each function and each of these faults: it throws an `Error`; it
-   throws an object whose `message` is a number and whose `toString` throws; it returns `undefined`; it returns
-   `{}`; it returns its true result with one key deleted, once for each key the result has, at every depth of the
-   first block, the first issue and the report's totals; it returns its true result with one value replaced by a
-   string, likewise. After each, for the build:
-   - `publish()` returns `ok: true` and does not throw;
+1. **The table of faults, generated from what the fence calls.**
+
+   *Which functions.* The **boundary functions**: the exports of pi's two modules that `pi-fence.ts` calls, today
+   `storedPi` and `piPart` for the build and `syncPi` for the sync. The set is found, not listed: `vi.mock` wraps
+   every exported function of `src/core/pi.ts` and `scripts/lib/pi-sync.ts` in a wrapper that counts its calls. A
+   call inside pi's own modules uses the module's local name and never passes a wrapper, so the wrappers that are
+   called are exactly the functions the fence calls. The set is taken over a healthy build, a build without
+   `data/pi/`, a healthy first import, a 304 and a failed import, and the test fails unless it equals the names
+   `pi-fence.ts` imports as values from the two modules, read from its source. So a function the fence calls
+   later gets its rows without an edit; and an import the fence never calls, or a call that no longer passes its
+   wrapper, fails the test.
+
+   *Why the other exports have no rows.* A fault put into `matchPi` or `loadPi` this way cannot reach the build:
+   its row would pass without testing anything, and a table of such rows would look like more proof than it is.
+   Nothing is lost by leaving them out. Whatever goes wrong inside pi's code can leave it in two ways only, as
+   something a boundary function throws or as what it returns, because pi's code holds no reference to anything
+   that is published (rule 2); and the rows put both at the boundary, the return at every depth. pi's code is
+   **not** changed to call itself through its own exports for the sake of the table.
+
+   *The faults, for each boundary function.* Every row asserts that its fault fired (the wrapper says so).
+   - without running the true function: it throws an `Error`; it throws an object whose `message` is a number and
+     whose `toString` throws; it throws an `Error` whose message has line breaks, control characters and 1,000
+     characters; it returns `undefined`; it returns `{}`;
+   - after running the true function, it returns: an object with a getter that throws; an object that contains
+     itself; the true result with **one key deleted**; the true result with **one value replaced by a value its
+     schema refuses** (a number where it takes a string or `null`, a string everywhere else).
+   - *Which keys and values:* every key at the top level of the result that its schema requires; and inside
+     `blocks[0]`, `issues[0]` and `report.totals`, where the result has them, every key and value at every depth,
+     those inside `compat` excepted (an open map of any JSON: nothing there is a misfit). A result without keys
+     gets the first five faults only. The fixture is such that the first block has a tier, a difference, `compat`,
+     a thinking level map and prompt cache lifetimes, and that the build raises one alias issue.
+
+   *The builds of this table* use a status file with no `pi` key, the healthy and the without build too, so that
+   `meta.pi.sync` is the same in all three.
+
+   *What must hold after every row.* Each fault above is a throw or a misfit, so each row must end turned away:
+   - `publish()` returns `ok: true` and does not throw, and its `pi` is `turned_away`;
    - every answer of the published dataset fits the contract (the check `tests/api.test.ts` makes of a snapshot);
-   - **the dataset is one of two, byte for byte:** every file under `published/` is the *healthy* build's, or
-     every file is the *without* build's except `site/data/meta.json`, which differs from it in nothing but one
-     more item of `issues`, the `pi-snapshot-unreadable` warning for `data/pi`, with a reason of one line and at
-     most 300 characters; and `pi-report.json` is then absent. Nothing in between is ever published.
-   The same table for the record's part, with the `pi` key of the status file replaced by each of: a string, a
-   number, `null`, an array, the record with each key deleted, with each value of a wrong type, with an unknown
-   key: the files are the healthy build's except `meta.json`, whose `pi.sync` is the three `null`s and whose
-   `issues` has the warning for `data/sync-status.json`.
-2. **The sync, by the same table.** For each exported function of `scripts/lib/pi-sync.ts` and each fault, and for
-   a `fetch` that rejects with each of the thrown shapes above, answers with a body that never ends (the deadline shortened as the existing deadline test does), and answers
-   with a body over the size cap: `sync()` resolves; `report.ok` and the five fields of the status file are those
-   of a run with a healthy pi part; `data/upstream/` and `data/sources/` are byte for byte that run's; `data/pi/`
-   is byte for byte what it was; the `pi` record is `failed`, with this attempt's time and an error of one line;
-   `writeStepOutputs` writes `pi=failed`. And once, with a pi part held open: while it is pending, the status
-   file on disk already has this run's five fields and the record `The pi part did not finish.`
+   - models.dev's part is untouched: the comparison of section j between the healthy build and this one finds 0
+     differing objects;
+   - the dataset is the *without* build's, byte for byte: every file under `published/` is that build's, except
+     `site/data/meta.json`, which differs from it in nothing but one more item of `issues`, the
+     `pi-snapshot-unreadable` warning for `data/pi`, with a reason of one line and at most 300 characters; and
+     `pi-report.json` is absent.
+
+   *What the fence does not promise, shown by one row.* `piPart` returns its true result with the `name` of the
+   first block changed to another string. It fits the contract, so it is published as pi's part: the state is
+   `published`, the first three points above hold, and the files differ from the healthy build's only where that
+   block and the version are. The fence keeps pi from stopping the build and from touching the reference; whether
+   pi's part is right is for pi's own tests (`tests/pi-source.test.ts`).
+
+   *The record's part, the same way.* The healthy build here has a valid record. The `pi` key of the status file
+   is replaced by each of: a string, a number, `null`, an array, the record with each key deleted, with each
+   value of a wrong type, with an unknown key. After each: the first three points above; `pi` is `turned_away`;
+   the files are the healthy build's except `meta.json`, whose `pi.sync` is the three `null`s and whose `issues`
+   has the warning for `data/sync-status.json`.
+2. **The sync, by the same table.** The boundary function is `syncPi`, with the faults of test 1 (the keys its
+   schema requires: `status`). And through the one thing that reaches its inside, the `fetch` it is given: one
+   that rejects with each of the thrown shapes, one whose body never ends (the deadline shortened as the existing
+   deadline test does), one whose body is over the size cap. After each: `sync()` resolves; `report.ok` and the
+   five fields of the status file are those of a run with a healthy pi part; `data/upstream/` and `data/sources/`
+   are byte for byte that run's; the `pi` record is `failed`, with this attempt's time and an error of one line;
+   `writeStepOutputs` writes `pi=failed`; and `data/pi/` is a snapshot `storedPi` calls usable, byte for byte
+   **what it was** where the true `syncPi` did not run or did not get to its swap, and what a healthy run leaves
+   where the fault came after it. It is never anything else. And once, with a pi part held open: while it is
+   pending, the status file on disk already has this run's five fields and the record
+   `The pi part did not finish.`
 3. **Nothing calls pi's code outside the fence.** `tests/pi-fence-imports.test.ts` reads every `.ts` and `.astro`
    file under `src/`, `scripts/` and `worker/` and fails where an `import`, a dynamic `import()` or an
    `export … from` that is not type-only names `src/core/pi.ts` or `scripts/lib/pi-sync.ts` from any file but the
    ones the table of modules allows (an import that mixes values and inline `type` names counts as a value
-   import); where `scripts/lib/pi-fence.ts` exports anything but `piOfBuild`, `piOfSync` and types; and where
-   `piOfBuild(` or `piOfSync(` is called from more than the one file each.
+   import); where `scripts/lib/fenced.ts` imports anything of pi's at all; where `scripts/lib/pi-fence.ts`
+   exports anything but `piOfBuild`, `piOfSync` and types; and where `piOfBuild(` or `piOfSync(` is called from
+   more than the one file each. The whole rule holds from step F2 on; until `piOfSync` exists (F3) its two
+   clauses about it have nothing to bite on.
 4. **The dataset is complete without pi.** `resolve()` on the fixture, with no pi anywhere, gives `pi: null` on
    every entry, `buildIndex` `pi: null` on every summary, and both fit the contract; `noPiMeta()` fits
    `MetaSchema.shape.pi`.
@@ -1719,10 +1782,10 @@ One task each, in this order, on `pi-source`. **After every step, on the committ
 
 | step | what | files | what else must be shown |
 |---|---|---|---|
-| F1 | **Move, change nothing.** pi's sync code into `scripts/lib/pi-sync.ts`; `PiAliases` and `PI_URL` into `src/core/schema.ts`; `scripts/lib/pi-fence.ts` created with `fenced`, `fencedAsync`, `reasonOf` and their tests alone | `scripts/lib/sync.ts`, `pi-sync.ts`, `pi-fence.ts`, `src/core/pi.ts`, `schema.ts`, the imports of the tests | the diff moves code and edits imports, nothing else; the replays of step F3 give the stored files of `adf67cd` |
-| F2 | **The build behind the fence.** `resolve()` without pi, with `before` and `ruledOut`; the two literals and `noPiMeta()`; `piPart`; lookups by own property; `piOfBuild`; `publish()` as in 1; `assemble`, `piMisfit`, `readPi`, `piUnreadable`, `piSync`, `piSummary` deleted | `src/core/resolve.ts`, `entries.ts`, `pi.ts`, `schema.ts`, `scripts/lib/pi-fence.ts`, `publish.ts` | tests 1 (the build's table), 3 for the build's modules, 4 and 5; the number of rows the table generated, and that each ended in one of the two datasets |
-| F3 | **The sync behind the fence.** `piOfSync`; the record written before and after; the swap last; the size cap; `pi_revision7` | `scripts/lib/pi-sync.ts`, `pi-fence.ts`, `sync.ts`, `scripts/sync.ts` | test 2 and the rest of 3; five offline replays (a first 200, a changed 200, a 304, an equal-body 200, a 503) leave every stored file under `data/`, `sync-status.json` included, byte for byte as the same replays at `adf67cd` |
-| F4 | **Being seen.** `storedPi`'s *none*; `PublishReport.pi` and `writeBuildOutputs`; the workflow's second warning step and the commit step without `node -p` on pi's file | `scripts/lib/pi-sync.ts`, `publish.ts`, `scripts/build-data.ts`, `.github/workflows/publish.yml` | test 6; the diff of the workflow in full |
+| F1 | **Move, change nothing.** pi's sync code into `scripts/lib/pi-sync.ts`; `PiAliases` and `PI_URL` into `src/core/schema.ts`; the guard and its tests written. *Done at `d3605ec`.* | `scripts/lib/sync.ts`, `pi-sync.ts`, `pi-fence.ts`, `src/core/pi.ts`, `schema.ts`, the imports of the tests | the diff moves code and edits imports, nothing else; the replays of step F3 give the stored files of `adf67cd` |
+| F2 | **The build behind the fence.** First the guard to its own module: `fenced`, `fencedAsync`, `reasonOf` move to `scripts/lib/fenced.ts`, their direct tests to `tests/fenced.test.ts`, unchanged. Then `resolve()` without pi, with `before` and `ruledOut`; the two literals and `noPiMeta()`; `piPart`; lookups by own property in `src/core/pi.ts` and in `loadPi`; `storedPi`'s *none* only for a folder that does not exist; `piOfBuild`; `publish()` as in 1, with `PublishReport.pi`; `assemble`, `piMisfit`, `readPi`, `piUnreadable`, `piSync`, `piSummary` deleted | `scripts/lib/fenced.ts`, `pi-fence.ts`, `pi-sync.ts`, `publish.ts`, `src/core/resolve.ts`, `entries.ts`, `pi.ts`, `schema.ts` | tests 1 (the build's and the record's tables), 3, 4, 5 and the folder cases of 6; the boundary functions the test found; the number of rows generated, that every fault fired and every row ended turned away |
+| F3 | **The sync behind the fence.** `piOfSync`; the record written before and after; the pi part's own import summary, with lookups by own property; the swap last; the size cap; `pi_revision7` | `scripts/lib/pi-sync.ts`, `pi-fence.ts`, `sync.ts`, `scripts/sync.ts` | test 2; five offline replays (a first 200, a changed 200, a 304, an equal-body 200, a 503) leave every stored file under `data/`, `sync-status.json` included, byte for byte as the same replays at `adf67cd` |
+| F4 | **Being seen on the run.** `writeBuildOutputs`; the workflow's second warning step and the commit step without `node -p` on pi's file | `scripts/lib/publish.ts`, `scripts/build-data.ts`, `.github/workflows/publish.yml` | the rest of test 6; the diff of the workflow in full |
 | F5 | **Words.** README ("Syncing": the two warnings, the record written twice, the size cap), `AGENTS.md` if it names the moved functions | `README.md`, `AGENTS.md` | nothing but the four lines above |
 
 F1 comes first so that the rule of the modules can be stated and tested from F2 on. If a step cannot keep the
