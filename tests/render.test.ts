@@ -902,6 +902,46 @@ describe("pi's catalog on an entry's page and in a row", () => {
     expect(piPlaces(failed).context_window).toContain(">2026-11-12 · last import failed</span>");
   });
 
+  it("a wrong `only` never takes the place of the entry's own value: the entry's value stays, with what pi states under it (the review's injection)", () => {
+    // The review of 613cce9, finding 4: a coherent block whose standing says `only` where the entry has a value, and
+    // whose difference was taken out, published by the fence as designed. The entry's own value decides the place
+    // (design/pi-merged.md, sections 4 and 7, rule 1): here on both limits, a price and a documented lifetime.
+    const model = structuredClone(modelOf("lab/full"));
+    const extension = model[NS] as unknown as ModelExtension;
+    const block = extension.pi!;
+    for (const field of ["context_window", "max_tokens", "cost.input", "prompt_cache.short"]) block.values.find((item) => item.field === field)!.standing = "only";
+    block.differences = block.differences.filter((item) => item.field !== "context_window");
+    extension.cache.lifetime.short.documented_s = 600;
+    expect(model.limit).toEqual({ context: 200000, output: 8000 });
+    const summary = { ...index.entries.find((entry) => entry.ref === "lab/full")!, pi: { ...index.entries.find((entry) => entry.ref === "lab/full")!.pi!, difference_count: 1 } };
+    const html = entryHtml({ summary, provider: index.providers[0]!, model, today, cache_ages_s: CACHE_AGES_S, imported: "2026-11-13", pi: meta() });
+    const places = piPlaces(html);
+    // The entry's 200,000 with its source, and pi's 190,000 as a line of pi's under it: never pi's figure in its place.
+    expect(text(places.context_window).trim()).toBe("Context window limit.context : what this provider accepts for the model, input and output together. 200,000 tokens pi states 190,000 models.dev");
+    expect(places.context_window).toMatch(/200,000 <span class="muted">tokens<\/span><div class="pi-line"><span class="pi-note listed" title="[^"]*This page publishes the entry&#39;s own value \(limit\.context\)[^"]*">pi states 190,000<\/span><\/div><\/td><td data-label="Source"><span class="origin upstream"/);
+    expect(text(places.max_tokens)).toContain("8,000 tokens pi states 8,000 models.dev");
+    expect(text(places["cost.input"]).trim()).toBe("Input $1 / 1M tokens pi states $1");
+    expect(text(places["prompt_cache.short"]).trim()).toBe("Documented 10 min pi states 5 min");
+    for (const field of ["context_window", "max_tokens", "cost.input", "prompt_cache.short"] as const) expect(places[field], field).not.toMatch(/class="pi-only"|class="origin pi"|Not checked by providers\.dev/);
+    // The tiles: the entry's limits, with what pi states under them.
+    const tiles = text(html.split('<div class="tiles')[1]!.split("<section")[0]!);
+    expect(tiles).toContain("Context window 200,000 tokens Exposed by this provider pi states 190,000");
+    expect(tiles).toContain("Maximum output 8,000 tokens Per response; not a default pi states 8,000");
+    expect(tiles).not.toContain("From pi's catalog");
+    // The same injection where the entry states no value (nolimit, as built): pi's figure takes the place, as before.
+    expect(text(piPlaces(page("nolimit")).context_window)).toContain("272,000 tokens pi.dev 2026-11-12 Not checked by providers.dev");
+  });
+
+  it("an entry's limit of 0 is none stated: where pi alone states the limit, pi's figure takes the place of the 0", () => {
+    const model = structuredClone(modelOf("lab/nolimit"));
+    model.limit = { context: 0, output: 0 };
+    const summary = index.entries.find((entry) => entry.ref === "lab/nolimit")!;
+    const html = entryHtml({ summary, provider: index.providers[0]!, model, today, cache_ages_s: CACHE_AGES_S, imported: "2026-11-13", pi: meta() });
+    expect(text(piPlaces(html).context_window)).toContain("272,000 tokens pi.dev 2026-11-12 Not checked by providers.dev");
+    expect(text(piPlaces(html).max_tokens)).toContain("128,000 tokens pi.dev 2026-11-12 Not checked by providers.dev");
+    expect(text(html.split('<div class="tiles')[1]!.split("<section")[0]!)).toContain("Context window 272,000 tokens pi.dev From pi's catalog");
+  });
+
   it("pi's data moves no input window and no safe lifetime: the same HTML with and without pi's block", () => {
     const windowTable = (html: string): string => html.split('<table class="facts limit-facts window-table')[1]!.split("</table>")[0]!;
     const safe = (html: string): string[] => [...html.matchAll(/<span class="safe">[\s\S]*?<\/dd>/g)].map((match) => match[0]);

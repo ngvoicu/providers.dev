@@ -661,6 +661,8 @@ describe("pi's catalog on the pages", () => {
     const without = piPlaces((await (await page("/entries/provider-02/model-7")).text())).context_window;
     expect(without).toContain('<td class="num" data-label="Value"><span class="unknown"');
     expect(without).not.toMatch(/pi\.dev|pi-only|pi-note/);
+    // model-0 publishes an output limit of 0, which is none stated: pi's 1,000 takes its place, marked pi's.
+    expect(piPlaces(await piPage("/entries/provider-02/lab/model-0")).max_tokens).toMatch(/<span class="pi-only">1,000 <span class="muted">tokens<\/span><\/span>/);
   });
 
   it("a page built without pi's data says nothing of pi in any row, and its section is one line", async () => {

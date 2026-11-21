@@ -490,12 +490,15 @@ function priceSection(summary: Summary, pi: PiStanding | null): string {
   const absent = pricing.billing === "not_applicable" ? IN_PLAN : UNKNOWN;
   const rows = meters
     .map((meter) => {
-      const own = base.filter((rule) => rule.meter === meter).map(rateHtml);
-      const lifetimes = byLifetime.filter((rule) => rule.meter === meter).map((rule) => `${rateHtml(rule)} <span class="muted">· ${e(lifetimeOf(rule)!)} lifetime</span>`);
+      const ownRules = base.filter((rule) => rule.meter === meter);
+      const lifetimeRules = byLifetime.filter((rule) => rule.meter === meter);
+      const own = ownRules.map(rateHtml);
+      const lifetimes = lifetimeRules.map((rule) => `${rateHtml(rule)} <span class="muted">· ${e(lifetimeOf(rule)!)} lifetime</span>`);
       const value = [...own, ...lifetimes];
-      // pi's price beside the row's, by the item's standing; where only pi states one, pi's in the place of the value.
+      // pi's price beside the row's, by the item's standing; where only pi states one and the row has none of the
+      // entry's, pi's in the place of the value.
       const item = PI_PRICE_ROW[meter] ? pi?.items.get(PI_PRICE_ROW[meter]) : undefined;
-      const shown = item?.standing === "only" ? piOnlyInline(item, pi!.meta) : `${value.length ? value.join("<br>") : absent}${piLine(item, pi?.meta)}`;
+      const shown = piTakesPlace(item, [...ownRules, ...lifetimeRules][0]?.amount ?? null) ? piOnlyInline(item, pi!.meta) : `${value.length ? value.join("<br>") : absent}${piLine(item, pi?.meta)}`;
       return `<tr><th scope="row">${e(meterLabel(meter))}</th><td class="num">${shown}</td></tr>`;
     })
     .join("");
@@ -608,7 +611,7 @@ function otherAges(results: readonly CacheResult[], columns: readonly Column[]):
 function profileRow(profile: RetentionProfile, p: SafeLifetime, today: Today, columns: readonly Column[], pi: PiStanding | null): string {
   const item = pi?.items.get(profile === "short" ? "prompt_cache.short" : "prompt_cache.long");
   const documented =
-    item?.standing === "only"
+    piTakesPlace(item, p.documented_s)
       ? piOnlyInline(item, pi!.meta)
       : `${p.documented_s === null ? '<span class="muted">Not documented</span>' : lifetimeText(p.documented_s, "documented")}${item ? ` ${piNote(item, pi!.meta)}` : ""}`;
   const safe =
@@ -869,9 +872,28 @@ function piFigure(item: PiValue, full = false): string {
 }
 
 /**
+ * Whether the entry itself states the value of a row, read as the rule of the standings reads it (design/pi-merged.md,
+ * section 2): a number is a value, except a limit of 0, which is "none stated"; absent and null are none. A price of 0
+ * and a lifetime of 0 are values.
+ */
+const entryStates = (own: unknown, unit: PiValue["unit"]): boolean => typeof own === "number" && !(unit === "tokens" && own === 0);
+
+/**
+ * Whether pi's figure takes the place of the value in a row: only where the item is `only` and the entry itself states
+ * no value. Where the entry has a value, the row prints it whatever pi's standing says, and an `only` there is a line of
+ * pi's under it like any other statement of pi's: a wrong standing can put a wrong line beside a value, never take its
+ * place (sections 4 and 7, rule 1). One rule for every place that can take an `only`: the two limits, the four prices
+ * and the two documented lifetimes, in rows and tiles alike; `own` is what that place prints of the entry.
+ */
+function piTakesPlace(item: PiValue | undefined, own: unknown): item is PiValue {
+  return item !== undefined && item.standing === "only" && !entryStates(own, item.unit);
+}
+
+/**
  * What a row says of pi beside the entry's own value, by the item's standing: that pi agrees, once and briefly; what pi
- * says where it differs; what pi lists where nothing is compared. Nothing where pi is silent. A value only pi states is
- * not a note: it takes the place of the value (`piOnlyInline`, `piOnlySource`). The tiers have a block of their own.
+ * says where it differs; what pi lists where nothing is compared; what pi states where the item is `only` and the entry
+ * has a value all the same. Nothing where pi is silent. Where only pi states a value and the entry states none, pi's
+ * figure is not a note: it takes the place of the value (`piTakesPlace`). The tiers have a block of their own.
  */
 function piNote(item: PiValue | undefined, meta: MetaPi | undefined): string {
   if (!item || item.field === "cost.tiers") return "";
@@ -879,6 +901,7 @@ function piNote(item: PiValue | undefined, meta: MetaPi | undefined): string {
   if (item.standing === "agrees") return `<span class="pi-note agrees" title="${e(`pi's catalog states the same value. ${whose}`)}">pi agrees</span>`;
   if (item.standing === "differs") return `<span class="pi-note differs" title="${e(`pi's catalog states ${piFigure(item, true)}. This page publishes the entry's own value (${item.entry_field}); pi's stands beside it and is not used. ${whose}`)}">pi says ${e(piFigure(item))}</span>`;
   if (item.standing === "not_compared") return `<span class="pi-note listed" title="${e(`pi's catalog lists ${piFigure(item, true)}. It is not compared with this entry's value: the methodology says when a value is not compared. ${whose}`)}">pi lists ${e(piFigure(item))}, not compared</span>`;
+  if (item.standing === "only") return `<span class="pi-note listed" title="${e(`pi's catalog states ${piFigure(item, true)}. This page publishes the entry's own value (${item.entry_field}); pi's stands beside it and is not used. ${whose}`)}">pi states ${e(piFigure(item))}</span>`;
   return "";
 }
 /** A value only pi states, said under a value it does not replace (the safe lifetime of a tile, which pi never enters). */
@@ -1053,17 +1076,21 @@ export function entryHtml(view: EntryView): string {
   // Where pi stands beside each value: the items of `values`, by field. Null where pi does not list the entry.
   const pi = piStanding(extension.pi, view.pi);
   /**
-   * What a tile says of pi, under its own foot: what pi says where it differs, what only pi states. That pi agrees, or
-   * lists a value that is not compared, is said once, in the value's row below.
+   * What a tile says of pi, under its own foot: what pi says where it differs, and an `only`: where the entry states no
+   * value, that only pi states one (in a tile whose value pi does not take, the safe lifetime); where the entry has a
+   * value all the same, what pi states, under it (`piTakesPlace`). That pi agrees, or lists a value that is not
+   * compared, is said once, in the value's row below.
    */
-  const piTileLine = (item: PiValue | undefined): string =>
-    item?.standing === "differs" ? `<div class="pi-line">${piNote(item, view.pi)}</div>` : item?.standing === "only" ? `<div class="pi-line">${piOnlyNote(item, view.pi)}</div>` : "";
+  const piTileLine = (item: PiValue | undefined, own: unknown): string =>
+    item?.standing === "differs" || item?.standing === "only"
+      ? `<div class="pi-line">${piTakesPlace(item, own) ? piOnlyNote(item, view.pi) : piNote(item, view.pi)}</div>`
+      : "";
   // The safe lifetime of each profile, at the top of the page: the value, its basis, and whose it is as of when. pi's
   // lifetime is beside it, never in it.
   const lifetimeTile = (profile: RetentionProfile): string => {
     const p = cache.lifetime[profile];
     const label = `Cache lifetime, ${profile}`;
-    const piSays = piTileLine(pi?.items.get(profile === "short" ? "prompt_cache.short" : "prompt_cache.long"));
+    const piSays = piTileLine(pi?.items.get(profile === "short" ? "prompt_cache.short" : "prompt_cache.long"), p.documented_s);
     if (p.safe_s === null || p.basis === "none" || p.source === null) return tile(label, '<span class="muted">Unknown</span>', `Not documented or measured${piSays}`);
     // The other of the two lifetimes it was chosen from, where there is one, read from `basis` as in the list; whether
     // the documented one is contradicted is `documented_status`.
@@ -1078,20 +1105,21 @@ export function entryHtml(view: EntryView): string {
     return tile(label, `<span title="${e(safeSaid(profile, p))}">${lifetimeText(p.safe_s, p.basis)}</span>${basisTag(p.basis)}`, `${e(p.source)}${p.date ? ` · ${e(p.date)}` : ""}${other}${piSays}`);
   };
   /**
-   * A limit's tile: the entry's own value, and under it what pi says where it differs. Where only pi states the value,
-   * pi's figure is the tile's value, with pi's mark beside it, and the foot says whose it is and that it is not checked.
+   * A limit's tile: the entry's own value, and under it what pi says where it differs. Where only pi states the value and
+   * the entry states none, pi's figure is the tile's value, with pi's mark beside it, and the foot says whose it is and
+   * that it is not checked.
    */
   const limitTile = (label: string, own: Json | undefined, foot: string, field: PiValueField): string => {
     const item = pi?.items.get(field);
-    if (item?.standing === "only") {
+    if (piTakesPlace(item, own)) {
       return tile(label, `<span title="${e(`${exact(item.pi ?? 0)} tokens. ${piWhose(view.pi)}`)}">${exact(item.pi ?? 0)} <span class="unit">tokens</span></span>${PI_ONLY_MARK(view.pi)}`, `From pi's catalog${piDateTag(view.pi) ? ` · ${piDateTag(view.pi)}` : ""}<div>Not checked by providers.dev</div>`);
     }
-    return tile(label, big(own), `${foot}${piTileLine(item)}`);
+    return tile(label, big(own), `${foot}${piTileLine(item, own)}`);
   };
   /** A limit's row in the table of documented limits: the entry's value and source, and pi's standing beside it. */
   const limitFact = (label: string, hint: string, key: "context" | "output", field: PiValueField): string => {
     const item = pi?.items.get(field);
-    if (item?.standing === "only") return fact(label, hint, piOnlyValue(item), piOnlySource(view.pi));
+    if (piTakesPlace(item, limit[key])) return fact(label, hint, piOnlyValue(item), piOnlySource(view.pi));
     return fact(label, hint, number(limit[key]), sourceOf(`limit.${key}`, provenance, extension.origin, fromMeasurement), piLine(item, view.pi));
   };
   // The input window, first: the value, "at least" where its bound says so, its basis, source and date, what kind of
