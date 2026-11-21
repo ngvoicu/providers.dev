@@ -34,7 +34,8 @@ import {
   type Today,
 } from "./format.ts";
 import { isObject, type Json, type JsonObject } from "./merge.ts";
-import type { PiBlock, PiCostTier, PiDifference, PiDifferenceField, PiSummary } from "./pi.ts";
+import type { PiBlock, PiCostTier, PiDifference, PiSummary, PiValue, PiValueField } from "./pi.ts";
+import { PI_ACCEPTS_FLAGS, PI_FLAG_GROUPS, PI_FORMAT_WORDS, piFlagGroup, type PiFlagGroup } from "./pi-words.ts";
 import { NS, type MeasuredLimit, type MetaPi, type ModelExtension, type Provenance, type PublishedEvidence } from "./schema.ts";
 
 const UNKNOWN = '<span class="unknown" title="The source does not say. Unknown is not zero and not unlimited.">Unknown</span>';
@@ -96,7 +97,7 @@ function piDatesSaid(meta: MetaPi | undefined): string {
  * The pi.dev mark of an entry pi's catalog also lists (`pi` of a summary): a mark like the models.dev and providers.dev
  * ones beside it, saying what it means in its title, not a link. In a row it says only that pi lists the entry; on the
  * entry's own page it also says how many values pi states otherwise, as the API counts them (`difference_count`), in
- * words. pi is not a source of the entry: its origin stays as it is.
+ * words, and that each row of the page says where pi stands. pi is not a source of the entry: its origin stays as it is.
  */
 function piMark(pi: PiSummary, differences: boolean): string {
   const n = pi.difference_count;
@@ -104,8 +105,8 @@ function piMark(pi: PiSummary, differences: boolean): string {
   const said = !differences
     ? `pi's model catalog (pi.dev) also lists this entry${named}. Imported beside models.dev, not verified by providers.dev. The entry's page shows what pi states.`
     : n === 0
-      ? `pi's model catalog (pi.dev) also lists this entry${named}. Its price, context window and output limit agree with this page wherever both state one. Imported, not verified by providers.dev.`
-      : `pi's model catalog (pi.dev) also lists this entry${named}, and states ${plural(n, "value")} otherwise than this page, which follows models.dev. Imported, not verified by providers.dev.`;
+      ? `pi's model catalog (pi.dev) also lists this entry${named}. No value of pi's differs from this page's; each row says where pi stands. Imported, not verified by providers.dev.`
+      : `pi's model catalog (pi.dev) also lists this entry${named}, and states ${plural(n, "value")} otherwise than this page; each row says where pi stands. Imported, not verified by providers.dev.`;
   const differ = differences && n > 0 ? `<span class="pi-differ">${exact(n)} ${n === 1 ? "differs" : "differ"}<span class="sr-only"> from this page</span></span>` : "";
   return `<span class="origin pi" title="${e(said)}">pi.dev${differ}</span>`;
 }
@@ -474,7 +475,10 @@ function lifetimeOf(rule: PricingRule): string | null {
   return when.field === "cache.retention_value" && typeof when.value === "string" ? when.value : null;
 }
 
-function priceSection(summary: Summary): string {
+/** The row of the price table that each of pi's four prices stands beside (design/pi-merged.md, section 7). */
+const PI_PRICE_ROW: Readonly<Record<string, PiValueField>> = { "text.input": "cost.input", "text.output": "cost.output", "text.cache_read": "cost.cache_read", "text.cache_write": "cost.cache_write" };
+
+function priceSection(summary: Summary, pi: PiStanding | null): string {
   const pricing = summary.pricing;
   const rules = pricing.rules ?? [];
   const base = rules.filter((rule) => rule.when === null && rule.operation === "set");
@@ -489,7 +493,10 @@ function priceSection(summary: Summary): string {
       const own = base.filter((rule) => rule.meter === meter).map(rateHtml);
       const lifetimes = byLifetime.filter((rule) => rule.meter === meter).map((rule) => `${rateHtml(rule)} <span class="muted">· ${e(lifetimeOf(rule)!)} lifetime</span>`);
       const value = [...own, ...lifetimes];
-      return `<tr><th scope="row">${e(meterLabel(meter))}</th><td class="num">${value.length ? value.join("<br>") : absent}</td></tr>`;
+      // pi's price beside the row's, by the item's standing; where only pi states one, pi's in the place of the value.
+      const item = PI_PRICE_ROW[meter] ? pi?.items.get(PI_PRICE_ROW[meter]) : undefined;
+      const shown = item?.standing === "only" ? piOnlyInline(item, pi!.meta) : `${value.length ? value.join("<br>") : absent}${piLine(item, pi?.meta)}`;
+      return `<tr><th scope="row">${e(meterLabel(meter))}</th><td class="num">${shown}</td></tr>`;
     })
     .join("");
 
@@ -528,7 +535,7 @@ function priceSection(summary: Summary): string {
   return `${note}<div class="scroll"><table class="facts pairs stack-phone"><thead><tr><th scope="col">Base charge</th><th scope="col" class="num">Rate</th></tr></thead><tbody>${rows}</tbody></table></div>
 <h3>Conditional rates</h3>
 <div class="scroll"><table class="facts conditional stack-phone"><thead><tr><th scope="col">Condition</th><th scope="col">Charge</th><th scope="col" class="num">Rate</th><th scope="col">Applies to</th></tr></thead>${changes || `<tbody><tr class="empty-row"><td colspan="4" class="muted">${none}</td></tr></tbody>`}</table></div>
-<p class="hint">Source: ${source || (pricing.billing === "not_applicable" ? NOT_APPLICABLE : UNKNOWN)}</p>
+${piTiers(pi)}<p class="hint">Source: ${source || (pricing.billing === "not_applicable" ? NOT_APPLICABLE : UNKNOWN)}</p>
 <details><summary>Other prices in the source, not shown above (${pricing.unparsed.length})</summary>${pricing.unparsed.length ? `<pre>${e(JSON.stringify(pricing.unparsed, null, 2))}</pre>` : `<p class="muted mt-3">${NONE}</p>`}</details>`;
 }
 
@@ -565,10 +572,10 @@ function sourceOf(path: string, provenance: Provenance[], origin: ModelExtension
   return '<span class="origin upstream" title="Imported from models.dev. Not independently checked.">models.dev</span>';
 }
 
-function fact(label: string, hint: string, value: string, source: string): string {
+function fact(label: string, hint: string, value: string, source: string, pi = ""): string {
   // An unknown value has no source to name, unless it was published as unknown on purpose.
   if ((value === UNKNOWN || value === IN_PLAN) && !source.includes("Corrected")) source = DASH;
-  return `<tr><th scope="row">${label}<div class="hint">${hint}</div></th><td class="num" data-label="Value">${value}</td><td data-label="Source">${source}</td></tr>`;
+  return `<tr><th scope="row">${label}<div class="hint">${hint}</div></th><td class="num" data-label="Value">${value}${pi}</td><td data-label="Source">${source}</td></tr>`;
 }
 
 /** A column's heading in the table of lifetimes, also repeated by each of its cells where the table is stacked. */
@@ -594,8 +601,16 @@ function otherAges(results: readonly CacheResult[], columns: readonly Column[]):
   return `Also checked: ${others.map((result) => `${ageText(result.age_s)} ${Math.round(result.hit_rate_pct)}% (${result.hits}/${result.checks})`).join(", ")}`;
 }
 
-/** The safe lifetime of a profile, then the two lifetimes it was chosen from and how many checks hit inside the documented one. */
-function profileRow(profile: RetentionProfile, p: SafeLifetime, today: Today, columns: readonly Column[]): string {
+/**
+ * The safe lifetime of a profile, then the two lifetimes it was chosen from and how many checks hit inside the documented
+ * one. pi's lifetime of the profile stands beside the documented one, by its item's standing, and never in the safe value.
+ */
+function profileRow(profile: RetentionProfile, p: SafeLifetime, today: Today, columns: readonly Column[], pi: PiStanding | null): string {
+  const item = pi?.items.get(profile === "short" ? "prompt_cache.short" : "prompt_cache.long");
+  const documented =
+    item?.standing === "only"
+      ? piOnlyInline(item, pi!.meta)
+      : `${p.documented_s === null ? '<span class="muted">Not documented</span>' : lifetimeText(p.documented_s, "documented")}${item ? ` ${piNote(item, pi!.meta)}` : ""}`;
   const safe =
     p.safe_s === null || p.basis === "none" || p.source === null
       ? UNKNOWN
@@ -610,7 +625,7 @@ function profileRow(profile: RetentionProfile, p: SafeLifetime, today: Today, co
   const fact = (label: string, value: string): string => `<div><dt>${label}</dt><dd>${value}</dd></div>`;
   return `<tbody class="profile"><tr><th scope="row" title="${PROFILE_TITLE[profile]}">${PROFILE_WORD[profile]} retention</th><td class="profile-facts" colspan="${1 + columns.length}"><dl>
 ${fact("Safe lifetime", `<span class="safe">${safe}</span>${verdict}`)}
-${fact("Documented", p.documented_s === null ? '<span class="muted">Not documented</span>' : lifetimeText(p.documented_s, "documented"))}
+${fact("Documented", documented.trimEnd())}
 ${fact("Measured", p.measured_s === null ? '<span class="muted">Not measured</span>' : `${lifetimeText(p.measured_s, "measured")} <span class="muted">· ${plural(p.clients, "client")}</span>`)}
 ${fact("Inside the documented lifetime", p.checks_inside === null || p.hits_inside === null ? NOT_APPLICABLE : `<span title="Checks at ages up to the documented lifetime, the control included, and how many were served from the cache.">${exact(p.hits_inside)} of ${exact(p.checks_inside)} checks hit</span>`)}
 </dl></td></tr></tbody>`;
@@ -665,10 +680,10 @@ function itemRows(item: CacheLifetimeItem, evaluations: readonly CacheEvaluation
  * columns are the published ones (`cache_ages_s` of /api/v1/meta). What the ages and the cells are is said to a screen
  * reader by the heading over the ages, and in sight by the legend under the table: one sample cell and its words.
  */
-function lifetimesTable(cache: EntryCache, today: Today, ages: CacheAges): string {
+function lifetimesTable(cache: EntryCache, today: Today, ages: CacheAges, pi: PiStanding | null): string {
   const record = cache.lifetime;
   const columns = columnsOf(ages);
-  const body = RETENTION_PROFILES.map((profile) => profileRow(profile, record[profile], today, columns) + record.lifetimes.filter((item) => item.retention_profile === profile).map((item) => itemRows(item, cache.evaluations, today, columns)).join("")).join("");
+  const body = RETENTION_PROFILES.map((profile) => profileRow(profile, record[profile], today, columns, pi) +record.lifetimes.filter((item) => item.retention_profile === profile).map((item) => itemRows(item, cache.evaluations, today, columns)).join("")).join("");
   // An evaluation that is in no lifetime (no timed result, and a control that hit) is still on the page.
   const named = new Set(record.lifetimes.flatMap((item) => item.evaluation_ids));
   const others = cache.evaluations.filter((run) => !named.has(run.id));
@@ -805,23 +820,13 @@ function cacheDocumented(documented: CacheDocumentation, source: string): string
 }
 
 // ---- pi's catalog: `providers_dev.pi` of an entry and `pi` of /api/v1/meta, as the API publishes them. Printed as
-// the block has it: which values differ is `differences`, and nothing here compares, converts or fills in a default.
+// the block has it: where pi stands beside each value is the item's `standing` in `values`, and nothing here compares,
+// converts, tests a value for 0, a unit or an access, or fills in a default (design/pi-merged.md, section 7).
 // What pi does not state says so, never "no": a flag absent from `compat` is not false.
 
 const NOT_STATED = '<span class="unknown" title="pi\'s catalog does not state it.">Not stated</span>';
 /** pi writes 0 for a price it does not charge and for a price it has not recorded alike (the contract, PiCost). */
 const ZERO_PRICE = '<span class="unknown" title="pi\'s catalog writes 0 here. It writes 0 both for no charge and for no price recorded, so it is not shown as free.">Not stated</span>';
-
-/** The rows of pi's limits and prices: one per field of `differences`, in its order, on every entry pi lists. */
-const PI_ROWS: { field: PiDifferenceField; label: string; hint: string }[] = [
-  { field: "context_window", label: "Context window", hint: "<code>context_window</code>; here <code>limit.context</code>" },
-  { field: "max_tokens", label: "Maximum output", hint: "<code>max_tokens</code>: the most pi asks for in one response; here <code>limit.output</code>" },
-  { field: "cost.input", label: "Input", hint: "US dollars per 1M tokens" },
-  { field: "cost.output", label: "Output", hint: "US dollars per 1M tokens" },
-  { field: "cost.cache_read", label: "Cache read", hint: "US dollars per 1M tokens" },
-  { field: "cost.cache_write", label: "Cache write", hint: "pi states one price: a write of the short lifetime" },
-  { field: "cost.tiers", label: "Price tiers", hint: "By size of request, in US dollars per 1M tokens: the whole request is priced at a tier once its input is above the threshold" },
-];
 const TIER_PRICES = [["input", "In"], ["output", "Out"], ["cache_read", "Cache read"], ["cache_write", "Cache write"]] as const;
 
 /** A price per 1M tokens as one side states it: pi's 0 is not a statement; the page's own null is unknown. */
@@ -831,7 +836,6 @@ function piPrice(value: number | null, side: "pi" | "published", unit = true): s
   // Never rounded: the number the API states, written as the site writes prices where that is the same number.
   return `${usdUnrounded(value)}${unit ? ' <span class="muted">/ 1M</span>' : ""}`;
 }
-const piTokens = (value: number | null): string => (value === null || value === 0 ? NOT_STATED : `${exact(value)} <span class="muted">tokens</span>`);
 
 /** Tiers by size of request, each with its threshold and its four prices, laid out alike on both sides so that they read across. */
 function tiersHtml(tiers: readonly PiCostTier[], side: "pi" | "published"): string {
@@ -839,25 +843,91 @@ function tiersHtml(tiers: readonly PiCostTier[], side: "pi" | "published"): stri
   return `<ul class="pi-tiers">${tiers.map((tier) => `<li><span class="tier-at" title="${exact(tier.input_tokens_above)} input tokens: input, cache reads and cache writes together.">Above ${exact(tier.input_tokens_above)}</span>${TIER_PRICES.map(([key, label]) => `<span><span class="muted">${label}</span> ${piPrice(tier[key], side, false)}</span>`).join("")}</li>`).join("")}</ul>`;
 }
 
-/** pi's value of a row, as the block states it. */
-function piValue(block: PiBlock, field: PiDifferenceField): string {
-  switch (field) {
-    case "context_window": return piTokens(block.context_window);
-    case "max_tokens": return piTokens(block.max_tokens);
-    case "cost.input": return piPrice(block.cost.input, "pi");
-    case "cost.output": return piPrice(block.cost.output, "pi");
-    case "cost.cache_read": return piPrice(block.cost.cache_read, "pi");
-    case "cost.cache_write": return piPrice(block.cost.cache_write, "pi");
-    case "cost.tiers": return tiersHtml(block.cost.tiers, "pi");
-  }
+/** pi's items of an entry by field, its differences, and /api/v1/meta's word on pi's data; null where pi does not list the entry. */
+interface PiStanding {
+  items: ReadonlyMap<PiValueField, PiValue>;
+  differences: readonly PiDifference[];
+  meta: MetaPi | undefined;
+}
+function piStanding(block: PiBlock | null, meta: MetaPi | undefined): PiStanding | null {
+  return block === null ? null : { items: new Map(block.values.map((item) => [item.field, item])), differences: block.differences, meta };
 }
 
-/** This page's value of a row where pi's differs: the item's `published` (or `published_tiers`), and the field it is. */
-function publishedValue(item: PiDifference): string {
-  const value = item.field === "cost.tiers" ? tiersHtml(item.published_tiers ?? [], "published") : item.unit === "tokens" ? piTokens(item.published) : piPrice(item.published, "published");
-  const tag = `<span class="pi-differ" title="pi's catalog states this otherwise. This page publishes the value in ${e(item.entry_field)}.">Differs</span>`;
-  // Tiers are a list: the tag goes under it, so that the two lists begin on the same line.
-  return item.field === "cost.tiers" ? `${value}${tag}` : `${tag} ${value}`;
+/** Whose a value of pi's is and as of when, for a hover text: pi's, imported, not checked, the fetch, a failed import. */
+function piWhose(meta: MetaPi | undefined): string {
+  const dates = piDates(meta);
+  const failed = dates.failed ? ` The last import${dates.failed_at ? `, ${dates.failed_at},` : ""} failed: this is the last good one.` : "";
+  return `From pi's model catalog (pi.dev)${dates.fetched ? `, fetched ${dates.fetched}` : ""}. Imported, not checked by providers.dev.${failed}`;
+}
+
+/** `pi` of an item as its row writes a value: tokens exactly, a price per 1M tokens never rounded, a lifetime. */
+function piFigure(item: PiValue, full = false): string {
+  const value = item.pi ?? 0;
+  if (item.unit === "tokens") return full ? `${exact(value)} tokens` : exact(value);
+  if (item.unit === "seconds") return full ? `${span(value)} (${seconds(value)})` : span(value);
+  return full ? `${usdUnrounded(value)} per 1M tokens` : usdUnrounded(value);
+}
+
+/**
+ * What a row says of pi beside the entry's own value, by the item's standing: that pi agrees, once and briefly; what pi
+ * says where it differs; what pi lists where nothing is compared. Nothing where pi is silent. A value only pi states is
+ * not a note: it takes the place of the value (`piOnlyInline`, `piOnlySource`). The tiers have a block of their own.
+ */
+function piNote(item: PiValue | undefined, meta: MetaPi | undefined): string {
+  if (!item || item.field === "cost.tiers") return "";
+  const whose = piWhose(meta);
+  if (item.standing === "agrees") return `<span class="pi-note agrees" title="${e(`pi's catalog states the same value. ${whose}`)}">pi agrees</span>`;
+  if (item.standing === "differs") return `<span class="pi-note differs" title="${e(`pi's catalog states ${piFigure(item, true)}. This page publishes the entry's own value (${item.entry_field}); pi's stands beside it and is not used. ${whose}`)}">pi says ${e(piFigure(item))}</span>`;
+  if (item.standing === "not_compared") return `<span class="pi-note listed" title="${e(`pi's catalog lists ${piFigure(item, true)}. It is not compared with this entry's value: the methodology says when a value is not compared. ${whose}`)}">pi lists ${e(piFigure(item))}, not compared</span>`;
+  return "";
+}
+/** A value only pi states, said under a value it does not replace (the safe lifetime of a tile, which pi never enters). */
+const piOnlyNote = (item: PiValue, meta: MetaPi | undefined): string =>
+  `<span class="pi-note listed" title="${e(`Only pi's catalog states ${piFigure(item, true)}: the entry states none. It is not part of the safe value. ${piWhose(meta)}`)}">Only pi states ${e(piFigure(item))}</span>`;
+/** A note on a line of its own under the value it stands beside. */
+const piLine = (item: PiValue | undefined, meta: MetaPi | undefined): string => {
+  const note = piNote(item, meta);
+  return note ? `<div class="pi-line">${note}</div>` : "";
+};
+
+/** The date of pi's data beside its mark, as the head of the page has it: the fetch, and a failed last import in words. */
+function piDateTag(meta: MetaPi | undefined): string {
+  const dates = piDates(meta);
+  if (dates.fetched === null) return "";
+  return `<span class="${dates.failed ? "stale" : "muted date"}" title="${e(piDatesSaid(meta))}">${e(dates.fetched)}${dates.failed ? " · last import failed" : ""}</span>`;
+}
+const PI_ONLY_MARK = (meta: MetaPi | undefined): string => `<span class="origin pi" title="${e(`Only pi's catalog states this value: the entry states none. ${piWhose(meta)}`)}">pi.dev</span>`;
+const NOT_CHECKED = '<span class="hint pi-unchecked">Not checked by providers.dev</span>';
+
+/** A value only pi states, in the place of the value in a table with a source column: pi's figure. */
+const piOnlyValue = (item: PiValue): string => `<span class="pi-only">${e(item.unit === "tokens" ? exact(item.pi ?? 0) : piFigure(item))}${item.unit === "tokens" ? ' <span class="muted">tokens</span>' : ""}</span>`;
+/** Its source: pi's mark and the date of pi's data, and that providers.dev has not checked it. */
+const piOnlySource = (meta: MetaPi | undefined): string => `<span class="life-source">${PI_ONLY_MARK(meta)}${piDateTag(meta)}</span><div>${NOT_CHECKED}</div>`;
+/** A value only pi states where the row has no source column (a price, a documented lifetime): figure, mark and date together. */
+const piOnlyInline = (item: PiValue, meta: MetaPi | undefined): string =>
+  `<span class="pi-only">${e(piFigure(item))}${item.unit === "usd_per_million_tokens" ? ' <span class="muted">/ 1M tokens</span>' : ""}</span> <span class="life-source">${PI_ONLY_MARK(meta)}${piDateTag(meta)}</span><div>${NOT_CHECKED}</div>`;
+
+/**
+ * The tiers by size of request, said once for the list as a whole under the conditional rates: that pi agrees; pi's
+ * list beside the entry's where they differ (both from the `cost.tiers` item of `differences`); pi's list where it is
+ * not compared. Nothing where pi is silent. Tiers are never `only`.
+ */
+function piTiers(pi: PiStanding | null): string {
+  const item = pi?.items.get("cost.tiers");
+  if (!pi || !item || item.standing === "silent" || item.standing === "only") return "";
+  const whose = piWhose(pi.meta);
+  const name = '<span class="pi-tiers-name">Tiers by size of request</span>';
+  if (item.standing === "agrees") return `<p class="pi-tiers-line">${name}<span class="pi-note agrees" title="${e(`pi's catalog states the same tiers. ${whose}`)}">pi agrees</span></p>\n`;
+  if (item.standing === "not_compared") {
+    return `<div class="pi-tiers-line">${name}<span class="pi-note listed" title="${e(`pi's catalog lists these tiers. They are not compared with this entry's rates: the methodology says when a value is not compared. ${whose}`)}">pi lists, not compared</span>${tiersHtml(item.pi_tiers ?? [], "pi")}</div>\n`;
+  }
+  // Where they differ: the two lists, one above the other so that their thresholds and prices read across.
+  const difference = pi.differences.find((entry) => entry.field === "cost.tiers");
+  const note = `<span class="pi-note differs" title="${e(`pi's catalog states its tiers otherwise than this entry's rates read as tiers. This page publishes the entry's own rates (${item.entry_field}); pi's stand beside them and are not used. ${whose}`)}">pi says otherwise</span>`;
+  const row = (label: string, hint: string, tiers: string): string => `<tr><th scope="row">${label}<div class="hint">${hint}</div></th><td class="num" data-label="Tiers">${tiers}</td></tr>`;
+  const own = difference ? row("This entry", "Its conditional rates above, read as tiers", tiersHtml(difference.published_tiers ?? [], "published")) : "";
+  const theirs = row(`pi's catalog ${note}`, "pi's tiers, as pi states them", tiersHtml(difference?.pi_tiers ?? item.pi_tiers ?? [], "pi"));
+  return `<div class="scroll"><table class="facts pairs pi-tiers-table stack-phone"><thead><tr><th scope="col">Tiers by size of request</th><th scope="col" class="num">Above a number of input tokens, per 1M tokens</th></tr></thead><tbody>${own}${theirs}</tbody></table></div>\n`;
 }
 
 /** A map pi states, a name and a value per line, values as written in pi's catalog. */
@@ -865,18 +935,45 @@ function piPairs(pairs: [string, string][], className: string): string {
   return `<dl class="pi-pairs ${className}">${pairs.map(([name, value]) => `<div><dt>${name}</dt><dd>${value}</dd></div>`).join("")}</dl>`;
 }
 
-/** How pi calls the model: the request format, the address, the input, reasoning, the flags, the cache and the request limits. */
+/** A word of the table of words: escaped, a field or value in backticks as code. */
+const piWord = (text: string): string => e(text).replace(/`([^`]+)`/g, "<code>$1</code>");
+const rawFlag = (value: Json): string => (typeof value === "string" ? value : JSON.stringify(value));
+
+/**
+ * pi's flags in their three groups (`src/core/pi-words.ts`), each printed only where pi states it, once, in the order pi
+ * lists them. Group A says a flag in words, then pi's name and value; groups B and C print pi's name and value.
+ */
+function piFlags(compat: PiBlock["compat"]): Record<PiFlagGroup, string> {
+  const flags = Object.entries(compat ?? {});
+  const none = (group: PiFlagGroup): string =>
+    `<span class="unknown" title="pi's catalog states no ${group === "other" ? "other flag" : "flag of this group"} for this model. A flag not stated follows pi's own default: it is not false.">None stated</span>`;
+  const of = (group: PiFlagGroup) => flags.filter(([name]) => piFlagGroup(name) === group);
+  const accepts = of("accepts").map(([name, value]): [string, string] => {
+    const words = PI_ACCEPTS_FLAGS[name]!;
+    const said = typeof value === "boolean" && words.says !== "value"
+      ? words.says === "required" ? (value ? "Required" : "Not required") : value ? "Accepted" : "Not accepted"
+      : `<code>${e(rawFlag(value))}</code>`;
+    return [`${piWord(words.label)}<div class="hint"><code>${e(name)}: ${e(JSON.stringify(value))}</code></div>`, said];
+  });
+  const raw = (group: PiFlagGroup): [string, string][] => of(group).map(([name, value]) => [`<code>${e(name)}</code>`, `<code>${e(JSON.stringify(value))}</code>`]);
+  return {
+    accepts: accepts.length ? piPairs(accepts, "accepts") : none("accepts"),
+    own: of("own").length ? piPairs(raw("own"), "flags") : none("own"),
+    other: of("other").length ? piPairs(raw("other"), "flags") : none("other"),
+  };
+}
+
+/**
+ * How pi calls the model: pi's name for it, the request format in words and in pi's word, the address, the input,
+ * reasoning, the thinking levels, the flags in their three groups and the request limits. The same rows on every entry
+ * pi lists. pi's limits, prices and cache lifetimes are not here: they stand in the rows of the page, beside its own.
+ */
 function piCallTable(block: PiBlock): string {
   const row = (label: string, hint: string, value: string): string => `<tr><th scope="row">${label}<div class="hint">${hint}</div></th><td>${value}</td></tr>`;
   const levels = block.thinking_level_map === null
     ? NOT_STATED
     : piPairs(Object.entries(block.thinking_level_map).map(([level, value]) => [e(level), value === null ? '<span class="muted" title="pi marks this level as not supported.">not supported</span>' : `<code>${e(value)}</code>`]), "levels");
-  const flags = block.compat === null || Object.keys(block.compat).length === 0
-    ? '<span class="unknown" title="pi\'s catalog states no flags for this model. It is not the same as every flag false.">None stated</span>'
-    : piPairs(Object.entries(block.compat).map(([name, value]) => [`<code>${e(name)}</code>`, `<code>${e(JSON.stringify(value))}</code>`]), "flags");
-  const cache = block.prompt_cache === null
-    ? NOT_STATED
-    : piPairs([["Short", block.prompt_cache.short_s === null ? NOT_STATED : `<span title="${seconds(block.prompt_cache.short_s)}">${span(block.prompt_cache.short_s)}</span>`], ["Long", block.prompt_cache.long_s === null ? NOT_STATED : `<span title="${seconds(block.prompt_cache.long_s)}">${span(block.prompt_cache.long_s)}</span>`]], "cache");
+  const flags = piFlags(block.compat);
   const limits = block.input_limits;
   const limit = (value: number | null, unit: string): string => (value === null ? NOT_STATED : `${exact(value)} <span class="muted">${unit}</span>`);
   const requestLimits = limits.max_request_bytes === null && limits.max_images_per_request === null && limits.max_images_per_message === null
@@ -885,22 +982,26 @@ function piCallTable(block: PiBlock): string {
   const named = block.match === "alias"
     ? "Paired by providers.dev: pi spells the provider or model id otherwise than this entry."
     : "The same provider and model id as this entry.";
+  const words = PI_FORMAT_WORDS[block.api];
+  const format = words ? `${e(words)}<div class="id"><code>${e(block.api)}</code></div>` : `<code>${e(block.api)}</code>`;
+  const group = (key: PiFlagGroup): string => row(e(PI_FLAG_GROUPS[key].title), piWord(PI_FLAG_GROUPS[key].said), flags[key]);
   return `<div class="scroll"><table class="facts pairs pi-call stack-phone"><thead><tr><th scope="col">In pi's catalog</th><th scope="col">As pi states it</th></tr></thead><tbody>
 ${row("Model", named, `<strong>${e(block.name)}</strong><div class="id"><code>${e(block.ref)}</code>${copyButton(block.ref, "pi's id")}</div>`)}
-${row("Request format", "<code>api</code>: the API pi speaks to this model", `<code>${e(block.api)}</code>`)}
+${row("Request format", "<code>api</code>: the API pi speaks to this model, in words and in pi's word", format)}
 ${row("Address", "<code>base_url</code>: where pi sends requests, placeholders as written", block.base_url === null ? NOT_STATED : `<code class="break">${e(block.base_url)}</code> ${copyButton(block.base_url, "address")}`)}
 ${row("Input", "What pi sends to the model, in pi's words", block.input.length ? block.input.map((kind) => `<span class="chip">${e(kind)}</span>`).join(" ") : NOT_STATED)}
 ${row("Reasoning", "Whether pi treats the model as one that reasons", block.reasoning ? "Yes" : "No")}
-${row("Thinking levels", "The value pi sends for each level. A level not named follows pi's own default", levels)}
-${row("Flags", "<code>compat</code>, in pi's words. A flag not named follows pi's own default: it is not false", flags)}
-${row("Cache lifetimes", "What pi's own cache timer reckons with. Not this page's lifetimes", cache)}
+${row("Thinking levels", "The value pi sends for each level it names. A level not named follows pi's own default. Not the provider's list of effort values", levels)}
+${group("accepts")}
+${group("own")}
+${group("other")}
 ${row("Request limits", "The provider's limits on one request, as pi states them", requestLimits)}
 </tbody></table></div>`;
 }
 
 /**
- * The pi section of an entry's page, the same on every entry pi lists: pi's limits and prices beside this page's where
- * they differ, then how pi calls the model. On an entry pi does not list, one line. Whose data it is, and as of when, first.
+ * The section of an entry's page that holds only what pi alone returns, the same on every entry pi lists: whose data it
+ * is and as of when, then how pi calls the model. On an entry pi does not list, one line.
  */
 function piSection(block: PiBlock | null, meta: MetaPi | undefined): string {
   const dates = piDates(meta);
@@ -913,20 +1014,10 @@ function piSection(block: PiBlock | null, meta: MetaPi | undefined): string {
     if (meta && meta.snapshot === null) return `<p class="muted">This dataset is built without pi's catalog (${source}).${failed ? ` ${failed}` : ""}</p>`;
     return `<p class="muted">pi's model catalog does not list this entry.</p><p class="pi-facts muted">${fetched}${checked}${failed}</p>`;
   }
-  const differs = new Map(block.differences.map((item) => [item.field, item]));
-  const rows = PI_ROWS.map(({ field, label, hint }) => {
-    const item = differs.get(field);
-    const published = item ? publishedValue(item) : '<span class="muted" title="pi states no other value here: the two agree, or one of them states none.">No difference</span>';
-    return `<tr${item ? ' class="differs"' : ""}><th scope="row">${label}<div class="hint">${hint}</div></th><td class="num" data-label="pi's catalog">${piValue(block, field)}</td><td class="num" data-label="This page">${published}</td></tr>`;
-  }).join("");
-  const count = block.differences.length;
   const list = `https://pi.dev/models?provider=${encodeURIComponent(block.provider)}`;
-  return `<p class="pi-facts"><span class="origin pi" title="pi's model catalog, a second source imported beside models.dev.">pi.dev</span>${fetched}${checked}${failed}<span>Not verified by providers.dev</span><span>This page follows models.dev</span><span><a href="${e(list)}" rel="noopener">pi's list for <code>${e(block.provider)}</code></a></span></p>
-<h3 id="pi-prices">Limits and prices <span class="hint">${count === 0 ? "no difference" : `${plural(count, "difference")}`}</span></h3>
-<div class="scroll"><table class="facts pi-compare stack-phone"><thead><tr><th scope="col">Value</th><th scope="col" class="num">pi's catalog</th><th scope="col" class="num" title="The value this page publishes: models.dev's, or a providers.dev correction.">This page</th></tr></thead><tbody>${rows}</tbody></table></div>
-<h3 id="pi-call">How pi calls the model</h3>
+  return `<p class="pi-facts"><span class="origin pi" title="pi's model catalog, a second source imported beside models.dev.">pi.dev</span>${fetched}${checked}${failed}<span>Not verified by providers.dev</span><span>Its limits, prices and cache lifetimes: in the rows above, beside this page's</span><span><a href="${e(list)}" rel="noopener">pi's list for <code>${e(block.provider)}</code></a></span></p>
 ${piCallTable(block)}
-<p class="hint"><a href="/docs/methodology/#pi">How pi's catalog is used, and how its values are compared</a></p>`;
+<p class="hint"><a href="/docs/methodology/#pi">How pi's catalog is used, and where it stands beside each value</a></p>`;
 }
 
 function tile(label: string, value: string, foot: string, small = false): string {
@@ -959,11 +1050,21 @@ export function entryHtml(view: EntryView): string {
   const api = `/api/v1${entryHref(summary.ref)}`;
   // The sources of the entry, the pi.dev mark among them where pi lists it, dated by the pi import.
   const sources = sourcesHtml(summary, { today, imported: view.imported, pi: view.pi, entry: true }, true);
-  // The safe lifetime of each profile, at the top of the page: the value, its basis, and whose it is as of when.
+  // Where pi stands beside each value: the items of `values`, by field. Null where pi does not list the entry.
+  const pi = piStanding(extension.pi, view.pi);
+  /**
+   * What a tile says of pi, under its own foot: what pi says where it differs, what only pi states. That pi agrees, or
+   * lists a value that is not compared, is said once, in the value's row below.
+   */
+  const piTileLine = (item: PiValue | undefined): string =>
+    item?.standing === "differs" ? `<div class="pi-line">${piNote(item, view.pi)}</div>` : item?.standing === "only" ? `<div class="pi-line">${piOnlyNote(item, view.pi)}</div>` : "";
+  // The safe lifetime of each profile, at the top of the page: the value, its basis, and whose it is as of when. pi's
+  // lifetime is beside it, never in it.
   const lifetimeTile = (profile: RetentionProfile): string => {
     const p = cache.lifetime[profile];
     const label = `Cache lifetime, ${profile}`;
-    if (p.safe_s === null || p.basis === "none" || p.source === null) return tile(label, '<span class="muted">Unknown</span>', "Not documented or measured");
+    const piSays = piTileLine(pi?.items.get(profile === "short" ? "prompt_cache.short" : "prompt_cache.long"));
+    if (p.safe_s === null || p.basis === "none" || p.source === null) return tile(label, '<span class="muted">Unknown</span>', `Not documented or measured${piSays}`);
     // The other of the two lifetimes it was chosen from, where there is one, read from `basis` as in the list; whether
     // the documented one is contradicted is `documented_status`.
     const other =
@@ -974,7 +1075,24 @@ export function entryHtml(view: EntryView): string {
           : p.documented_status === "contradicted"
             ? `<div class="contradicted">Documented ${p.documented_s === 0 ? "None" : span(p.documented_s)}, contradicted</div>`
             : `<div>Documented ${p.documented_s === 0 ? "None" : span(p.documented_s)}</div>`;
-    return tile(label, `<span title="${e(safeSaid(profile, p))}">${lifetimeText(p.safe_s, p.basis)}</span>${basisTag(p.basis)}`, `${e(p.source)}${p.date ? ` · ${e(p.date)}` : ""}${other}`);
+    return tile(label, `<span title="${e(safeSaid(profile, p))}">${lifetimeText(p.safe_s, p.basis)}</span>${basisTag(p.basis)}`, `${e(p.source)}${p.date ? ` · ${e(p.date)}` : ""}${other}${piSays}`);
+  };
+  /**
+   * A limit's tile: the entry's own value, and under it what pi says where it differs. Where only pi states the value,
+   * pi's figure is the tile's value, with pi's mark beside it, and the foot says whose it is and that it is not checked.
+   */
+  const limitTile = (label: string, own: Json | undefined, foot: string, field: PiValueField): string => {
+    const item = pi?.items.get(field);
+    if (item?.standing === "only") {
+      return tile(label, `<span title="${e(`${exact(item.pi ?? 0)} tokens. ${piWhose(view.pi)}`)}">${exact(item.pi ?? 0)} <span class="unit">tokens</span></span>${PI_ONLY_MARK(view.pi)}`, `From pi's catalog${piDateTag(view.pi) ? ` · ${piDateTag(view.pi)}` : ""}<div>Not checked by providers.dev</div>`);
+    }
+    return tile(label, big(own), `${foot}${piTileLine(item)}`);
+  };
+  /** A limit's row in the table of documented limits: the entry's value and source, and pi's standing beside it. */
+  const limitFact = (label: string, hint: string, key: "context" | "output", field: PiValueField): string => {
+    const item = pi?.items.get(field);
+    if (item?.standing === "only") return fact(label, hint, piOnlyValue(item), piOnlySource(view.pi));
+    return fact(label, hint, number(limit[key]), sourceOf(`limit.${key}`, provenance, extension.origin, fromMeasurement), piLine(item, view.pi));
   };
   // The input window, first: the value, "at least" where its bound says so, its basis, source and date, what kind of
   // figure it is, and the other of the two figures under it, as the cache tiles have it.
@@ -1006,8 +1124,8 @@ export function entryHtml(view: EntryView): string {
 
 <div class="tiles tiles-five mt-6">
   ${windowTile()}
-  ${tile("Context window", big(limit.context), "Exposed by this provider")}
-  ${tile("Maximum output", big(limit.output), "Per response; not a default")}
+  ${limitTile("Context window", limit.context, "Exposed by this provider", "context_window")}
+  ${limitTile("Maximum output", limit.output, "Per response; not a default", "max_tokens")}
   ${lifetimeTile("short")}
   ${lifetimeTile("long")}
 </div>
@@ -1020,9 +1138,9 @@ export function entryHtml(view: EntryView): string {
   <div class="scroll"><table class="facts limit-facts stack-phone">
     <thead><tr><th scope="col">Limit</th><th scope="col" class="num">Value</th><th scope="col">Source</th></tr></thead>
     <tbody>
-      ${fact("Context window", "<code>limit.context</code>: what this provider accepts for the model, input and output together.", number(limit.context), sourceOf("limit.context", provenance, extension.origin, fromMeasurement))}
+      ${limitFact("Context window", "<code>limit.context</code>: what this provider accepts for the model, input and output together.", "context", "context_window")}
       ${fact("Largest input", "<code>limit.input</code>: stated where the input limit is lower than the context window.", number(limit.input), sourceOf("limit.input", provenance, extension.origin))}
-      ${fact("Maximum output", "<code>limit.output</code>: the most one response can hold. A maximum, not what you get by default.", number(limit.output), sourceOf("limit.output", provenance, extension.origin, fromMeasurement))}
+      ${limitFact("Maximum output", "<code>limit.output</code>: the most one response can hold. A maximum, not what you get by default.", "output", "max_tokens")}
     </tbody>
   </table></div>
   <h3>Measured <span class="hint">tokens</span></h3>
@@ -1033,7 +1151,7 @@ export function entryHtml(view: EntryView): string {
 
 <section aria-labelledby="price">
   <h2 id="price">Price</h2>
-  ${priceSection(summary)}
+  ${priceSection(summary, pi)}
   <h3>Request controls</h3>
   ${requestControlTable(summary.request_controls.items.filter((control) => control.id !== "cache.retention"))}
 </section>
@@ -1041,7 +1159,7 @@ export function entryHtml(view: EntryView): string {
 <section aria-labelledby="cache">
   <h2 id="cache">Prompt caching</h2>
   <h3>Lifetimes</h3>
-  ${lifetimesTable(cache, today, cache_ages_s)}
+  ${lifetimesTable(cache, today, cache_ages_s, pi)}
   <h3>Cache modes</h3>
   ${cacheDocumented(cache.documented, sourceOf("capabilities.cache", provenance, extension.origin))}
   <h3>Retention</h3>
@@ -1049,7 +1167,7 @@ export function entryHtml(view: EntryView): string {
 </section>
 
 <section aria-labelledby="pi">
-  <h2 id="pi">pi's catalog</h2>
+  <h2 id="pi">How pi calls the model</h2>
   ${piSection(extension.pi, view.pi)}
 </section>
 

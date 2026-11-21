@@ -854,8 +854,7 @@
     margin-left: 0.45rem;
   }
 
-  /* pi's catalog on an entry's page: whose data it is in one line of short facts, then pi's figures beside the page's,
-     a differing row marked at its edge and in words, then how pi calls the model */
+  /* pi's section of an entry's page: whose data it is in one line of short facts, then how pi calls the model */
   .pi-facts {
     display: flex;
     flex-wrap: wrap;
@@ -865,28 +864,93 @@
     font-size: 0.84rem;
     color: var(--fg-soft);
   }
-  /* The name takes the slack, so that pi's value and the page's stand next to each other (where the table is a table:
-     stacked, its head is out of sight and keeps the size the site gives it) */
+  .pi-facts + .scroll {
+    margin-top: 0.9rem;
+  }
+  /* pi's standing beside a value of the entry: one short line under the value, drawn with a ring where the site's own
+     kinds of value (documented, measured) have a filled dot. That pi agrees is said quietly; what pi says otherwise is
+     in the colour the site gives a contradicted value, as the count beside the pi.dev mark is; what pi lists without a
+     comparison is muted. A value only pi states stands in the place of the value, with the pi.dev mark as its source. */
+  .pi-line {
+    margin-top: 0.2rem;
+  }
+  .pi-note {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-family: var(--font-sans);
+    font-size: 0.74rem;
+    font-weight: 500;
+    line-height: 1.6;
+    letter-spacing: 0;
+    white-space: nowrap;
+    color: var(--muted);
+    vertical-align: 0.05rem;
+  }
+  .pi-note::before {
+    content: "";
+    flex: none;
+    width: 0.42rem;
+    height: 0.42rem;
+    border-radius: 50%;
+    border: 1.5px solid currentColor;
+  }
+  .pi-note.differs {
+    color: var(--warn);
+    background: var(--warn-bg);
+    padding: 0 0.45rem;
+    border-radius: 999px;
+  }
+  .pi-only {
+    font-variant-numeric: tabular-nums;
+  }
+  .pi-unchecked {
+    font-size: 0.74rem;
+  }
+  .tile .value .origin.pi {
+    margin-left: 0.5rem;
+    vertical-align: 0.2em;
+    letter-spacing: 0;
+  }
+  /* The tiers by size of request, said once under the conditional rates: a line where pi agrees, else pi's list (and
+     the entry's, where they differ) in a small table whose names take the slack, so that the two lists read across */
+  .pi-tiers-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.3rem 0.75rem;
+    margin-top: 0.6rem;
+    font-size: 0.84rem;
+  }
+  .pi-tiers-name {
+    font-weight: 500;
+  }
+  /* pi's list under its line, read from the left in the figures of the price tables */
+  .pi-tiers-line .pi-tiers {
+    flex-basis: 100%;
+    font-family: var(--font-mono);
+    font-size: 0.84rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .pi-tiers-line .pi-tiers li {
+    justify-content: flex-start;
+  }
+  .scroll:has(table.pi-tiers-table) {
+    margin-top: 0.6rem;
+  }
   @media (min-width: 640px) {
-    table.pi-compare > thead th:first-child {
+    table.pi-tiers-table > thead th:first-child {
       width: 100%;
     }
   }
+  table.pi-tiers-table tbody th .pi-note {
+    margin-left: 0.35rem;
+  }
+  table.pi-tiers-table td.num {
+    white-space: normal;
+  }
   .pi-tiers li > span {
     white-space: nowrap;
-  }
-  .pi-tiers + .pi-differ {
-    margin-top: 0.35rem;
-  }
-  table.pi-compare tr.differs > th {
-    box-shadow: inset 2px 0 0 var(--warn);
-  }
-  table.pi-compare td.num .pi-differ {
-    margin-right: 0.35rem;
-    vertical-align: 0.05rem;
-  }
-  table.pi-compare td.num:has(.pi-tiers) {
-    white-space: normal;
   }
   .pi-tiers {
     display: grid;
@@ -933,6 +997,21 @@
   .pi-pairs code,
   table.pi-call code {
     font-size: 0.8rem;
+  }
+  /* What the provider accepts, as pi states it: the page's words for a flag and pi's name and value under them, what
+     pi states at the end of the line */
+  .pi-pairs.accepts {
+    grid-template-columns: minmax(0, 1fr) max-content;
+    gap: 0.45rem 1.5rem;
+  }
+  .pi-pairs.accepts dt {
+    color: var(--fg);
+  }
+  .pi-pairs.accepts dt .hint code {
+    font-size: 0.74rem;
+  }
+  table.pi-call td .id {
+    margin-top: 0.1rem;
   }
   code.break {
     overflow-wrap: anywhere;
@@ -2230,20 +2309,14 @@
       flex-basis: 100%;
       margin-left: 0;
     }
-    /* pi's figures beside the page's: stacked, both under their names, left-aligned like the other stacked numbers; a
-       value and its tag may wrap, and a differing row is marked along its whole edge */
+    /* pi's tiers beside the entry's: each list under its name, read from the left like the other stacked numbers */
     .pi-tiers li {
       justify-content: flex-start;
     }
-    table.pi-compare.stack-phone > tbody > tr > td.num {
-      flex: 1 1 9rem;
-      white-space: normal;
-    }
-    table.pi-compare tr.differs > th {
-      box-shadow: none;
-    }
-    table.pi-compare.stack-phone > tbody > tr.differs {
-      box-shadow: inset 2px 0 0 var(--warn);
+    table.pi-tiers-table.stack-phone > tbody > tr > td.num {
+      flex-basis: 100%;
+      margin-left: 0;
+      text-align: left;
     }
     /* Request controls: support and default side by side, then the field, the values and the conditions */
     table.controls.stack-phone > tbody > tr > th {

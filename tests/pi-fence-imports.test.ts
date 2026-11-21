@@ -71,6 +71,15 @@ describe("3. nothing calls pi's code outside the fence", () => {
     expect(fromSync.map((reference) => reference.text)).toEqual([]);
   });
 
+  it("src/core/pi-words.ts, the page's words for pi's formats and flags, imports nothing from pi's two modules", () => {
+    // design/pi-merged.md, section 9: it is plain data, read by the entry page and the methodology, and outside the table of modules.
+    const own = references("src/core/pi-words.ts");
+    expect(files).toContain("src/core/pi-words.ts");
+    expect(own.filter((reference) => reference.target === PI || reference.target === PI_SYNC).map((reference) => reference.text)).toEqual([]);
+    // Nor anything else: no import at all, of a value or a type.
+    expect(own.map((reference) => reference.text)).toEqual([]);
+  });
+
   it("scripts/lib/fenced.ts imports nothing of pi's", () => {
     const own = references(GUARD).filter((reference) => /(^|\/)pi[-.]|pi\.ts$/.test(reference.target));
     expect(own).toEqual([]);

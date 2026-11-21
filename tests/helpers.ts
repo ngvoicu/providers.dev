@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { stringify } from "yaml";
+import { expect } from "vitest";
 import type { z } from "zod";
 import { handleApi, modelsFor, type ApiDeps } from "../src/core/api.ts";
 import {
@@ -18,13 +19,13 @@ import {
   ProviderSchema,
   ProviderSummarySchema,
 } from "../src/core/contract.ts";
-import { entryHref } from "../src/core/format.ts";
+import { duration, entryHref, escapeHtml, exact, usdUnrounded } from "../src/core/format.ts";
 import { addResults, documentedCache, emptyCacheLifetime, RETENTION_PROFILES, type CacheDocumentation, type CacheEvaluation, type CacheLifetimeRecord, type CacheResult, type EntryCache } from "../src/core/cache.ts";
 import type { Index, Summary } from "../src/core/entries.ts";
 import { controlsOf, pricingOf } from "../src/core/policies.ts";
 import { emptyInputWindow, type InputWindow } from "../src/core/limits.ts";
 import { ext, type Catalog, type MeasuredLimit, type Meta, type ModelExtension, type PiAliases, type UpstreamCatalog } from "../src/core/schema.ts";
-import { piPart, type PiBlock, type PiCatalog, type PiModel, type PiReport, type PiSummary } from "../src/core/pi.ts";
+import { piPart, type PiBlock, type PiCatalog, type PiModel, type PiReport, type PiSummary, type PiValue } from "../src/core/pi.ts";
 import { resolve, type ResolveInput, type ResolveResult } from "../src/core/resolve.ts";
 import { pretty, ROOT } from "../scripts/lib/files.ts";
 import { piProviderFile } from "../scripts/lib/pi-sync.ts";
@@ -473,3 +474,71 @@ export async function contractProblems(dir: string): Promise<string[]> {
 }
 
 export { ROOT };
+
+// ---- pi's standing on an entry's page (design/pi-merged.md, section 7): the place on the page of each item of
+// `providers_dev.pi.values`, and what that place must say of pi by the item's standing alone.
+
+/** The HTML of the place where each of pi's nine values stands on an entry's page: its row, or the tiers block. */
+export function piPlaces(html: string): Record<PiValue["field"], string> {
+  const between = (from: string, to: string, after = 0): string => {
+    const start = html.indexOf(from, after);
+    if (start < 0) throw new Error(`not on the page: ${from}`);
+    return html.slice(start, html.indexOf(to, start + from.length));
+  };
+  const limits = html.indexOf('<h3>Documented</h3>');
+  const price = html.indexOf('<h2 id="price">');
+  const cache = html.indexOf('<h2 id="cache">');
+  const conditional = html.indexOf('<table class="facts conditional');
+  return {
+    context_window: between('<th scope="row">Context window<', "</tr>", limits),
+    max_tokens: between('<th scope="row">Maximum output<', "</tr>", limits),
+    "cost.input": between('<th scope="row">Input</th>', "</tr>", price),
+    "cost.output": between('<th scope="row">Output</th>', "</tr>", price),
+    "cost.cache_read": between('<th scope="row">Cache read</th>', "</tr>", price),
+    "cost.cache_write": between('<th scope="row">Cache write</th>', "</tr>", price),
+    // Under the conditional rates, before the source of the prices.
+    "cost.tiers": html.slice(html.indexOf("</table></div>", conditional) + "</table></div>".length, html.indexOf('<p class="hint">Source:', conditional)),
+    "prompt_cache.short": between("<dt>Documented</dt>", "</dd>", html.indexOf(">Short retention</th>", cache)),
+    "prompt_cache.long": between("<dt>Documented</dt>", "</dd>", html.indexOf(">Long retention</th>", cache)),
+  };
+}
+
+/** `pi` of an item as the page writes it in a row: tokens exactly, a price never rounded, a lifetime. */
+export const piFigureOf = (item: PiValue): string =>
+  item.unit === "tokens" ? exact(item.pi!) : item.unit === "seconds" ? duration(item.pi!) : usdUnrounded(item.pi!);
+
+/**
+ * What the place of each value says of pi, from the item's standing and nothing else: "pi agrees" once; "pi says" and
+ * pi's figure; "pi lists" and pi's figure, not compared; pi's figure in the place of the value with pi's mark; and
+ * nothing of pi's where pi is silent.
+ */
+export function expectStandings(html: string, values: readonly PiValue[], where = ""): void {
+  const places = piPlaces(html);
+  for (const item of values) {
+    const place = places[item.field];
+    const said = `${where} ${item.field} ${item.standing}`;
+    const notes = [...place.matchAll(/class="pi-note (\w+)"/g)].map((match) => match[1]);
+    if (item.standing === "silent") {
+      expect(notes, said).toEqual([]);
+      expect(place, said).not.toMatch(/pi\.dev|pi-only|pi&#39;s catalog|\bpi (?:agrees|says|lists)\b/);
+      continue;
+    }
+    if (item.standing === "agrees") {
+      expect(notes, said).toEqual(["agrees"]);
+      expect(place.split(">pi agrees<").length - 1, said).toBe(1);
+    } else if (item.standing === "differs") {
+      expect(notes, said).toEqual(["differs"]);
+      if (item.field !== "cost.tiers") expect(place, said).toContain(`>pi says ${escapeHtml(piFigureOf(item))}<`);
+      else expect(place, said).toContain(">pi says otherwise<");
+    } else if (item.standing === "not_compared") {
+      expect(notes, said).toEqual(["listed"]);
+      expect(place, said).toContain(item.field === "cost.tiers" ? ">pi lists, not compared<" : `>pi lists ${escapeHtml(piFigureOf(item))}, not compared<`);
+    } else {
+      // only: pi's figure in the place of the value, with pi's mark as its source, and no note.
+      expect(notes, said).toEqual([]);
+      expect(place, said).toMatch(new RegExp(`class="pi-only">${escapeHtml(piFigureOf(item)).replace(/[$.]/g, "\\$&")}`));
+      expect(place, said).toContain('class="origin pi"');
+      expect(place, said).toContain("Not checked by providers.dev");
+    }
+  }
+}

@@ -1,6 +1,11 @@
 ---
 import Doc from "../../../layouts/Doc.astro";
 import { IDENTITY_FIELDS } from "../../../core/resolve.ts";
+import { escapeHtml } from "../../../core/format.ts";
+import { PI_ACCEPTS_FLAGS, PI_FLAG_GROUPS, PI_FORMAT_WORDS, PI_OWN_FLAGS } from "../../../core/pi-words.ts";
+
+/** A word of the table of words: escaped, a field or value in backticks as code. */
+const words = (text: string): string => escapeHtml(text).replace(/`([^`]+)`/g, "<code>$1</code>");
 ---
 
 <Doc
@@ -29,7 +34,7 @@ import { IDENTITY_FIELDS } from "../../../core/resolve.ts";
       <li><span class="origin upstream">models.dev</span> <strong>Imported.</strong> Copied from models.dev and not independently checked. Imported values never carry a verification date.</li>
       <li><span class="badge documented">documented</span> <strong>Documented.</strong> Set because the provider's own documentation says so. The entry names the page and the date it was read.</li>
       <li><span class="badge measured">measured</span> <strong>Measured.</strong> Observed by sending requests. The entry names the access method, the client, the date and the raw result.</li>
-      <li><span class="origin pi">pi.dev</span> <strong>pi's catalog.</strong> What the model catalog of the coding agent pi states for an entry, imported and not independently checked. It is shown beside the entry's values and never replaces one (see <a href="#pi">pi's catalog</a>).</li>
+      <li><span class="origin pi">pi.dev</span> <strong>pi's catalog.</strong> What the model catalog of the coding agent pi states for an entry, imported and not independently checked. It is shown beside the entry's values and never replaces one; where the entry states no value and pi does, pi's is shown in its place, marked as pi's (see <a href="#pi">pi's catalog</a>).</li>
       <li><strong>API price.</strong> The list price of the API entry of the same model, shown on a subscription entry and marked "API price". It is the only value an entry takes from another one (see <a href="#prices">Prices</a>).</li>
     </ul>
     <p>
@@ -196,7 +201,7 @@ import { IDENTITY_FIELDS } from "../../../core/resolve.ts";
       <li><strong>Additions</strong>: providers and entries that models.dev does not have.</li>
       <li><strong>Corrections</strong>: single fields set on upstream entries. They take precedence.</li>
     </ol>
-    <p>pi's catalog is a fourth input that sets no field: what it states for an entry is published beside the entry, under <code>providers_dev.pi</code> (see <a href="#pi">pi's catalog</a>).</p>
+    <p>pi's catalog is a fourth input that sets no field and stands last: what it states for an entry is published beside the entry, under <code>providers_dev.pi</code>, with where it stands beside each value (see <a href="#pi">pi's catalog</a>).</p>
     <p>A correction is a patch applied field by field:</p>
   </div>
   <div class="scroll max-w-[62rem]">
@@ -240,24 +245,53 @@ import { IDENTITY_FIELDS } from "../../../core/resolve.ts";
     <h2 id="pi">pi's catalog</h2>
     <p>
       pi is a coding agent (<a href="https://github.com/earendil-works/pi">github.com/earendil-works/pi</a>, MIT License). Its model catalog, <a href="https://pi.dev/models">pi.dev/models</a>,
-      says how pi calls each model it supports and at what price and limits it reckons. providers.dev imports it as a second source, beside models.dev, and is not affiliated with pi.
-      models.dev stays the reference: every figure of an entry's page and every filter, sort and list follows models.dev and providers.dev's own corrections and evaluations, and nothing of pi's is merged
-      into <code>limit</code>, <code>cost</code> or <code>capabilities</code>. A model that only pi lists is not an entry.
+      says how pi calls each model it supports and at what price and limits it reckons. providers.dev imports it beside models.dev and is not affiliated with pi. A model that only pi
+      lists is not an entry.
+    </p>
+    <p>
+      For one value the sources stand in this order: providers.dev's own (a correction, an added entry's own value, a measurement), then models.dev, then pi. The entry's field is the
+      value of the first two; pi's never replaces it and is never written into <code>limit</code>, <code>cost</code> or <code>capabilities</code>. pi's data enters no safe value either:
+      the input window and the cache lifetimes are worked out from what is documented and what providers.dev measured, and pi's catalog is neither.
+    </p>
+    <h3>Where pi stands beside each value</h3>
+    <p>
+      For each value pi can state, the build works out once where pi stands beside the entry, and publishes it in the entry's pi block (<code>providers_dev.pi.values</code>). The entry's
+      page prints it in the value's own row and compares nothing itself. The values are the context window, the output limit, the input, output, cache-read and cache-write prices, the
+      tiers by size of request (said once, under the conditional rates), and the short and long cache lifetimes, which are set beside the documented lifetime of the profile, not the
+      safe one.
     </p>
     <ul>
+      <li><strong>pi agrees</strong> (<code>agrees</code>): pi states the same value. Limits, prices and lifetimes are compared exactly, tiers threshold by threshold.</li>
       <li>
-        Where pi's catalog lists an entry, the entry carries pi's block (<code>providers_dev.pi</code>). In a list the entry is marked <span class="origin pi">pi.dev</span>, which says only
-        that pi lists it. The entry's page has a section <em>pi's catalog</em>: pi's limits and prices beside the page's, and how pi calls the model (the request format, the address,
-        the input, the thinking levels, pi's flags, the cache lifetimes pi reckons with and the request limits), each as pi states it.
+        <strong>pi says</strong> (<code>differs</code>): pi states another value. The page keeps the entry's own and shows pi's beside it; it does not say which is right. The pi.dev mark at
+        the top of the page counts these values.
       </li>
       <li>
-        What pi does not state is <em>Not stated</em>, never "no": a flag pi does not name follows pi's own default, which is not published. pi writes 0 both for a price it does not
-        charge and for a price it has not recorded, so a price of 0 in pi's catalog is shown as <em>Not stated</em>, never as free.
+        <strong>Only pi</strong> (<code>only</code>): the entry states no value and pi does. pi's value is shown in the place of the value, with the <span class="origin pi">pi.dev</span>
+        mark as its source, and is not checked by providers.dev. It stays in pi's block: the lists, the filters and the input window still have no value there. A context window of pi's
+        can be the window pi's own client works with rather than what the route accepts, so it can stand beside a measured input window several times larger.
       </li>
       <li>
-        A value is listed as differing where pi's context window, output limit or a price is not the entry's published value: limits exactly, prices exactly
-        too, tiers by size of request threshold by threshold. Nothing is compared where either side states no value, where pi's price is 0, where the entry prices per character,
-        or where the entry's cache write has one price per lifetime. The page shows both values and says which one it follows; it does not say which is right.
+        <strong>pi lists, not compared</strong> (<code>not_compared</code>): pi states a value that cannot be set beside the entry's: a price or tiers on a subscription entry, which is not
+        paid per token; a price the entry states in another unit than per million tokens; a cache-write price the entry gives per lifetime; tiers the entry states in a form that cannot be
+        read as tiers; or a value providers.dev publishes as unknown or removes.
+      </li>
+      <li>
+        <strong>Nothing</strong> (<code>silent</code>): pi states no value. pi writes 0 both for a limit or price it does not state and for a price it does not charge, so its 0 is no
+        statement and is never shown as free.
+      </li>
+    </ul>
+    <h3>How pi calls the model</h3>
+    <ul>
+      <li>
+        The section <em>How pi calls the model</em> of an entry's page holds what only pi returns, as pi states it: pi's name for the model, the request format in words and in pi's word,
+        the address, what pi sends, whether pi treats the model as one that reasons, the thinking levels with the value pi sends for each (not the provider's list of effort values), pi's
+        flags in three groups, and the request limits. None of it becomes a value of providers.dev's: pi's catalog names no source, and a flag speaks of one request format at pi's address.
+      </li>
+      <li>
+        What pi does not state is <em>Not stated</em>, never "no": a flag pi does not name follows pi's own default, which is not published. A flag of the first group that is <code>true</code>
+        or <code>false</code> is said as Accepted or Not accepted (Required or Not required for the one that names a requirement), with pi's name and value beside the
+        words. A flag the table below does not name is printed as pi states it, under <em>Other flags</em>.
       </li>
       <li>
         Where pi spells a provider or model id otherwise, providers.dev pairs the two by hand, and only where they are certainly the same; nothing is matched by similarity. The page
@@ -268,6 +302,28 @@ import { IDENTITY_FIELDS } from "../../../core/resolve.ts";
         imported, so they are never marked stale. When the last import failed, the page and the footer say so, and the last good catalog stays published.
       </li>
     </ul>
+    <p>The page's words for pi's request formats and flags:</p>
+  </div>
+  <div class="scroll max-w-[62rem]">
+    <table class="facts">
+      <thead><tr><th scope="col">Request format (<code>api</code>)</th><th scope="col">On the page</th></tr></thead>
+      <tbody>
+        {Object.entries(PI_FORMAT_WORDS).map(([api, words]) => <tr><th scope="row"><code>{api}</code></th><td>{words}</td></tr>)}
+        <tr><th scope="row">Any other</th><td>pi's word alone</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="scroll max-w-[62rem] mt-4">
+    <table class="facts">
+      <thead><tr><th scope="col">pi's flag (<code>compat</code>)</th><th scope="col">Group</th><th scope="col">On the page</th></tr></thead>
+      <tbody>
+        {Object.entries(PI_ACCEPTS_FLAGS).map(([name, flag]) => <tr><th scope="row"><code>{name}</code></th><td class="whitespace-nowrap">{PI_FLAG_GROUPS.accepts.title}</td><td set:html={words(flag.label) + (flag.says === "accepted" ? ": Accepted or Not accepted" : flag.says === "required" ? ": Required or Not required" : ": the value as stated")} /></tr>)}
+        {PI_OWN_FLAGS.map((name) => <tr><th scope="row"><code>{name}</code></th><td class="whitespace-nowrap">{PI_FLAG_GROUPS.own.title}</td><td>As pi states it: pi's own switch, not a statement about the provider</td></tr>)}
+        <tr><th scope="row">Any other</th><td class="whitespace-nowrap">{PI_FLAG_GROUPS.other.title}</td><td>As pi states it</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="prose">
 
     <h2 id="caching">Documented caching</h2>
     <ul>

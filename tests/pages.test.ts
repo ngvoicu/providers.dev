@@ -16,10 +16,10 @@ import { PARAMS } from "../src/core/query.ts";
 import { DOCUMENTS } from "../src/core/resources.ts";
 import { readSnapshot, type AssetBinding } from "../src/core/snapshot.ts";
 import worker from "../worker/index.ts";
-import type { PiCatalog } from "../src/core/pi.ts";
+import type { PiCatalog, PiValue } from "../src/core/pi.ts";
 import type { JsonObject } from "../src/core/merge.ts";
 import type { Meta } from "../src/core/schema.ts";
-import { depsFrom, fetchReturning, fixturePi, fixtureUpstream, ROOT, tempDataDir, writeAuthored, writePiSnapshot } from "./helpers.ts";
+import { depsFrom, expectStandings, fetchReturning, fixturePi, fixtureUpstream, piPlaces, ROOT, tempDataDir, writeAuthored, writePiSnapshot } from "./helpers.ts";
 
 const shell = `<html><head><title>${MARK.title} · providers.dev</title><meta name="description" content="${MARK.description}"><link rel="canonical" href="${MARK.canonical}"></head><body><nav>${MARK.nav}</nav><main>${MARK.html}</main><footer>${MARK.dataset}</footer></body></html>`;
 const now = () => new Date("2026-11-14T12:00:00Z");
@@ -595,44 +595,81 @@ describe("pi's catalog on the pages", () => {
     const { entry } = (await (await piApi("/api/v1/entries/provider-02/lab/model-0")).json() as { data: { entry: JsonObject } }).data;
     const block = (entry.providers_dev as JsonObject).pi as JsonObject;
     expect(block).toMatchObject({ api: "anthropic-messages", base_url: "https://api.provider-02.example/v1", differences: [] });
-    const { section, head } = parts(await piPage("/entries/provider-02/lab/model-0"));
-    expect(section).toContain("<code>anthropic-messages</code>");
+    const html = await piPage("/entries/provider-02/lab/model-0");
+    const { section, head } = parts(html);
+    expect(section).toContain("Anthropic Messages<div class=\"id\"><code>anthropic-messages</code></div>");
     expect(section).toContain("<code class=\"break\">https://api.provider-02.example/v1</code>");
-    for (const [name, value] of Object.entries(block.compat as JsonObject)) expect(section).toContain(`<dt><code>${name}</code></dt><dd><code>${escapeHtml(JSON.stringify(value))}</code></dd>`);
+    // Each flag pi states, once, with pi's name and value; the provider's in words.
+    for (const [name, value] of Object.entries(block.compat as JsonObject)) expect(section.split(`<code>${name}: ${escapeHtml(JSON.stringify(value))}</code>`).length - 1, name).toBe(1);
+    expect(section).toContain("The <code>store</code> request field<div class=\"hint\"><code>supportsStore: false</code></div></dt><dd>Not accepted</dd>");
     for (const [level, value] of Object.entries(block.thinking_level_map as JsonObject)) expect(section).toContain(`<dt>${level}</dt><dd>${value === null ? '<span class="muted" title="pi marks this level as not supported.">not supported</span>' : `<code>${value}</code>`}</dd>`);
-    // Whose data it is, and as of when: fetched from pi, last checked unchanged, the page following models.dev, pi's list.
+    // Whose data it is, and as of when: fetched from pi, last checked unchanged, its values in the rows, pi's list.
     expect(section).toContain("Fetched <span class=\"date\" title=\"2026-11-20 14:19 UTC\">2026-11-20</span> from <a href=\"https://pi.dev/api/models\"");
     expect(section).toContain("Last checked <span class=\"date\" title=\"2026-11-21 04:17 UTC\">2026-11-21</span>, unchanged");
     expect(section).toContain("Not verified by providers.dev");
-    expect(section).toContain("This page follows models.dev");
+    expect(section).toContain("Its limits, prices and cache lifetimes: in the rows above, beside this page's");
     expect(section).toContain('href="https://pi.dev/models?provider=provider-02"');
     expect(section).toContain("The same provider and model id as this entry.");
     expect(section).not.toContain("The last import");
-    // Agreeing everywhere: seven rows, each "No difference"; the mark in the heading says no more than pi.dev.
-    expect(section.split(">No difference<").length - 1).toBe(7);
-    expect(section).not.toContain("Differs");
-    expect(head).toContain('<span class="origin pi" title="pi&#39;s model catalog (pi.dev) also lists this entry. Its price, context window and output limit agree with this page wherever both state one.');
+    // The section holds only what pi alone returns.
+    expect(section).not.toMatch(/id="pi-prices"|Limits and prices|>Cache lifetimes<|No difference/);
+    // No difference: the mark in the heading says no more than pi.dev, and each row says where pi stands.
+    expectStandings(html, block.values as unknown as PiValue[], "provider-02/lab/model-0");
+    expect(head).toContain('<span class="origin pi" title="pi&#39;s model catalog (pi.dev) also lists this entry. No value of pi&#39;s differs from this page&#39;s; each row says where pi stands.');
     expect(head).toMatch(/>pi\.dev<\/span><span class="muted date" title="[^"]*">2026-11-20<\/span>/);
-    expect(head).not.toContain("differ");
+    expect(head).not.toContain("differ<");
   });
 
-  it("an entry page with differences: both values of each, and pi's price of 0 is not stated, never free", async () => {
+  it("an entry page with differences: the entry's own value in each row with what pi says under it; pi's price of 0 is not stated, never free", async () => {
     const { entry, summary } = (await (await piApi("/api/v1/entries/provider-02/lab/model-4")).json() as { data: { entry: JsonObject; summary: { pi: { difference_count: number } } } }).data;
-    const differences = ((entry.providers_dev as JsonObject).pi as JsonObject).differences as { field: string; pi: number; published: number }[];
+    const block = (entry.providers_dev as JsonObject).pi as JsonObject;
+    const differences = block.differences as { field: string; pi: number; published: number }[];
     expect(differences.map((item) => [item.field, item.pi, item.published])).toEqual([["context_window", 450000, 500000], ["max_tokens", 4000, 5000], ["cost.input", 4, 2]]);
     expect(summary.pi.difference_count).toBe(3);
-    const { section, head } = parts(await piPage("/entries/provider-02/lab/model-4"));
+    const html = await piPage("/entries/provider-02/lab/model-4");
+    const { section, head } = parts(html);
     expect(head).toContain('<span class="pi-differ">3 differ<span class="sr-only"> from this page</span></span>');
-    const row = (label: string) => section.split(`<th scope="row">${label}<`)[1]!.split("</tr>")[0]!;
-    expect(row("Context window")).toMatch(/450,000 <span class="muted">tokens<\/span>.*Differs<\/span> 500,000 <span class="muted">tokens/);
-    expect(row("Maximum output")).toMatch(/4,000 <span class="muted">tokens<\/span>.*Differs<\/span> 5,000 <span class="muted">tokens/);
-    expect(row("Input")).toMatch(/\$4 <span class="muted">\/ 1M<\/span>.*Differs<\/span> \$2 <span class="muted">\/ 1M/);
-    expect(section.split('<tr class="differs">').length - 1).toBe(3);
-    // The output price agrees (16 and 16); pi's cache write is 0, which is not a statement.
-    expect(row("Output")).toContain("No difference");
-    expect(row("Cache write")).toContain(">Not stated</span>");
-    expect(section.replace(/title="[^"]*"/g, "")).not.toMatch(/\bfree\b/i);
-    for (const flag of ["supportsLongCacheRetention", "thinkingFormat"]) expect(section).toContain(`<code>${flag}</code>`);
+    const rows = piPlaces(html);
+    expect(rows.context_window).toMatch(/500,000 <span class="muted">tokens<\/span><div class="pi-line"><span class="pi-note differs" [^>]*>pi says 450,000<\/span>/);
+    expect(rows.max_tokens).toMatch(/5,000 <span class="muted">tokens<\/span><div class="pi-line"><span class="pi-note differs" [^>]*>pi says 4,000<\/span>/);
+    expect(rows["cost.input"]).toMatch(/\$2 <span class="muted">\/ 1M tokens<\/span><div class="pi-line"><span class="pi-note differs" [^>]*>pi says \$4<\/span>/);
+    expect(html.split('class="pi-note differs"').length - 1).toBe(3 + 2); // three rows, and the two limit tiles
+    // The output price agrees (16 and 16); pi's cache write is 0, which is not a statement: nothing of pi's in that row.
+    expect(rows["cost.output"]).toContain(">pi agrees<");
+    expect(rows["cost.cache_write"]).not.toMatch(/pi-note|pi\.dev/);
+    expectStandings(html, block.values as unknown as PiValue[], "provider-02/lab/model-4");
+    expect(html.replace(/title="[^"]*"/g, "")).not.toMatch(/\bfree\b|pi (?:says|lists) \$0\b/i);
+    for (const flag of ["supportsLongCacheRetention", "thinkingFormat"]) expect(section).toContain(`<code>${flag}: `);
+  });
+
+  it("every entry page with a block says, in each row, the standing the API gives and nothing else; the values only pi states are pi's, and Unknown without pi's data", async () => {
+    const { data } = (await (await piApi("/api/v1/entries?provider=provider-02&limit=200")).json() as { data: { ref: string; pi: unknown }[] });
+    const listed = data.filter((summary) => summary.pi !== null);
+    expect(listed.length).toBeGreaterThan(10);
+    const seen = new Set<string>();
+    for (const { ref } of listed) {
+      const { entry } = (await (await piApi(`/api/v1/entries/${ref}`)).json() as { data: { entry: JsonObject } }).data;
+      const values = ((entry.providers_dev as JsonObject).pi as JsonObject).values as unknown as PiValue[];
+      for (const item of values) seen.add(item.standing);
+      expectStandings(await piPage(`/entries/${ref}`), values, ref);
+    }
+    expect([...seen].sort()).toEqual(["agrees", "differs", "only", "silent"]);
+    // model-7 states no limit: pi's 800,000 is in its row, marked pi's, and in a dataset without pi data the row says Unknown.
+    const only = piPlaces(await piPage("/entries/provider-02/model-7")).context_window;
+    expect(only).toMatch(/<span class="pi-only">800,000 <span class="muted">tokens<\/span><\/span>/);
+    expect(only).toMatch(/<span class="origin pi" [^>]*>pi\.dev<\/span><span class="muted date" [^>]*>2026-11-20<\/span>/);
+    const without = piPlaces((await (await page("/entries/provider-02/model-7")).text())).context_window;
+    expect(without).toContain('<td class="num" data-label="Value"><span class="unknown"');
+    expect(without).not.toMatch(/pi\.dev|pi-only|pi-note/);
+  });
+
+  it("a page built without pi's data says nothing of pi in any row, and its section is one line", async () => {
+    for (const ref of ["provider-02/lab/model-0", "provider-02/lab/model-4", "provider-02/model-7"]) {
+      const html = await (await page(`/entries/${ref}`)).text();
+      expect(html, ref).not.toMatch(/class="pi-(?:note|only|line|tiers-line)"|pi-tiers-table|class="origin pi"/);
+      const { section } = parts(html);
+      expect(section.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim(), ref).toMatch(/^How pi calls the model (?:This dataset is built without pi's catalog|pi's model catalog does not list this entry)/);
+    }
   });
 
   it("an entry paired through the alias file shows pi's own spelling", async () => {
