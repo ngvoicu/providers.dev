@@ -18,14 +18,21 @@ decisions:
 5. The page shows what pi returns beyond the entry's values.
 6. Open: can pi's data contribute to the safe values?
 
+**Decided with the owner on 2026-11-21**, after two reviews of the page: "our measurements are highest priority,
+then models.dev and then pi.dev; and if they don't match we show they dont match". **pi never takes the place of
+the entry's value.** Every row and tile prints the entry's own value, or Unknown, as without pi; pi speaks only on
+its line under it. Decision 3 is met there: a value only pi states is "pi states X" on that line, with pi's mark
+and date (section 7).
+
 **What this design answers, in short:**
 
 - One rule gives every value pi can speak of a **standing**: `agrees`, `differs`, `only`, `not_compared` or
   `silent`. It is worked out once, when the data is built, and published as one new key of the pi block,
   `providers_dev.pi.values`. The page prints it and works nothing out (sections 2, 7, 8).
 - A value only pi states is **not written into `limit` or `cost`**. It is an item with the standing `only`, and
-  the page prints it in the row where a reader looks for it, with pi's mark. There are ten such values today, on
-  five entries (section 3).
+  the page prints it on pi's line under that row's value, "pi states X", with pi's mark and date; the value
+  itself stays the entry's (Unknown, or a limit of 0). There are ten such values today, on five entries
+  (section 3).
 - The fence stays as it is, sentence for sentence (section 4).
 - pi's data does **not** contribute to the safe values (section 5).
 - The section "pi's catalog" of the entry page keeps only what pi alone returns: how pi calls the model
@@ -198,7 +205,7 @@ that list can be empty; with `silent` it is `null`. Every other item has `pi_tie
 | pi agrees with the entry | the value, as today | `agrees` | the value with its source, and "pi agrees" |
 | pi differs | the value by the order: providers.dev's, else models.dev's | `differs`, with pi's value; `differences` has both values, as today | the value with its source, and "pi says X" |
 | only providers.dev or models.dev speaks | the value | `silent` | the value with its source; nothing about pi |
-| only pi speaks | absent, as today | `only`, with pi's value | pi's value in the row, marked as pi's |
+| only pi speaks | absent, as today | `only`, with pi's value | the row as without pi (Unknown, or the entry's 0), and "pi states X" under it, with pi's mark and date |
 | pi speaks and the field is not compared | whatever it is today | `not_compared`, with pi's value | the row as today, and "pi lists X", without a verdict |
 | nobody speaks | absent | `silent` | Unknown |
 
@@ -216,8 +223,8 @@ page would show "3 differ" on an entry where no row differs (section 11, decisio
 ## 3. Where a value only pi states lives
 
 **In the pi block, as the item with the standing `only`. Not in `limit`, `cost` or any other field of the
-entry.** The page puts it where a reader looks for it: in the row and the tile of that value, with pi's mark
-(section 7). The API consumer finds it where it is today, in `providers_dev.pi`, now with the published fact
+entry.** The page says it where a reader looks for it: on pi's line under the value of that row and tile, with
+pi's mark and date; the value itself stays the entry's (section 7). The API consumer finds it where it is today, in `providers_dev.pi`, now with the published fact
 that the entry itself states none.
 
 Why not the main field with a source mark:
@@ -238,8 +245,8 @@ Why not the main field with a source mark:
 5. **It is ten values.**
 
 A consequence, stated so that it is seen: in every list (the home page, a provider's page, a model's page) these
-five entries show their context window and output limit as unknown, as today, and their own page shows pi's
-figures. The lists say nothing of pi's values, as they say nothing of pi's differences (decision 8).
+five entries show their context window and output limit as unknown, as today, and so does their own page, with
+pi's figures on the line under each. The lists say nothing of pi's values, as they say nothing of pi's differences (decision 8).
 
 ---
 
@@ -260,17 +267,23 @@ What changes inside the fence is small and is of the kind the fence already hand
   states and `publish()` do not change. The fence still turns nothing away for what pi says of the world.
 
 **A build with pi's part turned away or absent** publishes `pi: null` on every entry. The page then shows the
-entry's own values and nothing else: the ten rows of section 3 say Unknown, and no row says "pi agrees". That is
+entry's own values and nothing else: the ten rows of section 3 keep the value they have with pi, without pi's line,
+and no row says "pi agrees". That is
 said where it is said today and nowhere new: `meta.pi.snapshot: null`, the `pi-snapshot-unreadable` warning in
 `/api/v1/meta` and on the run where the part was turned away, and the one line of the page's pi section ("This
 dataset is built without pi's catalog"). No sentence is needed for "the filled values are gone", because nothing
-was filled: the values were pi's, shown as pi's, and go with pi's block.
+was filled: pi's figures were lines of pi's, and go with pi's block.
 
 **pi's code still cannot stop or alter a build.** A fault in the new code is a throw or a misfit inside
 `piPart`, which the guard catches like every other. What the fence does not promise is unchanged too: a part
 that fits the contract and is wrong is published as pi's part. Its reach on the page is wider than before, and
 bounded: a wrong standing puts a wrong "pi agrees" or a wrong pi figure **beside** a value, and never changes
-the value, because the page prints the entry's own field wherever the entry has one (section 7, rule 1).
+the value, because the page prints the entry's own value in every row and tile, whatever the standing says, and
+pi's figure only on pi's line (section 7, rule 1). The first builds of the page put pi's figure in the value's
+place where the standing said `only`, and then where the page judged that the entry stated nothing; two reviews
+found a well-formed wrong block that hid an entry's value that way (a subscription's "In plan", an explicit
+unknown, a removed price, a 0 read through a wrong unit). Nothing on the page decides any more when pi may take
+the place of a value.
 
 **What the alternative would cost**, for the record. A pi value in `limit` or `cost` means one of two things.
 Either pi's code runs before the values that are made from those fields (the input window, the summaries, the
@@ -459,8 +472,9 @@ Purpose and data only; the look is the frontend designer's. Everything comes fro
 
 Three rules for the whole page:
 
-1. **The entry's own value is printed wherever the entry has one, with its source, as today.** Nothing of pi's
-   replaces it, hides it or reorders it.
+1. **The entry's own value is printed in every row and tile, with its source, as today, or Unknown where the entry
+   has none: on every entry, whatever pi's block says.** Nothing of pi's replaces it, hides it or reorders it;
+   pi speaks only on its line under the value.
 2. **What the page says of pi in a row is the item's `standing` and nothing else.** The page does not compare
    two numbers, does not test a value for 0, a unit or an access, and does not look for a correction. It prints
    `pi` (or `pi_tiers`) of the item, formatted.
@@ -472,7 +486,7 @@ What a row can say, by the item's standing:
 |---|---|
 | `agrees` | the entry's value and source, and that pi agrees |
 | `differs` | the entry's value and source, and what pi says: `pi` of the item (for the tiers, `pi_tiers` beside the entry's tiers, both from the `cost.tiers` item of `differences`, as today) |
-| `only` | pi's value in the place of the value, with pi's mark as its source, and that providers.dev has not checked it |
+| `only` | the row as today (Unknown, or the entry's 0), and "pi states X" under it, with pi's mark and the date of pi's data |
 | `not_compared` | the row as today, and that pi lists `pi` of the item, with no verdict; the methodology says the five reasons |
 | `silent` | the row as today; nothing about pi |
 
@@ -481,7 +495,7 @@ Row by row. "Item" is the item of `providers_dev.pi.values` with that `field`.
 | on the page | the value and its source, as today | of pi |
 |---|---|---|
 | tile "Input window"; the input-window table | `providers_dev.limits.input_window` | nothing (section 5) |
-| tile "Context window" | `limit.context` | where the item `context_window` is `only`: pi's value, marked as pi's. Whether the tile also says "pi agrees" or "pi says" is the designer's |
+| tile "Context window" | `limit.context` | under the entry's value: what pi says where the item `context_window` is `differs`, "pi states X" with pi's mark where it is `only`. That pi agrees, or lists a value, is said once, in the row |
 | tile "Maximum output" | `limit.output` | the same with `max_tokens` |
 | Limits, row "Context window" | `limit.context`, source by `provenance`, `origin`, `from_measurement` | the item `context_window`, every standing |
 | Limits, row "Largest input" | `limit.input` | nothing: pi states no input limit |
@@ -722,8 +736,9 @@ on the tiers; an `only` on both limits; a subscription entry with `not_compared`
 
 - every value on the page is in the API answers it was drawn from;
 - the entry's own value of each row is on the page wherever the entry has one, also where the item is `differs`;
-- an `only` value is on the page with pi's mark, and the page of the same entry with `pi: null` says Unknown in
-  that row;
+- an `only` value is on pi's line with pi's mark and date, and the row's value is the same HTML as on the page of
+  the same entry with `pi: null`; every value of every page is that HTML, whatever each item's standing, unit or
+  figure (the reviews' injections among them);
 - nothing of pi's is in a row whose item is `silent`; no price of pi's is shown as 0 or as free;
 - the input-window table and the safe lifetime are the same HTML with and without the pi block;
 - the table "Limits and prices" of the pi section is gone, and pi's section has the request format in words and
@@ -800,13 +815,15 @@ steps.
 
 Each is designed one way above, so that the steps can start; the other way is said with what it costs.
 
-1. **A value only pi states is shown on the page and stays out of `limit` and `cost`** (section 3). The other
+1. **A value only pi states is shown on the page, on pi's line under the entry's value, and stays out of `limit` and
+   `cost`** (section 3). The other
    way, the main field with a mark, costs the fence its first rule or a second build pass, moves the input
    window on the same entries, and buys ten values (section 4).
 2. **The ten values are shown although pi's figure is a client's window on four of the five entries.** On
-   `openai-codex/gpt-6-astra` and `gpt-6-luna` the page will show 272,000 from pi beside an input window of at
-   least 921,500, measured. The other way: no `only` on a limit where the entry has a counted limit evaluation.
-   It would leave six values on three entries, and adds a case to the rule. Recommended: show them, marked.
+   `openai-codex/gpt-6-astra` and `gpt-6-luna` the page shows "Unknown" with "pi states 272,000 tokens" under it,
+   beside an input window of at least 921,500, measured. The other way: no `only` on a limit where the entry has a
+   counted limit evaluation. It would leave six values on three entries, and adds a case to the rule. Decided:
+   shown, on pi's line, never in the value's place (the decision of 2026-11-21 at the top).
 3. **`differences` loses 32 items on ten subscription entries**, and their `difference_count` falls. The other
    way: `differences` stays byte for byte and only `values` says `not_compared` there; the head of those ten
    pages then says "3 differ" (or 4, or 5) over rows that do not differ. Recommended: correct it.
@@ -822,7 +839,7 @@ Each is designed one way above, so that the steps can start; the other way is sa
    its own checks and its own rows in the fault tables, for no gain to a reader.
 7. **The version is 1.3.0.**
 8. **The lists stay as they are.** The five entries of section 3 show "Unknown" for the context window and the
-   output limit in every list and pi's figures on their own page.
+   output limit in every list and on their own page, with pi's figures on the line under each.
 9. **The words**: the heading of what is left of pi's section, and the plain words for the request formats and
    the flags (section 6). They are proposed here; they are the designer's and the owner's.
 

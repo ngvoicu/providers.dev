@@ -508,9 +508,10 @@ export const piFigureOf = (item: PiValue): string =>
   item.unit === "tokens" ? exact(item.pi!) : item.unit === "seconds" ? duration(item.pi!) : usdUnrounded(item.pi!);
 
 /**
- * What the place of each value says of pi, from the item's standing and nothing else: "pi agrees" once; "pi says" and
- * pi's figure; "pi lists" and pi's figure, not compared; pi's figure in the place of the value with pi's mark; and
- * nothing of pi's where pi is silent.
+ * What the place of each value says of pi, from the item's standing and nothing else, always on a line under the
+ * entry's own value: "pi agrees" once; "pi says" and pi's figure; "pi lists" and pi's figure, not compared; "pi states"
+ * and pi's figure, with the pi.dev mark and the date of pi's data; and nothing of pi's where pi is silent. pi's figure
+ * is never in the place of the value.
  */
 export function expectStandings(html: string, values: readonly PiValue[], where = ""): void {
   const places = piPlaces(html);
@@ -534,11 +535,31 @@ export function expectStandings(html: string, values: readonly PiValue[], where 
       expect(notes, said).toEqual(["listed"]);
       expect(place, said).toContain(item.field === "cost.tiers" ? ">pi lists, not compared<" : `>pi lists ${escapeHtml(piFigureOf(item))}, not compared<`);
     } else {
-      // only: pi's figure in the place of the value, with pi's mark as its source, and no note.
-      expect(notes, said).toEqual([]);
-      expect(place, said).toMatch(new RegExp(`class="pi-only">${escapeHtml(piFigureOf(item)).replace(/[$.]/g, "\\$&")}`));
-      expect(place, said).toContain('class="origin pi"');
-      expect(place, said).toContain("Not checked by providers.dev");
+      // only: a line like the others, with pi's mark and pi's date after it; the value above it is the entry's own.
+      expect(notes, said).toEqual(["listed"]);
+      expect(place, said).toContain(`>pi states ${escapeHtml(piFigureOf(item))}${item.unit === "tokens" ? " tokens" : ""}</span><span class="pi-from"><span class="origin pi"`);
+      expect(place, said).toMatch(/>pi\.dev<\/span><span class="(?:muted date|stale)" title="[^"]*">\d{4}-\d\d-\d\d/);
     }
+    // Whatever the standing, pi's figure is never in the place of the value: pi speaks only inside its line. (The tiers
+    // are not a value's place: they are a block of pi's own under the conditional rates.)
+    if (item.field !== "cost.tiers") expect(place.replace(/<div class="pi-line">[\s\S]*?<\/div>/g, ""), said).not.toMatch(/pi-note|class="origin pi"|pi-only/);
   }
+}
+
+/**
+ * The values of an entry's page, as a reader finds them in its tiles and rows, with what pi says taken out: everything
+ * from the tiles to pi's section, without pi's lines (`pi-line`) and without the block of the tiers under the
+ * conditional rates. On every entry it must be the HTML the page has without pi: pi never changes a value.
+ */
+export function valueCells(html: string): string {
+  const from = html.indexOf('<div class="tiles tiles-five');
+  const to = html.indexOf('<section aria-labelledby="pi">');
+  if (from < 0 || to < 0) throw new Error("not an entry page");
+  let part = html.slice(from, to).replace(/<div class="pi-line">[\s\S]*?<\/div>/g, "");
+  // The tiers block sits between the conditional rates and the source of the prices; without pi that is one line break.
+  const conditional = part.indexOf('<table class="facts conditional');
+  const end = part.indexOf("</table></div>", conditional) + "</table></div>".length;
+  const source = part.indexOf('<p class="hint">Source:', end);
+  part = part.slice(0, end) + "\n" + part.slice(source);
+  return part;
 }

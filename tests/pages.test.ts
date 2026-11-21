@@ -642,7 +642,7 @@ describe("pi's catalog on the pages", () => {
     for (const flag of ["supportsLongCacheRetention", "thinkingFormat"]) expect(section).toContain(`<code>${flag}: `);
   });
 
-  it("every entry page with a block says, in each row, the standing the API gives and nothing else; the values only pi states are pi's, and Unknown without pi's data", async () => {
+  it("every entry page with a block says, in each row, the standing the API gives and nothing else; a value only pi states is pi's line under the entry's own", async () => {
     const { data } = (await (await piApi("/api/v1/entries?provider=provider-02&limit=200")).json() as { data: { ref: string; pi: unknown }[] });
     const listed = data.filter((summary) => summary.pi !== null);
     expect(listed.length).toBeGreaterThan(10);
@@ -654,15 +654,15 @@ describe("pi's catalog on the pages", () => {
       expectStandings(await piPage(`/entries/${ref}`), values, ref);
     }
     expect([...seen].sort()).toEqual(["agrees", "differs", "only", "silent"]);
-    // model-7 states no limit: pi's 800,000 is in its row, marked pi's, and in a dataset without pi data the row says Unknown.
+    // model-7 states no limit: its row says Unknown, as in a dataset without pi data, and pi's 800,000 is the line under it.
     const only = piPlaces(await piPage("/entries/provider-02/model-7")).context_window;
-    expect(only).toMatch(/<span class="pi-only">800,000 <span class="muted">tokens<\/span><\/span>/);
-    expect(only).toMatch(/<span class="origin pi" [^>]*>pi\.dev<\/span><span class="muted date" [^>]*>2026-11-20<\/span>/);
     const without = piPlaces((await (await page("/entries/provider-02/model-7")).text())).context_window;
-    expect(without).toContain('<td class="num" data-label="Value"><span class="unknown"');
-    expect(without).not.toMatch(/pi\.dev|pi-only|pi-note/);
-    // model-0 publishes an output limit of 0, which is none stated: pi's 1,000 takes its place, marked pi's.
-    expect(piPlaces(await piPage("/entries/provider-02/lab/model-0")).max_tokens).toMatch(/<span class="pi-only">1,000 <span class="muted">tokens<\/span><\/span>/);
+    expect(only).toContain('<td class="num" data-label="Value"><span class="unknown"');
+    expect(only).toMatch(/>pi states 800,000 tokens<\/span><span class="pi-from"><span class="origin pi" [^>]*>pi\.dev<\/span><span class="muted date" [^>]*>2026-11-20<\/span>/);
+    expect(only.replace(/<div class="pi-line">[\s\S]*?<\/div>/, "")).toBe(without);
+    expect(without).not.toMatch(/pi\.dev|pi-note/);
+    // model-0 publishes an output limit of 0, which is none stated: the 0 stays, and pi's 1,000 is the line under it.
+    expect(piPlaces(await piPage("/entries/provider-02/lab/model-0")).max_tokens).toMatch(/>0 <span class="muted">tokens<\/span><div class="pi-line"><span class="pi-note listed" [^>]*>pi states 1,000 tokens</);
   });
 
   it("a page built without pi's data says nothing of pi in any row, and its section is one line", async () => {

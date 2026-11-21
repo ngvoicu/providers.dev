@@ -9,9 +9,9 @@ import { canonicalModels } from "../src/core/resources.ts";
 import { resolve } from "../src/core/resolve.ts";
 import { NS, UpstreamModel, type ModelExtension } from "../src/core/schema.ts";
 import { pricingOf } from "../src/core/policies.ts";
-import { expectStandings, limitOf, NO_CACHE, piPlaces, piShort, resolveWithPi, summaryOf } from "./helpers.ts";
+import { expectStandings, limitOf, NO_CACHE, piPlaces, piShort, resolveWithPi, summaryOf, valueCells } from "./helpers.ts";
 import { duration, usd, usdUnrounded } from "../src/core/format.ts";
-import type { PiBlock, PiCatalog, PiModel } from "../src/core/pi.ts";
+import type { PiBlock, PiCatalog, PiModel, PiValue } from "../src/core/pi.ts";
 import type { MetaPi } from "../src/core/schema.ts";
 
 const row = (more: Partial<Summary>): string => rowHtml(summaryOf(more), { today: { date: new Date("2026-11-13T00:00:00Z"), stale_after_days: 90 } });
@@ -792,6 +792,10 @@ describe("pi's catalog on an entry's page and in a row", () => {
       pricey: piModel("pricey", { api: "an-api-without-words" }),
       // The entry states no limit and no price: pi alone does.
       nolimit: piModel("nolimit", { contextWindow: 272000, maxTokens: 128000 }),
+      // The entry's limits are 0, none stated (Vercel's Grok Voice): pi alone states them.
+      zero: piModel("zero", { contextWindow: 4096, maxTokens: 4096, cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 } }),
+      // providers.dev publishes the context window as unknown and removes the input price (the review's override fixture).
+      fixed: piModel("fixed"),
     },
     plan: {
       // A subscription entry: pi's prices and tiers are not compared; its limits are.
@@ -810,11 +814,15 @@ describe("pi's catalog on an entry's page and in a row", () => {
           agree: UpstreamModel.parse({ id: "agree", name: "Agree", limit: { context: 190000, output: 8000 }, cost: { text: listed } }),
           pricey: UpstreamModel.parse({ id: "pricey", name: "Pricey", limit: { context: 190000, output: 8000 }, cost: { text: { ...listed, input: { ...listed.input, price: 2 } } } }),
           nolimit: UpstreamModel.parse({ id: "nolimit", name: "No limit" }),
+          zero: UpstreamModel.parse({ id: "zero", name: "Zero", limit: { context: 0, output: 0 } }),
+          fixed: UpstreamModel.parse({ id: "fixed", name: "Fixed", limit: { context: 190000, output: 8000 }, cost: { text: listed } }),
         },
       },
       plan: { id: "plan", name: "Plan", models: { sub: UpstreamModel.parse({ id: "sub", name: "Sub", limit: { context: 190000, output: 8000 }, cost: { text: { input: { price: 0 }, output: { price: 0 } } } }) } },
     },
-    additions: [], overrides: [], routes: {}, access: { default: "api", default_basis: "fixture", patterns: [], providers: { plan: { access: "subscription", basis: "A plan" } } }, upstreamDate: "2026-11-13",
+    additions: [],
+    overrides: [{ provider: "lab", rules: [{ models: ["fixed"], set: { limit: { context: null }, cost: { text: { input: { price: "$delete" } } } }, reason: "Not documented for this access", evidence: [{ kind: "documented", url: "https://example.com/limits", date: "2026-11-01" }] }] }],
+    routes: {}, access: { default: "api", default_basis: "fixture", patterns: [], providers: { plan: { access: "subscription", basis: "A plan" } } }, upstreamDate: "2026-11-13",
   }, { catalog: pi });
   const index = buildIndex(catalog, "fixture", "2026-11-14T00:00:00Z", "2026-11-14T00:00:00Z");
   const modelOf = (ref: string): JsonObject => catalog[ref.split("/")[0]!]!.models[ref.split("/").slice(1).join("/")]!;
@@ -843,7 +851,7 @@ describe("pi's catalog on an entry's page and in a row", () => {
   /** What a reader sees: the text of the HTML, without its tags and the hover texts. */
   const text = (html: string): string => html.replace(/<[^>]+>/g, " ").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, "&").replace(/\s+/g, " ");
   const numbersOf = (value: unknown): number[] => (typeof value === "number" ? [value] : value && typeof value === "object" ? Object.values(value).flatMap(numbersOf) : []);
-  const LISTED = ["full", "bare", "agree", "pricey", "nolimit", "plan/sub"];
+  const LISTED = ["full", "bare", "agree", "pricey", "nolimit", "zero", "fixed", "plan/sub"];
 
   it("the blocks are as the cases need them: each standing, on a limit, a price, the tiers and a lifetime", () => {
     expect(blockOf("full").differences.map((item) => item.field)).toEqual(["context_window", "cost.tiers"]);
@@ -858,10 +866,12 @@ describe("pi's catalog on an entry's page and in a row", () => {
     expect(standingsOf("agree")).toEqual(all("agrees", ["context_window", "max_tokens", ...prices], all("silent", ["cost.tiers", ...lifetimes])));
     expect(standingsOf("pricey")).toEqual(all("agrees", ["context_window", "max_tokens", ...prices], { "cost.input": "differs", ...all("silent", ["cost.tiers", ...lifetimes]) }));
     expect(standingsOf("nolimit")).toEqual(all("only", ["context_window", "max_tokens", ...prices], all("silent", ["cost.tiers", ...lifetimes])));
+    expect(standingsOf("zero")).toEqual(all("only", ["context_window", "max_tokens"], all("silent", [...prices, "cost.tiers", ...lifetimes])));
+    expect(standingsOf("fixed")).toEqual(all("agrees", ["max_tokens", "cost.output", "cost.cache_read", "cost.cache_write"], { context_window: "not_compared", "cost.input": "not_compared", ...all("silent", ["cost.tiers", ...lifetimes]) }));
     expect(standingsOf("plan/sub")).toEqual(all("not_compared", [...prices, "cost.tiers"], { context_window: "agrees", max_tokens: "agrees", ...all("silent", lifetimes) }));
   });
 
-  it("each row says the standing of its item and nothing else of pi's: agrees once, what pi says, what pi lists, pi's value in the place of the value, nothing where pi is silent", () => {
+  it("each row says the standing of its item on a line under the entry's value: agrees once, what pi says, what pi lists, what pi states with pi's mark and date, nothing where pi is silent", () => {
     for (const model of LISTED) expectStandings(page(model), blockOf(model).values, model);
   });
 
@@ -880,66 +890,77 @@ describe("pi's catalog on an entry's page and in a row", () => {
     expect(text(tiers)).toContain("pi's catalog pi says otherwise pi's tiers, as pi states them Above 199,999 In $2 Out $8 Cache read $0.20 Cache write Not stated");
   });
 
-  it("a value only pi states: pi's figure in the row and the tile, with pi's mark, the date of pi's data and not checked; without pi's block the same rows say Unknown", () => {
+  /** The page of an entry whose pi block `change` alters, as a faulty but well-formed block would be published. */
+  const injected = (model: string, change: (block: PiBlock) => void): string => {
+    const ref = refOf(model);
+    const entry = structuredClone(modelOf(ref));
+    change((entry[NS] as unknown as ModelExtension).pi!);
+    const summary = index.entries.find((item) => item.ref === ref)!;
+    return entryHtml({ summary, provider: index.providers.find((item) => item.id === summary.provider)!, model: entry, today, cache_ages_s: CACHE_AGES_S, imported: "2026-11-13", pi: meta() });
+  };
+  const itemOf = (block: PiBlock, field: string): PiValue => block.values.find((item) => item.field === field)!;
+
+  it("a value only pi states is a line under the entry's own value, with pi's mark and date: the row and the tile keep Unknown, or the entry's 0", () => {
     const html = page("nolimit");
     const rows = piPlaces(html);
-    expect(text(rows.context_window).trim()).toBe("Context window limit.context : what this provider accepts for the model, input and output together. 272,000 tokens pi.dev 2026-11-12 Not checked by providers.dev");
-    expect(text(rows.max_tokens)).toContain("128,000 tokens pi.dev 2026-11-12 Not checked by providers.dev");
-    expect(text(rows["cost.input"]).trim()).toBe("Input $1 / 1M tokens pi.dev 2026-11-12 Not checked by providers.dev");
+    expect(text(rows.context_window).trim()).toBe("Context window limit.context : what this provider accepts for the model, input and output together. Unknown pi states 272,000 tokens pi.dev 2026-11-12 –");
+    expect(text(rows.max_tokens)).toContain("Unknown pi states 128,000 tokens pi.dev 2026-11-12 –");
+    expect(text(rows["cost.input"]).trim()).toBe("Input Unknown pi states $1 pi.dev 2026-11-12");
     const tiles = text(html.split('<div class="tiles')[1]!.split("<section")[0]!);
-    expect(tiles).toContain("Context window 272,000 tokens pi.dev From pi's catalog · 2026-11-12 Not checked by providers.dev");
-    expect(tiles).toContain("Maximum output 128,000 tokens pi.dev From pi's catalog · 2026-11-12 Not checked by providers.dev");
-    const without = piPlaces(page("nolimit", meta(), true));
-    expect(text(without.context_window).trim()).toBe("Context window limit.context : what this provider accepts for the model, input and output together. Unknown –");
-    expect(text(without["cost.input"]).trim()).toBe("Input Unknown");
-    // A lifetime only pi states is beside the documented one, which is not documented, and never the safe one.
+    expect(tiles).toContain("Context window Unknown Exposed by this provider pi states 272,000 tokens pi.dev 2026-11-12");
+    expect(tiles).toContain("Maximum output Unknown Per response; not a default pi states 128,000 tokens pi.dev 2026-11-12");
+    // The entry's 0 stays, as without pi; pi's 4,096 is the line under it.
+    const zero = page("zero");
+    expect(text(piPlaces(zero).context_window).trim()).toBe("Context window limit.context : what this provider accepts for the model, input and output together. 0 tokens pi states 4,096 tokens pi.dev 2026-11-12 models.dev");
+    expect(text(zero.split('<div class="tiles')[1]!.split("<section")[0]!)).toContain("Context window 0 tokens Exposed by this provider pi states 4,096 tokens pi.dev 2026-11-12");
+    // A lifetime only pi states: "Not documented", and pi's under it; the safe lifetime as it is.
     const full = page("full");
-    expect(text(piPlaces(full)["prompt_cache.short"]).trim()).toBe("Documented 5 min pi.dev 2026-11-12 Not checked by providers.dev");
-    expect(text(full.split(">Short retention</th>")[1]!.split("<dt>Documented")[0]!)).toContain("Safe lifetime Unknown");
-    expect(text(full.split('<div class="tiles')[1]!.split("<section")[0]!)).toContain("Cache lifetime, short Unknown Not documented or measured Only pi states 5 min");
+    expect(text(piPlaces(full)["prompt_cache.short"]).trim()).toBe("Documented Not documented pi states 5 min pi.dev 2026-11-12");
+    expect(text(full.split('<div class="tiles')[1]!.split("<section")[0]!)).toContain("Cache lifetime, short Unknown Not documented or measured pi states 5 min pi.dev 2026-11-12");
+    // Each of them is the page without pi, but for pi's lines.
+    for (const model of ["nolimit", "zero", "full"]) expect(valueCells(page(model)), model).toBe(valueCells(page(model, meta(), true)));
     // A failed last import is said beside pi's date, as at the head of the page.
     const failed = page("nolimit", meta({ last_attempt_at: "2026-11-15T04:17:00.000Z", last_attempt_ok: false, last_error: "pi.dev answered HTTP 503" }));
     expect(piPlaces(failed).context_window).toContain(">2026-11-12 · last import failed</span>");
   });
 
-  it("a wrong `only` never takes the place of the entry's own value: the entry's value stays, with what pi states under it (the review's injection)", () => {
-    // The review of 613cce9, finding 4: a coherent block whose standing says `only` where the entry has a value, and
-    // whose difference was taken out, published by the fence as designed. The entry's own value decides the place
-    // (design/pi-merged.md, sections 4 and 7, rule 1): here on both limits, a price and a documented lifetime.
-    const model = structuredClone(modelOf("lab/full"));
-    const extension = model[NS] as unknown as ModelExtension;
-    const block = extension.pi!;
-    for (const field of ["context_window", "max_tokens", "cost.input", "prompt_cache.short"]) block.values.find((item) => item.field === field)!.standing = "only";
-    block.differences = block.differences.filter((item) => item.field !== "context_window");
-    extension.cache.lifetime.short.documented_s = 600;
-    expect(model.limit).toEqual({ context: 200000, output: 8000 });
-    const summary = { ...index.entries.find((entry) => entry.ref === "lab/full")!, pi: { ...index.entries.find((entry) => entry.ref === "lab/full")!.pi!, difference_count: 1 } };
-    const html = entryHtml({ summary, provider: index.providers[0]!, model, today, cache_ages_s: CACHE_AGES_S, imported: "2026-11-13", pi: meta() });
-    const places = piPlaces(html);
-    // The entry's 200,000 with its source, and pi's 190,000 as a line of pi's under it: never pi's figure in its place.
-    expect(text(places.context_window).trim()).toBe("Context window limit.context : what this provider accepts for the model, input and output together. 200,000 tokens pi states 190,000 models.dev");
-    expect(places.context_window).toMatch(/200,000 <span class="muted">tokens<\/span><div class="pi-line"><span class="pi-note listed" title="[^"]*This page publishes the entry&#39;s own value \(limit\.context\)[^"]*">pi states 190,000<\/span><\/div><\/td><td data-label="Source"><span class="origin upstream"/);
-    expect(text(places.max_tokens)).toContain("8,000 tokens pi states 8,000 models.dev");
-    expect(text(places["cost.input"]).trim()).toBe("Input $1 / 1M tokens pi states $1");
-    expect(text(places["prompt_cache.short"]).trim()).toBe("Documented 10 min pi states 5 min");
-    for (const field of ["context_window", "max_tokens", "cost.input", "prompt_cache.short"] as const) expect(places[field], field).not.toMatch(/class="pi-only"|class="origin pi"|Not checked by providers\.dev/);
-    // The tiles: the entry's limits, with what pi states under them.
-    const tiles = text(html.split('<div class="tiles')[1]!.split("<section")[0]!);
-    expect(tiles).toContain("Context window 200,000 tokens Exposed by this provider pi states 190,000");
-    expect(tiles).toContain("Maximum output 8,000 tokens Per response; not a default pi states 8,000");
-    expect(tiles).not.toContain("From pi's catalog");
-    // The same injection where the entry states no value (nolimit, as built): pi's figure takes the place, as before.
-    expect(text(piPlaces(page("nolimit")).context_window)).toContain("272,000 tokens pi.dev 2026-11-12 Not checked by providers.dev");
+  it("the reviews' injections change only pi's line, never the value: each row's value is the HTML of the page without pi", () => {
+    const cases: [string, string, (block: PiBlock) => void, string][] = [
+      // The first review: a standing changed to only, its difference taken out, the entry's own value present.
+      ["DeepSeek: only where the entry has a value", "full", (block) => { itemOf(block, "context_window").standing = "only"; block.differences = block.differences.filter((item) => item.field !== "context_window"); }, "context_window"],
+      // The second review: a subscription's "In plan" price; providers.dev's explicit unknown; a price providers.dev removed.
+      ["a subscription's price", "plan/sub", (block) => { itemOf(block, "cost.input").standing = "only"; }, "cost.input"],
+      ["an explicit unknown", "fixed", (block) => { itemOf(block, "context_window").standing = "only"; }, "context_window"],
+      ["a removed price", "fixed", (block) => { itemOf(block, "cost.input").standing = "only"; }, "cost.input"],
+      // A wrong unit: an entry's $0 read as a limit of 0, and an entry's 0 tokens read as seconds.
+      ["a price of 0 with the unit of a limit", "bare", (block) => { Object.assign(itemOf(block, "cost.input"), { standing: "only", unit: "tokens", pi: 5 }); }, "cost.input"],
+      ["a limit of 0 with the unit of a lifetime", "zero", (block) => { itemOf(block, "context_window").unit = "seconds"; }, "context_window"],
+      ["a documented lifetime with the unit of a limit", "full", (block) => { Object.assign(itemOf(block, "prompt_cache.short"), { unit: "tokens" }); }, "prompt_cache.short"],
+    ];
+    for (const [said, model, change, field] of cases) {
+      const html = injected(model, change);
+      expect(valueCells(html), said).toBe(valueCells(page(model, meta(), true)));
+      // pi still speaks, on its line, and only there.
+      expect(piPlaces(html)[field as PiValue["field"]], said).toContain('<div class="pi-line">');
+    }
+    // What the reader sees in the first two: the entry's own, with pi's line under it.
+    expect(text(piPlaces(injected("full", cases[0]![2])).context_window).trim()).toBe("Context window limit.context : what this provider accepts for the model, input and output together. 200,000 tokens pi states 190,000 tokens pi.dev 2026-11-12 models.dev");
+    expect(text(piPlaces(page("plan/sub", meta(), true))["cost.input"])).toBe(text(piPlaces(injected("plan/sub", cases[1]![2]))["cost.input"]).replace(/ pi states \$1 pi\.dev 2026-11-12/, ""));
   });
 
-  it("an entry's limit of 0 is none stated: where pi alone states the limit, pi's figure takes the place of the 0", () => {
-    const model = structuredClone(modelOf("lab/nolimit"));
-    model.limit = { context: 0, output: 0 };
-    const summary = index.entries.find((entry) => entry.ref === "lab/nolimit")!;
-    const html = entryHtml({ summary, provider: index.providers[0]!, model, today, cache_ages_s: CACHE_AGES_S, imported: "2026-11-13", pi: meta() });
-    expect(text(piPlaces(html).context_window)).toContain("272,000 tokens pi.dev 2026-11-12 Not checked by providers.dev");
-    expect(text(piPlaces(html).max_tokens)).toContain("128,000 tokens pi.dev 2026-11-12 Not checked by providers.dev");
-    expect(text(html.split('<div class="tiles')[1]!.split("<section")[0]!)).toContain("Context window 272,000 tokens pi.dev From pi's catalog");
+  it("every value of every page is the page's without pi, whatever each item's standing, unit and figure", () => {
+    const STANDINGS = ["agrees", "differs", "only", "not_compared", "silent"] as const;
+    const UNITS = ["tokens", "usd_per_million_tokens", "seconds"] as const;
+    let pages = 0;
+    for (const model of LISTED) {
+      const without = valueCells(page(model, meta(), true));
+      for (const standing of STANDINGS) for (const unit of UNITS) for (const figure of [0, 4096]) {
+        const html = injected(model, (block) => { for (const item of block.values) Object.assign(item, { standing, unit, pi: item.field === "cost.tiers" ? null : figure }); });
+        expect(valueCells(html), `${model} ${standing} ${unit} ${figure}`).toBe(without);
+        pages += 1;
+      }
+    }
+    expect(pages).toBe(LISTED.length * 30);
   });
 
   it("pi's data moves no input window and no safe lifetime: the same HTML with and without pi's block", () => {
