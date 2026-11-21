@@ -670,7 +670,13 @@ describe("pi's catalog on the pages", () => {
       expect(sources, path).toMatch(new RegExp(`>pi\\.dev</span><span class="muted date" title="Fetched from pi&#39;s catalog ${fetched} \\d\\d:\\d\\d UTC\\. Last checked ${checked} \\d\\d:\\d\\d UTC: unchanged since the fetch\\.">${fetched}</span></span>$`));
       expect(listed).not.toMatch(/differ|otherwise|agree/i);
       expect(listed).not.toContain("pi-differ");
-      expect(listed).not.toContain(`>${checked}<`);
+      // The pi.dev mark and what follows it show fetched_at, not checked_at. Only that part is searched: the models.dev
+      // date before it is the fixture's import, made with today's clock, and may be either day.
+      const mark = sources.indexOf('<span class="origin pi"');
+      expect(mark, path).toBeGreaterThan(0);
+      const piPart = sources.slice(mark);
+      expect(piPart, path).toContain(`>${fetched}<`);
+      expect(piPart, path).not.toContain(`>${checked}<`);
       if (!path.startsWith("/providers/")) {
         const unlisted = rowOf(html, "provider-20/lab/model-4");
         expect(unlisted, path).not.toContain("pi.dev");
