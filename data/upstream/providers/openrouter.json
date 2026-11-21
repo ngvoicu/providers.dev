@@ -11,6 +11,7 @@
    "name": "Aion-2.0",
    "description": "Reasoning model for deliberate analysis, multi-step problem solving, and tool use",
    "type": "chat",
+   "family": "aion",
    "canonical_id": "aion-labs/aion-2.0",
    "release_date": "2025-12-21",
    "limit": {
@@ -118,6 +119,7 @@
    "name": "Aion-3.0",
    "description": "Reasoning model for deliberate analysis, multi-step problem solving, and tool use",
    "type": "chat",
+   "family": "aion",
    "canonical_id": "aion-labs/aion-3.0",
    "release_date": "2026-05-05",
    "limit": {
@@ -225,6 +227,7 @@
    "name": "Aion-3.0-Mini",
    "description": "Efficient model for low-latency assistance, extraction, and routine automation",
    "type": "chat",
+   "family": "aion-mini",
    "canonical_id": "aion-labs/aion-3.0-mini",
    "release_date": "2026-05-14",
    "limit": {
@@ -332,6 +335,7 @@
    "name": "Aion 3.5",
    "description": "Reasoning model for deliberate analysis, multi-step problem solving, and tool use",
    "type": "chat",
+   "family": "aion",
    "release_date": "2026-09-23",
    "limit": {
     "context": 262144,
@@ -441,6 +445,7 @@
    "name": "Aion 3.5 Mini",
    "description": "Efficient model for low-latency assistance, extraction, and routine automation",
    "type": "chat",
+   "family": "aion",
    "release_date": "2026-09-23",
    "limit": {
     "context": 262144,
@@ -550,7 +555,7 @@
    "name": "Aion-RP 1.0 (8B)",
    "description": "Open Llama instruction model for multilingual chat, reasoning, and coding",
    "type": "chat",
-   "family": "llama",
+   "family": "aion-rp",
    "canonical_id": "aion-labs/aion-rp-llama-3.1-8b",
    "release_date": "2025-02-04",
    "limit": {
@@ -622,6 +627,7 @@
    "name": "HappyHorse-1.0",
    "description": "Video model for text, image and reference to video with realistic motion",
    "type": "video",
+   "family": "happyhorse",
    "canonical_id": "alibaba/happyhorse-1.0",
    "release_date": "2026-04-22",
    "limit": {
@@ -689,6 +695,7 @@
    "name": "HappyHorse-1.1",
    "description": "Video model for text, image and reference to video with smoother motion and stronger consistency",
    "type": "video",
+   "family": "happyhorse",
    "canonical_id": "alibaba/happyhorse-1.1",
    "release_date": "2026-06-16",
    "limit": {
@@ -751,179 +758,12 @@
    "last_updated": "2026-06-16",
    "recommended_api": "videos"
   },
-  "alibaba/wan-2.6": {
-   "id": "alibaba/wan-2.6",
-   "name": "Wan2.6",
-   "description": "Video model for text- and image-to-video with audio input and synchronized sound",
-   "type": "video",
-   "canonical_id": "alibaba/wan2.6",
-   "release_date": "2025-12-03",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "video": {
-     "output": {
-      "unit": "second",
-      "price": 0.04,
-      "overrides": [
-       {
-        "when": {
-         "resolution": {
-          "equals": "720p"
-         },
-         "mode": {
-          "equals": "text-to-video"
-         }
-        },
-        "price": 0.08
-       },
-       {
-        "when": {
-         "resolution": {
-          "equals": "720p"
-         },
-         "mode": {
-          "equals": "image-to-video"
-         }
-        },
-        "price": 0.1
-       },
-       {
-        "when": {
-         "resolution": {
-          "equals": "1080p"
-         },
-         "mode": {
-          "equals": "text-to-video"
-         }
-        },
-        "price": 0.12
-       },
-       {
-        "when": {
-         "resolution": {
-          "equals": "1080p"
-         },
-         "mode": {
-          "equals": "image-to-video"
-         }
-        },
-        "price": 0.15
-       }
-      ]
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/bmp",
-     "image/webp",
-     "video/mp4",
-     "video/quicktime",
-     "audio/wav",
-     "audio/mpeg"
-    ],
-    "output": [
-     "video/mp4"
-    ]
-   },
-   "api": {
-    "videos": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@openrouter/ai-sdk-provider",
-      "opencodeai": "@opencode/ai/providers/openrouter/videos"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2025-12-03",
-   "recommended_api": "videos"
-  },
-  "alibaba/wan-2.7": {
-   "id": "alibaba/wan-2.7",
-   "name": "Wan2.7",
-   "description": "Video model for text, image and reference to video, with mixed image and video references and voice timbre cloning",
-   "type": "video",
-   "canonical_id": "alibaba/wan2.7",
-   "release_date": "2026-04-03",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "video": {
-     "output": {
-      "unit": "second",
-      "price": 0.1
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/bmp",
-     "image/webp",
-     "video/mp4",
-     "video/quicktime",
-     "audio/wav",
-     "audio/mpeg"
-    ],
-    "output": [
-     "video/mp4"
-    ]
-   },
-   "api": {
-    "videos": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@openrouter/ai-sdk-provider",
-      "opencodeai": "@opencode/ai/providers/openrouter/videos"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-04-03",
-   "recommended_api": "videos"
-  },
   "alibaba/wan-3.0": {
    "id": "alibaba/wan-3.0",
    "name": "Wan 3.0",
    "description": "All-in-one video model for reference, editing and image-to-video generation with audio, up to 30 seconds",
    "type": "video",
+   "family": "wan",
    "canonical_id": "alibaba/wan3.0-video",
    "release_date": "2026-08-06",
    "limit": {
@@ -1003,6 +843,7 @@
    "name": "Wan 3.0 Prime",
    "description": "High-speed Wan3.0 video model with the same four-modal references, up to 30 seconds",
    "type": "video",
+   "family": "wan",
    "canonical_id": "alibaba/wan3.0-video-prime",
    "release_date": "2026-08-20",
    "limit": {
@@ -1082,7 +923,7 @@
    "name": "Nova 2 Lite",
    "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
    "type": "chat",
-   "family": "nova",
+   "family": "nova-lite",
    "canonical_id": "amazon/nova-2-lite-v1",
    "release_date": "2025-12-02",
    "limit": {
@@ -1379,7 +1220,7 @@
    "name": "Nova Premier 1.0",
    "description": "Flagship model for demanding analysis, coding, and production agent workflows",
    "type": "chat",
-   "family": "nova",
+   "family": "nova-premier",
    "canonical_id": "amazon/nova-premier",
    "status": "deprecated",
    "release_date": "2025-04-30",
@@ -1718,6 +1559,7 @@
    "name": "Magnum v4 72B",
    "description": "Open-weight instruction model for adaptable chat and self-hosted production workloads",
    "type": "chat",
+   "family": "magnum",
    "canonical_id": "anthracite-org/magnum-v4-72b",
    "release_date": "2024-10-22",
    "limit": {
@@ -4133,6 +3975,7 @@
    "name": "Universal-3.5 Pro",
    "description": "Speech-to-text model with code switching, contextual prompting, and speaker diarization",
    "type": "transcription",
+   "family": "assemblyai-universal",
    "canonical_id": "assemblyai/universal-3-5-pro",
    "release_date": "2026-06-15",
    "limit": {
@@ -4192,6 +4035,7 @@
    "name": "Universal-3.6 Pro",
    "description": "Speech-to-text model trained on voice-agent and telephony audio, successor to Universal-3.5 Pro",
    "type": "transcription",
+   "family": "assemblyai-universal",
    "canonical_id": "assemblyai/universal-3-6-pro",
    "release_date": "2026-09-29",
    "limit": {
@@ -4251,7 +4095,7 @@
    "name": "BGE Base EN v1.5",
    "description": "English text embedding model for retrieval and semantic search",
    "type": "embedding",
-   "family": "bge",
+   "family": "bge-base",
    "canonical_id": "baai/bge-base-en-v1.5",
    "release_date": "2023-09-12",
    "limit": {
@@ -4304,7 +4148,7 @@
    "name": "BGE Large EN v1.5",
    "description": "English text embedding model for retrieval and semantic search",
    "type": "embedding",
-   "family": "bge",
+   "family": "bge-large",
    "canonical_id": "baai/bge-large-en-v1.5",
    "release_date": "2023-09-12",
    "limit": {
@@ -4410,7 +4254,7 @@
    "name": "ERNIE-5.5-Flash-Preview (free)",
    "description": "Flagship model for demanding analysis, coding, and production agent workflows",
    "type": "chat",
-   "family": "ernie",
+   "family": "ernie-free",
    "release_date": "2026-11-10",
    "limit": {
     "context": 1024000,
@@ -4619,6 +4463,62 @@
    "last_updated": "2026-11-10",
    "recommended_api": "chat-completions"
   },
+  "baseten/bison-1": {
+   "id": "baseten/bison-1",
+   "name": "Bison 1",
+   "description": "Decision model for typed evaluation of shared state",
+   "type": "decision",
+   "release_date": "2026-11-20",
+   "limit": {
+    "context": 32768
+   },
+   "capabilities": {
+    "temperature": false,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "systemone": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/typesafe-ai",
+      "opencodeai": "@opencode/ai/providers/openrouter/decisions"
+     },
+     "compatibility": {
+      "media_input": "state"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-11-20",
+   "recommended_api": "systemone"
+  },
   "baseten/elephant-1": {
    "id": "baseten/elephant-1",
    "name": "Elephant 1",
@@ -4674,6 +4574,62 @@
    },
    "open_weights": true,
    "last_updated": "2026-10-21",
+   "recommended_api": "systemone"
+  },
+  "baseten/groundhog-1": {
+   "id": "baseten/groundhog-1",
+   "name": "Groundhog 1",
+   "description": "Decision model for typed evaluation of shared state",
+   "type": "decision",
+   "release_date": "2026-11-20",
+   "limit": {
+    "context": 16384
+   },
+   "capabilities": {
+    "temperature": false,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.035
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "systemone": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/typesafe-ai",
+      "opencodeai": "@opencode/ai/providers/openrouter/decisions"
+     },
+     "compatibility": {
+      "media_input": "state"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-11-20",
    "recommended_api": "systemone"
   },
   "baseten/joey-1": {
@@ -4737,6 +4693,7 @@
    "name": "Mammoth 1",
    "description": "Decision model for typed evaluation of shared state",
    "type": "decision",
+   "family": "mammoth",
    "release_date": "2026-10-21",
    "limit": {
     "context": 16384
@@ -4884,7 +4841,7 @@
    "name": "FLUX 3 Image Klein",
    "description": "5.6B open-weight FLUX 3 image generation and editing model",
    "type": "image",
-   "family": "flux",
+   "family": "flux-klein",
    "canonical_id": "black-forest-labs/flux-3-image-klein",
    "release_date": "2026-10-15",
    "limit": {
@@ -4976,7 +4933,7 @@
    "name": "FLUX 3 Video",
    "description": "Video model with synchronized audio for text, keyframe and continuation workflows",
    "type": "video",
-   "family": "flux",
+   "family": "flux-video",
    "canonical_id": "black-forest-labs/flux-3-video",
    "release_date": "2026-08-04",
    "limit": {
@@ -5104,7 +5061,7 @@
    "name": "FLUX Video Edit [fast]",
    "description": "Prompt-based video editing model that adds, removes or replaces elements while keeping motion and timing",
    "type": "video",
-   "family": "flux",
+   "family": "flux-video",
    "canonical_id": "black-forest-labs/flux-video-edit",
    "release_date": "2026-09",
    "limit": {
@@ -5159,7 +5116,7 @@
    "name": "FLUX Video Upscale",
    "description": "FLUX 3 video super-resolution model that upscales clips 1.5x to 3x while keeping the audio track",
    "type": "video",
-   "family": "flux",
+   "family": "flux-video",
    "canonical_id": "black-forest-labs/flux-video-upscale",
    "release_date": "2026-08-20",
    "limit": {
@@ -5206,7 +5163,7 @@
    "name": "FLUX.2 [flex]",
    "description": "Image generation and editing model with adjustable steps and guidance, tuned for typography",
    "type": "image",
-   "family": "flux",
+   "family": "flux-flex",
    "canonical_id": "black-forest-labs/flux-2-flex",
    "release_date": "2025-11-25",
    "limit": {
@@ -5269,7 +5226,7 @@
    "name": "FLUX.2 [klein] 4B",
    "description": "Fast 4B open-weight image generation and editing model",
    "type": "image",
-   "family": "flux",
+   "family": "flux-klein",
    "canonical_id": "black-forest-labs/flux-2-klein-4b",
    "release_date": "2026-01-15",
    "limit": {
@@ -5328,7 +5285,7 @@
    "name": "FLUX.2 [max]",
    "description": "Highest-quality FLUX.2 image model with grounding search and multi-reference editing",
    "type": "image",
-   "family": "flux",
+   "family": "flux-max",
    "canonical_id": "black-forest-labs/flux-2-max",
    "release_date": "2025-12-16",
    "limit": {
@@ -5387,7 +5344,7 @@
    "name": "FLUX.2 [pro]",
    "description": "Production image generation and multi-reference editing model",
    "type": "image",
-   "family": "flux",
+   "family": "flux-pro",
    "canonical_id": "black-forest-labs/flux-2-pro",
    "release_date": "2025-11-25",
    "limit": {
@@ -5446,7 +5403,7 @@
    "name": "Seed 2.1 Turbo",
    "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
    "type": "chat",
-   "family": "seed",
+   "family": "seed-turbo",
    "canonical_id": "bytedance-seed/seed-2.1-turbo",
    "release_date": "2026-06-23",
    "limit": {
@@ -5566,7 +5523,7 @@
    "name": "Seed 2.0 Lite",
    "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
    "type": "chat",
-   "family": "seed",
+   "family": "seed-lite",
    "canonical_id": "bytedance-seed/seed-2.0-lite",
    "release_date": "2026-02-14",
    "limit": {
@@ -5711,7 +5668,7 @@
    "name": "Seed 2.0 Mini",
    "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
    "type": "chat",
-   "family": "seed",
+   "family": "seed-mini",
    "canonical_id": "bytedance-seed/seed-2.0-mini",
    "release_date": "2026-02-14",
    "limit": {
@@ -5857,7 +5814,7 @@
    "name": "Seed Audio 1.0",
    "description": "Audio creation model generating speech, sound effects, and ambience from text prompts",
    "type": "speech",
-   "family": "seed",
+   "family": "seed-tts",
    "canonical_id": "bytedance-seed/seed-audio-1.0",
    "release_date": "2026-07-20",
    "limit": {
@@ -5912,7 +5869,7 @@
    "name": "Seedream 4.5",
    "description": "Unified image generation and editing model with multi-image references",
    "type": "image",
-   "family": "seed",
+   "family": "seedream",
    "canonical_id": "bytedance-seed/seedream-4.5",
    "release_date": "2025-12-03",
    "limit": {
@@ -5978,7 +5935,7 @@
    "name": "Seedream 5.0 Flash",
    "description": "Fast, low-cost Seedream 5.0 image generation and editing model",
    "type": "image",
-   "family": "seed",
+   "family": "seedream-flash",
    "canonical_id": "bytedance-seed/seedream-5.0-flash",
    "release_date": "2026-09",
    "limit": {
@@ -6045,7 +6002,7 @@
    "name": "Seedream 5.0 Lite",
    "description": "Image generation model with deeper reasoning and real-time web search",
    "type": "image",
-   "family": "seed",
+   "family": "seedream-lite",
    "canonical_id": "bytedance-seed/seedream-5.0-lite",
    "release_date": "2026-02-13",
    "limit": {
@@ -6112,7 +6069,7 @@
    "name": "Seedream 5.0 Pro",
    "description": "Image generation and interactive editing model for commercial visual production",
    "type": "image",
-   "family": "seed",
+   "family": "seedream-pro",
    "canonical_id": "bytedance-seed/seedream-5.0-pro",
    "release_date": "2026-07-08",
    "limit": {
@@ -6235,7 +6192,7 @@
    "name": "Seedance 2.0",
    "description": "ByteDance unified multimodal audio-video model supporting text, image, video and audio references, editing, extension and synchronized stereo sound.",
    "type": "video",
-   "family": "seed",
+   "family": "seedance",
    "canonical_id": "bytedance-seed/seedance-2.0",
    "release_date": "2026-02-12",
    "limit": {
@@ -6349,7 +6306,7 @@
    "name": "Seedance 2.0 Fast",
    "description": "Faster, lower-cost Seedance 2.0 variant for text, image, video and audio references with synchronized sound.",
    "type": "video",
-   "family": "seed",
+   "family": "seedance",
    "canonical_id": "bytedance-seed/seedance-2.0-fast",
    "release_date": "2026-02-12",
    "limit": {
@@ -6425,7 +6382,7 @@
    "name": "Seedance 2.0 Mini",
    "description": "Lower-cost, faster Seedance 2.0 audio-video model at 480p and 720p",
    "type": "video",
-   "family": "seed",
+   "family": "seedance-mini",
    "canonical_id": "bytedance-seed/seedance-2.0-mini",
    "release_date": "2026-06-15",
    "limit": {
@@ -6500,7 +6457,7 @@
    "name": "Seedance 2.5",
    "description": "ByteDance multimodal audio-video model with up to 30-second single-pass generation, multi-round extension, reference inputs and timestamp-level editing.",
    "type": "video",
-   "family": "seed",
+   "family": "seedance",
    "canonical_id": "bytedance-seed/seedance-2.5",
    "release_date": "2026-07-31",
    "limit": {
@@ -6746,7 +6703,7 @@
    "name": "Orpheus 3B",
    "description": "Open English text-to-speech model fine-tuned for natural prosody and expressive delivery",
    "type": "speech",
-   "family": "canopylabs",
+   "family": "orpheus",
    "canonical_id": "canopylabs/orpheus-3b-0.1-ft",
    "release_date": "2025-03",
    "limit": {
@@ -6857,6 +6814,7 @@
    "name": "Clef",
    "description": "Decision model for typed evaluation of shared state",
    "type": "decision",
+   "family": "clef",
    "release_date": "2026-10-01",
    "limit": {
     "context": 65537
@@ -6916,6 +6874,7 @@
    "name": "Clef Flash",
    "description": "Decision model for typed evaluation of shared state",
    "type": "decision",
+   "family": "clef-flash",
    "release_date": "2026-10-01",
    "limit": {
     "context": 24576
@@ -6975,6 +6934,7 @@
    "name": "Clef Omni",
    "description": "Decision model for typed evaluation of shared state",
    "type": "decision",
+   "family": "clef",
    "release_date": "2026-10-09",
    "limit": {
     "context": 65536
@@ -7045,7 +7005,7 @@
    "name": "Uncensored",
    "description": "Mistral model for multilingual chat, reasoning, and tool-assisted workflows",
    "type": "chat",
-   "family": "mistral",
+   "family": "dolphin",
    "canonical_id": "cognitivecomputations/dolphin-mistral-24b-venice-edition",
    "release_date": "2025-07-09",
    "limit": {
@@ -7222,7 +7182,7 @@
    "name": "Command A+",
    "description": "Cohere command model for multilingual enterprise agents, tools, and chat",
    "type": "chat",
-   "family": "command-a",
+   "family": "command-a-plus",
    "canonical_id": "cohere/command-a-plus-05-2026",
    "release_date": "2026-05-20",
    "limit": {
@@ -7440,7 +7400,7 @@
    "name": "Command R+",
    "description": "Cohere's RAG workhorse for long-context enterprise search and tool use",
    "type": "chat",
-   "family": "command-r",
+   "family": "command-r-plus",
    "canonical_id": "cohere/command-r-plus-08-2024",
    "release_date": "2024-08-30",
    "limit": {
@@ -7650,7 +7610,7 @@
    "name": "Embed 5 Fast",
    "description": "Faster, lighter Embed 5 model sharing Embed 5 Pro's embedding space",
    "type": "embedding",
-   "family": "cohere-embed",
+   "family": "cohere-embed-fast",
    "canonical_id": "cohere/embed-v5.0-fast",
    "release_date": "2026-09-30",
    "limit": {
@@ -7707,7 +7667,7 @@
    "name": "Embed 5 Pro",
    "description": "Cohere's most capable multimodal embedding model for text, images, and mixed documents",
    "type": "embedding",
-   "family": "cohere-embed",
+   "family": "cohere-embed-pro",
    "canonical_id": "cohere/embed-v5.0-pro",
    "release_date": "2026-09-30",
    "limit": {
@@ -7764,6 +7724,7 @@
    "name": "Rerank 4 Fast",
    "description": "Low-latency multilingual reranker for high-throughput retrieval",
    "type": "reranking",
+   "family": "cohere-rerank-fast",
    "canonical_id": "cohere/rerank-v4.0-fast",
    "release_date": "2025-12-11",
    "limit": {
@@ -7808,6 +7769,7 @@
    "name": "Rerank 4 Pro",
    "description": "Multilingual reranker for maximum relevance on documents and semi-structured data",
    "type": "reranking",
+   "family": "cohere-rerank-pro",
    "canonical_id": "cohere/rerank-v4.0-pro",
    "release_date": "2025-12-11",
    "limit": {
@@ -7852,6 +7814,7 @@
    "name": "Rerank 5 Fast",
    "description": "Low-latency multilingual reranker for high-volume search and agent loops",
    "type": "reranking",
+   "family": "cohere-rerank-fast",
    "canonical_id": "cohere/rerank-v5.0-fast",
    "release_date": "2026-10-21",
    "limit": {
@@ -7896,6 +7859,7 @@
    "name": "Rerank 5 Pro",
    "description": "Highest-quality multilingual reranker for reasoning-heavy queries and long documents",
    "type": "reranking",
+   "family": "cohere-rerank-pro",
    "canonical_id": "cohere/rerank-v5.0-pro",
    "release_date": "2026-10-21",
    "limit": {
@@ -7940,6 +7904,7 @@
    "name": "Rerank 3.5",
    "description": "Multilingual reranker for documents and semi-structured data",
    "type": "reranking",
+   "family": "cohere-rerank",
    "canonical_id": "cohere/rerank-v3.5",
    "release_date": "2024-12-02",
    "limit": {
@@ -8039,6 +8004,7 @@
    "name": "Flux TTS",
    "description": "Conversation-native text-to-speech model for real-time voice agents",
    "type": "speech",
+   "family": "deepgram-flux",
    "canonical_id": "deepgram/flux-tts",
    "release_date": "2026-08-12",
    "limit": {
@@ -8093,6 +8059,7 @@
    "name": "Nova-3",
    "description": "General-purpose speech-to-text model with monolingual and multilingual transcription",
    "type": "transcription",
+   "family": "deepgram-nova",
    "canonical_id": "deepgram/nova-3",
    "release_date": "2025-02-12",
    "limit": {
@@ -8263,7 +8230,7 @@
    "release_date": "2025-03-24",
    "limit": {
     "context": 163840,
-    "output": 115200
+    "output": 147456
    },
    "capabilities": {
     "temperature": true,
@@ -8282,13 +8249,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.29,
-      "cache": {
-       "read": 0.11
-      }
+      "price": 0.25
      },
      "output": {
-      "price": 1.14
+      "price": 1
      }
     }
    },
@@ -8475,7 +8439,7 @@
    "name": "DeepSeek R1 0528",
    "description": "DeepSeek reasoning model for multi-step analysis, math, coding, and tools",
    "type": "chat",
-   "family": "deepseek-thinking",
+   "family": "deepseek-r",
    "canonical_id": "deepseek/deepseek-r1-0528",
    "release_date": "2025-05-28",
    "limit": {
@@ -9132,7 +9096,7 @@
    "release_date": "2026-08-21",
    "limit": {
     "context": 1048576,
-    "output": 943717
+    "output": 262144
    },
    "capabilities": {
     "temperature": true,
@@ -9157,13 +9121,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.44,
+      "price": 0.2156,
       "cache": {
-       "read": 0.014
+       "read": 0.00686
       }
      },
      "output": {
-      "price": 1.32
+      "price": 0.6468
      }
     }
    },
@@ -9244,7 +9208,7 @@
    "name": "DeepSeek V4 Pro",
    "description": "Open MoE flagship with million-token context for coding and long agent runs",
    "type": "chat",
-   "family": "deepseek-thinking",
+   "family": "deepseek-pro",
    "canonical_id": "deepseek/deepseek-v4-pro",
    "release_date": "2026-04-24",
    "limit": {
@@ -9360,7 +9324,7 @@
    "name": "DeepSeek V4 Pro 0813",
    "description": "DeepSeek V4 Pro snapshot with million-token context and support for thinking and non-thinking modes",
    "type": "chat",
-   "family": "deepseek-thinking",
+   "family": "deepseek-pro",
    "canonical_id": "deepseek/deepseek-v4-pro-0813",
    "release_date": "2026-08-13",
    "limit": {
@@ -9478,7 +9442,7 @@
    "release_date": "2026-09-10",
    "limit": {
     "context": 1048576,
-    "output": 943718
+    "output": 393216
    },
    "capabilities": {
     "temperature": true,
@@ -9503,13 +9467,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.3,
+      "price": 0.0498,
       "cache": {
-       "read": 0.006
+       "read": 0.000996
       }
      },
      "output": {
-      "price": 1.2
+      "price": 0.1992
      }
     }
    },
@@ -9972,119 +9936,12 @@
    "last_updated": "2026-10-17",
    "recommended_api": "chat-completions"
   },
-  "dots-studio/dots-3-note-preview:free": {
-   "id": "dots-studio/dots-3-note-preview:free",
-   "name": "Dots3-Note Preview (free)",
-   "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
-   "type": "chat",
-   "status": "deprecated",
-   "release_date": "2026-08-14",
-   "limit": {
-    "context": 512000,
-    "output": 460800
-   },
-   "capabilities": {
-    "temperature": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/gif"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@openrouter/ai-sdk-provider",
-      "opencodeai": "@opencode/ai/providers/openrouter"
-     },
-     "capabilities": {
-      "system_updates": true,
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-08-14",
-   "recommended_api": "chat-completions"
-  },
   "elevenlabs/eleven-flash-v2": {
    "id": "elevenlabs/eleven-flash-v2",
    "name": "Eleven Flash v2",
    "description": "Ultra-low-latency English text-to-speech model for real-time use",
    "type": "speech",
-   "family": "elevenlabs",
+   "family": "elevenlabs-flash",
    "canonical_id": "elevenlabs/eleven_flash_v2",
    "release_date": "2024-12-19",
    "limit": {
@@ -10139,7 +9996,7 @@
    "name": "Eleven Flash v2.5",
    "description": "Ultra-low-latency multilingual text-to-speech model for real-time use",
    "type": "speech",
-   "family": "elevenlabs",
+   "family": "elevenlabs-flash",
    "canonical_id": "elevenlabs/eleven_flash_v2_5",
    "release_date": "2024-12-19",
    "limit": {
@@ -10194,7 +10051,7 @@
    "name": "Eleven Multilingual v2",
    "description": "Lifelike multilingual text-to-speech model for long-form narration in 29 languages",
    "type": "speech",
-   "family": "elevenlabs",
+   "family": "elevenlabs-multilingual",
    "canonical_id": "elevenlabs/eleven_multilingual_v2",
    "release_date": "2023-08-22",
    "limit": {
@@ -10249,7 +10106,7 @@
    "name": "Eleven Turbo v2",
    "description": "Low-latency English text-to-speech model, superseded by Flash v2",
    "type": "speech",
-   "family": "elevenlabs",
+   "family": "elevenlabs-turbo",
    "canonical_id": "elevenlabs/eleven_turbo_v2",
    "release_date": "2023-11-09",
    "limit": {
@@ -10304,7 +10161,7 @@
    "name": "Eleven Turbo v2.5",
    "description": "Low-latency multilingual text-to-speech model, superseded by Flash v2.5",
    "type": "speech",
-   "family": "elevenlabs",
+   "family": "elevenlabs-turbo",
    "canonical_id": "elevenlabs/eleven_turbo_v2_5",
    "release_date": "2024-07-19",
    "limit": {
@@ -10524,7 +10381,7 @@
    "name": "Eleven v4 Turbo",
    "description": "Low-latency Eleven v4 text-to-speech model for real-time agents",
    "type": "speech",
-   "family": "elevenlabs",
+   "family": "elevenlabs-turbo",
    "canonical_id": "elevenlabs/eleven_v4_turbo",
    "release_date": "2026-09-28",
    "limit": {
@@ -10579,7 +10436,7 @@
    "name": "Scribe v2",
    "description": "Speech-to-text model with word timestamps, speaker diarization, and audio-event tagging in 90+ languages",
    "type": "transcription",
-   "family": "elevenlabs",
+   "family": "scribe",
    "canonical_id": "elevenlabs/scribe_v2",
    "release_date": "2026-01-12",
    "limit": {
@@ -10650,7 +10507,7 @@
    "name": "Scribe v2 Medical",
    "description": "Scribe v2 speech-to-text model specialized for medical and clinical audio",
    "type": "transcription",
-   "family": "elevenlabs",
+   "family": "scribe",
    "canonical_id": "elevenlabs/scribe_v2_medical",
    "release_date": "2026-09-11",
    "limit": {
@@ -10833,6 +10690,7 @@
    "name": "Ember-1",
    "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
    "type": "chat",
+   "family": "ember",
    "canonical_id": "fireworks/ember-1",
    "release_date": "2026-09-22",
    "limit": {
@@ -10951,6 +10809,7 @@
    "name": "Drama 3",
    "description": "Text-to-speech model directed with plain-language performance notes",
    "type": "speech",
+   "family": "fish-drama",
    "canonical_id": "fish-audio/drama-3",
    "release_date": "2026-10-13",
    "limit": {
@@ -11005,6 +10864,7 @@
    "name": "S1",
    "description": "Multilingual text-to-speech model with parenthetical emotion controls",
    "type": "speech",
+   "family": "fish-s",
    "canonical_id": "fish-audio/s1",
    "release_date": "2025-06",
    "limit": {
@@ -11059,6 +10919,7 @@
    "name": "S2 Pro",
    "description": "Open multilingual text-to-speech model with bracket emotion cues and multi-speaker dialogue",
    "type": "speech",
+   "family": "fish-s-pro",
    "canonical_id": "fish-audio/s2-pro",
    "release_date": "2026-03",
    "limit": {
@@ -11113,6 +10974,7 @@
    "name": "S2.1 Pro",
    "description": "Production text-to-speech model improving on S2 Pro in quality, latency, and throughput",
    "type": "speech",
+   "family": "fish-s-pro",
    "canonical_id": "fish-audio/s2.1-pro",
    "release_date": "2026-06-23",
    "limit": {
@@ -11167,6 +11029,7 @@
    "name": "S2.1 Pro Free (free)",
    "description": "Production text-to-speech model improving on S2 Pro in quality, latency, and throughput",
    "type": "speech",
+   "family": "fish-s-pro-free",
    "canonical_id": "fish-audio/s2.1-pro",
    "release_date": "2026-06-23",
    "limit": {
@@ -11221,6 +11084,7 @@
    "name": "Transcribe 1",
    "description": "Speech-to-text model for short recordings with language detection and optional timestamps",
    "type": "transcription",
+   "family": "fish-transcribe",
    "canonical_id": "fish-audio/transcribe-1",
    "release_date": "2025-09",
    "limit": {
@@ -11279,6 +11143,7 @@
    "name": "Transcribe 1 Pro",
    "description": "Speech-to-text model with speaker markers and emotion and vocal-event cues",
    "type": "transcription",
+   "family": "fish-transcribe-pro",
    "canonical_id": "fish-audio/transcribe-1-pro",
    "release_date": "2026-09-18",
    "limit": {
@@ -11340,6 +11205,7 @@
    "name": "Chirp 3",
    "description": "Multilingual speech-to-text model with diarization and automatic language detection",
    "type": "transcription",
+   "family": "chirp",
    "canonical_id": "google/chirp-3",
    "release_date": "2025-08-29",
    "limit": {
@@ -11567,7 +11433,7 @@
    "name": "Nano Banana",
    "description": "Nano Banana image model for fast generation, edits, and character-consistent assets",
    "type": "image",
-   "family": "gemini-flash",
+   "family": "nano-banana",
    "canonical_id": "google/gemini-2.5-flash-image",
    "release_date": "2025-08-26",
    "limit": {
@@ -11828,7 +11694,7 @@
    "name": "Gemini 2.5 Flash TTS",
    "description": "Speech generation model for controllable voice, narration, and audio delivery",
    "type": "speech",
-   "family": "gemini-flash",
+   "family": "gemini-tts-flash",
    "canonical_id": "google/gemini-2.5-flash-tts",
    "release_date": "2025-09-30",
    "limit": {
@@ -12095,7 +11961,7 @@
    "name": "Gemini 2.5 Pro Preview 06-05",
    "description": "Advanced Gemini model for complex reasoning, coding, and multimodal analysis",
    "type": "chat",
-   "family": "gemini",
+   "family": "gemini-pro",
    "canonical_id": "google/gemini-2.5-pro-preview",
    "release_date": "2025-06-05",
    "limit": {
@@ -12292,7 +12158,7 @@
    "name": "Gemini 2.5 Pro TTS",
    "description": "Speech generation model for controllable voice, narration, and audio delivery",
    "type": "speech",
-   "family": "gemini-pro",
+   "family": "gemini-tts-pro",
    "canonical_id": "google/gemini-2.5-pro-tts",
    "release_date": "2025-09-30",
    "limit": {
@@ -12525,7 +12391,7 @@
    "name": "Nano Banana Pro",
    "description": "Nano Banana Pro for higher-fidelity image generation and design-heavy edits",
    "type": "image",
-   "family": "gemini-pro",
+   "family": "nano-banana-pro",
    "canonical_id": "google/gemini-3-pro-image",
    "release_date": "2026-05-28",
    "limit": {
@@ -12643,7 +12509,7 @@
    "name": "Nano Banana Pro Preview",
    "description": "Nano Banana Pro for higher-fidelity image generation and design-heavy edits",
    "type": "image",
-   "family": "gemini-pro",
+   "family": "nano-banana-pro",
    "canonical_id": "google/gemini-3-pro-image-preview",
    "release_date": "2025-11-20",
    "limit": {
@@ -12739,7 +12605,7 @@
    "name": "Nano Banana 2",
    "description": "Image model for prompt-driven generation, editing, and visual design workflows",
    "type": "image",
-   "family": "gemini-flash",
+   "family": "nano-banana",
    "canonical_id": "google/gemini-3.1-flash-image",
    "release_date": "2026-05-28",
    "limit": {
@@ -12822,7 +12688,7 @@
    "name": "Nano Banana 2 Preview",
    "description": "Image model for prompt-driven generation, editing, and visual design workflows",
    "type": "image",
-   "family": "gemini-flash",
+   "family": "nano-banana",
    "canonical_id": "google/gemini-3.1-flash-image-preview",
    "release_date": "2026-02-26",
    "limit": {
@@ -13075,7 +12941,7 @@
    "name": "Nano Banana 2 Lite",
    "description": "Image model for prompt-driven generation, editing, and visual design workflows",
    "type": "image",
-   "family": "gemini-flash-lite",
+   "family": "nano-banana-lite",
    "canonical_id": "google/gemini-3.1-flash-lite-image",
    "release_date": "2026-06-30",
    "limit": {
@@ -13330,7 +13196,7 @@
    "name": "Gemini 3.1 Flash TTS Preview",
    "description": "Low-latency speech generation with steerable prompts and expressive audio tags",
    "type": "speech",
-   "family": "gemini-flash",
+   "family": "gemini-tts-flash",
    "canonical_id": "google/gemini-3.1-flash-tts-preview",
    "release_date": "2026-04-15",
    "limit": {
@@ -14142,7 +14008,7 @@
    "name": "Gemini 3.5 Transcribe",
    "description": "Speech-to-text model with language detection, speaker diarization, word timestamps, and custom vocabulary",
    "type": "transcription",
-   "family": "gemini",
+   "family": "gemini-transcribe",
    "canonical_id": "google/gemini-3.5-transcribe",
    "release_date": "2026-08-26",
    "limit": {
@@ -14719,7 +14585,7 @@
    "name": "Gemini 3.8 Flash Lite TTS",
    "description": "Fast, cost-efficient text-to-speech model for high-volume narration and voice agent pipelines",
    "type": "speech",
-   "family": "gemini-flash-lite",
+   "family": "gemini-tts-flash-lite",
    "canonical_id": "google/gemini-3.8-flash-lite-tts",
    "release_date": "2026-09-22",
    "limit": {
@@ -14778,7 +14644,7 @@
    "name": "Gemini 3.8 Flash TTS",
    "description": "Flagship text-to-speech model for expressive, studio-grade voices and long-form multi-speaker audio",
    "type": "speech",
-   "family": "gemini-flash",
+   "family": "gemini-tts-flash",
    "canonical_id": "google/gemini-3.8-flash-tts",
    "release_date": "2026-09-22",
    "limit": {
@@ -15493,7 +15359,7 @@
    "name": "Gemini Decision 1",
    "description": "Decision model for typed evaluation of shared state",
    "type": "decision",
-   "family": "gemini",
+   "family": "gemini-decision",
    "canonical_id": "google/gemini-decision-1",
    "release_date": "2026-11-11",
    "limit": {
@@ -15585,7 +15451,7 @@
    "name": "Gemini Embedding 001",
    "description": "Embedding model for semantic search, retrieval, clustering, and ranking pipelines",
    "type": "embedding",
-   "family": "gemini",
+   "family": "gemini-embedding",
    "canonical_id": "google/gemini-embedding-001",
    "release_date": "2025-05-20",
    "limit": {
@@ -15639,7 +15505,7 @@
    "name": "Gemini Embedding 2",
    "description": "Multimodal embedding model mapping text, images, video, audio, and PDFs into a unified embedding space",
    "type": "embedding",
-   "family": "gemini",
+   "family": "gemini-embedding",
    "canonical_id": "google/gemini-embedding-2",
    "release_date": "2026-04-22",
    "limit": {
@@ -15710,7 +15576,7 @@
    "name": "Gemini Embedding 2 Preview",
    "description": "Preview of Gemini Embedding 2, a multimodal embedding model for text, images, video, audio, and PDFs",
    "type": "embedding",
-   "family": "gemini",
+   "family": "gemini-embedding",
    "canonical_id": "google/gemini-embedding-2-preview",
    "release_date": "2026-03-10",
    "limit": {
@@ -15780,7 +15646,7 @@
    "name": "Nano Banana 2.1",
    "description": "Image model for prompt-driven generation, editing, and visual design workflows",
    "type": "image",
-   "family": "gemini-flash",
+   "family": "nano-banana",
    "canonical_id": "google/gemini-nano-banana-2.1",
    "release_date": "2026-10-06",
    "limit": {
@@ -15884,7 +15750,7 @@
    "name": "Gemini Omni 1.1 Flash",
    "description": "Omni-modal model for text, vision, audio, and multimodal agent tasks",
    "type": "video",
-   "family": "gemini",
+   "family": "gemini-omni-flash",
    "canonical_id": "google/gemini-omni-1.1-flash",
    "release_date": "2026-08-27",
    "limit": {
@@ -15992,7 +15858,7 @@
    "name": "Gemini Omni 1.2 Flash",
    "description": "Omni-modal model for text, vision, audio, and multimodal agent tasks",
    "type": "video",
-   "family": "gemini",
+   "family": "gemini-omni-flash",
    "canonical_id": "google/gemini-omni-1.2-flash",
    "release_date": "2026-11-05",
    "limit": {
@@ -16497,13 +16363,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.09,
+      "price": 0.0675,
       "cache": {
-       "read": 0.05
+       "read": 0.0375
       }
      },
      "output": {
-      "price": 0.3
+      "price": 0.225
      }
     }
    },
@@ -16587,7 +16453,7 @@
    "name": "Gemma 4 26B A4B  (free)",
    "description": "Open Gemma instruction model for efficient chat and self-hosted deployments",
    "type": "chat",
-   "family": "gemma",
+   "family": "gemma-free",
    "canonical_id": "google/gemma-4-26b-a4b-it",
    "release_date": "2026-04-02",
    "limit": {
@@ -16812,7 +16678,7 @@
    "name": "Gemma 4 31B (free)",
    "description": "Largest Gemma 4 instruction model for open, self-hosted chat and reasoning",
    "type": "chat",
-   "family": "gemma",
+   "family": "gemma-free",
    "canonical_id": "google/gemma-4-31b-it",
    "release_date": "2026-04-02",
    "limit": {
@@ -16925,7 +16791,7 @@
    "name": "Lyria 3 Clip Preview",
    "description": "Speech generation model for controllable voice, narration, and audio delivery",
    "type": "audio",
-   "family": "lyria",
+   "family": "lyria-clip",
    "canonical_id": "google/lyria-3-clip-preview",
    "release_date": "2026-03-25",
    "limit": {
@@ -16988,7 +16854,7 @@
    "name": "Lyria 3 Pro Preview",
    "description": "Speech generation model for controllable voice, narration, and audio delivery",
    "type": "audio",
-   "family": "lyria",
+   "family": "lyria-pro",
    "canonical_id": "google/lyria-3-pro-preview",
    "release_date": "2026-03-25",
    "limit": {
@@ -17250,7 +17116,7 @@
    "name": "Veo 3.1 Lite",
    "description": "Video model for prompt-guided generation, editing, and motion workflows",
    "type": "video",
-   "family": "veo",
+   "family": "veo-lite",
    "canonical_id": "google/veo-3.1-lite-generate-preview",
    "release_date": "2026-03-31",
    "limit": {
@@ -17338,6 +17204,7 @@
    "name": "MythoMax L2 13B",
    "description": "Open-weight instruction model for adaptable chat and self-hosted production workloads",
    "type": "chat",
+   "family": "mythomax",
    "canonical_id": "gryphe/mythomax-l2-13b",
    "release_date": "2023-08-10",
    "limit": {
@@ -17408,6 +17275,7 @@
    "name": "Kokoro 82M",
    "description": "Lightweight open text-to-speech model",
    "type": "speech",
+   "family": "kokoro",
    "canonical_id": "hexgrad/kokoro-82m",
    "release_date": "2024-12",
    "limit": {
@@ -17462,6 +17330,7 @@
    "name": "Avatar IV",
    "description": "Image-to-video avatar model that turns one photo and a script or audio track into a lip-synced talking video",
    "type": "video",
+   "family": "heygen-avatar",
    "canonical_id": "heygen/avatar-iv",
    "release_date": "2025-05",
    "limit": {
@@ -17782,6 +17651,7 @@
    "name": "HeyGen Video",
    "description": "General-purpose video model for text, image and reference to video with generated dialogue, ambience and effects",
    "type": "video",
+   "family": "heygen-video",
    "canonical_id": "heygen/heygen-video-1",
    "release_date": "2026-09-30",
    "limit": {
@@ -17831,6 +17701,7 @@
    "name": "HeyGen Voice",
    "description": "Text-to-speech model with default voices and HeyGen voice clones",
    "type": "speech",
+   "family": "heygen-voice",
    "canonical_id": "heygen/heygen-voice-1",
    "release_date": "2026-10-13",
    "limit": {
@@ -17885,6 +17756,7 @@
    "name": "HeyGen Voice Turbo",
    "description": "Lower-latency version of HeyGen Voice",
    "type": "speech",
+   "family": "heygen-voice-turbo",
    "canonical_id": "heygen/heygen-voice-1-turbo",
    "release_date": "2026-10-13",
    "limit": {
@@ -17939,6 +17811,7 @@
    "name": "HeyGen Voice Turbo (free)",
    "description": "Lower-latency version of HeyGen Voice",
    "type": "speech",
+   "family": "heygen-voice-turbo-free",
    "canonical_id": "heygen/heygen-voice-1-turbo",
    "release_date": "2026-10-13",
    "limit": {
@@ -18106,7 +17979,7 @@
    "name": "Ling 3.0 Flash",
    "description": "Efficient model for low-latency assistance, extraction, and routine automation",
    "type": "chat",
-   "family": "ling",
+   "family": "ling-flash",
    "canonical_id": "inclusionai/ling-3.0-flash",
    "release_date": "2026-07-23",
    "limit": {
@@ -18215,7 +18088,7 @@
    "name": "Ling 3.0 Flash VL",
    "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
    "type": "chat",
-   "family": "ling",
+   "family": "ling-flash",
    "canonical_id": "inclusionai/ling-3.0-flash-vl",
    "release_date": "2026-09-10",
    "limit": {
@@ -18325,7 +18198,7 @@
    "name": "Ling 3.0 Tiny",
    "description": "Reasoning model for deliberate analysis, multi-step problem solving, and tool use",
    "type": "chat",
-   "family": "ling",
+   "family": "ling-tiny",
    "release_date": "2026-08-06",
    "limit": {
     "context": 262144,
@@ -18430,7 +18303,7 @@
    "name": "Ling 3.1 Flash",
    "description": "Efficient model for low-latency assistance, extraction, and routine automation",
    "type": "chat",
-   "family": "ling",
+   "family": "ling-flash",
    "canonical_id": "inclusionai/ling-3.1-flash",
    "release_date": "2026-09-29",
    "limit": {
@@ -18539,7 +18412,7 @@
    "name": "Ling 3.2 Flash (free)",
    "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
    "type": "chat",
-   "family": "ling",
+   "family": "ling-flash-free",
    "release_date": "2026-11-13",
    "limit": {
     "context": 1048576,
@@ -18642,6 +18515,7 @@
    "name": "Schematron V2 Small",
    "description": "Efficient model for low-latency assistance, extraction, and routine automation",
    "type": "chat",
+   "family": "schematron-small",
    "canonical_id": "inference-net/schematron-v2-small",
    "release_date": "2026-04-16",
    "limit": {
@@ -18715,6 +18589,7 @@
    "name": "Schematron V2 Turbo",
    "description": "Efficient model for low-latency assistance, extraction, and routine automation",
    "type": "chat",
+   "family": "schematron-turbo",
    "canonical_id": "inference-net/schematron-v2-turbo",
    "release_date": "2026-04-16",
    "limit": {
@@ -18788,6 +18663,7 @@
    "name": "E5 Base v2",
    "description": "English text embedding model for retrieval and semantic similarity",
    "type": "embedding",
+   "family": "e5-base",
    "canonical_id": "intfloat/e5-base-v2",
    "release_date": "2023-05",
    "limit": {
@@ -18840,6 +18716,7 @@
    "name": "E5 Large v2",
    "description": "English text embedding model for retrieval and semantic similarity",
    "type": "embedding",
+   "family": "e5-large",
    "canonical_id": "intfloat/e5-large-v2",
    "release_date": "2023-05",
    "limit": {
@@ -18892,6 +18769,7 @@
    "name": "Multilingual E5 Large",
    "description": "Multilingual text embedding model for retrieval and semantic similarity",
    "type": "embedding",
+   "family": "e5-multilingual",
    "canonical_id": "intfloat/multilingual-e5-large",
    "release_date": "2023-06",
    "limit": {
@@ -18944,6 +18822,7 @@
    "name": "Kev 4B",
    "description": "Decision model for typed evaluation of shared state",
    "type": "decision",
+   "family": "kev",
    "release_date": "2026-09-25",
    "limit": {
     "context": 8192
@@ -18996,6 +18875,7 @@
    "name": "K3 Edit",
    "description": "Fast image editing model that keeps products and characters consistent",
    "type": "image",
+   "family": "krea",
    "canonical_id": "krea/krea-3",
    "release_date": "2026-10-15",
    "limit": {
@@ -19044,6 +18924,7 @@
    "name": "Krea 2 Large",
    "description": "Krea 2 image model for photorealism and raw textures",
    "type": "image",
+   "family": "krea-large",
    "canonical_id": "krea/krea-2-large",
    "release_date": "2026-05-12",
    "limit": {
@@ -19092,6 +18973,7 @@
    "name": "Krea 2 Medium",
    "description": "Balanced Krea 2 image model for general and expressive styles",
    "type": "image",
+   "family": "krea-medium",
    "canonical_id": "krea/krea-2-medium",
    "release_date": "2026-05-12",
    "limit": {
@@ -19140,6 +19022,7 @@
    "name": "Krea 2 Turbo",
    "description": "8-step distilled Krea 2 Medium image model for fast iteration",
    "type": "image",
+   "family": "krea-medium-turbo",
    "canonical_id": "krea/krea-2-medium-turbo",
    "release_date": "2026-06-03",
    "limit": {
@@ -19286,191 +19169,6 @@
    "open_weights": false,
    "last_updated": "2026-11-05",
    "recommended_api": "chat-completions"
-  },
-  "kwaivgi/kling-v3.0-pro": {
-   "id": "kwaivgi/kling-v3.0-pro",
-   "name": "Kling VIDEO 3.0 Pro",
-   "description": "Higher-quality Kling 3.0 video model with first and last frame control and native audio",
-   "type": "video",
-   "canonical_id": "kuaishou/kling-v3.0-pro",
-   "release_date": "2026-02-05",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "video": {
-     "output": {
-      "unit": "second",
-      "price": 0.112,
-      "overrides": [
-       {
-        "when": {
-         "generate_audio": {
-          "equals": true
-         }
-        },
-        "price": 0.168
-       }
-      ]
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png"
-    ],
-    "output": [
-     "video/mp4"
-    ]
-   },
-   "api": {
-    "videos": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@openrouter/ai-sdk-provider",
-      "opencodeai": "@opencode/ai/providers/openrouter/videos"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-02-05",
-   "recommended_api": "videos"
-  },
-  "kwaivgi/kling-v3.0-std": {
-   "id": "kwaivgi/kling-v3.0-std",
-   "name": "Kling VIDEO 3.0 Standard",
-   "description": "Kling 3.0 video model with first and last frame control and native audio",
-   "type": "video",
-   "canonical_id": "kuaishou/kling-v3.0-std",
-   "release_date": "2026-02-05",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "video": {
-     "output": {
-      "unit": "second",
-      "price": 0.084,
-      "overrides": [
-       {
-        "when": {
-         "generate_audio": {
-          "equals": true
-         }
-        },
-        "price": 0.126
-       }
-      ]
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png"
-    ],
-    "output": [
-     "video/mp4"
-    ]
-   },
-   "api": {
-    "videos": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@openrouter/ai-sdk-provider",
-      "opencodeai": "@opencode/ai/providers/openrouter/videos"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-02-05",
-   "recommended_api": "videos"
-  },
-  "kwaivgi/kling-video-o1": {
-   "id": "kwaivgi/kling-video-o1",
-   "name": "Kling VIDEO O1",
-   "description": "Unified multimodal Kling model for video generation and editing",
-   "type": "video",
-   "canonical_id": "kuaishou/kling-video-o1",
-   "release_date": "2025-12-01",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "video": {
-     "output": {
-      "unit": "second",
-      "price": 0.112
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png"
-    ],
-    "output": [
-     "video/mp4"
-    ]
-   },
-   "api": {
-    "videos": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@openrouter/ai-sdk-provider",
-      "opencodeai": "@opencode/ai/providers/openrouter/videos"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2025-12-01",
-   "recommended_api": "videos"
   },
   "liquid/d1-ultra": {
    "id": "liquid/d1-ultra",
@@ -19714,7 +19412,7 @@
    "name": "LFM2.5-24B-A2B",
    "description": "Reasoning model for deliberate analysis, multi-step problem solving, and tool use",
    "type": "chat",
-   "family": "liquid",
+   "family": "lfm",
    "release_date": "2026-10-13",
    "limit": {
     "context": 128000,
@@ -19819,7 +19517,7 @@
    "name": "LFM3-1.7B",
    "description": "Reasoning model for deliberate analysis, multi-step problem solving, and tool use",
    "type": "chat",
-   "family": "liquid",
+   "family": "lfm",
    "release_date": "2026-11-06",
    "limit": {
     "context": 262144,
@@ -19923,7 +19621,7 @@
    "name": "LFM3-1.7B (free)",
    "description": "Free provider route for experiments, demos, and cost-sensitive chat workloads",
    "type": "chat",
-   "family": "liquid",
+   "family": "lfm-free",
    "release_date": "2026-11-06",
    "limit": {
     "context": 262144,
@@ -20024,7 +19722,7 @@
    "name": "Weaver (alpha)",
    "description": "General-purpose chat model for instruction following, writing, and analysis",
    "type": "chat",
-   "family": "alpha",
+   "family": "weaver",
    "canonical_id": "mancer/weaver",
    "release_date": "2023-08-02",
    "limit": {
@@ -20092,116 +19790,6 @@
    "open_weights": false,
    "knowledge": "2023-06-30",
    "last_updated": "2023-08-02",
-   "recommended_api": "chat-completions"
-  },
-  "meituan/longcat-2.0": {
-   "id": "meituan/longcat-2.0",
-   "name": "LongCat-2.0",
-   "description": "Reasoning model for deliberate analysis, multi-step problem solving, and tool use",
-   "type": "chat",
-   "family": "longcat",
-   "canonical_id": "meituan/longcat-2.0",
-   "release_date": "2026-06-30",
-   "limit": {
-    "context": 1048756,
-    "output": 262144
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "budget": {}
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.3,
-      "cache": {
-       "read": 0.006
-      }
-     },
-     "output": {
-      "price": 1.2
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@openrouter/ai-sdk-provider",
-      "opencodeai": "@opencode/ai/providers/openrouter"
-     },
-     "capabilities": {
-      "system_updates": true,
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-06-30",
    "recommended_api": "chat-completions"
   },
   "meta-llama/llama-3.1-70b-instruct": {
@@ -20821,7 +20409,7 @@
    "name": "Llama Guard 4 12B",
    "description": "Safety model for policy screening, moderation, and risk-aware routing workflows",
    "type": "chat",
-   "family": "llama",
+   "family": "llama-guard",
    "canonical_id": "meta/llama-guard-4-12b",
    "release_date": "2025-04-29",
    "limit": {
@@ -20893,7 +20481,7 @@
    "name": "Muse Ember",
    "description": "Open Llama multimodal model for image understanding and text reasoning",
    "type": "chat",
-   "family": "muse",
+   "family": "muse-ember",
    "release_date": "2026-11-09",
    "limit": {
     "context": 1048576,
@@ -21013,7 +20601,7 @@
    "name": "Muse Glimmer 30B",
    "description": "Muse Glimmer is a 30-billion-parameter open-weight multimodal model from Meta Superintelligence Labs, distilled from Muse Spark for always-on local agents, tool use, coding, and image understanding.",
    "type": "chat",
-   "family": "muse",
+   "family": "muse-glimmer",
    "canonical_id": "meta/muse-glimmer-30b",
    "release_date": "2026-08-10",
    "limit": {
@@ -21128,7 +20716,7 @@
    "name": "Muse Image",
    "description": "Agentic image generation and editing model that plans, searches and refines before rendering",
    "type": "image",
-   "family": "muse",
+   "family": "muse-image",
    "canonical_id": "meta/muse-image-1.0",
    "release_date": "2026-07-07",
    "limit": {
@@ -21179,7 +20767,7 @@
    "name": "Muse Spark 1.1",
    "description": "Open Llama multimodal model for image understanding and text reasoning",
    "type": "chat",
-   "family": "muse",
+   "family": "muse-spark",
    "canonical_id": "meta/muse-spark-1.1",
    "release_date": "2026-04-08",
    "limit": {
@@ -21303,7 +20891,7 @@
    "name": "Muse Spark 1.2",
    "description": "Muse Spark 1.2 is a coding-focused update to Muse Spark 1.1 with improvements in code generation, complex debugging, codebase understanding, and end-to-end developer workflows.",
    "type": "chat",
-   "family": "muse",
+   "family": "muse-spark",
    "canonical_id": "meta/muse-spark-1.2",
    "release_date": "2026-08-05",
    "limit": {
@@ -21427,7 +21015,7 @@
    "name": "Muse Spark 1.2 Contributor",
    "description": "Open Llama multimodal model for image understanding and text reasoning",
    "type": "chat",
-   "family": "muse",
+   "family": "muse-spark",
    "release_date": "2026-08-21",
    "limit": {
     "context": 1048576,
@@ -21551,7 +21139,7 @@
    "name": "Muse Spark 1.3",
    "description": "Open Llama multimodal model for image understanding and text reasoning",
    "type": "chat",
-   "family": "muse",
+   "family": "muse-spark",
    "canonical_id": "meta/muse-spark-1.3",
    "release_date": "2026-09-02",
    "limit": {
@@ -21676,7 +21264,7 @@
    "name": "Muse Spark 1.3 Contributor",
    "description": "Open Llama multimodal model for image understanding and text reasoning",
    "type": "chat",
-   "family": "muse",
+   "family": "muse-spark",
    "release_date": "2026-09-02",
    "limit": {
     "context": 1048576,
@@ -21801,7 +21389,7 @@
    "name": "Muse Spark Open",
    "description": "Open Llama multimodal model for image understanding and text reasoning",
    "type": "chat",
-   "family": "muse",
+   "family": "muse-spark",
    "canonical_id": "meta/muse-spark-open",
    "release_date": "2026-10-15",
    "limit": {
@@ -21926,7 +21514,7 @@
    "name": "Muse Voice Transcribe 1.0",
    "description": "Speech-to-text model with speaker diarization and endpointing",
    "type": "transcription",
-   "family": "muse",
+   "family": "muse-transcribe",
    "canonical_id": "meta/muse-voice-transcribe-1.0",
    "release_date": "2026-09-01",
    "limit": {
@@ -21986,7 +21574,7 @@
    "name": "Muse Wonder",
    "description": "Open Llama multimodal model for image understanding and text reasoning",
    "type": "chat",
-   "family": "muse",
+   "family": "muse-wonder",
    "release_date": "2026-10-12",
    "limit": {
     "context": 1048576,
@@ -22118,7 +21706,7 @@
    "name": "MAI-Image-2.5",
    "description": "Image generation and precise editing model",
    "type": "image",
-   "family": "mai",
+   "family": "mai-image",
    "canonical_id": "microsoft/mai-image-2.5",
    "release_date": "2026-06-02",
    "limit": {
@@ -22181,7 +21769,7 @@
    "name": "MAI-Image-2.5-Pro",
    "description": "Highest-fidelity MAI-Image-2.5 model for detailed editing and in-image text",
    "type": "image",
-   "family": "mai",
+   "family": "mai-image-pro",
    "canonical_id": "microsoft/mai-image-2.5-pro",
    "release_date": "2026-07-23",
    "limit": {
@@ -22244,7 +21832,7 @@
    "name": "MAI-Image-2.6",
    "description": "Image generation and multi-reference editing model with web grounding",
    "type": "image",
-   "family": "mai",
+   "family": "mai-image",
    "canonical_id": "microsoft/mai-image-2.6",
    "release_date": "2026-08-14",
    "limit": {
@@ -22307,7 +21895,7 @@
    "name": "MAI-Image-2.6-Flash",
    "description": "Faster, lower-cost MAI-Image-2.6 for high-throughput generation and editing",
    "type": "image",
-   "family": "mai",
+   "family": "mai-image-flash",
    "canonical_id": "microsoft/mai-image-2.6-flash",
    "release_date": "2026-09-04",
    "limit": {
@@ -22370,7 +21958,7 @@
    "name": "MAI-Image-2.7",
    "description": "Image generation and precise multi-reference editing model with transparent backgrounds",
    "type": "image",
-   "family": "mai",
+   "family": "mai-image",
    "canonical_id": "microsoft/mai-image-2.7",
    "release_date": "2026-11-17",
    "limit": {
@@ -22433,7 +22021,7 @@
    "name": "MAI-Image-2.7-Flash",
    "description": "Faster, lower-cost MAI-Image-2.7 for high-throughput generation and editing",
    "type": "image",
-   "family": "mai",
+   "family": "mai-image-flash",
    "canonical_id": "microsoft/mai-image-2.7-flash",
    "release_date": "2026-11-17",
    "limit": {
@@ -22496,7 +22084,7 @@
    "name": "MAI-Transcribe-1.5",
    "description": "Multilingual speech-to-text model across 43 languages",
    "type": "transcription",
-   "family": "mai",
+   "family": "mai-transcribe",
    "canonical_id": "microsoft/mai-transcribe-1.5",
    "release_date": "2026-06-02",
    "limit": {
@@ -22556,7 +22144,7 @@
    "name": "MAI-Transcribe-2",
    "description": "Multilingual speech-to-text model across 60 languages with language identification and code switching",
    "type": "transcription",
-   "family": "mai",
+   "family": "mai-transcribe",
    "canonical_id": "microsoft/mai-transcribe-2",
    "release_date": "2026-09-03",
    "limit": {
@@ -22616,7 +22204,7 @@
    "name": "MAI-Voice-2",
    "description": "Expressive multilingual text-to-speech model for long-form and conversational voice",
    "type": "speech",
-   "family": "mai",
+   "family": "mai-voice",
    "canonical_id": "microsoft/mai-voice-2",
    "release_date": "2026-06-02",
    "limit": {
@@ -22671,7 +22259,7 @@
    "name": "MAI-Voice-2-Flash",
    "description": "Low-latency MAI-Voice-2 text-to-speech model for voice agents",
    "type": "speech",
-   "family": "mai",
+   "family": "mai-voice-flash",
    "canonical_id": "microsoft/mai-voice-2-flash",
    "release_date": "2026-07-23",
    "limit": {
@@ -22726,7 +22314,7 @@
    "name": "MAI-Voice-2.1",
    "description": "Highest-fidelity MAI text-to-speech model across 23 languages",
    "type": "speech",
-   "family": "mai",
+   "family": "mai-voice",
    "canonical_id": "microsoft/mai-voice-2.1",
    "release_date": "2026-10-01",
    "limit": {
@@ -22781,7 +22369,7 @@
    "name": "MAI-Voice-2.1-Flash",
    "description": "Low-latency MAI-Voice-2.1 text-to-speech model",
    "type": "speech",
-   "family": "mai",
+   "family": "mai-voice-flash",
    "canonical_id": "microsoft/mai-voice-2.1-flash",
    "release_date": "2026-10-01",
    "limit": {
@@ -22836,6 +22424,7 @@
    "name": "Microsoft-Decision-1",
    "description": "Decision model for typed evaluation of shared state",
    "type": "decision",
+   "family": "microsoft-decision",
    "canonical_id": "microsoft/microsoft-decision-1",
    "release_date": "2026-10-09",
    "limit": {
@@ -22891,6 +22480,7 @@
    "name": "Microsoft-Decision-1.1",
    "description": "Decision model for typed evaluation of shared state",
    "type": "decision",
+   "family": "microsoft-decision",
    "canonical_id": "microsoft/microsoft-decision-1.1",
    "release_date": "2026-11-17",
    "limit": {
@@ -23014,353 +22604,17 @@
    "last_updated": "2025-01-10",
    "recommended_api": "chat-completions"
   },
-  "minimax/hailuo-2.3": {
-   "id": "minimax/hailuo-2.3",
-   "name": "Hailuo 2.3",
-   "description": "Video model for realistic human motion, cinematic effects and stylized scenes from text or a first-frame image",
-   "type": "video",
-   "family": "minimax",
-   "canonical_id": "minimax/MiniMax-Hailuo-2.3",
-   "release_date": "2025-10-28",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "video": {
-     "output": {
-      "unit": "second",
-      "price": 0.0817
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/webp"
-    ],
-    "output": [
-     "video/mp4"
-    ]
-   },
-   "api": {
-    "videos": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@openrouter/ai-sdk-provider",
-      "opencodeai": "@opencode/ai/providers/openrouter/videos"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2025-10-28",
-   "recommended_api": "videos"
-  },
-  "minimax/hailuo-3": {
-   "id": "minimax/hailuo-3",
-   "name": "H3",
-   "description": "MiniMax general-purpose video model with multimodal references and synchronized stereo audio. Open H3-Base checkpoints; Context-IR and 2K regeneration are not included in the initial weights release.",
-   "type": "video",
-   "family": "minimax",
-   "canonical_id": "minimax/MiniMax-H3",
-   "release_date": "2026-07-31",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "image": {
-     "input": {
-      "unit": "image",
-      "price": 0.04
-     }
-    },
-    "video": {
-     "output": {
-      "unit": "second",
-      "price": 0.13
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "video/mp4",
-     "video/quicktime",
-     "audio/wav",
-     "audio/mpeg"
-    ],
-    "output": [
-     "video/mp4",
-     "audio"
-    ]
-   },
-   "api": {
-    "videos": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@openrouter/ai-sdk-provider",
-      "opencodeai": "@opencode/ai/providers/openrouter/videos"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-10-04",
-   "recommended_api": "videos"
-  },
-  "minimax/hailuo-3-max": {
-   "id": "minimax/hailuo-3-max",
-   "name": "H3 Max",
-   "description": "Fast video model post-trained by fal.ai on MiniMax H3, with synchronized audio at 480p and 768p",
-   "type": "video",
-   "family": "minimax",
-   "canonical_id": "minimax/MiniMax-H3-Max",
-   "release_date": "2026-08-26",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "video": {
-     "output": {
-      "unit": "second",
-      "price": 0.08,
-      "overrides": [
-       {
-        "when": {
-         "resolution": {
-          "equals": "480p"
-         }
-        },
-        "price": 0.05
-       }
-      ]
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/webp",
-     "image/heic",
-     "image/heif",
-     "video/mp4",
-     "video/quicktime",
-     "audio/wav",
-     "audio/mpeg"
-    ],
-    "output": [
-     "video/mp4"
-    ]
-   },
-   "api": {
-    "videos": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@openrouter/ai-sdk-provider",
-      "opencodeai": "@opencode/ai/providers/openrouter/videos"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-08-26",
-   "recommended_api": "videos"
-  },
-  "minimax/minimax-h3-image": {
-   "id": "minimax/minimax-h3-image",
-   "name": "MiniMax H3 Image",
-   "description": "MiniMax text-to-image and image-editing model",
-   "type": "image",
-   "family": "minimax",
-   "canonical_id": "minimax/MiniMax-H3-Image",
-   "release_date": "2026-11-10",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2.3
-     }
-    },
-    "image": {
-     "input": {
-      "price": 1.5
-     },
-     "output": {
-      "price": 3.8
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/webp",
-     "image/heic",
-     "image/heif"
-    ],
-    "output": [
-     "image/jpeg",
-     "image/png",
-     "image/webp"
-    ]
-   },
-   "api": {
-    "images": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@openrouter/ai-sdk-provider",
-      "opencodeai": "@opencode/ai/providers/openrouter/images"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-11-10",
-   "recommended_api": "images"
-  },
-  "minimax/minimax-h3-image-highspeed": {
-   "id": "minimax/minimax-h3-image-highspeed",
-   "name": "MiniMax H3 Image Highspeed",
-   "description": "Faster tier of MiniMax H3 Image for text-to-image and image editing",
-   "type": "image",
-   "family": "minimax",
-   "canonical_id": "minimax/MiniMax-H3-Image-Highspeed",
-   "release_date": "2026-11-10",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2.3
-     }
-    },
-    "image": {
-     "input": {
-      "price": 3
-     },
-     "output": {
-      "price": 7.6
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/webp",
-     "image/heic",
-     "image/heif"
-    ],
-    "output": [
-     "image/jpeg",
-     "image/png",
-     "image/webp"
-    ]
-   },
-   "api": {
-    "images": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@openrouter/ai-sdk-provider",
-      "opencodeai": "@opencode/ai/providers/openrouter/images"
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-11-10",
-   "recommended_api": "images"
-  },
   "minimax/minimax-m2.5": {
    "id": "minimax/minimax-m2.5",
    "name": "MiniMax-M2.5",
    "description": "Prior MiniMax coding model for agent workflows, office edits, and automation",
    "type": "chat",
-   "family": "minimax",
+   "family": "minimax-m",
    "canonical_id": "minimax/MiniMax-M2.5",
    "release_date": "2026-02-12",
    "limit": {
     "context": 198000,
-    "output": 176947
+    "output": 32768
    },
    "capabilities": {
     "temperature": true,
@@ -23379,13 +22633,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.295,
+      "price": 0.27,
       "cache": {
-       "read": 0.06
+       "read": 0.03
       }
      },
      "output": {
-      "price": 1.2
+      "price": 0.95
      }
     }
    },
@@ -23465,12 +22719,12 @@
    "name": "MiniMax-M2.7",
    "description": "Open MiniMax flagship for coding agents, office automation, and complex environments",
    "type": "chat",
-   "family": "minimax",
+   "family": "minimax-m",
    "canonical_id": "minimax/MiniMax-M2.7",
    "release_date": "2026-03-18",
    "limit": {
     "context": 196608,
-    "output": 176947
+    "output": 131072
    },
    "capabilities": {
     "temperature": true,
@@ -23489,13 +22743,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.21,
-      "cache": {
-       "read": 0.042
-      }
+      "price": 0.6
      },
      "output": {
-      "price": 0.84
+      "price": 1.8
      }
     }
    },
@@ -23572,12 +22823,12 @@
    "name": "MiniMax-M3",
    "description": "MiniMax multimodal model for long-context coding, perception, and agent planning",
    "type": "chat",
-   "family": "minimax",
+   "family": "minimax-m",
    "canonical_id": "minimax/MiniMax-M3",
    "release_date": "2026-06-01",
    "limit": {
     "context": 1048576,
-    "output": 512000
+    "output": 235929
    },
    "capabilities": {
     "temperature": true,
@@ -23597,13 +22848,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.3,
+      "price": 0.23,
       "cache": {
-       "read": 0.06
+       "read": 0.05
       }
      },
      "output": {
-      "price": 1.2
+      "price": 0.96
      }
     }
    },
@@ -23688,12 +22939,12 @@
    "name": "MiniMax-M3.1-Flash",
    "description": "MiniMax multimodal coding model for long-context reasoning and agent tasks",
    "type": "chat",
-   "family": "minimax",
+   "family": "minimax-m-flash",
    "canonical_id": "minimax/MiniMax-M3.1-Flash",
    "release_date": "2026-10-19",
    "limit": {
     "context": 1048576,
-    "output": 524288
+    "output": 512000
    },
    "capabilities": {
     "temperature": true,
@@ -23719,91 +22970,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.075,
+      "price": 0.135,
       "cache": {
-       "read": 0.0075
-      },
-      "overrides": [
-       {
-        "when": {
-         "any": [
-          {
-           "utc_hours": {
-            "gte": "15:00"
-           }
-          },
-          {
-           "utc_hours": {
-            "lt": "01:00"
-           }
-          }
-         ]
-        },
-        "price": 0.075,
-        "cache": {
-         "read": 0.0075
-        }
-       },
-       {
-        "when": {
-         "all": [
-          {
-           "utc_hours": {
-            "gte": "01:00"
-           }
-          },
-          {
-           "utc_hours": {
-            "lt": "15:00"
-           }
-          }
-         ]
-        },
-        "price": 0.15,
-        "cache": {
-         "read": 0.015
-        }
-       }
-      ]
+       "read": 0.0135
+      }
      },
      "output": {
-      "price": 0.3,
-      "overrides": [
-       {
-        "when": {
-         "any": [
-          {
-           "utc_hours": {
-            "gte": "15:00"
-           }
-          },
-          {
-           "utc_hours": {
-            "lt": "01:00"
-           }
-          }
-         ]
-        },
-        "price": 0.3
-       },
-       {
-        "when": {
-         "all": [
-          {
-           "utc_hours": {
-            "gte": "01:00"
-           }
-          },
-          {
-           "utc_hours": {
-            "lt": "15:00"
-           }
-          }
-         ]
-        },
-        "price": 0.6
-       }
-      ]
+      "price": 0.54
      }
     }
    },
@@ -23883,116 +23056,6 @@
    "open_weights": true,
    "last_updated": "2026-10-19",
    "recommended_api": "chat-completions"
-  },
-  "minimax/speech-2.8-hd": {
-   "id": "minimax/speech-2.8-hd",
-   "name": "Speech 2.8 HD",
-   "description": "High-fidelity text-to-speech model with sound tags and voice cloning",
-   "type": "speech",
-   "family": "minimax",
-   "canonical_id": "minimax/speech-2.8-hd",
-   "release_date": "2026-01-23",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 100,
-      "unit": "character"
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "audio/mpeg",
-     "audio/pcm"
-    ]
-   },
-   "api": {
-    "speech": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/protocols/openai-speech"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-01-23",
-   "recommended_api": "speech"
-  },
-  "minimax/speech-2.8-turbo": {
-   "id": "minimax/speech-2.8-turbo",
-   "name": "Speech 2.8 Turbo",
-   "description": "Fast text-to-speech model with sound tags and voice cloning",
-   "type": "speech",
-   "family": "minimax",
-   "canonical_id": "minimax/speech-2.8-turbo",
-   "release_date": "2026-01-23",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 60,
-      "unit": "character"
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "audio/mpeg",
-     "audio/pcm"
-    ]
-   },
-   "api": {
-    "speech": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/protocols/openai-speech"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-01-23",
-   "recommended_api": "speech"
   },
   "mistralai/codestral-2508": {
    "id": "mistralai/codestral-2508",
@@ -26062,7 +25125,7 @@
    "name": "Mixtral 8x22B Instruct",
    "description": "Mistral model for multilingual chat, reasoning, and tool-assisted workflows",
    "type": "chat",
-   "family": "mistral",
+   "family": "mixtral",
    "canonical_id": "mistral/mixtral-8x22b-instruct",
    "release_date": "2024-04-17",
    "limit": {
@@ -26171,7 +25234,7 @@
    "name": "Pixtral Large (25.02)",
    "description": "Mistral vision-language model for image understanding and multimodal chat",
    "type": "chat",
-   "family": "pixtral",
+   "family": "pixtral-large",
    "canonical_id": "mistral/pixtral-large-2502",
    "release_date": "2025-04-08",
    "limit": {
@@ -26246,7 +25309,7 @@
    "name": "Voxtral Mini 3B 2507",
    "description": "Open audio-language model for speech transcription, audio understanding, and voice-driven tool use",
    "type": "transcription",
-   "family": "voxtral",
+   "family": "voxtral-mini",
    "canonical_id": "mistral/voxtral-mini-3b-2507",
    "release_date": "2025-07-15",
    "limit": {
@@ -26301,7 +25364,7 @@
    "name": "Voxtral Mini Transcribe",
    "description": "Speech-to-text model with timestamps, optimized for transcription only",
    "type": "transcription",
-   "family": "voxtral",
+   "family": "voxtral-transcribe",
    "canonical_id": "mistral/voxtral-mini-2602",
    "release_date": "2026-02-04",
    "limit": {
@@ -26414,7 +25477,7 @@
    "name": "Voxtral Mini TTS",
    "description": "Multilingual text-to-speech model with zero-shot voice cloning",
    "type": "speech",
-   "family": "voxtral",
+   "family": "voxtral-tts",
    "canonical_id": "mistral/voxtral-mini-tts-2603",
    "release_date": "2026-03-23",
    "limit": {
@@ -26519,7 +25582,7 @@
    "name": "Voxtral Small 24B 2507",
    "description": "Efficient Mistral model for fast chat, extraction, and production assistants",
    "type": "chat",
-   "family": "voxtral",
+   "family": "voxtral-small",
    "canonical_id": "mistral/voxtral-small-24b-2507",
    "release_date": "2025-07-15",
    "limit": {
@@ -26635,7 +25698,7 @@
    "name": "Voxtral Small 24B 2507 STT",
    "description": "Open audio-language model for speech transcription, audio understanding, and voice-driven tool use",
    "type": "transcription",
-   "family": "voxtral",
+   "family": "voxtral-small",
    "canonical_id": "mistral/voxtral-small-24b-2507",
    "release_date": "2025-07-15",
    "limit": {
@@ -26745,7 +25808,7 @@
    "name": "rerank-2.5",
    "description": "Instruction-following reranker optimized for retrieval quality",
    "type": "reranking",
-   "family": "voyage",
+   "family": "voyage-rerank",
    "canonical_id": "voyageai/rerank-2.5",
    "release_date": "2025-08-11",
    "limit": {
@@ -26790,7 +25853,7 @@
    "name": "rerank-2.5-lite",
    "description": "Instruction-following reranker optimized for latency and quality",
    "type": "reranking",
-   "family": "voyage",
+   "family": "voyage-rerank-lite",
    "canonical_id": "voyageai/rerank-2.5-lite",
    "release_date": "2025-08-11",
    "limit": {
@@ -26835,7 +25898,7 @@
    "name": "rerank-3",
    "description": "Reranker optimized for retrieval quality, successor to rerank-2.5",
    "type": "reranking",
-   "family": "voyage",
+   "family": "voyage-rerank",
    "canonical_id": "voyageai/rerank-3",
    "release_date": "2026-09-30",
    "limit": {
@@ -26880,7 +25943,7 @@
    "name": "rerank-3-lite",
    "description": "Reranker optimized for latency and cost, successor to rerank-2.5-lite",
    "type": "reranking",
-   "family": "voyage",
+   "family": "voyage-rerank-lite",
    "canonical_id": "voyageai/rerank-3-lite",
    "release_date": "2026-09-30",
    "limit": {
@@ -26978,7 +26041,7 @@
    "name": "voyage-4-large",
    "description": "General-purpose and multilingual embedding model optimized for retrieval quality",
    "type": "embedding",
-   "family": "voyage",
+   "family": "voyage-large",
    "canonical_id": "voyageai/voyage-4-large",
    "release_date": "2026-01-15",
    "limit": {
@@ -27031,7 +26094,7 @@
    "name": "voyage-4-lite",
    "description": "Lightweight general-purpose embedding model optimized for latency and cost",
    "type": "embedding",
-   "family": "voyage",
+   "family": "voyage-lite",
    "canonical_id": "voyageai/voyage-4-lite",
    "release_date": "2026-01-15",
    "limit": {
@@ -27084,7 +26147,7 @@
    "name": "voyage-code-4",
    "description": "Code embedding model for code retrieval and coding agents",
    "type": "embedding",
-   "family": "voyage",
+   "family": "voyage-code",
    "canonical_id": "voyageai/voyage-code-4",
    "release_date": "2026-08-13",
    "limit": {
@@ -27137,7 +26200,7 @@
    "name": "voyage-multimodal-3.5",
    "description": "Multimodal embedding model for text, images, video, and interleaved content",
    "type": "embedding",
-   "family": "voyage",
+   "family": "voyage-multimodal",
    "canonical_id": "voyageai/voyage-multimodal-3.5",
    "release_date": "2026-01-15",
    "limit": {
@@ -27394,7 +26457,7 @@
    "name": "Kimi K2 0711",
    "description": "Kimi model for long-context chat, coding, and agentic reasoning",
    "type": "chat",
-   "family": "kimi-k2",
+   "family": "kimi",
    "canonical_id": "moonshotai/kimi-k2",
    "release_date": "2025-07-11",
    "limit": {
@@ -27499,7 +26562,7 @@
    "name": "Kimi K2 Instruct 0905",
    "description": "Kimi model for long-context chat, coding, and agentic reasoning",
    "type": "chat",
-   "family": "kimi-k2",
+   "family": "kimi",
    "canonical_id": "moonshotai/kimi-k2-0905",
    "release_date": "2025-09-05",
    "limit": {
@@ -27604,7 +26667,7 @@
    "name": "Kimi K2 Thinking",
    "description": "Thinking Kimi model for slower research passes, planning, and hard technical questions",
    "type": "chat",
-   "family": "kimi-thinking",
+   "family": "kimi",
    "canonical_id": "moonshotai/kimi-k2-thinking",
    "release_date": "2025-11-06",
    "limit": {
@@ -27716,7 +26779,7 @@
    "name": "Kimi K2.5",
    "description": "Earlier Kimi frontier model for long-context agents, coding, and multimodal work",
    "type": "chat",
-   "family": "kimi-k2",
+   "family": "kimi",
    "canonical_id": "moonshotai/kimi-k2.5",
    "release_date": "2026-01-27",
    "limit": {
@@ -27833,7 +26896,7 @@
    "name": "Kimi K2.6",
    "description": "Multimodal Kimi workhorse for agent loops, coding tasks, and visual context",
    "type": "chat",
-   "family": "kimi-k2",
+   "family": "kimi",
    "canonical_id": "moonshotai/kimi-k2.6",
    "release_date": "2026-04-20",
    "limit": {
@@ -27950,7 +27013,7 @@
    "name": "Kimi K2.7 Code",
    "description": "Coding-focused Kimi model, stronger on long-horizon repo work with less overthinking",
    "type": "chat",
-   "family": "kimi-k2",
+   "family": "kimi-code",
    "canonical_id": "moonshotai/kimi-k2.7-code",
    "release_date": "2026-06-12",
    "limit": {
@@ -28063,7 +27126,7 @@
    "name": "Kimi K3",
    "description": "Kimi multimodal agent model for visual understanding, coding, and planning",
    "type": "chat",
-   "family": "kimi-k3",
+   "family": "kimi",
    "canonical_id": "moonshotai/kimi-k3",
    "release_date": "2026-07-16",
    "limit": {
@@ -28192,7 +27255,7 @@
    "name": "Kimi K3.1 Pro",
    "description": "Kimi multimodal agent model for visual understanding, coding, and planning",
    "type": "chat",
-   "family": "kimi-k3",
+   "family": "kimi-pro",
    "canonical_id": "moonshotai/kimi-k3.1-pro",
    "release_date": "2026-10-23",
    "limit": {
@@ -28322,7 +27385,7 @@
    "name": "Morph V3 Fast",
    "description": "Efficient model for low-latency assistance, extraction, and routine automation",
    "type": "chat",
-   "family": "morph",
+   "family": "morph-fast",
    "canonical_id": "morph/morph-v3-fast",
    "release_date": "2025-07-07",
    "limit": {
@@ -28393,7 +27456,7 @@
    "name": "Morph V3 Large",
    "description": "Flagship model for demanding analysis, coding, and production agent workflows",
    "type": "chat",
-   "family": "morph",
+   "family": "morph-large",
    "canonical_id": "morph/morph-v3-large",
    "release_date": "2025-07-07",
    "limit": {
@@ -28464,7 +27527,7 @@
    "name": "Reflex",
    "description": "Decision model for typed evaluation of shared state",
    "type": "decision",
-   "family": "morph",
+   "family": "morph-reflex",
    "release_date": "2026-11-03",
    "limit": {
     "context": 65536
@@ -28629,6 +27692,7 @@
    "name": "Drex Max",
    "description": "Decision model for typed evaluation of shared state",
    "type": "decision",
+   "family": "drex",
    "release_date": "2026-10-21",
    "limit": {
     "context": 262144
@@ -28688,6 +27752,7 @@
    "name": "Drex Max Finance",
    "description": "Decision model for typed evaluation of shared state",
    "type": "decision",
+   "family": "drex",
    "release_date": "2026-11-10",
    "limit": {
     "context": 262144
@@ -28747,6 +27812,7 @@
    "name": "Drex 1.5",
    "description": "System One decision model for typed, calibrated probabilistic answers over text or structured state",
    "type": "decision",
+   "family": "drex",
    "canonical_id": "nace-ai/drex-v1.5",
    "release_date": "2026-09-28",
    "limit": {
@@ -28802,6 +27868,7 @@
    "name": "Drex 2.0",
    "description": "35B mixture-of-experts System One decision model with 3B active parameters, returning typed, calibrated probabilities over text or structured state without generating text",
    "type": "decision",
+   "family": "drex",
    "canonical_id": "nace-ai/drex-v2.0",
    "release_date": "2026-10-06",
    "limit": {
@@ -28857,7 +27924,7 @@
    "name": "Nex-N2.5-Mini",
    "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
    "type": "chat",
-   "family": "agi",
+   "family": "nex-n-mini",
    "release_date": "2026-09-08",
    "limit": {
     "context": 262144,
@@ -28940,7 +28007,7 @@
    "name": "Nex-N2.5-Pro",
    "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
    "type": "chat",
-   "family": "agi",
+   "family": "nex-n-pro",
    "release_date": "2026-09-08",
    "limit": {
     "context": 262144,
@@ -29054,7 +28121,7 @@
    "name": "Nex-N2.6",
    "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
    "type": "chat",
-   "family": "agi",
+   "family": "nex-n",
    "release_date": "2026-11-10",
    "limit": {
     "context": 262144,
@@ -29242,7 +28309,7 @@
    "name": "Nemotron 3 Embed 1B (free)",
    "description": "Open text embedding model for retrieval, RAG, and code search",
    "type": "embedding",
-   "family": "nemotron",
+   "family": "nemotron-embed-free",
    "canonical_id": "nvidia/nemotron-3-embed-1b",
    "release_date": "2026-07-16",
    "limit": {
@@ -29295,7 +28362,7 @@
    "name": "Nemotron 3 Nano 30B A3B",
    "description": "Small Nemotron 3 MoE for efficient coding, math, and long-context agents",
    "type": "chat",
-   "family": "nemotron",
+   "family": "nemotron-nano",
    "canonical_id": "nvidia/nemotron-3-nano-30b-a3b",
    "release_date": "2025-12-15",
    "limit": {
@@ -29405,7 +28472,7 @@
    "name": "Nemotron 3 Nano Omni (free)",
    "description": "Open Nemotron omni model combining reasoning with text, vision, and audio",
    "type": "chat",
-   "family": "nemotron",
+   "family": "nemotron-nano-free",
    "canonical_id": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
    "release_date": "2026-04-28",
    "limit": {
@@ -29517,7 +28584,7 @@
    "name": "Nemotron 3 Super 120B A12B",
    "description": "Nemotron middle tier for collaborative agents and high-volume reasoning workloads",
    "type": "chat",
-   "family": "nemotron",
+   "family": "nemotron-super",
    "canonical_id": "nvidia/nemotron-3-super-120b-a12b",
    "release_date": "2026-03-11",
    "limit": {
@@ -29629,7 +28696,7 @@
    "name": "Nemotron 3 Ultra 550B A55B",
    "description": "Largest Nemotron 3 model for maximum open-weight reasoning and agent accuracy",
    "type": "chat",
-   "family": "nemotron",
+   "family": "nemotron-ultra",
    "canonical_id": "nvidia/nemotron-3-ultra-550b-a55b",
    "release_date": "2026-06-04",
    "limit": {
@@ -29743,7 +28810,7 @@
    "name": "Nemotron 3 Ultra (free)",
    "description": "Largest Nemotron 3 model for maximum open-weight reasoning and agent accuracy",
    "type": "chat",
-   "family": "nemotron",
+   "family": "nemotron-ultra-free",
    "canonical_id": "nvidia/nemotron-3-ultra-550b-a55b",
    "release_date": "2026-06-04",
    "limit": {
@@ -29855,7 +28922,7 @@
    "name": "Nemotron 3.5 ASR Streaming Multilingual 0.6B",
    "description": "Open streaming speech recognition model for 40 language-locales",
    "type": "transcription",
-   "family": "nemotron",
+   "family": "nemotron-asr",
    "canonical_id": "nvidia/nemotron-3.5-asr-streaming-multilingual-0.6b",
    "release_date": "2026-08",
    "limit": {
@@ -29915,7 +28982,7 @@
    "name": "Nemotron 3.5 Content Safety",
    "description": "Safety model for policy screening, moderation, and risk-aware routing workflows",
    "type": "chat",
-   "family": "nemotron",
+   "family": "nemotron-safety",
    "canonical_id": "nvidia/nemotron-3.5-content-safety",
    "release_date": "2026-06-02",
    "limit": {
@@ -29990,7 +29057,7 @@
    "name": "Nemotron 3.5 Embed 1B (free)",
    "description": "Multimodal multilingual embedding model for text and document-image retrieval",
    "type": "embedding",
-   "family": "nemotron",
+   "family": "nemotron-embed-free",
    "canonical_id": "nvidia/nemotron-3.5-embed-1b",
    "release_date": "2026-10-20",
    "limit": {
@@ -30045,7 +29112,7 @@
    "name": "Nemotron 3.5 Embed 8B (free)",
    "description": "Multimodal multilingual embedding model for text and document-image retrieval",
    "type": "embedding",
-   "family": "nemotron",
+   "family": "nemotron-embed-free",
    "canonical_id": "nvidia/nemotron-3.5-embed-8b",
    "release_date": "2026-10-19",
    "limit": {
@@ -30100,7 +29167,7 @@
    "name": "Nemotron 3.5 Lightning 30B A3B",
    "description": "Nemotron model for efficient reasoning, coding, and specialized AI agents",
    "type": "chat",
-   "family": "nemotron",
+   "family": "nemotron-lightning",
    "canonical_id": "nvidia/nemotron-3.5-lightning",
    "release_date": "2026-08-11",
    "limit": {
@@ -30210,7 +29277,7 @@
    "name": "Nemotron 3.5 Lightning (free)",
    "description": "Nemotron model for efficient reasoning, coding, and specialized AI agents",
    "type": "chat",
-   "family": "nemotron",
+   "family": "nemotron-lightning-free",
    "canonical_id": "nvidia/nemotron-3.5-lightning",
    "release_date": "2026-08-11",
    "limit": {
@@ -30368,12 +29435,12 @@
    "name": "Nemotron 3.5 Super VL",
    "description": "Nemotron multimodal model for visual reasoning and agentic AI workflows",
    "type": "chat",
-   "family": "nemotron",
+   "family": "nemotron-super",
    "canonical_id": "nvidia/nemotron-3.5-super-vl-120b-a12b",
    "release_date": "2026-10-15",
    "limit": {
     "context": 1048576,
-    "output": 235929
+    "output": 943718
    },
    "capabilities": {
     "temperature": true,
@@ -30399,7 +29466,7 @@
       }
      },
      "output": {
-      "price": 0.5
+      "price": 0.47
      }
     }
    },
@@ -30479,7 +29546,7 @@
    "name": "Nemotron 3.5 Super VL (free)",
    "description": "Nemotron multimodal model for visual reasoning and agentic AI workflows",
    "type": "chat",
-   "family": "nemotron",
+   "family": "nemotron-super-free",
    "canonical_id": "nvidia/nemotron-3.5-super-vl-120b-a12b",
    "release_date": "2026-10-15",
    "limit": {
@@ -32075,7 +31142,7 @@
    "name": "GPT-4o Mini Transcribe",
    "description": "Speech-to-text model powered by GPT-4o Mini for fast, accurate transcription",
    "type": "transcription",
-   "family": "gpt-mini",
+   "family": "gpt-transcribe-mini",
    "canonical_id": "openai/gpt-4o-mini-transcribe",
    "release_date": "2025-03-20",
    "limit": {
@@ -32146,7 +31213,7 @@
    "name": "GPT-4o Transcribe",
    "description": "Speech-to-text model powered by GPT-4o for accurate transcription",
    "type": "transcription",
-   "family": "gpt",
+   "family": "gpt-transcribe",
    "canonical_id": "openai/gpt-4o-transcribe",
    "release_date": "2025-03-20",
    "limit": {
@@ -32350,7 +31417,7 @@
    "name": "GPT-5 Image",
    "description": "Image model for prompt-driven generation, editing, and visual design workflows",
    "type": "image",
-   "family": "gpt",
+   "family": "gpt-image",
    "canonical_id": "openai/gpt-5-image",
    "release_date": "2025-10-14",
    "limit": {
@@ -32439,7 +31506,7 @@
    "name": "GPT-5 Image Mini",
    "description": "Image model for prompt-driven generation, editing, and visual design workflows",
    "type": "image",
-   "family": "gpt",
+   "family": "gpt-image-mini",
    "canonical_id": "openai/gpt-5-image-mini",
    "release_date": "2025-10-16",
    "limit": {
@@ -33311,7 +32378,7 @@
    "name": "GPT-5.1 Codex mini",
    "description": "Coding-optimized GPT model for repository edits, reviews, and agentic software work",
    "type": "chat",
-   "family": "gpt-codex",
+   "family": "gpt-codex-mini",
    "canonical_id": "openai/gpt-5.1-codex-mini",
    "release_date": "2025-11-13",
    "limit": {
@@ -34123,7 +33190,7 @@
    "name": "GPT-5.4 Image 2",
    "description": "Image model for prompt-driven generation, editing, and visual design workflows",
    "type": "image",
-   "family": "gpt",
+   "family": "gpt-image",
    "canonical_id": "openai/gpt-5.4-image-2",
    "release_date": "2026-04-21",
    "limit": {
@@ -36113,7 +35180,7 @@
    "name": "GPT-6 Astra Pro",
    "description": "Frontier GPT model for professional reasoning, coding, and multimodal work",
    "type": "chat",
-   "family": "gpt",
+   "family": "gpt-pro",
    "release_date": "2026-09-04",
    "limit": {
     "context": 1050000,
@@ -36512,7 +35579,7 @@
    "name": "GPT-6 Luna Pro",
    "description": "Frontier GPT model for professional reasoning, coding, and multimodal work",
    "type": "chat",
-   "family": "gpt",
+   "family": "gpt-pro",
    "release_date": "2026-09-22",
    "limit": {
     "context": 1050000,
@@ -36845,7 +35912,7 @@
    "name": "GPT-6 Sol Pro",
    "description": "Frontier GPT model for professional reasoning, coding, and multimodal work",
    "type": "chat",
-   "family": "gpt",
+   "family": "gpt-pro",
    "release_date": "2026-09-22",
    "limit": {
     "context": 1050000,
@@ -37177,7 +36244,7 @@
    "name": "GPT-6.1 Sol Pro",
    "description": "Frontier GPT model for professional reasoning, coding, and multimodal work",
    "type": "chat",
-   "family": "gpt",
+   "family": "gpt-pro",
    "release_date": "2026-09-29",
    "limit": {
     "context": 1050000,
@@ -37509,7 +36576,7 @@
    "name": "GPT-6.1 Terra Pro",
    "description": "Frontier GPT model for professional reasoning, coding, and multimodal work",
    "type": "chat",
-   "family": "gpt",
+   "family": "gpt-pro",
    "release_date": "2026-10-26",
    "limit": {
     "context": 1050000,
@@ -37826,7 +36893,7 @@
    "name": "GPT-6.2 Astra Pro",
    "description": "Frontier GPT model for professional reasoning, coding, and multimodal work",
    "type": "chat",
-   "family": "gpt",
+   "family": "gpt-pro",
    "release_date": "2026-11-17",
    "limit": {
     "context": 1050000,
@@ -38135,7 +37202,7 @@
    "name": "GPT-6.2 Sol Pro",
    "description": "Frontier GPT model for professional reasoning, coding, and multimodal work",
    "type": "chat",
-   "family": "gpt",
+   "family": "gpt-pro",
    "release_date": "2026-11-17",
    "limit": {
     "context": 1050000,
@@ -38276,7 +37343,7 @@
    "name": "GPT-Audio",
    "description": "Speech generation model for controllable voice, narration, and audio delivery",
    "type": "chat",
-   "family": "gpt",
+   "family": "gpt-audio",
    "canonical_id": "openai/gpt-audio",
    "release_date": "2025-08-28",
    "limit": {
@@ -38361,7 +37428,7 @@
    "name": "GPT-Audio Mini",
    "description": "Speech generation model for controllable voice, narration, and audio delivery",
    "type": "chat",
-   "family": "gpt-mini",
+   "family": "gpt-audio-mini",
    "canonical_id": "openai/gpt-audio-mini",
    "release_date": "2025-10-06",
    "limit": {
@@ -38629,7 +37696,7 @@
    "name": "GPT-Image-1 Mini",
    "description": "Cost-efficient GPT Image 1 variant for image generation and editing",
    "type": "image",
-   "family": "gpt-image",
+   "family": "gpt-image-mini",
    "canonical_id": "openai/gpt-image-1-mini",
    "release_date": "2025-10-06",
    "limit": {
@@ -39168,13 +38235,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.018,
+      "price": 0.017,
       "cache": {
-       "read": 0.009
+       "read": 0.0085
       }
      },
      "output": {
-      "price": 0.09
+      "price": 0.085
      }
     }
    },
@@ -39252,7 +38319,7 @@
    "name": "GPT OSS Safeguard 20B",
    "description": "Safety model for policy screening, moderation, and risk-aware routing workflows",
    "type": "chat",
-   "family": "gpt-oss",
+   "family": "gpt-oss-safeguard",
    "canonical_id": "openai/gpt-oss-safeguard-20b",
    "release_date": "2025-10-29",
    "limit": {
@@ -39364,7 +38431,7 @@
    "name": "GPT-Transcribe",
    "description": "High-accuracy speech-to-text model for audio files and committed Realtime turns",
    "type": "transcription",
-   "family": "gpt",
+   "family": "gpt-transcribe",
    "canonical_id": "openai/gpt-transcribe",
    "release_date": "2026-07-28",
    "limit": {
@@ -40353,6 +39420,7 @@
    "name": "Particle-1",
    "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
    "type": "chat",
+   "family": "particle",
    "release_date": "2026-10-28",
    "limit": {
     "context": 1048576,
@@ -40466,6 +39534,7 @@
    "name": "Particle-1 (free)",
    "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
    "type": "chat",
+   "family": "particle",
    "release_date": "2026-10-28",
    "limit": {
     "context": 1048576,
@@ -40576,6 +39645,7 @@
    "name": "Perceptron Mk1",
    "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
    "type": "chat",
+   "family": "perceptron-mk",
    "canonical_id": "perceptron/perceptron-mk1",
    "release_date": "2026-05-12",
    "limit": {
@@ -40774,6 +39844,7 @@
    "name": "Decider Flash V1.2",
    "description": "Decision model for typed evaluation of shared state",
    "type": "decision",
+   "family": "pplx-decider-flash",
    "release_date": "2026-10-16",
    "limit": {
     "context": 262144
@@ -40833,6 +39904,7 @@
    "name": "Decider Flash V1.3 (free)",
    "description": "Decision model for typed evaluation of shared state",
    "type": "decision",
+   "family": "pplx-decider-flash",
    "release_date": "2026-11-12",
    "limit": {
     "context": 262144
@@ -40889,6 +39961,7 @@
    "name": "Decider V1.2",
    "description": "Decision model for typed evaluation of shared state",
    "type": "decision",
+   "family": "pplx-decider",
    "release_date": "2026-10-16",
    "limit": {
     "context": 262144
@@ -40948,6 +40021,7 @@
    "name": "Decider V1.3 (free)",
    "description": "Decision model for typed evaluation of shared state",
    "type": "decision",
+   "family": "pplx-decider",
    "release_date": "2026-11-12",
    "limit": {
     "context": 262144
@@ -41004,6 +40078,7 @@
    "name": "pplx-embed-v1-0.6b",
    "description": "Open text embedding model for web-scale dense retrieval",
    "type": "embedding",
+   "family": "pplx-embed",
    "canonical_id": "perplexity/pplx-embed-v1-0.6b",
    "release_date": "2026-02-26",
    "limit": {
@@ -41056,6 +40131,7 @@
    "name": "pplx-embed-v1-4b",
    "description": "Open text embedding model for web-scale dense retrieval",
    "type": "embedding",
+   "family": "pplx-embed",
    "canonical_id": "perplexity/pplx-embed-v1-4b",
    "release_date": "2026-02-26",
    "limit": {
@@ -41101,6 +40177,110 @@
    },
    "open_weights": true,
    "last_updated": "2026-02-26",
+   "recommended_api": "embeddings"
+  },
+  "perplexity/pplx-embed-v2-context-0.6b": {
+   "id": "perplexity/pplx-embed-v2-context-0.6b",
+   "name": "Embed V2 Context 0.6B",
+   "description": "Multimodal embedding model",
+   "type": "embedding",
+   "release_date": "2026-11-20",
+   "limit": {
+    "context": 32000,
+    "output": 0
+   },
+   "capabilities": {
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.02
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/gif"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "api": {
+    "embeddings": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@openrouter/ai-sdk-provider",
+      "opencodeai": "@opencode/ai/providers/openrouter/embeddings"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-11-20",
+   "recommended_api": "embeddings"
+  },
+  "perplexity/pplx-embed-v2-context-9b": {
+   "id": "perplexity/pplx-embed-v2-context-9b",
+   "name": "Embed V2 Context 9B",
+   "description": "Multimodal embedding model",
+   "type": "embedding",
+   "release_date": "2026-11-20",
+   "limit": {
+    "context": 32000,
+    "output": 0
+   },
+   "capabilities": {
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.12
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/gif"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "api": {
+    "embeddings": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@openrouter/ai-sdk-provider",
+      "opencodeai": "@opencode/ai/providers/openrouter/embeddings"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-11-20",
    "recommended_api": "embeddings"
   },
   "perplexity/sonar": {
@@ -41406,7 +40586,7 @@
    "name": "Sonar Reasoning Pro",
    "description": "Web-grounded reasoning model for multi-step research and cited answers",
    "type": "chat",
-   "family": "sonar-reasoning",
+   "family": "sonar-reasoning-pro",
    "release_date": "2025-03-07",
    "limit": {
     "context": 128000,
@@ -41801,7 +40981,7 @@
    "name": "Qwen2.5-Coder-32B-Instruct",
    "description": "Qwen coding model for software agents, repository edits, and code reasoning",
    "type": "chat",
-   "family": "qwen",
+   "family": "qwen-coder",
    "canonical_id": "alibaba/qwen2.5-coder-32b-instruct",
    "release_date": "2024-11-12",
    "limit": {
@@ -41872,7 +41052,7 @@
    "name": "Qwen-Audio-3.0-TTS Flash",
    "description": "Fast hosted text-to-speech model for real-time use",
    "type": "speech",
-   "family": "qwen",
+   "family": "qwen-tts-flash",
    "canonical_id": "alibaba/qwen-audio-3.0-tts-flash",
    "release_date": "2026-07",
    "limit": {
@@ -41927,7 +41107,7 @@
    "name": "Qwen-Audio-3.0-TTS Plus",
    "description": "Quality-first hosted text-to-speech model",
    "type": "speech",
-   "family": "qwen",
+   "family": "qwen-tts-plus",
    "canonical_id": "alibaba/qwen-audio-3.0-tts-plus",
    "release_date": "2026-07",
    "limit": {
@@ -41982,7 +41162,7 @@
    "name": "Qwen-Image-2.1-Pro",
    "description": "Qwen-Image-2.1 API tier for image generation and editing with native transparency",
    "type": "image",
-   "family": "qwen",
+   "family": "qwen-image-pro",
    "canonical_id": "alibaba/qwen-image-2.1-pro",
    "release_date": "2026-10-02",
    "limit": {
@@ -42046,7 +41226,7 @@
    "name": "Qwen-Image-2.1-Turbo",
    "description": "8-step Qwen-Image-2.1 model for fast image generation and editing",
    "type": "image",
-   "family": "qwen",
+   "family": "qwen-image-turbo",
    "canonical_id": "alibaba/qwen-image-2.1-turbo",
    "release_date": "2026-10-09",
    "limit": {
@@ -42110,7 +41290,7 @@
    "name": "Qwen Image 3",
    "description": "Unified image generation and editing model with dense layouts and small-text rendering",
    "type": "image",
-   "family": "qwen",
+   "family": "qwen-image",
    "canonical_id": "alibaba/qwen-image-3.0",
    "release_date": "2026-08-05",
    "limit": {
@@ -42174,7 +41354,7 @@
    "name": "Qwen Image 3 Pro",
    "description": "Higher-quality Qwen-Image-3.0 for complex layouts, small text and photographic detail",
    "type": "image",
-   "family": "qwen",
+   "family": "qwen-image-pro",
    "canonical_id": "alibaba/qwen-image-3.0-pro",
    "release_date": "2026-08-05",
    "limit": {
@@ -42249,7 +41429,7 @@
    "name": "Qwen Plus",
    "description": "Qwen instruction model for multilingual chat, reasoning, and tool use",
    "type": "chat",
-   "family": "qwen",
+   "family": "qwen-plus",
    "canonical_id": "alibaba/qwen-plus",
    "release_date": "2024-01-25",
    "limit": {
@@ -42382,7 +41562,7 @@
    "name": "Qwen2.5-VL 72B Instruct",
    "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
    "type": "chat",
-   "family": "qwen",
+   "family": "qwen-vl",
    "canonical_id": "alibaba/qwen2-5-vl-72b-instruct",
    "release_date": "2025-01-26",
    "limit": {
@@ -43099,7 +42279,7 @@
    "name": "Qwen3 ASR 0.6B",
    "description": "Open multilingual speech recognition model covering 30 languages and 22 Chinese dialects",
    "type": "transcription",
-   "family": "qwen",
+   "family": "qwen-asr",
    "canonical_id": "alibaba/qwen3-asr-0.6b",
    "release_date": "2026-01",
    "limit": {
@@ -43159,7 +42339,7 @@
    "name": "Qwen3 ASR 1.7B",
    "description": "Open multilingual speech recognition model covering 30 languages and 22 Chinese dialects",
    "type": "transcription",
-   "family": "qwen",
+   "family": "qwen-asr",
    "canonical_id": "alibaba/qwen3-asr-1.7b",
    "release_date": "2026-01",
    "limit": {
@@ -43219,7 +42399,7 @@
    "name": "Qwen3 Coder 480B A35B",
    "description": "Qwen coding model for software agents, repository edits, and code reasoning",
    "type": "chat",
-   "family": "qwen",
+   "family": "qwen-coder",
    "canonical_id": "alibaba/qwen3-coder-480b-a35b-instruct",
    "release_date": "2025-07-22",
    "limit": {
@@ -43327,7 +42507,7 @@
    "name": "Qwen3-Coder 30B-A3B Instruct",
    "description": "Smaller Qwen coder for efficient local agents and repo-level fixes",
    "type": "chat",
-   "family": "qwen",
+   "family": "qwen-coder",
    "canonical_id": "alibaba/qwen3-coder-30b-a3b-instruct",
    "release_date": "2025-07-31",
    "limit": {
@@ -43351,10 +42531,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.15
+      "price": 0.07
      },
      "output": {
-      "price": 0.6
+      "price": 0.28
      }
     }
    },
@@ -43433,7 +42613,7 @@
    "name": "Qwen3 Coder Flash",
    "description": "Qwen coding model for software agents, repository edits, and code reasoning",
    "type": "chat",
-   "family": "qwen",
+   "family": "qwen-coder-flash",
    "canonical_id": "alibaba/qwen3-coder-flash",
    "release_date": "2025-07-28",
    "limit": {
@@ -43586,7 +42766,7 @@
    "name": "Qwen3 Coder Next",
    "description": "Qwen coding model for software agents, repository edits, and code reasoning",
    "type": "chat",
-   "family": "qwen",
+   "family": "qwen-coder",
    "canonical_id": "alibaba/qwen3-coder-next",
    "release_date": "2026-02-03",
    "limit": {
@@ -43695,7 +42875,7 @@
    "name": "Qwen3 Embedding 4B",
    "description": "Multilingual text embedding model for retrieval, code search, classification, and clustering",
    "type": "embedding",
-   "family": "qwen",
+   "family": "qwen-embedding",
    "canonical_id": "alibaba/qwen3-embedding-4b",
    "release_date": "2025-06-05",
    "limit": {
@@ -43748,7 +42928,7 @@
    "name": "Qwen3 Embedding 8B",
    "description": "Multilingual text embedding model for retrieval, code search, classification, and clustering",
    "type": "embedding",
-   "family": "qwen",
+   "family": "qwen-embedding",
    "canonical_id": "alibaba/qwen3-embedding-8b",
    "release_date": "2025-06-05",
    "limit": {
@@ -43910,7 +43090,7 @@
    "name": "Qwen3 Reranker 0.6B",
    "description": "Compact multilingual query-document reranking model supporting more than 100 languages",
    "type": "reranking",
-   "family": "qwen",
+   "family": "qwen-reranker",
    "canonical_id": "alibaba/qwen3-reranker-0.6b",
    "release_date": "2025-06-05",
    "limit": {
@@ -43955,7 +43135,7 @@
    "name": "Qwen3 Reranker 8B",
    "description": "Multilingual query-document reranking model supporting more than 100 languages",
    "type": "reranking",
-   "family": "qwen",
+   "family": "qwen-reranker",
    "canonical_id": "alibaba/qwen3-reranker-8b",
    "release_date": "2025-06-05",
    "limit": {
@@ -43995,12 +43175,62 @@
    "last_updated": "2025-06-05",
    "recommended_api": "rerank"
   },
+  "qwen/qwen3-tts-1.7b": {
+   "id": "qwen/qwen3-tts-1.7b",
+   "name": "Qwen3 TTS 1.7B",
+   "description": "Text-to-speech model",
+   "type": "speech",
+   "release_date": "2026-11-20",
+   "limit": {
+    "context": 4096,
+    "output": 3686
+   },
+   "capabilities": {
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 20,
+      "unit": "character"
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "audio/mpeg",
+     "audio/pcm"
+    ]
+   },
+   "api": {
+    "speech": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/protocols/openai-speech"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-20",
+   "recommended_api": "speech"
+  },
   "qwen/qwen3-vl-235b-a22b-instruct": {
    "id": "qwen/qwen3-vl-235b-a22b-instruct",
    "name": "Qwen3 VL 235B A22B Instruct",
    "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
    "type": "chat",
-   "family": "qwen",
+   "family": "qwen-vl",
    "canonical_id": "alibaba/qwen3-vl-235b-a22b-instruct",
    "release_date": "2025-09-23",
    "limit": {
@@ -44114,7 +43344,7 @@
    "name": "Qwen3 VL 30B A3B Instruct",
    "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
    "type": "chat",
-   "family": "qwen",
+   "family": "qwen-vl",
    "canonical_id": "alibaba/qwen3-vl-30b-a3b-instruct",
    "release_date": "2025-10-04",
    "limit": {
@@ -44221,7 +43451,7 @@
    "name": "Qwen3 VL 8B Instruct",
    "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
    "type": "chat",
-   "family": "qwen",
+   "family": "qwen-vl",
    "release_date": "2025-10-14",
    "limit": {
     "context": 262144,
@@ -44921,7 +44151,7 @@
    "name": "Qwen3.5-Flash",
    "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
    "type": "chat",
-   "family": "qwen",
+   "family": "qwen-flash",
    "release_date": "2026-02-25",
    "limit": {
     "context": 1000000,
@@ -45031,7 +44261,7 @@
    "name": "Qwen3.5 Plus 2026-02-15",
    "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
    "type": "chat",
-   "family": "qwen",
+   "family": "qwen-plus",
    "release_date": "2026-02-16",
    "limit": {
     "context": 1000000,
@@ -45162,7 +44392,7 @@
    "name": "Qwen3.5 Plus 2026-04-20",
    "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
    "type": "chat",
-   "family": "qwen3.5",
+   "family": "qwen-plus",
    "release_date": "2026-04-27",
    "limit": {
     "context": 1000000,
@@ -45536,7 +44766,7 @@
    "name": "Qwen3.6 Flash",
    "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
    "type": "chat",
-   "family": "qwen3.6",
+   "family": "qwen-flash",
    "canonical_id": "alibaba/qwen3.6-flash",
    "release_date": "2026-04-27",
    "limit": {
@@ -45679,7 +44909,7 @@
    "name": "Qwen3.6 Plus",
    "description": "Earlier Qwen multimodal workhorse for million-token agent and document tasks",
    "type": "chat",
-   "family": "qwen",
+   "family": "qwen-plus",
    "canonical_id": "alibaba/qwen3.6-plus",
    "release_date": "2026-04-02",
    "limit": {
@@ -45823,7 +45053,7 @@
    "name": "Qwen3.7 Flash",
    "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
    "type": "chat",
-   "family": "qwen",
+   "family": "qwen-flash",
    "canonical_id": "alibaba/qwen3.7-flash",
    "release_date": "2026-07-15",
    "limit": {
@@ -45991,7 +45221,7 @@
    "name": "Qwen3.7 Max",
    "description": "Qwen frontier model tuned for agent frameworks, coding assistants, and long tasks",
    "type": "chat",
-   "family": "qwen",
+   "family": "qwen-max",
    "canonical_id": "alibaba/qwen3.7-max",
    "release_date": "2026-05-21",
    "limit": {
@@ -46101,7 +45331,7 @@
    "name": "Qwen3.7 Plus",
    "description": "Multimodal Qwen workhorse for long-context agents, visual inputs, and coding",
    "type": "chat",
-   "family": "qwen",
+   "family": "qwen-plus",
    "canonical_id": "alibaba/qwen3.7-plus",
    "release_date": "2026-06-02",
    "limit": {
@@ -46476,7 +45706,7 @@
    "name": "Qwen3.8 Flash",
    "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
    "type": "chat",
-   "family": "qwen",
+   "family": "qwen-flash",
    "canonical_id": "alibaba/qwen3.8-flash",
    "release_date": "2026-08-26",
    "limit": {
@@ -46598,7 +45828,7 @@
    "name": "Qwen3.8 Max 0902",
    "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
    "type": "chat",
-   "family": "qwen",
+   "family": "qwen-max",
    "canonical_id": "alibaba/qwen3.8-max-0902",
    "release_date": "2026-09-02",
    "limit": {
@@ -46717,7 +45947,7 @@
    "name": "Qwen 3.8 Max Prime",
    "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
    "type": "chat",
-   "family": "qwen3.8-max",
+   "family": "qwen-max",
    "canonical_id": "alibaba/qwen3.8-max-prime",
    "release_date": "2026-09-23",
    "limit": {
@@ -46844,7 +46074,7 @@
    "name": "Qwen3.8 Omni Flash",
    "description": "Qwen omni model for text, vision, audio, and multimodal agent tasks",
    "type": "chat",
-   "family": "qwen",
+   "family": "qwen-omni-flash",
    "canonical_id": "alibaba/qwen3.8-omni-flash",
    "release_date": "2026-09-17",
    "limit": {
@@ -46970,7 +46200,7 @@
    "name": "Qwen4 Max",
    "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
    "type": "chat",
-   "family": "qwen",
+   "family": "qwen-max",
    "canonical_id": "alibaba/qwen4-max",
    "release_date": "2026-11-16",
    "limit": {
@@ -47079,6 +46309,116 @@
    },
    "open_weights": false,
    "last_updated": "2026-11-16",
+   "recommended_api": "chat-completions"
+  },
+  "radixark/daisyrose-27b": {
+   "id": "radixark/daisyrose-27b",
+   "name": "DaisyRose 27B",
+   "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
+   "type": "chat",
+   "release_date": "2026-11-21",
+   "limit": {
+    "context": 262144,
+    "output": 235929
+   },
+   "capabilities": {
+    "temperature": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.15,
+      "cache": {
+       "read": 0.0375
+      }
+     },
+     "output": {
+      "price": 1.875
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@openrouter/ai-sdk-provider",
+      "opencodeai": "@opencode/ai/providers/openrouter"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-11-21",
    "recommended_api": "chat-completions"
   },
   "recraft/recraft-v3": {
@@ -47202,7 +46542,7 @@
    "name": "Recraft V4 Pro",
    "description": "2K Recraft V4 image model with finer detail",
    "type": "image",
-   "family": "recraft",
+   "family": "recraft-pro",
    "canonical_id": "recraft/recraft-v4-pro",
    "release_date": "2026-02-17",
    "limit": {
@@ -47260,7 +46600,7 @@
    "name": "Recraft V4 Pro Vector",
    "description": "Higher-detail Recraft V4 model that generates editable SVG images",
    "type": "image",
-   "family": "recraft",
+   "family": "recraft-pro",
    "canonical_id": "recraft/recraft-v4-pro-vector",
    "release_date": "2026-02-17",
    "limit": {
@@ -47367,7 +46707,7 @@
    "name": "Recraft V4 Styles Pro",
    "description": "2K style-consistent image model driven by reference images",
    "type": "image",
-   "family": "recraft",
+   "family": "recraft-pro",
    "canonical_id": "recraft/recraft-v4-styles-pro",
    "release_date": "2026-08-26",
    "limit": {
@@ -47417,7 +46757,7 @@
    "name": "Recraft V4 Styles Pro Vector",
    "description": "Higher-detail style-consistent SVG image model driven by reference images",
    "type": "image",
-   "family": "recraft",
+   "family": "recraft-pro",
    "canonical_id": "recraft/recraft-v4-styles-pro-vector",
    "release_date": "2026-08-26",
    "limit": {
@@ -47630,7 +46970,7 @@
    "name": "Recraft V4.1 Flash",
    "description": "Fast, low-cost text-to-image model with quality close to Recraft V4.1",
    "type": "image",
-   "family": "recraft",
+   "family": "recraft-flash",
    "canonical_id": "recraft/recraft-v4.1-flash",
    "release_date": "2026-09-23",
    "limit": {
@@ -47775,7 +47115,7 @@
    "name": "Recraft V4.1 Pro",
    "description": "2K Recraft V4.1 image model for print-ready detail",
    "type": "image",
-   "family": "recraft",
+   "family": "recraft-pro",
    "canonical_id": "recraft/recraft-v4.1-pro",
    "release_date": "2026-05-14",
    "limit": {
@@ -47833,7 +47173,7 @@
    "name": "Recraft V4.1 Pro Vector",
    "description": "Higher-detail Recraft V4.1 model that generates editable SVG images",
    "type": "image",
-   "family": "recraft",
+   "family": "recraft-pro",
    "canonical_id": "recraft/recraft-v4.1-pro-vector",
    "release_date": "2026-05-14",
    "limit": {
@@ -47948,7 +47288,7 @@
    "name": "Recraft V4.1 Utility Pro",
    "description": "2K Recraft V4.1 Utility model for product shots and mockups",
    "type": "image",
-   "family": "recraft",
+   "family": "recraft-pro",
    "canonical_id": "recraft/recraft-v4.1-utility-pro",
    "release_date": "2026-05-14",
    "limit": {
@@ -48063,7 +47403,7 @@
    "name": "Flint (free)",
    "description": "Free provider route for experiments, demos, and cost-sensitive chat workloads",
    "type": "chat",
-   "family": "flint",
+   "family": "flint-free",
    "release_date": "2026-10-21",
    "limit": {
     "context": 262144,
@@ -48442,6 +47782,7 @@
    "name": "Relace Apply 3",
    "description": "General-purpose chat model for instruction following, writing, and analysis",
    "type": "chat",
+   "family": "relace-apply",
    "canonical_id": "relace/relace-apply-3",
    "release_date": "2025-09-26",
    "limit": {
@@ -48512,6 +47853,7 @@
    "name": "Relace Search",
    "description": "Tool-capable chat model for instruction following and agentic application workflows",
    "type": "chat",
+   "family": "relace-search",
    "canonical_id": "relace/relace-search",
    "release_date": "2025-12-08",
    "limit": {
@@ -48615,6 +47957,7 @@
    "name": "Span-01",
    "description": "Behavior classifier for agent traces that applies plain-language definitions and returns present, absent, and not-observable probabilities in one forward pass",
    "type": "decision",
+   "family": "span",
    "canonical_id": "respan/span-01",
    "release_date": "2026-09-24",
    "limit": {
@@ -48670,6 +48013,7 @@
    "name": "Span-01 Lite",
    "description": "Decision model for typed evaluation of shared state",
    "type": "decision",
+   "family": "span",
    "release_date": "2026-09-26",
    "limit": {
     "context": 0
@@ -48722,6 +48066,7 @@
    "name": "Span-01 Lite (free)",
    "description": "Decision model for typed evaluation of shared state",
    "type": "decision",
+   "family": "span",
    "release_date": "2026-09-26",
    "limit": {
     "context": 0
@@ -48774,6 +48119,7 @@
    "name": "Span-02",
    "description": "Open-weight decision model with optional anytime reasoning over text, JSON state, and images, returning typed choices, yes/no probabilities, scores, and numbers",
    "type": "decision",
+   "family": "span",
    "canonical_id": "respan/span-02",
    "release_date": "2026-10-15",
    "limit": {
@@ -48940,7 +48286,7 @@
    "name": "Aleph 2.0",
    "description": "Video editing model that changes existing footage from a text prompt and optional keyframe images",
    "type": "video",
-   "family": "runway",
+   "family": "runway-aleph",
    "canonical_id": "runway/aleph-2",
    "release_date": "2026-06-02",
    "limit": {
@@ -48995,7 +48341,7 @@
    "name": "Gen-4.5",
    "description": "Video generation model for text-to-video and image-to-video with precise prompt adherence and physical accuracy",
    "type": "video",
-   "family": "runway",
+   "family": "runway-gen",
    "canonical_id": "runway/gen-4.5",
    "release_date": "2025-12-01",
    "limit": {
@@ -49052,7 +48398,7 @@
    "name": "Fugu Max",
    "description": "Multi-agent model for routing expert agents across complex analytical tasks",
    "type": "chat",
-   "family": "fugu",
+   "family": "fugu-max",
    "canonical_id": "sakana/fugu-max",
    "release_date": "2026-09-11",
    "limit": {
@@ -49170,7 +48516,7 @@
    "name": "Fugu Ultra",
    "description": "Quality-first multi-agent model for hard research, analysis, and competitions",
    "type": "chat",
-   "family": "fugu",
+   "family": "fugu-ultra",
    "canonical_id": "sakana/fugu-ultra",
    "release_date": "2026-06-15",
    "limit": {
@@ -49310,7 +48656,7 @@
    "name": "Fugu Ultra v2",
    "description": "Quality-first multi-agent model for hard research, analysis, and competitions",
    "type": "chat",
-   "family": "fugu",
+   "family": "fugu-ultra",
    "canonical_id": "sakana/fugu-ultra-v2",
    "release_date": "2026-09-11",
    "limit": {
@@ -49568,7 +48914,7 @@
    "name": "Llama 3 8B Lunaris",
    "description": "Open Llama instruction model for multilingual chat, reasoning, and coding",
    "type": "chat",
-   "family": "llama",
+   "family": "lunaris",
    "canonical_id": "sao10k/l3-lunaris-8b",
    "release_date": "2024-08-13",
    "limit": {
@@ -49643,7 +48989,7 @@
    "name": "Llama 3.1 Euryale 70B v2.2",
    "description": "Open Llama instruction model for multilingual chat, reasoning, and coding",
    "type": "chat",
-   "family": "llama",
+   "family": "euryale",
    "canonical_id": "sao10k/l3.1-euryale-70b",
    "release_date": "2024-08-28",
    "limit": {
@@ -49919,6 +49265,7 @@
    "name": "all-MiniLM-L12-v2",
    "description": "Sentence and short-paragraph embedding model for clustering and semantic search",
    "type": "embedding",
+   "family": "minilm",
    "canonical_id": "sentence-transformers/all-minilm-l12-v2",
    "release_date": "2021-08-30",
    "limit": {
@@ -49971,6 +49318,7 @@
    "name": "all-MiniLM-L6-v2",
    "description": "Sentence and short-paragraph embedding model for clustering and semantic search",
    "type": "embedding",
+   "family": "minilm",
    "canonical_id": "sentence-transformers/all-minilm-l6-v2",
    "release_date": "2021-08-30",
    "limit": {
@@ -50023,6 +49371,7 @@
    "name": "all-mpnet-base-v2",
    "description": "Sentence and short-paragraph embedding model for clustering and semantic search",
    "type": "embedding",
+   "family": "mpnet",
    "canonical_id": "sentence-transformers/all-mpnet-base-v2",
    "release_date": "2021-08-30",
    "limit": {
@@ -50075,6 +49424,7 @@
    "name": "multi-qa-mpnet-base-dot-v1",
    "description": "Semantic search embedding model trained on 215M question-answer pairs",
    "type": "embedding",
+   "family": "mpnet",
    "canonical_id": "sentence-transformers/multi-qa-mpnet-base-dot-v1",
    "release_date": "2021-08-23",
    "limit": {
@@ -50127,6 +49477,7 @@
    "name": "paraphrase-MiniLM-L6-v2",
    "description": "Sentence embedding model for paraphrase detection and semantic similarity",
    "type": "embedding",
+   "family": "minilm",
    "canonical_id": "sentence-transformers/paraphrase-minilm-l6-v2",
    "release_date": "2021-05-19",
    "limit": {
@@ -50179,6 +49530,7 @@
    "name": "CSM 1B",
    "description": "Open conversational speech generation model",
    "type": "speech",
+   "family": "csm",
    "canonical_id": "sesame/csm-1b",
    "release_date": "2025-03",
    "limit": {
@@ -50233,6 +49585,7 @@
    "name": "Riverflow 2.0 Fast",
    "description": "Fast Riverflow 2.0 image generation and editing model with a reasoning judge",
    "type": "image",
+   "family": "riverflow-fast",
    "canonical_id": "sourceful/riverflow-v2-fast",
    "release_date": "2026-02-02",
    "limit": {
@@ -50281,6 +49634,7 @@
    "name": "Riverflow 2.0 Pro",
    "description": "Most capable Riverflow 2.0 image generation and editing model with a reasoning judge",
    "type": "image",
+   "family": "riverflow-pro",
    "canonical_id": "sourceful/riverflow-v2-pro",
    "release_date": "2026-02-02",
    "limit": {
@@ -50329,6 +49683,7 @@
    "name": "Riverflow 2.5 Fast",
    "description": "Speed-optimized Riverflow 2.5 agentic image model with candidate scoring",
    "type": "image",
+   "family": "riverflow-fast",
    "canonical_id": "sourceful/riverflow-v2.5-fast",
    "release_date": "2026-06-05",
    "limit": {
@@ -50379,6 +49734,7 @@
    "name": "Riverflow 2.5 Pro",
    "description": "Most capable Riverflow 2.5 agentic image model with candidate scoring and 4K output",
    "type": "image",
+   "family": "riverflow-pro",
    "canonical_id": "sourceful/riverflow-v2.5-pro",
    "release_date": "2026-06-05",
    "limit": {
@@ -50526,6 +49882,7 @@
    "name": "Step 3.7 Flash",
    "description": "Newer StepFun flash model for faster agents, coding, and multimodal prompts",
    "type": "chat",
+   "family": "step-flash",
    "canonical_id": "stepfun/step-3.7-flash",
    "release_date": "2026-05-29",
    "limit": {
@@ -50646,6 +50003,7 @@
    "name": "Step 5 Preview",
    "description": "StepFun flash model for efficient multimodal reasoning, coding, and tool use",
    "type": "chat",
+   "family": "step",
    "canonical_id": "stepfun/step-5-preview",
    "release_date": "2026-09-16",
    "limit": {
@@ -50829,7 +50187,7 @@
    "name": "Hy Image 3.5 Preview",
    "description": "Preview image generation and multi-turn editing model",
    "type": "image",
-   "family": "Hy",
+   "family": "hy-image",
    "canonical_id": "tencent/hy-image-v3.5-preview",
    "release_date": "2026-09-22",
    "limit": {
@@ -50884,7 +50242,7 @@
    "name": "Hy-MT2-1.8B",
    "description": "Tencent Hy reasoning model for coding, instruction following, and agent tasks",
    "type": "chat",
-   "family": "Hy",
+   "family": "hy-mt",
    "canonical_id": "tencent/hy-mt2-1.8b",
    "release_date": "2026-05-21",
    "limit": {
@@ -50955,7 +50313,7 @@
    "name": "Hy-MT2-30B-A3B",
    "description": "Tencent Hy reasoning model for coding, instruction following, and agent tasks",
    "type": "chat",
-   "family": "Hy",
+   "family": "hy-mt",
    "canonical_id": "tencent/hy-mt2-30b-a3b",
    "release_date": "2026-05-21",
    "limit": {
@@ -51026,7 +50384,7 @@
    "name": "Hy-MT2-7B",
    "description": "Tencent Hy reasoning model for coding, instruction following, and agent tasks",
    "type": "chat",
-   "family": "Hy",
+   "family": "hy-mt",
    "canonical_id": "tencent/hy-mt2-7b",
    "release_date": "2026-05-21",
    "limit": {
@@ -51145,7 +50503,7 @@
    "name": "Hy3",
    "description": "Tencent Hy reasoning model for coding, instruction following, and agent tasks",
    "type": "chat",
-   "family": "Hy",
+   "family": "hy",
    "canonical_id": "tencent/hy3",
    "release_date": "2026-07-06",
    "limit": {
@@ -51175,9 +50533,9 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.0825,
+      "price": 0.132,
       "cache": {
-       "read": 0.020625
+       "read": 0.033
       },
       "overrides": [
        {
@@ -51205,7 +50563,7 @@
       ]
      },
      "output": {
-      "price": 0.33,
+      "price": 0.528,
       "overrides": [
        {
         "when": {
@@ -51295,124 +50653,12 @@
    "last_updated": "2026-07-06",
    "recommended_api": "chat-completions"
   },
-  "tencent/hy3-preview": {
-   "id": "tencent/hy3-preview",
-   "name": "Hy3 preview",
-   "description": "Tencent Hy reasoning model for coding, instruction following, and agent tasks",
-   "type": "chat",
-   "family": "Hy",
-   "canonical_id": "tencent/hy3-preview",
-   "release_date": "2026-04-20",
-   "limit": {
-    "context": 262144,
-    "output": 235929
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "low",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.18,
-      "cache": {
-       "read": 0.06
-      }
-     },
-     "output": {
-      "price": 0.6
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@openrouter/ai-sdk-provider",
-      "opencodeai": "@opencode/ai/providers/openrouter"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2026-04-20",
-   "recommended_api": "chat-completions"
-  },
   "tencent/hy4": {
    "id": "tencent/hy4",
    "name": "Hy4",
    "description": "Tencent Hy reasoning model for coding, instruction following, and agent tasks",
    "type": "chat",
-   "family": "Hy",
+   "family": "hy",
    "canonical_id": "tencent/hy4",
    "release_date": "2026-11-04",
    "limit": {
@@ -51530,7 +50776,7 @@
    "name": "Hy4 flash",
    "description": "Tencent Hy reasoning model for coding, instruction following, and agent tasks",
    "type": "chat",
-   "family": "Hy",
+   "family": "hy-flash",
    "canonical_id": "tencent/hy4-flash",
    "release_date": "2026-11-16",
    "limit": {
@@ -51643,7 +50889,7 @@
    "name": "Hy4 preview",
    "description": "Tencent Hy reasoning model for coding, instruction following, and agent tasks",
    "type": "chat",
-   "family": "Hy",
+   "family": "hy",
    "canonical_id": "tencent/hy4-preview",
    "release_date": "2026-08-28",
    "limit": {
@@ -51672,9 +50918,9 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.7506,
+      "price": 0.834,
       "cache": {
-       "read": 0.0378
+       "read": 0.042
       },
       "overrides": [
        {
@@ -51702,7 +50948,7 @@
       ]
      },
      "output": {
-      "price": 2.2509,
+      "price": 2.501,
       "overrides": [
        {
         "when": {
@@ -51798,6 +51044,7 @@
    "name": "Cydonia 24B V4.1",
    "description": "Open-weight instruction model for adaptable chat and self-hosted production workloads",
    "type": "chat",
+   "family": "cydonia",
    "canonical_id": "thedrummer/cydonia-24b-v4.1",
    "release_date": "2025-09-27",
    "limit": {
@@ -51875,6 +51122,7 @@
    "name": "Skyfall 36B V2",
    "description": "Open-weight instruction model for adaptable chat and self-hosted production workloads",
    "type": "chat",
+   "family": "skyfall",
    "canonical_id": "thedrummer/skyfall-36b-v2",
    "release_date": "2025-03-10",
    "limit": {
@@ -51952,6 +51200,7 @@
    "name": "UnslopNemo 12B",
    "description": "Open-weight instruction model for adaptable chat and self-hosted production workloads",
    "type": "chat",
+   "family": "unslopnemo",
    "canonical_id": "thedrummer/unslopnemo-12b",
    "release_date": "2024-11-08",
    "limit": {
@@ -52026,6 +51275,7 @@
    "name": "GTE Base",
    "description": "English text embedding model producing 768-dimensional vectors",
    "type": "embedding",
+   "family": "gte",
    "canonical_id": "thenlper/gte-base",
    "release_date": "2023-07",
    "limit": {
@@ -52078,6 +51328,7 @@
    "name": "GTE Large",
    "description": "English text embedding model producing 1024-dimensional vectors",
    "type": "embedding",
+   "family": "gte",
    "canonical_id": "thenlper/gte-large",
    "release_date": "2023-07",
    "limit": {
@@ -52130,7 +51381,7 @@
    "name": "Inkling",
    "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
    "type": "chat",
-   "family": "ling",
+   "family": "inkling",
    "canonical_id": "thinkingmachines/inkling",
    "release_date": "2026-07-15",
    "limit": {
@@ -52243,12 +51494,125 @@
    "last_updated": "2026-07-15",
    "recommended_api": "chat-completions"
   },
+  "thinkingmachines/inkling-2-mini": {
+   "id": "thinkingmachines/inkling-2-mini",
+   "name": "Inkling 2 Mini",
+   "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
+   "type": "chat",
+   "family": "inkling",
+   "release_date": "2026-11-21",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1,
+      "cache": {
+       "read": 0.02
+      }
+     },
+     "output": {
+      "price": 0.4
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@openrouter/ai-sdk-provider",
+      "opencodeai": "@opencode/ai/providers/openrouter"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-11-21",
+   "recommended_api": "chat-completions"
+  },
   "thinkingmachines/inkling-2-small": {
    "id": "thinkingmachines/inkling-2-small",
    "name": "Inkling 2 Small",
    "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
    "type": "chat",
-   "family": "ling",
+   "family": "inkling-small",
    "canonical_id": "thinkingmachines/inkling-2-small",
    "release_date": "2026-11-05",
    "limit": {
@@ -52363,7 +51727,7 @@
    "name": "Inkling Small",
    "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
    "type": "chat",
-   "family": "ling",
+   "family": "inkling-small",
    "canonical_id": "thinkingmachines/inkling-small",
    "release_date": "2026-07-30",
    "limit": {
@@ -52534,6 +51898,7 @@
    "name": "Jev 1.13",
    "description": "System One model for fast, typed probabilistic decisions over text or structured state",
    "type": "decision",
+   "family": "jev",
    "canonical_id": "typesafe/jev-1.13.0",
    "release_date": "2026-09-15",
    "limit": {
@@ -52594,6 +51959,7 @@
    "name": "Jev 1.14",
    "description": "Decision model for typed evaluation of shared state",
    "type": "decision",
+   "family": "jev",
    "canonical_id": "typesafe/jev-1.14.0",
    "release_date": "2026-10-14",
    "limit": {
@@ -52654,6 +52020,7 @@
    "name": "Pareto 26.10",
    "description": "Multimodal model for analyzing text, images, documents, and rich media",
    "type": "chat",
+   "family": "pareto",
    "release_date": "2026-10-15",
    "limit": {
     "context": 1048576,
@@ -52762,6 +52129,7 @@
    "name": "Pareto 26.10 Preview",
    "description": "Preview model for early access evaluation, prototyping, and compatibility testing",
    "type": "chat",
+   "family": "pareto",
    "release_date": "2026-10-01",
    "limit": {
     "context": 1048576,
@@ -52866,6 +52234,7 @@
    "name": "Pareto 26.9",
    "description": "Multimodal model for analyzing text, images, documents, and rich media",
    "type": "chat",
+   "family": "pareto",
    "release_date": "2026-10-13",
    "limit": {
     "context": 262144,
@@ -52974,6 +52343,7 @@
    "name": "ReMM SLERP 13B",
    "description": "Open-weight instruction model for adaptable chat and self-hosted production workloads",
    "type": "chat",
+   "family": "remm",
    "canonical_id": "undi95/remm-slerp-l2-13b",
    "release_date": "2023-07-22",
    "limit": {
@@ -54307,7 +53677,7 @@
    "name": "Grok Imagine Image 2.0",
    "description": "Image model for prompt-driven generation, editing, and visual design workflows",
    "type": "image",
-   "family": "grok",
+   "family": "grok-imagine-image",
    "canonical_id": "xai/grok-imagine-image-2.0",
    "release_date": "2026-08-07",
    "limit": {
@@ -54404,7 +53774,7 @@
    "name": "Grok Imagine Video",
    "description": "Video model for text-to-video, image-to-video, video editing and extension with native synchronized audio",
    "type": "video",
-   "family": "grok",
+   "family": "grok-imagine-video",
    "canonical_id": "xai/grok-imagine-video",
    "release_date": "2026-01-28",
    "limit": {
@@ -54478,7 +53848,7 @@
    "name": "Grok Imagine Video 1.5",
    "description": "Video model for text-to-video, image-to-video, and reference-to-video generation with optional voice references",
    "type": "video",
-   "family": "grok",
+   "family": "grok-imagine-video",
    "canonical_id": "xai/grok-imagine-video-1.5",
    "release_date": "2026-05-30",
    "limit": {
@@ -54560,7 +53930,7 @@
    "name": "Grok Imagine Video 1.5 Lite",
    "description": "Cost-efficient video model for text-to-video and image-to-video generation",
    "type": "video",
-   "family": "grok",
+   "family": "grok-imagine-video-lite",
    "canonical_id": "xai/grok-imagine-video-1.5-lite",
    "release_date": "2026-10-01",
    "limit": {
@@ -54696,6 +54066,7 @@
    "name": "Grok Voice TTS 1.0",
    "description": "Convert text into spoken audio with a single API call. The API supports a rich set of expressive voices, inline speech tags for fine-grained delivery control, and output formats from high-fidelity MP3 to telephony-optimized μ-law.",
    "type": "speech",
+   "family": "grok-tts",
    "canonical_id": "xai/grok-tts",
    "release_date": "2026-03-16",
    "limit": {
@@ -54878,7 +54249,7 @@
    "name": "MiMo-V2.5-Pro",
    "description": "Stronger MiMo Pro tier for multimodal reasoning and coding-agent execution",
    "type": "chat",
-   "family": "mimo",
+   "family": "mimo-pro",
    "canonical_id": "xiaomi/mimo-v2.5-pro",
    "status": "deprecated",
    "release_date": "2026-04-22",
@@ -54992,11 +54363,11 @@
    "name": "MiMo-V2.6-Flash",
    "description": "MiMo flash model for fast multimodal assistance and agent workflows",
    "type": "chat",
-   "family": "mimo",
+   "family": "mimo-flash",
    "canonical_id": "xiaomi/mimo-v2.6-flash",
    "release_date": "2026-09-22",
    "limit": {
-    "context": 1050000,
+    "context": 1048576,
     "output": 131072
    },
    "capabilities": {
@@ -55115,11 +54486,11 @@
    "name": "MiMo-V2.6-Pro",
    "description": "MiMo pro model for strong multimodal reasoning and agent execution",
    "type": "chat",
-   "family": "mimo",
+   "family": "mimo-pro",
    "canonical_id": "xiaomi/mimo-v2.6-pro",
    "release_date": "2026-09-22",
    "limit": {
-    "context": 1050000,
+    "context": 1048576,
     "output": 131072
    },
    "capabilities": {
@@ -55238,7 +54609,7 @@
    "name": "MiMo-V2.6-Pro-UltraSpeed",
    "description": "MiMo pro model for strong multimodal reasoning and agent execution",
    "type": "chat",
-   "family": "mimo",
+   "family": "mimo-pro",
    "canonical_id": "xiaomi/mimo-v2.6-pro-ultraspeed",
    "release_date": "2026-09-21",
    "limit": {
@@ -55580,7 +54951,7 @@
    "name": "GLM-4.5V",
    "description": "GLM vision model for visual reasoning, documents, and multimodal agents",
    "type": "chat",
-   "family": "glm",
+   "family": "glmv",
    "canonical_id": "zhipuai/glm-4.5v",
    "release_date": "2025-08-11",
    "limit": {
@@ -55800,7 +55171,7 @@
    "name": "GLM-4.6V",
    "description": "GLM vision model for visual reasoning, documents, and multimodal agents",
    "type": "chat",
-   "family": "glm",
+   "family": "glmv",
    "canonical_id": "zhipuai/glm-4.6v",
    "release_date": "2025-12-08",
    "limit": {
@@ -55827,7 +55198,7 @@
      "input": {
       "price": 0.3,
       "cache": {
-       "read": 0.05
+       "read": 0.055
       }
      },
      "output": {
@@ -56248,7 +55619,7 @@
    "name": "GLM-5-Turbo",
    "description": "Faster GLM-5 lane for coding agents that need lower latency",
    "type": "chat",
-   "family": "glm",
+   "family": "glm-turbo",
    "canonical_id": "zhipuai/glm-5-turbo",
    "release_date": "2026-03-16",
    "limit": {
@@ -56384,13 +55755,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 1.19,
+      "price": 1.4,
       "cache": {
-       "read": 0.6
+       "read": 0.26
       }
      },
      "output": {
-      "price": 3.74
+      "price": 4.4
      }
     }
    },
@@ -57154,7 +56525,7 @@
    "name": "GLM-5V-Turbo",
    "description": "Fast GLM vision model for screenshots, documents, and multimodal agent tasks",
    "type": "chat",
-   "family": "glm",
+   "family": "glmv-turbo",
    "canonical_id": "zhipuai/glm-5v-turbo",
    "release_date": "2026-04-01",
    "limit": {
@@ -59486,6 +58857,7 @@
    "name": "Decider Flash Latest",
    "description": "Decision model for typed evaluation of shared state",
    "type": "decision",
+   "family": "pplx-decider-flash",
    "release_date": "2026-10-16",
    "limit": {
     "context": 262144
@@ -59545,6 +58917,7 @@
    "name": "Decider Latest",
    "description": "Decision model for typed evaluation of shared state",
    "type": "decision",
+   "family": "pplx-decider",
    "release_date": "2026-10-14",
    "limit": {
     "context": 262144
@@ -59604,6 +58977,7 @@
    "name": "Jev Latest",
    "description": "System One model for fast, typed probabilistic decisions over text or structured state",
    "type": "decision",
+   "family": "jev",
    "canonical_id": "typesafe/jev-latest",
    "release_date": "2026-09-15",
    "limit": {
@@ -59664,6 +59038,7 @@
    "name": "Pareto Latest",
    "description": "Multimodal model for analyzing text, images, documents, and rich media",
    "type": "chat",
+   "family": "pareto",
    "release_date": "2026-10-13",
    "limit": {
     "context": 1048576,

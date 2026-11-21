@@ -11,7 +11,7 @@
    "name": "Beam Free",
    "description": "Sparse mixture-of-experts reasoning model with 23B active parameters for coding and agentic workflows",
    "type": "chat",
-   "family": "beam",
+   "family": "beam-free",
    "canonical_id": "reflection/beam-1.0-501b-a23b",
    "release_date": "2026-10-05",
    "limit": {
@@ -2256,7 +2256,7 @@
    "name": "Embed 5 Fast",
    "description": "Faster, lighter Embed 5 model sharing Embed 5 Pro's embedding space",
    "type": "embedding",
-   "family": "cohere-embed",
+   "family": "cohere-embed-fast",
    "canonical_id": "cohere/embed-v5.0-fast",
    "release_date": "2026-09-30",
    "limit": {
@@ -2312,7 +2312,7 @@
    "name": "Embed 5 Pro",
    "description": "Cohere's most capable multimodal embedding model for text, images, and mixed documents",
    "type": "embedding",
-   "family": "cohere-embed",
+   "family": "cohere-embed-pro",
    "canonical_id": "cohere/embed-v5.0-pro",
    "release_date": "2026-09-30",
    "limit": {
@@ -2523,7 +2523,7 @@
    "name": "DeepSeek V4 Flash Free",
    "description": "Official DeepSeek V4 Flash release with enhanced agentic capabilities and integrated DSpark speculative decoding",
    "type": "chat",
-   "family": "deepseek-flash",
+   "family": "deepseek-flash-free",
    "canonical_id": "deepseek/deepseek-v4-flash-0731",
    "status": "deprecated",
    "release_date": "2026-07-31",
@@ -2689,7 +2689,7 @@
    "name": "DeepSeek V4 Pro",
    "description": "Open MoE flagship with million-token context for coding and long agent runs",
    "type": "chat",
-   "family": "deepseek-thinking",
+   "family": "deepseek-pro",
    "canonical_id": "deepseek/deepseek-v4-pro",
    "release_date": "2026-04-24",
    "limit": {
@@ -2860,7 +2860,7 @@
    "name": "DeepSeek V4.1 Flash Free",
    "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
    "type": "chat",
-   "family": "deepseek-flash",
+   "family": "deepseek-flash-free",
    "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
    "release_date": "2026-10-17",
    "limit": {
@@ -3071,7 +3071,7 @@
    "name": "Flint 40B Free",
    "description": "Open-weight mixture-of-experts model with about 2.5B active parameters for local coding agents",
    "type": "chat",
-   "family": "flint",
+   "family": "flint-free",
    "canonical_id": "recursive/flint",
    "release_date": "2026-10-21",
    "limit": {
@@ -4744,7 +4744,7 @@
    "name": "Gemini Decision 1",
    "description": "Google's decision model that returns calibrated probabilities for typed yes/no, choice and score questions about text, images, audio, video and PDFs",
    "type": "decision",
-   "family": "gemini",
+   "family": "gemini-decision",
    "canonical_id": "google/gemini-decision-1",
    "release_date": "2026-11-11",
    "limit": {
@@ -4833,7 +4833,7 @@
    "name": "Gemini Embedding 001",
    "description": "Embedding model for semantic search, retrieval, clustering, and ranking pipelines",
    "type": "embedding",
-   "family": "gemini",
+   "family": "gemini-embedding",
    "canonical_id": "google/gemini-embedding-001",
    "release_date": "2025-05-20",
    "limit": {
@@ -4890,7 +4890,7 @@
    "name": "Gemini Embedding 2",
    "description": "Multimodal embedding model mapping text, images, video, audio, and PDFs into a unified embedding space",
    "type": "embedding",
-   "family": "gemini",
+   "family": "gemini-embedding",
    "canonical_id": "google/gemini-embedding-2",
    "release_date": "2026-04-22",
    "limit": {
@@ -4947,7 +4947,7 @@
    "name": "Nano Banana 2.1",
    "description": "Image model for prompt-driven generation, multi-turn editing, and visual design workflows",
    "type": "image",
-   "family": "gemini-flash",
+   "family": "nano-banana",
    "canonical_id": "google/gemini-nano-banana-2.1",
    "release_date": "2026-10-06",
    "limit": {
@@ -5036,6 +5036,81 @@
    "open_weights": false,
    "last_updated": "2026-10-06",
    "recommended_api": "images"
+  },
+  "gemini-omni-1.2-flash": {
+   "id": "gemini-omni-1.2-flash",
+   "name": "Gemini Omni 1.2 Flash",
+   "description": "Video generation and editing model with native audio, up to 15-second clips, extension, frame interpolation, and reference-guided multimodal control",
+   "type": "video",
+   "family": "gemini-omni-flash",
+   "canonical_id": "google/gemini-omni-1.2-flash",
+   "release_date": "2026-11-05",
+   "limit": {
+    "context": 131072,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.5
+     },
+     "output": {
+      "price": 9
+     }
+    },
+    "video": {
+     "output": {
+      "price": 12
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp"
+    ],
+    "output": [
+     "video/mp4"
+    ]
+   },
+   "api": {
+    "videos": {
+     "base_url": "https://opencode.ai/inference/google/v1beta",
+     "path": "/interactions",
+     "sdk": {
+      "opencodeai": "@opencode/ai/providers/google/videos"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-05",
+   "recommended_api": "videos"
   },
   "glm-4.6": {
    "id": "glm-4.6",
@@ -5185,7 +5260,7 @@
    "name": "GLM-4.7 Free",
    "description": "Legacy model retained for compatibility with older integrations",
    "type": "chat",
-   "family": "glm",
+   "family": "glm-free",
    "canonical_id": "zhipuai/glm-4.7",
    "status": "deprecated",
    "release_date": "2025-12-22",
@@ -5334,7 +5409,7 @@
    "name": "GLM-5 Free",
    "description": "Legacy model retained for compatibility with older integrations",
    "type": "chat",
-   "family": "glm",
+   "family": "glm-free",
    "canonical_id": "zhipuai/glm-5",
    "status": "deprecated",
    "release_date": "2026-02-12",
@@ -5719,7 +5794,7 @@
    "name": "GLM-5.3-Flash Free",
    "description": "Native multimodal GLM model for efficient coding and long-horizon agent tasks",
    "type": "chat",
-   "family": "glm-flash",
+   "family": "glm-flash-free",
    "canonical_id": "zhipuai/glm-5.3-flash",
    "status": "deprecated",
    "release_date": "2026-08-26",
@@ -6403,7 +6478,7 @@
    "name": "GPT-5.1 Codex Mini",
    "description": "Coding-optimized GPT model for repository edits, reviews, and agentic software work",
    "type": "chat",
-   "family": "gpt-codex",
+   "family": "gpt-codex-mini",
    "canonical_id": "openai/gpt-5.1-codex-mini",
    "release_date": "2025-11-13",
    "limit": {
@@ -9652,7 +9727,7 @@
    "name": "Grok Code Fast 1",
    "description": "Legacy model retained for compatibility with older integrations",
    "type": "chat",
-   "family": "grok",
+   "family": "grok-code",
    "canonical_id": "xai/grok-code-fast-1",
    "status": "deprecated",
    "release_date": "2025-09-02",
@@ -9724,7 +9799,7 @@
    "name": "Grok Imagine Image 2.0",
    "description": "Image model for prompt-driven generation, editing, and visual design workflows",
    "type": "image",
-   "family": "grok",
+   "family": "grok-imagine-image",
    "canonical_id": "xai/grok-imagine-image-2.0",
    "release_date": "2026-08-07",
    "limit": {
@@ -9873,7 +9948,7 @@
    "name": "Hy3 Free",
    "description": "Tencent Hy reasoning model for coding, instruction following, and agent tasks",
    "type": "chat",
-   "family": "Hy",
+   "family": "hy-free",
    "canonical_id": "tencent/hy3",
    "status": "deprecated",
    "release_date": "2026-07-06",
@@ -9948,7 +10023,7 @@
    "name": "Hy3 preview Free",
    "description": "Legacy model retained for compatibility with older integrations",
    "type": "chat",
-   "family": "Hy",
+   "family": "hy-free",
    "canonical_id": "tencent/hy3-preview",
    "status": "deprecated",
    "release_date": "2026-04-20",
@@ -10014,7 +10089,7 @@
    "name": "Hy4 flash Free",
    "description": "Tencent's lower-cost Hy4 tier for everyday agent and productivity tasks, with image understanding and a 1M-token context window.",
    "type": "chat",
-   "family": "Hy",
+   "family": "hy-flash-free",
    "canonical_id": "tencent/hy4-flash",
    "release_date": "2026-11-16",
    "limit": {
@@ -10146,7 +10221,7 @@
    "name": "Inkling 2 Small Free",
    "description": "Inkling 2 Small, free for a limited time",
    "type": "chat",
-   "family": "ling",
+   "family": "inkling-small-free",
    "canonical_id": "thinkingmachines/inkling-2-small",
    "status": "deprecated",
    "release_date": "2026-11-05",
@@ -10224,6 +10299,7 @@
    "name": "Jev 1.13",
    "description": "System One model for fast, typed probabilistic decisions over text or structured state",
    "type": "decision",
+   "family": "jev",
    "canonical_id": "typesafe/jev-1.13.0",
    "release_date": "2026-09-15",
    "limit": {
@@ -10281,6 +10357,7 @@
    "name": "Jev 1.13 Free",
    "description": "System One model for fast, typed probabilistic decisions over text or structured state",
    "type": "decision",
+   "family": "jev-free",
    "canonical_id": "typesafe/jev-1.13.0",
    "release_date": "2026-09-15",
    "limit": {
@@ -10338,7 +10415,7 @@
    "name": "Kimi K2",
    "description": "Legacy model retained for compatibility with older integrations",
    "type": "chat",
-   "family": "kimi-k2",
+   "family": "kimi",
    "canonical_id": "moonshotai/kimi-k2-0905",
    "status": "deprecated",
    "release_date": "2025-09-05",
@@ -10404,7 +10481,7 @@
    "name": "Kimi K2 Thinking",
    "description": "Legacy model retained for compatibility with older integrations",
    "type": "chat",
-   "family": "kimi-thinking",
+   "family": "kimi",
    "canonical_id": "moonshotai/kimi-k2-thinking",
    "status": "deprecated",
    "release_date": "2025-11-06",
@@ -10473,7 +10550,7 @@
    "name": "Kimi K2.5",
    "description": "Kimi multimodal agent model for visual understanding, coding, and planning",
    "type": "chat",
-   "family": "kimi-k2",
+   "family": "kimi",
    "canonical_id": "moonshotai/kimi-k2.5",
    "release_date": "2026-01-27",
    "limit": {
@@ -10558,7 +10635,7 @@
    "name": "Kimi K2.5 Free",
    "description": "Legacy model retained for compatibility with older integrations",
    "type": "chat",
-   "family": "kimi-k2",
+   "family": "kimi-free",
    "canonical_id": "moonshotai/kimi-k2.5",
    "status": "deprecated",
    "release_date": "2026-01-27",
@@ -10644,7 +10721,7 @@
    "name": "Kimi K2.6",
    "description": "Kimi multimodal agent model for visual understanding, coding, and planning",
    "type": "chat",
-   "family": "kimi-k2",
+   "family": "kimi",
    "canonical_id": "moonshotai/kimi-k2.6",
    "release_date": "2026-04-20",
    "limit": {
@@ -10734,7 +10811,7 @@
    "name": "Kimi K2.7 Code",
    "description": "Coding-focused Kimi model, stronger on long-horizon repo work with less overthinking",
    "type": "chat",
-   "family": "kimi-k2",
+   "family": "kimi-code",
    "canonical_id": "moonshotai/kimi-k2.7-code",
    "release_date": "2026-06-12",
    "limit": {
@@ -10824,7 +10901,7 @@
    "name": "Kimi K3",
    "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
    "type": "chat",
-   "family": "kimi-k3",
+   "family": "kimi",
    "canonical_id": "moonshotai/kimi-k3",
    "release_date": "2026-07-16",
    "limit": {
@@ -10926,7 +11003,7 @@
    "name": "Laguna S 2.1 Free",
    "description": "Agentic coding model from Poolside in the XS size class for local deployment",
    "type": "chat",
-   "family": "laguna",
+   "family": "laguna-s-free",
    "canonical_id": "poolside/laguna-s-2.1",
    "status": "deprecated",
    "release_date": "2026-07-21",
@@ -11057,7 +11134,7 @@
    "name": "Ling 3.0 Flash Fin Free",
    "description": "Finance-enhanced model for financial research, multi-step investment workflows, and long-horizon planning and execution",
    "type": "chat",
-   "family": "ling",
+   "family": "ling-flash-free",
    "canonical_id": "inclusionai/ling-3.0-flash-fin",
    "status": "deprecated",
    "release_date": "2026-08-27",
@@ -11124,7 +11201,7 @@
    "name": "Ling-3.0-flash Free",
    "description": "Efficient model for low-latency assistance, extraction, and routine automation",
    "type": "chat",
-   "family": "ling",
+   "family": "ling-flash-free",
    "canonical_id": "inclusionai/ling-3.0-flash",
    "status": "deprecated",
    "release_date": "2026-07-23",
@@ -11195,7 +11272,7 @@
    "name": "Ling-3.0-tiny Free",
    "description": "Compact MoE model for responsive agents, instruction following, and multi-turn conversations",
    "type": "chat",
-   "family": "ling",
+   "family": "ling-tiny-free",
    "status": "deprecated",
    "release_date": "2026-08-06",
    "limit": {
@@ -11255,7 +11332,7 @@
    "name": "Ling 3.1 Flash Free",
    "description": "Efficient model for low-latency assistance, extraction, and routine automation",
    "type": "chat",
-   "family": "ling",
+   "family": "ling-flash-free",
    "canonical_id": "inclusionai/ling-3.1-flash",
    "status": "deprecated",
    "release_date": "2026-09-29",
@@ -11395,7 +11472,7 @@
    "name": "LongCat-2.0 Free",
    "description": "Meituan LongCat-2.0, a reasoning model with tool calling and a 1M-token context window",
    "type": "chat",
-   "family": "longcat",
+   "family": "longcat-free",
    "canonical_id": "meituan/longcat-2.0",
    "status": "deprecated",
    "release_date": "2026-06-30",
@@ -11464,7 +11541,7 @@
    "name": "LongCat 2.5 Free",
    "description": "Meituan's multimodal reasoning model for long-horizon coding and agent tasks, with visual understanding and a 1M-token context window",
    "type": "chat",
-   "family": "longcat",
+   "family": "longcat-free",
    "canonical_id": "meituan/longcat-2.5",
    "release_date": "2026-11-02",
    "limit": {
@@ -11533,7 +11610,7 @@
    "name": "LongCat 2.5 Preview Free",
    "description": "Meituan's multimodal reasoning model for coding and agent tasks, with image understanding and a 1M-token context window",
    "type": "chat",
-   "family": "longcat",
+   "family": "longcat-free",
    "canonical_id": "meituan/longcat-2.5-preview",
    "status": "deprecated",
    "release_date": "2026-09-25",
@@ -11603,7 +11680,7 @@
    "name": "MiMo V2 Flash Free",
    "description": "Legacy model retained for compatibility with older integrations",
    "type": "chat",
-   "family": "mimo",
+   "family": "mimo-flash-free",
    "canonical_id": "xiaomi/mimo-v2-flash",
    "status": "deprecated",
    "release_date": "2025-12-16",
@@ -11672,7 +11749,7 @@
    "name": "MiMo V2 Omni Free",
    "description": "Legacy model retained for compatibility with older integrations",
    "type": "chat",
-   "family": "mimo",
+   "family": "mimo-omni-free",
    "canonical_id": "xiaomi/mimo-v2-omni",
    "status": "deprecated",
    "release_date": "2026-03-18",
@@ -11744,7 +11821,7 @@
    "name": "MiMo V2 Pro Free",
    "description": "Legacy model retained for compatibility with older integrations",
    "type": "chat",
-   "family": "mimo",
+   "family": "mimo-pro-free",
    "canonical_id": "xiaomi/mimo-v2-pro",
    "status": "deprecated",
    "release_date": "2026-03-18",
@@ -11813,7 +11890,7 @@
    "name": "MiMo V2.5 Free",
    "description": "MiMo omni model for text, image, video, audio, and agents",
    "type": "chat",
-   "family": "mimo",
+   "family": "mimo-free",
    "canonical_id": "xiaomi/mimo-v2.5",
    "status": "deprecated",
    "release_date": "2026-04-22",
@@ -11896,7 +11973,7 @@
    "name": "MiMo-V2.6-Flash Free",
    "description": "MiMo Flash model for multimodal coding agents and long-context automation",
    "type": "chat",
-   "family": "mimo",
+   "family": "mimo-flash-free",
    "canonical_id": "xiaomi/mimo-v2.6-flash",
    "release_date": "2026-09-22",
    "limit": {
@@ -11981,7 +12058,7 @@
    "name": "MiniMax H3 Image",
    "description": "MiniMax text-to-image and image-editing model",
    "type": "image",
-   "family": "minimax",
+   "family": "minimax-h-image",
    "canonical_id": "minimax/MiniMax-H3-Image",
    "release_date": "2026-11-10",
    "limit": {
@@ -12051,7 +12128,7 @@
    "name": "MiniMax H3",
    "description": "MiniMax general-purpose video model with multimodal references and synchronized stereo audio. Open H3-Base checkpoints; Context-IR and 2K regeneration are not included in the initial weights release.",
    "type": "video",
-   "family": "minimax",
+   "family": "minimax-h",
    "canonical_id": "minimax/MiniMax-H3",
    "release_date": "2026-07-31",
    "limit": {
@@ -12145,7 +12222,7 @@
    "name": "MiniMax-M2.1",
    "description": "Legacy model retained for compatibility with older integrations",
    "type": "chat",
-   "family": "minimax",
+   "family": "minimax-m",
    "canonical_id": "minimax/MiniMax-M2.1",
    "status": "deprecated",
    "release_date": "2025-12-23",
@@ -12214,7 +12291,7 @@
    "name": "MiniMax-M2.1 Free",
    "description": "Legacy model retained for compatibility with older integrations",
    "type": "chat",
-   "family": "minimax",
+   "family": "minimax-m-free",
    "canonical_id": "minimax/MiniMax-M2.1",
    "status": "deprecated",
    "release_date": "2025-12-23",
@@ -12280,7 +12357,7 @@
    "name": "MiniMax-M2.5",
    "description": "MiniMax model for chat, coding, office work, and agentic tasks",
    "type": "chat",
-   "family": "minimax",
+   "family": "minimax-m",
    "canonical_id": "minimax/MiniMax-M2.5",
    "release_date": "2026-02-12",
    "limit": {
@@ -12348,7 +12425,7 @@
    "name": "MiniMax-M2.5 Free",
    "description": "Legacy model retained for compatibility with older integrations",
    "type": "chat",
-   "family": "minimax",
+   "family": "minimax-m-free",
    "canonical_id": "minimax/MiniMax-M2.5",
    "status": "deprecated",
    "release_date": "2026-02-12",
@@ -12414,7 +12491,7 @@
    "name": "MiniMax-M2.7",
    "description": "MiniMax model for chat, coding, office work, and agentic tasks",
    "type": "chat",
-   "family": "minimax",
+   "family": "minimax-m",
    "canonical_id": "minimax/MiniMax-M2.7",
    "release_date": "2026-03-18",
    "limit": {
@@ -12482,7 +12559,7 @@
    "name": "MiniMax-M3",
    "description": "MiniMax multimodal model for long-context coding, perception, and agent planning",
    "type": "chat",
-   "family": "minimax",
+   "family": "minimax-m",
    "canonical_id": "minimax/MiniMax-M3",
    "release_date": "2026-06-01",
    "limit": {
@@ -12564,7 +12641,7 @@
    "name": "MiniMax-M3 Free",
    "description": "Legacy model retained for compatibility with older integrations",
    "type": "chat",
-   "family": "minimax",
+   "family": "minimax-m-free",
    "canonical_id": "minimax/MiniMax-M3",
    "status": "deprecated",
    "release_date": "2026-06-01",
@@ -12642,7 +12719,7 @@
    "name": "MiniMax M3.1 Flash Free",
    "description": "Frontier multimodal coding model with 1M context window and tunable thinking depth",
    "type": "chat",
-   "family": "minimax",
+   "family": "minimax-m-flash-free",
    "canonical_id": "minimax/MiniMax-M3.1-Flash",
    "status": "deprecated",
    "release_date": "2026-10-19",
@@ -12867,7 +12944,7 @@
    "name": "Muse Ember 1.0",
    "description": "Reasoning model from Meta with text, image, video and PDF input and tool use",
    "type": "chat",
-   "family": "muse",
+   "family": "muse-ember",
    "canonical_id": "meta/muse-ember-1.0",
    "release_date": "2026-11-09",
    "limit": {
@@ -12971,7 +13048,7 @@
    "name": "Muse Spark 1.2",
    "description": "Muse Spark 1.2 is a coding-focused update to Muse Spark 1.1 with improvements in code generation, complex debugging, codebase understanding, and end-to-end developer workflows.",
    "type": "chat",
-   "family": "muse",
+   "family": "muse-spark",
    "canonical_id": "meta/muse-spark-1.2",
    "release_date": "2026-08-05",
    "limit": {
@@ -13051,7 +13128,7 @@
    "name": "Muse Spark 1.2 Free",
    "description": "Muse Spark 1.2 is a coding-focused update to Muse Spark 1.1 with improvements in code generation, complex debugging, codebase understanding, and end-to-end developer workflows.",
    "type": "chat",
-   "family": "muse",
+   "family": "muse-spark-free",
    "canonical_id": "meta/muse-spark-1.2",
    "status": "deprecated",
    "release_date": "2026-08-05",
@@ -13132,7 +13209,7 @@
    "name": "Muse Spark 1.3",
    "description": "Muse Spark 1.3 is a multimodal reasoning model from Meta for long-running agentic, multi-agent, and coding workflows. It improves long-horizon agent collaboration, instruction following, and coding efficiency relative to Muse Spark 1.2.",
    "type": "chat",
-   "family": "muse",
+   "family": "muse-spark",
    "canonical_id": "meta/muse-spark-1.3",
    "release_date": "2026-09-02",
    "limit": {
@@ -13215,7 +13292,7 @@
    "name": "Muse Spark 1.3 Free",
    "description": "Muse Spark 1.3 is a multimodal reasoning model from Meta for coding and agentic workflows.",
    "type": "chat",
-   "family": "muse",
+   "family": "muse-spark-free",
    "canonical_id": "meta/muse-spark-1.3",
    "status": "deprecated",
    "release_date": "2026-09-02",
@@ -13296,7 +13373,7 @@
    "name": "Muse Wonder",
    "description": "Muse Wonder is a frontier multimodal reasoning model from Meta for personal and professional agents, long-horizon coding, and computer use. It combines Active Memory, which carries relevant context across conversations, with Active Focus, which keeps it working through blockers toward a goal.",
    "type": "chat",
-   "family": "muse",
+   "family": "muse-wonder",
    "canonical_id": "meta/muse-wonder-1.0",
    "release_date": "2026-10-12",
    "limit": {
@@ -13380,7 +13457,7 @@
    "name": "Nemotron 3 Super Free",
    "description": "Nemotron middle tier for collaborative agents and high-volume reasoning workloads",
    "type": "chat",
-   "family": "nemotron",
+   "family": "nemotron-super-free",
    "canonical_id": "nvidia/nemotron-3-super-120b-a12b",
    "status": "deprecated",
    "release_date": "2026-03-11",
@@ -13449,7 +13526,7 @@
    "name": "Nemotron 3 Ultra Free",
    "description": "Largest Nemotron 3 model for maximum open-weight reasoning and agent accuracy",
    "type": "chat",
-   "family": "nemotron",
+   "family": "nemotron-ultra-free",
    "canonical_id": "nvidia/nemotron-3-ultra-550b-a55b",
    "status": "deprecated",
    "release_date": "2026-06-04",
@@ -13518,7 +13595,7 @@
    "name": "Nemotron 3.5 Lightning Free",
    "description": "Fast NVIDIA Nemotron MoE for reliable agentic tasks across enterprise workloads",
    "type": "chat",
-   "family": "nemotron",
+   "family": "nemotron-lightning-free",
    "canonical_id": "nvidia/nemotron-3.5-lightning",
    "release_date": "2026-08-11",
    "limit": {
@@ -13587,7 +13664,7 @@
    "name": "Nemotron 3.5 Super VL Free",
    "description": "NVIDIA vision-language reasoning model for text, image, and video understanding and agentic tool use",
    "type": "chat",
-   "family": "nemotron",
+   "family": "nemotron-super-free",
    "canonical_id": "nvidia/nemotron-3.5-super-vl-120b-a12b",
    "release_date": "2026-10-15",
    "limit": {
@@ -13665,7 +13742,7 @@
    "name": "North Mini Code Free",
    "description": "Cohere coding model for practical software engineering and agentic edits",
    "type": "chat",
-   "family": "north",
+   "family": "north-mini-free",
    "canonical_id": "cohere/north-mini-code-1-0",
    "status": "deprecated",
    "release_date": "2026-06-09",
@@ -13807,7 +13884,7 @@
    "name": "Qwen3 Coder",
    "description": "Legacy model retained for compatibility with older integrations",
    "type": "chat",
-   "family": "qwen",
+   "family": "qwen-coder",
    "canonical_id": "alibaba/qwen3-coder-480b-a35b-instruct",
    "status": "deprecated",
    "release_date": "2025-07-22",
@@ -13875,7 +13952,7 @@
    "name": "Qwen3 Embedding 8B",
    "description": "Multilingual text embedding model for retrieval, code search, classification, and clustering",
    "type": "embedding",
-   "family": "qwen",
+   "family": "qwen-embedding",
    "canonical_id": "alibaba/qwen3-embedding-8b",
    "release_date": "2025-06-05",
    "limit": {
@@ -13931,7 +14008,7 @@
    "name": "Qwen3.5 Plus",
    "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
    "type": "chat",
-   "family": "qwen",
+   "family": "qwen-plus",
    "canonical_id": "alibaba/qwen3.5-plus",
    "release_date": "2026-02-16",
    "limit": {
@@ -14016,7 +14093,7 @@
    "name": "Qwen3.6 Plus",
    "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
    "type": "chat",
-   "family": "qwen",
+   "family": "qwen-plus",
    "canonical_id": "alibaba/qwen3.6-plus",
    "release_date": "2026-04-02",
    "limit": {
@@ -14108,7 +14185,7 @@
    "name": "Qwen3.6 Plus Free",
    "description": "Legacy model retained for compatibility with older integrations",
    "type": "chat",
-   "family": "qwen",
+   "family": "qwen-plus-free",
    "canonical_id": "alibaba/qwen3.6-plus",
    "status": "deprecated",
    "release_date": "2026-04-02",
@@ -14193,7 +14270,7 @@
    "name": "Qwen3.8 Flash",
    "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
    "type": "chat",
-   "family": "qwen",
+   "family": "qwen-flash",
    "canonical_id": "alibaba/qwen3.8-flash",
    "release_date": "2026-08-26",
    "limit": {
@@ -14291,7 +14368,7 @@
    "name": "Qwen3.8 Max",
    "description": "2.4-trillion-parameter MoE flagship for coding, professional work, multimodal understanding, and long-horizon agentic workflows",
    "type": "chat",
-   "family": "qwen",
+   "family": "qwen-max",
    "canonical_id": "alibaba/qwen3.8-max",
    "release_date": "2026-08-03",
    "limit": {
@@ -14379,7 +14456,7 @@
    "name": "Ring 2.6 1T Free",
    "description": "Legacy model retained for compatibility with older integrations",
    "type": "chat",
-   "family": "ring-1t-free",
+   "family": "ring-free",
    "status": "deprecated",
    "release_date": "2026-05-08",
    "limit": {
@@ -14516,6 +14593,7 @@
    "name": "Step 5 Preview Free",
    "description": "StepFun's next-generation flagship base model for coding and professional knowledge work, with native text, image, and video input and a 1M-token context window",
    "type": "chat",
+   "family": "step-free",
    "canonical_id": "stepfun/step-5-preview",
    "status": "deprecated",
    "release_date": "2026-09-16",
@@ -14780,7 +14858,7 @@
    "name": "Trinity Large Preview",
    "description": "Legacy model retained for compatibility with older integrations",
    "type": "chat",
-   "family": "trinity",
+   "family": "trinity-large-free",
    "canonical_id": "arcee-ai/trinity-large-preview",
    "status": "deprecated",
    "release_date": "2026-01-27",
@@ -14899,7 +14977,7 @@
    "name": "voyage-code-4",
    "description": "Code embedding model for code retrieval and coding agents",
    "type": "embedding",
-   "family": "voyage",
+   "family": "voyage-code",
    "canonical_id": "voyageai/voyage-code-4",
    "release_date": "2026-08-13",
    "limit": {
