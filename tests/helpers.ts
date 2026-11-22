@@ -11,6 +11,7 @@ import {
   EntryDetailSchema,
   EntrySummarySchema,
   LimitEvaluationRecordSchema,
+  ListingSchema,
   MetaSchema,
   one,
   pageOf,
@@ -644,6 +645,11 @@ export async function contractProblems(dir: string): Promise<string[]> {
   valid(pageOf(CanonicalModelSchema), await ask("/api/v1/models?limit=200"), "models");
   valid(pageOf(CacheEvaluationRecordSchema), await ask("/api/v1/evaluations/cache?limit=200"), "cache evaluations");
   valid(pageOf(LimitEvaluationRecordSchema), await ask("/api/v1/evaluations/limits?limit=200"), "limit evaluations");
+  // The listings, in both views, and each one alone (since 1.4.0).
+  const listings = (await ask("/api/v1/listings?view=full&limit=200")) as { data: { provider: string }[] };
+  valid(pageOf(ListingSchema), listings, "listings, view=full");
+  valid(pageOf(ListingSchema), await ask("/api/v1/listings?limit=200"), "listings");
+  for (const listing of listings.data) valid(one(ListingSchema), await ask(`/api/v1/listings/${encodeURIComponent(listing.provider)}`), `listing ${listing.provider}`);
   const model = modelsFor(local.index)[0]!;
   valid(one(CanonicalModelDetailSchema), await ask(`/api/v1/models/${model.id}`), model.id);
   // Every entry in full, straight from the export: thousands of them, so no request each.

@@ -15,6 +15,7 @@ import type { ProviderSummary, Summary } from "./entries.ts";
 import type { InputWindow, InputWindowMeasurement } from "./limits.ts";
 import type { CanonicalModel, CanonicalModelDetail, Correction, Documentation, Facets, ModelInputWindowEnd } from "./resources.ts";
 import type { PiBlock, PiCost, PiCostTier, PiDifference, PiSummary, PiValue } from "./pi.ts";
+import type { Listing, ListingModel, ListingReasoning, ListingReasoningSources, ListingSources } from "./listings.ts";
 import type { PiStatements, PriceStatement, PriceTier, SafePrice, SafeValue, SafeValues, SourceValue } from "./safe.ts";
 import { Access, type Exclusion, type MeasuredLimit, type ModelExtension, type ProviderExtension, type Provenance, type PublishedEvidence } from "./schema.ts";
 
@@ -533,6 +534,89 @@ export const CanonicalModelDetailSchema = z
   .strictObject({ ...canonicalModel, entries: z.array(EntrySummarySchema).describe("Every entry for the model: the lab's own API first, then subscriptions, then the rest by provider.") })
   .describe("A canonical model with every entry that serves it.") satisfies z.ZodType<CanonicalModelDetail>;
 
+// ---- listings: every model a provider and access method offers, measured or not. Since 1.4.0.
+const listingSource = z.enum(["listed", "providers.dev", "models.dev", "pi.dev"]);
+const fieldSource = listingSource.nullable();
+
+export const ListingReasoningSchema = z
+  .strictObject({
+    supported: z.boolean().nullable().describe("The model reasons (thinks) at all. Null = no source says."),
+    levels: z.array(z.string()).nullable().describe("The reasoning levels a request can ask for, in the source's order, for example low, medium, high. Null = no source states them. Empty = the source states none."),
+    budget_min: z.int().min(0).nullable().describe("The smallest thinking budget, in tokens. Null = not stated."),
+    budget_max: z.int().min(0).nullable().describe("The largest thinking budget, in tokens. Null = not stated."),
+    can_disable: z.boolean().nullable().describe("Thinking can be turned off. Null = not stated."),
+    dynamic: z.boolean().nullable().describe("The model may choose its own budget. Null = not stated."),
+    disable_with: z.string().nullable().describe("The vendor's word for off, where it is not the usual one. Null = not stated."),
+  })
+  .describe("What the sources say of a listed model's reasoning. Each key from the first source that states it.") satisfies z.ZodType<ListingReasoning>;
+
+export const ListingReasoningSourcesSchema = z
+  .strictObject({
+    supported: fieldSource,
+    levels: fieldSource,
+    budget_min: fieldSource,
+    budget_max: fieldSource,
+    can_disable: fieldSource,
+    dynamic: fieldSource,
+    disable_with: fieldSource,
+  })
+  .describe("Per key of reasoning, the source that gave it. Null = no source states it.") satisfies z.ZodType<ListingReasoningSources>;
+
+export const ListingSourcesSchema = z
+  .strictObject({
+    name: fieldSource,
+    owner: fieldSource,
+    released: fieldSource,
+    context_window: fieldSource,
+    max_input: fieldSource,
+    max_output: fieldSource,
+    input_modalities: fieldSource,
+    output_modalities: fieldSource,
+    reasoning: ListingReasoningSourcesSchema,
+    web_search: fieldSource,
+    aliases: fieldSource,
+    variants: fieldSource,
+    plans: fieldSource,
+    hidden: fieldSource,
+  })
+  .describe("Per field of a listed model, the source that gave it: listed (the vendor's own list, through groundtruth's discovery), providers.dev (an authored statement with evidence), models.dev, pi.dev. Null = no source states it. Other values may be added.") satisfies z.ZodType<ListingSources>;
+
+export const ListingModelSchema = z
+  .strictObject({
+    id: z.string().min(1).describe("The id a request names on this access method."),
+    name: z.string().nullable().describe("Null = no source names it."),
+    owner: z.string().nullable().describe("The lab that makes the model. Null = not stated."),
+    entry: z.strictObject({ provider: z.string(), model: z.string() }).nullable().describe("The catalog entry for this model on this provider, as in /api/v1/entries/{provider}/{model}. Null = listed, not an entry of the catalog."),
+    canonical: z.string().nullable().describe("canonical_id of that entry. Null without an entry, or where the entry names none."),
+    released: z.string().nullable().describe("The release date as the source writes it. Null = not stated."),
+    context_window: z.int().positive().nullable().describe("Tokens: the window input and output share. Null = not stated; never 0."),
+    max_input: z.int().positive().nullable().describe("Tokens: the most input, where the source states it apart from the window. Null = not stated."),
+    max_output: z.int().positive().nullable().describe("Tokens: the most one response can hold. A maximum, not a default. Null = not stated."),
+    input_modalities: z.array(z.string()).nullable().describe("The kinds of input: text, image, audio, video, pdf, and others as the source names them. Null = not stated."),
+    output_modalities: z.array(z.string()).nullable().describe("The kinds of output. Null = not stated."),
+    reasoning: ListingReasoningSchema.nullable().describe("Null = no source says anything about reasoning."),
+    web_search: z.boolean().nullable().describe("The access method runs the vendor's own web search for this model. Null = not stated."),
+    aliases: z.array(z.string()).describe("Other ids the access method accepts for the model. Empty = none stated."),
+    variants: z.array(z.string()).describe("The vendor's own ids where it has one id per reasoning level (Devin). Empty where id itself is what a request names."),
+    plans: z.array(z.string()).describe("Plan names the vendor's own list attaches to the model, as it writes them. Empty = the list names none. No prices, allowances or quotas."),
+    hidden: z.boolean().nullable().describe("The vendor's list marks the model as not shown in pickers. Null = not stated."),
+    sources: ListingSourcesSchema,
+  })
+  .describe("One model of a listing: what the sources state of it on this access method. A listed model need not be an entry.") satisfies z.ZodType<ListingModel>;
+
+export const ListingSchema = z
+  .strictObject({
+    provider: z.string().describe("The provider id, as in /api/v1/providers/{provider}."),
+    basis: listingSource.describe("The source the listing's models are taken from, whole: listed (the vendor's own list, read by groundtruth's discovery), providers.dev (an authored list), models.dev (the imported entries of the provider), pi.dev (pi's models of the provider). The first of these four that has a list for the provider. Other values may be added."),
+    listed_at: date.nullable().describe("The day that source was read: the discovery's date for listed, the import's date for models.dev and pi.dev, the newest evidence date for providers.dev. Null = not known."),
+    client: z.string().nullable().describe("For listed: the public id of the client that read the vendor's list, as in data/authored/measurement-labels.yaml. Null otherwise."),
+    client_label: z.string().nullable().describe("Its public label. Null with client."),
+    evidence: z.array(EvidenceSchema).describe("Where the list comes from: the discovery file for listed, the authored evidence for providers.dev. Empty for an imported list, whose date is listed_at."),
+    model_count: z.int().min(0).describe("How many models the listing has."),
+    models: z.array(ListingModelSchema).nullable().describe("The models, in the source's order. Null in /api/v1/listings without view=full, so that the answer has the same keys in both views."),
+  })
+  .describe("The model list of one provider and access method: what the vendor's own list said, read on a date through a named client, completed by sourced statements. Not an evaluation: a listed model need not be an entry, and nothing of a listing is written into an entry. Since 1.4.0.") satisfies z.ZodType<Listing>;
+
 // ---- full objects. The part that comes from models.dev is theirs and grows with it, so unknown fields are allowed there.
 export const EntrySchema = z
   .looseObject({
@@ -652,6 +736,22 @@ export const MetaSchema = z
           .describe("The three add up to snapshot.models."),
       })
       .describe("pi's model catalog, the second imported source: where it came from, whether the last import worked, and how much of it is in this dataset. Since 1.2.0."),
+    listings: z
+      .strictObject({
+        count: z.int().min(0).describe("Listings in this dataset."),
+        models: z.int().min(0).describe("Models in them, all listings together."),
+        by_basis: z
+          .strictObject({ listed: z.int().min(0), "providers.dev": z.int().min(0), "models.dev": z.int().min(0), "pi.dev": z.int().min(0) })
+          .describe("Listings by the source of their models."),
+        source: z.string().describe("The address groundtruth's discovery file, listed.json, is fetched from."),
+        fetched_at: z.string().nullable().describe("When the discovery file this dataset is built on was fetched. Null = there is none."),
+        checked_at: z.string().nullable().describe("When it was last confirmed unchanged. Null = there is none."),
+        listed_at: date.nullable().describe("The newest day a provider's list in that file was read. Null = there is none."),
+        sync: z
+          .strictObject({ last_attempt_at: z.string().nullable(), last_attempt_ok: z.boolean().nullable(), last_error: z.string().nullable() })
+          .describe("The last attempt to fetch the discovery file. All null = none is recorded. A failed attempt keeps the last good file."),
+      })
+      .describe("The listings (/api/v1/listings) and the discovery file they read. Since 1.4.0."),
   })
   .describe("The dataset: its version, what it holds and where it comes from.");
 
@@ -674,7 +774,7 @@ export const one = <T extends z.ZodType>(data: T) => z.strictObject({ meta: Brie
 
 export const ErrorSchema = z.strictObject({
   error: z.strictObject({
-    code: z.string().describe("invalid_parameters, provider_not_found, entry_not_found, model_not_found, method_not_allowed, not_found or snapshot_incomplete."),
+    code: z.string().describe("invalid_parameters, provider_not_found, entry_not_found, model_not_found, listing_not_found, method_not_allowed, not_found or snapshot_incomplete."),
     message: z.string(),
     details: json.optional(),
   }),
@@ -769,4 +869,9 @@ export const COMPONENTS = {
   LimitEvaluationRecord: LimitEvaluationRecordSchema,
   Meta: MetaSchema,
   Error: ErrorSchema,
+  Listing: ListingSchema,
+  ListingModel: ListingModelSchema,
+  ListingReasoning: ListingReasoningSchema,
+  ListingSources: ListingSourcesSchema,
+  ListingReasoningSources: ListingReasoningSourcesSchema,
 } as const;

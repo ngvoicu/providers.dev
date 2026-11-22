@@ -999,6 +999,195 @@
         }
       }
     },
+    "/api/v1/listings": {
+      "get": {
+        "parameters": {
+          "query:provider": {
+            "in": "query",
+            "name": "provider",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "list": true
+            }
+          },
+          "query:basis": {
+            "in": "query",
+            "name": "basis",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "list": [
+                "listed",
+                "models.dev",
+                "pi.dev",
+                "providers.dev"
+              ]
+            }
+          },
+          "query:view": {
+            "in": "query",
+            "name": "view",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "full",
+                "summary"
+              ]
+            }
+          },
+          "query:limit": {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50
+            }
+          },
+          "query:offset": {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "headers": {
+              "ETag": {
+                "type": "string"
+              },
+              "X-Dataset-Version": {
+                "type": "string"
+              },
+              "X-Dataset-Generated-At": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "X-Upstream-Fetched-At": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "content": {
+              "application/json": {
+                "type": "object",
+                "properties": {
+                  "meta": {
+                    "ref": "BriefMeta"
+                  },
+                  "total": {
+                    "type": "integer"
+                  },
+                  "limit": {
+                    "type": "integer"
+                  },
+                  "offset": {
+                    "type": "integer"
+                  },
+                  "next_offset": {
+                    "type": "integer",
+                    "nullable": true
+                  },
+                  "data": {
+                    "type": "array",
+                    "items": {
+                      "ref": "Listing"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "headers": {},
+            "content": {}
+          },
+          "400": {
+            "headers": {},
+            "content": {
+              "application/json": {
+                "ref": "Error"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/listings/{provider}": {
+      "get": {
+        "parameters": {
+          "path:provider": {
+            "in": "path",
+            "name": "provider",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "headers": {
+              "ETag": {
+                "type": "string"
+              },
+              "X-Dataset-Version": {
+                "type": "string"
+              },
+              "X-Dataset-Generated-At": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "X-Upstream-Fetched-At": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "content": {
+              "application/json": {
+                "type": "object",
+                "properties": {
+                  "meta": {
+                    "ref": "BriefMeta"
+                  },
+                  "data": {
+                    "ref": "Listing"
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "headers": {},
+            "content": {}
+          },
+          "400": {
+            "headers": {},
+            "content": {
+              "application/json": {
+                "ref": "Error"
+              }
+            }
+          },
+          "404": {
+            "headers": {},
+            "content": {
+              "application/json": {
+                "ref": "Error"
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/meta": {
       "get": {
         "parameters": {},
@@ -5485,6 +5674,73 @@
               }
             }
           }
+        },
+        "listings": {
+          "type": "object",
+          "properties": {
+            "count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "models": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "by_basis": {
+              "type": "object",
+              "properties": {
+                "listed": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "providers.dev": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "models.dev": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "pi.dev": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "source": {
+              "type": "string"
+            },
+            "fetched_at": {
+              "type": "string",
+              "nullable": true
+            },
+            "checked_at": {
+              "type": "string",
+              "nullable": true
+            },
+            "listed_at": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "nullable": true
+            },
+            "sync": {
+              "type": "object",
+              "properties": {
+                "last_attempt_at": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "last_attempt_ok": {
+                  "type": "boolean",
+                  "nullable": true
+                },
+                "last_error": {
+                  "type": "string",
+                  "nullable": true
+                }
+              }
+            }
+          }
         }
       },
       "additional": {
@@ -5508,6 +5764,403 @@
               "optional": true
             }
           }
+        }
+      }
+    },
+    "Listing": {
+      "type": "object",
+      "properties": {
+        "provider": {
+          "type": "string"
+        },
+        "basis": {
+          "type": "string",
+          "enum": [
+            "listed",
+            "models.dev",
+            "pi.dev",
+            "providers.dev"
+          ]
+        },
+        "listed_at": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "nullable": true
+        },
+        "client": {
+          "type": "string",
+          "nullable": true
+        },
+        "client_label": {
+          "type": "string",
+          "nullable": true
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "ref": "Evidence"
+          }
+        },
+        "model_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "models": {
+          "type": "array",
+          "items": {
+            "ref": "ListingModel"
+          },
+          "nullable": true
+        }
+      }
+    },
+    "ListingModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "nullable": true
+        },
+        "owner": {
+          "type": "string",
+          "nullable": true
+        },
+        "entry": {
+          "type": "object",
+          "properties": {
+            "provider": {
+              "type": "string"
+            },
+            "model": {
+              "type": "string"
+            }
+          },
+          "nullable": true
+        },
+        "canonical": {
+          "type": "string",
+          "nullable": true
+        },
+        "released": {
+          "type": "string",
+          "nullable": true
+        },
+        "context_window": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "nullable": true
+        },
+        "max_input": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "nullable": true
+        },
+        "max_output": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "nullable": true
+        },
+        "input_modalities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "nullable": true
+        },
+        "output_modalities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "nullable": true
+        },
+        "reasoning": {
+          "ref": "ListingReasoning",
+          "nullable": true
+        },
+        "web_search": {
+          "type": "boolean",
+          "nullable": true
+        },
+        "aliases": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "variants": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "plans": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "hidden": {
+          "type": "boolean",
+          "nullable": true
+        },
+        "sources": {
+          "ref": "ListingSources"
+        }
+      }
+    },
+    "ListingReasoning": {
+      "type": "object",
+      "properties": {
+        "supported": {
+          "type": "boolean",
+          "nullable": true
+        },
+        "levels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "nullable": true
+        },
+        "budget_min": {
+          "type": "integer",
+          "minimum": 0,
+          "nullable": true
+        },
+        "budget_max": {
+          "type": "integer",
+          "minimum": 0,
+          "nullable": true
+        },
+        "can_disable": {
+          "type": "boolean",
+          "nullable": true
+        },
+        "dynamic": {
+          "type": "boolean",
+          "nullable": true
+        },
+        "disable_with": {
+          "type": "string",
+          "nullable": true
+        }
+      }
+    },
+    "ListingSources": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": [
+            "listed",
+            "models.dev",
+            "pi.dev",
+            "providers.dev"
+          ],
+          "nullable": true
+        },
+        "owner": {
+          "type": "string",
+          "enum": [
+            "listed",
+            "models.dev",
+            "pi.dev",
+            "providers.dev"
+          ],
+          "nullable": true
+        },
+        "released": {
+          "type": "string",
+          "enum": [
+            "listed",
+            "models.dev",
+            "pi.dev",
+            "providers.dev"
+          ],
+          "nullable": true
+        },
+        "context_window": {
+          "type": "string",
+          "enum": [
+            "listed",
+            "models.dev",
+            "pi.dev",
+            "providers.dev"
+          ],
+          "nullable": true
+        },
+        "max_input": {
+          "type": "string",
+          "enum": [
+            "listed",
+            "models.dev",
+            "pi.dev",
+            "providers.dev"
+          ],
+          "nullable": true
+        },
+        "max_output": {
+          "type": "string",
+          "enum": [
+            "listed",
+            "models.dev",
+            "pi.dev",
+            "providers.dev"
+          ],
+          "nullable": true
+        },
+        "input_modalities": {
+          "type": "string",
+          "enum": [
+            "listed",
+            "models.dev",
+            "pi.dev",
+            "providers.dev"
+          ],
+          "nullable": true
+        },
+        "output_modalities": {
+          "type": "string",
+          "enum": [
+            "listed",
+            "models.dev",
+            "pi.dev",
+            "providers.dev"
+          ],
+          "nullable": true
+        },
+        "reasoning": {
+          "ref": "ListingReasoningSources"
+        },
+        "web_search": {
+          "type": "string",
+          "enum": [
+            "listed",
+            "models.dev",
+            "pi.dev",
+            "providers.dev"
+          ],
+          "nullable": true
+        },
+        "aliases": {
+          "type": "string",
+          "enum": [
+            "listed",
+            "models.dev",
+            "pi.dev",
+            "providers.dev"
+          ],
+          "nullable": true
+        },
+        "variants": {
+          "type": "string",
+          "enum": [
+            "listed",
+            "models.dev",
+            "pi.dev",
+            "providers.dev"
+          ],
+          "nullable": true
+        },
+        "plans": {
+          "type": "string",
+          "enum": [
+            "listed",
+            "models.dev",
+            "pi.dev",
+            "providers.dev"
+          ],
+          "nullable": true
+        },
+        "hidden": {
+          "type": "string",
+          "enum": [
+            "listed",
+            "models.dev",
+            "pi.dev",
+            "providers.dev"
+          ],
+          "nullable": true
+        }
+      }
+    },
+    "ListingReasoningSources": {
+      "type": "object",
+      "properties": {
+        "supported": {
+          "type": "string",
+          "enum": [
+            "listed",
+            "models.dev",
+            "pi.dev",
+            "providers.dev"
+          ],
+          "nullable": true
+        },
+        "levels": {
+          "type": "string",
+          "enum": [
+            "listed",
+            "models.dev",
+            "pi.dev",
+            "providers.dev"
+          ],
+          "nullable": true
+        },
+        "budget_min": {
+          "type": "string",
+          "enum": [
+            "listed",
+            "models.dev",
+            "pi.dev",
+            "providers.dev"
+          ],
+          "nullable": true
+        },
+        "budget_max": {
+          "type": "string",
+          "enum": [
+            "listed",
+            "models.dev",
+            "pi.dev",
+            "providers.dev"
+          ],
+          "nullable": true
+        },
+        "can_disable": {
+          "type": "string",
+          "enum": [
+            "listed",
+            "models.dev",
+            "pi.dev",
+            "providers.dev"
+          ],
+          "nullable": true
+        },
+        "dynamic": {
+          "type": "string",
+          "enum": [
+            "listed",
+            "models.dev",
+            "pi.dev",
+            "providers.dev"
+          ],
+          "nullable": true
+        },
+        "disable_with": {
+          "type": "string",
+          "enum": [
+            "listed",
+            "models.dev",
+            "pi.dev",
+            "providers.dev"
+          ],
+          "nullable": true
         }
       }
     }

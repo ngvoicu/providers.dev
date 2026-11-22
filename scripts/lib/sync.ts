@@ -13,6 +13,8 @@ import { piOfSync } from "./pi-fence.ts";
 export const UPSTREAM_URL = "https://models.dev/experimental/v2.0/api.json?include=openai-codex";
 export const UPSTREAM_COMMIT_URL = "https://api.github.com/repos/anomalyco/models.dev/commits/dev";
 export const OBSERVED_URL = "https://raw.githubusercontent.com/ngvoicu/groundtruth/main/observed.json";
+/** groundtruth's discovery: what each login's vendor listed, beside observed.json at the root of its repository. */
+export const LISTED_URL = "https://raw.githubusercontent.com/ngvoicu/groundtruth/main/listed.json";
 
 /** An import smaller than this is treated as broken, whatever the previous snapshot held. */
 const MIN_PROVIDERS = 20;

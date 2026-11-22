@@ -658,6 +658,26 @@ export interface Meta {
   license: { data: string; upstream: string; notice: string; pi: string; pi_notice: string };
   /** pi's model catalog, the second imported source. Always there: without a snapshot, `snapshot` is null and the counts 0. */
   pi: MetaPi;
+  /** The listings (/api/v1/listings) and the discovery file they read. Since 1.4.0. */
+  listings: MetaListings;
+}
+
+export interface MetaListings {
+  /** Listings in this dataset. */
+  count: number;
+  /** Models in them, all listings together. */
+  models: number;
+  /** Listings by the source of their models. */
+  by_basis: { listed: number; "providers.dev": number; "models.dev": number; "pi.dev": number };
+  /** The address the discovery file (listed.json) is fetched from. */
+  source: string;
+  /** When the discovery file this dataset is built on was fetched. Null = there is none. */
+  fetched_at: string | null;
+  checked_at: string | null;
+  /** The newest date a provider's list in that file was read. Null = there is none. */
+  listed_at: string | null;
+  /** The last attempt to fetch the discovery file. All null = none is recorded. */
+  sync: { last_attempt_at: string | null; last_attempt_ok: boolean | null; last_error: string | null };
 }
 
 export interface MetaPi {

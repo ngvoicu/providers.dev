@@ -11,6 +11,7 @@ import {
   CanonicalModelDetailSchema,
   EntryDetailSchema,
   EntrySummarySchema,
+  ListingSchema,
   MeasuredLimitSchema,
   one,
   pageOf,
@@ -24,6 +25,7 @@ import { handlePage } from "../src/core/pages.ts";
 import { MARK } from "../src/core/page-shell.ts";
 import { CACHE_EVALUATION_PARAMS, LIMIT_EVALUATION_PARAMS, PARAMS, parseQuery, runQuery } from "../src/core/query.ts";
 import { canonicalModels, inputWindowRange, listEvaluations, withoutEntries } from "../src/core/resources.ts";
+import type { Listing } from "../src/core/listings.ts";
 import { ext, type Catalog, type Meta, type ModelExtension } from "../src/core/schema.ts";
 import { depsFrom, fetchReturning, fixturePi, fixtureUpstream, contractProblems, inputWindowRuleBreaks, lifetimeRuleBreaks, piShort, ROOT, safeBreaks, summaryOf, tempDataDir, writeAuthored, writePiSnapshot } from "./helpers.ts";
 
@@ -503,7 +505,8 @@ describe("HTTP behaviour", () => {
       "/api/v1/providers/{provider}": "/api/v1/providers/provider-02",
       "/api/v1/models/{lab}/{model}": "/api/v1/models/lab/model-1",
     };
-    for (const path of Object.keys(document.paths).filter((item) => item.startsWith("/api/v1/"))) {
+    // The fixture has no listing yet: /api/v1/listings/{provider} is asked in the listings' own tests.
+    for (const path of Object.keys(document.paths).filter((item) => item.startsWith("/api/v1/") && item !== "/api/v1/listings/{provider}")) {
       const response = await get(example[path] ?? path);
       expect(response.status, path).toBe(200);
     }
@@ -696,6 +699,64 @@ describe("the input window of a model", () => {
   });
 });
 
+describe("listings: the contract and the two paths (1.4.0)", () => {
+  /** A snapshot whose listings file holds `data`: the rest is the fixture's. */
+  const withListings = (data: Listing[]): ApiDeps => ({
+    ...deps,
+    asset: async (path: string) => (path === "/data/listings.json" ? new Response(JSON.stringify({ meta: {}, data })) : deps.asset(path)),
+  });
+  const ask = async (local: ApiDeps, path: string): Promise<Response> => handleApi(new Request(`https://providers.dev${path}`), local);
+  const sources = { name: null, owner: null, released: null, context_window: null, max_input: null, max_output: null, input_modalities: null, output_modalities: null, reasoning: { supported: null, levels: null, budget_min: null, budget_max: null, can_disable: null, dynamic: null, disable_with: null }, web_search: null, aliases: null, variants: null, plans: null, hidden: null };
+  const model = { id: "m", name: null, owner: null, entry: null, canonical: null, released: null, context_window: null, max_input: null, max_output: null, input_modalities: null, output_modalities: null, reasoning: null, web_search: null, aliases: [], variants: [], plans: [], hidden: null, sources };
+  const listing = (provider: string): Listing => ({ provider, basis: "listed", listed_at: "2026-11-22", client: "provimux", client_label: "Provimux", evidence: [], model_count: 1, models: [model] });
+
+  it("answers an empty page when there is no listing", async () => {
+    const response = await ask(withListings([]), "/api/v1/listings?view=full");
+    expect(response.status).toBe(200);
+    const body = (await response.json()) as Record<string, unknown>;
+    expect(pageOf(ListingSchema).safeParse(body).success).toBe(true);
+    expect(body).toMatchObject({ total: 0, offset: 0, next_offset: null, data: [] });
+  });
+
+  it("gives models only with view=full, with the same keys in both views, and filters by provider and basis", async () => {
+    const local = withListings([listing("a"), listing("b")]);
+    const short = (await (await ask(local, "/api/v1/listings")).json()) as { data: Listing[] };
+    const full = (await (await ask(local, "/api/v1/listings?view=full")).json()) as { data: Listing[] };
+    expect(short.data.map((item) => item.models)).toEqual([null, null]);
+    expect(full.data.map((item) => item.models)).toEqual([[model], [model]]);
+    expect(Object.keys(short.data[0]!)).toEqual(Object.keys(full.data[0]!));
+    for (const item of [...short.data, ...full.data]) expect(ListingSchema.safeParse(item).success).toBe(true);
+    expect(((await (await ask(local, "/api/v1/listings?provider=b")).json()) as { data: Listing[] }).data.map((item) => item.provider)).toEqual(["b"]);
+    expect(((await (await ask(local, "/api/v1/listings?basis=models.dev")).json()) as { total: number }).total).toBe(0);
+    expect((await ask(local, "/api/v1/listings?basis=router")).status).toBe(400);
+    expect((await ask(local, "/api/v1/listings?view=all")).status).toBe(400);
+  });
+
+  it("gives one listing with its models, 404 listing_not_found otherwise", async () => {
+    const local = withListings([listing("provider-02")]);
+    const one = (await (await ask(local, "/api/v1/listings/provider-02")).json()) as { data: Listing };
+    expect(one.data.models).toEqual([model]);
+    const known = await ask(local, "/api/v1/listings/provider-03");
+    expect(known.status).toBe(404);
+    expect(((await known.json()) as { error: { code: string; message: string } }).error).toMatchObject({ code: "listing_not_found", message: expect.stringContaining("has no listing") });
+    expect(((await (await ask(local, "/api/v1/listings/nobody")).json()) as { error: { message: string } }).error.message).toContain('No provider "nobody"');
+    expect((await ask(local, "/api/v1/listings/provider-02?view=full")).status).toBe(400);
+  });
+
+  it("is in the OpenAPI document: two paths, the Listing components with every key required, meta.listings, and a guide section", async () => {
+    const document = (await (await get("/api/v1/openapi.json")).json()) as { paths: Record<string, unknown>; "x-guide": { id: string; paragraphs: string[] }[]; components: { schemas: Record<string, { properties: Record<string, unknown>; required: string[] }> } };
+    expect(Object.keys(document.paths)).toEqual(expect.arrayContaining(["/api/v1/listings", "/api/v1/listings/{provider}"]));
+    const schemas = document.components.schemas;
+    for (const name of ["Listing", "ListingModel", "ListingReasoning", "ListingSources", "ListingReasoningSources"]) expect(schemas[name]!.required, name).toEqual(Object.keys(schemas[name]!.properties));
+    expect(Object.keys(schemas.Listing!.properties)).toEqual(["provider", "basis", "listed_at", "client", "client_label", "evidence", "model_count", "models"]);
+    expect(Object.keys((schemas.Meta!.properties.listings as { properties: Record<string, unknown> }).properties)).toEqual(["count", "models", "by_basis", "source", "fetched_at", "checked_at", "listed_at", "sync"]);
+    const text = document["x-guide"].find((section) => section.id === "listings")!.paragraphs.join(" ");
+    for (const words of ["Since 1.4.0", "need not be an entry", "taken whole from the first source", "no prices, allowances or quotas"]) expect(text).toContain(words);
+    const meta = (await (await get("/api/v1/meta")).json()) as { data: Meta };
+    expect(meta.data.listings.source).toBe("https://raw.githubusercontent.com/ngvoicu/groundtruth/main/listed.json");
+  });
+});
+
 describe("the contract", () => {
   /** Every answer of the API is checked against the definition the OpenAPI document is generated from. */
   const holds = async (dir: string): Promise<void> => {
@@ -775,6 +836,16 @@ describe("the contract", () => {
     same(extensions.flatMap((extension) => [...extension.evidence, ...extension.provenance.flatMap((change) => change.evidence)]), "evidence");
     for (const list of ["cache", "limits"]) same(((await ask(`/api/v1/evaluations/${list}?limit=200`)) as { data: object[] }).data, `the list of ${list} evaluations`);
     same(modelsFor(local.index).map(withoutEntries), "canonical models");
+    // The listings (1.4.0): every listing, model, reasoning record and sources record has the same keys, in both views.
+    const listings = ((await ask("/api/v1/listings?view=full&limit=200")) as { data: Listing[] }).data;
+    same(listings, "listings");
+    same(((await ask("/api/v1/listings?limit=200")) as { data: Listing[] }).data, "listings without view=full");
+    const listed = listings.flatMap((listing) => listing.models ?? []);
+    same(listed, "listed models");
+    same(listed.flatMap((model) => (model.reasoning ? [model.reasoning] : [])), "reasoning of a listed model");
+    same(listed.map((model) => model.sources), "sources of a listed model");
+    same(listed.map((model) => model.sources.reasoning), "sources.reasoning of a listed model");
+    same(listings.flatMap((listing) => listing.evidence), "evidence of a listing");
 
     // The cache lifetime record of every entry keeps the rules of section 2.6 of design/safe-cache-lifetime.md, and its
     // safe value is the documented lifetime exactly where no counted evaluation contradicts it, redone from evaluations[].

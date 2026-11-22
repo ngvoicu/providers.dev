@@ -29,7 +29,8 @@ import {
 import { readJsonIfExists, sha256, swapDir } from "./files.ts";
 import { fenced } from "./fenced.ts";
 import { piOfBuild, type PiOfBuild } from "./pi-fence.ts";
-import { loadUpstream, type SyncStatus } from "./sync.ts";
+import { LISTED_URL, loadUpstream, type SyncStatus } from "./sync.ts";
+import type { Listing } from "../../src/core/listings.ts";
 
 /**
  * providers.dev evidence (a correction, an evaluation, a measured lifetime) whose date is more than this many days before
@@ -193,8 +194,11 @@ export function publish(input: PublishOptions): PublishReport {
 
   // The version covers everything a reader can get: the catalog and the summaries made from it. A new summary field
   // changes the version (and with it every ETag) also when the catalog itself did not change.
+  // The listings: every model a provider offers, measured or not (src/core/listings.ts).
+  const listings: Listing[] = [];
+
   const draft = withPi(buildIndex(catalog, "", generatedAt, upstream.meta.fetched_at));
-  const datasetVersion = sha256(compact({ catalog, exclusions, providers: draft.providers, entries: draft.entries })).slice(0, 16);
+  const datasetVersion = sha256(compact({ catalog, exclusions, providers: draft.providers, entries: draft.entries, listings })).slice(0, 16);
   const index = withPi(buildIndex(catalog, datasetVersion, generatedAt, upstream.meta.fetched_at));
   const observedMeta = readJsonIfExists<SourceMeta>(join(dataDir, "sources", "observed.meta.json"));
 
@@ -244,10 +248,25 @@ export function publish(input: PublishOptions): PublishReport {
       pi_notice: "The pi block of an entry (providers_dev.pi) is imported from https://pi.dev/api/models. providers.dev is not affiliated with or endorsed by pi.",
     },
     pi: pi.meta,
+    listings: {
+      count: listings.length,
+      models: listings.reduce((sum, listing) => sum + listing.model_count, 0),
+      by_basis: {
+        listed: listings.filter((listing) => listing.basis === "listed").length,
+        "providers.dev": listings.filter((listing) => listing.basis === "providers.dev").length,
+        "models.dev": listings.filter((listing) => listing.basis === "models.dev").length,
+        "pi.dev": listings.filter((listing) => listing.basis === "pi.dev").length,
+      },
+      source: LISTED_URL,
+      fetched_at: null,
+      checked_at: null,
+      listed_at: null,
+      sync: { last_attempt_at: null, last_attempt_ok: null, last_error: null },
+    },
   };
 
   try {
-    writeSnapshot(next, catalog, index, meta, options.rootDir);
+    writeSnapshot(next, catalog, index, meta, listings, options.rootDir);
     verifySnapshot(next, index);
   } catch (error) {
     rmSync(next, { recursive: true, force: true });
@@ -266,7 +285,7 @@ export function writeBuildOutputs(report: PublishReport, path: string): void {
   appendFileSync(path, `pi=${report.pi}\n`);
 }
 
-function writeSnapshot(dir: string, catalog: Catalog, index: Index, meta: Meta, rootDir: string): void {
+function writeSnapshot(dir: string, catalog: Catalog, index: Index, meta: Meta, listings: Listing[], rootDir: string): void {
   const site = join(dir, "site");
   const short = { dataset_version: meta.dataset_version, generated_at: meta.generated_at, upstream_fetched_at: meta.upstream.fetched_at };
   mkdirSync(join(site, "data", "providers"), { recursive: true });
@@ -292,6 +311,8 @@ function writeSnapshot(dir: string, catalog: Catalog, index: Index, meta: Meta, 
   // Every evaluation with the entry it was made on: what /api/v1/evaluations/cache and /limits answer from.
   writeFileSync(join(site, "data", "evaluations.json"), compact({ meta: short, data: listEvaluations(catalog, index) }));
   writeFileSync(join(site, "data", "corrections.json"), compact({ meta: short, data: listCorrections(catalog, index) }));
+  // Every listing in full, by provider id: what /api/v1/listings and /api/v1/listings/{provider} answer from.
+  writeFileSync(join(site, "data", "listings.json"), compact({ meta: short, data: listings }));
   for (const [id, provider] of Object.entries(catalog)) {
     writeFileSync(join(site, "data", "providers", `${id}.json`), compact({ meta: short, data: provider }));
     // The provider's entries in full, alone: the Worker streams them into /api/v1/providers/{id}?view=full without

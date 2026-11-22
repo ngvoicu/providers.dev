@@ -1,7 +1,8 @@
 // The read-only HTTP API, as one function of (request, published data). The Worker calls it with the
 // built snapshot; the tests call it with the same files. It never fetches anything outside the snapshot.
 //
-// Resources: providers, entries (a model at a provider), models (canonical) and evaluations. Every collection
+// Resources: providers, entries (a model at a provider), models (canonical), evaluations and listings (every model a
+// provider offers, since 1.4.0). Every collection
 // answers `{ meta, total, limit, offset, next_offset, data }`; every single object `{ meta, data }`.
 import type { Index, Summary } from "./entries.ts";
 import { API_VERSION, openapi } from "./openapi.ts";
@@ -10,6 +11,7 @@ import {
   CORRECTION_PARAMS,
   CACHE_EVALUATION_PARAMS,
   LIMIT_EVALUATION_PARAMS,
+  LISTING_PARAMS,
   MODEL_PARAMS,
   parseParams,
   parseQuery,
@@ -20,6 +22,7 @@ import {
   type ParamDoc,
 } from "./query.ts";
 import { canonicalModels, DOCUMENTS, facets, page, withoutEntries, type CanonicalModelDetail, type Correction, type Documentation, type EvaluationRecord } from "./resources.ts";
+import type { Listing } from "./listings.ts";
 import type { Meta } from "./schema.ts";
 
 export interface ApiDeps {
@@ -253,6 +256,40 @@ export async function handleApi(request: Request, deps: ApiDeps): Promise<Respon
       yield asset?.body ?? "null";
       yield "}}";
     });
+  }
+
+  // ---- listings: every model a provider offers, measured or not. Since 1.4.0.
+  if (path === `${BASE}/listings`) {
+    const values = params(LISTING_PARAMS);
+    if (values instanceof Response) return values;
+    const asset = await deps.asset("/data/listings.json");
+    if (!asset) return missing("/data/listings.json");
+    const all = ((await asset.json()) as { data: Listing[] }).data;
+    const providers = values.provider as string[] | undefined;
+    const bases = values.basis as string[] | undefined;
+    const found = all.filter((item) => (!providers || providers.includes(item.provider)) && (!bases || bases.includes(item.basis)));
+    // The same keys in both views: `models` is null until it is asked for.
+    const shown = values.view === "full" ? found : found.map((item) => ({ ...item, models: null }));
+    return sendJson({ meta: brief(meta), ...page(shown, ...paging(values)) });
+  }
+  const listingId = under("listings");
+  if (listingId !== null) {
+    let id: string;
+    try {
+      id = decodeURIComponent(listingId);
+    } catch {
+      return fail(meta, 400, "invalid_parameters", "The provider id is not valid URL encoding.");
+    }
+    const values = params([]);
+    if (values instanceof Response) return values;
+    const asset = await deps.asset("/data/listings.json");
+    if (!asset) return missing("/data/listings.json");
+    const listing = ((await asset.json()) as { data: Listing[] }).data.find((item) => item.provider === id);
+    if (!listing) {
+      const known = index.providers.some((provider) => provider.id === id);
+      return fail(meta, 404, "listing_not_found", known ? `The provider "${id}" has no listing: no source has a model list for it.` : `No provider "${id}". GET ${BASE}/listings lists the listings.`);
+    }
+    return one(listing);
   }
 
   // ---- entries: a model at a provider

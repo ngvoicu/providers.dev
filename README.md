@@ -466,8 +466,10 @@ method), **models** (canonical: a model as its lab names it) and **evaluations**
 | `GET /api/v1/models/{lab}/{model}` | one canonical model with every entry that serves it |
 | `GET /api/v1/evaluations/cache` | every cache evaluation, with the entry it was made on |
 | `GET /api/v1/evaluations/limits` | every limit evaluation, with the entry it was made on |
+| `GET /api/v1/listings` | listings: every model a provider offers, evaluated or not; `?view=full` adds the models, `?provider=` and `?basis=` filter (since 1.4.0) |
+| `GET /api/v1/listings/{provider}` | one listing with its models (since 1.4.0) |
 | `GET /api/v1/catalog` | the complete merged catalog, `{ meta, data }` with `data` keyed by provider id |
-| `GET /api/v1/meta` | dataset version, counts, freshness, the stale threshold (`stale_after_days`), upstream commit, sync status, pi's catalog (`pi`), open issues |
+| `GET /api/v1/meta` | dataset version, counts, freshness, the stale threshold (`stale_after_days`), upstream commit, sync status, pi's catalog (`pi`), the listings and the discovery file (`listings`), open issues |
 | `GET /api/v1/openapi.json` | the OpenAPI 3.1 document |
 | `GET /api.json` | the merged catalog keyed by provider id, in the models.dev v2 structure, no envelope |
 
