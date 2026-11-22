@@ -19,6 +19,9 @@ import { publish, writeBuildOutputs, type PublishReport } from "../scripts/lib/p
 import { OBSERVED_URL, sync, UPSTREAM_COMMIT_URL, UPSTREAM_URL, writeStepOutputs, type SyncReport, type SyncStatus } from "../scripts/lib/sync.ts";
 import { contractProblems, fetchByAddress, fixturePi, fixtureUpstream, ROOT, tempDataDir, writeAuthored } from "./helpers.ts";
 
+/** The hooks of this file run whole data builds: well over vitest's 10 s default on a CI runner. */
+const HOOK_TIMEOUT = 120_000;
+
 // ---- the wrappers: every exported function of pi's two modules, counted, and the one fault of the row in hand.
 
 /** A fault: given the true function (run it or not), what the boundary function does instead. */
@@ -280,7 +283,7 @@ beforeAll(async () => {
     stringify({ providers: { "ghost-pi": { same_as: "provider-29", reason: "A pairing whose pi provider is gone.", evidence: [{ kind: "listed", url: "https://pi.dev/api/models", date: "2026-11-20", note: "ghost-pi" }] } } }),
   );
   setRecord(base, undefined);
-});
+}, HOOK_TIMEOUT);
 
 /** A copy of the base data folder, with pi's catalog (or none) and the record (or none). */
 function variant(pi: PiCatalog | null, record: unknown): string {
@@ -363,7 +366,7 @@ describe("1. the table of faults of the build, generated from what the fence cal
     expect(build(withoutDir)).toMatchObject({ ok: true, pi: "none" });
     healthy = filesOf(healthyDir);
     without = filesOf(withoutDir);
-  });
+  }, HOOK_TIMEOUT);
 
   it("the fixture is as the table needs it: a first block with a tier, a difference, compat, levels, cache lifetimes and values with a tiers item that has pi_tiers; one alias issue", () => {
     const block = blocksOf(healthy).get("provider-00/lab/model-0") as { cost: { tiers: unknown[] }; differences: unknown[]; compat: object; thinking_level_map: object; prompt_cache: object; values: { field: string; standing: string; pi_tiers: unknown[] | null }[] };
@@ -581,7 +584,7 @@ describe("1. the table of faults of the build, generated from what the fence cal
   describe("the private report's write", () => {
     afterEach(() => {
       state.reportWriteFails = false;
-    });
+    }, HOOK_TIMEOUT);
 
     it("the report's write throws: the healthy build, published, with one warning; pi-report.json absent", async () => {
       const dir = variant(piCatalog(), undefined);
@@ -633,7 +636,7 @@ describe("1. the table of faults of the build, generated from what the fence cal
       expect(build(recordHealthyDir)).toMatchObject({ ok: true, pi: "published" });
       recordHealthy = filesOf(recordHealthyDir);
       expect(metaOf(recordHealthy).pi.sync).toEqual({ last_attempt_at: RECORD.last_attempt_at, last_attempt_ok: true, last_error: null });
-    });
+    }, HOOK_TIMEOUT);
 
     const records: [string, unknown][] = [
       ["a string", "updated"],
@@ -691,7 +694,7 @@ describe("5. own properties: a name of Object.prototype is an id like any other"
     rmSync(join(dir, "authored", "pi-aliases.yaml"));
     expect(build(dir).pi).toBe("published");
     plainBlocks = blocksOf(filesOf(dir));
-  });
+  }, HOOK_TIMEOUT);
 
   const model = (provider: string, id: string): PiModel => ({ ...piCatalog()["provider-00"]!["model-1"]!, id, provider, name: `pi ${id}` });
 
@@ -796,7 +799,7 @@ describe("6. a part that fits and has no block is published whole, with the fenc
     withoutDir = variant(null, undefined);
     expect(build(healthyDir)).toMatchObject({ ok: true, pi: "published" });
     expect(build(withoutDir)).toMatchObject({ ok: true, pi: "none" });
-  });
+  }, HOOK_TIMEOUT);
 
   it("piPart's true result with no block and every match counted unmatched: pi's code says nothing, the fence warns, the data is published", async () => {
     const dir = variant(piCatalog(), undefined);
@@ -942,12 +945,12 @@ describe("2. the sync, by the same table", () => {
     expect(report).toMatchObject({ ok: true, pi: { status: "updated" }, piRevision7: "dd93eb2" });
     healthy = { report, status: statusOf(dir), upstream: under(join(dir, "upstream")), sources: under(join(dir, "sources")), pi: under(join(dir, "pi")) };
     expect(same(healthy.pi, piBefore)).toBe(false);
-  });
+  }, HOOK_TIMEOUT);
 
   afterEach(() => {
     vi.useRealTimers();
     state.fault = null;
-  });
+  }, HOOK_TIMEOUT);
 
   /** What must hold after a pi part that failed: everything of models.dev as a healthy run leaves it; data/pi/ usable. */
   const holds = (dir: string, report: SyncReport, pi: "as it was" | "as a healthy run leaves it"): void => {
