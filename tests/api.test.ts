@@ -504,9 +504,9 @@ describe("HTTP behaviour", () => {
       "/api/v1/entries/{provider}/{model}": "/api/v1/entries/provider-02/model-1",
       "/api/v1/providers/{provider}": "/api/v1/providers/provider-02",
       "/api/v1/models/{lab}/{model}": "/api/v1/models/lab/model-1",
+      "/api/v1/listings/{provider}": "/api/v1/listings/provider-02",
     };
-    // The fixture has no listing yet: /api/v1/listings/{provider} is asked in the listings' own tests.
-    for (const path of Object.keys(document.paths).filter((item) => item.startsWith("/api/v1/") && item !== "/api/v1/listings/{provider}")) {
+    for (const path of Object.keys(document.paths).filter((item) => item.startsWith("/api/v1/"))) {
       const response = await get(example[path] ?? path);
       expect(response.status, path).toBe(200);
     }
@@ -703,7 +703,11 @@ describe("listings: the contract and the two paths (1.4.0)", () => {
   /** A snapshot whose listings file holds `data`: the rest is the fixture's. */
   const withListings = (data: Listing[]): ApiDeps => ({
     ...deps,
-    asset: async (path: string) => (path === "/data/listings.json" ? new Response(JSON.stringify({ meta: {}, data })) : deps.asset(path)),
+    asset: async (path: string) => {
+      if (path === "/data/listings.json") return new Response(JSON.stringify({ meta: {}, data: data.map((item) => ({ ...item, models: null })) }));
+      const own = data.find((item) => path === `/data/listings/${item.provider}.json`);
+      return own ? new Response(JSON.stringify({ meta: {}, data: own })) : path.startsWith("/data/listings/") ? null : deps.asset(path);
+    },
   });
   const ask = async (local: ApiDeps, path: string): Promise<Response> => handleApi(new Request(`https://providers.dev${path}`), local);
   const sources = { name: null, owner: null, released: null, context_window: null, max_input: null, max_output: null, input_modalities: null, output_modalities: null, reasoning: { supported: null, levels: null, budget_min: null, budget_max: null, can_disable: null, dynamic: null, disable_with: null }, web_search: null, aliases: null, variants: null, plans: null, hidden: null };

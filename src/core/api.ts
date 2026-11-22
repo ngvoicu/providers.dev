@@ -264,13 +264,17 @@ export async function handleApi(request: Request, deps: ApiDeps): Promise<Respon
     if (values instanceof Response) return values;
     const asset = await deps.asset("/data/listings.json");
     if (!asset) return missing("/data/listings.json");
+    // Every listing with models: null. The same keys in both views: `models` is null until it is asked for.
     const all = ((await asset.json()) as { data: Listing[] }).data;
     const providers = values.provider as string[] | undefined;
     const bases = values.basis as string[] | undefined;
     const found = all.filter((item) => (!providers || providers.includes(item.provider)) && (!bases || bases.includes(item.basis)));
-    // The same keys in both views: `models` is null until it is asked for.
-    const shown = values.view === "full" ? found : found.map((item) => ({ ...item, models: null }));
-    return sendJson({ meta: brief(meta), ...page(shown, ...paging(values)) });
+    const shown = page(found, ...paging(values));
+    if (values.view !== "full") return sendJson({ meta: brief(meta), ...shown });
+    // In full: the file of each listing of the page, and nothing more.
+    const full = await Promise.all(shown.data.map((item) => loadListing(deps, item.provider)));
+    if (full.some((item) => item === null)) return missing("a listing's file");
+    return sendJson({ meta: brief(meta), ...shown, data: full });
   }
   const listingId = under("listings");
   if (listingId !== null) {
@@ -284,10 +288,12 @@ export async function handleApi(request: Request, deps: ApiDeps): Promise<Respon
     if (values instanceof Response) return values;
     const asset = await deps.asset("/data/listings.json");
     if (!asset) return missing("/data/listings.json");
-    const listing = ((await asset.json()) as { data: Listing[] }).data.find((item) => item.provider === id);
+    const known = ((await asset.json()) as { data: Listing[] }).data.some((item) => item.provider === id);
+    const listing = known ? await loadListing(deps, id) : null;
+    if (known && !listing) return missing("this listing's file");
     if (!listing) {
-      const known = index.providers.some((provider) => provider.id === id);
-      return fail(meta, 404, "listing_not_found", known ? `The provider "${id}" has no listing: no source has a model list for it.` : `No provider "${id}". GET ${BASE}/listings lists the listings.`);
+      const provider = index.providers.some((item) => item.id === id);
+      return fail(meta, 404, "listing_not_found", provider ? `The provider "${id}" has no listing: no source has a model list for it.` : `No provider "${id}". GET ${BASE}/listings lists the listings.`);
     }
     return one(listing);
   }
@@ -356,6 +362,12 @@ export async function handleApi(request: Request, deps: ApiDeps): Promise<Respon
   }
 
   return fail(meta, 404, "not_found", `No such endpoint. GET ${BASE}/openapi.json describes the API.`);
+}
+
+/** One listing in full, from its own file of the snapshot. Null when missing. */
+export async function loadListing(deps: Pick<ApiDeps, "asset">, provider: string): Promise<Listing | null> {
+  const asset = await deps.asset(`/data/listings/${encodeURIComponent(provider)}.json`);
+  return asset ? ((await asset.json()) as { data: Listing }).data : null;
 }
 
 export async function loadEntry(deps: Pick<ApiDeps, "asset">, summary: Summary): Promise<Record<string, unknown> | null> {

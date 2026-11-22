@@ -12,6 +12,7 @@ import { resolve } from "../../src/core/resolve.ts";
 import { layPi, mirror } from "../../src/core/safe.ts";
 import {
   AccessRules,
+  AuthoredListing,
   AuthoredProvider,
   CatalogRules,
   ext,
@@ -24,13 +25,14 @@ import {
   type Catalog,
   type Issue,
   type Meta,
+  type PublishedModel,
   type SourceMeta,
 } from "../../src/core/schema.ts";
 import { readJsonIfExists, sha256, swapDir } from "./files.ts";
 import { fenced } from "./fenced.ts";
 import { piOfBuild, type PiOfBuild } from "./pi-fence.ts";
 import { LISTED_URL, loadUpstream, type SyncStatus } from "./sync.ts";
-import type { Listing } from "../../src/core/listings.ts";
+import { buildListings, type Listing } from "../../src/core/listings.ts";
 
 /**
  * providers.dev evidence (a correction, an evaluation, a measured lifetime) whose date is more than this many days before
@@ -106,6 +108,8 @@ export function publish(input: PublishOptions): PublishReport {
   const authored = join(dataDir, "authored");
   const additions = loadYamlDir(join(authored, "providers"), AuthoredProvider, errors, (value) => value.id);
   const overrides = loadYamlDir(join(authored, "overrides"), OverrideFile, errors, (value) => value.provider);
+  // What providers.dev states of a provider's model list (src/core/listings.ts). May be absent.
+  const authoredListings = loadYamlDir(join(authored, "listings"), AuthoredListing, errors, (value) => value.provider);
   const access = loadYaml(join(authored, "access.yaml"), AccessRules, errors);
   const routes = loadYaml(join(authored, "routes.yaml"), RouteMap, errors);
   const labelsPath = join(authored, "measurement-labels.yaml");
@@ -194,8 +198,16 @@ export function publish(input: PublishOptions): PublishReport {
 
   // The version covers everything a reader can get: the catalog and the summaries made from it. A new summary field
   // changes the version (and with it every ETag) also when the catalog itself did not change.
-  // The listings: every model a provider offers, measured or not (src/core/listings.ts).
-  const listings: Listing[] = [];
+  // The listings: every model a provider offers, measured or not (src/core/listings.ts). Built from the catalog as
+  // published, after pi's blocks were laid on it; nothing of a listing is written back into an entry.
+  const leftOut = ruledOut.flatMap(({ ref }) => {
+    const slash = ref.indexOf("/");
+    const model = upstream.catalog[ref.slice(0, slash)]?.models[ref.slice(slash + 1)];
+    return model ? [{ ref, model: model as unknown as PublishedModel }] : [];
+  });
+  const built = buildListings({ catalog, upstreamDate: upstream.meta.fetched_at.slice(0, 10), authored: authoredListings, ruledOut: leftOut });
+  const listings = built.listings;
+  issues.push(...built.issues);
 
   const draft = withPi(buildIndex(catalog, "", generatedAt, upstream.meta.fetched_at));
   const datasetVersion = sha256(compact({ catalog, exclusions, providers: draft.providers, entries: draft.entries, listings })).slice(0, 16);
@@ -312,7 +324,11 @@ function writeSnapshot(dir: string, catalog: Catalog, index: Index, meta: Meta, 
   writeFileSync(join(site, "data", "evaluations.json"), compact({ meta: short, data: listEvaluations(catalog, index) }));
   writeFileSync(join(site, "data", "corrections.json"), compact({ meta: short, data: listCorrections(catalog, index) }));
   // Every listing in full, by provider id: what /api/v1/listings and /api/v1/listings/{provider} answer from.
-  writeFileSync(join(site, "data", "listings.json"), compact({ meta: short, data: listings }));
+  // The listings: every one without its models in one file, and each one in full in a file of its own, so that no
+  // answer reads more than the listings it gives (all of them in full are some 10 MB).
+  writeFileSync(join(site, "data", "listings.json"), compact({ meta: short, data: listings.map((listing) => ({ ...listing, models: null })) }));
+  mkdirSync(join(site, "data", "listings"), { recursive: true });
+  for (const listing of listings) writeFileSync(join(site, "data", "listings", `${listing.provider}.json`), compact({ meta: short, data: listing }));
   for (const [id, provider] of Object.entries(catalog)) {
     writeFileSync(join(site, "data", "providers", `${id}.json`), compact({ meta: short, data: provider }));
     // The provider's entries in full, alone: the Worker streams them into /api/v1/providers/{id}?view=full without

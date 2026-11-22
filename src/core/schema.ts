@@ -342,6 +342,70 @@ export const MeasurementLabels = z
   });
 export type MeasurementLabels = z.infer<typeof MeasurementLabels>;
 
+// ---- listings (src/core/listings.ts). The fields a source can state of a listed model, written once: an authored
+// statement (data/authored/listings/) and a model of the discovery file (listed.json) take the same. A field left out
+// is not stated.
+const nonEmpty = z.string().min(1);
+export const ListingFields = z.strictObject({
+  name: nonEmpty.optional(),
+  owner: nonEmpty.optional(),
+  released: nonEmpty.optional(),
+  context_window: z.int().positive().optional(),
+  max_input: z.int().positive().optional(),
+  max_output: z.int().positive().optional(),
+  input_modalities: z.array(nonEmpty).optional(),
+  output_modalities: z.array(nonEmpty).optional(),
+  reasoning: z
+    .strictObject({
+      supported: z.boolean().optional(),
+      levels: z.array(nonEmpty).optional(),
+      budget_min: z.int().min(0).optional(),
+      budget_max: z.int().min(0).optional(),
+      can_disable: z.boolean().optional(),
+      dynamic: z.boolean().optional(),
+      disable_with: nonEmpty.optional(),
+    })
+    .optional(),
+  web_search: z.boolean().optional(),
+  aliases: z.array(nonEmpty).optional(),
+  variants: z.array(nonEmpty).optional(),
+  plans: z.array(nonEmpty).optional(),
+  hidden: z.boolean().optional(),
+});
+export type ListingFields = z.infer<typeof ListingFields>;
+
+/**
+ * data/authored/listings/<provider>.yaml: what providers.dev states of a provider's model list, each statement with a
+ * reason and evidence. `list` is an authored list of the provider's models (the second source of a listing's models);
+ * `rules` state fields of models, by id or for every model of the listing (`all`).
+ */
+export const AuthoredListing = z
+  .strictObject({
+    provider: z.string().regex(PROVIDER_ID),
+    list: z
+      .strictObject({
+        models: z.array(nonEmpty).min(1),
+        reason: nonEmpty,
+        evidence: z.array(Evidence).min(1),
+      })
+      .optional(),
+    rules: z
+      .array(
+        z.strictObject({
+          models: z.union([z.literal("all"), z.array(nonEmpty).min(1)]),
+          set: ListingFields.refine((fields) => Object.keys(fields).length > 0, "Set at least one field."),
+          reason: nonEmpty,
+          evidence: z.array(Evidence).min(1),
+        }),
+      )
+      .default([]),
+  })
+  .superRefine((file, ctx) => {
+    if (!file.list && file.rules.length === 0) ctx.addIssue({ code: "custom", message: "A listing file needs a list, a rule, or both." });
+    if (file.list && new Set(file.list.models).size !== file.list.models.length) ctx.addIssue({ code: "custom", path: ["list", "models"], message: "A model is in the list twice." });
+  });
+export type AuthoredListing = z.infer<typeof AuthoredListing>;
+
 // ---- measurements (observed.json from groundtruth)
 const check = z.looseObject({ age: z.string().optional(), age_s: z.number(), warm: z.number(), total: z.number() });
 export const ObservedRun = z.looseObject({
@@ -602,7 +666,13 @@ export interface Issue {
     | "pi-alias-conflict"
     | "pi-alias-redundant"
     | "pi-snapshot-unreadable"
-    | "pi-no-blocks";
+    | "pi-no-blocks"
+    | "listing-provider-unknown"
+    | "listing-rule-orphan"
+    | "listing-model-twice"
+    | "listed-provider-unknown"
+    | "listed-sync-failed"
+    | "unmapped-listing-client";
   target: string;
   message: string;
 }

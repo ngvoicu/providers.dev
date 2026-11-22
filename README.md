@@ -59,7 +59,7 @@ If there is no snapshot, the build stops and says so; it never falls back to sam
 data/upstream/    the last good import of models.dev      written only by `npm run sync`
 data/sources/     the measurements file (observed.json)   written only by `npm run sync`
 data/pi/          the last good import of pi's catalog    written only by `npm run sync`
-data/authored/    our providers, overrides and rules      written by people
+data/authored/    our providers, overrides, rules, listings  written by people
         │
         ▼  npm run data   (src/core/resolve.ts: deterministic, no network)
 data/published/   the resolved snapshot                   not in git
@@ -323,6 +323,42 @@ entry is left out, by which rule) or unmatched (with the reason, and `alike` and
 A line that no longer fits is reported in `/api/v1/meta`: `pi-alias-orphan` (it names a provider, entry or pi model
 that is gone), `pi-provider-collides` (the catalog now has the pi provider id itself), `pi-alias-conflict`,
 `pi-alias-redundant` (the entry now has the pi model's own id). None of them fails the build.
+
+### State what a provider's model list holds
+
+A listing (`/api/v1/listings`, since API 1.4.0) is the model list of one provider and access method: every model it
+offers, evaluated or not. It is built in `src/core/listings.ts` from four sources, in this order: `listed` (the
+vendor's own list, from groundtruth's discovery file `listed.json`), `providers.dev` (this folder), `models.dev` (the
+provider's imported models, those a catalog rule leaves out of the catalog included: a rule says what providers.dev
+lists as entries, not what a provider offers) and `pi.dev`. The models are taken whole from the first source that has
+a list for the provider; each field of a model from the first source that states it, and the model names that source
+per field. Nothing of a listing is written into an entry.
+
+`data/authored/listings/<provider>.yaml` holds what providers.dev states, each statement with a reason and evidence:
+
+```yaml
+provider: devin
+list:                     # optional: the provider's models, where no discovery lists them
+  models: [swe-1-6, gemini-4-neon]
+  reason: The vendor's model page lists these two.
+  evidence:
+    - { kind: documented, url: https://example.com/models, date: "2026-11-22" }
+rules:                    # optional: fields of models, by id or for every model of the listing (all)
+  - models: [gemini-4-neon]
+    set: { max_output: 65536, reasoning: { budget_max: 32768 } }
+    reason: The vendor's documentation states the output limit and the largest thinking budget.
+    evidence:
+      - { kind: documented, url: https://example.com/limits, date: "2026-11-22" }
+```
+
+`set` takes the fields of a listed model: `name`, `owner`, `released`, `context_window`, `max_input`, `max_output`,
+`input_modalities`, `output_modalities`, `reasoning` (`supported`, `levels`, `budget_min`, `budget_max`,
+`can_disable`, `dynamic`, `disable_with`), `web_search`, `aliases`, `variants`, `plans` (plan names only) and
+`hidden`. A rule comes after the discovery and before models.dev; of two rules, the first that states a field gives it.
+A statement without evidence, or a key the file does not know, fails `npm run data`. A rule for a model the listing
+does not name raises `listing-rule-orphan`, and a file for a provider the catalog lacks `listing-provider-unknown`.
+No value is copied from router-for-me's model files: each comes from the vendor's list or documentation, models.dev,
+pi or a measurement, and says which.
 
 ## Syncing
 
