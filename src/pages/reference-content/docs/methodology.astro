@@ -10,13 +10,14 @@ const words = (text: string): string => escapeHtml(text).replace(/`([^`]+)`/g, "
 
 <Doc
   title="Methodology"
-  description="Where each value on providers.dev comes from, how the models.dev baseline is merged with corrections and evaluations, how pi's catalog is shown beside it, and what unknown means."
-  lead="The catalog is the latest verified import of models.dev, plus added providers, documented corrections and independent evaluations; pi's model catalog is shown beside it. This page explains how they are combined and what each label means."
+  description="Where each value on providers.dev comes from: one value per quantity from four sources in a fixed order, a warning where they disagree, how the models.dev baseline is merged with corrections and evaluations, and what unknown means."
+  lead="The catalog is the latest verified import of models.dev, plus added providers, documented corrections and independent evaluations, with pi's model catalog as the last source. Each quantity is shown as one value, chosen by one rule; where the sources disagree, a warning shows what each one states. This page explains how."
   toc={[
-    { id: "kinds", label: "Kinds of value" },
+    { id: "kinds", label: "Sources" },
+    { id: "safe-values", label: "One value per quantity" },
     { id: "unknown", label: "Unknown values" },
     { id: "limits", label: "Limits" },
-    { id: "input-window", label: "Input window" },
+    { id: "input-window", label: "Context window" },
     { id: "prices", label: "Prices" },
     { id: "access", label: "Access methods" },
     { id: "merge", label: "Merge rules" },
@@ -29,25 +30,107 @@ const words = (text: string): string => escapeHtml(text).replace(/`([^`]+)`/g, "
   ]}
 >
   <div class="prose">
-    <h2 id="kinds">Kinds of value</h2>
+    <h2 id="kinds">Sources</h2>
+    <p>Every value comes from one of four sources. Pages and the API name them so:</p>
     <ul>
-      <li><span class="origin upstream">models.dev</span> <strong>Imported.</strong> Copied from models.dev and not independently checked. Imported values never carry a verification date.</li>
-      <li><span class="badge documented">documented</span> <strong>Documented.</strong> Set because the provider's own documentation says so. The entry names the page and the date it was read.</li>
-      <li><span class="badge measured">measured</span> <strong>Measured.</strong> Observed by sending requests. The entry names the access method, the client, the date and the raw result.</li>
-      <li><span class="origin pi">pi.dev</span> <strong>pi's catalog.</strong> What the model catalog of the coding agent pi states for an entry, imported and not independently checked. It is shown on a line under the entry's values and never replaces one, also where the entry states no value (see <a href="#pi">pi's catalog</a>).</li>
+      <li><strong>Measured.</strong> Observed by providers.dev by sending requests. A measurement names the access method, the client the requests went through, the date and the raw result.</li>
+      <li><span class="origin added">providers.dev</span> <strong>Stated by providers.dev.</strong> A correction of an imported entry, or a value of an entry providers.dev adds, each resting on the provider's own page, named with the date it was read.</li>
+      <li><span class="origin upstream">models.dev</span> <strong>Imported.</strong> Copied from models.dev and not independently checked. Its date is the date of the import.</li>
+      <li><span class="origin pi">pi.dev</span> <strong>pi's catalog.</strong> What the model catalog of the coding agent pi states for an entry, imported and not independently checked (see <a href="#pi">pi's catalog</a>). Its date is the date of the import of pi's catalog.</li>
       <li><strong>API price.</strong> The list price of the API entry of the same model, shown on a subscription entry and marked "API price". It is the only value an entry takes from another one (see <a href="#prices">Prices</a>).</li>
     </ul>
     <p>
-      A documented value and a measured one are both shown, each with its source and date. A provider documenting a 30-minute cache and an evaluation that found the cache gone after
-      15 minutes are two different facts, and both stay published. A measured value takes the place of a documented one in two figures only, the safe cache lifetime and the input
-      window, and only where a measurement clearly contradicts the documentation (see <a href="#lifetimes">Cache lifetimes</a> and <a href="#input-window">Input window</a>); the
-      documented figure stays beside it, and a documented limit stays in <code>limit</code> as imported. The other exception is an added entry, where no documented limit exists: there
-      a measured limit is published as the limit and labelled as measured.
+      A page shows one value per quantity, chosen from these sources by one rule (see <a href="#safe-values">One value per quantity</a>). It does not say which source the value
+      is from, and shows no date beside it. Where the sources that state a value do not agree, a warning sign beside the value opens what each of them states, with its date.
+      The API keeps every source: the value, its source, and each source's own statement beside it.
     </p>
     <p>
       providers.dev takes no payment for listing, correcting or measuring an entry. A provider may supply documentation, or access for a measurement; the result is published
       whatever it shows. A provider can write to <a href="mailto:office@providers.dev">office@providers.dev</a>. How to propose a value, with the evidence it needs, is on the{" "}
       <a href="/docs/contributing/">contributing</a> page.
+    </p>
+
+    <h2 id="safe-values">One value per quantity</h2>
+    <p>
+      Five quantities have one value on every entry, its safe value: the context window, the maximum output, the short and the long cache lifetime, and the price. Each is worked
+      out once, when the data is built, and published in the API (<code>providers_dev.safe</code> of an entry, <code>safe</code> of a summary) with what every source states
+      beside it. The pages print it, compare nothing and work nothing out.
+    </p>
+    <p><strong>The order.</strong> The value is the statement of the first of these sources that states one:</p>
+    <ol>
+      <li><strong>Measured</strong>: the most direct measurement of the entry (below).</li>
+      <li><strong>providers.dev</strong>: a correction with its evidence, or the value of an entry providers.dev adds.</li>
+      <li><strong>models.dev</strong>: the entry as imported.</li>
+      <li><strong>pi.dev</strong>: pi's catalog, where it lists the entry.</li>
+    </ol>
+    <p>
+      Where no source states one, the value is <em>Unknown</em>. A price is taken whole from one source, never mixed: a part one source lacks, a cache-read price say, is not
+      filled in from another. providers.dev does not measure prices, so a price is providers.dev's, models.dev's or pi's.
+    </p>
+    <h3>Which measurement counts</h3>
+    <ul>
+      <li>
+        Every client a measurement goes through has a kind: plain requests sent straight to the provider, the vendor's own client (such as OpenAI's Codex CLI), or a proxy
+        (CLIProxyAPI, plain or with a coding agent on top).
+      </li>
+      <li>
+        On an entry reached with an API key, only requests sent straight to the provider count. On a subscription login, the vendor's own client counts first; where it measured
+        nothing, requests sent straight to the provider; where none of those either, a proxy. Measurements of the other kinds stay published on the entry's page, marked{" "}
+        <em>Not counted</em>, and give no value.
+      </li>
+      <li>
+        This is decided for each quantity, and for each cache lifetime on its own. Within the kind that counts, the lowest value counts, and the warning names the measurement
+        it is: its client, its date and its raw result.
+      </li>
+      <li>
+        A measured context window is the window the route names, or else the largest input it was seen to accept, below a refusal or read to the end. That one is a lower bound,
+        shown as <em>at least</em> (≥ in the lists, rounded down, never up), and it is the value also where a later source states more. A measured maximum output is the lowest
+        output limit a measurement read. A measured cache lifetime is, for each evaluation, the oldest age up to which every check hit, from the immediate re-send on (see{" "}
+        <a href="#lifetimes">Cache lifetimes</a>).
+      </li>
+    </ul>
+    <h3>What counts as a statement</h3>
+    <ul>
+      <li>A source that states nothing has no say: a field that is missing or <code>null</code>, and a limit of 0, which means none stated.</li>
+      <li>A cache lifetime of 0 (the entry does not cache) and a listed price of 0 are statements. A lifetime of 0 is shown as <em>None</em>, whatever its source.</li>
+      <li>pi writes 0 both for a price it does not charge and for one it has not recorded, so pi's 0 states nothing. pi states no price for a subscription entry.</li>
+      <li>
+        providers.dev can publish a value as unknown on purpose, where the imported one does not hold for an access method. That is its statement: the value is{" "}
+        <em>Unknown</em>, no later source fills it, and the warning shows what the others state.
+      </li>
+      <li>A subscription entry's price is the API list price of the same model: the statements of providers.dev and models.dev are those of that API entry.</li>
+    </ul>
+    <h3>One refinement</h3>
+    <p>
+      A source states the context window either as a cap on the input alone or as a window that the input and the response share. Where the first statement is a window and a
+      later source states a cap that is not above it, the cap is the value: a measured total is never published above a stated cap on the input inside it.
+    </p>
+    <h3>When sources disagree</h3>
+    <p>A warning sign stands beside a value where two of the sources that state it contradict each other:</p>
+    <ul>
+      <li>two numbers, a maximum output, a lifetime, or two windows of the same kind, when they are not equal;</li>
+      <li>a cap on the input and a window, when the cap is above the window (a cap inside the window is what a window allows);</li>
+      <li>
+        a measured context window and a stated one, when the route names a window below it or another window than a stated window, when an input at or below 99 % of it was
+        refused, or when an input at or above 101 % of it was accepted. An input accepted below the stated value contradicts nothing: the walk stopped there. The 1 % margin is
+        for sizes: a refused size is the probe's own count, and routes add tokens of their own;
+      </li>
+      <li>
+        a measured lifetime and a stated one, when every check still hit after the stated lifetime, or when a check missed at an age the stated lifetime covers. One miss is
+        enough: it already lowers the measured value;
+      </li>
+      <li>a value providers.dev publishes as unknown on purpose, and a value a later source states;</li>
+      <li>
+        two prices, part by part: the input, output, cache-read and cache-write prices and the tiers by size of request, when both sources state the part and the numbers are
+        not equal; and the other rates of a price, between providers.dev and models.dev.
+      </li>
+    </ul>
+    <p>
+      A source that states nothing does not disagree, and prices agree only when exactly equal. The sign opens, for each source that states the value, what it states and its
+      date; a measurement with its client and raw result, a correction with its evidence. The value on the page stays the first source's. On the price table the sign is on the
+      row of each part that differs, and on the conditional rates for the tiers and the other rates; in the lists and the tiles, on the price as a whole. The sign opens with a
+      click, a tap, or Enter, and closes with Escape. In the API a warning is <code>agreement: "differ"</code>, and <code>safe.differing</code> lists the quantities that carry
+      one; the catalog's <em>Warning</em> filter is the parameter <code>disagree</code>.
     </p>
 
     <h2 id="unknown">Unknown values</h2>
@@ -70,89 +153,66 @@ const words = (text: string): string => escapeHtml(text).replace(/`([^`]+)`/g, "
 
     <h2 id="limits">Limits</h2>
     <ul>
-      <li><strong>Context window</strong> (<code>limit.context</code>): what this provider and access method accepts for the model. It can be lower than the model's window at its lab; model pages show them side by side.</li>
-      <li><strong>Largest input</strong> (<code>limit.input</code>): stated where the input limit is lower than the window.</li>
-      <li><strong>Maximum output</strong> (<code>limit.output</code>): the most one response can hold. It is not the default a provider applies when none is requested.</li>
       <li>
-        <strong>Input window</strong> (<code>input_window</code>): the most input one request can carry on this provider and access method, in tokens as the provider counts them. One
-        figure per entry, documented or measured, worked out once when the data is built (see <a href="#input-window">Input window</a>).
+        <strong>Context window</strong>: the most input one request can carry on this provider and access method, in tokens as the provider counts them, its safe value
+        (<code>safe.input_window</code>; see <a href="#input-window">Context window</a>).
       </li>
+      <li><strong>Maximum output</strong> (<code>safe.max_output</code>): the most one response can hold. It is not the default a provider applies when none is requested.</li>
       <li>
-        <strong>Usable context</strong>: the window minus the system prompt and tool definitions of the client in use. That overhead varies, so no usable figure is published. The input
+        <strong>Usable context</strong>: the window minus the system prompt and tool definitions of the client in use. That overhead varies, so no usable figure is published. The context
         window is not that: it is what the route accepts, the client's own prompt and tools included, not what is left after them.
       </li>
       <li><strong>Compaction threshold</strong>: a setting of an agent or client. It is not a provider limit and is not published as one.</li>
       <li>
-        <strong>Measured input</strong>: a limit evaluation sends requests of several input sizes on one access method. It records the largest input accepted, the smallest refused, and
-        the window the route names where its answer names one; the entry page lists each evaluation with these numbers. In the catalog, <strong>≥</strong> before an input window marks a
-        lower bound (<code>bound: at_least</code> in the API): the largest input seen accepted, rounded down, never up. A window listed by a client (a default the client works with) is not
-        taken as the limit.
+        <strong>Limit evaluations</strong>: a limit evaluation sends requests of several input sizes on one access method. It records the largest input accepted, the smallest refused,
+        and the window the route names where its answer names one; the entry page lists each evaluation with these numbers. A window listed by a client (a default the client
+        works with) is not taken as the limit.
       </li>
     </ul>
 
-    <h2 id="input-window">Input window</h2>
+    <h2 id="input-window">Context window</h2>
     <p>
-      Every entry has one input window: the most input one request can carry on that provider and access method, in tokens as the provider counts them, the client's own system
-      prompt and tool definitions included. It is worked out once, when the data is built, from the entry's own documented limits and its limit evaluations, and published in the API
-      (<code>providers_dev.limits.input_window</code>, and <code>input_window</code> of a summary). The pages print it.
+      On every page, <em>Context window</em> is the input window: the most input one request can carry on that provider and access method, in tokens as the provider counts
+      them, the client's own system prompt and tool definitions included. It is the most a conversation can be. In the API its name stays <code>input_window</code>:{" "}
+      <code>safe.input_window</code>, the same value in <code>providers_dev.limits.input_window</code> and <code>input_window</code> of a summary.
     </p>
     <ul>
       <li>
-        <strong>Documented.</strong> Where the entry documents an input limit (<code>limit.input</code>), that is the input window. Where it documents only a context window
-        (<code>limit.context</code>), the window is, and the response is counted against the same figure. A 0 means none stated and is skipped. A window written onto an added entry from
-        a measurement is a measurement, not documentation. Nothing is taken from another entry, not even from the API entry of the same model.
+        A source states it as <code>limit.input</code>, a cap on the input alone, or else as <code>limit.context</code>, a window the response is counted against too. A
+        window written onto an added entry from a measurement is a measurement. Nothing is taken from another entry, not even from the API entry of the same model.
       </li>
       <li>
-        <strong>Contradicted.</strong> A measurement contradicts the documented figure when the route names a window below it, or names another window than a documented context
-        window; when an input at or below 99 % of it was refused; or when an input at or above 101 % of it was accepted, below a refusal or read to the end. A window the route names is
-        exact. The 1 % margin is for sizes: a refused size is the probe's own count, and routes add tokens of their own. Then the measured value is the input window, and the documented
-        figure stays beside it.
+        Where the entry states a larger window that the response shares, a short note under the value says so ("1,050,000 including the response"): the API publishes that
+        window as <code>safe.input_window.window_tokens</code>, and the note is there exactly where it does. <code>limit.context</code> and <code>limit.input</code> stay in the
+        entry as imported and corrected, and the warning shows them where the sources disagree.
       </li>
-      <li>
-        <strong>Measured.</strong> Where nothing is documented, or the documentation is contradicted, the input window is the measured one: the window the route names, or else the
-        largest input it was seen to accept, below a refusal or read to the end. That one is a lower bound, shown as <em>at least</em>, and as ≥ in the catalog. Where several clients
-        were measured, the lowest decides; each client's value is listed.
-      </li>
-      <li>
-        An input accepted with nothing refused, no window named and no check that the reply read it to the end gives no value: a route can answer a request without reading all of it.
-      </li>
-      <li>Where nothing is documented or measured, the input window is not known and is shown as <em>Unknown</em>, never as 0.</li>
+      <li>A model's page gives the smallest and the largest context window among its entries, with ≥ where it is a lower bound, and the one of the lab's own entry.</li>
     </ul>
-    <p>
-      On an entry's page the <em>Input window</em> table gives the value with its basis (documented or measured), what kind of figure it is (input alone, or input and output
-      together), its source and date. Under it, the documented figure and the field it is in, with what the rule found of it, published as <code>documented_status</code>:{" "}
-      <code>contradicted</code> says <em>Documentation contradicted</em>, <code>not_contradicted</code> says <em>Documentation not contradicted</em>, which is not the same as
-      confirmed. Then each measurement on its own line, with its client, date and raw result. The catalog, a provider's page and a model's page show the value in an{" "}
-      <em>Input window</em> column with its basis under it; the <em>Context</em> column shows <code>limit.context</code> and nothing else.
-    </p>
-    <p>
-      A model's page opens with an <em>Input window</em> tile: the smallest and the largest input window among the model's entries, each as its entry has it, with ≥ where
-      it is a lower bound (at an equal number, a lower bound counts as the larger); how many of its entries have none; and the input window of the lab's own entry, with what
-      kind of figure it is. The two ends and the count are worked out when the data is built and published with the model (<code>input_window_min</code>,{" "}
-      <code>input_window_max</code>, <code>input_window_unknown_count</code>, and <code>input_window_reference</code> for the lab's own entry, of{" "}
-      <code>/api/v1/models/&#123;lab&#125;/&#123;model&#125;</code>); the page prints them. The{" "}
-      <em>Context window</em> tile beside it gives <code>limit.context</code> from smallest to largest: another figure, often larger, since it can count the output too.
-    </p>
-    <p>The input window has limits:</p>
+    <p>A measured context window has limits:</p>
     <ul>
       <li>One account per route. Another plan, region or account can have another limit.</li>
-      <li>Dated. A provider can change a limit the next day. The date is on every value, and a measured one goes stale as all providers.dev evidence does.</li>
+      <li>Dated. A provider can change a limit the next day. A measurement goes stale as all providers.dev evidence does.</li>
       <li>
         A few requests. A walk costs quota for each request that is answered, so it stops early: the real limit lies between the accepted size and the refused one, and an{" "}
-        <em>at least</em> value is a lower bound by as much as that gap.
+        <em>at least</em> value is a lower bound by as much as that gap. Where no refusal was seen, nothing shows where the limit is, only that it is not below the value.
       </li>
-      <li>Where no refusal was seen, nothing shows where the limit is, only that it is not below the value.</li>
       <li>A refused size is the probe's count, not the provider's.</li>
       <li>
         Requests were short questions with filler text and a reply of a few tokens. A window that input and output share has less room for input when a long reply is asked for.
       </li>
       <li>A window a route names is its total. A cap on the input inside it shows only as a refusal.</li>
-      <li>The documented figure is models.dev's unless marked otherwise, and not contradicted is not confirmed.</li>
+      <li>
+        An input accepted with nothing refused, no window named and no check that the reply read it to the end gives no value: a route can answer a request without reading all
+        of it.
+      </li>
     </ul>
 
     <h2 id="prices">Prices</h2>
     <ul>
-      <li>Prices are list prices in US dollars, as models.dev records them (<code>cost</code>). They are imported, not checked.</li>
+      <li>
+        Prices are list prices in US dollars. The price of an entry is one source's, whole: providers.dev's where it corrects one, else models.dev's (<code>cost</code>), else
+        pi's (see <a href="#safe-values">One value per quantity</a>). Every price is printed with every digit the source states.
+      </li>
       <li>
         Text is priced per million tokens. Audio, images, video and web search are charges of their own, each in the unit the source gives: per million tokens or characters, per second
         or minute, per image or megapixel, and per 1,000 web searches. The entry page lists them under the text charges, and the catalog shows one where an entry has no text price.
@@ -201,7 +261,7 @@ const words = (text: string): string => escapeHtml(text).replace(/`([^`]+)`/g, "
       <li><strong>Additions</strong>: providers and entries that models.dev does not have.</li>
       <li><strong>Corrections</strong>: single fields set on upstream entries. They take precedence.</li>
     </ol>
-    <p>pi's catalog is a fourth input that sets no field and stands last: what it states for an entry is published beside the entry, under <code>providers_dev.pi</code>, with where it stands beside each value (see <a href="#pi">pi's catalog</a>).</p>
+    <p>pi's catalog is a fourth input that sets no field of an entry and stands last: what it states is published under <code>providers_dev.pi</code>, and its limits, prices and lifetimes are the last source of the safe values (see <a href="#pi">pi's catalog</a>).</p>
     <p>A correction is a patch applied field by field:</p>
   </div>
   <div class="scroll max-w-[62rem]">
@@ -249,40 +309,16 @@ const words = (text: string): string => escapeHtml(text).replace(/`([^`]+)`/g, "
       lists is not an entry.
     </p>
     <p>
-      For one value the sources stand in this order: providers.dev's own (a correction, an added entry's own value, a measurement), then models.dev, then pi. The entry's field is the
-      value of the first two; pi's never replaces it and is never written into <code>limit</code>, <code>cost</code> or <code>capabilities</code>. pi's data enters no safe value either:
-      the input window and the cache lifetimes are worked out from what is documented and what providers.dev measured, and pi's catalog is neither.
+      pi is the last of the four sources of a value (see <a href="#safe-values">One value per quantity</a>). Its context window, maximum output, prices and cache lifetimes
+      become the value of an entry only where no other source states one; there they are shown unmarked, like any other value, and the API names pi as the source. Where pi
+      states a value otherwise than another source, the value's warning shows pi's figure beside the others'. pi's figures are never written into <code>limit</code>,{" "}
+      <code>cost</code> or <code>capabilities</code>, and no value another source states changes with or without pi's data.
     </p>
-    <h3>Where pi stands beside each value</h3>
     <p>
-      For each value pi can state, the build works out once where pi stands beside the entry, and publishes it in the entry's pi block (<code>providers_dev.pi.values</code>). The entry's
-      page prints it on a line under the value, in the value's own row, and compares nothing itself. The value itself is always the entry's: providers.dev's own, else models.dev's,
-      else Unknown, exactly as without pi. The values are the context window, the output limit, the input, output, cache-read and cache-write prices, the
-      tiers by size of request (said once, under the conditional rates), and the short and long cache lifetimes, which are set beside the documented lifetime of the profile, not the
-      safe one.
+      A context window of pi's can be the window pi's own client works with rather than what the route accepts, and pi's price for a subscription entry is a list price too: pi
+      states no price there. Where pi stands beside each field of the entry is published as well, in the entry's pi block (<code>providers_dev.pi.values</code>); the pages do not
+      print it.
     </p>
-    <ul>
-      <li><strong>pi agrees</strong> (<code>agrees</code>): pi states the same value. Limits, prices and lifetimes are compared exactly, tiers threshold by threshold.</li>
-      <li>
-        <strong>pi says</strong> (<code>differs</code>): pi states another value. The page keeps the entry's own and shows pi's beside it; it does not say which is right. The pi.dev mark at
-        the top of the page counts these values.
-      </li>
-      <li>
-        <strong>pi states</strong> (<code>only</code>): the entry states no value and pi does. The row keeps the entry's own (Unknown, or a limit of 0, which says that none is stated),
-        and pi's figure is on the line under it, with the <span class="origin pi">pi.dev</span> mark and the date of pi's data; providers.dev has not checked it. It stays in pi's block:
-        the lists, the filters and the input window have no value there either. A context window of pi's can be the window pi's own client works with rather than what the route
-        accepts, so it can stand beside a measured input window several times larger.
-      </li>
-      <li>
-        <strong>pi lists, not compared</strong> (<code>not_compared</code>): pi states a value that cannot be set beside the entry's: a price or tiers on a subscription entry, which is not
-        paid per token; a price the entry states in another unit than per million tokens; a cache-write price the entry gives per lifetime; tiers the entry states in a form that cannot be
-        read as tiers; or a value providers.dev publishes as unknown or removes.
-      </li>
-      <li>
-        <strong>Nothing</strong> (<code>silent</code>): pi states no value. pi writes 0 both for a limit or price it does not state and for a price it does not charge, so its 0 is no
-        statement and is never shown as free.
-      </li>
-    </ul>
     <h3>How pi calls the model</h3>
     <ul>
       <li>
@@ -333,8 +369,8 @@ const words = (text: string): string => escapeHtml(text).replace(/`([^`]+)`/g, "
       <li><strong>Manual</strong> (<code>explicit</code>): nothing is cached unless the request marks what to cache. The mark also picks the lifetime, where there is a choice.</li>
       <li>
         On an entry's page the <em>Cache modes</em> table has one row for each way of caching, supported or not, with its minimum prompt size, breakpoints and targets. The lifetimes the
-        provider documents are in the <em>Lifetimes</em> table (see <a href="#lifetimes">Cache lifetimes</a>), each naming its way of caching and the text as documented
-        (<code>5m</code>, say). The request parameter and accepted values are recorded separately under Retention.
+        provider documents are statements of the two cache lifetimes (see <a href="#lifetimes">Cache lifetimes</a>), and stay in the API with their way of caching and the text
+        as documented (<code>5m</code>, say). The request parameter and accepted values are recorded separately under Retention.
       </li>
       <li>An entry can have both: it caches by itself, and a request can also mark parts. Then each has its own line.</li>
     </ul>
@@ -351,7 +387,7 @@ const words = (text: string): string => escapeHtml(text).replace(/`([^`]+)`/g, "
       route reports cache hits, so that a later miss means the cache is gone and not that nothing was cached. Older evaluations keep the ages they were made with, and some start at 5 minutes.
     </p>
     <p>
-      Results are shown per client. On an entry's page each measured lifetime in the <em>Lifetimes</em> table is one client and one request setting, with its results by age, and
+      Results are shown per client. On an entry's page each lifetime in the <em>Cache evaluations</em> table is one client and one request setting, with its results by age, and
       opens onto each of its evaluations with their own results. The columns are the control and the ages above. A cell is the share of re-sends at exactly that age that were served
       from the cache, in percent rounded to a whole number, with the hits and checks under it; the hover text has the exact percentage. Nothing is rounded into a neighbouring age:
       7.5 minutes and 10 minutes are two cells. A cell with no check shows a dot; it is not a miss. A check made at an age that has no column (an older evaluation at 3 hours, say) is in
@@ -366,7 +402,7 @@ const words = (text: string): string => escapeHtml(text).replace(/`([^`]+)`/g, "
       </li>
     </ul>
     <p>
-      Both profiles are there on every entry. A profile with no lifetime measured says <em>Not measured</em>; that is not 0 %, and it says nothing about whether the provider accepts a
+      Both profiles are there on every entry. A profile with no lifetime measured says <em>No evaluation</em>; that is not 0 %, and it says nothing about whether the provider accepts a
       lifetime. What a request can ask for is a separate record, <em>Retention</em>, on every entry's page: whether a lifetime is accepted, the request field, the accepted values and which
       value gives which line. It is filled from the provider's own documentation, quoted with the record: the field as a request sends it (<code>cache_control.ttl</code>, say), its
       values, and the default. Where the short lifetime is what a request gets by leaving the field out, the record says so instead of naming a value. Sending a value, receiving a cache
@@ -390,39 +426,29 @@ const words = (text: string): string => escapeHtml(text).replace(/`([^`]+)`/g, "
 
     <h2 id="lifetimes">Cache lifetimes</h2>
     <p>
-      Every entry has a safe cache lifetime for each retention profile, short and long: how long a cached prompt can be relied on. It is worked out once, when the data is built, from
-      the entry's documented lifetimes and its evaluations, and published in the API (<code>providers_dev.cache.lifetime</code>, and <code>cache_lifetime</code> of a summary). The
-      pages print it.
+      Every entry has a cache lifetime for each retention profile, short and long: how long a cached prompt can be relied on. It is a safe value like the others (see{" "}
+      <a href="#safe-values">One value per quantity</a>), from what was measured, what providers.dev and models.dev document, and what pi states, in that order.
     </p>
     <ul>
-      <li><strong>Documented.</strong> Where the provider documents a lifetime for the profile, that is the safe lifetime, unless a measurement clearly contradicts it.</li>
       <li>
-        <strong>Contradicted.</strong> A measurement contradicts the documentation when one evaluation has a result at an age up to the documented lifetime, the immediate re-send
-        included, in which fewer than half of the checks hit. Exactly half does not contradict. A miss after the documented lifetime is what the documentation says and is not looked at.
-        Then the measured lifetime is the safe one, and the documented lifetime stays in the list.
+        A documented lifetime is the lowest the source documents for the profile. Where the provider documents that it does not cache, the lifetime is 0, shown as{" "}
+        <em>None</em>.
       </li>
       <li>
-        <strong>Measured.</strong> Where nothing is documented, the safe lifetime is the measured one: for each evaluation, the oldest age up to which every check hit, from the
-        immediate re-send on (one miss ends it, and an older age that hits again does not raise it); then the lowest of these across evaluations and clients.
+        A measured lifetime is, for each evaluation, the oldest age up to which every check hit, from the immediate re-send on: one miss ends it, and an older age that hits
+        again does not raise it. Within the kind of client that counts, the lowest across evaluations. A measured 0, also shown as <em>None</em>, means that a check already
+        missed at the immediate re-send or at the youngest tested age; later ages may still have hit.
       </li>
-      <li>The safe lifetime is never above the documented lifetime: a cache that still hits after it changes nothing.</li>
-      <li>
-        A provider that documents that it does not cache has a safe lifetime of 0, documented, shown as <em>None</em>. A measured 0, shown as <em>0 s</em>, means that a check already missed
-        at the immediate re-send or at the youngest tested age; later ages may still have hit. Where nothing is documented or measured the lifetime is not known and is shown as <em>Unknown</em>, never as 0.
-      </li>
-      <li>A measured lifetime is per client and request setting. It does not expire, and shows the date of its newest evaluation.</li>
+      <li>Where no source states a lifetime it is not known and is shown as <em>Unknown</em>, never as 0.</li>
     </ul>
     <p>
-      On an entry's page the <em>Lifetimes</em> table gives, for each retention profile, the safe lifetime with its basis (documented or measured), source and date; then the documented
-      lifetime, the measured one with its number of clients, and how many checks hit inside the documented lifetime. The profile prints what the rule found, published as{" "}
-      <code>documented_status</code> where a lifetime above 0 is documented and one is measured: <code>contradicted</code> says <em>Documentation contradicted</em> (the safe
-      lifetime is the measured one), <code>not_contradicted</code> says <em>Documentation not contradicted</em>: no evaluation contradicts it, which is not the same as confirmed. Under the profile, every documented and every measured lifetime, one per line, each with its source and date. The catalog, a
-      provider's page and a model's page show the safe lifetime of both profiles in one <em>Cache lifetime</em> column, with the other of the two lifetimes beside it where there is one.
-      Lifetimes are shown in minutes and hours (<em>5 min</em>, <em>24 h</em>); the exact seconds are in the hover text and in the API.
+      On an entry's page the <em>Prompt caching</em> table gives the two lifetimes. Under it, <em>Cache evaluations</em> lists, for each retention profile, the lifetime each
+      client held with each request setting, with its checks and its results by age, those that count first; it opens onto each evaluation. Lifetimes are shown in minutes and
+      hours (<em>5 min</em>, <em>24 h</em>); the exact seconds are in the hover text and in the API.
     </p>
     <p>
-      The safe lifetime has limits. A measurement is a sample: a few requests from one account, on some days. An age between two tested ages is not known: a cache that hit at 30
-      minutes and missed at 1 h 5 min may have ended at any point between. And a provider can change its cache behaviour without notice. The safe lifetime is a published number made by
+      A lifetime has limits. A measurement is a sample: a few requests from one account, on some days. An age between two tested ages is not known: a cache that hit at 30
+      minutes and missed at 1 h 5 min may have ended at any point between. And a provider can change its cache behaviour without notice. The value is a published number made by
       this rule, not a guarantee.
     </p>
 
@@ -435,7 +461,10 @@ const words = (text: string): string => escapeHtml(text).replace(/`([^`]+)`/g, "
       The number is <code>stale_after_days</code> of <a href="/api/v1/meta"><code>/api/v1/meta</code></a>, set once when the data is built. The API publishes the dates and this
       number; a page compares a published date with today's date using it, and that is the only thing a page works out. A reader of the API applies it to its own date.
     </p>
-    <p>Imported values, models.dev's and pi's, are never marked stale: their date is the date of the import, given next to the source.</p>
+    <p>
+      Imported values, models.dev's and pi's, are never marked stale: their date is the date of the import, given next to the source. A value without a warning shows no
+      date; the date of each source's statement is in the warning and in the API.
+    </p>
     <p>Licences and attribution are on the <a href="/docs/licensing/">licensing</a> page. How to propose a correction or a measurement is on the <a href="/docs/contributing/">contributing</a> page.</p>
   </div>
 </Doc>

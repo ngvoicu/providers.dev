@@ -3,7 +3,7 @@ import { apiLink, pageLinks, type Envelope } from "./catalog-view.ts";
 import type { ProviderSummary, Summary } from "./entries.ts";
 import { compactTokens, compactTokensDown, entryHref, escapeHtml as e, exact, isStale, plural, type Today } from "./format.ts";
 import type { WindowBound } from "./limits.ts";
-import { evaluationStrip, rowHtml, SCOPE_WORD, stripHead, tableHead } from "./render.ts";
+import { evaluationStrip, rowHtml, stripHead, tableHead } from "./render.ts";
 import type { CacheEvaluationRecord, CanonicalModelDetail, Correction, LimitEvaluationRecord } from "./resources.ts";
 import type { Meta, MetaPi } from "./schema.ts";
 
@@ -26,14 +26,14 @@ function windowFigure(w: { tokens: number; bound: WindowBound | null }, full = f
   return full ? exact(w.tokens) : compactTokens(w.tokens);
 }
 
-/** An input window in words, for the hover text: the exact tokens, "at least" where it is a bound, and its basis. */
-const windowWords = (w: { tokens: number; bound: WindowBound | null; basis: string }): string => `${w.bound === "at_least" ? "at least " : ""}${exact(w.tokens)} tokens, ${w.basis}`;
+/** An input window in words, for the hover text: the exact tokens, "at least" where it is a bound. */
+const windowWords = (w: { tokens: number; bound: WindowBound | null }): string => `${w.bound === "at_least" ? "at least " : ""}${exact(w.tokens)} tokens`;
 
 /**
- * The input window of a model, as the API publishes it: `input_window_min` to `input_window_max`, "≥" at an end that
- * is a lower bound, `input_window_unknown_count`, and `input_window_reference`, the lab's own entry, with what kind of
- * figure it is, which is what tells it from the context window beside it. It compares no values and looks up no
- * entry: every figure is a field of the model.
+ * The context window of a model, as a page names the safe input window, as the API publishes it: `input_window_min`
+ * to `input_window_max`, "≥" at an end that is a lower bound, `input_window_unknown_count`, and
+ * `input_window_reference`, the lab's own entry. It compares no values and looks up no entry: every figure is a field
+ * of the model.
  */
 function modelWindowTile(model: CanonicalModelDetail, providerNames: Record<string, string>): string {
   const { entry_count: entries, input_window_min: min, input_window_max: max, input_window_unknown_count: unknown } = model;
@@ -41,7 +41,7 @@ function modelWindowTile(model: CanonicalModelDetail, providerNames: Record<stri
   let value: string;
   if (min === null || max === null) {
     value = '<span class="muted">Unknown</span>';
-    lines.push(entries === 1 ? "Not documented or measured" : `Not documented or measured at any of its ${exact(entries)} entries`);
+    lines.push(entries === 1 ? "No source states one" : `No source states one at any of its ${exact(entries)} entries`);
   } else {
     const same = min.tokens === max.tokens && min.bound === max.bound;
     // Two ends that round to the same figure are written out in full.
@@ -52,22 +52,21 @@ function modelWindowTile(model: CanonicalModelDetail, providerNames: Record<stri
     lines.push(unknown === 0 ? where : `${where}; unknown at ${exact(unknown)} of ${exact(entries)}`);
     if (min.bound === "at_least" || max.bound === "at_least") lines.push("≥ marks a lower bound");
   }
-  // The lab's own entry, where the model has one: its input window as the API publishes it with the model.
+  // The lab's own entry, where the model has one: its context window as the API publishes it with the model.
   if (model.reference_ref !== null) {
     const w = model.input_window_reference;
-    const scope = w ? `, ${SCOPE_WORD[w.scope].toLowerCase()}` : "";
-    const said = `The lab's own entry, ${model.reference_ref}: ${w ? `${windowWords(w)}${scope}` : "unknown"}.`;
-    lines.push(`<span title="${e(said)}">At ${e(providerNames[model.lab] ?? model.lab)}: ${w ? `${windowFigure(w)}${scope}` : "unknown"}</span>`);
+    const said = `The lab's own entry, ${model.reference_ref}: ${w ? windowWords(w) : "unknown"}.`;
+    lines.push(`<span title="${e(said)}">At ${e(providerNames[model.lab] ?? model.lab)}: ${w ? windowFigure(w) : "unknown"}</span>`);
   }
-  return `<div class="tile"><div class="label">Input window</div><div class="value small">${value}</div><div class="foot">${lines.map((line) => `<div>${line}</div>`).join("")}</div></div>`;
+  return `<div class="tile"><div class="label">Context window</div><div class="value small">${value}</div><div class="foot">${lines.map((line) => `<div>${line}</div>`).join("")}</div></div>`;
 }
 
 export function modelHtml(model: CanonicalModelDetail, providerNames: Record<string, string>, imported: string, today: Today, pi?: MetaPi): string {
   const range = (low: number | null, high: number | null): string => low === null || high === null ? "Unknown" : low === high ? compactTokens(low) : `${compactTokens(low)} to ${compactTokens(high)}`;
   const tile = (label: string, value: string, foot: string): string => `<div class="tile"><div class="label">${label}</div><div class="value small">${value}</div><div class="foot">${foot}</div></div>`;
-  // The input window first, as on an entry's page: the three limits together, then the two counts.
+  // The two limits first, as on an entry's page, then the two counts. The context window is the safe input window.
   return `<p class="crumbs"><a href="/models/">Models</a> / ${e(model.name)}</p><h1>${e(model.name)}</h1><p class="id mt-1"><code>${e(model.id)}</code><button type="button" class="copy" data-copy="${e(model.id)}">Copy</button></p>
-    <div class="tiles tiles-five mt-6">${modelWindowTile(model, providerNames)}${tile("Context window", `${range(model.context_min, model.context_max)} <span class="unit">tokens</span>`, "Smallest to largest among its entries")}${tile("Maximum output", `${range(model.max_output_min, model.max_output_max)} <span class="unit">tokens</span>`, "Smallest to largest among its entries")}${tile("Entries", exact(model.entry_count), `${exact(model.subscription_entry_count)} by subscription`)}${tile("With providers.dev evidence", exact(model.evidence_entry_count), "Corrections or evaluations")}</div>
+    <div class="tiles mt-6">${modelWindowTile(model, providerNames)}${tile("Maximum output", `${range(model.max_output_min, model.max_output_max)} <span class="unit">tokens</span>`, "Smallest to largest among its entries")}${tile("Entries", exact(model.entry_count), `${exact(model.subscription_entry_count)} by subscription`)}${tile("With providers.dev evidence", exact(model.evidence_entry_count), "Corrections or evaluations")}</div>
     ${model.reference_ref ? `<p class="note mt-5">Reference entry: <a href="${e(entryHref(model.reference_ref))}"><code>${e(model.reference_ref)}</code></a>. Values below are specific to each provider and access method.</p>` : ""}
     <div class="scroll mt-5"><table class="entries stack-tablet"><caption class="sr-only">Entries for ${e(model.name)}</caption><thead>${tableHead({})}</thead><tbody>${model.entries.map((entry) => rowHtml(entry, { today, imported, pi, providerNames })).join("")}</tbody></table></div><p class="hint mt-3">${apiLink(`/api/v1/models/${model.id.split("/").map(encodeURIComponent).join("/")}`)}</p>`;
 }

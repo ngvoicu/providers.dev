@@ -9,17 +9,17 @@ import { handleApi, type ApiDeps } from "../src/core/api.ts";
 import { CorrectionSchema, DocumentationSchema, FacetsSchema, one, pageOf } from "../src/core/contract.ts";
 import { escapeHtml } from "../src/core/format.ts";
 import { fillShell, MARK } from "../src/core/page-shell.ts";
-import { emptyInputWindow } from "../src/core/limits.ts";
 import { handlePage, type PageDeps } from "../src/core/pages.ts";
 import { openapi } from "../src/core/openapi.ts";
 import { PARAMS } from "../src/core/query.ts";
 import { DOCUMENTS } from "../src/core/resources.ts";
 import { readSnapshot, type AssetBinding } from "../src/core/snapshot.ts";
 import worker from "../worker/index.ts";
-import type { PiCatalog, PiValue } from "../src/core/pi.ts";
+import type { PiCatalog } from "../src/core/pi.ts";
+import type { Summary } from "../src/core/entries.ts";
 import type { JsonObject } from "../src/core/merge.ts";
 import type { Meta } from "../src/core/schema.ts";
-import { depsFrom, expectStandings, fetchReturning, fixturePi, fixtureUpstream, piPlaces, ROOT, tempDataDir, writeAuthored, writePiSnapshot } from "./helpers.ts";
+import { depsFrom, fetchReturning, fixturePi, fixtureUpstream, ROOT, tempDataDir, writeAuthored, writePiSnapshot } from "./helpers.ts";
 
 const shell = `<html><head><title>${MARK.title} · providers.dev</title><meta name="description" content="${MARK.description}"><link rel="canonical" href="${MARK.canonical}"></head><body><nav>${MARK.nav}</nav><main>${MARK.html}</main><footer>${MARK.dataset}</footer></body></html>`;
 const now = () => new Date("2026-11-14T12:00:00Z");
@@ -94,7 +94,7 @@ describe("API response boundary", () => {
     expect(html).toContain("Published 2030-01-02 03:04 UTC");
   });
 
-  it("prints cache lifetimes from cache_lifetime", async () => {
+  it("prints cache lifetimes from safe, and the lifetime each client held under them", async () => {
     // Documented lifetimes, caching with no lifetime, does not cache, nothing known; and the lists.
     const paths = ["/?provider=provider-02&limit=8", "/providers/provider-02/", "/models/lab/model-4/", "/entries/provider-02/lab/model-4", "/entries/provider-02/model-1", "/entries/provider-02/lab/model-2", "/entries/provider-02/model-3"];
     for (const path of paths) {
@@ -103,61 +103,67 @@ describe("API response boundary", () => {
       const html = await response.text();
       expect(html, path).not.toContain("Cache, measured");
     }
-    // model-4 documents 5m and 1h: two documented lifetimes, models.dev, on the date of the import.
+    // model-4 documents 5m and 1h: the two values, and no documented lifetime listed under them.
     const entry = await (await page("/entries/provider-02/lab/model-4")).text();
-    expect(entry).toContain("<h3>Lifetimes</h3>");
-    expect(entry.match(/<tbody class="item documented">/g)).toHaveLength(2);
-    expect(entry).toContain('<th scope="row" title="Short retention: the cache a request gets without asking for a lifetime, or with the provider\'s shortest setting.">Short retention</th>');
+    expect(entry).toContain("<h3>Cache evaluations</h3>");
+    expect(entry).not.toContain('<tbody class="item documented">');
+    expect(entry).toContain('<th scope="rowgroup" title="Short retention: the cache a request gets without asking for a lifetime, or with the provider\'s shortest setting.">Short retention</th>');
+    expect(entry.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ")).toContain("Cache lifetime, short Without asking for a lifetime, or with the shortest one 5 min Cache lifetime, long When the request asks for a longer lifetime 1 h");
     const catalog = await (await page("/?provider=provider-02&limit=8")).text();
-    expect(catalog).toContain('<td class="life-col" data-label="Cache lifetime"><a class="plain lifes" href="/entries/provider-02/lab/model-4#cache"');
+    expect(catalog).toContain('<td class="life-col" data-label="Cache lifetime"><span class="lifes">');
+    expect(catalog).toContain('<a class="plain" href="/entries/provider-02/lab/model-4#cache" title="300 s.">5 min</a>');
   });
 
-  it("prints the input window from input_window of the API's answer, on the lists and on the entry page", async () => {
-    // A record that is in no entry of the fixture: whatever the pages print of it, they read from the answer.
-    const record = {
-      ...emptyInputWindow(), tokens: 1047604, basis: "measured", bound: "at_least", scope: "input", source: "providers.dev", date: "2026-11-10",
-      measured_tokens: 1047604, measured_bound: "at_least", measured_kind: "bracket", measured_refused: 1050000, measured_date: "2026-11-10", clients: 1, evaluations: 1,
-      measurements: [{ client: "cliproxyapi", client_label: "Requests sent through CLIProxyAPI", route: "login", route_label: "A login", date: "2026-11-10", tokens: 1047604, bound: "at_least", kind: "bracket", accepted: 1047604, refused: 1050000, named: null, read: null, source: "https://example.com/limits.jsonl" }],
+  it("prints the context window from safe.input_window of the API's answer, on the lists and on the entry page", async () => {
+    // A value that is in no entry of the fixture: whatever the pages print of it, they read from the answer.
+    const value = {
+      value: 1047604, unit: "tokens", at_least: true, scope: "input", window_tokens: 1050000, source: "measured", date: "2026-11-10", agreement: "single",
+      sources: [{ source: "measured", value: 1047604, withheld: false, at_least: true, below: 1050000, scope: "input", date: "2026-11-10", evidence_url: "https://example.com/limits.jsonl", client: "cliproxyapi", client_label: "Requests sent through CLIProxyAPI", client_kind: "proxy", evaluation_id: null }],
     };
     type Answer = { data: unknown };
     const swapped = async (path: string): Promise<Response> => {
       const response = await api(path);
       if (!/^\/api\/v1\/(entries|providers\/|models\/)/.test(path)) return response;
       const answer = await response.json() as Answer;
-      const swap = (value: unknown): unknown => {
-        if (Array.isArray(value)) return value.map(swap);
-        if (value === null || typeof value !== "object") return value;
-        return Object.fromEntries(Object.entries(value).map(([key, inner]) => [key, key === "input_window" ? record : swap(inner)]));
+      const swap = (inner: unknown, key = ""): unknown => {
+        if (Array.isArray(inner)) return inner.map((item) => swap(item));
+        if (inner === null || typeof inner !== "object") return inner;
+        return Object.fromEntries(Object.entries(inner).map(([name, item]) => [name, key === "safe" && name === "input_window" ? value : swap(item, name)]));
       };
       return Response.json({ ...answer, data: swap(answer.data) });
     };
     for (const path of ["/?provider=provider-02&limit=8", "/providers/provider-02/", "/models/lab/model-4/"]) {
       const html = await (await page(path, swapped)).text();
-      expect(html, path).toContain('<span class="window-value">≥ 1.04M</span><span class="basis measured">measured</span>');
-      // As published, the fixture's own record: documented from models.dev.
+      expect(html, path).toContain('title="At least 1,047,604 tokens. 1,050,000 including the response.">≥ 1.04M</a>');
+      // As published, the fixture's own value.
       const published = await (await page(path)).text();
       expect(published, path).not.toContain("≥ 1.04M");
-      expect(published, path).toContain('<span class="basis documented">documented</span>');
+      expect(published, path).not.toMatch(/class="basis|>documented<|>measured</);
     }
     const entry = await (await page("/entries/provider-02/lab/model-4", swapped)).text();
-    expect(entry).toContain('<span class="window-value"><span class="bound">at least</span> 1,047,604 <span class="muted">tokens</span></span>');
-    expect(entry).toContain("1,047,604 accepted · 1,050,000 refused");
-    expect(entry).toContain('<a href="https://example.com/limits.jsonl" rel="noopener">Raw result</a>');
+    expect(entry).toContain('<span class="safe-cell"><span class="bound">at least</span> 1,047,604 <span class="unit">tokens</span></span>');
+    expect(entry.split("1,050,000 including the response")).toHaveLength(3);
     const published = await (await page("/entries/provider-02/lab/model-4")).text();
-    expect(published).toContain('<h3 id="input-window">Input window</h3>');
+    expect(published).toContain('<h2 id="limits">Limits</h2>');
     expect(published).not.toContain("1,047,604");
   });
 
-  it("says in the methodology how the input window is worked out and what it does not say", () => {
+  it("says in the methodology how one value per quantity is chosen, when sources disagree, and what the context window is", () => {
     const source = readFileSync(join(ROOT, "src", "pages", "reference-content", "docs", "methodology.astro"), "utf8").replace(/\s+/g, " ");
     for (const words of [
-      '{ id: "input-window", label: "Input window" }', '<h2 id="input-window">Input window</h2>', "<code>providers_dev.limits.input_window</code>", "the client's own system prompt and tool definitions included",
-      "in two figures only, the safe cache lifetime and the input window", "it is what the route accepts, the client's own prompt and tools included, not what is left after them",
-      "at or below 99 %", "at or above 101 %", "the lowest decides", "<code>bound: at_least</code>", "rounded down, never up",
-      "<em>Documentation contradicted</em>", "<em>Documentation not contradicted</em>", "<code>limit.context</code> and nothing else",
+      '{ id: "safe-values", label: "One value per quantity" }', '<h2 id="safe-values">One value per quantity</h2>', "<code>providers_dev.safe</code>",
+      '{ id: "input-window", label: "Context window" }', '<h2 id="input-window">Context window</h2>', "In the API its name stays <code>input_window</code>",
+      "the client's own system prompt and tool definitions included", "it is what the route accepts, the client's own prompt and tools included, not what is left after them",
+      "<strong>Measured</strong>", "<strong>providers.dev</strong>", "<strong>models.dev</strong>", "<strong>pi.dev</strong>",
+      "only requests sent straight to the provider count", "the vendor's own client counts first", "<em>Not counted</em>",
+      "A price is taken whole from one source, never mixed", "pi's 0 states nothing", "the cap is the value",
+      "at or below 99 %", "at or above 101 %", "A source that states nothing does not disagree", "prices agree only when exactly equal",
+      "<code>agreement: \"differ\"</code>", "<code>disagree</code>", "<code>safe.input_window.window_tokens</code>", "rounded down, never up",
       "One account per route.", "goes stale as all providers.dev evidence does", "A refused size is the probe's count, not the provider's.",
-      "A window a route names is its total.", "not contradicted is not confirmed",
+      "A window a route names is its total.", "become the value of an entry only where no other source states one",
     ]) expect(source, words).toContain(words);
+    // The rules the safe values replaced, and pi's standings, are gone; pi does give a safe value.
+    for (const gone of ["pi's data enters no safe value", "<em>Documentation contradicted</em>", "the lowest decides", "<strong>pi agrees</strong>", "in two figures only", "<code>limit.context</code> and nothing else"]) expect(source, gone).not.toContain(gone);
     expect(source).not.toContain("limit-value");
   });
 
@@ -607,68 +613,66 @@ describe("pi's catalog on the pages", () => {
     expect(section).toContain("Fetched <span class=\"date\" title=\"2026-11-20 14:19 UTC\">2026-11-20</span> from <a href=\"https://pi.dev/api/models\"");
     expect(section).toContain("Last checked <span class=\"date\" title=\"2026-11-21 04:17 UTC\">2026-11-21</span>, unchanged");
     expect(section).toContain("Not verified by providers.dev");
-    expect(section).toContain("Its limits, prices and cache lifetimes: in the rows above, beside this page's");
+    expect(section).toContain("Its limits, prices and cache lifetimes: the last source of each value above");
     expect(section).toContain('href="https://pi.dev/models?provider=provider-02"');
     expect(section).toContain("The same provider and model id as this entry.");
     expect(section).not.toContain("The last import");
     // The section holds only what pi alone returns.
     expect(section).not.toMatch(/id="pi-prices"|Limits and prices|>Cache lifetimes<|No difference/);
-    // No difference: the mark in the heading says no more than pi.dev, and each row says where pi stands.
-    expectStandings(html, block.values as unknown as PiValue[], "provider-02/lab/model-0");
-    expect(head).toContain('<span class="origin pi" title="pi&#39;s model catalog (pi.dev) also lists this entry. No value of pi&#39;s differs from this page&#39;s; each row says where pi stands.');
+    // No difference: the mark in the heading says no more than pi.dev, and no value warns.
+    expect(html).not.toContain("warn-sign");
+    expect(head).toContain('<span class="origin pi" title="pi&#39;s model catalog (pi.dev) also lists this entry. Imported, not verified by providers.dev. It is the last source of each value.">pi.dev</span>');
     expect(head).toMatch(/>pi\.dev<\/span><span class="muted date" title="[^"]*">2026-11-20<\/span>/);
     expect(head).not.toContain("differ<");
   });
 
-  it("an entry page with differences: the entry's own value in each row with what pi says under it; pi's price of 0 is not stated, never free", async () => {
-    const { entry, summary } = (await (await piApi("/api/v1/entries/provider-02/lab/model-4")).json() as { data: { entry: JsonObject; summary: { pi: { difference_count: number } } } }).data;
+  it("an entry page with differences: the entry's own value in each row, a warning on it, pi's figure in its list; pi's price of 0 states nothing, never free", async () => {
+    const { entry, summary } = (await (await piApi("/api/v1/entries/provider-02/lab/model-4")).json() as { data: { entry: JsonObject; summary: Summary } }).data;
     const block = (entry.providers_dev as JsonObject).pi as JsonObject;
     const differences = block.differences as { field: string; pi: number; published: number }[];
     expect(differences.map((item) => [item.field, item.pi, item.published])).toEqual([["context_window", 450000, 500000], ["max_tokens", 4000, 5000], ["cost.input", 4, 2]]);
-    expect(summary.pi.difference_count).toBe(3);
+    expect(summary.safe.differing).toEqual(["input_window", "max_output", "price"]);
     const html = await piPage("/entries/provider-02/lab/model-4");
     const { section, head } = parts(html);
-    expect(head).toContain('<span class="pi-differ">3 differ<span class="sr-only"> from this page</span></span>');
-    const rows = piPlaces(html);
-    expect(rows.context_window).toMatch(/500,000 <span class="muted">tokens<\/span><div class="pi-line"><span class="pi-note differs" [^>]*>pi says 450,000<\/span>/);
-    expect(rows.max_tokens).toMatch(/5,000 <span class="muted">tokens<\/span><div class="pi-line"><span class="pi-note differs" [^>]*>pi says 4,000<\/span>/);
-    expect(rows["cost.input"]).toMatch(/\$2 <span class="muted">\/ 1M tokens<\/span><div class="pi-line"><span class="pi-note differs" [^>]*>pi says \$4<\/span>/);
-    expect(html.split('class="pi-note differs"').length - 1).toBe(3 + 2); // three rows, and the two limit tiles
-    // The output price agrees (16 and 16); pi's cache write is 0, which is not a statement: nothing of pi's in that row.
-    expect(rows["cost.output"]).toContain(">pi agrees<");
-    expect(rows["cost.cache_write"]).not.toMatch(/pi-note|pi\.dev/);
-    expectStandings(html, block.values as unknown as PiValue[], "provider-02/lab/model-4");
+    expect(head).not.toMatch(/pi-differ|\d differ/);
+    const text = (part: string): string => part.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+    const listOf = (id: string): string => { const at = html.indexOf(`<div class="warn-tip" id="${id}"`); return text(html.slice(at, html.indexOf("</div>", at))); };
+    expect(listOf("warn-row-input_window")).toMatch(/^Not all sources agree Context window models\.dev 500,000 tokens \(the value on this page\) \d{4}-\d\d-\d\d pi\.dev 450,000 tokens 2026-11-20 How a value is chosen$/);
+    expect(listOf("warn-row-max_output")).toMatch(/^Not all sources agree Maximum output models\.dev 5,000 tokens \(the value on this page\) \d{4}-\d\d-\d\d pi\.dev 4,000 tokens 2026-11-20 How a value is chosen$/);
+    // The input price: providers.dev's, with its evidence, is the value (the fixture's models.dev lists none); pi's beside it.
+    expect(listOf("warn-price-input")).toBe("Not all sources agree Input providers.dev $2 / 1M (the value on this page) 2026-11-01 Evidence pi.dev $4 / 1M 2026-11-20 How a value is chosen");
+    expect([...html.matchAll(/popovertarget="warn-([^"]+)"/g)].map((match) => match[1])).toEqual(["tile-input_window", "tile-max_output", "tile-price", "row-input_window", "row-max_output", "price-input"]);
+    // The values stay the entry's own; pi's cache write is 0, which is not a statement.
+    expect(text(html.slice(html.indexOf('<div class="tiles'), html.indexOf("<h3>Limit evaluations")).replace(/<div class="warn-tip"[\s\S]*?<\/div>/g, ""))).toMatch(/^Context window 500,000 tokens Maximum output 5,000 tokens Price \$2 \/ \$16/);
+    expect(html).not.toContain('popovertarget="warn-price-cache_write"');
     expect(html.replace(/title="[^"]*"/g, "")).not.toMatch(/\bfree\b|pi (?:says|lists) \$0\b/i);
     for (const flag of ["supportsLongCacheRetention", "thinkingFormat"]) expect(section).toContain(`<code>${flag}: `);
   });
 
-  it("every entry page with a block says, in each row, the standing the API gives and nothing else; a value only pi states is pi's line under the entry's own", async () => {
-    const { data } = (await (await piApi("/api/v1/entries?provider=provider-02&limit=200")).json() as { data: { ref: string; pi: unknown }[] });
+  it("every entry page with a block warns where safe.differing says so and nowhere else; a value only pi states is the value, unmarked", async () => {
+    const { data } = (await (await piApi("/api/v1/entries?provider=provider-02&limit=200")).json() as { data: Summary[] });
     const listed = data.filter((summary) => summary.pi !== null);
     expect(listed.length).toBeGreaterThan(10);
-    const seen = new Set<string>();
-    for (const { ref } of listed) {
-      const { entry } = (await (await piApi(`/api/v1/entries/${ref}`)).json() as { data: { entry: JsonObject } }).data;
-      const values = ((entry.providers_dev as JsonObject).pi as JsonObject).values as unknown as PiValue[];
-      for (const item of values) seen.add(item.standing);
-      expectStandings(await piPage(`/entries/${ref}`), values, ref);
+    for (const summary of listed) {
+      const html = await piPage(`/entries/${summary.ref}`);
+      const tiles = [...html.matchAll(/popovertarget="warn-tile-([^"]+)"/g)].map((match) => match[1]);
+      expect(tiles, summary.ref).toEqual(summary.safe.differing);
+      expect(html, summary.ref).not.toMatch(/pi-note|pi-line|pi-from|\bpi (?:agrees|says|lists)\b|pi states [$\d]/);
     }
-    expect([...seen].sort()).toEqual(["agrees", "differs", "only", "silent"]);
-    // model-7 states no limit: its row says Unknown, as in a dataset without pi data, and pi's 800,000 is the line under it.
-    const only = piPlaces(await piPage("/entries/provider-02/model-7")).context_window;
-    const without = piPlaces((await (await page("/entries/provider-02/model-7")).text())).context_window;
-    expect(only).toContain('<td class="num" data-label="Value"><span class="unknown"');
-    expect(only).toMatch(/>pi states 800,000 tokens<\/span><span class="pi-from"><span class="origin pi" [^>]*>pi\.dev<\/span><span class="muted date" [^>]*>2026-11-20<\/span>/);
-    expect(only.replace(/<div class="pi-line">[\s\S]*?<\/div>/, "")).toBe(without);
-    expect(without).not.toMatch(/pi\.dev|pi-note/);
-    // model-0 publishes an output limit of 0, which is none stated: the 0 stays, and pi's 1,000 is the line under it.
-    expect(piPlaces(await piPage("/entries/provider-02/lab/model-0")).max_tokens).toMatch(/>0 <span class="muted">tokens<\/span><div class="pi-line"><span class="pi-note listed" [^>]*>pi states 1,000 tokens</);
+    // model-7 states no limit: pi's 800,000 is its context window, shown like any value; without pi's data, Unknown.
+    const values = (html: string): string => html.slice(html.indexOf('<div class="tiles'), html.indexOf("<h3>Limit evaluations")).replace(/<div class="warn-tip"[\s\S]*?<\/div>/g, "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+    const only = values(await piPage("/entries/provider-02/model-7"));
+    expect(only).toMatch(/^Context window 800,000 tokens/);
+    expect(only).not.toMatch(/pi\.dev|\bpi\b/);
+    expect(values((await (await page("/entries/provider-02/model-7")).text()))).toMatch(/^Context window Unknown/);
+    // model-0 publishes an output limit of 0, which is none stated: pi's 1,000 is the value.
+    expect(values(await piPage("/entries/provider-02/lab/model-0"))).toContain("Maximum output 1,000 tokens");
   });
 
   it("a page built without pi's data says nothing of pi in any row, and its section is one line", async () => {
     for (const ref of ["provider-02/lab/model-0", "provider-02/lab/model-4", "provider-02/model-7"]) {
       const html = await (await page(`/entries/${ref}`)).text();
-      expect(html, ref).not.toMatch(/class="pi-(?:note|only|line|tiers-line)"|pi-tiers-table|class="origin pi"/);
+      expect(html, ref).not.toMatch(/class="pi-(?:note|only|line|tiers-line)"|pi-tiers-table|class="origin pi"|<span class="warn-src">pi\.dev<\/span>/);
       const { section } = parts(html);
       expect(section.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim(), ref).toMatch(/^How pi calls the model (?:This dataset is built without pi's catalog|pi's model catalog does not list this entry)/);
     }
@@ -707,7 +711,7 @@ describe("pi's catalog on the pages", () => {
       const sources = listed.split('<td class="nowrap source-col" data-label="Source">')[1]!.split("</td>")[0]!;
       expect(sources.replace(/<[^>]+>/g, " ").trim().split(/\s+/), path).toEqual(["models.dev", expect.stringMatching(/^\d{4}-\d\d-\d\d$/), "providers.dev", "2026-11-01", "pi.dev", fetched]);
       expect(sources, path).toMatch(new RegExp(`>pi\\.dev</span><span class="muted date" title="Fetched from pi&#39;s catalog ${fetched} \\d\\d:\\d\\d UTC\\. Last checked ${checked} \\d\\d:\\d\\d UTC: unchanged since the fetch\\.">${fetched}</span></span>$`));
-      expect(listed).not.toMatch(/differ|otherwise|agree/i);
+      expect(listed).not.toMatch(/\d differs?|otherwise/i);
       expect(listed).not.toContain("pi-differ");
       // The pi.dev mark and what follows it show fetched_at, not checked_at. Only that part is searched: the models.dev
       // date before it is the fixture's import, made with today's clock, and may be either day.
@@ -741,7 +745,7 @@ describe("pi's catalog on the pages", () => {
       const aboutPi = html.split(/[<>"]/).filter((piece) => /\bpi\b|pi\.dev|pi&#39;s/i.test(piece));
       expect(aboutPi.length, path).toBeGreaterThan(2);
       expect(aboutPi.filter((piece) => /differ/i.test(piece)), path).toEqual([]);
-      expect(html, path).toContain("imported beside models.dev and never merged into it. The entry&#39;s own page shows what pi states.");
+      expect(html, path).toContain("and the import of pi&#39;s catalog, where pi lists the entry.");
     }
   });
 

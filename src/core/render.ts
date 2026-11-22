@@ -8,17 +8,12 @@ import {
   type CacheLifetimeItem,
   type CacheResult,
   type EntryCache,
-  type LifetimeSource,
   type RetentionProfile,
-  type SafeLifetime,
 } from "./cache.ts";
 import type { ProviderSummary, Summary } from "./entries.ts";
 import { conditionText } from "./conditions.ts";
 import type { PricingRule, RequestControl } from "./policy-contract.ts";
-import type { InputWindow, InputWindowMeasurement } from "./limits.ts";
 import {
-  compactTokens,
-  compactTokensDown,
   duration,
   entryHref,
   escapeHtml as e,
@@ -29,13 +24,14 @@ import {
   ORIGIN_TITLE,
   plural,
   shortAge,
-  usd,
   usdUnrounded,
   type Today,
 } from "./format.ts";
-import { isObject, type Json, type JsonObject } from "./merge.ts";
-import type { PiBlock, PiCostTier, PiDifference, PiSummary, PiValue, PiValueField } from "./pi.ts";
+import type { Json, JsonObject } from "./merge.ts";
+import type { PiBlock, PiSummary } from "./pi.ts";
 import { PI_ACCEPTS_FLAGS, PI_FLAG_GROUPS, PI_FORMAT_WORDS, piFlagGroup, type PiFlagGroup } from "./pi-words.ts";
+import type { PricePart, SafeQuantity, SafeValue } from "./safe.ts";
+import { lifetimeWords, priceWarning, QUANTITY_LABEL, safeCompact, safeText, safeTitle, safeWarning, span, warnId, wholePriceWarning, windowNote } from "./safe-view.ts";
 import { NS, type MeasuredLimit, type MetaPi, type ModelExtension, type Provenance, type PublishedEvidence } from "./schema.ts";
 
 const UNKNOWN = '<span class="unknown" title="The source does not say. Unknown is not zero and not unlimited.">Unknown</span>';
@@ -46,10 +42,6 @@ const NOT_APPLICABLE = '<span class="muted" title="This field does not apply to 
 const NONE = '<span class="muted">None</span>';
 const IN_PLAN = '<span class="muted" title="No price per token: the entry is paid for through a plan or subscription, which providers.dev does not list.">In plan</span>';
 const ACCESS_LABEL = { api: "API key", subscription: "Subscription", unknown: "Unclassified" } as const;
-
-function tokens(value: number | null): string {
-  return value === null ? UNKNOWN : `<span title="${exact(value)} tokens">${compactTokens(value)}</span>`;
-}
 
 function copyButton(value: string, label: string): string {
   return `<button type="button" class="copy" data-copy="${e(value)}" aria-label="Copy ${e(label)}" title="Copy ${e(label)}">Copy</button>`;
@@ -95,29 +87,20 @@ function piDatesSaid(meta: MetaPi | undefined): string {
 
 /**
  * The pi.dev mark of an entry pi's catalog also lists (`pi` of a summary): a mark like the models.dev and providers.dev
- * ones beside it, saying what it means in its title, not a link. In a row it says only that pi lists the entry; on the
- * entry's own page it also says how many values pi states otherwise, as the API counts them (`difference_count`), in
- * words, and that each row of the page says where pi stands. pi is not a source of the entry: its origin stays as it is.
+ * ones beside it, saying what it means in its title, not a link. pi is the last source of each value: where its figure
+ * contradicts another source's, the value's warning lists it.
  */
-function piMark(pi: PiSummary, differences: boolean): string {
-  const n = pi.difference_count;
+function piMark(pi: PiSummary): string {
   const named = pi.match === "alias" ? `, as ${pi.ref}` : "";
-  const said = !differences
-    ? `pi's model catalog (pi.dev) also lists this entry${named}. Imported beside models.dev, not verified by providers.dev. The entry's page shows what pi states.`
-    : n === 0
-      ? `pi's model catalog (pi.dev) also lists this entry${named}. No value of pi's differs from this page's; each row says where pi stands. Imported, not verified by providers.dev.`
-      : `pi's model catalog (pi.dev) also lists this entry${named}, and states ${plural(n, "value")} otherwise than this page; each row says where pi stands. Imported, not verified by providers.dev.`;
-  const differ = differences && n > 0 ? `<span class="pi-differ">${exact(n)} ${n === 1 ? "differs" : "differ"}<span class="sr-only"> from this page</span></span>` : "";
-  return `<span class="origin pi" title="${e(said)}">pi.dev${differ}</span>`;
+  return `<span class="origin pi" title="${e(`pi's model catalog (pi.dev) also lists this entry${named}. Imported, not verified by providers.dev. It is the last source of each value.`)}">pi.dev</span>`;
 }
 
 /**
  * One line per source with its own date: the models.dev import, the newest providers.dev evidence, and, where pi's
  * catalog lists the entry, the pi.dev mark with the import of pi's catalog (`fetched_at` of `pi.snapshot` in
  * /api/v1/meta: like the models.dev date, it moves only when the data changed). The date is there wherever `pi` is
- * given: in a row and on the entry's own page. Only the entry's page (`entry`) has the mark say how many values pi
- * states otherwise and the date say that the last import failed; in a row the date is plain like the models.dev one,
- * and its title says the rest.
+ * given: in a row and on the entry's own page. Only the entry's page (`entry`) has the date say that the last import
+ * failed; in a row the date is plain like the models.dev one, and its title says the rest.
  */
 function sourcesHtml(entry: Pick<Summary, "origin" | "verified" | "overridden_fields" | "pi">, options: { today: Today; imported?: string; pi?: MetaPi; entry?: boolean }, inline = false): string {
   const parts: string[] = [];
@@ -136,7 +119,7 @@ function sourcesHtml(entry: Pick<Summary, "origin" | "verified" | "overridden_fi
     const date = !options.pi || dates.fetched === null
       ? ""
       : `<span class="${failed ? "stale" : "muted date"}" title="${e(piDatesSaid(options.pi))}">${e(dates.fetched)}${failed ? " · last import failed" : ""}</span>`;
-    parts.push(`${piMark(entry.pi, options.entry === true)}${date}`);
+    parts.push(`${piMark(entry.pi)}${date}`);
   }
   return `<span class="sources${inline ? " side" : ""}">${parts.join("")}</span>`;
 }
@@ -148,156 +131,32 @@ const CACHE_MODE_TITLE = {
   explicit: "Manual (explicit): nothing is cached unless the request marks what to cache. The mark also picks the lifetime.",
 } as const;
 
-// ---- the input window: `input_window` of a summary and `providers_dev.limits.input_window` of an entry, as the API
-// publishes them. This file compares nothing, takes no minimum, applies no margin and picks no source: which value is
-// the published one is `basis`, whether it is a lower bound is `bound` ("at least", "≥"), what the rule found of the
-// documentation is `documented_status`, and what a measurement is, is its `kind`.
-
-export const SCOPE_WORD = { input: "Input alone", window: "Input and output together" } as const;
-const SCOPE_TITLE = {
-  input: "A figure for the input alone: the response is not counted against it.",
-  window: "A context window: input and output together. The response is counted against the same figure.",
-} as const;
-const WINDOW_BASIS_TITLE = {
-  documented: "Documented: the input limit or context window the source documents for this entry.",
-  measured: "Measured by providers.dev on this access.",
-} as const;
-/** What a measured value is, by its `kind`, in a sentence. */
-const MEASURED_SAID = { window: "the window the route named", bracket: "the largest input seen accepted", accepted: "the largest input seen accepted and read to the end, nothing refused" } as const;
-
-/** "at least " where the record says the value is a lower bound, and only there. */
-const atLeast = (bound: InputWindow["bound"]): string => (bound === "at_least" ? "at least " : "");
-
-/** What one measurement saw, in its own numbers, by its `kind`. */
-function measurementSaid(item: InputWindowMeasurement): string {
-  const parts =
-    item.kind === "window"
-      ? ["Window named by the route", item.accepted === null ? "" : `an input of ${exact(item.accepted)} accepted`]
-      : item.kind === "bracket"
-        ? [item.accepted === null ? "" : `${exact(item.accepted)} accepted`, item.refused === null ? "" : `${exact(item.refused)} refused`]
-        : [item.accepted === null ? "Accepted" : `${exact(item.accepted)} accepted`, "read to the end", "nothing refused"];
-  // A read check is printed wherever one was made; on an `accepted` measurement it is the value itself.
-  if (item.read !== null && item.kind !== "accepted") parts.push(`${exact(item.read)} read to the end`);
-  if (item.read !== null && item.kind === "accepted") parts[1] = `${exact(item.read)} read to the end`;
-  return parts.filter(Boolean).join(" · ");
-}
-
-/** The input window of an entry and what it rests on, in plain sentences for a tooltip. All of it is the record's. */
-function windowSaid(w: InputWindow): string {
-  if (w.tokens === null || w.basis === "none") return "Input window: unknown. Nothing documented or measured.";
-  const head = `Input window: ${atLeast(w.bound)}${exact(w.tokens)} tokens${w.scope ? `, ${SCOPE_WORD[w.scope].toLowerCase()}` : ""}.`;
-  const basis =
-    w.basis === "documented"
-      ? `Documented${w.documented_field ? ` in ${w.documented_field}` : ""}, ${w.source ?? "source unknown"}${w.date ? `, ${w.date}` : ""}.`
-      : `Measured by providers.dev${w.date ? `, ${w.date}` : ""}${w.measured_kind === null ? "" : `: ${MEASURED_SAID[w.measured_kind]}`}${w.measured_refused === null ? "" : `; ${exact(w.measured_refused)} tokens refused`}.`;
-  const other =
-    w.basis === "documented"
-      ? w.measured_tokens === null ? "Not measured." : `Measured: ${atLeast(w.measured_bound)}${exact(w.measured_tokens)} tokens${w.measured_kind === "window" ? ", a window named by the route" : ""} (${plural(w.clients, "client")}, ${plural(w.evaluations, "evaluation")}).`
-      : w.documented_tokens === null ? "Not documented." : `Documented: ${exact(w.documented_tokens)} tokens${w.documented_field ? ` in ${w.documented_field}` : ""}, ${w.documented_source ?? "source unknown"}.`;
-  const status = w.documented_status === "contradicted" ? " Documentation contradicted." : w.documented_status === "not_contradicted" ? " Documentation not contradicted." : "";
-  return `${head} ${basis} ${other}${status}`;
-}
-
-/**
- * The input window in a table row: the compact number, "≥" before it and rounded down where the record says it is a
- * lower bound, and its basis in a word under it. The rest is in the hover text and on the entry's page.
- */
-function windowCell(entry: Pick<Summary, "input_window">, href: string): string {
-  const w = entry.input_window;
-  if (w.tokens === null || w.basis === "none") return `<span class="unknown" title="${e(windowSaid(w))}">Unknown</span>`;
-  const value = w.bound === "at_least" ? `≥ ${compactTokensDown(w.tokens)}` : compactTokens(w.tokens);
-  return `<a class="plain window" href="${e(href)}#input-window" title="${e(windowSaid(w))}"><span class="window-value">${value}</span>${basisTag(w.basis, null)}</a>`;
-}
-
-// ---- cache lifetimes: `cache_lifetime` of a summary and `providers_dev.cache.lifetime` of an entry, as the API
-// publishes them. Per retention profile the safe value, then every lifetime of the entry in one list, documented and
-// measured alike, each with its source and date. This file picks no value and compares none: which value is the safe
-// one is `basis`, and the results by age are the items' and the evaluations' own.
+// ---- the safe values in a list: `safe` of a summary, as `src/core/safe-view.ts` prints it. The value, compact, and
+// the warning where its sources disagree; the exact value is in the hover text and on the entry's page.
 
 const PROFILE_WORD = { short: "Short", long: "Long" } as const;
 const PROFILE_TITLE = {
   short: "Short retention: the cache a request gets without asking for a lifetime, or with the provider's shortest setting.",
   long: "Long retention: the cache a request gets when it asks for a longer lifetime.",
 } as const;
-const BASIS_TITLE = {
-  documented: "Documented: a lifetime the source documents for this entry.",
-  measured: "Measured by providers.dev: the oldest age through which every check hit.",
-} as const;
-
-/** A span of time, as a lifetime or an age: "2.5 min", "1 h 15 min", "24 h" (never "1 d": caches are counted in hours). */
-const span = (seconds: number): string => (seconds > 0 && seconds % 86400 === 0 ? shortAge(seconds) : duration(seconds));
 /** An age as a column heading or in a sentence: "at once" for the control, then "2.5 min", "1 h 15 min", "24 h". */
 const ageText = (seconds: number): string => (seconds === 0 ? "at once" : span(seconds));
-const seconds = (value: number): string => `${exact(value)} s`;
+const LIFETIME_KEY = { short: "cache_short", long: "cache_long" } as const;
 
 /**
- * A lifetime as a page prints it, the exact seconds in its title. 0 is two statements, told apart by the basis:
- * documented, the source says the entry does not cache ("None"); measured, a check missed at the immediate re-send or at the youngest tested age ("0 s").
+ * A safe value in a list's cell. In a column of numbers the warning comes first, so that the numbers stay aligned on
+ * the right; in the lines of the cache lifetimes, read from the left, it comes after.
  */
-function lifetimeText(value: number, basis: "documented" | "measured"): string {
-  if (value === 0 && basis === "documented") return '<span title="Documented: the source says this entry does not cache prompts.">None</span>';
-  if (value === 0) return '<span title="Measured: 0 s. A check missed at the immediate re-send or at the youngest tested age.">0 s</span>';
-  return `<span title="${seconds(value)}">${span(value)}</span>`;
+function listValue(entry: Pick<Summary, "ref" | "safe">, quantity: Exclude<SafeQuantity, "price">, href: string, today: Today, after = false): string {
+  const safe: SafeValue = entry.safe[quantity];
+  const warning = safeWarning(safe, quantity, warnId(entry.ref, quantity), today);
+  const value = safe.value === null ? '<span class="unknown">Unknown</span>' : `<a class="plain" href="${e(href)}" title="${e(safeTitle(safe))}">${safeCompact(safe)}</a>`;
+  return `<span class="safe-cell">${after ? value + warning : warning + value}</span>`;
 }
 
-/** Documented or measured, in words, on every value: no legend needed. `null` leaves the title to what holds the tag. */
-function basisTag(basis: "documented" | "measured", title: string | null = BASIS_TITLE[basis]): string {
-  return `<span class="basis ${basis}"${title === null ? "" : ` title="${e(title)}"`}>${basis}</span>`;
-}
-
-/**
- * Who a value is from, and its date. A providers.dev date is marked stale like all our evidence, after the published
- * `stale_after_days`. `dateTitle` says what the date is where it is not the newest evaluation's or evidence's.
- */
-function lifetimeSource(source: LifetimeSource | "pi.dev", date: string | null, basis: "documented" | "measured", today: Today, dateTitle?: string): string {
-  const name =
-    source === "models.dev"
-      ? `<span class="origin upstream" title="${e(ORIGIN_TITLE.upstream)}">models.dev</span>`
-      : source === "pi.dev"
-        ? '<span class="origin pi" title="From pi\'s catalog: no other source states this value.">pi.dev</span>'
-        : `<span class="origin added" title="${basis === "measured" ? "Measured by providers.dev." : "Documented, with a providers.dev correction or on an entry providers.dev added."}">providers.dev</span>`;
-  const title = dateTitle ?? (basis === "measured" ? "The date of the newest evaluation." : source === "models.dev" ? "Imported from models.dev on this date." : "The date of the newest providers.dev evidence.");
-  return `<span class="life-source">${name}${dateText(date, source === "providers.dev", title, today)}</span>`;
-}
-
-/** A date with what it is in its title; a providers.dev date is marked stale after the published `stale_after_days`. */
-function dateText(date: string | null, ours: boolean, title: string, today: Today): string {
-  if (date === null) return '<span class="muted date">Date unknown</span>';
-  return ours && isStale(date, today)
-    ? `<span class="stale" title="${e(title)} More than ${plural(today.stale_after_days, "day")} ago.">${e(date)} · stale</span>`
-    : `<span class="muted date" title="${e(title)}">${e(date)}</span>`;
-}
-
-/** The safe lifetime of a profile and what it was chosen from, in one plain sentence for a tooltip. */
-function safeSaid(profile: RetentionProfile, p: SafeLifetime): string {
-  const name = `${PROFILE_WORD[profile]} retention`;
-  if (p.safe_s === null || p.basis === "none") return `${name}: no lifetime is documented or measured.`;
-  const documented = p.documented_s === null ? "none" : p.documented_s === 0 ? "0 s, does not cache" : seconds(p.documented_s);
-  const measured = p.measured_s === null ? "not measured" : `${seconds(p.measured_s)} (${plural(p.clients, "client")}, ${plural(p.evaluations, "evaluation")})`;
-  const inside = p.checks_inside === null || p.hits_inside === null ? "" : ` ${exact(p.hits_inside)} of ${exact(p.checks_inside)} checks hit inside the documented lifetime.`;
-  return `${name}, safe lifetime: ${seconds(p.safe_s)}, ${p.basis}, ${p.source}${p.date ? `, ${p.date}` : ""}. Documented: ${documented}. Measured: ${measured}.${inside}`;
-}
-
-/**
- * One line of the list cell: the profile, the safe value and its basis, and beside it the other of the two lifetimes
- * it was chosen from where there is one. Which is the other is read from `basis`, and its emphasis from
- * `documented_status`; nothing is compared.
- */
-function lifetimeLine(profile: RetentionProfile, p: SafeLifetime): string {
-  const name = `<span class="life-profile">${PROFILE_WORD[profile]}</span>`;
-  if (p.safe_s === null || p.basis === "none") return `${name}<span class="life-value unknown" title="${e(safeSaid(profile, p))}">Unknown</span><span></span>`;
-  const other =
-    p.basis === "documented"
-      ? p.measured_s === null ? "" : `<span class="life-other">measured ${span(p.measured_s)}</span>`
-      : p.documented_s === null ? "" : `<span class="life-other${p.documented_status === "contradicted" ? " contradicted" : ""}">documented ${p.documented_s === 0 ? "None" : span(p.documented_s)}</span>`;
-  const value = p.safe_s === 0 ? (p.basis === "documented" ? "None" : "0 s") : span(p.safe_s);
-  return `${name}<span class="life-value" title="${e(safeSaid(profile, p))}">${value}</span><span class="life-basis">${basisTag(p.basis)}${other}</span>`;
-}
-
-/** The cache lifetime of an entry in a table row: short and long, each on its line, the same two lines for every entry. */
-function lifetimeCell(entry: Pick<Summary, "cache_lifetime">, href: string): string {
-  const record = entry.cache_lifetime;
-  return `<a class="plain lifes" href="${e(href)}#cache" aria-label="Cache lifetimes. Open the entry for every lifetime and its source.">${lifetimeLine("short", record.short)}${lifetimeLine("long", record.long)}</a>`;
+/** The cache lifetimes of an entry in a list: short and long, each on its line, the same two lines for every entry. */
+function lifetimeCell(entry: Pick<Summary, "ref" | "safe">, href: string, today: Today): string {
+  return `<span class="lifes">${RETENTION_PROFILES.map((profile) => `<span class="life-profile" title="${PROFILE_TITLE[profile]}">${PROFILE_WORD[profile]}</span>${listValue(entry, LIFETIME_KEY[profile], `${href}#cache`, today, true)}`).join("")}</span>`;
 }
 
 // ---- results by age: the cells of an item, of an evaluation, and of the evidence page's list of evaluations.
@@ -370,7 +229,8 @@ export interface RowOptions {
 }
 
 /** The column names of the entry table. Where the table is stacked, each cell repeats its column's name. */
-const COLUMN = { provider: "Provider", input_window: "Input window", context: "Context", max_output:"Max output", price: "Price in / out", released: "Released", lifetime: "Cache lifetime", source: "Source" } as const;
+const COLUMN = { provider: "Provider", input_window: "Context window", max_output: "Max output", price: "Price in / out", released: "Released", lifetime: "Cache lifetime", source: "Source" } as const;
+const WARNED = ` A warning sign marks a value whose sources do not all agree: it opens each source's value.`;
 
 export function tableHead(options: { hideProvider?: boolean; sortable?: boolean; sort?: string; order?: string }): string {
   const column = (key: string | null, label: string, title: string, className = ""): string => {
@@ -384,13 +244,12 @@ export function tableHead(options: { hideProvider?: boolean; sortable?: boolean;
   return `<tr>
 ${column("name", "Model", "The model's name and its id at this provider.")}
 ${options.hideProvider ? "" : column("provider", COLUMN.provider, "Who serves it, and how it is reached.")}
-${column(null, COLUMN.input_window, "The most input one request can carry on this entry, in tokens (input_window). Each value says whether it is documented or measured by providers.dev; ≥ marks a lower bound, the largest input seen accepted. Hover a value for what it rests on; the entry's page has the documented and measured figures side by side.", "num window-col")}
-${column("context", COLUMN.context, "Exposed context window in tokens (limit.context): what this provider accepts for the model.", "num")}
-${column("max_output", COLUMN.max_output, "Largest single response in tokens (limit.output). A maximum, not a default.", "num")}
-${column("price_in", COLUMN.price, "Base list price in US dollars per million tokens, input then output, as models.dev records it. Conditional rates marks an entry whose price changes with context size, service tier, region, date or the time of day: open the entry for those. A subscription is not paid per token: it shows the API list price of the same model, marked API price, or In plan where the catalog has no API entry of that model.", "num mid-only")}
+${column("input_window", COLUMN.input_window, `The most input one request can carry on this entry, in tokens (safe.input_window). ≥ marks a lower bound, rounded down.${WARNED}`, "num window-col")}
+${column("max_output", COLUMN.max_output, `The most tokens one response can hold (safe.max_output). A maximum, not a default.${WARNED}`, "num")}
+${column("price_in", COLUMN.price, `List price in US dollars per million tokens, input then output, before any conditional rate (pricing). Conditional rates marks an entry whose price changes with context size, service tier, region, date or the time of day: open the entry for those. A subscription is not paid per token: it shows the API list price of the same model, marked API price, or In plan where the catalog has no API entry of that model.${WARNED}`, "num mid-only")}
 ${column("release_date", COLUMN.released, "When the model was released, as models.dev records it. It is the model's date: the same at every provider.", "wide-only")}
-${column(null, COLUMN.lifetime, "How long a cached prompt can be relied on (cache_lifetime): for short retention, what a request gets without asking for a lifetime; for long, what it gets when it asks for a longer one. Each value says whether it is documented or measured by providers.dev, and names the other of the two where there is one. Hover a value for its source and date; the entry's page lists every lifetime.", "life-col")}
-${column("verified", COLUMN.source,"Where the entry comes from, with a date per source: the import from models.dev, the newest providers.dev evidence, and the import of pi's catalog. pi.dev marks an entry that pi's model catalog also lists, imported beside models.dev and never merged into it. The entry's own page shows what pi states.")}
+${column(null, COLUMN.lifetime, `How long a cached prompt can be relied on (safe.cache_short, safe.cache_long): short, what a request gets without asking for a lifetime; long, what it gets when it asks for a longer one. None: no time at all.${WARNED}`, "life-col")}
+${column("verified", COLUMN.source, "Where the entry comes from, with a date per source: the import from models.dev, the newest providers.dev evidence, and the import of pi's catalog, where pi lists the entry.")}
 </tr>`;
 }
 
@@ -402,41 +261,43 @@ export function rowHtml(entry: Summary, options: RowOptions): string {
   return `<tr>
 <th scope="row"><a href="${e(href)}">${e(entry.name)}</a>${status}<div class="id"><code>${e(entry.model)}</code>${copyButton(entry.ref, "entry id")}</div></th>
 ${options.hideProvider ? "" : `<td class="provider-col" data-label="${COLUMN.provider}"><a class="plain" href="/providers/${e(entry.provider)}/">${e(provider)}</a>${access}</td>`}
-<td class="num window-col" data-label="${COLUMN.input_window}">${windowCell(entry, href)}</td>
-<td class="num" data-label="${COLUMN.context}">${tokens(entry.context)}</td>
-<td class="num" data-label="${COLUMN.max_output}">${tokens(entry.max_output)}</td>
-<td class="num mid-only" data-label="${COLUMN.price}">${priceCell(entry)}</td>
+<td class="num window-col" data-label="${COLUMN.input_window}">${listValue(entry, "input_window", `${href}#limits`, options.today)}</td>
+<td class="num" data-label="${COLUMN.max_output}">${listValue(entry, "max_output", `${href}#limits`, options.today)}</td>
+<td class="num mid-only" data-label="${COLUMN.price}">${priceCell(entry, wholePriceWarning(entry.safe.price, warnId(entry.ref, "price"), options.today))}</td>
 <td class="wide-only" data-label="${COLUMN.released}">${entry.release_date ? `<span class="muted date">${e(entry.release_date)}</span>` : UNKNOWN}</td>
-<td class="life-col" data-label="${COLUMN.lifetime}">${lifetimeCell(entry, href)}</td>
+<td class="life-col" data-label="${COLUMN.lifetime}">${lifetimeCell(entry, href, options.today)}</td>
 <td class="nowrap source-col" data-label="${COLUMN.source}">${sourcesHtml(entry, options)}</td>
 </tr>`;
 }
 
-// ---- prices: `pricing` as the API publishes it. Nothing here multiplies or compares: a multiplier's prices are its
-// `resulting_rates`, and a time rule's name is its `period`.
+// ---- prices: `pricing` as the API publishes it, the price of `safe.price.source` whole. Nothing here multiplies or
+// compares: a multiplier's prices are its `resulting_rates`, and a time rule's name is its `period`. Every price is
+// printed with every digit the API states.
 
 const LISTED_PRICE = "The price models.dev lists for this entry. The entry is a subscription; what the listed price bills is not established.";
 
-function priceCell(entry: Pick<Summary, "price_in" | "price_out" | "price_from" | "access" | "pricing">): string {
+/** The base price of text in a list, input then output, and the warning of the price before it where its sources disagree. */
+function priceCell(entry: Pick<Summary, "price_in" | "price_out" | "price_from" | "access" | "pricing">, warning = ""): string {
   const { price_in: input, price_out: output } = entry;
   const conditional = entry.pricing.rules?.some((rule) => rule.when !== null || rule.operation === "multiply");
   const conditionNote = conditional ? '<div class="hint">Conditional rates</div>' : "";
+  const cell = (html: string): string => `<span class="safe-cell">${warning}${html}</span>`;
   // A subscription entry with no API entry of the same model to refer to has no price per token at all.
   if (input === null && output === null) {
     // No price per token for text: a model that makes video or transcribes speech is priced by the second, the image
     // or the minute. The first of its base charges stands in the cell, with its name; the rest are on its page.
     const other = (entry.pricing.rules ?? []).filter((rule) => rule.when === null && rule.operation === "set").sort((a, b) => meterRank(a.meter) - meterRank(b.meter))[0];
-    if (other) return `<span class="price">${rateHtml(other)}</span><div class="hint">${e(meterLabel(other.meter))}</div>${conditionNote}`;
-    return (entry.pricing.billing === "not_applicable" ? IN_PLAN : UNKNOWN) + conditionNote;
+    if (other) return `${cell(`<span class="price">${rateHtml(other)}</span>`)}<div class="hint">${e(meterLabel(other.meter))}</div>${conditionNote}`;
+    return cell(entry.pricing.billing === "not_applicable" ? IN_PLAN : UNKNOWN) + conditionNote;
   }
   // A listed 0 is shown as the source has it. It can mean free, or paid for another way: the page does not decide.
-  const price = `<span class="price">${input === null ? DASH : usd(input)} <span class="muted">/</span> ${output === null ? DASH : usd(output)}</span>${conditionNote}`;
+  const price = `<span class="price">${input === null ? DASH : usdUnrounded(input)} <span class="muted">/</span> ${output === null ? DASH : usdUnrounded(output)}</span>`;
   // Two short lines: the price, then whose price it is.
   if (entry.price_from) {
-    return `<span class="price-inherited" title="Not what this entry costs: a subscription is not paid per token. This is the API list price of ${e(entry.price_from)}.">${price}<span class="price-from">API price</span></span>`;
+    return `<span class="price-inherited" title="Not what this entry costs: a subscription is not paid per token. This is the API list price of ${e(entry.price_from)}.">${cell(price)}<span class="price-from">API price</span></span>${conditionNote}`;
   }
-  if (entry.access === "subscription") return `<span class="price-inherited" title="${e(LISTED_PRICE)}">${price}<span class="price-from">Listed price</span></span>`;
-  return price;
+  if (entry.access === "subscription") return `<span class="price-inherited" title="${e(LISTED_PRICE)}">${cell(price)}<span class="price-from">Listed price</span></span>${conditionNote}`;
+  return cell(price) + conditionNote;
 }
 
 // A charge is a kind of content and what is charged for it: `text.input`, `audio.cache_read`, `video.output`. The
@@ -461,7 +322,7 @@ const APPLIES_TO = { all_usage: "Whole request", above_threshold: "Only the part
 
 /** "$2 / 1M tokens". */
 function rateHtml(rate: Pick<PricingRule, "amount" | "currency" | "unit">): string {
-  const amount = rate.currency === "USD" ? usd(rate.amount) : `${e(rate.currency ?? "Currency unknown")} ${e(String(rate.amount))}`;
+  const amount = rate.currency === "USD" ? usdUnrounded(rate.amount) : `${e(rate.currency ?? "Currency unknown")} ${e(String(rate.amount))}`;
   if (!rate.unit) return `${amount} <span class="muted">· unit unknown</span>`;
   const { name, quantity } = rate.unit;
   const plural = name.endsWith("ch") ? `${name}es` : `${name}s`;
@@ -477,11 +338,16 @@ function lifetimeOf(rule: PricingRule): string | null {
   return when.field === "cache.retention_value" && typeof when.value === "string" ? when.value : null;
 }
 
-/** The row of the price table that each of pi's four prices stands beside (design/pi-merged.md, section 7). */
-const PI_PRICE_ROW: Readonly<Record<string, PiValueField>> = { "text.input": "cost.input", "text.output": "cost.output", "text.cache_read": "cost.cache_read", "text.cache_write": "cost.cache_write" };
+/** The part of the price each of the four text charges is, where the sources compare it (`safe.price.differs`). */
+const PRICE_PART: Readonly<Record<string, PricePart>> = { "text.input": "input", "text.output": "output", "text.cache_read": "cache_read", "text.cache_write": "cache_write" };
 
-function priceSection(summary: Summary, pi: PiStanding | null): string {
+/**
+ * The price of an entry, `pricing` whole: one row per base charge, then one block per condition. The warning is on a
+ * row where `safe.price.differs` names its part, and on the conditional rates where it names `tiers` or `other`.
+ */
+function priceSection(summary: Summary, today: Today): string {
   const pricing = summary.pricing;
+  const price = summary.safe.price;
   const rules = pricing.rules ?? [];
   const base = rules.filter((rule) => rule.when === null && rule.operation === "set");
   const byLifetime = rules.filter((rule) => lifetimeOf(rule) !== null);
@@ -495,9 +361,9 @@ function priceSection(summary: Summary, pi: PiStanding | null): string {
       const own = base.filter((rule) => rule.meter === meter).map(rateHtml);
       const lifetimes = byLifetime.filter((rule) => rule.meter === meter).map((rule) => `${rateHtml(rule)} <span class="muted">· ${e(lifetimeOf(rule)!)} lifetime</span>`);
       const value = [...own, ...lifetimes];
-      // The row's own value as it is, and pi's line under it, by the item's standing.
-      const item = PI_PRICE_ROW[meter] ? pi?.items.get(PI_PRICE_ROW[meter]) : undefined;
-      return `<tr><th scope="row">${e(meterLabel(meter))}</th><td class="num">${value.length ? value.join("<br>") : absent}${piLine(item, pi?.meta)}</td></tr>`;
+      const part = PRICE_PART[meter];
+      const warning = part ? priceWarning(price, [part], meterLabel(meter), warnId("price", part), today) : "";
+      return `<tr><th scope="row">${e(meterLabel(meter))}</th><td class="num"><span class="safe-cell">${warning}<span class="rates">${value.length ? value.join("<br>") : absent}</span></span></td></tr>`;
     })
     .join("");
 
@@ -532,11 +398,10 @@ function priceSection(summary: Summary, pi: PiStanding | null): string {
     : summary.access === "subscription" && pricing.rules !== null
       ? `<p class="hint">${e(LISTED_PRICE)}</p>`
       : "";
-  const source = pricing.evidence.map((item) => `<a href="${e(item.url)}" rel="noopener">${e(shortUrl(item.url))}</a>${item.date ? ` <span class="date">${e(item.date)}</span>` : ""}`).join(" · ");
+  const ratesWarning = priceWarning(price, ["tiers", "other"], "Conditional rates", warnId("price", "rates"), today);
   return `${note}<div class="scroll"><table class="facts pairs stack-phone"><thead><tr><th scope="col">Base charge</th><th scope="col" class="num">Rate</th></tr></thead><tbody>${rows}</tbody></table></div>
-<h3>Conditional rates</h3>
+<h3 class="with-warning"><span>Conditional rates</span>${ratesWarning}</h3>
 <div class="scroll"><table class="facts conditional stack-phone"><thead><tr><th scope="col">Condition</th><th scope="col">Charge</th><th scope="col" class="num">Rate</th><th scope="col">Applies to</th></tr></thead>${changes || `<tbody><tr class="empty-row"><td colspan="4" class="muted">${none}</td></tr></tbody>`}</table></div>
-${piTiers(pi)}<p class="hint">Source: ${source || (pricing.billing === "not_applicable" ? NOT_APPLICABLE : UNKNOWN)}</p>
 <details><summary>Other prices in the source, not shown above (${pricing.unparsed.length})</summary>${pricing.unparsed.length ? `<pre>${e(JSON.stringify(pricing.unparsed, null, 2))}</pre>` : `<p class="muted mt-3">${NONE}</p>`}</details>`;
 }
 
@@ -565,18 +430,11 @@ function show(value: Json): string {
   return `<code>${e(JSON.stringify(value))}</code>`;
 }
 
-function sourceOf(path: string, provenance: Provenance[], origin: ModelExtension["origin"], measured: string[] = []): string {
-  if (measured.some((field) => path === `limit.${field}`)) return '<span class="badge measured" title="Measured by providers.dev on this access. See the evaluation below.">measured</span>';
+function sourceOf(path: string, provenance: Provenance[], origin: ModelExtension["origin"]): string {
   const change = provenance.find((item) => item.path === path || path.startsWith(`${item.path}.`) || item.path.startsWith(`${path}.`));
   if (change) return `<span class="origin modified" title="Corrected by providers.dev. models.dev says: ${e(change.had_upstream ? JSON.stringify(change.upstream) : "nothing")}">providers.dev</span>`;
   if (origin === "added") return '<span class="origin added">providers.dev</span>';
   return '<span class="origin upstream" title="Imported from models.dev. Not independently checked.">models.dev</span>';
-}
-
-function fact(label: string, hint: string, value: string, source: string, pi = ""): string {
-  // An unknown value has no source to name, unless it was published as unknown on purpose.
-  if ((value === UNKNOWN || value === IN_PLAN) && !source.includes("Corrected")) source = DASH;
-  return `<tr><th scope="row">${label}<div class="hint">${hint}</div></th><td class="num" data-label="Value">${value}${pi}</td><td data-label="Source">${source}</td></tr>`;
 }
 
 /** A column's heading in the table of lifetimes, also repeated by each of its cells where the table is stacked. */
@@ -602,44 +460,27 @@ function otherAges(results: readonly CacheResult[], columns: readonly Column[]):
   return `Also checked: ${others.map((result) => `${ageText(result.age_s)} ${Math.round(result.hit_rate_pct)}% (${result.hits}/${result.checks})`).join(", ")}`;
 }
 
-/**
- * The safe lifetime of a profile, then the two lifetimes it was chosen from and how many checks hit inside the documented
- * one. pi's lifetime of the profile stands beside the documented one, by its item's standing, and never in the safe value.
- */
-function profileRow(profile: RetentionProfile, p: SafeLifetime, today: Today, columns: readonly Column[], pi: PiStanding | null): string {
-  const item = pi?.items.get(profile === "short" ? "prompt_cache.short" : "prompt_cache.long");
-  const documented = `${p.documented_s === null ? '<span class="muted">Not documented</span>' : lifetimeText(p.documented_s, "documented")}${piLine(item, pi?.meta)}`;
-  const safe =
-    p.safe_s === null || p.basis === "none" || p.source === null
-      ? UNKNOWN
-      : `<span class="life-value">${lifetimeText(p.safe_s, p.basis)}</span>${basisTag(p.basis)}${lifetimeSource(p.source, p.date, p.basis, today)}`;
-  // The case, as the API publishes it in `documented_status`, and from nothing else.
-  const verdict =
-    p.documented_status === "contradicted"
-      ? '<span class="case contradicted" title="An evaluation contradicts the documented lifetime: the safe value is the measured one. The documented lifetime stays in the list.">Documentation contradicted</span>'
-      : p.documented_status === "not_contradicted"
-        ? '<span class="case" title="No evaluation contradicts the documented lifetime: the safe value is the documented one. Not contradicted is not confirmed.">Documentation not contradicted</span>'
-        : "";
-  const fact = (label: string, value: string): string => `<div><dt>${label}</dt><dd>${value}</dd></div>`;
-  return `<tbody class="profile"><tr><th scope="row" title="${PROFILE_TITLE[profile]}">${PROFILE_WORD[profile]} retention</th><td class="profile-facts" colspan="${1 + columns.length}"><dl>
-${fact("Safe lifetime", `<span class="safe">${safe}</span>${verdict}`)}
-${fact("Documented", documented)}
-${fact("Measured", p.measured_s === null ? '<span class="muted">Not measured</span>' : `${lifetimeText(p.measured_s, "measured")} <span class="muted">· ${plural(p.clients, "client")}</span>`)}
-${fact("Inside the documented lifetime", p.checks_inside === null || p.hits_inside === null ? NOT_APPLICABLE : `<span title="Checks at ages up to the documented lifetime, the control included, and how many were served from the cache.">${exact(p.hits_inside)} of ${exact(p.checks_inside)} checks hit</span>`)}
-</dl></td></tr></tbody>`;
+/** A retention profile in the table of cache evaluations: its name, over the lifetimes measured for it. */
+function profileRow(profile: RetentionProfile, items: number, columns: readonly Column[]): string {
+  return `<tbody class="profile"><tr><th scope="rowgroup" title="${PROFILE_TITLE[profile]}">${PROFILE_WORD[profile]} retention</th><td class="profile-facts" colspan="${1 + columns.length}">${items === 0 ? '<span class="muted">No evaluation</span>' : `<span class="muted">${items === 1 ? "1 client and setting" : `${exact(items)} clients and settings`}</span>`}</td></tr></tbody>`;
 }
 
-/** The value of an item, its basis, its source and its date: the first cell of every lifetime. */
+/** The lifetime one client held, and the date of its newest evaluation: the first cell of each lifetime. */
 function lifetimeHead(item: CacheLifetimeItem, today: Today): string {
-  return `<td class="life" data-label="Lifetime"><span class="life-value">${lifetimeText(item.lifetime_s, item.basis)}</span>${basisTag(item.basis)}${lifetimeSource(item.source, item.date, item.basis, today)}</td>`;
+  const date = item.date === null
+    ? '<span class="muted date">Date unknown</span>'
+    : isStale(item.date, today)
+      ? `<span class="stale" title="The newest evaluation, more than ${plural(today.stale_after_days, "day")} ago.">${e(item.date)} · stale</span>`
+      : `<span class="muted date" title="The date of the newest evaluation.">${e(item.date)}</span>`;
+  return `<td class="life" data-label="Lifetime"><span class="life-value" title="${exact(item.lifetime_s)} s: the oldest age through which every check hit.">${lifetimeWords(item.lifetime_s)}</span>${date}</td>`;
 }
 
 /** The note of an evaluation, where it has one, named by the evaluation where the note could be read as another's. */
 const runNote = (run: CacheEvaluation, named: boolean): string => (run.note ? `<p class="run-note"><b>Note${named ? ` <code>${e(run.id)}</code>` : ""}</b> ${e(run.note)}</p>` : "");
 
 /**
- * One evaluation under its measured lifetime: the run, its settings, the raw result, and its own results by age. Its note
- * is on the lifetime's row, in sight before the evaluations are opened; an evaluation in no lifetime carries its own.
+ * One evaluation under its lifetime: the run, its settings, the raw result, and its own results by age. Its note is on
+ * the lifetime's row, in sight before the evaluations are opened; an evaluation in no lifetime carries its own.
  */
 function runRow(run: CacheEvaluation, today: Today, columns: readonly Column[], withNote = false): string {
   const settings = settingsText(run.request_settings);
@@ -648,47 +489,46 @@ function runRow(run: CacheEvaluation, today: Today, columns: readonly Column[], 
   return `<tr class="run"><td class="run-head" colspan="2">${withNote ? runNote(run, false) : ""}<code>${e(run.id)}</code> ${date}<div class="hint">${e(run.route_label)}${settings ? ` · <code>${e(settings)}</code>` : ""}${other ? ` · ${e(other)}` : ""}</div><a href="${e(run.source)}" rel="noopener">Raw result</a></td>${heatCells(run.results, columns)}</tr>`;
 }
 
+const NOT_COUNTED = '<span class="chip not-counted" title="On this entry another kind of client counts: what this one held gives no value. The methodology says which counts.">Not counted</span>';
+
 /**
- * One lifetime of the list, in the same columns whatever its basis. A documented one names the way of caching it is
- * documented for and the text as documented; a measured one names its client and setting, its checks and results by
- * age, the notes of its evaluations, and opens onto each evaluation.
+ * The lifetime one client held with one request setting: its client and setting, its checks and results by age, the
+ * notes of its evaluations, and each evaluation under it. One that does not feed the value (`chosen: false`) says so.
  */
 function itemRows(item: CacheLifetimeItem, evaluations: readonly CacheEvaluation[], today: Today, columns: readonly Column[]): string {
-  if (item.basis === "documented") {
-    const what =
-      item.mode === null
-        ? "Documented as not caching"
-        : `<span title="${e(CACHE_MODE_TITLE[item.mode])}">${CACHE_MODE_WORD[item.mode]}</span> <span class="chip">${item.mode}</span><div class="hint">As documented: <code>${e(item.documented_as ?? "")}</code></div>`;
-    return `<tbody class="item documented"><tr>${lifetimeHead(item, today)}<td class="through" data-label="Documented for">${what}</td><td class="heat-none" colspan="${columns.length}" data-label="Results by age"><span class="muted" title="A documented lifetime has no results by age.">Not applicable</span></td></tr></tbody>`;
-  }
   const runs = item.evaluation_ids.flatMap((id) => evaluations.filter((run) => run.id === id));
   const setting = item.parameter && item.value ? `Sent <code>${e(item.parameter)}=${e(item.value)}</code>` : "No lifetime asked for";
   const checks = `<span title="Re-sends served from the cache, of those made, the control included.">${exact(item.hits)} of ${exact(item.checks)} checks hit</span>`;
   const ages = `${item.tested_from_s === null ? "No timed check" : `Tested from ${span(item.tested_from_s)}`} · ${item.first_miss_s === null ? "No miss" : `First miss ${ageText(item.first_miss_s)}`}`;
   const other = item.results ? otherAges(item.results, columns) : "";
   const notes = runs.map((run) => runNote(run, runs.length > 1)).join("");
-  const what = `<strong class="client">${e(item.client_label ?? item.client ?? "")}</strong><div class="hint">${setting} · ${checks}</div><div class="hint">${ages}${other ? ` · ${e(other)}` : ""}</div>${notes}<details class="runs"><summary>${plural(item.evaluations, "evaluation")}</summary></details>`;
+  const what = `<strong class="client">${e(item.client_label ?? item.client ?? "")}</strong>${item.chosen ? "" : ` ${NOT_COUNTED}`}<div class="hint">${setting} · ${checks}</div><div class="hint">${ages}${other ? ` · ${e(other)}` : ""}</div>${notes}<details class="runs"><summary>${plural(item.evaluations, "evaluation")}</summary></details>`;
   const results = item.results ?? [];
-  return `<tbody class="item measured"><tr>${lifetimeHead(item, today)}<td class="through" data-label="Measured through">${what}</td>${heatCells(results, columns)}</tr>${runs.map((run) => runRow(run, today, columns)).join("")}</tbody>`;
+  return `<tbody class="item measured${item.chosen ? "" : " not-counted"}"><tr>${lifetimeHead(item, today)}<td class="through" data-label="Client">${what}</td>${heatCells(results, columns)}</tr>${runs.map((run) => runRow(run, today, columns)).join("")}</tbody>`;
 }
 
 /**
- * Every lifetime of an entry, one table for all: per retention profile the safe value and what it was chosen from, then
- * each documented and each measured lifetime as the API lists them, in its order. Both profiles on every entry. The age
- * columns are the published ones (`cache_ages_s` of /api/v1/meta). What the ages and the cells are is said to a screen
- * reader by the heading over the ages, and in sight by the legend under the table: one sample cell and its words.
+ * The cache evaluations of an entry, one table for all: per retention profile the lifetime each client held with each
+ * request setting, those that feed the value (`chosen`) first and the others marked as not counted, each opening onto
+ * its evaluations. Both profiles on every entry. The age columns are the published ones (`cache_ages_s` of
+ * /api/v1/meta). What the ages and the cells are is said to a screen reader by the heading over the ages, and in sight
+ * by the legend under the table: one sample cell and its words.
  */
-function lifetimesTable(cache: EntryCache, today: Today, ages: CacheAges, pi: PiStanding | null): string {
+function evaluationsTable(cache: EntryCache, today: Today, ages: CacheAges): string {
   const record = cache.lifetime;
   const columns = columnsOf(ages);
-  const body = RETENTION_PROFILES.map((profile) => profileRow(profile, record[profile], today, columns, pi) +record.lifetimes.filter((item) => item.retention_profile === profile).map((item) => itemRows(item, cache.evaluations, today, columns)).join("")).join("");
+  const body = RETENTION_PROFILES.map((profile) => {
+    const measured = record.lifetimes.filter((item) => item.retention_profile === profile && item.basis === "measured");
+    const ordered = [...measured.filter((item) => item.chosen), ...measured.filter((item) => !item.chosen)];
+    return profileRow(profile, ordered.length, columns) + ordered.map((item) => itemRows(item, cache.evaluations, today, columns)).join("");
+  }).join("");
   // An evaluation that is in no lifetime (no timed result, and a control that hit) is still on the page.
   const named = new Set(record.lifetimes.flatMap((item) => item.evaluation_ids));
   const others = cache.evaluations.filter((run) => !named.has(run.id));
   const rest = others.length
-    ? `<tbody class="profile"><tr><th scope="row">Other evaluations</th><td class="profile-facts" colspan="${1 + columns.length}"><span class="muted">In no lifetime</span></td></tr></tbody><tbody class="item others">${others.map((run) => runRow(run, today, columns, true)).join("")}</tbody>`
+    ? `<tbody class="profile"><tr><th scope="rowgroup">Other evaluations</th><td class="profile-facts" colspan="${1 + columns.length}"><span class="muted">In no lifetime</span></td></tr></tbody><tbody class="item others">${others.map((run) => runRow(run, today, columns, true)).join("")}</tbody>`
     : "";
-  return `<div class="scroll"><table class="facts heat lifetimes stack-tablet"><caption class="sr-only">Every cache lifetime of this entry, by retention</caption><thead><tr><th scope="col" rowspan="2">Lifetime</th><th scope="col" rowspan="2">Documented for, or measured through</th><th scope="colgroup" colspan="${columns.length}" class="span"><span class="sr-only">Time since the prompt was cached · served from the cache, in percent, with hits/checks</span></th></tr><tr>${heatHead(columns)}</tr></thead>${body}${rest}</table></div>
+  return `<div class="scroll"><table class="facts heat lifetimes stack-tablet"><caption class="sr-only">The cache evaluations of this entry, by retention</caption><thead><tr><th scope="col" rowspan="2">Lifetime</th><th scope="col" rowspan="2">Client</th><th scope="colgroup" colspan="${columns.length}" class="span"><span class="sr-only">Time since the prompt was cached · served from the cache, in percent, with hits/checks</span></th></tr><tr>${heatHead(columns)}</tr></thead>${body}${rest}</table></div>
 <p class="legend"><span class="legend-head"><span class="heat-key most" aria-hidden="true">67<small>2/3</small></span> Checks served from the cache, in percent and as hits/checks, by time since the prompt was cached</span><span><span class="heat-key all">100</span> All</span><span><span class="heat-key most">67</span> Half or more</span><span><span class="heat-key few">33</span> Fewer</span><span><span class="heat-key none">0</span> None</span><span><span class="heat-key skip">·</span> Not checked at that age</span><span><a href="/docs/methodology/#evaluations">Methodology</a></span></p>`;
 }
 
@@ -726,72 +566,12 @@ function requestControlTable(controls: RequestControl[]): string {
 <p class="hint">Source: ${source || UNKNOWN}</p>`;
 }
 
-const WINDOW_CASE = {
-  contradicted: '<span class="case contradicted" title="A limit evaluation clearly contradicts the documented figure: the input window is the measured one. The documented figure stays here, beside it.">Documentation contradicted</span>',
-  not_contradicted: '<span class="case" title="No limit evaluation contradicts the documented figure: the input window is the documented one. Not contradicted is not confirmed.">Documentation not contradicted</span>',
-} as const;
-
-/** The date of a value of the input window, said for what it is. */
-function windowDateTitle(basis: "documented" | "measured", source: LifetimeSource | "pi.dev"): string {
-  if (basis === "measured") return "The date of the evaluation that gives this value.";
-  if (source === "pi.dev") return "The day of pi's snapshot.";
-  return source === "models.dev" ? "Imported from models.dev on this date." : "The date of the newest providers.dev evidence for the documented figure.";
-}
-
-/** A value of the input window: "at least" where its bound says so, the exact tokens. */
-const windowTokens = (value: number, bound: InputWindow["bound"]): string =>
-  `<span class="window-value">${bound === "at_least" ? '<span class="bound">at least</span> ' : ""}${exact(value)} <span class="muted">tokens</span></span>`;
-
-/**
- * The input window of an entry, in the columns of the other limit tables and the same three rows on every entry: the
- * published value with its basis, scope, source and date; the documented figure with what the rule found of it; and
- * one line per measurement, each with its client, date and raw result. Printed as the record has it.
- */
-function inputWindowTable(w: InputWindow, today: Today): string {
-  const row = (label: string, hint: string, rest: string, span = 1): string =>
-    `<th scope="row"${span > 1 ? ` rowspan="${span}"` : ""}>${label}<div class="hint">${hint}</div></th>${rest}`;
-  const valueCell = (html: string): string => `<td class="num" data-label="Value">${html}</td>`;
-  const sourceCell = (html: string): string => `<td data-label="Source">${html}</td>`;
-
-  const published =
-    w.tokens === null || w.basis === "none" || w.source === null
-      ? valueCell(UNKNOWN) + sourceCell(DASH)
-      : valueCell(`${windowTokens(w.tokens, w.bound)}<span class="window-what">${basisTag(w.basis, WINDOW_BASIS_TITLE[w.basis])}${w.scope ? `<span title="${SCOPE_TITLE[w.scope]}">${SCOPE_WORD[w.scope]}</span>` : ""}</span>`) +
-        sourceCell(lifetimeSource(w.source, w.date, w.basis, today, windowDateTitle(w.basis, w.source)));
-
-  const documented =
-    w.documented_tokens === null || w.documented_source === null
-      ? valueCell('<span class="muted">Not documented</span>') + sourceCell(DASH)
-      : valueCell(`${windowTokens(w.documented_tokens, "limit")}<span class="window-what">${w.documented_field ? `<code>${e(w.documented_field)}</code>` : ""}${w.documented_status ? WINDOW_CASE[w.documented_status] : ""}</span>`) +
-        sourceCell(lifetimeSource(w.documented_source, w.documented_date, "documented", today, windowDateTitle("documented", w.documented_source)));
-
-  const measuredHint = "What each limit evaluation that counts gives, one line per evaluation.";
-  const measured =
-    w.measurements.length === 0
-      ? [`<tr>${row("Measured", measuredHint, valueCell('<span class="muted">Not measured</span>') + sourceCell(DASH))}</tr>`]
-      : w.measurements.map((item, at) => {
-          const value = valueCell(`${windowTokens(item.tokens, item.bound)}<div class="hint">${e(measurementSaid(item))}</div>`);
-          const source = sourceCell(`<span class="client">${e(item.client_label)}</span><div class="hint">${dateText(item.date, true, "The date of this evaluation.", today)} · <a href="${e(item.source)}" rel="noopener">Raw result</a></div>`);
-          return `<tr${at > 0 ? ' class="more"' : ""}>${at === 0 ? row("Measured", measuredHint, value + source, w.measurements.length) : value + source}</tr>`;
-        });
-
-  return `<div class="scroll"><table class="facts limit-facts window-table stack-phone">
-    <thead><tr><th scope="col">Limit</th><th scope="col" class="num">Value</th><th scope="col">Source</th></tr></thead>
-    <tbody>
-      <tr class="published">${row("Input window", "<code>input_window</code>: the most input one request can carry on this entry, in tokens as the provider counts them.", published)}</tr>
-      <tr>${row("Documented", "The figure the source documents, and the field it is in.", documented)}</tr>
-      ${measured.join("")}
-    </tbody>
-  </table></div>
-<p class="hint"><a href="/docs/methodology/#input-window">How the input window is worked out, and what it does not say</a></p>`;
-}
-
 function measuredLimitRows(limits: MeasuredLimit[]): string {
   const cell = (value: number | null, label: string): string => `<td class="num" data-label="${label}">${value === null ? UNKNOWN : exact(value)}</td>`;
   return limits
     .map(
       (limit) =>
-        `<tr><td data-label="Date">${limit.date ? `<span class="muted date">${e(limit.date)}</span>` : UNKNOWN}</td><td class="span-row" data-label="Measured through">${e(limit.route_label)}<div class="hint">${e(limit.client_label)}</div></td>${cell(limit.context, "Context")}${cell(limit.input_accepted, "Input accepted")}${cell(limit.input_refused, "Input refused")}${cell(limit.output, "Output limit")}${cell(limit.output_accepted, "Requested output accepted")}<td data-label="Evidence"><a href="${e(limit.source)}" rel="noopener">Raw result</a></td></tr>`,
+        `<tr><td data-label="Date">${limit.date ? `<span class="muted date">${e(limit.date)}</span>` : UNKNOWN}</td><td class="span-row" data-label="Route and client">${e(limit.route_label)}<div class="hint">${e(limit.client_label)}</div></td>${cell(limit.context, "Context")}${cell(limit.input_accepted, "Input accepted")}${cell(limit.input_refused, "Input refused")}${cell(limit.output, "Output limit")}${cell(limit.output_accepted, "Requested output accepted")}<td data-label="Evidence"><a href="${e(limit.source)}" rel="noopener">Raw result</a></td></tr>`,
     )
     .join("");
 }
@@ -807,7 +587,7 @@ function cacheDocumented(documented: CacheDocumentation, source: string): string
     const supported = detail.support === "supported";
     const blank = detail.support === "unsupported" ? NOT_APPLICABLE : UNKNOWN;
     return `<tr>
-<th scope="row">${CACHE_MODE_WORD[mode]} <span class="chip">${mode}</span></th>
+<th scope="row" title="${e(CACHE_MODE_TITLE[mode])}">${CACHE_MODE_WORD[mode]} <span class="chip">${mode}</span></th>
 <td data-label="Supported">${state}</td>
 <td class="num" data-label="Min. tokens">${supported ? (detail.min_tokens === null ? UNKNOWN : exact(detail.min_tokens)) : blank}</td>
 <td class="num" data-label="Breakpoints">${supported && mode === "explicit" ? (detail.max_breakpoints === null ? UNKNOWN : exact(detail.max_breakpoints)) : supported ? NOT_APPLICABLE : blank}</td>
@@ -818,109 +598,12 @@ function cacheDocumented(documented: CacheDocumentation, source: string): string
 <p class="hint">Source: ${source} · <a href="/docs/methodology/#caching">Cache modes</a></p>`;
 }
 
-// ---- pi's catalog: `providers_dev.pi` of an entry and `pi` of /api/v1/meta, as the API publishes them. Printed as
-// the block has it: where pi stands beside each value is the item's `standing` in `values`, and nothing here compares,
-// converts, tests a value for 0, a unit or an access, or fills in a default (design/pi-merged.md, section 7).
-// What pi does not state says so, never "no": a flag absent from `compat` is not false.
+// ---- pi's catalog: `providers_dev.pi` of an entry and `pi` of /api/v1/meta, as the API publishes them: what only pi
+// returns, printed as the block has it. pi's limits, prices and lifetimes are statements of the safe values, and the
+// page shows them only in a value's warning, or as the value where pi alone states one. What pi does not state says
+// so, never "no": a flag absent from `compat` is not false.
 
 const NOT_STATED = '<span class="unknown" title="pi\'s catalog does not state it.">Not stated</span>';
-/** pi writes 0 for a price it does not charge and for a price it has not recorded alike (the contract, PiCost). */
-const ZERO_PRICE = '<span class="unknown" title="pi\'s catalog writes 0 here. It writes 0 both for no charge and for no price recorded, so it is not shown as free.">Not stated</span>';
-const TIER_PRICES = [["input", "In"], ["output", "Out"], ["cache_read", "Cache read"], ["cache_write", "Cache write"]] as const;
-
-/** A price per 1M tokens as one side states it: pi's 0 is not a statement; the page's own null is unknown. */
-function piPrice(value: number | null, side: "pi" | "published", unit = true): string {
-  if (value === null) return NOT_STATED;
-  if (value === 0 && side === "pi") return ZERO_PRICE;
-  // Never rounded: the number the API states, written as the site writes prices where that is the same number.
-  return `${usdUnrounded(value)}${unit ? ' <span class="muted">/ 1M</span>' : ""}`;
-}
-
-/** Tiers by size of request, each with its threshold and its four prices, laid out alike on both sides so that they read across. */
-function tiersHtml(tiers: readonly PiCostTier[], side: "pi" | "published"): string {
-  if (tiers.length === 0) return side === "pi" ? '<span class="unknown" title="pi\'s catalog states no tiers for this model.">None stated</span>' : '<span class="muted">None</span>';
-  return `<ul class="pi-tiers">${tiers.map((tier) => `<li><span class="tier-at" title="${exact(tier.input_tokens_above)} input tokens: input, cache reads and cache writes together.">Above ${exact(tier.input_tokens_above)}</span>${TIER_PRICES.map(([key, label]) => `<span><span class="muted">${label}</span> ${piPrice(tier[key], side, false)}</span>`).join("")}</li>`).join("")}</ul>`;
-}
-
-/** pi's items of an entry by field, its differences, and /api/v1/meta's word on pi's data; null where pi does not list the entry. */
-interface PiStanding {
-  items: ReadonlyMap<PiValueField, PiValue>;
-  differences: readonly PiDifference[];
-  meta: MetaPi | undefined;
-}
-function piStanding(block: PiBlock | null, meta: MetaPi | undefined): PiStanding | null {
-  return block === null ? null : { items: new Map(block.values.map((item) => [item.field, item])), differences: block.differences, meta };
-}
-
-/** Whose a value of pi's is and as of when, for a hover text: pi's, imported, not checked, the fetch, a failed import. */
-function piWhose(meta: MetaPi | undefined): string {
-  const dates = piDates(meta);
-  const failed = dates.failed ? ` The last import${dates.failed_at ? `, ${dates.failed_at},` : ""} failed: this is the last good one.` : "";
-  return `From pi's model catalog (pi.dev)${dates.fetched ? `, fetched ${dates.fetched}` : ""}. Imported, not checked by providers.dev.${failed}`;
-}
-
-/** `pi` of an item as its row writes a value: tokens exactly, a price per 1M tokens never rounded, a lifetime. */
-function piFigure(item: PiValue, full = false): string {
-  const value = item.pi ?? 0;
-  if (item.unit === "tokens") return full ? `${exact(value)} tokens` : exact(value);
-  if (item.unit === "seconds") return full ? `${span(value)} (${seconds(value)})` : span(value);
-  return full ? `${usdUnrounded(value)} per 1M tokens` : usdUnrounded(value);
-}
-
-/**
- * What a row says of pi, on its own line under the entry's own value: that pi agrees, once and briefly; what pi says
- * where it differs; what pi lists where nothing is compared; what pi states where the item is `only`, with the pi.dev
- * mark and the date of pi's data, since nothing else in that row speaks of pi. Nothing where pi is silent. pi's figure
- * never takes the place of the entry's value, whatever the standing says: a row prints the entry's own value, or
- * Unknown, exactly as it would without pi (design/pi-merged.md, section 7, rule 1). The tiers have a block of their own.
- */
-function piNote(item: PiValue | undefined, meta: MetaPi | undefined): string {
-  if (!item || item.field === "cost.tiers") return "";
-  const whose = piWhose(meta);
-  if (item.standing === "agrees") return `<span class="pi-note agrees" title="${e(`pi's catalog states the same value. ${whose}`)}">pi agrees</span>`;
-  if (item.standing === "differs") return `<span class="pi-note differs" title="${e(`pi's catalog states ${piFigure(item, true)}. This page publishes the entry's own value (${item.entry_field}); pi's stands beside it and is not used. ${whose}`)}">pi says ${e(piFigure(item))}</span>`;
-  if (item.standing === "not_compared") return `<span class="pi-note listed" title="${e(`pi's catalog lists ${piFigure(item, true)}. It is not compared with this entry's value: the methodology says when a value is not compared. ${whose}`)}">pi lists ${e(piFigure(item))}, not compared</span>`;
-  if (item.standing === "only") {
-    const figure = item.unit === "tokens" ? `${exact(item.pi ?? 0)} tokens` : piFigure(item);
-    return `<span class="pi-note listed" title="${e(`pi's catalog states ${piFigure(item, true)}. This page prints the entry's own value; pi's stands beside it and is not used. ${whose}`)}">pi states ${e(figure)}</span><span class="pi-from"><span class="origin pi" title="${e(whose)}">pi.dev</span>${piDateTag(meta)}</span>`;
-  }
-  return "";
-}
-/** A note on a line of its own under the value it stands beside, in a row, a tile or a profile of the lifetimes. */
-const piLine = (item: PiValue | undefined, meta: MetaPi | undefined): string => {
-  const note = piNote(item, meta);
-  return note ? `<div class="pi-line">${note}</div>` : "";
-};
-
-/** The date of pi's data beside its mark, as the head of the page has it: the fetch, and a failed last import in words. */
-function piDateTag(meta: MetaPi | undefined): string {
-  const dates = piDates(meta);
-  if (dates.fetched === null) return "";
-  return `<span class="${dates.failed ? "stale" : "muted date"}" title="${e(piDatesSaid(meta))}">${e(dates.fetched)}${dates.failed ? " · last import failed" : ""}</span>`;
-}
-
-/**
- * The tiers by size of request, said once for the list as a whole under the conditional rates: that pi agrees; pi's
- * list beside the entry's where they differ (both from the `cost.tiers` item of `differences`); pi's list where it is
- * not compared. Nothing where pi is silent. Tiers are never `only`.
- */
-function piTiers(pi: PiStanding | null): string {
-  const item = pi?.items.get("cost.tiers");
-  if (!pi || !item || item.standing === "silent" || item.standing === "only") return "";
-  const whose = piWhose(pi.meta);
-  const name = '<span class="pi-tiers-name">Tiers by size of request</span>';
-  if (item.standing === "agrees") return `<p class="pi-tiers-line">${name}<span class="pi-note agrees" title="${e(`pi's catalog states the same tiers. ${whose}`)}">pi agrees</span></p>\n`;
-  if (item.standing === "not_compared") {
-    return `<div class="pi-tiers-line">${name}<span class="pi-note listed" title="${e(`pi's catalog lists these tiers. They are not compared with this entry's rates: the methodology says when a value is not compared. ${whose}`)}">pi lists, not compared</span>${tiersHtml(item.pi_tiers ?? [], "pi")}</div>\n`;
-  }
-  // Where they differ: the two lists, one above the other so that their thresholds and prices read across.
-  const difference = pi.differences.find((entry) => entry.field === "cost.tiers");
-  const note = `<span class="pi-note differs" title="${e(`pi's catalog states its tiers otherwise than this entry's rates read as tiers. This page publishes the entry's own rates (${item.entry_field}); pi's stand beside them and are not used. ${whose}`)}">pi says otherwise</span>`;
-  const row = (label: string, hint: string, tiers: string): string => `<tr><th scope="row">${label}<div class="hint">${hint}</div></th><td class="num" data-label="Tiers">${tiers}</td></tr>`;
-  const own = difference ? row("This entry", "Its conditional rates above, read as tiers", tiersHtml(difference.published_tiers ?? [], "published")) : "";
-  const theirs = row(`pi's catalog ${note}`, "pi's tiers, as pi states them", tiersHtml(difference?.pi_tiers ?? item.pi_tiers ?? [], "pi"));
-  return `<div class="scroll"><table class="facts pairs pi-tiers-table stack-phone"><thead><tr><th scope="col">Tiers by size of request</th><th scope="col" class="num">Above a number of input tokens, per 1M tokens</th></tr></thead><tbody>${own}${theirs}</tbody></table></div>\n`;
-}
 
 /** A map pi states, a name and a value per line, values as written in pi's catalog. */
 function piPairs(pairs: [string, string][], className: string): string {
@@ -958,7 +641,7 @@ function piFlags(compat: PiBlock["compat"]): Record<PiFlagGroup, string> {
 /**
  * How pi calls the model: pi's name for it, the request format in words and in pi's word, the address, the input,
  * reasoning, the thinking levels, the flags in their three groups and the request limits. The same rows on every entry
- * pi lists. pi's limits, prices and cache lifetimes are not here: they stand in the rows of the page, beside its own.
+ * pi lists. pi's limits, prices and cache lifetimes are not here: they are statements of the values above.
  */
 function piCallTable(block: PiBlock): string {
   const row = (label: string, hint: string, value: string): string => `<tr><th scope="row">${label}<div class="hint">${hint}</div></th><td>${value}</td></tr>`;
@@ -1007,13 +690,13 @@ function piSection(block: PiBlock | null, meta: MetaPi | undefined): string {
     return `<p class="muted">pi's model catalog does not list this entry.</p><p class="pi-facts muted">${fetched}${checked}${failed}</p>`;
   }
   const list = `https://pi.dev/models?provider=${encodeURIComponent(block.provider)}`;
-  return `<p class="pi-facts"><span class="origin pi" title="pi's model catalog, a second source imported beside models.dev.">pi.dev</span>${fetched}${checked}${failed}<span>Not verified by providers.dev</span><span>Its limits, prices and cache lifetimes: in the rows above, beside this page's</span><span><a href="${e(list)}" rel="noopener">pi's list for <code>${e(block.provider)}</code></a></span></p>
+  return `<p class="pi-facts"><span class="origin pi" title="pi's model catalog, a second source imported beside models.dev.">pi.dev</span>${fetched}${checked}${failed}<span>Not verified by providers.dev</span><span>Its limits, prices and cache lifetimes: the last source of each value above</span><span><a href="${e(list)}" rel="noopener">pi's list for <code>${e(block.provider)}</code></a></span></p>
 ${piCallTable(block)}
-<p class="hint"><a href="/docs/methodology/#pi">How pi's catalog is used, and where it stands beside each value</a></p>`;
+<p class="hint"><a href="/docs/methodology/#pi">How pi's catalog is used</a></p>`;
 }
 
 function tile(label: string, value: string, foot: string, small = false): string {
-  return `<div class="tile"><div class="label">${label}</div><div class="value${small ? " small" : ""}">${value}</div><div class="foot">${foot}</div></div>`;
+  return `<div class="tile"><div class="label">${label}</div><div class="value${small ? " small" : ""}">${value}</div>${foot ? `<div class="foot">${foot}</div>` : ""}</div>`;
 }
 
 export interface EntryView {
@@ -1029,70 +712,56 @@ export interface EntryView {
   pi?: MetaPi;
 }
 
+/** What each safe quantity is, under its label in its table: the same words on every entry. */
+const QUANTITY_HINT = {
+  input_window: "The most input one request can carry, in tokens",
+  max_output: "The most one response can hold. A maximum, not a default",
+  cache_short: "Without asking for a lifetime, or with the shortest one",
+  cache_long: "When the request asks for a longer lifetime",
+} as const;
+
+/**
+ * The page of one entry. Each quantity is shown as its safe value and nothing else (`safe` of the summary): in a tile
+ * at the top, and in its row of its topic's table, with the warning where its sources disagree. Under each table, the
+ * evidence: the limit evaluations, the price's conditions and request controls, the cache evaluations.
+ */
 export function entryHtml(view: EntryView): string {
   const { summary, provider, model, today, cache_ages_s } = view;
   const extension = model[NS] as unknown as ModelExtension;
   const provenance = extension.provenance;
-  const limit = isObject(model.limit) ? model.limit : {};
   const cache = extension.cache;
   const measuredLimits = extension.limits.measured;
-  const fromMeasurement = extension.limits.from_measurement;
-  const number = (value: Json | undefined): string => (typeof value === "number" ? `${exact(value)} <span class="muted">tokens</span>` : UNKNOWN);
-  const big = (value: Json | undefined): string => (typeof value === "number" ? `${exact(value)} <span class="unit">tokens</span>` : '<span class="muted">Unknown</span>');
+  const safe = summary.safe;
   const api = `/api/v1${entryHref(summary.ref)}`;
   // The sources of the entry, the pi.dev mark among them where pi lists it, dated by the pi import.
   const sources = sourcesHtml(summary, { today, imported: view.imported, pi: view.pi, entry: true }, true);
-  // Where pi stands beside each value: the items of `values`, by field. Null where pi does not list the entry.
-  const pi = piStanding(extension.pi, view.pi);
-  /**
-   * What a tile says of pi, under its own foot: what pi says where it differs, and what pi states where the item is
-   * `only`. That pi agrees, or lists a value that is not compared, is said once, in the value's row below. The tile's
-   * value is the entry's own, as without pi.
-   */
-  const piTileLine = (item: PiValue | undefined): string => (item?.standing === "differs" || item?.standing === "only" ? piLine(item, view.pi) : "");
-  // The safe lifetime of each profile, at the top of the page: the value, its basis, and whose it is as of when. pi's
-  // lifetime is beside it, never in it.
-  const lifetimeTile = (profile: RetentionProfile): string => {
-    const p = cache.lifetime[profile];
-    const label = `Cache lifetime, ${profile}`;
-    const piSays = piTileLine(pi?.items.get(profile === "short" ? "prompt_cache.short" : "prompt_cache.long"));
-    if (p.safe_s === null || p.basis === "none" || p.source === null) return tile(label, '<span class="muted">Unknown</span>', `Not documented or measured${piSays}`);
-    // The other of the two lifetimes it was chosen from, where there is one, read from `basis` as in the list; whether
-    // the documented one is contradicted is `documented_status`.
-    const other =
-      p.basis === "documented"
-        ? p.measured_s === null ? "" : `<div>Measured ${p.measured_s === 0 ? "0 s" : span(p.measured_s)}</div>`
-        : p.documented_s === null
-          ? ""
-          : p.documented_status === "contradicted"
-            ? `<div class="contradicted">Documented ${p.documented_s === 0 ? "None" : span(p.documented_s)}, contradicted</div>`
-            : `<div>Documented ${p.documented_s === 0 ? "None" : span(p.documented_s)}</div>`;
-    return tile(label, `<span title="${e(safeSaid(profile, p))}">${lifetimeText(p.safe_s, p.basis)}</span>${basisTag(p.basis)}`, `${e(p.source)}${p.date ? ` · ${e(p.date)}` : ""}${other}${piSays}`);
+  // The note under the context window: exactly where the API publishes `window_tokens`.
+  const window = safe.input_window.window_tokens;
+  const note = window === null ? "" : `<div class="window-note" title="${exact(window)} tokens: the window the input shares with the response.">${windowNote(window)}</div>`;
+
+  /** A safe value in a tile: the value, then its warning. */
+  const tileValue = (quantity: Exclude<SafeQuantity, "price">): string =>
+    `<span class="safe-cell">${safeText(safe[quantity])}${safeWarning(safe[quantity], quantity, warnId("tile", quantity), today)}</span>`;
+  /** The price in a tile: text input and output, or the first other charge; whose price it is under it. */
+  const priceTile = (): string => {
+    const warning = wholePriceWarning(safe.price, warnId("tile", "price"), today);
+    const conditional = summary.pricing.rules?.some((rule) => rule.when !== null || rule.operation === "multiply") ? "<div>Conditional rates below</div>" : "";
+    const whose = summary.price_from
+      ? `<div>API list price of <a href="${e(entryHref(summary.price_from))}"><code>${e(summary.price_from)}</code></a></div>`
+      : summary.access === "subscription" && summary.pricing.rules !== null ? `<div title="${e(LISTED_PRICE)}">Listed price</div>` : "";
+    if (summary.price_in === null && summary.price_out === null) {
+      const other = (summary.pricing.rules ?? []).filter((rule) => rule.when === null && rule.operation === "set").sort((a, b) => meterRank(a.meter) - meterRank(b.meter))[0];
+      if (other) return tile("Price", `<span class="safe-cell"><span>${rateHtml(other)}</span>${warning}</span>`, `${e(meterLabel(other.meter))}${whose}${conditional}`, true);
+      return tile("Price", `<span class="safe-cell">${summary.pricing.billing === "not_applicable" ? IN_PLAN : UNKNOWN}${warning}</span>`, `${whose}${conditional}`);
+    }
+    const side = (value: number | null): string => (value === null ? DASH : usdUnrounded(value));
+    return tile("Price", `<span class="safe-cell"><span class="price">${side(summary.price_in)} <span class="unit">/</span> ${side(summary.price_out)}</span>${warning}</span>`, `Input / output, per 1M tokens${whose}${conditional}`);
   };
-  /** A limit's tile: the entry's own value, as without pi, and under it what pi says where it differs or states alone. */
-  const limitTile = (label: string, own: Json | undefined, foot: string, field: PiValueField): string => {
-    const item = pi?.items.get(field);
-    return tile(label, big(own), `${foot}${piTileLine(item)}`);
-  };
-  /** A limit's row in the table of documented limits: the entry's value and source, and pi's standing beside it. */
-  const limitFact = (label: string, hint: string, key: "context" | "output", field: PiValueField): string => {
-    const item = pi?.items.get(field);
-    return fact(label, hint, number(limit[key]), sourceOf(`limit.${key}`, provenance, extension.origin, fromMeasurement), piLine(item, view.pi));
-  };
-  // The input window, first: the value, "at least" where its bound says so, its basis, source and date, what kind of
-  // figure it is, and the other of the two figures under it, as the cache tiles have it.
-  const inputWindow = extension.limits.input_window;
-  const windowTile = (): string => {
-    const w = inputWindow;
-    if (w.tokens === null || w.basis === "none" || w.source === null) return tile("Input window", '<span class="muted">Unknown</span>', "Not documented or measured");
-    const contradicted = w.documented_status === "contradicted";
-    const other =
-      w.basis === "documented"
-        ? w.measured_tokens === null ? "" : `<div>Measured ${atLeast(w.measured_bound)}${exact(w.measured_tokens)}${w.measured_kind === "window" ? ", window named" : ""}</div>`
-        : w.documented_tokens === null ? "" : `<div${contradicted ? ' class="contradicted"' : ""}>Documented ${exact(w.documented_tokens)}${contradicted ? ", contradicted" : ""}</div>`;
-    const value = `<span title="${e(windowSaid(w))}">${w.bound === "at_least" ? '<span class="unit">at least</span> ' : ""}${exact(w.tokens)} <span class="unit">tokens</span></span>${basisTag(w.basis, WINDOW_BASIS_TITLE[w.basis])}`;
-    return tile("Input window", value, `${e(w.source)}${w.date ? ` · ${e(w.date)}` : ""}${w.scope ? `<div>${SCOPE_WORD[w.scope]}</div>` : ""}${other}`);
-  };
+  /** A safe value in its row: the warning first, so that the column's numbers stay aligned on the right. */
+  const row = (quantity: Exclude<SafeQuantity, "price">, more = ""): string =>
+    `<tr><th scope="row">${QUANTITY_LABEL[quantity]}<div class="hint">${QUANTITY_HINT[quantity]}</div></th><td class="num" data-label="Value"><span class="safe-cell">${safeWarning(safe[quantity], quantity, warnId("row", quantity), today)}<span class="safe-value">${safeText(safe[quantity])}</span></span>${more}</td></tr>`;
+  const valueTable = (head: string, rows: string): string =>
+    `<div class="scroll"><table class="facts safe-facts stack-phone"><thead><tr><th scope="col">${head}</th><th scope="col" class="num">Value</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 
   return `
 <header class="entry-head">
@@ -1108,43 +777,34 @@ export function entryHtml(view: EntryView): string {
 </header>
 
 <div class="tiles tiles-five mt-6">
-  ${windowTile()}
-  ${limitTile("Context window", limit.context, "Exposed by this provider", "context_window")}
-  ${limitTile("Maximum output", limit.output, "Per response; not a default", "max_tokens")}
-  ${lifetimeTile("short")}
-  ${lifetimeTile("long")}
+  ${tile(QUANTITY_LABEL.input_window, tileValue("input_window"), note)}
+  ${tile(QUANTITY_LABEL.max_output, tileValue("max_output"), "")}
+  ${priceTile()}
+  ${tile(QUANTITY_LABEL.cache_short, tileValue("cache_short"), "")}
+  ${tile(QUANTITY_LABEL.cache_long, tileValue("cache_long"), "")}
 </div>
 
 <section aria-labelledby="limits">
   <h2 id="limits">Limits</h2>
-  <h3 id="input-window">Input window</h3>
-  ${inputWindowTable(inputWindow, today)}
-  <h3>Documented</h3>
-  <div class="scroll"><table class="facts limit-facts stack-phone">
-    <thead><tr><th scope="col">Limit</th><th scope="col" class="num">Value</th><th scope="col">Source</th></tr></thead>
-    <tbody>
-      ${limitFact("Context window", "<code>limit.context</code>: what this provider accepts for the model, input and output together.", "context", "context_window")}
-      ${fact("Largest input", "<code>limit.input</code>: stated where the input limit is lower than the context window.", number(limit.input), sourceOf("limit.input", provenance, extension.origin))}
-      ${limitFact("Maximum output", "<code>limit.output</code>: the most one response can hold. A maximum, not what you get by default.", "output", "max_tokens")}
-    </tbody>
-  </table></div>
-  <h3>Measured <span class="hint">tokens</span></h3>
-  <div class="scroll"><table class="facts stack-tablet"><thead><tr><th scope="col">Date</th><th scope="col">Measured through</th><th scope="col" class="num">Context</th><th scope="col" class="num">Input accepted</th><th scope="col" class="num">Input refused</th><th scope="col" class="num">Output limit</th><th scope="col" class="num">Requested output accepted</th><th scope="col">Evidence</th></tr></thead><tbody>${
-    measuredLimits.length > 0 ? measuredLimitRows(measuredLimits) : '<tr class="empty-row"><td colspan="8" class="muted">No limits were measured on this entry.</td></tr>'
+  ${valueTable("Limit", row("input_window", note) + row("max_output"))}
+  <h3>Limit evaluations <span class="hint">tokens</span></h3>
+  <div class="scroll"><table class="facts stack-tablet"><thead><tr><th scope="col">Date</th><th scope="col">Route and client</th><th scope="col" class="num">Context</th><th scope="col" class="num">Input accepted</th><th scope="col" class="num">Input refused</th><th scope="col" class="num">Output limit</th><th scope="col" class="num">Requested output accepted</th><th scope="col">Evidence</th></tr></thead><tbody>${
+    measuredLimits.length > 0 ? measuredLimitRows(measuredLimits) : '<tr class="empty-row"><td colspan="8" class="muted">No limit evaluation on this entry.</td></tr>'
   }</tbody></table></div>
 </section>
 
 <section aria-labelledby="price">
   <h2 id="price">Price</h2>
-  ${priceSection(summary, pi)}
+  ${priceSection(summary, today)}
   <h3>Request controls</h3>
   ${requestControlTable(summary.request_controls.items.filter((control) => control.id !== "cache.retention"))}
 </section>
 
 <section aria-labelledby="cache">
   <h2 id="cache">Prompt caching</h2>
-  <h3>Lifetimes</h3>
-  ${lifetimesTable(cache, today, cache_ages_s, pi)}
+  ${valueTable("Lifetime", row("cache_short") + row("cache_long"))}
+  <h3>Cache evaluations</h3>
+  ${evaluationsTable(cache, today, cache_ages_s)}
   <h3>Cache modes</h3>
   ${cacheDocumented(cache.documented, sourceOf("capabilities.cache", provenance, extension.origin))}
   <h3>Retention</h3>

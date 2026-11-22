@@ -40,7 +40,7 @@ export function catalogHtml(result: Envelope<Summary>, query: Query, facets: Fac
   const api = `/api/v1/entries?${serializeQuery(query)}`;
   const providerNames = Object.fromEntries(facets.providers.map((provider) => [provider.id, provider.name]));
   return `<header class="home-head"><h1>AI models as each provider exposes them</h1>
-    <p class="lead">Context window, maximum output, price and prompt caching for ${exact(meta.counts.entries)} entries. Built on <a href="https://models.dev">models.dev</a>, with <a href="/?origin=modified,added">${exact(facets.evidence_entries)} entries</a> corrected or evaluated by providers.dev.${meta.pi.snapshot ? ` The model catalog of <a href="/docs/methodology/#pi">pi</a> is shown beside ${exact(meta.pi.counts.entries_with_block)} entries.` : ""}</p>
+    <p class="lead">Context window, maximum output, price and prompt caching for ${exact(meta.counts.entries)} entries. Built on <a href="https://models.dev">models.dev</a>, with <a href="/?origin=modified,added">${exact(facets.evidence_entries)} entries</a> corrected or evaluated by providers.dev${meta.pi.snapshot ? `, and <a href="/docs/methodology/#pi">pi's model catalog</a> as the last source for ${exact(meta.pi.counts.entries_with_block)}` : ""}. Each quantity has one value; <a href="/docs/methodology/#safe-values">a warning</a> marks where its sources disagree.</p>
     <p class="facts-line muted"><span>${exact(meta.counts.providers)} providers, <a href="/?access=subscription">${exact(facets.subscription_providers)} by subscription</a></span><span><a href="/models/">${exact(meta.counts.models)} models</a></span><span><a href="/evidence/#cache">${exact(meta.counts.cache_evaluations)} cache evaluations</a></span><span>Updated ${e(meta.generated_at.slice(0, 10))}</span></p></header>
     <form id="filters" class="mt-5" role="search" aria-label="Filter entries" method="get">
       <label class="search block"><span class="sr-only">Search</span><input type="search" ${named("q")} value="${value("q")}" placeholder="Search models, providers and families" autocomplete="off" spellcheck="false"><kbd class="hidden sm:block">/</kbd></label>
@@ -48,14 +48,15 @@ export function catalogHtml(result: Envelope<Summary>, query: Query, facets: Fac
         <label class="field">Provider<input ${named("provider")} value="${value("provider")}" list="provider-ids" placeholder="Any" autocomplete="off"></label>
         ${select("access", "Access", [["api", "API key"], ["subscription", "Subscription"], ["unknown", "Unclassified"]])}
         ${select("type", "Type", facets.types.map((type) => [type, type]))}
-        ${select("cache", "Cache, documented", [["yes", "Supported"], ["no", "Not supported"], ["unknown", "Unknown"]])}
+        ${select("cache", "Caching", [["yes", "Supported"], ["no", "Not supported"], ["unknown", "Unknown"]])}
         ${select("cache_mode", "Cache mode", [["implicit", "Automatic"], ["explicit", "Manual"]])}
         ${select("origin", "Source", [["modified,added", "With providers.dev evidence"], ["added", "providers.dev only"], ["upstream", "models.dev only"]])}
         ${select("evaluated", "Cache evaluated", [["true", "Yes"], ["false", "No"]])}
         <div class="field justify-end"><button type="reset" class="button">Clear filters</button></div>
-        <label class="field col-span-2">Minimum context window (tokens)<input ${named("min_context")} value="${value("min_context")}" inputmode="numeric" placeholder="200000"><span class="hint">Entries with an unknown window are excluded.</span></label>
+        <label class="field col-span-2">Minimum context window (tokens)<input ${named("min_input_window")} value="${value("min_input_window")}" inputmode="numeric" placeholder="200000"><span class="hint">Entries with an unknown window are excluded.</span></label>
         <label class="field col-span-2">Minimum maximum output (tokens)<input ${named("min_output")} value="${value("min_output")}" inputmode="numeric" placeholder="64000"><span class="hint">The largest single response, not a default.</span></label>
         ${select("max_age_months", "Released", [...new Set([1, 3, 6, 12, 24, ...(query.max_age_months ? [query.max_age_months] : [])])].map((months) => [String(months), `Last ${months} months`]))}
+        ${select("disagree", "Warning", [["true", "Not all sources agree"], ["false", "No warning"]])}
         <div class="field justify-end"><button class="button" type="submit">Apply filters</button></div>
       </div></details>
       ${PARAMS.map(({ name }) => name).filter((name) => !controls.has(name) && !NOT_CARRIED.includes(name) && value(name) !== "").map((name) => `<input type="hidden" name="${name}" value="${value(name)}">`).join("")}

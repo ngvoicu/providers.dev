@@ -485,9 +485,9 @@
       grid-template-columns: repeat(4, minmax(0, 1fr));
     }
   }
-  /* Five tiles, an entry's and a model's: the input window first, across the whole width on a phone; from a tablet up
-     the three limits on one line and the other two (an entry's cache lifetimes, a model's counts) under them; on a
-     wide screen all five on one line */
+  /* An entry's five tiles, one per safe value: the context window first, across the whole width on a phone; from a
+     tablet up the two limits and the price on one line and the two cache lifetimes under them; on a wide screen all
+     five on one line */
   .tiles.tiles-five > .tile:first-child {
     grid-column: 1 / -1;
   }
@@ -545,14 +545,6 @@
     margin-top: 0.35rem;
     font-size: 0.78rem;
     color: var(--muted);
-  }
-  .tile .value .basis {
-    margin-left: 0.5rem;
-    vertical-align: 0.2em;
-    letter-spacing: 0;
-  }
-  .tile .foot .contradicted {
-    color: var(--warn);
   }
 
   /* Support plans: one column on a phone, two on a tablet, four on a wide screen */
@@ -748,35 +740,6 @@
     font-family: var(--font-sans, inherit);
     font-size: 0.8rem;
   }
-  /* The input window in a table row: the number, then its basis in a word under it, both to the right of the column */
-  a.window {
-    display: inline-flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 0.15rem;
-    line-height: 1.35;
-    white-space: nowrap;
-    text-decoration: none;
-  }
-  a.window:hover {
-    text-decoration: none;
-  }
-  a.window:hover .window-value {
-    color: var(--link);
-  }
-  a.window .basis {
-    font-family: var(--font-sans);
-  }
-  .window-value {
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
-  }
-  /* "at least" before a lower bound, in words, beside the number it qualifies */
-  .window-value .bound {
-    font-family: var(--font-sans);
-    font-size: 0.8rem;
-    color: var(--muted);
-  }
   .price {
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
@@ -866,119 +829,6 @@
   }
   .pi-facts + .scroll {
     margin-top: 0.9rem;
-  }
-  /* pi's standing beside a value of the entry: one short line under the value, drawn with a ring where the site's own
-     kinds of value (documented, measured) have a filled dot. That pi agrees is said quietly; what pi says otherwise is
-     in the colour the site gives a contradicted value, as the count beside the pi.dev mark is; what pi lists without a
-     comparison, and what pi states alone, is muted. pi's figure never stands in the place of the value: what pi alone
-     states is a line too, with the pi.dev mark and the date of pi's data after it. */
-  .pi-line {
-    margin-top: 0.2rem;
-  }
-  .pi-note {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-    font-family: var(--font-sans);
-    font-size: 0.74rem;
-    font-weight: 500;
-    line-height: 1.6;
-    letter-spacing: 0;
-    white-space: nowrap;
-    color: var(--muted);
-    vertical-align: 0.05rem;
-  }
-  .pi-note::before {
-    content: "";
-    flex: none;
-    width: 0.42rem;
-    height: 0.42rem;
-    border-radius: 50%;
-    border: 1.5px solid currentColor;
-  }
-  .pi-note.differs {
-    color: var(--warn);
-    background: var(--warn-bg);
-    padding: 0 0.45rem;
-    border-radius: 999px;
-  }
-  .pi-from {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    margin-left: 0.45rem;
-    font-family: var(--font-sans);
-    font-size: 0.74rem;
-    white-space: nowrap;
-    vertical-align: 0.05rem;
-  }
-  /* In a tile there is no room beside the line: the mark and the date go under it, in line with its words */
-  .tile .pi-from {
-    display: flex;
-    width: fit-content;
-    margin: 0.15rem 0 0 0.72rem;
-  }
-  /* The tiers by size of request, said once under the conditional rates: a line where pi agrees, else pi's list (and
-     the entry's, where they differ) in a small table whose names take the slack, so that the two lists read across */
-  .pi-tiers-line {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.3rem 0.75rem;
-    margin-top: 0.6rem;
-    font-size: 0.84rem;
-  }
-  .pi-tiers-name {
-    font-weight: 500;
-  }
-  /* pi's list under its line, read from the left in the figures of the price tables */
-  .pi-tiers-line .pi-tiers {
-    flex-basis: 100%;
-    font-family: var(--font-mono);
-    font-size: 0.84rem;
-    font-variant-numeric: tabular-nums;
-  }
-  .pi-tiers-line .pi-tiers li {
-    justify-content: flex-start;
-  }
-  .scroll:has(table.pi-tiers-table) {
-    margin-top: 0.6rem;
-  }
-  @media (min-width: 640px) {
-    table.pi-tiers-table > thead th:first-child {
-      width: 100%;
-    }
-  }
-  table.pi-tiers-table tbody th .pi-note {
-    margin-left: 0.35rem;
-  }
-  table.pi-tiers-table td.num {
-    white-space: normal;
-  }
-  .pi-tiers li > span {
-    white-space: nowrap;
-  }
-  .pi-tiers {
-    display: grid;
-    gap: 0.3rem;
-    margin-top: 0.15rem;
-    list-style: none;
-    padding: 0;
-  }
-  .pi-tiers li {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    gap: 0.1rem 0.8rem;
-  }
-  @media (min-width: 640px) {
-    .pi-tiers li {
-      flex-wrap: nowrap;
-    }
-  }
-  .pi-tiers .tier-at {
-    font-weight: 520;
-    color: var(--fg);
   }
   .pi-pairs {
     display: grid;
@@ -1342,29 +1192,6 @@
     color: var(--muted);
   }
 
-  /* Cache lifetimes. Every value says whether it is documented or measured, in a word with the colour of its kind. */
-  .basis {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-    font-size: 0.74rem;
-    font-weight: 500;
-    line-height: 1.4;
-    white-space: nowrap;
-  }
-  .basis::before {
-    content: "";
-    width: 0.4rem;
-    height: 0.4rem;
-    border-radius: 50%;
-    background: currentColor;
-  }
-  .basis.documented {
-    color: var(--documented);
-  }
-  .basis.measured {
-    color: var(--measured);
-  }
   .life-value {
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
@@ -1372,16 +1199,10 @@
   .life-value.unknown {
     color: var(--muted);
   }
-  .life-source {
-    display: inline-flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.2rem 0.45rem;
-  }
-  /* In a list: short and long, each on its line: the profile, the safe value, its basis, the other value beside it */
+  /* In a list: short and long, each on its line: the profile, then the safe value and its warning */
   .lifes {
     display: inline-grid;
-    grid-template-columns: auto auto minmax(0, auto);
+    grid-template-columns: auto auto;
     align-items: baseline;
     gap: 0.3rem 0.55rem;
     line-height: 1.35;
@@ -1394,34 +1215,16 @@
     color: var(--muted);
     font-size: 0.78rem;
   }
-  .lifes .life-value {
+  .lifes .safe-cell {
     font-family: var(--font-mono);
     font-size: 0.84rem;
   }
-  .lifes .life-value.unknown {
+  .lifes .safe-cell .unknown {
     font-family: var(--font-sans);
     font-size: 0.86rem;
   }
-  .lifes .life-basis {
-    display: inline-flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 0.1rem 0.45rem;
-  }
-  .life-other {
-    color: var(--muted);
-    font-size: 0.74rem;
-    white-space: nowrap;
-  }
-  .life-other.contradicted {
-    color: var(--warn);
-  }
-  a.lifes:hover .life-value {
-    color: var(--link);
-  }
-  /* On an entry's page: one table of every lifetime. Each retention starts with its safe value and what it was chosen
-     from, on a band; under it each lifetime, documented or measured, in the same columns, set in from the band with a
-     line down its side that ties it to its retention. */
+  /* On an entry's page: one table of every cache evaluation. Each retention starts on a band; under it the lifetime each
+     client held, those that count first, set in from the band with a line down its side that ties it to its retention. */
   table.lifetimes {
     --band: color-mix(in oklab, var(--panel) 45%, var(--bg));
     --tie: linear-gradient(var(--line-strong), var(--line-strong)) 0.9rem 0 / 2px 100% no-repeat;
@@ -1458,9 +1261,6 @@
   table.lifetimes td.life .life-value {
     font-weight: 600;
     font-size: 0.95rem;
-  }
-  table.lifetimes td.life .life-source {
-    margin-top: 0.3rem;
   }
   table.lifetimes td.through {
     min-width: 15rem;
@@ -1521,108 +1321,227 @@
   table.lifetimes tbody.profile:first-of-type > tr > * {
     border-top: 0;
   }
-  .profile-facts dl {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem 2.2rem;
+  /* The safe values of an entry: one table per topic, the quantity and what it is on the left, the value on the right
+     with its warning before it, so that the numbers of the column stay aligned */
+  @media (min-width: 640px) {
+    table.safe-facts > thead th.num {
+      width: 18rem;
+    }
   }
-  .profile-facts dt {
-    color: var(--muted);
-    font-size: 0.74rem;
-  }
-  .profile-facts dd {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.3rem 0.6rem;
-    font-size: 0.9rem;
-  }
-  .profile-facts .safe {
-    display: inline-flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.3rem 0.6rem;
-  }
-  .profile-facts .safe .life-value {
-    font-size: 1.05rem;
+  table.safe-facts .safe-value {
+    font-size: 1rem;
     font-weight: 620;
     letter-spacing: -0.01em;
   }
-  .case {
-    font-size: 0.74rem;
-    line-height: 1.6;
-    padding: 0 0.5rem;
-    border-radius: 999px;
-    border: 1px solid var(--line);
-    color: var(--fg-soft);
-    white-space: nowrap;
-  }
-  .case.contradicted {
-    color: var(--warn);
-    background: var(--warn-bg);
-    border-color: transparent;
-  }
-  /* The input window on an entry's page: the published value, the documented figure and each measurement, their numbers
-     in one column so that they read side by side; under each, what it is, in words */
-  /* The input window and the documented limits under it: the values and the sources in columns of the same width, so
-     that the two tables read as one */
-  @media (min-width: 1024px) {
-    table.limit-facts > thead th:nth-child(2) {
-      width: 20rem;
-    }
-    table.limit-facts > thead th:nth-child(3) {
-      width: 17rem;
-    }
-  }
-  table.window-table .window-value {
+  table.safe-facts .safe-value .unknown {
+    font-family: var(--font-sans);
     font-size: 0.9rem;
-  }
-  table.window-table tr.published .window-value {
-    font-size: 1rem;
-    font-weight: 620;
-  }
-  table.window-table .window-value > .muted {
-    font-size: 0.84rem;
     font-weight: 400;
   }
-  /* "Not documented", "Not measured", "Unknown": words, not numbers */
-  table.window-table td.num > :is(.muted, .unknown) {
-    font-family: var(--font-sans);
-    font-size: 0.86rem;
+  .safe-value .unit,
+  .tile .value .unit {
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: var(--muted);
+    letter-spacing: 0;
   }
-  table.window-table .window-what {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 0.3rem 0.6rem;
-    margin-top: 0.3rem;
+  /* "at least" before a lower bound, in words, beside the number it qualifies */
+  .bound {
     font-family: var(--font-sans);
     font-size: 0.8rem;
-    color: var(--fg-soft);
-    white-space: normal;
+    font-weight: 400;
+    color: var(--muted);
+    letter-spacing: 0;
   }
-  table.window-table .window-what code {
-    font-size: 0.78rem;
-  }
-  table.window-table td.num > .hint {
-    margin-top: 0.2rem;
+  /* The note under the context window, where the entry states a larger window the response shares */
+  .window-note {
+    margin-top: 0.15rem;
     font-family: var(--font-sans);
+    font-size: 0.78rem;
+    font-weight: 400;
+    color: var(--muted);
     white-space: normal;
   }
-  table.window-table .client {
-    font-weight: 500;
+  .tile .window-note {
+    margin-top: 0;
   }
-  table.window-table td .hint .date,
-  table.window-table td .hint .stale {
-    margin-right: 0.1rem;
+  h3.with-warning {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
   }
-  /* Two measurements of one entry: a lighter line between them, under the one row heading */
-  table.window-table tr.more > td {
-    border-top: 1px dashed var(--line);
+
+  /* A value and its warning, on one line: the value's own alignment decides which side the sign is on */
+  .safe-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    white-space: nowrap;
   }
-  table.window-table tr:has(+ tr.more) > td {
-    border-bottom: 0;
+  td.num .safe-cell {
+    justify-content: flex-end;
+  }
+  td.num .safe-cell .rates {
+    white-space: normal;
+  }
+  /* The warning: a small sign in the colour the site gives what does not hold together, on a target a finger can hit */
+  .warn-sign {
+    flex: none;
+    display: inline-grid;
+    place-items: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    margin: -0.3rem -0.1rem;
+    border-radius: 6px;
+    color: var(--warn);
+    cursor: pointer;
+    vertical-align: middle;
+  }
+  .warn-sign svg {
+    width: 0.95rem;
+    height: 0.95rem;
+    overflow: visible;
+  }
+  .warn-sign .tri {
+    fill: currentColor;
+  }
+  .warn-sign .bang {
+    fill: none;
+    stroke: var(--bg);
+    stroke-width: 1.7;
+    stroke-linecap: round;
+  }
+  .warn-sign:hover,
+  .warn-sign[aria-expanded="true"] {
+    background: var(--warn-bg);
+  }
+  .tile .warn-sign {
+    margin-left: 0.15rem;
+  }
+  /* Its list: each source on a line, its value and its date in columns; what a measurement went through under it */
+  .warn-tip {
+    width: max-content;
+    max-width: min(26rem, calc(100vw - 1.5rem));
+    padding: 0.65rem 0.85rem 0.55rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 10px;
+    background: var(--bg);
+    color: var(--fg);
+    box-shadow: 0 12px 32px -10px rgb(9 9 11 / 0.28), var(--shadow);
+    font-family: var(--font-sans);
+    font-size: 0.82rem;
+    font-weight: 400;
+    line-height: 1.45;
+    letter-spacing: 0;
+    text-align: left;
+    white-space: normal;
+  }
+  .warn-tip.placed {
+    position: fixed;
+    inset: auto;
+    margin: 0;
+  }
+  .warn-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.1rem 1rem;
+    margin-bottom: 0.45rem;
+  }
+  .warn-title {
+    color: var(--warn);
+    font-weight: 600;
+  }
+  .warn-what {
+    color: var(--muted);
+    font-size: 0.76rem;
+  }
+  .warn-lines {
+    display: grid;
+    grid-template-columns: max-content auto max-content;
+    align-items: baseline;
+    gap: 0.3rem 0.9rem;
+  }
+  .warn-lines > li {
+    display: contents;
+  }
+  .warn-src {
+    font-weight: 520;
+  }
+  .warn-val {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    white-space: nowrap;
+  }
+  .warn-lines > li.shown .warn-val {
+    font-weight: 650;
+  }
+  .warn-val .muted {
+    font-family: var(--font-sans);
+    font-weight: 400;
+  }
+  .warn-val .unit {
+    color: var(--muted);
+    font-weight: 400;
+  }
+  .warn-tiers {
+    display: block;
+    font-family: var(--font-sans);
+    font-size: 0.78rem;
+    font-weight: 400;
+  }
+  .warn-lines > li.shown .warn-val .warn-tiers {
+    font-weight: 560;
+  }
+  .warn-tiers > span {
+    display: block;
+    text-align: left;
+    white-space: normal;
+  }
+  .warn-date {
+    color: var(--muted);
+    font-size: 0.76rem;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .warn-date.stale {
+    color: var(--warn);
+  }
+  .warn-sub {
+    grid-column: 1 / -1;
+    margin: -0.2rem 0 0.1rem 0.75rem;
+    color: var(--muted);
+    font-size: 0.76rem;
+  }
+  li.warn-part {
+    grid-column: 1 / -1;
+    display: block;
+    margin-top: 0.25rem;
+    color: var(--fg-soft);
+    font-size: 0.76rem;
+    font-weight: 600;
+  }
+  li.warn-part:first-child {
+    margin-top: 0;
+  }
+  .warn-foot {
+    margin-top: 0.55rem;
+    padding-top: 0.45rem;
+    border-top: 1px solid var(--line);
+    font-size: 0.76rem;
+  }
+  /* A lifetime held through a client that does not count on this entry: there, and quieter */
+  .chip.not-counted {
+    font-family: var(--font-sans);
+    background: transparent;
+    border: 1px dashed var(--line-strong);
+    color: var(--muted);
+  }
+  table.lifetimes tbody.not-counted td.life .life-value {
+    color: var(--muted);
   }
   /* The note of an evaluation, in sight with the lifetime it belongs to */
   .run-note {
@@ -1760,30 +1679,11 @@
     background: var(--documented-bg);
     border-color: transparent;
   }
-  /* pi.dev: a second imported source, neutral like models.dev but drawn with a firmer line so that it is told apart in a
-     column of sources. Where pi states a price or limit otherwise than the page, the count follows in the colour the site
-     gives a contradicted value, and in words. */
+  /* pi.dev: an imported source, neutral like models.dev but drawn with a firmer line so that it is told apart in a
+     column of sources. */
   .origin.pi {
     color: var(--fg-soft);
     border-color: var(--line-strong);
-  }
-  .pi-differ {
-    display: inline-flex;
-    align-items: center;
-    font-family: var(--font-sans);
-    font-size: 0.72rem;
-    font-weight: 500;
-    line-height: 1.6;
-    padding: 0 0.45rem;
-    border-radius: 999px;
-    color: var(--warn);
-    background: var(--warn-bg);
-    white-space: nowrap;
-  }
-  .origin.pi .pi-differ {
-    margin: -1px -0.5rem -1px auto;
-    border: 1px solid transparent;
-    line-height: inherit;
   }
 
   /* Forms */
@@ -2074,9 +1974,6 @@
     table.stack-phone > tbody > tr > td.num {
       text-align: left;
     }
-    table.stack-phone.window-table .window-what {
-      justify-content: flex-start;
-    }
     table.stack-phone > tbody > tr > [data-label]::before {
       content: attr(data-label);
       display: block;
@@ -2100,10 +1997,6 @@
     table.entries.stack-tablet > tbody > tr > .num,
     table.entries.stack-tablet > tbody > tr > .wide-only {
       flex: 1 1 5.5rem;
-    }
-    /* Stacked, the input window sits under its column's name like the numbers beside it, its basis under it */
-    table.entries.stack-tablet a.window {
-      align-items: flex-start;
     }
     /* The price is the widest of the numbers; a price per unit other than tokens may take two lines */
     table.entries.stack-tablet > tbody > tr > .mid-only {
@@ -2244,9 +2137,6 @@
     table.lifetimes.stack-tablet td.life::before {
       flex-basis: 100%;
     }
-    table.lifetimes.stack-tablet td.life .life-source {
-      margin-top: 0;
-    }
     /* Code and JSON wrap instead of running off the side */
     pre {
       white-space: pre-wrap;
@@ -2314,15 +2204,6 @@
     table.pi-call.stack-phone > tbody > tr > td {
       flex-basis: 100%;
       margin-left: 0;
-    }
-    /* pi's tiers beside the entry's: each list under its name, read from the left like the other stacked numbers */
-    .pi-tiers li {
-      justify-content: flex-start;
-    }
-    table.pi-tiers-table.stack-phone > tbody > tr > td.num {
-      flex-basis: 100%;
-      margin-left: 0;
-      text-align: left;
     }
     /* Request controls: support and default side by side, then the field, the values and the conditions */
     table.controls.stack-phone > tbody > tr > th {

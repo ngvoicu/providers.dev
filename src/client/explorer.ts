@@ -24,7 +24,7 @@ const today: Today = { date: new Date(table.dataset.now ?? Date.now()), stale_af
 // pi's catalog (`pi` of /api/v1/meta), written by the server in the same way: the date beside the pi.dev mark of a row.
 const pi = table.dataset.pi ? (JSON.parse(table.dataset.pi) as MetaPi) : undefined;
 
-const FIELDS = ["q", "provider", "access", "type", "cache", "cache_mode", "origin", "min_context", "min_output", "max_age_months", "evaluated"] as const;
+const FIELDS = ["q", "provider", "access", "type", "cache", "cache_mode", "origin", "min_input_window", "min_output", "max_age_months", "evaluated", "disagree"] as const;
 
 const providerNames = Object.fromEntries([...document.querySelectorAll<HTMLOptionElement>("#provider-ids option")].map((option) => [option.value, option.textContent ?? option.value]));
 let active: AbortController | undefined;
@@ -188,7 +188,7 @@ head.addEventListener("click", (event) => {
   if (!button) return;
   const key = button.dataset.sort as SortKey;
   // Numbers and dates are most useful largest or newest first.
-  const firstOrder = key === "context" || key === "max_output" || key === "verified" || key === "release_date" ? "desc" : "asc"; // a price starts at the cheapest
+  const firstOrder = key === "input_window" || key === "context" || key === "max_output" || key === "verified" || key === "release_date" ? "desc" : "asc"; // a price starts at the cheapest
   query.order = query.sort === key ? (query.order === "asc" ? "desc" : "asc") : firstOrder;
   query.sort = key;
   query.offset = 0;
