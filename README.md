@@ -605,6 +605,11 @@ entries (`null` on 457 whose `limit.output` is 0, pi.dev's figure on 5); of the 
 `max_output_max` on 161 of 476 (the minimum on 161, the maximum on 157) and `input_window_unknown_count` on 3
 (`openai/gpt-6.2-astra`, `openai/gpt-6.2-sol`, `xai/grok-voice-3.0`); and the price of the 3 subscription entries
 without an API entry to refer to (`github-copilot/mai-code-1.1-flash`, `mai-code-2`, `mai-code-2-flash`).
+1.5.0 added the listings: the paths `/api/v1/listings` (with `provider`, `basis`, `view`, `limit` and `offset`) and
+`/api/v1/listings/{provider}`, `listings` in `/api/v1/meta`, the error code `listing_not_found`, and the components
+`Listing`, `ListingModel`, `ListingReasoning`, `ListingSources` and `ListingReasoningSources`: every model a provider
+and access method offers, evaluated or not, from the vendor's own list, providers.dev, models.dev or pi, each field
+with its source.
 
 That promise holds for everything providers.dev makes itself: summaries, `providers_dev` records, evaluations,
 corrections, evidence, paths and parameters. The fields imported from models.dev (`limit`, `cost`, `capabilities`,
