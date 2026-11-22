@@ -3,12 +3,12 @@
 import { z } from "zod";
 import { BriefMetaSchema, COMPONENTS } from "./contract.ts";
 import { CONTROL_EXAMPLE, PRICING_EXAMPLE } from "./policy-examples.ts";
-import { CACHE_EVALUATION_PARAMS, CORRECTION_PARAMS, DEFAULT_LIMIT, LIMIT_EVALUATION_PARAMS, MAX_AGE_MONTHS, MAX_LIMIT, LISTING_PARAMS, MODEL_PARAMS, PARAMS, PROVIDER_PARAMS, PROVIDER_VIEW_PARAMS, type ParamDoc } from "./query.ts";
+import { CACHE_EVALUATION_PARAMS, CORRECTION_PARAMS, DEFAULT_LIMIT, FULL_LISTING_LIMIT, LIMIT_EVALUATION_PARAMS, MAX_AGE_MONTHS, MAX_LIMIT, LISTING_PARAMS, MODEL_PARAMS, PARAMS, PROVIDER_PARAMS, PROVIDER_VIEW_PARAMS, type ParamDoc } from "./query.ts";
 
 type Schema = Record<string, unknown>;
 
 /** The version of the structure of /api/v1 (info.version). */
-export const API_VERSION = "1.5.0";
+export const API_VERSION = "1.5.1";
 
 /** A contract definition as JSON Schema (2020-12, which is what OpenAPI 3.1 uses). */
 export function jsonSchema(schema: z.ZodType, component?: string): Schema {
@@ -124,7 +124,7 @@ export function openapi(): Record<string, unknown> {
       { id: "usage", title: "Requests and pagination", paragraphs: [
         "Four resources: providers, entries (a model at a provider and access method), models (canonical: a model as its lab names it) and evaluations (of the cache at /evaluations/cache, of limits at /evaluations/limits). Limits, prices and caching belong to an entry, because the same model differs from one provider to the next.",
         "No authentication is required. GET and HEAD are supported; OPTIONS answers CORS preflights. Public requests read a published snapshot and never fetch upstream providers.",
-        `Every collection returns { meta, total, limit, offset, next_offset, data }. Use limit from 1 to ${MAX_LIMIT} (default ${DEFAULT_LIMIT}) and continue with next_offset until it is null. Every single resource returns { meta, data }, /meta and /catalog included. Only /openapi.json and the compatibility export /api.json return their documents directly.`,
+        `Every collection returns { meta, total, limit, offset, next_offset, data }. Use limit from 1 to ${MAX_LIMIT} (default ${DEFAULT_LIMIT}; /listings?view=full from 1 to ${FULL_LISTING_LIMIT}, default ${FULL_LISTING_LIMIT}) and continue with next_offset until it is null. Every single resource returns { meta, data }, /meta and /catalog included. Only /openapi.json and the compatibility export /api.json return their documents directly.`,
         "Filters combine with AND. Unknown parameters, duplicate parameters and invalid values return 400 with details. URL-encode each provider/model path segment; model ids may contain slashes. Keep dataset_version and generated_at when joining pages; restart pagination if either changes.",
       ] },
       { id: "stability", title: "Stability", paragraphs: [
@@ -132,7 +132,7 @@ export function openapi(): Record<string, unknown> {
         "That promise covers everything providers.dev makes itself: summaries, providers_dev records, evaluations, corrections, evidence, paths and parameters. The fields imported from models.dev (limit, cost, capabilities, modalities and the like) follow the models.dev v2 schema, which models.dev calls experimental. When models.dev changes one of them, providers.dev takes the change over, and that is not a new major version of this API. The first case was on 2026-11-17: capabilities.tools.updates, until then true or false, became a list of the tool changes an API accepts in the middle of a conversation (add, remove, replace; [] for none).",
         "A client must ignore keys it does not know, and must tolerate a value of an enumerated field that it does not know, for example by reading it as unknown. A client that refuses either can break on a change /api/v1 allows.",
         "A change that removes, renames or retypes something would be /api/v2, published beside /api/v1, which is kept.",
-        "The version of this document, info.version, is the version of the structure of /api/v1. It started at 1.0.0 with the first public release. A release that adds something takes a minor step: 1.1.0, then 1.2.0, then 1.3.0, then 1.4.0, then 1.5.0. A correction of the text alone can take a patch step. The major number stays 1 within /api/v1.",
+        "The version of this document, info.version, is the version of the structure of /api/v1. It started at 1.0.0 with the first public release. A release that adds something takes a minor step: 1.1.0, then 1.2.0, then 1.3.0, then 1.4.0, then 1.5.0. A correction that changes no structure, of the text alone or of a range that never worked, takes a patch step: 1.5.1 limited /listings?view=full to 40 listings a page. The major number stays 1 within /api/v1.",
         "X-Dataset-Version, and dataset_version of /meta, are about the data, not about the structure: they change when the data changes, as a rule every day. They are not this version.",
       ] },
       { id: "unknown", title: "Unknown values", paragraphs: [
@@ -176,6 +176,7 @@ export function openapi(): Record<string, unknown> {
         "Since 1.5.0. A listing is the model list of one provider and access method: every model it offers, evaluated or not. /api/v1/listings gives one per provider that a source has a list for, by provider id; /api/v1/listings/{provider} gives one with its models. A listing is not a set of entries: a listed model need not be an entry (entry is then null), and nothing of a listing is written into an entry's limit or into a safe value.",
         "Four sources, in a fixed order: listed (the vendor's own list, read through a client by groundtruth's daily discovery and published in its listed.json), providers.dev (an authored list or statement, each with a reason and evidence), models.dev (the imported entries of the provider) and pi.dev (pi's models of the provider). The models of a listing are taken whole from the first source that has a list for the provider, and basis names it; models of the other sources are not added. Each field of a model is taken from the first source that states it, and sources names that source per field. A field no source states is null, or [] for a list.",
         "listed_at is the day the list was read: for listed, the day of the discovery, which runs daily; for models.dev and pi.dev, the day of the import; for providers.dev, the newest evidence. A listed listing older than stale_after_days of /meta is stale, as all providers.dev evidence is. plans are the plan names the vendor's own list attaches to a model, as it writes them; no prices, allowances or quotas are published. /meta.listings counts the listings and gives the discovery file's dates and the last attempt to fetch it.",
+        `A page of /api/v1/listings?view=full holds at most ${FULL_LISTING_LIMIT} listings, and ${FULL_LISTING_LIMIT} when limit is not given; a larger limit returns 400 (invalid_parameters). Continue with next_offset until it is null, as with any list. Since 1.5.1: in 1.5.0 the range was that of the other lists, 1 to ${MAX_LIMIT} with a default of ${DEFAULT_LIMIT}, and a page of more than 48 listings in full failed with 500. view=summary keeps that range.`,
       ] },
       { id: "pricing-rules", title: "Pricing and request controls", paragraphs: [
         "Every entry summary has pricing and request_controls, identical to providers_dev.pricing and providers_dev.request_controls on the full entry. This includes entries nested in provider, model and catalog responses. Provider and model list items do not aggregate prices across entries.",

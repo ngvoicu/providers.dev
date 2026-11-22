@@ -5,7 +5,7 @@ import { isDeepStrictEqual } from "node:util";
 import { beforeAll, describe, expect, it } from "vitest";
 import { publish } from "../scripts/lib/publish.ts";
 import { loadUpstream, sync } from "../scripts/lib/sync.ts";
-import { handleApi, modelsFor, type ApiDeps } from "../src/core/api.ts";
+import { handleApi, modelsFor, type ApiDeps, type LoadedDeps } from "../src/core/api.ts";
 import { snapshotAsset } from "../src/core/assets.ts";
 import {
   CanonicalModelDetailSchema,
@@ -29,7 +29,7 @@ import type { Listing } from "../src/core/listings.ts";
 import { ext, type Catalog, type Meta, type ModelExtension } from "../src/core/schema.ts";
 import { depsFrom, fetchReturning, fixturePi, fixtureUpstream, contractProblems, inputWindowRuleBreaks, lifetimeRuleBreaks, piShort, ROOT, safeBreaks, summaryOf, tempDataDir, writeAuthored, writePiSnapshot } from "./helpers.ts";
 
-let deps: ApiDeps;
+let deps: LoadedDeps;
 let published: string;
 
 beforeAll(async () => {
@@ -514,7 +514,7 @@ describe("HTTP behaviour", () => {
 
   it("describes the cache lifetime record: its components and a guide section", async () => {
     const document = await json<{ info: { version: string; contact: unknown; license: unknown }; "x-guide": { id: string; title: string; paragraphs: string[] }[]; components: { schemas: Record<string, { properties?: Record<string, unknown> }> } }>("/api/v1/openapi.json");
-    expect(document.info.version).toBe("1.5.0");
+    expect(document.info.version).toBe("1.5.1");
     expect(document.info.contact).toEqual({ name: "providers.dev", email: "office@providers.dev", url: "https://providers.dev/docs/contributing/" });
     expect(document.info.license).toEqual({ name: "MIT", url: "https://providers.dev/docs/licensing/" });
     const schemas = document.components.schemas;
@@ -577,9 +577,9 @@ describe("pi's catalog in the API (design/pi-source.md, section d)", () => {
     expect(meta.sync.last_error ?? "").not.toMatch(/pi/);
   });
 
-  it("is version 1.5.0, with the six pi components, the keys on the entry, the summary and /meta, and a guide section after Input window", async () => {
+  it("is version 1.5.1, with the six pi components, the keys on the entry, the summary and /meta, and a guide section after Input window", async () => {
     const document = await json<{ info: { version: string; description: string }; "x-guide": { id: string; title: string; paragraphs: string[] }[]; components: { schemas: Record<string, { properties?: Record<string, unknown>; required?: string[] }> } }>("/api/v1/openapi.json");
-    expect(document.info.version).toBe("1.5.0");
+    expect(document.info.version).toBe("1.5.1");
     expect(document.info.description).toContain("A second catalog, pi's (MIT), is imported beside it: what it states for an entry is under providers_dev.pi.");
     const schemas = document.components.schemas;
     for (const name of ["PiBlock", "PiCost", "PiCostTier", "PiDifference", "PiSummary", "PiValue"]) expect(schemas[name], name).toBeDefined();
@@ -635,7 +635,7 @@ describe("pi's catalog in the API (design/pi-source.md, section d)", () => {
 describe("the input window in the OpenAPI document", () => {
   it("has the two components, the key on the entry and the summary, input_read on an evaluation, and a guide section after Unknown values", async () => {
     const document = await json<{ info: { version: string }; "x-guide": { id: string; title: string; paragraphs: string[] }[]; components: { schemas: Record<string, { properties?: Record<string, unknown>; required?: string[] }> } }>("/api/v1/openapi.json");
-    expect(document.info.version).toBe("1.5.0");
+    expect(document.info.version).toBe("1.5.1");
     const schemas = document.components.schemas;
     expect(Object.keys(schemas.InputWindow!.properties!)).toEqual([
       "tokens", "basis", "bound", "scope", "source", "date", "documented_tokens", "documented_field", "documented_source", "documented_date", "documented_status",
@@ -734,6 +734,30 @@ describe("listings: the contract and the two paths (1.5.0)", () => {
     expect(((await (await ask(local, "/api/v1/listings?basis=models.dev")).json()) as { total: number }).total).toBe(0);
     expect((await ask(local, "/api/v1/listings?basis=router")).status).toBe(400);
     expect((await ask(local, "/api/v1/listings?view=all")).status).toBe(400);
+  });
+
+  it("holds a page in full to 40 listings, 40 by default, and pages through every one; view=summary keeps 1 to 200 (1.5.1)", async () => {
+    const local = withListings(Array.from({ length: 95 }, (_, i) => listing(`p${String(i).padStart(2, "0")}`)));
+    const first = (await (await ask(local, "/api/v1/listings?view=full")).json()) as { limit: number; next_offset: number | null; data: Listing[] };
+    expect([first.limit, first.data.length, first.next_offset]).toEqual([40, 40, 40]);
+    expect((await ask(local, "/api/v1/listings?view=full&limit=40")).status).toBe(200);
+    for (const limit of [41, 49, 200]) {
+      const refused = await ask(local, `/api/v1/listings?view=full&limit=${limit}`);
+      expect(refused.status, `limit ${limit}`).toBe(400);
+      expect(((await refused.json()) as { error: unknown }).error).toEqual({ code: "invalid_parameters", message: "One or more query parameters are not valid.", details: [{ param: "limit", message: "Must be between 1 and 40 with view=full." }] });
+    }
+    // Beyond 200 the message is the one of every list.
+    expect(((await (await ask(local, "/api/v1/listings?view=full&limit=201")).json()) as { error: { details: unknown } }).error.details).toEqual([{ param: "limit", message: "Must be between 1 and 200." }]);
+    const seen: string[] = [];
+    for (let offset: number | null = 0; offset !== null;) {
+      const shown = (await (await ask(local, `/api/v1/listings?view=full&offset=${offset}`)).json()) as { next_offset: number | null; data: Listing[] };
+      seen.push(...shown.data.map((item) => item.provider));
+      offset = shown.next_offset;
+    }
+    expect(seen).toEqual(Array.from({ length: 95 }, (_, i) => `p${String(i).padStart(2, "0")}`));
+    const summary = (await (await ask(local, "/api/v1/listings?limit=200")).json()) as { limit: number; data: Listing[] };
+    expect([summary.limit, summary.data.length]).toEqual([200, 95]);
+    expect(((await (await ask(local, "/api/v1/listings")).json()) as { limit: number }).limit).toBe(50);
   });
 
   it("gives one listing with its models, 404 listing_not_found otherwise", async () => {
@@ -841,7 +865,12 @@ describe("the contract", () => {
     for (const list of ["cache", "limits"]) same(((await ask(`/api/v1/evaluations/${list}?limit=200`)) as { data: object[] }).data, `the list of ${list} evaluations`);
     same(modelsFor(local.index).map(withoutEntries), "canonical models");
     // The listings (1.5.0): every listing, model, reasoning record and sources record has the same keys, in both views.
-    const listings = ((await ask("/api/v1/listings?view=full&limit=200")) as { data: Listing[] }).data;
+    const listings: Listing[] = [];
+    for (let offset: number | null = 0; offset !== null;) {
+      const shown = (await ask(`/api/v1/listings?view=full&offset=${offset}`)) as { data: Listing[]; next_offset: number | null };
+      listings.push(...shown.data);
+      offset = shown.next_offset;
+    }
     same(listings, "listings");
     same(((await ask("/api/v1/listings?limit=200")) as { data: Listing[] }).data, "listings without view=full");
     const listed = listings.flatMap((listing) => listing.models ?? []);

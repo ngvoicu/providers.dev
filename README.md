@@ -535,7 +535,7 @@ method), **models** (canonical: a model as its lab names it) and **evaluations**
 | `GET /api/v1/models/{lab}/{model}` | one canonical model with every entry that serves it |
 | `GET /api/v1/evaluations/cache` | every cache evaluation, with the entry it was made on |
 | `GET /api/v1/evaluations/limits` | every limit evaluation, with the entry it was made on |
-| `GET /api/v1/listings` | listings: every model a provider offers, evaluated or not; `?view=full` adds the models, `?provider=` and `?basis=` filter (since 1.5.0) |
+| `GET /api/v1/listings` | listings: every model a provider offers, evaluated or not; `?view=full` adds the models, at most 40 listings a page (since 1.5.1), `?provider=` and `?basis=` filter (since 1.5.0) |
 | `GET /api/v1/listings/{provider}` | one listing with its models (since 1.5.0) |
 | `GET /api/v1/catalog` | the complete merged catalog, `{ meta, data }` with `data` keyed by provider id |
 | `GET /api/v1/meta` | dataset version, counts, freshness, the stale threshold (`stale_after_days`), upstream commit, sync status, pi's catalog (`pi`), the listings and the discovery file (`listings`), open issues |
@@ -622,6 +622,12 @@ without an API entry to refer to (`github-copilot/mai-code-1.1-flash`, `mai-code
 `Listing`, `ListingModel`, `ListingReasoning`, `ListingSources` and `ListingReasoningSources`: every model a provider
 and access method offers, evaluated or not, from the vendor's own list, providers.dev, models.dev or pi, each field
 with its source.
+1.5.1 changed no structure: it fixed a range that never worked. A page of `/api/v1/listings?view=full` holds at most
+40 listings, and 40 when `limit` is not given; a larger `limit` returns 400 (`invalid_parameters`), as a limit above
+200 does on every list. In 1.5.0 the range was 1 to 200 with a default of 50, and a page of more than 48 listings in
+full failed with 500 on Cloudflare (each listing in full is a file, each file a subrequest; see
+[Worker subrequests](#worker-subrequests)). `view=summary` keeps 1 to 200, default 50. The OpenAPI schema of `limit`
+is shared by both views and stays as recorded (maximum 200, default 50); its description gives the range in full.
 
 That promise holds for everything providers.dev makes itself: summaries, `providers_dev` records, evaluations,
 corrections, evidence, paths and parameters. The fields imported from models.dev (`limit`, `cost`, `capabilities`,
@@ -839,6 +845,24 @@ assembling a large answer:
   after another, so that it never holds the whole 31 MB text beside the parsed summaries (`src/core/snapshot.ts`).
   `data/index.json` stays published as it was.
 - Nothing a request makes is kept: one parsed publication per binding, and the canonical models of its index.
+
+### Worker subrequests
+
+Every read of the `ASSETS` binding is a subrequest, and Cloudflare allows a Worker 50 in one invocation; `wrangler
+dev` has no such cap, so a local run never shows it (Cloudflare answers 500, error 1101, "Too many subrequests").
+`tests/subrequests.test.ts` asks every route of the Worker (every API path, every page family, the data files) on a
+fresh isolate, which reads the publication from nothing, against the fixture with more listings than a page in full
+holds and against the build in `dist/`, and fails a route that reads `ASSETS` more than 45 times. What keeps them
+under it:
+
+- The pointer and `meta.json` are read at once; the index (its head and its parts) only by the first request that
+  reads a summary (`src/core/snapshot.ts`). A request that reads none (the listings, `/meta`, the evaluations) does
+  not read it.
+- The index has at most `MAX_INDEX_PARTS` (30) parts (`scripts/lib/publish.ts`): past 7,500 summaries its parts grow
+  instead of their number. On 2026-11-22 it has 26, and a page that reads the index on a fresh isolate makes at
+  most 33 reads.
+- A page of `/api/v1/listings?view=full` holds at most 40 listings (`FULL_LISTING_LIMIT`), each a file of its own:
+  the pointer, the meta, the list and 40 files are 43 reads. Since API 1.5.1; in 1.5.0 such a page failed above 48.
 
 Measured on 2026-11-22 with workerd 1.20261110.1 (`--max-old-space-size=128`), the release review's method: the
 inspector's used heap plus backing storage and embedder heap, sampled every 2 ms, over one warm isolate serving in

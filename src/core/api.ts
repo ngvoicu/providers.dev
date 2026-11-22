@@ -8,6 +8,7 @@ import type { Index, Summary } from "./entries.ts";
 import { API_VERSION, openapi } from "./openapi.ts";
 import {
   DEFAULT_LIMIT,
+  FULL_LISTING_LIMIT,
   CORRECTION_PARAMS,
   CACHE_EVALUATION_PARAMS,
   LIMIT_EVALUATION_PARAMS,
@@ -26,11 +27,18 @@ import type { Listing } from "./listings.ts";
 import type { Meta } from "./schema.ts";
 
 export interface ApiDeps {
-  index: Index;
+  /**
+   * The index of summaries, or how to load it. The Worker passes a loader, so that a request that reads no summary
+   * (the listings, /meta, the evaluations) does not read the index's files: each read is a subrequest.
+   */
+  index: Index | (() => Promise<Index>);
   meta: Meta;
   /** Reads a file of the published snapshot, for example `/data/providers/openai.json`. Null when missing. */
   asset(path: string): Promise<Response | null>;
 }
+
+/** Deps whose index is already loaded, as the tests and the scripts build them. */
+export type LoadedDeps = ApiDeps & { index: Index };
 
 export const BASE = "/api/v1";
 
@@ -140,7 +148,8 @@ export function refFromPath(rest: string): string | null {
 }
 
 export async function handleApi(request: Request, deps: ApiDeps): Promise<Response> {
-  const { meta, index } = deps;
+  const { meta } = deps;
+  const summaries = async (): Promise<Index> => (typeof deps.index === "function" ? await deps.index() : deps.index);
   const url = new URL(request.url);
   const path = url.pathname.replace(/\/+$/, "") || "/";
 
@@ -200,7 +209,7 @@ export async function handleApi(request: Request, deps: ApiDeps): Promise<Respon
   }
   if (path === `${BASE}/facets`) {
     const values = params([]);
-    return values instanceof Response ? values : one(facets(index));
+    return values instanceof Response ? values : one(facets(await summaries()));
   }
   if (path === `${BASE}/corrections`) {
     const values = params(CORRECTION_PARAMS);
@@ -228,7 +237,7 @@ export async function handleApi(request: Request, deps: ApiDeps): Promise<Respon
     const access = values.access as string[] | undefined;
     const origin = values.origin as string[] | undefined;
     const words = String(values.q ?? "").toLowerCase().split(/\s+/).filter(Boolean);
-    const found = index.providers.filter((provider) => (!access || access.includes(provider.access)) && (!origin || origin.includes(provider.origin)) && words.every((word) => `${provider.id} ${provider.name}`.toLowerCase().includes(word)))
+    const found = (await summaries()).providers.filter((provider) => (!access || access.includes(provider.access)) && (!origin || origin.includes(provider.origin)) && words.every((word) => `${provider.id} ${provider.name}`.toLowerCase().includes(word)))
       .sort((a, b) => a.name.localeCompare(b.name) || a.id.localeCompare(b.id));
     return sendJson({ meta: brief(meta), ...page(found, ...paging(values)) });
   }
@@ -240,6 +249,7 @@ export async function handleApi(request: Request, deps: ApiDeps): Promise<Respon
     } catch {
       return fail(meta, 400, "invalid_parameters", "The provider id is not valid URL encoding.");
     }
+    const index = await summaries();
     const provider = index.providers.find((item) => item.id === id);
     if (!provider) return fail(meta, 404, "provider_not_found", `No provider "${id}". GET ${BASE}/providers lists them.`);
     const values = params(PROVIDER_VIEW_PARAMS);
@@ -262,6 +272,11 @@ export async function handleApi(request: Request, deps: ApiDeps): Promise<Respon
   if (path === `${BASE}/listings`) {
     const values = params(LISTING_PARAMS);
     if (values instanceof Response) return values;
+    // In full each listing of the page is a file of its own, and each file read is a subrequest of the Worker: a page
+    // in full holds at most FULL_LISTING_LIMIT, by default as many (since 1.5.1).
+    const full = values.view === "full";
+    const [limit, offset] = [(values.limit as number | undefined) ?? (full ? FULL_LISTING_LIMIT : DEFAULT_LIMIT), (values.offset as number | undefined) ?? 0];
+    if (full && limit > FULL_LISTING_LIMIT) return fail(meta, 400, "invalid_parameters", "One or more query parameters are not valid.", [{ param: "limit", message: `Must be between 1 and ${FULL_LISTING_LIMIT} with view=full.` }]);
     const asset = await deps.asset("/data/listings.json");
     if (!asset) return missing("/data/listings.json");
     // Every listing with models: null. The same keys in both views: `models` is null until it is asked for.
@@ -269,12 +284,12 @@ export async function handleApi(request: Request, deps: ApiDeps): Promise<Respon
     const providers = values.provider as string[] | undefined;
     const bases = values.basis as string[] | undefined;
     const found = all.filter((item) => (!providers || providers.includes(item.provider)) && (!bases || bases.includes(item.basis)));
-    const shown = page(found, ...paging(values));
-    if (values.view !== "full") return sendJson({ meta: brief(meta), ...shown });
+    const shown = page(found, limit, offset);
+    if (!full) return sendJson({ meta: brief(meta), ...shown });
     // In full: the file of each listing of the page, and nothing more.
-    const full = await Promise.all(shown.data.map((item) => loadListing(deps, item.provider)));
-    if (full.some((item) => item === null)) return missing("a listing's file");
-    return sendJson({ meta: brief(meta), ...shown, data: full });
+    const listings = await Promise.all(shown.data.map((item) => loadListing(deps, item.provider)));
+    if (listings.some((item) => item === null)) return missing("a listing's file");
+    return sendJson({ meta: brief(meta), ...shown, data: listings });
   }
   const listingId = under("listings");
   if (listingId !== null) {
@@ -292,7 +307,7 @@ export async function handleApi(request: Request, deps: ApiDeps): Promise<Respon
     const listing = known ? await loadListing(deps, id) : null;
     if (known && !listing) return missing("this listing's file");
     if (!listing) {
-      const provider = index.providers.some((item) => item.id === id);
+      const provider = (await summaries()).providers.some((item) => item.id === id);
       return fail(meta, 404, "listing_not_found", provider ? `The provider "${id}" has no listing: no source has a model list for it.` : `No provider "${id}". GET ${BASE}/listings lists the listings.`);
     }
     return one(listing);
@@ -304,7 +319,7 @@ export async function handleApi(request: Request, deps: ApiDeps): Promise<Respon
     if (!parsed.ok) return fail(meta, 400, "invalid_parameters", "One or more query parameters are not valid.", parsed.errors);
     // The representation hash changes when a date-relative result changes.
     const today = utcToday();
-    const result = runQuery(index.entries, parsed.query, today);
+    const result = runQuery((await summaries()).entries, parsed.query, today);
     return sendJson({ meta: brief(meta), ...result });
   }
   const entryPath = under("entries");
@@ -313,6 +328,7 @@ export async function handleApi(request: Request, deps: ApiDeps): Promise<Respon
     if (!ref) return fail(meta, 400, "invalid_parameters", `Name the entry as ${BASE}/entries/{provider}/{model}. The model id may contain slashes.`);
     const values = params([]);
     if (values instanceof Response) return values;
+    const index = await summaries();
     const summary = index.entries.find((entry) => entry.ref === ref);
     if (!summary) return fail(meta, 404, "entry_not_found", `No entry "${ref}". GET ${BASE}/entries?q=… searches them.`);
     const entry = await loadEntry(deps, summary);
@@ -325,7 +341,7 @@ export async function handleApi(request: Request, deps: ApiDeps): Promise<Respon
     const values = params(MODEL_PARAMS);
     if (values instanceof Response) return values;
     const words = String(values.q ?? "").toLowerCase().split(/\s+/).filter(Boolean);
-    const found = modelsFor(index).filter((model) => (!values.lab || model.lab === values.lab) && words.every((word) => `${model.id} ${model.name}`.toLowerCase().includes(word)));
+    const found = modelsFor(await summaries()).filter((model) => (!values.lab || model.lab === values.lab) && words.every((word) => `${model.id} ${model.name}`.toLowerCase().includes(word)));
     return sendJson({ meta: brief(meta), ...page(found.map(withoutEntries), ...paging(values)) });
   }
   const modelPath = under("models");
@@ -334,7 +350,7 @@ export async function handleApi(request: Request, deps: ApiDeps): Promise<Respon
     if (!id) return fail(meta, 400, "invalid_parameters", `Name the model as ${BASE}/models/{lab}/{model}.`);
     const values = params([]);
     if (values instanceof Response) return values;
-    const model = modelsFor(index).find((item) => item.id === id);
+    const model = modelsFor(await summaries()).find((item) => item.id === id);
     if (!model) return fail(meta, 404, "model_not_found", `No canonical model "${id}". GET ${BASE}/models?q=… searches them.`);
     return one(model);
   }

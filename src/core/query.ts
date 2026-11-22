@@ -11,6 +11,12 @@ export const SITE_DEFAULT = "sort=verified&order=desc";
 export const MAX_LIMIT = 200;
 export const MAX_AGE_MONTHS = 600;
 export const DEFAULT_LIMIT = 50;
+/**
+ * The most listings, and the default, of one page of /api/v1/listings?view=full (since 1.5.1). Each listing in full
+ * is a file of its own, and each read of a file is a subrequest of the Worker, which may make 50 in one request; the
+ * others of the request take the rest (tests/subrequests.test.ts holds every route to 45).
+ */
+export const FULL_LISTING_LIMIT = 40;
 
 export interface Query {
   q?: string;
@@ -100,8 +106,9 @@ export const PROVIDER_VIEW_PARAMS: ParamDoc[] = [
 export const LISTING_PARAMS: ParamDoc[] = [
   { name: "provider", kind: "list", description: "Provider ids, comma-separated. A listing matches any of them." },
   { name: "basis", kind: "list", values: ["listed", "providers.dev", "models.dev", "pi.dev"], description: "The source of a listing's models." },
-  { name: "view", kind: "enum", values: ["summary", "full"], description: "summary (default) = each listing without its models; models is null. full = each listing with its models." },
-  ...PAGING,
+  { name: "view", kind: "enum", values: ["summary", "full"], description: `summary (default) = each listing without its models; models is null. full = each listing with its models, at most ${FULL_LISTING_LIMIT} a page.` },
+  { name: "limit", kind: "integer", description: `Listings per page. With view=summary 1 to ${MAX_LIMIT}, default ${DEFAULT_LIMIT}; with view=full 1 to ${FULL_LISTING_LIMIT}, default ${FULL_LISTING_LIMIT} (since 1.5.1: a larger limit returns 400).` },
+  { name: "offset", kind: "integer", description: "Listings to skip. Default 0." },
 ];
 export const CORRECTION_PARAMS: ParamDoc[] = [
   { name: "provider", kind: "text", description: "Exact provider id." },

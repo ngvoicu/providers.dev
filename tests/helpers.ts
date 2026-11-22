@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { stringify } from "yaml";
 import type { z } from "zod";
-import { handleApi, modelsFor, type ApiDeps } from "../src/core/api.ts";
+import { handleApi, modelsFor, type LoadedDeps } from "../src/core/api.ts";
 import {
   CacheEvaluationRecordSchema,
   CanonicalModelDetailSchema,
@@ -559,7 +559,7 @@ export function fetchReturning(body: string, init: ResponseInit = { status: 200,
   }) as typeof fetch;
 }
 
-export function depsFrom(publishedDir: string): ApiDeps {
+export function depsFrom(publishedDir: string): LoadedDeps {
   const index = JSON.parse(readFileSync(join(publishedDir, "site", "data", "index.json"), "utf8")) as Index;
   const meta = JSON.parse(readFileSync(join(publishedDir, "site", "data", "meta.json"), "utf8")) as Meta;
   return {
@@ -648,8 +648,14 @@ export async function contractProblems(dir: string): Promise<string[]> {
   valid(pageOf(CacheEvaluationRecordSchema), await ask("/api/v1/evaluations/cache?limit=200"), "cache evaluations");
   valid(pageOf(LimitEvaluationRecordSchema), await ask("/api/v1/evaluations/limits?limit=200"), "limit evaluations");
   // The listings, in both views, and each one alone (since 1.5.0).
-  const listings = (await ask("/api/v1/listings?view=full&limit=200")) as { data: { provider: string }[] };
-  valid(pageOf(ListingSchema), listings, "listings, view=full");
+  // In full a page holds at most 40 listings (since 1.5.1): every page, to the end.
+  const listings: { data: { provider: string }[] } = { data: [] };
+  for (let offset: number | null = 0; offset !== null;) {
+    const shown = (await ask(`/api/v1/listings?view=full&offset=${offset}`)) as { data: { provider: string }[]; next_offset: number | null };
+    valid(pageOf(ListingSchema), shown, `listings, view=full, offset ${offset}`);
+    listings.data.push(...shown.data);
+    offset = shown.next_offset;
+  }
   valid(pageOf(ListingSchema), await ask("/api/v1/listings?limit=200"), "listings");
   for (const listing of listings.data) valid(one(ListingSchema), await ask(`/api/v1/listings/${encodeURIComponent(listing.provider)}`), `listing ${listing.provider}`);
   const model = modelsFor(local.index)[0]!;

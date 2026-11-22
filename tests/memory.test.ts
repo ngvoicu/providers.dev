@@ -5,16 +5,16 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { beforeAll, describe, expect, it } from "vitest";
 import { stageSnapshot } from "../scripts/lib/stage.ts";
-import { INDEX_PART_SIZE, publish } from "../scripts/lib/publish.ts";
+import { INDEX_PART_SIZE, indexPartSize, MAX_INDEX_PARTS, publish } from "../scripts/lib/publish.ts";
 import { sync } from "../scripts/lib/sync.ts";
-import { brief, handleApi, type ApiDeps } from "../src/core/api.ts";
+import { brief, handleApi, type ApiDeps, type LoadedDeps } from "../src/core/api.ts";
 import type { Index } from "../src/core/entries.ts";
 import { readSnapshot, type AssetBinding } from "../src/core/snapshot.ts";
 import type { Catalog } from "../src/core/schema.ts";
 import { depsFrom, fetchReturning, fixtureUpstream, ROOT, tempDataDir, writeAuthored } from "./helpers.ts";
 
 let published: string;
-let deps: ApiDeps;
+let deps: LoadedDeps;
 beforeAll(async () => {
   const dataDir = tempDataDir();
   await sync({ dataDir, fetch: fetchReturning(JSON.stringify(fixtureUpstream())) });
@@ -90,9 +90,19 @@ describe("the Worker loads the index in parts", () => {
     const dir = join(published, "site", "data", "index-parts");
     const index = JSON.parse(readFileSync(join(published, "site", "data", "index.json"), "utf8")) as Index;
     const files = readdirSync(dir).sort();
-    const parts = Math.ceil(index.entries.length / INDEX_PART_SIZE);
+    const parts = Math.ceil(index.entries.length / indexPartSize(index.entries.length));
     expect(parts).toBeGreaterThan(1);
     expect(files).toEqual(["head.json.gz", ...Array.from({ length: parts }, (_, part) => `${part}.json.gz`)].sort());
+  });
+
+  it("holds at most MAX_INDEX_PARTS parts, each a subrequest of a fresh isolate: past that the parts grow", () => {
+    for (const count of [1, 250, 251, 6_500, 7_500, 7_501, 9_000, 50_000]) {
+      const size = indexPartSize(count);
+      expect(size).toBeGreaterThanOrEqual(INDEX_PART_SIZE);
+      expect(Math.ceil(count / size), `${count} summaries`).toBeLessThanOrEqual(MAX_INDEX_PARTS);
+    }
+    expect(indexPartSize(6_500)).toBe(INDEX_PART_SIZE);
+    expect(indexPartSize(9_000)).toBe(300);
   });
 
   it("reads the head and the parts one after another, never the whole index, and gets the index", async () => {
@@ -118,12 +128,15 @@ describe("the Worker loads the index in parts", () => {
       },
     };
     const snapshot = await readSnapshot(assets, "https://providers.dev");
-    expect(snapshot.index).toEqual(JSON.parse(readFileSync(join(published, "site", "data", "index.json"), "utf8")));
+    // The index is read only when a request reads it: until then the pointer and the meta.
+    expect(reads.map((path) => path.replace(/^\/snapshots\/[a-f0-9]+/, ""))).toEqual(["/current.json", "/data/meta.json"]);
+    const index = await snapshot.index();
+    expect(index).toEqual(JSON.parse(readFileSync(join(published, "site", "data", "index.json"), "utf8")));
     expect(reads.some((path) => path.endsWith("/data/index.json.gz") || path.endsWith("/data/index.json"))).toBe(false);
     expect(most).toBe(1);
     // The same publication is read once: a second request reads the pointer alone.
     reads.length = 0;
-    expect((await readSnapshot(assets, "https://providers.dev")).index).toBe(snapshot.index);
+    expect(await (await readSnapshot(assets, "https://providers.dev")).index()).toBe(index);
     expect(reads).toEqual(["/current.json"]);
   });
 });

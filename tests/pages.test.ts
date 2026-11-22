@@ -5,7 +5,7 @@ import { parse, stringify } from "yaml";
 import { publish } from "../scripts/lib/publish.ts";
 import { stageSnapshot } from "../scripts/lib/stage.ts";
 import { sync } from "../scripts/lib/sync.ts";
-import { handleApi, type ApiDeps } from "../src/core/api.ts";
+import { handleApi, type ApiDeps, type LoadedDeps } from "../src/core/api.ts";
 import { CorrectionSchema, DocumentationSchema, FacetsSchema, one, pageOf } from "../src/core/contract.ts";
 import { escapeHtml } from "../src/core/format.ts";
 import { fillShell, MARK } from "../src/core/page-shell.ts";
@@ -23,7 +23,7 @@ import { depsFrom, fetchReturning, fixturePi, fixtureUpstream, ROOT, tempDataDir
 
 const shell = `<html><head><title>${MARK.title} · providers.dev</title><meta name="description" content="${MARK.description}"><link rel="canonical" href="${MARK.canonical}"></head><body><nav>${MARK.nav}</nav><main>${MARK.html}</main><footer>${MARK.dataset}</footer></body></html>`;
 const now = () => new Date("2026-11-14T12:00:00Z");
-let deps: ApiDeps;
+let deps: LoadedDeps;
 let dataDir: string;
 
 beforeAll(async () => {
@@ -361,7 +361,7 @@ describe("API response boundary", () => {
 
   it("shows the version and the Stability section of the OpenAPI document on /docs/api/", async () => {
     const html = await (await page("/docs/api/")).text();
-    expect(html).toContain("Version 1.5.0 ·");
+    expect(html).toContain("Version 1.5.1 ·");
     expect(html).toContain('<h2 id="stability">Stability</h2>');
     expect(html).toContain("/api/v1 only grows.");
   });

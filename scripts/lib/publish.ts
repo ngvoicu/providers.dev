@@ -45,6 +45,17 @@ export const STALE_AFTER_DAYS = 90;
 
 /** How many summaries one part of the index holds (data/index-parts/), about 1.2 MB of JSON each today. */
 export const INDEX_PART_SIZE = 250;
+/**
+ * The most parts of the index. A request that reads the index on a fresh isolate reads every part, each a subrequest
+ * of the Worker, which may make 50 in one request (tests/subrequests.test.ts holds every route to 45). Above
+ * INDEX_PART_SIZE * MAX_INDEX_PARTS summaries (7,500) the parts grow instead of their number.
+ */
+export const MAX_INDEX_PARTS = 30;
+
+/** The summaries of one part of an index of `count`: INDEX_PART_SIZE, more once there would be more than MAX_INDEX_PARTS. */
+export function indexPartSize(count: number): number {
+  return Math.max(INDEX_PART_SIZE, Math.ceil(count / MAX_INDEX_PARTS));
+}
 
 export interface PublishOptions {
   dataDir: string;
@@ -362,10 +373,11 @@ function writeSnapshot(dir: string, catalog: Catalog, index: Index, meta: Meta, 
   // text beside the parsed summaries (src/core/snapshot.ts). The head carries everything but the summaries.
   mkdirSync(join(site, "data", "index-parts"), { recursive: true });
   const { entries: summaries, ...head } = index;
-  const parts = Math.ceil(summaries.length / INDEX_PART_SIZE);
+  const size = indexPartSize(summaries.length);
+  const parts = Math.ceil(summaries.length / size);
   writeFileSync(join(site, "data", "index-parts", "head.json.gz"), gzipSync(compact({ ...head, parts }), { level: 9 }));
   for (let part = 0; part < parts; part += 1) {
-    writeFileSync(join(site, "data", "index-parts", `${part}.json.gz`), gzipSync(compact(summaries.slice(part * INDEX_PART_SIZE, (part + 1) * INDEX_PART_SIZE)), { level: 9 }));
+    writeFileSync(join(site, "data", "index-parts", `${part}.json.gz`), gzipSync(compact(summaries.slice(part * size, (part + 1) * size)), { level: 9 }));
   }
   // Every evaluation with the entry it was made on: what /api/v1/evaluations/cache and /limits answer from.
   writeFileSync(join(site, "data", "evaluations.json"), compact({ meta: short, data: listEvaluations(catalog, index) }));
