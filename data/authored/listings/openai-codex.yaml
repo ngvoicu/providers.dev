@@ -1,0 +1,45 @@
+# data/authored/listings/openai-codex.yaml
+# The models a ChatGPT plan's Codex login offers, until groundtruth's discovery publishes Codex's own list in
+# listed.json. Discovery comes first: as soon as listed.json has a list for openai-codex, it replaces this list
+# whole, and this file can be deleted.
+#
+# Why it exists: models.dev lists two models for openai-codex (gpt-6.1-sol, gpt-6.1-terra), and providers.dev
+# measured four more through the Codex login (the entries it added: gpt-6-astra, gpt-6-luna, gpt-6.2-astra,
+# gpt-6.2-sol). A list from models.dev alone would leave out models a request on this login reaches.
+#
+# The fields of each model are not stated here: they come from the entries (providers.dev for what it measured,
+# models.dev for the rest and for what an added entry inherits).
+provider: openai-codex
+list:
+  models:
+    - gpt-6.1-sol
+    - gpt-6.1-terra
+    - gpt-6-astra
+    - gpt-6-luna
+    - gpt-6.2-astra
+    - gpt-6.2-sol
+  reason: >-
+    models.dev lists gpt-6.1-sol and gpt-6.1-terra for openai-codex; providers.dev's evaluations reached
+    gpt-6-astra, gpt-6-luna, gpt-6.2-astra and gpt-6.2-sol through a Codex login. Until the discovery publishes
+    Codex's own list, these six are the list.
+  evidence:
+    - kind: listed
+      url: https://models.dev/experimental/v2.0/api.json?include=openai-codex
+      date: "2026-11-22"
+      note: "openai-codex lists gpt-6.1-sol and gpt-6.1-terra."
+    - kind: measured
+      url: https://github.com/ngvoicu/groundtruth/blob/main/results/logins-long-2026-11-17/CL3-2026-11-17T16-30-03.partial.json
+      date: "2026-11-17"
+      note: "A cache evaluation of gpt-6-astra through the Codex login."
+    - kind: measured
+      url: https://github.com/ngvoicu/groundtruth/blob/main/results/logins-long-2026-11-17/CL4-2026-11-17T16-31-23.json
+      date: "2026-11-17"
+      note: "A cache evaluation of gpt-6-luna through the Codex login."
+    - kind: measured
+      url: https://github.com/ngvoicu/groundtruth/blob/main/results/logins-gpt-6-2-2026-11-17/GA1-2026-11-17T21-27-51.json
+      date: "2026-11-17"
+      note: "A cache evaluation of gpt-6.2-astra through the Codex login."
+    - kind: measured
+      url: https://github.com/ngvoicu/groundtruth/blob/main/results/logins-gpt-6-2-2026-11-17/GS1-2026-11-17T21-26-51.json
+      date: "2026-11-17"
+      note: "A cache evaluation of gpt-6.2-sol through the Codex login."

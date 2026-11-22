@@ -143,6 +143,8 @@ export interface ListingsInput {
   listed?: { page: string; providers: Record<string, ListedProvider> };
   /** The public id and label of a raw client id (data/authored/measurement-labels.yaml). */
   client?: (raw: string) => { id: string; label: string };
+  /** The address models.dev is imported from: the evidence of a value an added entry inherits from models.dev. */
+  upstreamSource?: string;
   /** pi's lists; undefined = no pi data in this dataset. */
   pi?: { date: string | null; lists: PiList[] };
 }
@@ -240,7 +242,19 @@ function entryStatement(model: PublishedModel): Statement {
 function entryStatements(model: PublishedModel): { providersDev: Statement; modelsDev: Statement } {
   const own = ext(model);
   const read = entryStatement(model);
-  if (own.origin === "added") return { providersDev: read, modelsDev: {} };
+  if (own.origin === "added") {
+    // An added entry's values are providers.dev's, but for the identity fields it inherits from a models.dev entry
+    // (`inherited.fields`): those are models.dev's, and say so.
+    const inherited = new Set(own.inherited?.fields ?? []);
+    const providersDev: Statement = {};
+    const modelsDev: Statement = {};
+    for (const [key, path] of Object.entries(ENTRY_PATHS) as [keyof Statement, string][]) {
+      if (!(key in read)) continue;
+      if (inherited.has(path.split(".")[0]!)) modelsDev[key] = read[key];
+      else providersDev[key] = read[key];
+    }
+    return { providersDev, modelsDev };
+  }
   const providersDev: Statement = {};
   const modelsDev: Statement = {};
   for (const [key, path] of Object.entries(ENTRY_PATHS) as [keyof Statement, string][]) {
@@ -265,6 +279,14 @@ function merged(id: string, statements: [ListingSource, Statement][], entry: { p
   };
   const plain = Object.fromEntries(PLAIN_KEYS.map((key) => [key, pick(key)])) as Record<PlainKey, { value: unknown; source: ListingSource | null }>;
   const reasoning = Object.fromEntries(REASONING_KEYS.map((key) => [key, pick(`reasoning.${key}`)])) as Record<ReasoningKey, { value: unknown; source: ListingSource | null }>;
+  // A field from a lower source never contradicts the row: an input or output limit above the window a higher source
+  // gives is not taken (the window's own source may state one; it is then kept, as stated).
+  const rank = (source: ListingSource | null): number => (source === null ? LISTING_SOURCES.length : LISTING_SOURCES.indexOf(source));
+  const window = plain.context_window;
+  for (const key of ["max_input", "max_output"] as const) {
+    const limit = plain[key];
+    if (window.source !== null && limit.source !== null && rank(limit.source) > rank(window.source) && (limit.value as number) > (window.value as number)) plain[key] = { value: null, source: null };
+  }
   const list = (key: "aliases" | "variants" | "plans"): string[] => (plain[key].value as string[] | null) ?? [];
   const anyReasoning = REASONING_KEYS.some((key) => reasoning[key].source !== null);
   return {
@@ -392,6 +414,7 @@ export function buildListings(input: ListingsInput): { listings: Listing[]; issu
       }
     }
     const applied = new Set<number>();
+    const inheritedFrom: string[] = [];
     const discovered = new Map((discovery?.models ?? []).map((model) => [model.id, model]));
     const piModels = new Map((pi?.models ?? []).map((model) => [model.id, model]));
     const models = unique.map((id) => {
@@ -408,11 +431,19 @@ export function buildListings(input: ListingsInput): { listings: Listing[]; issu
         const { providersDev, modelsDev } = entryStatements(entry);
         statements.push(["providers.dev", providersDev], ["models.dev", modelsDev]);
       } else if (left.has(id)) statements.push(["models.dev", entryStatement(left.get(id)!)]);
+      const own = entry ? ext(entry) : undefined;
+      if (own?.origin === "added" && own.inherited && Object.keys(entryStatements(entry!).modelsDev).length > 0) inheritedFrom.push(`${id} from ${own.inherited.from}`);
+      // pi gives no limit to a model whose entry has a measured window: pi's figure would stand beside, and against,
+      // what providers.dev measured.
+      const measured = (own?.limits?.input_window?.measured_tokens ?? null) !== null;
       const fromPi = piModels.get(id);
-      if (fromPi) statements.push(["pi.dev", piStatement(fromPi)]);
+      if (fromPi) statements.push(["pi.dev", piStatement(fromPi, measured)]);
       const canonical = entry && typeof entry.canonical_id === "string" ? entry.canonical_id : null;
       return merged(id, statements, entry ? { provider: providerId, model: id } : null, canonical);
     });
+    if (inheritedFrom.length > 0 && input.upstreamSource) {
+      evidence.push({ kind: "listed", url: input.upstreamSource, date: input.upstreamDate, note: `models.dev's records of the models an added entry inherits name, owner and released from: ${inheritedFrom.join(", ")}.` });
+    }
     for (const index of [...applied].sort((a, b) => a - b)) {
       for (const item of rules[index]!.evidence.map(evidenceOf)) {
         if (!evidence.some((known) => JSON.stringify(known) === JSON.stringify(item))) evidence.push(item);
@@ -424,10 +455,11 @@ export function buildListings(input: ListingsInput): { listings: Listing[]; issu
 }
 
 /** What pi states of a model: its name, window, output limit, input kinds and whether it reasons. A 0 is no statement. */
-function piStatement(model: PiListModel): Statement {
+function piStatement(model: PiListModel, noLimits = false): Statement {
   const out: Statement = { name: model.name, input_modalities: kinds(model.input), "reasoning.supported": model.reasoning };
+  if (model.input.length === 0) delete out.input_modalities;
+  if (noLimits) return out;
   if (Number.isSafeInteger(model.context_window) && model.context_window > 0) out.context_window = model.context_window;
   if (Number.isSafeInteger(model.max_output) && model.max_output > 0) out.max_output = model.max_output;
-  if (model.input.length === 0) delete out.input_modalities;
   return out;
 }

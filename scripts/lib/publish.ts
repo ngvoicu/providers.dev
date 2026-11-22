@@ -240,6 +240,7 @@ export function publish(input: PublishOptions): PublishReport {
   const built = buildListings({
     catalog,
     upstreamDate: upstream.meta.fetched_at.slice(0, 10),
+    upstreamSource: upstream.meta.source,
     authored: authoredListings,
     ruledOut: leftOut,
     pi: pi.lists,

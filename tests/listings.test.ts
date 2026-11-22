@@ -1,8 +1,8 @@
 // The listings (src/core/listings.ts; Provimux's model-lists.md, sections 4.1 and 4.4): the whole list from the first
 // source that has one, each field from the first source that states it, every key on every object.
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { stringify } from "yaml";
+import { parse, stringify } from "yaml";
 import { describe, expect, it } from "vitest";
 import { publish } from "../scripts/lib/publish.ts";
 import { sync } from "../scripts/lib/sync.ts";
@@ -15,8 +15,9 @@ import { fetchReturning, fixtureUpstream, ROOT, tempDataDir, writeAuthored } fro
 const evidence = [{ kind: "documented" as const, url: "https://example.com/models", date: "2026-11-20" }];
 
 /** A published entry: the models.dev fields given, and a providers_dev record with what the listings read. */
-function entry(id: string, fields: Record<string, unknown> = {}, own: { origin?: "upstream" | "added"; provenance?: { path: string; op: "set" | "unknown" | "delete" }[] } = {}): PublishedModel {
-  return { id, name: `Name of ${id}`, ...fields, providers_dev: { origin: own.origin ?? "upstream", provenance: own.provenance ?? [] } } as unknown as PublishedModel;
+function entry(id: string, fields: Record<string, unknown> = {}, own: { origin?: "upstream" | "added"; provenance?: { path: string; op: "set" | "unknown" | "delete" }[]; inherited?: { from: string; fields: string[] }; measured?: number } = {}): PublishedModel {
+  const limits = { input_window: { measured_tokens: own.measured ?? null } };
+  return { id, name: `Name of ${id}`, ...fields, providers_dev: { origin: own.origin ?? "upstream", provenance: own.provenance ?? [], inherited: own.inherited ?? null, limits } } as unknown as PublishedModel;
 }
 function catalogOf(providers: Record<string, PublishedModel[]>): Catalog {
   return Object.fromEntries(Object.entries(providers).map(([id, models]) => [id, { id, name: id, models: Object.fromEntries(models.map((model) => [model.id, model])) }])) as unknown as Catalog;
@@ -205,5 +206,65 @@ describe("pi's lists (handed over by the fence)", () => {
       ["q", "q2", ["q-model", "q-spelled"]],
     ]);
     expect(lists[0]!.models[0]).toEqual({ id: "a", name: "Pi a", context_window: 200000, max_output: 0, input: ["text", "image"], reasoning: true });
+  });
+});
+
+describe("the review's findings 2 and 6: the Codex login", () => {
+  // As the catalog has them: two models.dev entries, and the added entries providers.dev measured, which inherit
+  // identity fields from openai/... and have a measured window (921,500) and no limit of their own.
+  const inherits = (id: string) => ({ from: `openai/${id}`, fields: ["name", "description", "family", "type", "release_date", "canonical_id", "cost"] });
+  const astra = entry("gpt-6-astra", { name: "GPT-6 Astra", release_date: "2026-09-04", canonical_id: "openai/gpt-6-astra" }, { origin: "added", inherited: inherits("gpt-6-astra"), measured: 921500 });
+  const luna = entry("gpt-6-luna", { name: "GPT-6 Luna", release_date: "2026-09-22", canonical_id: "openai/gpt-6-luna" }, { origin: "added", inherited: inherits("gpt-6-luna"), measured: 921500 });
+  const sol = entry("gpt-6.1-sol", { canonical_id: "openai/gpt-6.1-sol", limit: { context: 1050000, input: 922000, output: 128000 } }, { measured: 922000 });
+  const catalog = catalogOf({ "openai-codex": [astra, luna, sol] });
+  const piModel = (id: string, window: number) => ({ id, name: `pi ${id}`, context_window: window, max_output: 128000, input: ["text"], reasoning: true });
+  const pi = { date: "2026-11-20", lists: [{ provider: "openai-codex", pi_provider: "openai-codex", models: [piModel("gpt-6-astra", 272000), piModel("gpt-6-luna", 272000), piModel("gpt-6.1-sol", 500000)] }] };
+  const authored = [AuthoredListing.parse({ provider: "openai-codex", list: { models: ["gpt-6.1-sol", "gpt-6-astra", "gpt-6-luna"], reason: "Six models.", evidence } })];
+
+  it("pi gives no limit to a model whose entry has a measured window: no 272,000 beside the measured 921,500 (finding 2)", () => {
+    const { listings } = build({ catalog, pi, authored, upstreamSource: "https://models.dev/experimental/v2.0/api.json?include=openai-codex" });
+    for (const id of ["gpt-6-astra", "gpt-6-luna"]) {
+      const model = modelOf(listings[0]!.models, id);
+      expect(model, id).toMatchObject({ context_window: null, max_input: null, max_output: null, sources: { context_window: null, max_output: null } });
+      // pi still names what is not a limit, where no other source does.
+      expect(model.sources.reasoning.supported).toBe("pi.dev");
+    }
+  });
+
+  it("a lower source's max_input above the chosen window is dropped: 922,000 of models.dev against 400,000 listed (finding 2)", () => {
+    const listed = { page: "https://example.com/listed.json", providers: { "openai-codex": { date: "2026-11-21", client: "provimux", models: [{ id: "gpt-6.1-sol", context_window: 400000 }] } } };
+    const model = build({ catalog, listed }).listings[0]!.models![0]!;
+    expect(model).toMatchObject({ context_window: 400000, max_input: null, max_output: 128000, sources: { context_window: "listed", max_input: null, max_output: "models.dev" } });
+    // An output limit above the window from a lower source goes too; one the window's own source states stays.
+    const big = build({ catalog, listed: { ...listed, providers: { "openai-codex": { ...listed.providers["openai-codex"], models: [{ id: "gpt-6.1-sol", context_window: 100000 }] } } } }).listings[0]!.models![0]!;
+    expect(big).toMatchObject({ context_window: 100000, max_input: null, max_output: null });
+    const own = build({ catalog, listed: { ...listed, providers: { "openai-codex": { ...listed.providers["openai-codex"], models: [{ id: "gpt-6.1-sol", context_window: 100000, max_output: 200000 }] } } } }).listings[0]!.models![0]!;
+    expect(own).toMatchObject({ max_output: 200000, sources: { max_output: "listed" } });
+  });
+
+  it("an added entry's inherited name, owner and released are models.dev's, with models.dev's evidence in the listing (finding 6)", () => {
+    const { listings } = build({ catalog, authored, upstreamSource: "https://models.dev/experimental/v2.0/api.json?include=openai-codex" });
+    const model = modelOf(listings[0]!.models, "gpt-6-astra");
+    expect(model).toMatchObject({ name: "GPT-6 Astra", owner: "openai", released: "2026-09-04", sources: { name: "models.dev", owner: "models.dev", released: "models.dev" } });
+    expect(listings[0]!.evidence.at(-1)).toEqual({
+      kind: "listed",
+      url: "https://models.dev/experimental/v2.0/api.json?include=openai-codex",
+      date: "2026-11-21",
+      note: "models.dev's records of the models an added entry inherits name, owner and released from: gpt-6-astra from openai/gpt-6-astra, gpt-6-luna from openai/gpt-6-luna.",
+    });
+    // A field an added entry does not inherit stays providers.dev's.
+    const measuredOnly = build({ catalog: catalogOf({ s: [entry("own", { name: "Own", limit: { context: 900000 } }, { origin: "added", inherited: { from: "x/own", fields: ["release_date"] } })] }), listed: { page: "https://example.com/l.json", providers: { s: { date: "2026-11-22", client: "provimux", models: [{ id: "own" }] } } } }).listings[0]!.models![0]!;
+    expect(measuredOnly.sources).toMatchObject({ name: "providers.dev", context_window: "providers.dev" });
+  });
+});
+
+describe("the authored Codex listing (finding 5)", () => {
+  it("lists the six models of the catalog's openai-codex: models.dev's two and the four providers.dev measured, each with evidence", () => {
+    const file = AuthoredListing.parse(parse(readFileSync(join(ROOT, "data", "authored", "listings", "openai-codex.yaml"), "utf8")));
+    expect(file.list!.models).toEqual(["gpt-6.1-sol", "gpt-6.1-terra", "gpt-6-astra", "gpt-6-luna", "gpt-6.2-astra", "gpt-6.2-sol"]);
+    expect(file.list!.evidence.map((item) => item.kind)).toEqual(["listed", "measured", "measured", "measured", "measured"]);
+    const upstream = Object.keys((JSON.parse(readFileSync(join(ROOT, "data", "upstream", "providers", "openai-codex.json"), "utf8")) as { models: object }).models).sort();
+    expect(upstream).toEqual(["gpt-6.1-sol", "gpt-6.1-terra"]);
+    expect(readFileSync(join(ROOT, "data", "authored", "listings", "openai-codex.yaml"), "utf8")).toContain("replaces this list");
   });
 });
