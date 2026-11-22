@@ -334,8 +334,10 @@ that is gone), `pi-provider-collides` (the catalog now has the pi provider id it
   before any work.
 - **The copy on the owner's Forgejo server:** it follows GitHub by itself. `.forgejo/workflows/follow-github.yml`
   ("Follow GitHub") runs there every hour, at minute 03 (UTC), and by hand. It fetches `main` from GitHub and
-  fast-forwards the server's `main` to it. It never forces and never merges: if the server has a commit GitHub lacks,
-  the run fails and changes nothing. GitHub reads only `.github/workflows/`, so it never runs this file; Forgejo reads
+  brings the server's `main` to it: a fast-forward when it can be one; when GitHub's `main` is not a descendant of the
+  server's (the server got a commit GitHub lacks), the run first keeps the server's `main` as
+  `refs/nas-backup/main-<UTC time>`, then sets it to GitHub's, in one atomic push, so no commit is lost there. It
+  never merges and only reads GitHub. GitHub reads only `.github/workflows/`, so it never runs this file; Forgejo reads
   only `.forgejo/workflows/` once that folder exists, so the server runs neither `Publish` nor `Check`. Work is pushed
   to GitHub only; nobody has to push it to the server (doing so does no harm). The copy has followed when the two heads are equal
   (`git ls-remote` on both remotes, `refs/heads/main`).
