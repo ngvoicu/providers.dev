@@ -5,9 +5,11 @@ import { buildIndex } from "../src/core/entries.ts";
 import { windowMeasurement, type InputWindowMeasurement } from "../src/core/limits.ts";
 import { priceParts, pricingOf } from "../src/core/policies.ts";
 import { resolve, type ResolveInput } from "../src/core/resolve.ts";
-import { countingKind, safeNumber, type SafeValues, type SourceValue } from "../src/core/safe.ts";
+import { PiBlockSchema, PiStatementsSchema } from "../src/core/contract.ts";
+import type { PiBlock, PiCatalog, PiModel } from "../src/core/pi.ts";
+import { countingKind, layPi, mirror, piStatements, safeNumber, SAFE_QUANTITIES, tiersAgree, withoutPi, type PiLayFacts, type PiStatements, type SafeValues, type SourceValue } from "../src/core/safe.ts";
 import { ext, MeasurementLabels, ObservedFile, type AccessRules, type AuthoredProvider, type Catalog, type Evidence, type OverrideFile, type UpstreamCatalog } from "../src/core/schema.ts";
-import { limitOf, safeBreaks } from "./helpers.ts";
+import { fixturePi, fixtureUpstream, limitOf, resolveWithPi, safeBreaks } from "./helpers.ts";
 
 const REPO = "https://github.com/example/probe";
 const IMPORT_DATE = "2026-11-20";
@@ -432,5 +434,219 @@ describe("9. what always holds, over every entry built here", () => {
     extension.cache.lifetime.short.safe_s = 301;
     extension.limits.input_window.measurements.forEach((item) => (item.chosen = true));
     expect(safeBreaks(catalog)).toEqual(expect.arrayContaining(["lab/m: cache_short 5 agreement", "lab/m: 5.2 short"]));
+  });
+});
+
+// ---- pi, the last source (cases 10 to 12)
+
+/** One model of pi's catalog, every field the import requires. */
+const piModel = (provider: string, id: string, more: Partial<PiModel> = {}): PiModel => ({
+  id, name: id, api: "openai-completions", provider, baseUrl: `https://api.${provider}.example/v1`, reasoning: false, input: ["text"], type: "chat",
+  contextWindow: 0, maxTokens: 0, cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 }, ...more,
+});
+const PI_DAY = "2026-11-20";
+const factsOf = (catalog: Catalog, ref: string): PiLayFacts => {
+  const at = ref.indexOf("/");
+  const extension = ext(catalog[ref.slice(0, at)]!.models[ref.slice(at + 1)]!);
+  return { access: extension.access, chosen: extension.limits.input_window.measurements.filter((item) => item.chosen) };
+};
+/** Every entry of a catalog with a pi block: its ref, block, safe values as resolve() settled them, and the facts. */
+const withBlocks = (catalog: Catalog): { ref: string; block: PiBlock; safe: SafeValues; facts: PiLayFacts }[] =>
+  Object.entries(catalog).flatMap(([provider, item]) => Object.entries(item.models).flatMap(([model, entry]) => {
+    const block = ext(entry).pi;
+    const ref = `${provider}/${model}`;
+    return block ? [{ ref, block, safe: structuredClone(ext(entry).safe), facts: factsOf(catalog, ref) }] : [];
+  }));
+/** pi's statements laid over every entry with a block, and the copies made, as publish() does after the fence. */
+function layAll(catalog: Catalog): void {
+  for (const { ref, block, facts } of withBlocks(catalog)) {
+    const at = ref.indexOf("/");
+    const extension = ext(catalog[ref.slice(0, at)]!.models[ref.slice(at + 1)]!);
+    extension.safe = layPi(extension.safe, piStatements(block, PI_DAY), facts);
+    mirror(extension);
+  }
+}
+
+/** pi's catalog for the fixture of this file: other limits and prices than models.dev's, a lifetime, tiers. */
+function piOfFixture(): PiCatalog {
+  return {
+    lab: {
+      m: piModel("lab", "m", { contextWindow: 1000000, maxTokens: 64000, cost: { input: 3, output: 12, cacheRead: 0, cacheWrite: 3.75, tiers: [{ inputTokensAbove: 199999, input: 6, output: 0, cacheRead: 0.6, cacheWrite: 0 }] }, promptCache: { short: 300, long: 3600 } }),
+      bare: piModel("lab", "bare", { contextWindow: 128000, maxTokens: 8192, cost: { input: 1, output: 2, cacheRead: 0.1, cacheWrite: 0 }, promptCache: { short: 0 } }),
+      zero: piModel("lab", "zero", { contextWindow: 4096, maxTokens: 4096 }),
+    },
+    login: { m: piModel("login", "m", { contextWindow: 500000, maxTokens: 128000, cost: { input: 10, output: 30, cacheRead: 1, cacheWrite: 0 } }) },
+  };
+}
+const fixtureWithPi = (more: { cache?: Run[]; limits?: Limit[]; overrides?: OverrideFile[] } = {}) => {
+  const observed: ObservedFile = { schema: 1, repository: REPO, routes: { "lab-api": "Lab API key", "lab-login": "Lab login", "unk-api": "x" }, clients: {}, cache: more.cache ?? [], limits: more.limits ?? [], known: [] };
+  return resolveWithPi({ upstream: upstream(), additions: [], overrides: more.overrides ?? [], access, routes, labels: LABELS, observed, upstreamDate: IMPORT_DATE }, { catalog: piOfFixture() });
+};
+/** The fixtures of the pi cases: this file's, with measurements and corrections, and the shared fixture of 30 providers. */
+function piFixtures(): Catalog[] {
+  return [
+    fixtureWithPi().catalog,
+    fixtureWithPi({ cache: [run("d", "lab/m", "direct", [[300, 3, 3], [450, 0, 3]])], limits: [limit("lab/m", "direct", { input_accepted: 600000, input_refused: 1100000, output: 60000 }), limit("login/m", "cliproxyapi", { input_accepted: 900000, input_refused: 910000 })] }).catalog,
+    fixtureWithPi({ overrides: [override(["m"], { capabilities: { cache: { explicit: { ttl: null } } }, cost: null, limit: { output: 32000 } })] }).catalog,
+    resolveWithPi({ upstream: fixtureUpstream(), additions: [], overrides: [], access: { default: "api", default_basis: "x", patterns: [], providers: {} }, routes: {}, upstreamDate: IMPORT_DATE }, { catalog: fixturePi() }).catalog,
+  ];
+}
+
+describe("10. layPi and withoutPi", () => {
+  it("fills only what no other source states; pi's item is last; withoutPi undoes it on every entry", () => {
+    const catalogs = piFixtures();
+    let compared = 0;
+    for (const catalog of catalogs) {
+      for (const { ref, block, safe, facts } of withBlocks(catalog)) {
+        const statements = piStatements(block, PI_DAY);
+        const laid = layPi(safe, statements, facts);
+        compared += 1;
+        expect(withoutPi(laid, facts), ref).toEqual(safe);
+        for (const quantity of ["input_window", "max_output", "cache_short", "cache_long"] as const) {
+          const before = safe[quantity];
+          const after = laid[quantity];
+          const pi = statements[quantity];
+          expect(after.sources.slice(0, before.sources.length), `${ref} ${quantity}`).toEqual(before.sources);
+          expect(after.sources.length, `${ref} ${quantity}`).toBe(before.sources.length + (pi === null ? 0 : 1));
+          if (pi !== null) expect(after.sources.at(-1), `${ref} ${quantity}`).toMatchObject({ source: "pi.dev", value: pi, date: PI_DAY, scope: quantity === "input_window" ? "window" : null });
+          // A value another source states is the same before and after; a value no source states becomes pi's.
+          if (before.sources.length > 0) expect({ ...after, sources: before.sources, agreement: before.agreement }, `${ref} ${quantity}`).toEqual(before);
+          else expect([after.value, after.source], `${ref} ${quantity}`).toEqual(pi === null ? [null, null] : [pi, "pi.dev"]);
+          // Agreement moves one way only.
+          const moves: Record<string, string[]> = { none: ["none", "single"], single: ["single", "agree", "differ"], agree: ["agree", "differ"], differ: ["differ"] };
+          expect(moves[before.agreement], `${ref} ${quantity}`).toContain(after.agreement);
+        }
+        const piPrice = laid.price.sources.find((item) => item.source === "pi.dev");
+        if (facts.access === "subscription") expect(piPrice, ref).toBeUndefined();
+        if (safe.price.sources.length > 0) expect([laid.price.source, laid.price.date], ref).toEqual([safe.price.source, safe.price.date]);
+        expect(laid.differing).toEqual(SAFE_QUANTITIES.filter((quantity) => laid[quantity].agreement === "differ"));
+      }
+    }
+    expect(compared).toBeGreaterThan(100);
+  });
+
+  it("a block without statements changes nothing", () => {
+    const nothing: PiStatements = { date: PI_DAY, input_window: null, max_output: null, cache_short: null, cache_long: null, price: null };
+    for (const { safe, facts } of withBlocks(piFixtures()[1]!)) expect(layPi(safe, nothing, facts)).toEqual(safe);
+  });
+
+  it("on this file's fixture: pi fills the bare entry, stands beside every other, and states no price on the login", () => {
+    const { catalog } = fixtureWithPi();
+    layAll(catalog);
+    const safe = (ref: string) => ext(catalog[ref.split("/")[0]!]!.models[ref.split("/")[1]!]!).safe;
+    expect(safe("lab/bare").input_window).toMatchObject({ value: 128000, source: "pi.dev", date: PI_DAY, scope: "window", agreement: "single", window_tokens: null });
+    expect(safe("lab/bare").cache_short).toMatchObject({ value: 0, source: "pi.dev" });
+    expect(safe("lab/bare").price).toMatchObject({ source: "pi.dev", agreement: "single", sources: [{ source: "pi.dev", input: 1, output: 2, cache_read: 0.1, cache_write: null, tiers: [] }] });
+    // pricing is pi's price whole, read back by priceParts; a summary's fields follow.
+    const bare = ext(catalog.lab!.models.bare!);
+    expect(bare.pricing).toMatchObject({ coverage: "partial", billing: "per_use", evidence: [{ kind: "listed", url: "https://pi.dev/api/models", date: PI_DAY }] });
+    expect(priceParts(bare.pricing)).toMatchObject({ input: 1, output: 2, cache_read: 0.1, cache_write: null, tiers: [] });
+    expect(bare.limits.input_window).toMatchObject({ tokens: 128000, basis: "documented", source: "pi.dev", bound: "limit", scope: "window", date: PI_DAY });
+    expect(bare.cache.lifetime.short).toMatchObject({ safe_s: 0, basis: "documented", source: "pi.dev" });
+    const summary = buildIndex(catalog, "v", "2026-11-20T00:00:00Z", "2026-11-20T00:00:00Z").entries.find((entry) => entry.ref === "lab/bare")!;
+    expect([summary.max_output, summary.price_in, summary.price_out, summary.input_window.tokens]).toEqual([8192, 1, 2, 128000]);
+    // The zero model: pi's 4,096 where models.dev's limits of 0 state nothing.
+    expect([safe("lab/zero").input_window.value, safe("lab/zero").max_output.value, safe("lab/zero").input_window.source]).toEqual([4096, 4096, "pi.dev"]);
+    // lab/m: every value models.dev's; pi's window beside the cap agrees, its output agrees, its price differs on output and tiers.
+    expect(safe("lab/m").input_window).toMatchObject({ value: 900000, source: "models.dev", agreement: "agree" });
+    expect(safe("lab/m").price).toMatchObject({ source: "models.dev", agreement: "differ", differs: ["output", "tiers"] });
+    expect(safe("lab/m").differing).toEqual(["price"]);
+    // The login: pi's window and output fill what nothing else states; no price of pi's.
+    expect(safe("login/m").input_window).toMatchObject({ value: 500000, source: "pi.dev" });
+    expect(safe("login/m").price.sources.map((item) => item.source)).toEqual(["models.dev"]);
+    expect(built.length).toBeGreaterThan(0);
+    expect(safeBreaks(catalog)).toEqual([]);
+  });
+
+  it("does not fill a withheld value, and a withheld value warns beside pi's", () => {
+    const { catalog } = fixtureWithPi({ overrides: [override(["m"], { capabilities: { cache: { explicit: { ttl: null } } } })] });
+    layAll(catalog);
+    expect(ext(catalog.lab!.models.m!).safe.cache_short).toMatchObject({ value: null, source: "providers.dev", agreement: "differ" });
+    expect(ext(catalog.lab!.models.m!).safe.cache_short.sources.map((item) => item.source)).toEqual(["providers.dev", "models.dev", "pi.dev"]);
+    expect(ext(catalog.lab!.models.m!).cache.lifetime.short).toMatchObject({ safe_s: null, basis: "none" });
+  });
+
+  it("keeps the sentences of 5.1 on every fixture with pi laid", () => {
+    for (const catalog of piFixtures()) {
+      layAll(catalog);
+      expect(safeBreaks(catalog)).toEqual([]);
+    }
+  });
+});
+
+describe("11. piStatements is total", () => {
+  /** Variants of a block the contract accepts: zeros, nulls where it takes them, odd tiers, numbers of the values items. */
+  const variants = (block: PiBlock): PiBlock[] => {
+    const out: PiBlock[] = [];
+    const change = (edit: (copy: PiBlock) => void): void => {
+      const copy = structuredClone(block);
+      edit(copy);
+      out.push(copy);
+    };
+    change((b) => { b.context_window = 0; b.max_tokens = 0; });
+    change((b) => { b.cost = { input: 0, output: 0, cache_read: 0, cache_write: 0, tiers: [] }; });
+    change((b) => { b.cost.input = 0; b.cost.output = 0.000001; });
+    change((b) => { b.cost.tiers = [{ input_tokens_above: 0, input: 0, output: null, cache_read: null, cache_write: 0 }, { input_tokens_above: 10, input: 1.5, output: 2, cache_read: 0, cache_write: 3 }]; });
+    change((b) => { b.prompt_cache = null; });
+    change((b) => { b.prompt_cache = { short_s: 0, long_s: null }; });
+    change((b) => { b.values = b.values.map((item) => ({ ...item, pi: 1.5, standing: "differs" })); });
+    change((b) => { b.values = b.values.map((item) => ({ ...item, pi: null, standing: "silent" })); });
+    change((b) => { b.values = b.values.map((item) => ({ ...item, field: "context_window" })); });
+    change((b) => { b.compat = null; b.thinking_level_map = null; b.differences = []; });
+    return out;
+  };
+
+  it("returns, and fits its schema, for every block of the fixtures and every variant the contract accepts", () => {
+    let blocks = 0;
+    for (const catalog of piFixtures()) {
+      for (const { block } of withBlocks(catalog)) {
+        for (const candidate of [block, ...variants(block)]) {
+          expect(PiBlockSchema.safeParse(candidate).success).toBe(true);
+          for (const date of [PI_DAY, null]) expect(PiStatementsSchema.safeParse(piStatements(candidate, date)).success, block.ref).toBe(true);
+          blocks += 1;
+        }
+      }
+    }
+    expect(blocks).toBeGreaterThan(1000);
+  });
+
+  it("reads pi's numbers: 0 states nothing for a limit or a price, and is a lifetime", () => {
+    const { catalog } = fixtureWithPi();
+    const statements = piStatements(ext(catalog.lab!.models.m!).pi!, PI_DAY);
+    expect(statements).toEqual({ date: PI_DAY, input_window: 1000000, max_output: 64000, cache_short: 300, cache_long: 3600, price: { input: 3, output: 12, cache_read: null, cache_write: 3.75, tiers: [{ input_tokens_above: 199999, input: 6, output: null, cache_read: 0.6, cache_write: null }] } });
+    expect(piStatements(ext(catalog.lab!.models.zero!).pi!, PI_DAY)).toMatchObject({ input_window: 4096, price: null, cache_short: null });
+  });
+});
+
+describe("12. the two readings agree", () => {
+  it("the reference finds a contradiction between pi and the entry exactly where pi.values says differs, for max_tokens and the five price parts", () => {
+    let comparisons = 0;
+    const mismatches: string[] = [];
+    for (const catalog of piFixtures()) {
+      for (const { ref, block, safe, facts } of withBlocks(catalog)) {
+        const at = ref.indexOf("/");
+        const extension = ext(catalog[ref.slice(0, at)]!.models[ref.slice(at + 1)]!);
+        const statements = piStatements(block, PI_DAY);
+        const standing = (field: string) => block.values.find((item) => item.field === field)!.standing;
+        // The entry's own statement of the output: the published limit, providers.dev's or models.dev's.
+        const output = safe.max_output.sources.find((item) => item.source === "providers.dev" || item.source === "models.dev");
+        if (output && !output.withheld && statements.max_output !== null) {
+          comparisons += 1;
+          if ((output.value !== statements.max_output) !== (standing("max_tokens") === "differs")) mismatches.push(`${ref} max_tokens`);
+        }
+        const parts = priceParts(extension.pricing);
+        if (facts.access === "subscription" || parts === null || statements.price === null) continue;
+        for (const [part, field] of [["input", "cost.input"], ["output", "cost.output"], ["cache_read", "cost.cache_read"], ["cache_write", "cost.cache_write"]] as const) {
+          comparisons += 1;
+          const pi = statements.price[part];
+          const own = parts[part];
+          if ((pi !== null && own !== null && pi !== own) !== (standing(field) === "differs")) mismatches.push(`${ref} ${field}`);
+        }
+        comparisons += 1;
+        if ((parts.tiers !== null && !tiersAgree(statements.price.tiers, parts.tiers)) !== (standing("cost.tiers") === "differs")) mismatches.push(`${ref} cost.tiers`);
+      }
+    }
+    expect(mismatches).toEqual([]);
+    expect(comparisons).toBeGreaterThan(200);
   });
 });

@@ -1,5 +1,10 @@
 # One cache record per entry: every lifetime, and the safe value
 
+> **Replaced in part (2026-11-22) by `design/sources-side-by-side.md`.** Section 4.1 (the rule and "contradicted"),
+> decisions 11 and 12, and section 9 (what a page prints) are replaced by its sections 2 and 8; decision 2 and the last
+> sentence of 3.3 ("the lowest across clients") by its 2.3: the lowest within the kind of client that counts. Sections
+> 2, 3 and 5 stay otherwise: the record, the strict value of one evaluation, the documented items.
+
 Design, 2026-11-15, final after the owner's answers of that day (section 12). Built: tasks 1 to 6 of section 11 are
 in `main` up to `a4eef56`, and `documented_status` (decision 32) after the final review T-26. This file says what
 is built and why; sections 6 and 11 also keep the order in which it was built. `AGENTS.md` and `README.md` stay the

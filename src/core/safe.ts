@@ -5,6 +5,8 @@
 // Pure: no file, no network, no clock. Imports nothing of pi's.
 import { evaluationLifetime, byCharacters, type CacheEvaluation, type RetentionProfile } from "./cache.ts";
 import { windowContradicts, type DocumentedField, type InputWindowMeasurement } from "./limits.ts";
+import { pricingOfPi } from "./policies.ts";
+import type { PiBlock } from "./pi.ts";
 import type { MeasuredLimit, ModelExtension } from "./schema.ts";
 
 export const VALUE_SOURCES = ["measured", "providers.dev", "models.dev", "pi.dev"] as const;
@@ -419,9 +421,19 @@ function safePrice(facts: SafeFacts): SafePrice {
   const items: (PriceStatement & { other: unknown[] | null })[] = [];
   if (!sameReading(imported?.rules ?? null, published?.rules ?? null)) items.push(of("providers.dev", published?.parts ?? null, facts.own.price));
   if (imported) items.push(of("models.dev", imported.parts, { date: facts.imported_date, evidence_url: null }));
-  const differs = new Set<PricePart>();
-  for (let i = 0; i < items.length; i += 1) {
-    for (let j = i + 1; j < items.length; j += 1) for (const part of priceClash(items[i]!, items[j]!)) differs.add(part);
+  return settlePrice(items, false);
+}
+
+/**
+ * The safe price of its statements, in the order of the sources: whose price it is, and which parts contradict.
+ * `other` is compared where the items carry it (providers.dev and models.dev, when `safeValues` reads them); where
+ * they do not (a published statement), `keepOther` says whether the two catalogs contradicted on it.
+ */
+function settlePrice(items: (PriceStatement & { other?: unknown[] | null })[], keepOther: boolean): SafePrice {
+  const differs = new Set<PricePart>(keepOther ? ["other"] : []);
+  const withOther = items.map((item) => ({ ...item, other: item.other ?? null }));
+  for (let i = 0; i < withOther.length; i += 1) {
+    for (let j = i + 1; j < withOther.length; j += 1) for (const part of priceClash(withOther[i]!, withOther[j]!)) differs.add(part);
   }
   const first = items[0];
   return {
@@ -453,6 +465,113 @@ export function safeValues(facts: SafeFacts): SafeValues {
   return { ...safe, differing: SAFE_QUANTITIES.filter((quantity) => safe[quantity].agreement === "differ") };
 }
 
+// ---- pi, the last source (section 4): its statements, read after the fence, and laid over the settled values
+
+/** What pi states of the five quantities, read from a checked block (2.3). Plain data; it crosses the fence. */
+export interface PiStatements {
+  /** The day of pi's snapshot. */
+  date: string | null;
+  input_window: number | null;
+  max_output: number | null;
+  cache_short: number | null;
+  cache_long: number | null;
+  /** Null = pi states no price (neither input nor output above 0). A part of 0 is null. */
+  price: { input: number | null; output: number | null; cache_read: number | null; cache_write: number | null; tiers: PriceTier[] } | null;
+}
+
+const above0 = (value: unknown): number | null => (typeof value === "number" && Number.isFinite(value) && value > 0 ? value : null);
+
+/**
+ * What pi states, from a checked block (2.3): pi's numbers, never its standing. The limits and the lifetimes are the
+ * block's own fields (`context_window`, `max_tokens`, `prompt_cache`), the numbers its `values` items carry, read
+ * where the contract makes them whole numbers. A limit or a price of 0 states nothing, a lifetime of 0 does; pi states
+ * a price where its input or its output price is above 0, with its tiers (a price of 0 in a tier states nothing
+ * either). Total: any block the contract accepts gives a result. Whether pi's price counts on the entry (never on a
+ * subscription) is `layPi`'s to say.
+ */
+export function piStatements(block: PiBlock, date: string | null): PiStatements {
+  const lifetime = (value: number | null | undefined): number | null => (typeof value === "number" && Number.isInteger(value) && value >= 0 ? value : null);
+  const whole = (value: number): number | null => (Number.isInteger(value) && value > 0 ? value : null);
+  const input = above0(block.cost.input);
+  const output = above0(block.cost.output);
+  return {
+    date,
+    input_window: whole(block.context_window),
+    max_output: whole(block.max_tokens),
+    cache_short: lifetime(block.prompt_cache?.short_s),
+    cache_long: lifetime(block.prompt_cache?.long_s),
+    price: input === null && output === null ? null : {
+      input,
+      output,
+      cache_read: above0(block.cost.cache_read),
+      cache_write: above0(block.cost.cache_write),
+      tiers: [...block.cost.tiers]
+        .sort((a, b) => a.input_tokens_above - b.input_tokens_above)
+        .map((tier) => ({ input_tokens_above: tier.input_tokens_above, input: above0(tier.input), output: above0(tier.output), cache_read: above0(tier.cache_read), cache_write: above0(tier.cache_write) })),
+    },
+  };
+}
+
+/** What `layPi` and `withoutPi` read of the entry besides `safe`. */
+export interface PiLayFacts {
+  /** providers_dev.access of the entry: pi's price counts on no subscription entry. */
+  access: EntryAccess;
+  /** The items of limits.input_window.measurements that are `chosen`: the test of agreement of a measured input window reads them. */
+  chosen: readonly InputWindowMeasurement[];
+}
+
+/**
+ * The safe values with pi's item added or taken off. Where pi's item is, or was, the only statement, the quantity is
+ * settled by the one rule (pi gives the value, or nothing does). Everywhere else the value, its source and its date
+ * are kept as they are, and only `sources` and the agreement change: pi's statement never touches a value another
+ * source states.
+ */
+function resettle(safe: SafeValues, numbers: Record<NumberQuantity, SourceValue[]>, price: PriceStatement[], facts: PiLayFacts): SafeValues {
+  const again = (quantity: NumberQuantity): SafeValue => {
+    const old = safe[quantity];
+    const settled = safeNumber(quantity, numbers[quantity], facts.chosen);
+    const others = numbers[quantity].filter((item) => item.source !== "pi.dev");
+    if (old.source === "pi.dev" || others.length === 0) return settled;
+    return { ...old, sources: settled.sources, agreement: settled.agreement };
+  };
+  const oldPrice = safe.price;
+  const settledPrice = settlePrice(price, oldPrice.differs.includes("other"));
+  const out = {
+    input_window: again("input_window"),
+    max_output: again("max_output"),
+    cache_short: again("cache_short"),
+    cache_long: again("cache_long"),
+    price: oldPrice.source === "pi.dev" || price.every((item) => item.source === "pi.dev") ? settledPrice : { ...oldPrice, agreement: settledPrice.agreement, differs: settledPrice.differs, sources: settledPrice.sources },
+  };
+  return { ...out, differing: SAFE_QUANTITIES.filter((quantity) => out[quantity].agreement === "differ") };
+}
+
+const NUMBER_QUANTITIES = ["input_window", "max_output", "cache_short", "cache_long"] as const;
+
+/**
+ * pi's statements laid over the safe values of an entry (section 4): pi's item appended to `sources`, last, and each
+ * quantity settled again by the one rule. So the value changes only where no other source states anything, and
+ * agreement only moves towards `differ`. pi states no price on a subscription entry. Pure; returns a new object.
+ */
+export function layPi(safe: SafeValues, statements: PiStatements, facts: PiLayFacts): SafeValues {
+  const numbers = Object.fromEntries(NUMBER_QUANTITIES.map((quantity) => {
+    const own = safe[quantity].sources.filter((item) => item.source !== "pi.dev");
+    const pi = statements[quantity];
+    return [quantity, pi === null ? own : [...own, statement("pi.dev", { value: pi, scope: quantity === "input_window" ? "window" : null, date: statements.date })]];
+  })) as Record<NumberQuantity, SourceValue[]>;
+  const price = safe.price.sources.filter((item) => item.source !== "pi.dev");
+  if (statements.price !== null && facts.access !== "subscription") {
+    price.push({ source: "pi.dev", withheld: false, ...statements.price, tiers: statements.price.tiers.map((tier) => ({ ...tier })), date: statements.date, evidence_url: null });
+  }
+  return resettle(safe, numbers, price, facts);
+}
+
+/** The inverse of `layPi`: pi's items taken off, and each quantity settled again. `withoutPi(layPi(x, s, f), f)` is x. */
+export function withoutPi(safe: SafeValues, facts: PiLayFacts): SafeValues {
+  const numbers = Object.fromEntries(NUMBER_QUANTITIES.map((quantity) => [quantity, safe[quantity].sources.filter((item) => item.source !== "pi.dev")])) as Record<NumberQuantity, SourceValue[]>;
+  return resettle(safe, numbers, safe.price.sources.filter((item) => item.source !== "pi.dev"), facts);
+}
+
 // ---- the copies (5.2)
 
 const basisOf = (safe: SafeValue): "measured" | "documented" | "none" => (safe.value === null ? "none" : safe.source === "measured" ? "measured" : "documented");
@@ -460,8 +579,9 @@ const recordSource = (safe: SafeValue): "providers.dev" | "models.dev" | "pi.dev
   safe.value === null || safe.source === null ? null : safe.source === "measured" ? "providers.dev" : safe.source;
 
 /**
- * Copy the safe values of an entry into the records that carried them (5.2): the input window and the two lifetime
- * profiles. Nothing else writes these keys. Returns the same object.
+ * Copy the safe values of an entry into the records that carried them (5.2): the input window, the two lifetime
+ * profiles, and `pricing` where the price is pi's (`pricingOfPi`); a price of providers.dev or models.dev is already
+ * `pricing`. Nothing else writes these keys. Returns the same object.
  */
 export function mirror(extension: ModelExtension): ModelExtension {
   const { safe } = extension;
@@ -481,6 +601,8 @@ export function mirror(extension: ModelExtension): ModelExtension {
     record.source = recordSource(value);
     record.date = value.value === null ? null : value.date;
   }
+  const pi = safe.price.source === "pi.dev" ? safe.price.sources[0] : undefined;
+  if (pi) extension.pricing = pricingOfPi(pi, extension.access);
   return extension;
 }
 

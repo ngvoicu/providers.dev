@@ -105,7 +105,7 @@ const text = (value: unknown): string | null => (typeof value === "string" && va
 const count = (value: unknown): number | null => (typeof value === "number" && Number.isFinite(value) ? value : null);
 
 /** The base price of one side of `cost.text`. A price in another unit (per character) is not a price per token. */
-function basePrice(pricing: Pricing, side: "input" | "output"): number | null {
+export function basePrice(pricing: Pricing, side: "input" | "output"): number | null {
   const rules = pricing.rules?.filter((rule) => rule.meter === `text.${side}` && rule.when === null && rule.operation === "set" && rule.currency === "USD" && rule.unit?.name === "token" && rule.unit.quantity === 1000000) ?? [];
   return (rules.length === 1 ? rules[0]!.amount : pricing.rule_order === "listed" ? rules.at(-1)?.amount : undefined) ?? null;
 }

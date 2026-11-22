@@ -1,5 +1,5 @@
 // The whole-dataset comparison (design/pi-source.md, section j), on two copies of the fixture's published dataset.
-import { cpSync, readFileSync, writeFileSync } from "node:fs";
+import { cpSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { beforeAll, describe, expect, it } from "vitest";
 import { comparePublished } from "../scripts/lib/compare-published.ts";
@@ -7,9 +7,11 @@ import { publish } from "../scripts/lib/publish.ts";
 import { sync } from "../scripts/lib/sync.ts";
 import type { Index } from "../src/core/entries.ts";
 import type { Catalog, JsonObject, Meta } from "../src/core/schema.ts";
-import { fetchReturning, fixtureUpstream, ROOT, tempDataDir, writeAuthored } from "./helpers.ts";
+import { fetchReturning, fixturePi, fixtureUpstream, ROOT, tempDataDir, writeAuthored, writePiSnapshot } from "./helpers.ts";
 
 let original: string;
+/** The same data with pi's catalog: blocks, and pi's statements laid over the safe values. */
+let withPi: string;
 
 beforeAll(async () => {
   const dataDir = tempDataDir();
@@ -17,6 +19,16 @@ beforeAll(async () => {
   writeAuthored(dataDir);
   expect(publish({ dataDir, rootDir: ROOT }).errors).toEqual([]);
   original = join(dataDir, "published");
+  const piDir = tempDataDir();
+  for (const part of ["upstream", "authored"]) cpSync(join(dataDir, part), join(piDir, part), { recursive: true });
+  mkdirSync(join(piDir, "sources"), { recursive: true });
+  cpSync(join(dataDir, "sync-status.json"), join(piDir, "sync-status.json"));
+  const pi = fixturePi();
+  // A model only pi lists a window and an output for: provider-03/model-7 has no limit of its own.
+  pi["provider-03"]!["model-7"]!.contextWindow = 777000;
+  writePiSnapshot(piDir, pi);
+  expect(publish({ dataDir: piDir, rootDir: ROOT }).errors).toEqual([]);
+  withPi = join(piDir, "published");
 });
 
 /** A copy of the fixture's published dataset, with `change` applied to its files. */
@@ -42,7 +54,31 @@ describe("compare:published", () => {
   it("passes two equal datasets, and counts the entries with the key and with a block", () => {
     const result = comparePublished(original, copy());
     expect(result.ok).toBe(true);
-    expect(result.lines).toEqual(["compared: 31 providers, 601 entries", "entries with the key pi: 601 -> 601", "entries with a pi block: 0 -> 0", "differing objects: 0"]);
+    expect(result.lines).toEqual(["compared: 31 providers, 601 entries", "entries with the key pi: 601 -> 601", "entries with a pi block: 0 -> 0", "items of safe.*.sources from pi.dev: 0 -> 0", "safe values from pi.dev: 0 -> 0", "differing objects: 0"]);
+  });
+
+  it("passes the build with pi's data against the build without: pi's items and the values only pi states are taken off with withoutPi and the copies", () => {
+    const result = comparePublished(original, withPi);
+    expect(result.differences).toEqual([]);
+    const counted = (prefix: string) => Number(result.lines.find((line) => line.startsWith(prefix))!.split(" -> ")[1]);
+    expect(counted("entries with a pi block")).toBeGreaterThan(0);
+    expect(counted("items of safe.*.sources from pi.dev")).toBeGreaterThan(0);
+    expect(counted("safe values from pi.dev")).toBeGreaterThanOrEqual(2);
+    const catalog = JSON.parse(readFileSync(join(withPi, "site", "api.json"), "utf8")) as Catalog;
+    expect(extension(catalog, "provider-03", "model-7").safe).toMatchObject({ input_window: { value: 777000, source: "pi.dev" }, max_output: { value: 8000, source: "pi.dev" } });
+    expect((extension(catalog, "provider-03", "model-7").limits as JsonObject).input_window).toMatchObject({ tokens: 777000, basis: "documented", source: "pi.dev" });
+  });
+
+  it("fails where pi's data changed a value another source states", () => {
+    const changed = join(tempDataDir(), "published");
+    cpSync(withPi, changed, { recursive: true });
+    const path = join(changed, "site", "api.json");
+    const catalog = JSON.parse(readFileSync(path, "utf8")) as Catalog;
+    const safe = extension(catalog, "provider-02", "lab/model-4").safe as { input_window: { value: number; sources: { source: string; value: number }[] } };
+    safe.input_window.value = 1;
+    writeFileSync(path, JSON.stringify(catalog));
+    expect(comparePublished(withPi, changed).ok).toBe(false);
+    expect(comparePublished(original, changed).differences.some((line) => line.startsWith("entry provider-02/lab/model-4"))).toBe(true);
   });
 
   it("passes a difference under providers_dev.pi, the summary's pi, meta.pi, the pi licence keys and the pi- issues alone", () => {

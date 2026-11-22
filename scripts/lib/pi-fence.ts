@@ -4,8 +4,9 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { z } from "zod";
-import { MetaSchema, PiBlockSchema } from "../../src/core/contract.ts";
+import { MetaSchema, PiBlockSchema, PiStatementsSchema } from "../../src/core/contract.ts";
 import { piPart, type PiBlock, type PiEntryFacts, type PiSummary } from "../../src/core/pi.ts";
+import { piStatements, type PiStatements } from "../../src/core/safe.ts";
 import type { CatalogBefore } from "../../src/core/resolve.ts";
 import { ext, noPiMeta, PiSyncRecord, type Catalog, type Issue, type Meta, type PiAliases } from "../../src/core/schema.ts";
 import { fenced, fencedAsync, reasonOf } from "./fenced.ts";
@@ -23,8 +24,8 @@ export interface PiOfBuildInput {
 }
 
 export interface PiOfBuild {
-  /** The entry's ref -> its block and the block in short. Empty = no pi data. */
-  entries: Map<string, { block: PiBlock; summary: PiSummary }>;
+  /** The entry's ref -> its block, the block in short, and what pi states of the entry's safe values. Empty = no pi data. */
+  entries: Map<string, { block: PiBlock; summary: PiSummary; statements: PiStatements }>;
   /** `meta.pi`, whole. */
   meta: Meta["pi"];
   /** The alias issues of a dataset with pi data, then the fence's own: pi-no-blocks, and one pi-snapshot-unreadable per part turned away. */
@@ -54,6 +55,8 @@ const PiData = z.strictObject({
 });
 type PiData = z.infer<typeof PiData>;
 
+const PiStatementsOfBlocks = z.array(z.strictObject({ ref: z.string(), statements: PiStatementsSchema }));
+
 /** Everything the build publishes of pi. Never throws. */
 export function piOfBuild(input: PiOfBuildInput): PiOfBuild {
   const issues: Issue[] = [];
@@ -62,6 +65,7 @@ export function piOfBuild(input: PiOfBuildInput): PiOfBuild {
   // The data. Without the folder data/pi/ no pi code is called: the one state without pi data and without a warning
   // does not rest on pi's code.
   let data: PiData | null = null;
+  let statements = new Map<string, PiStatements>();
   if (existsSync(join(input.dataDir, "pi"))) {
     const fencedData = fenced((): PiData => {
       const stored = storedPi(input.dataDir);
@@ -109,7 +113,17 @@ export function piOfBuild(input: PiOfBuildInput): PiOfBuild {
       };
     }, PiData);
     // The fence's own four checks.
-    const why = fencedData.ok ? misplaced(fencedData.value, input.catalog) : fencedData.why;
+    let why = fencedData.ok ? misplaced(fencedData.value, input.catalog) : fencedData.why;
+    // Then what pi states of each entry's safe values, read from the checked blocks by the reference's own code,
+    // through the guard (design/sources-side-by-side.md, section 4): a throw or a misfit turns the part away, whole.
+    if (why === null && fencedData.ok) {
+      const blocks = fencedData.value.blocks;
+      const day = fencedData.value.snapshot.fetched_at.slice(0, 10);
+      const read = fenced(() => blocks.map(({ ref, block }) => ({ ref, statements: piStatements(block, /^\d{4}-\d{2}-\d{2}$/.test(day) ? day : null) })), PiStatementsOfBlocks);
+      if (!read.ok) why = read.why;
+      else if (read.value.length !== blocks.length || read.value.some((item, index) => item.ref !== blocks[index]!.ref)) why = reasonOf(new Error("pi's statements do not name the blocks they are read from"));
+      else statements = new Map(read.value.map((item) => [item.ref, item.statements]));
+    }
     if (why === null && fencedData.ok) {
       data = fencedData.value;
       // The fence's own count of the blocks of the part it has taken: a part with none is published whole, and said.
@@ -139,8 +153,8 @@ export function piOfBuild(input: PiOfBuildInput): PiOfBuild {
 
   const state: PiOfBuild["state"] = turnedAway ? "turned_away" : !data ? "none" : data.blocks.length === 0 ? "published_without_blocks" : "published";
   if (!data) return { entries: new Map(), meta: { ...noPiMeta(), sync }, issues, report: null, state };
-  const entries = new Map<string, { block: PiBlock; summary: PiSummary }>();
-  for (const { ref, block } of data.blocks) entries.set(ref, { block, summary: { ref: block.ref, api: block.api, match: block.match, difference_count: block.differences.length } });
+  const entries = new Map<string, { block: PiBlock; summary: PiSummary; statements: PiStatements }>();
+  for (const { ref, block } of data.blocks) entries.set(ref, { block, summary: { ref: block.ref, api: block.api, match: block.match, difference_count: block.differences.length }, statements: statements.get(ref)! });
   return {
     entries,
     meta: { source: noPiMeta().source, snapshot: data.snapshot, sync, counts: data.counts },

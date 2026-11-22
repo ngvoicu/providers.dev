@@ -1,5 +1,11 @@
 # pi's model catalog as a second imported source
 
+> **Changed in part (2026-11-22) by `design/sources-side-by-side.md`, section 4.** In section k, one sentence of the
+> promise changes: "the models.dev part of the dataset is the same with or without pi's data" becomes "no value that a
+> measurement, providers.dev or models.dev states is different with or without pi's data". `PiOfBuild.entries`
+> carries `statements`, read from the checked blocks by `piStatements` through the guard. A build without pi's data
+> publishes the safe values only pi states as unknown, which the README's warning "pi data missing from the build" says.
+
 Design for the spec `pi-catalog-source` (items PIC-01 and PIC-13). Written 2026-11-20 against `main` at `6b95938`
 (models.dev snapshot `e06a33e`, 329 providers, 10,698 models) and the pi feed as served that day
 (ETag `"2197505f0de684a3eec3fcf68f253e97"`, revision `sha256-dd93eb27…`, 43 provider keys, 1,698 models).

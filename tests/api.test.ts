@@ -593,7 +593,7 @@ describe("pi's catalog in the API (design/pi-source.md, section d)", () => {
     expect(section.title).toBe("pi's catalog");
     expect(section.paragraphs).toHaveLength(6);
     const text = section.paragraphs.join(" ");
-    for (const words of ["Since 1.2.0", "models.dev stays the reference", "not an entry", "match", "alias", "not false", "0 stands for no charge and for no price recorded alike", "Prices are compared exactly, with no tolerance", "cost.tiers", "/meta.pi", "unmatched_models", "Since 1.3.0", "subscription", "agrees, differs, only, not_compared or silent", "in no field of the entry", "providers_dev.limits.input_window"]) expect(text).toContain(words);
+    for (const words of ["Since 1.2.0", "models.dev stays the reference", "not an entry", "match", "alias", "not false", "0 stands for no charge and for no price recorded alike", "Prices are compared exactly, with no tolerance", "cost.tiers", "/meta.pi", "unmatched_models", "Since 1.3.0", "subscription", "agrees, differs, only, not_compared or silent", "in no field of the entry", "providers_dev.safe", "Since 1.4.0 pi is also the last source of the safe values"]) expect(text).toContain(words);
   });
 
   it("gives every pi block of /entries/{provider}/{model} values with nine items (1.3.0)", async () => {

@@ -15,7 +15,7 @@ import type { ProviderSummary, Summary } from "./entries.ts";
 import type { InputWindow, InputWindowMeasurement } from "./limits.ts";
 import type { CanonicalModel, CanonicalModelDetail, Correction, Documentation, Facets, ModelInputWindowEnd } from "./resources.ts";
 import type { PiBlock, PiCost, PiCostTier, PiDifference, PiSummary, PiValue } from "./pi.ts";
-import type { PriceStatement, PriceTier, SafePrice, SafeValue, SafeValues, SourceValue } from "./safe.ts";
+import type { PiStatements, PriceStatement, PriceTier, SafePrice, SafeValue, SafeValues, SourceValue } from "./safe.ts";
 import { Access, type Exclusion, type MeasuredLimit, type ModelExtension, type ProviderExtension, type Provenance, type PublishedEvidence } from "./schema.ts";
 
 const date = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
@@ -295,6 +295,23 @@ export const SafeValuesSchema = z
   })
   .describe("The safe value of each quantity, its source, whether the sources agree, and what each source states. One rule for all: the first source in the order measured, providers.dev, models.dev, pi.dev that states a value gives it. Worked out once when the data is built; the records beside it copy it. Since 1.4.0.") satisfies z.ZodType<SafeValues>;
 
+/** What pi states of one entry (`piStatements`), as plain data that crosses the fence (scripts/lib/pi-fence.ts). Never published: not a component. */
+export const PiStatementsSchema = z.strictObject({
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable(),
+  input_window: z.int().positive().nullable(),
+  max_output: z.int().positive().nullable(),
+  cache_short: z.int().min(0).nullable(),
+  cache_long: z.int().min(0).nullable(),
+  price: z
+    .strictObject({
+      input: z.number().positive().nullable(),
+      output: z.number().positive().nullable(),
+      cache_read: z.number().positive().nullable(),
+      cache_write: z.number().positive().nullable(),
+      tiers: z.array(PriceTierSchema),
+    })
+    .nullable(),
+}) satisfies z.ZodType<PiStatements>;
 export const ProvenanceSchema = z
   .strictObject({
     path: z.string().describe("The field, for example limit.context."),

@@ -2,7 +2,7 @@
 import { byCharacters, durationSeconds, type CacheRetention } from "./cache.ts";
 import { isObject, type Json, type JsonObject } from "./merge.ts";
 import type { Condition, PolicyEvidence, Pricing, PricingInput, PricingRule, PricingRuleInput, RequestControl, RequestControls, ResultingRate } from "./policy-contract.ts";
-import type { PriceParts, PriceTier } from "./safe.ts";
+import type { PriceParts, PriceStatement, PriceTier } from "./safe.ts";
 
 // The condition keys of models.dev's cost schema (`CostConditionKeyV2Values`), as fields of a request.
 const fields: Record<string, string> = {
@@ -362,4 +362,42 @@ export function priceParts(pricing: Pricing): PriceParts | null {
   }
   parts.tiers = readable ? [...tiers.values()].sort((a, b) => a.input_tokens_above - b.input_tokens_above) : null;
   return parts;
+}
+
+/** Where pi's catalog is read (PI_URL of schema.ts, kept here too so that this file needs no schema). */
+export const PI_CATALOG_URL = "https://pi.dev/api/models";
+
+/**
+ * pi's price as a pricing record, where it is the safe price (design/sources-side-by-side.md, 5.2): its four prices
+ * and its tiers as rules of the same shape as an imported price (US dollars per million tokens, the base rules first,
+ * then each tier as an override on request.context_tokens above its threshold), coverage partial, and one evidence
+ * item: pi's catalog, on the day of its snapshot. `priceParts` reads it back as pi's numbers.
+ */
+export function pricingOfPi(price: PriceStatement, access: string): Pricing {
+  const unit = { name: "token", quantity: 1000000 };
+  const parts = ["input", "output", "cache_read", "cache_write"] as const;
+  const rule = (part: (typeof parts)[number], amount: number, threshold: number | null): PricingRuleInput => ({
+    id: threshold === null ? `pi.cost.${part}` : `pi.cost.tiers[${threshold}].${part}`,
+    when: threshold === null ? null : { kind: "predicate", field: "request.context_tokens", op: "gt", value: threshold },
+    meter: `text.${part}`,
+    operation: "set",
+    amount,
+    currency: "USD",
+    unit,
+    applies_to: "all_usage",
+    source_path: null,
+  });
+  const rules: PricingRuleInput[] = [
+    ...parts.flatMap((part) => (price[part] === null ? [] : [rule(part, price[part], null)])),
+    ...(price.tiers ?? []).flatMap((tier) => parts.flatMap((part) => (tier[part] === null ? [] : [rule(part, tier[part], tier.input_tokens_above)]))),
+  ];
+  return derivePricing({
+    coverage: "partial",
+    billing: access === "api" ? "per_use" : "unknown",
+    reference_ref: null,
+    rules,
+    rule_order: "listed",
+    unparsed: [],
+    evidence: [{ kind: "listed", url: PI_CATALOG_URL, date: price.date, note: "pi's catalog lists this price for the entry; no other source states one." }],
+  });
 }

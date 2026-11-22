@@ -107,6 +107,6 @@ describe("the warning about pi data missing from the build", () => {
     expect(steps[build]!.id).toBe("build");
     expect(steps[build + 1]).toMatchObject({ name: "Warn about pi data missing from the build", if: "steps.build.outputs.pi == 'turned_away' || steps.build.outputs.pi == 'published_without_blocks'" });
     // Fixed text: nothing that came from pi is printed as a workflow command.
-    expect(steps[build + 1]!.run).toBe(`echo "::warning title=pi data missing from the build::The dataset is built and deployed without pi's data, with pi's data but no pi block on any entry, or without the record of the last pi import. /api/v1/meta lists which and why, under issues (pi-snapshot-unreadable, pi-no-blocks). The models.dev part is as usual."`);
+    expect(steps[build + 1]!.run).toBe(`echo "::warning title=pi data missing from the build::The dataset is built and deployed without pi's data, with pi's data but no pi block on any entry, or without the record of the last pi import. /api/v1/meta lists which and why, under issues (pi-snapshot-unreadable, pi-no-blocks). The models.dev part is as usual; the safe values only pi states are published as unknown."`);
   });
 });

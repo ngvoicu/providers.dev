@@ -82,33 +82,32 @@ The baseline is imported from models.dev; our additions, corrections and measure
   models.dev hides it by default since its commit `f648ddb` (2026-11-17), and the site lists it as a subscription.
   Do not drop the parameter, and do not author the provider by hand. The README says why (Syncing).
 - Text on the site: plain, short, professional, no marketing. Say what a number means and where it comes from.
-- An entry page states values and their sources, in the same sections, tables and rows on every entry: a row with
-  nothing in it says so (Unknown, Not evaluated, Not applicable, None) and is never left out. It carries no sentence
+- An entry page states the safe value of each quantity, in the same sections, tables and rows on every entry, and a
+  warning where its sources contradict each other (`agreement: "differ"`, `safe.differing`); it names no source in a
+  cell. A row with nothing in it says so (Unknown, Not evaluated, Not applicable, None) and is never left out. It carries no sentence
   that would repeat on every page: how a value is made is said once, in the methodology. The source's own
   `description` of a model is in the API and not on the page.
-- Wording: the two sources are named `models.dev` and `providers.dev` (never "ours"). A cache run is an
+- Wording: the four sources are named `Measured`, `providers.dev`, `models.dev` and `pi.dev` (never "ours"). A page
+  labels the safe input window "Context window"; the API's name for it stays `input_window`. A cache run is an
   "evaluation". Pages use the full width of the home page (`.page`).
 - Results by age use the API's exact ages and counts, short and long apart, per client. A cell shows the hit
   percentage rounded to a whole number; the exact percentage is in the API and in the hover text. Do not generate narrative lifetime verdicts. Individual evaluations are collapsed by default.
-- Cache lifetimes are worked out once, in `cacheLifetime` (`src/core/cache.ts`), into `providers_dev.cache.lifetime`
-  (`cache_lifetime` of a summary). A lifetime providers.dev publishes of its own is an item of its `lifetimes` list and
-  nowhere else. A page prints the profiles (`short`, `long`) and the items as they are: it converts no lifetime, takes
-  no minimum, applies no rule and picks no source. `safe_s: 0` is documented (does not cache) or measured (no age
-  at which every check hit), told apart by `basis`; `null` is unknown. A measured safe value replaces a contradicted
-  documented one only in `safe_s`: the documented item stays in the list, and `capabilities.cache` stays as imported.
-  The safe value is a published number made by a published rule, not a verdict a page writes.
-- The input window is worked out once, in `inputWindow` (`src/core/limits.ts`), into
-  `providers_dev.limits.input_window` (`input_window` of a summary): the documented input unless a limit evaluation
-  clearly contradicts it, else the measured value, lowest across clients, else `null`. A page prints the record and
-  its `measurements` as they are: it compares nothing, takes no minimum, applies no margin and picks no source;
-  "at least" comes from `bound`, the documented or measured tag from `basis`. `limit` of an imported entry stays
-  models.dev's, and no limit is taken from another entry (an added entry's `inherited.from` gives it none). `null` is
-  unknown and there is no `0`: a window of 0 is "none stated". The rule "A measurement never replaces a documented
-  value on an upstream entry" holds: `limit` is untouched, and the documented value stays in the record beside the
-  measured one. Vendors' own model lists are not values of an entry; they stay in evaluation notes.
-- pi's values stand third, after providers.dev's own and models.dev's. They are never written into a field of the
-  entry (`limit`, `cost` or any other) or into a safe value (`providers_dev.cache.lifetime`,
-  `providers_dev.limits.input_window`); a value only pi states stays in pi's block. Where pi stands beside each value
+- The safe value of every quantity (the input window, the maximum output, the short and the long cache lifetime, the
+  price) is worked out once, in `safeValues` (`src/core/safe.ts`), by one order of sources: the most direct
+  measurement, providers.dev, models.dev, pi.dev; the first that states a value gives it. It is published as
+  `providers_dev.safe` (`safe` of a summary) and copied by `mirror` into the records that carried it before:
+  `providers_dev.limits.input_window` (`inputWindow`, `src/core/limits.ts`) and `providers_dev.cache.lifetime`
+  (`cacheLifetime`, `src/core/cache.ts`), which make their records and choose nothing. A page prints `safe` and
+  applies no rule: it compares nothing, takes no minimum, applies no margin and picks no source; the warning is
+  `agreement: "differ"` and nothing else. `limit`, `cost` and `capabilities` of an imported entry stay models.dev's,
+  and no limit is taken from another entry (an added entry's `inherited.from` gives it none). `null` is unknown; a
+  limit of 0 is "none stated", a lifetime of 0 and a listed price of 0 are values. The documented items stay in the
+  records beside the safe value. The safe value is a published number made by a published rule, not a verdict a page
+  writes. Vendors' own model lists are not values of an entry; they stay in evaluation notes.
+- pi's values stand last. They are never written into a field of the entry (`limit`, `cost` or any other), and a safe
+  value is pi's only where no other source states one: laid on by `layPi` after the fence, from the statements the
+  fence reads with `piStatements`. No value a measurement, providers.dev or models.dev states differs with or without
+  pi's data (`npm run compare:published`). Where pi stands beside each value
   is worked out once, in `piValues` (`src/core/pi.ts`), into `providers_dev.pi.values`, from the same reading as
   `differences`; a page prints the `standing` and compares nothing (`design/pi-merged.md`).
 - The safe value, like every figure the site shows, is worked out once, when the data is built, and published in the
@@ -140,7 +139,10 @@ The baseline is imported from models.dev; our additions, corrections and measure
 - Each source carries its own date: the import date next to `models.dev`, the newest evidence next to
   `providers.dev`, and next to `pi.dev` the import of pi's catalog (`pi.snapshot.fetched_at` of `/api/v1/meta`, which
   like the models.dev date moves only when the data changed).
-- A measurement names the client it went through: the provider directly, CLIProxyAPI, or a vendor's own CLI. The
+- A measurement names the client it went through: the provider directly, CLIProxyAPI, or a vendor's own CLI. Every
+  client has a kind (`direct`, `own-client`, `proxy`), from the measurements file or
+  `data/authored/measurement-labels.yaml`, where a new client must be added with its kind; which kind feeds a safe
+  value is decided once, in `countingKind` (`src/core/safe.ts`). The
   coding agent used on top of CLIProxyAPI is not named ("A coding agent, through CLIProxyAPI"). The public names
   are in `data/authored/measurement-labels.yaml`; a new client id must be added there (the build warns and publishes
   it as "other"). Runs marked `lacks` are not published: they say something about a proxy build, not a provider.

@@ -1,5 +1,9 @@
 # The input window: how much input a request can carry on an entry
 
+> **Replaced in part (2026-11-22) by `design/sources-side-by-side.md`.** Section 4.1 (the value), decision 3 as a rule
+> for the value, section 3.4 and decision 6 ("the lowest client decides"), and section 10 are replaced by its sections
+> 2 and 8. Sections 3.1 to 3.3 and 4.2 stay: what an evaluation gives, and the test, now the test of agreement.
+
 Design, 2026-11-16 (task LWL-01). It is built: the rule in `src/core/limits.ts`, the record on every entry and
 summary, and the pages. The owner's decisions it starts from are in section 1;
 the questions it left open were decided on 2026-11-16, as recommended, and are in section 13; the design is written

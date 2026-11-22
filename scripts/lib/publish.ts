@@ -9,6 +9,7 @@ import { CACHE_AGES_S } from "../../src/core/cache.ts";
 import { buildIndex, SHARD_SIZE, type Index } from "../../src/core/entries.ts";
 import { listCorrections, listEvaluations } from "../../src/core/resources.ts";
 import { resolve } from "../../src/core/resolve.ts";
+import { layPi, mirror } from "../../src/core/safe.ts";
 import {
   AccessRules,
   AuthoredProvider,
@@ -143,10 +144,16 @@ export function publish(input: PublishOptions): PublishReport {
   const status = readJsonIfExists<Partial<SyncStatus>>(join(dataDir, "sync-status.json"));
   // pi's part, behind the fence: checked, plain data, or nothing and a warning that says why.
   const pi = piOfBuild({ dataDir, status, aliases: piAliases, catalog, before, ruledOut });
+  // Each block laid on its entry, and pi's statements over the entry's safe values, by the reference's own code
+  // (design/sources-side-by-side.md, section 4): pi's item is added last, and fills only what no other source states.
   for (const [providerId, provider] of Object.entries(catalog)) {
     for (const [modelId, model] of Object.entries(provider.models)) {
       const found = pi.entries.get(`${providerId}/${modelId}`);
-      if (found) ext(model).pi = found.block;
+      if (!found) continue;
+      const extension = ext(model);
+      extension.pi = found.block;
+      extension.safe = layPi(extension.safe, found.statements, { access: extension.access, chosen: extension.limits.input_window.measurements.filter((item) => item.chosen) });
+      mirror(extension);
     }
   }
   const withPi = (index: Index): Index => {

@@ -1,5 +1,10 @@
 # pi's values beside the entry's own: one set of values on the page
 
+> **Replaced in part (2026-11-22) by `design/sources-side-by-side.md`.** Section 5 ("pi's data does not contribute to
+> the safe values") and section 7 (pi's lines on the page) are replaced by its sections 4 and 8: pi is the last source
+> of the safe values, and gives one only where no other source states one. Sections 2, 3 and 8 stay: `values`, and
+> that pi's value is never written into `limit` or `cost`.
+
 Design for the spec item PMV-01. Written 2026-11-20 against `main` at `78ead1b` with the branch `pi-no-blocks`
 (`09bdb42`) on top of it, which reaches `main` before this is built. It continues `design/pi-source.md` (sections a
 to k) and changes five of its sentences, listed in section 12. Where the two documents speak of the same thing, this

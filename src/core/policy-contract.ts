@@ -18,6 +18,13 @@ export const ConditionSchema: z.ZodType<Condition> = z.lazy(() => z.union([
 export const PolicyEvidenceSchema = z.strictObject({
   kind: z.enum(["documented", "measured"]), url: z.url(), date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable(), note: z.string(),
 });
+/**
+ * The evidence of a price. listed (since 1.4.0): a catalog lists it, on the one kind of price that is not the entry's
+ * own record: pi's, where no other source states one (providers_dev.safe.price.source pi.dev).
+ */
+export const PricingEvidenceSchema = PolicyEvidenceSchema.extend({
+  kind: z.enum(["documented", "measured", "listed"]).describe("documented = the provider says so. measured = providers.dev ran it. listed = a catalog lists it: pi's catalog, on a price that is pi's (since 1.4.0)."),
+});
 export const CoverageSchema = z.enum(["unknown", "partial", "complete", "not_applicable"])
   .describe("unknown = no usable record; partial = known fields without a completeness claim; complete = explicitly confirmed for the stated scope; not_applicable = no per-use billing on this access. Empty lists alone never prove absence.");
 
@@ -54,7 +61,7 @@ const pricingShape = {
   reference_ref: z.string().nullable().describe("With billing = reference: the API entry the rates are taken from. That is the entry a providers.dev entry inherits from, or the entry of the lab's own provider for the same canonical model. Otherwise null."),
   rule_order: z.literal("listed").nullable().describe("listed = process matching rules in array order per meter: set replaces the rate and multiply scales it. Imported rules are listed: base rates first, then models.dev's overrides in their order, then its multipliers, which is how models.dev defines a price. Null = combination precedence is unconfirmed; this record cannot produce an authoritative combined quote."),
   unparsed: z.array(z.strictObject({ path: z.string(), value: z.json() })).describe("Source fields not normalized, retained without loss. Nonempty means coverage is partial."),
-  evidence: z.array(PolicyEvidenceSchema),
+  evidence: z.array(PricingEvidenceSchema),
 };
 const rulesText = "Base prices, conditional replacements and multipliers. Null = unknown. [] proves no rules only with complete coverage.";
 /** Pricing before `period` and `resulting_rates` are worked out: what the import produces and what an author declares. */

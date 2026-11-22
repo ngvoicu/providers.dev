@@ -11,15 +11,21 @@ The baseline is imported daily from [models.dev](https://models.dev) (MIT). On t
   Google Antigravity);
 - **corrections** to single fields, each with a reason and a source;
 - **evaluations** of cache lifetimes and limits from [groundtruth](https://github.com/ngvoicu/groundtruth),
-  shown next to the documented values, each with its source and date. A measured value takes the place of a
-  documented one in two figures only, the safe cache lifetime and the input window, and only where a measurement
-  clearly contradicts the documentation; the documented value stays beside it (and `limit` stays as imported).
+  shown next to the documented values, each with its source and date.
+
+For five quantities (the input window, the maximum output, the short and the long cache lifetime, and the price) the
+API publishes one **safe value** (`providers_dev.safe`) and what every source states beside it. The order of the
+sources: what providers.dev measured (the most direct measurement that exists), providers.dev's own corrections and
+entries, models.dev, pi's catalog; the first that states a value gives it, and where two sources contradict each
+other the website shows a warning. A measurement never changes `limit`, `cost` or `capabilities`: those stay as
+imported and corrected.
 
 Beside it, a second catalog is imported with the same daily run: the model catalog of the coding agent pi
 ([pi.dev/models](https://pi.dev/models), MIT, from `https://pi.dev/api/models`). What pi states for an entry (how pi
 calls the model, its limits and prices, and where they differ from the published values) is published on that entry
-under `providers_dev.pi`, and never merged into its fields: models.dev stays the reference. A model only pi lists is
-not an entry.
+under `providers_dev.pi`, and never merged into its fields: models.dev stays the reference. pi is also the last
+source of the safe values: its figure is the safe value only where no other source states one. A model only pi lists
+is not an entry.
 
 It publishes metadata only. There is no chat and no inference proxy. List prices per token are shown as models.dev
 records them; a subscription entry shows the API list price of the same model, marked as an API price. Subscription
@@ -253,8 +259,13 @@ Models that exist only because they were evaluated do not need to be listed by h
 `data/authored/routes.yaml` maps to one of our providers creates the entry.
 
 `data/authored/measurement-labels.yaml` gives each client of the measurement file its public name (for example
-"Requests sent through CLIProxyAPI") and can list words whose note parts are not published. Runs marked `lacks` in
-the measurement file are skipped.
+"Requests sent through CLIProxyAPI") and its `kind`, required: `direct` (plain requests sent straight to the
+provider), `own-client` (the vendor's own client) or `proxy` (requests through a proxy, plain or made by a coding
+agent). The kind decides which measurement gives a safe value: on an API-key entry `direct` only; on a login
+`own-client`, else `direct`, else `proxy` (`countingKind` in `src/core/safe.ts`). Where the measurements file states a
+client's kind (in `client_kinds`, or as `kind` of the client's object in `clients`), that kind counts and the labels
+file's is the fallback; the build warns where the two differ. A new client must be added here with its kind. The
+file can also list words whose note parts are not published. Runs marked `lacks` in the measurement file are skipped.
 
 ### Evidence requirements
 
@@ -379,10 +390,15 @@ without moving `data/upstream/`.
 
 pi's part runs behind a fence (`scripts/lib/pi-fence.ts`, design section k): in the sync and in the build, pi's
 code is called in one guarded place each, and what it returns is taken only as plain data that fits the contract.
+The dataset is complete without pi before any of pi's code runs; then what pi states of the safe values is read from
+the checked blocks by the reference's own code (`piStatements`), through the same guard, and laid over the entries
+(`layPi`). No value that a measurement, providers.dev or models.dev states is different with or without pi's data:
+`npm run compare:published -- <without> <with>` checks it, taking pi's items off with `withoutPi`.
 Nothing on pi's side can stop the models.dev import, the build or the deploy, within three limits: a pi part that
 is well-formed, agrees with itself and is wrong is published as pi's part (it shows in `pi.counts` of
 `/api/v1/meta` and in the line the build prints, and where it gives no entry a pi block at all, the build says so
-with a warning); a computation that never ends is bounded only by the import's
+with a warning), and can then publish a wrong number as a safe value where no other source states one, marked
+`pi.dev` in the API, or a wrong warning wherever pi is listed; a computation that never ends is bounded only by the import's
 deadline and size cap; and a broken commit of pi's code is caught by the push that brings it, whose run fails. Two
 warnings say when pi's side went wrong:
 
@@ -398,7 +414,8 @@ warnings say when pi's side went wrong:
     snapshot's number of models and how many were left out and unmatched, and the build prints it. The data is
     published as pi's code gave it: nothing is turned away or repaired.
 
-  Either way the run carries the warning "pi data missing from the build". Without a folder `data/pi/` at all, the
+  Either way the run carries the warning "pi data missing from the build", and the safe values only pi states are
+  published as unknown. Without a folder `data/pi/` at all, the
   dataset simply has no pi data, with no warning about the data; a record of the last pi import in
   `data/sync-status.json` that cannot be used still gives its own warning, folder or not.
 
@@ -450,7 +467,8 @@ method), **models** (canonical: a model as its lab names it) and **evaluations**
 | `GET /api.json` | the merged catalog keyed by provider id, in the models.dev v2 structure, no envelope |
 
 ```
-curl 'https://providers.dev/api/v1/entries?access=subscription&min_context=400000&sort=context&order=desc'
+curl 'https://providers.dev/api/v1/entries?access=subscription&min_input_window=400000&sort=input_window&order=desc'
+curl 'https://providers.dev/api/v1/entries?disagree=true&provider=openrouter'
 curl 'https://providers.dev/api/v1/entries?lifetime_basis=measured&sort=cache_long&order=desc'
 curl https://providers.dev/api/v1/entries/openrouter/anthropic/claude-opus-5.5
 curl -H 'If-None-Match: "<dataset version>"' -i https://providers.dev/api/v1/catalog     # 304 until the data changes
@@ -459,7 +477,7 @@ curl -H 'If-None-Match: "<dataset version>"' -i https://providers.dev/api/v1/cat
 ```ts
 const base = "https://providers.dev/api/v1";
 const page = await (await fetch(`${base}/entries?q=opus&cache=yes&limit=200`)).json();
-for (const entry of page.data) console.log(entry.ref, entry.context, entry.input_window.tokens, entry.input_window.bound, entry.max_output, entry.cache_lifetime.short.safe_s, entry.cache_lifetime.lifetimes);
+for (const entry of page.data) console.log(entry.ref, entry.safe.input_window.value, entry.safe.input_window.at_least, entry.safe.max_output.value, entry.safe.cache_short.value, entry.safe.differing);
 
 const { data } = await (await fetch(`${base}/entries/openrouter/anthropic/claude-opus-5.5`)).json();
 console.log(data.entry.limit, data.entry.providers_dev.limits.input_window, data.entry.providers_dev.cache.retention, data.entry.providers_dev.cache.evaluations);
@@ -502,6 +520,20 @@ state of an entry (its two limits, four prices, tiers and two cache lifetimes), 
 the entry's own (`agrees`, `differs`, `only`, `not_compared`, `silent`). A value only pi states is there and in no
 field of the entry. With it, `differences` lists no price and no tiers on a subscription entry
 (`design/pi-merged.md`).
+1.4.0 added `safe` to every entry (`providers_dev.safe`) and every summary: for the input window, the maximum
+output, the short and the long cache lifetime and the price, the safe value, the source it is from (`measured`,
+`providers.dev`, `models.dev`, `pi.dev`, in that order: the first that states a value gives it), whether the sources
+agree, and what each source states, with its date. It added the components `SafeValues`, `SafeValue`, `SourceValue`,
+`SafePrice`, `PriceStatement` and `PriceTier`, the value `pi.dev` of `source` in the input window and lifetime
+records, the value `listed` of the kind of a price's evidence, the sort key `input_window` and the parameters
+`min_input_window` and `disagree`, and `client_kind` and `chosen` on evaluations and measured items. With it the rule
+of the safe value changed: `input_window.tokens` and `cache_lifetime.*.safe_s` are the measured value wherever
+providers.dev measured one, where before they were the documented value unless a measurement clearly contradicted it.
+The measurement that counts is the most direct one: on an API-key entry requests sent straight to the provider, on a
+login the vendor's own client and, where there is none, a proxy; the `measured_*` keys and `measured_s` follow it.
+`pricing` is the price of one source, whole; `max_output` of a summary is the safe maximum output;
+`documented_status` says whether the measurement contradicts the documented value and no longer which of the two is
+the safe value (`design/sources-side-by-side.md`).
 
 That promise holds for everything providers.dev makes itself: summaries, `providers_dev` records, evaluations,
 corrections, evidence, paths and parameters. The fields imported from models.dev (`limit`, `cost`, `capabilities`,
@@ -520,30 +552,33 @@ that has no timed check counts for no lifetime). The sums are made once, in
 
 Every entry has one cache lifetime record (`providers_dev.cache.lifetime`, and `cache_lifetime` of a summary):
 `lifetimes`, one list of every lifetime known for the entry, documented by models.dev or providers.dev and measured
-per client and retention setting, each item with its source and date; and for the `short` and the `long` profile a
-safe value, `safe_s` in seconds, with its `basis`. The documented lifetime is the safe value unless an evaluation
-contradicts it (at an age up to it, fewer than half of that evaluation's checks hit), and then the measured one is;
-where nothing is documented, the measured one, the oldest age through which every check hit, lowest across clients.
-`documented_s` and `measured_s` are published beside it, and `documented_status` says what the rule found where a
-lifetime above 0 is documented and one is measured: `contradicted` or `not_contradicted` (else `null`). `0` is a value (documented as not caching, or no age at
-which every check hit); `null` is not known. `cacheLifetime` in `src/core/cache.ts` works it out once, when the data
-is built; the rule in full is in `design/safe-cache-lifetime.md` and in the guide of the OpenAPI document.
+per client and retention setting, each item with its source and date, its client's `client_kind` and whether it is
+`chosen`; and for the `short` and the `long` profile a safe value, `safe_s` in seconds, with its `basis`: the safe
+lifetime of `safe.cache_short` and `safe.cache_long`, copied (see the safe values below). `documented_s` (the lowest
+documented lifetime) and `measured_s` (the lowest lifetime of the chosen items, the oldest age through which every
+check hit) are published beside it, and `documented_status` says whether the measurement that counts contradicts a
+documented lifetime above 0: `contradicted` where every check still hit after it or one missed at an age it covers,
+`not_contradicted` otherwise (else `null`). `0` is a value (documented as not caching, or no age at which every check
+hit); `null` is not known. `cacheLifetime` in `src/core/cache.ts` makes the record once, when the data is built; the
+record is described in `design/safe-cache-lifetime.md`, the rule in `design/sources-side-by-side.md` and in the guide
+of the OpenAPI document.
 `/api/v1/entries` sorts by the safe values with `sort=cache_short` or `sort=cache_long` (`null` last in either order,
 `0` a value), and `lifetime_basis=documented` or `measured` keeps the entries whose short or long safe value has that
 basis.
 
 Every entry has one input window record (`providers_dev.limits.input_window`, and `input_window` of a summary):
 `tokens`, the most input a request can carry on the entry, in tokens as the provider counts them, the client's own
-prompt included, with its `basis`, `bound` and `scope`. The documented input (`limit.input` above 0, else
-`limit.context` above 0 that is not a measured value) is the value unless a limit evaluation of the entry clearly
-contradicts it (a window named below it, or other than a documented window; an input refused at or below 99 % of it;
-one accepted, below a refusal or read to the end, at or above 101 % of it), and then the measured one is; where
-nothing is documented, the measured one: the window the route names (`bound: "limit"`), else the largest input seen
-accepted (`bound: "at_least"`), lowest across clients. `null` is not known, and there is no `0`: a window of 0 is
-"none stated". `documented_tokens` and `measured_tokens` are published beside it, with `documented_status` where
-both exist, and every counted evaluation is an item of `measurements`. `inputWindow` in `src/core/limits.ts` works it
-out once, when the data is built; the rule in full is in `design/usable-input-window.md` and in the guide of the
-OpenAPI document. `limit` stays as imported, and `context`, `input`, `max_output` and the `measured_*` keys of a
+prompt included, with its `basis`, `bound` and `scope`: the safe input window of `safe.input_window`, copied. The
+documented input (`limit.input` above 0, else `limit.context` above 0 that is not a measured value) and the measured
+one (the window the route names, `bound: "limit"`, else the largest input seen accepted, `bound: "at_least"`, the
+lowest of the chosen evaluations) are published beside it as `documented_tokens` and `measured_tokens`, with
+`documented_status` where both exist: `contradicted` where a chosen evaluation clearly contradicts the documented value
+(a window named below it, or other than a documented window; an input refused at or below 99 % of it; one accepted,
+below a refusal or read to the end, at or above 101 % of it). `null` is not known, and there is no `0`: a window of 0
+is "none stated". Every counted evaluation of every client is an item of `measurements`, with `client_kind` and
+`chosen`. `inputWindow` in `src/core/limits.ts` makes the record once, when the data is built; the record is described
+in `design/usable-input-window.md`, the rule in `design/sources-side-by-side.md` and in the guide of the OpenAPI
+document. `limit` stays as imported, and `context`, `input`, `max_output` and the `measured_*` keys of a
 summary keep their meaning. A limits row of the measurements file may carry `date` and `input_read` (the largest input
 the reply showed was read to the end); a file with two rows for one route, client and model, or a row whose numbers
 contradict each other, or a token count that is not a whole number of 0 or more, is refused when read and the last
@@ -555,6 +590,20 @@ A model (`/api/v1/models`, `/api/v1/models/{lab}/{model}`) gives the two ends am
 the reference entry (`reference_ref`, the lab's own). At an equal number of tokens a lower bound counts as the larger.
 `src/core/resources.ts` works them out (`inputWindowRange`), beside `context_min` and `context_max`, which stay
 `limit.context`.
+
+Every entry has `providers_dev.safe`, and every summary the same object as `safe`: for the input window, the maximum
+output, the short and the long cache lifetime and the price, the safe value, its source, its date, the agreement of
+the sources (`agree`, `differ`, `single`, `none`) and what each source states (`sources`, in the order of the sources,
+a measured item naming its client, its kind, its evaluation and its raw result). The first source that states a value
+gives it: the most direct measurement (on an API-key entry, requests sent straight to the provider; on a login, the
+vendor's own client, else direct, else a proxy), then providers.dev, then models.dev, then pi.dev. Where the first is
+a window and a later source states a cap on the input not above it, the cap is the value. A price is taken whole from
+one source. `differing` lists the quantities whose sources contradict each other: the website's warnings. pi's
+statements are laid on after the fence (`layPi`), and change a value only where no other source states one.
+`safeValues`, `layPi` and `mirror` in `src/core/safe.ts` work it out once; the records above carry the same values,
+copied by `mirror`. `/api/v1/entries` sorts by the safe input window (`sort=input_window`), filters by it
+(`min_input_window`) and by disagreement (`disagree=true` or `false`); `max_output` of a summary is the safe maximum
+output.
 
 The safe value, like every figure the site shows, is worked out once, when the data is built, and published in the
 API. A page never works anything out: it prints fields of the API, formatted. The site never shows anything that is

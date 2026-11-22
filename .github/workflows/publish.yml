@@ -59,7 +59,7 @@ jobs:
 
       - name: Warn about pi data missing from the build
         if: steps.build.outputs.pi == 'turned_away' || steps.build.outputs.pi == 'published_without_blocks'
-        run: echo "::warning title=pi data missing from the build::The dataset is built and deployed without pi's data, with pi's data but no pi block on any entry, or without the record of the last pi import. /api/v1/meta lists which and why, under issues (pi-snapshot-unreadable, pi-no-blocks). The models.dev part is as usual."
+        run: echo "::warning title=pi data missing from the build::The dataset is built and deployed without pi's data, with pi's data but no pi block on any entry, or without the record of the last pi import. /api/v1/meta lists which and why, under issues (pi-snapshot-unreadable, pi-no-blocks). The models.dev part is as usual; the safe values only pi states are published as unknown."
 
       - name: Lint, type-check and test
         run: npm run check

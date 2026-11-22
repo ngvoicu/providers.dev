@@ -11,6 +11,7 @@ import { buildIndex } from "../src/core/entries.ts";
 import type { PiCatalog, PiModel } from "../src/core/pi.ts";
 import { resolve } from "../src/core/resolve.ts";
 import { ext, noPiMeta, PI_URL, PROVIDER_ID, type Catalog, type Meta } from "../src/core/schema.ts";
+import type { Index } from "../src/core/entries.ts";
 import { comparePublished } from "../scripts/lib/compare-published.ts";
 import { pretty } from "../scripts/lib/files.ts";
 import { PI_DEADLINE_MS, storedPi } from "../scripts/lib/pi-sync.ts";
@@ -27,6 +28,9 @@ const state = vi.hoisted(() => ({
   calls: new Set<string>(),
   fault: null as null | { name: string; apply: (callTrue: () => unknown, args: unknown[]) => unknown; fired: boolean },
   exported: { pi: [] as string[], piSync: [] as string[] },
+  /** A fault inside the reference's piStatements, which the fence calls through the guard (design/sources-side-by-side.md, 4). */
+  statementsFault: null as null | ((callTrue: () => unknown) => unknown),
+  statementsFired: false,
   /** Armed: every write of a file named pi-report.json throws, as a disk would (the report's write fault). */
   reportWriteFails: false,
   reportWrites: 0,
@@ -59,6 +63,19 @@ vi.mock("../src/core/pi.ts", async (importOriginal) => {
     };
   }
   return out;
+});
+vi.mock("../src/core/safe.ts", async (importOriginal) => {
+  const original = await importOriginal<Record<string, unknown>>();
+  const piStatements = original.piStatements as (...args: unknown[]) => unknown;
+  return {
+    ...original,
+    piStatements(this: unknown, ...args: unknown[]) {
+      const callTrue = () => piStatements.apply(this, args);
+      if (!state.statementsFault) return callTrue();
+      state.statementsFired = true;
+      return state.statementsFault(callTrue);
+    },
+  };
 });
 vi.mock("../scripts/lib/pi-sync.ts", async (importOriginal) => {
   const original = await importOriginal<Record<string, unknown>>();
@@ -451,6 +468,114 @@ describe("1. the table of faults of the build, generated from what the fence cal
     const changed = differing(files, healthy);
     expect(changed).toContain("site/data/entries/provider-00/0.json");
     for (const path of changed) expect(back(text(files.get(path)!, path).replaceAll(version, healthyVersion)), path).toBe(text(healthy.get(path)!, path));
+  });
+
+  /** The rows of piStatements: a throw, and a result its schema refuses. Each turns the part away, whole. */
+  const statementRows: [string, (callTrue: () => unknown) => unknown][] = [
+    ["throws an Error", () => { throw new Error("broken on purpose"); }],
+    ["throws an object whose message is a number and whose toString throws", () => { throw hostile(); }],
+    ["returns undefined", () => undefined],
+    ["returns a window that is not a whole number", (callTrue) => ({ ...(callTrue() as object), input_window: 1.5 })],
+    ["returns a price of 0, which states nothing", (callTrue) => ({ ...(callTrue() as object), price: { input: 0, output: 1, cache_read: null, cache_write: null, tiers: [] } })],
+    ["returns a key the schema does not have", (callTrue) => ({ ...(callTrue() as object), extra: 1 })],
+    ["returns an object with a getter that throws", (callTrue) => Object.defineProperty({ ...(callTrue() as object) }, "date", { enumerable: true, get() { throw new Error("getter"); } })],
+  ];
+  it.each(statementRows)("piStatements %s: the part turned away, the dataset the without build's but for one warning", async (_name, fault) => {
+    const dir = variant(piCatalog(), undefined);
+    state.statementsFault = fault;
+    state.statementsFired = false;
+    const report = build(dir);
+    const fired = state.statementsFired;
+    state.statementsFault = null;
+    expect(fired).toBe(true);
+    expect(report).toMatchObject({ ok: true, pi: "turned_away" });
+    expect(await contractProblems(join(dir, "published"))).toEqual([]);
+    expect(comparePublished(join(withoutDir, "published"), join(dir, "published")).differences).toEqual([]);
+    const files = filesOf(dir);
+    expect(differing(files, without)).toEqual(["site/data/meta.json"]);
+    const meta = metaOf(files);
+    const warning = meta.issues.at(-1)!;
+    expect(warning).toMatchObject({ level: "warning", code: "pi-snapshot-unreadable", target: "data/pi" });
+    expect(warning.message).toMatch(/^pi's data is left out of this dataset \([^\r\n]{1,300}\)\. No entry has a pi block\.$/);
+    const expected = metaOf(without);
+    expected.issues = [...expected.issues, warning];
+    expect(meta).toEqual(expected);
+  });
+
+  it("what the fence does not promise: a wrong number on a value no other source states is published as pi.dev's, and no value another source states moves", async () => {
+    const dir = variant(piCatalog(), undefined);
+    state.fault = {
+      name: "piPart",
+      fired: false,
+      apply: (callTrue) => after(callTrue, (result) => {
+        const copy = structuredClone(result) as { blocks: { ref: string; block: { context_window: number } }[] };
+        // provider-00/model-7 states no limit of its own: pi's window is its only one.
+        copy.blocks.find((item) => item.ref === "provider-00/model-7")!.block.context_window = 999999;
+        return copy;
+      }),
+    };
+    const report = build(dir);
+    expect(state.fault.fired).toBe(true);
+    state.fault = null;
+    expect(report).toMatchObject({ ok: true, pi: "published" });
+    expect(await contractProblems(join(dir, "published"))).toEqual([]);
+    const catalog = JSON.parse(filesOf(dir).get("site/api.json")!.toString("utf8")) as Catalog;
+    expect(ext(catalog["provider-00"]!.models["model-7"]!).safe.input_window).toMatchObject({ value: 999999, source: "pi.dev", agreement: "single" });
+    expect(ext(catalog["provider-00"]!.models["model-7"]!).limits.input_window).toMatchObject({ tokens: 999999, source: "pi.dev" });
+    // Taken off on both sides, the two builds are the same: no value another source states differs.
+    expect(comparePublished(join(healthyDir, "published"), join(dir, "published")).differences).toEqual([]);
+    expect(comparePublished(join(withoutDir, "published"), join(dir, "published")).differences).toEqual([]);
+  });
+
+  it("the healthy build differs from the build without pi in exactly the keys of section 4", () => {
+    const read = <T>(files: Map<string, Buffer>, path: string): T => JSON.parse(files.get(path)!.toString("utf8")) as T;
+    /** Every path where `a` and `b` differ, array places as [], with the value of `b` at it. */
+    const paths = (a: unknown, b: unknown, path: string, out: string[]): void => {
+      const object = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null;
+      if (JSON.stringify(a) === JSON.stringify(b)) return;
+      if (!object(a) || !object(b) || Array.isArray(a) !== Array.isArray(b) || (Array.isArray(a) && Array.isArray(b) && a.length !== (b as unknown[]).length)) {
+        out.push(path);
+        return;
+      }
+      for (const key of new Set([...Object.keys(a), ...Object.keys(b)])) paths(a[key], b[key], Array.isArray(a) ? `${path}[]` : `${path}.${key}`, out);
+    };
+    const QUANTITY = /\.safe\.(input_window|max_output|cache_short|cache_long|price)\.(\w+)/;
+    /** The keys section 4 names; a value and its copies only where pi gives the value. */
+    const allowed = (path: string, safe: { [key: string]: { source: string | null } }): boolean => {
+      if (/^entry\.providers_dev\.pi$/.test(path) || /^summary\.pi$/.test(path)) return true;
+      if (/\.safe\.differing$/.test(path)) return true;
+      const quantity = QUANTITY.exec(path);
+      if (quantity) return ["sources", "agreement", "differs"].includes(quantity[2]!) || safe[quantity[1]!]!.source === "pi.dev";
+      if (/\.(limits\.)?input_window\.(tokens|basis|bound|scope|source|date)$/.test(path)) return safe.input_window!.source === "pi.dev";
+      const lifetime = /\.(?:cache\.lifetime|cache_lifetime)\.(short|long)\.(safe_s|basis|source|date)$/.exec(path);
+      if (lifetime) return safe[lifetime[1] === "short" ? "cache_short" : "cache_long"]!.source === "pi.dev";
+      if (/^summary\.max_output$/.test(path)) return safe.max_output!.source === "pi.dev";
+      if (/\.pricing(\.|$)|^summary\.price_(in|out|from)$/.test(path)) return safe.price!.source === "pi.dev";
+      return false;
+    };
+    const kept: string[] = [];
+    const seen = new Set<string>();
+    const a = read<Catalog>(without, "site/api.json");
+    const b = read<Catalog>(healthy, "site/api.json");
+    for (const [id, provider] of Object.entries(b)) {
+      for (const [model, entry] of Object.entries(provider.models)) {
+        const found: string[] = [];
+        paths(a[id]!.models[model], entry, "entry", found);
+        for (const path of found) {
+          seen.add(path.replace(QUANTITY, ".safe.$1.$2"));
+          if (!allowed(path, ext(entry).safe as never)) kept.push(`${id}/${model} ${path}`);
+        }
+      }
+    }
+    const summaries = new Map(read<Index>(without, "site/data/index.json").entries.map((entry) => [entry.ref, entry]));
+    for (const entry of read<Index>(healthy, "site/data/index.json").entries) {
+      const found: string[] = [];
+      paths(summaries.get(entry.ref), entry, "summary", found);
+      for (const path of found) if (!allowed(path, entry.safe as never)) kept.push(`${entry.ref} ${path}`);
+    }
+    expect(kept).toEqual([]);
+    // The fixture shows each kind: pi's block, pi's items, a value only pi states with its copies.
+    for (const path of ["entry.providers_dev.pi", "entry.providers_dev.safe.input_window.sources", "entry.providers_dev.limits.input_window.tokens"]) expect([...seen]).toContain(path);
   });
 
   describe("the private report's write", () => {

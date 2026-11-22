@@ -152,8 +152,11 @@ export function lifetimeRuleBreaks(record: CacheLifetimeRecord, evaluations: rea
     fail(`${profile} 2 clients`, p.clients === new Set(measured.map((item) => item.client)).size);
     fail(`${profile} 2 ages`, p.tested_from_s === min(measured.map((item) => item.tested_from_s)) && p.first_miss_s === min(measured.map((item) => item.first_miss_s)));
     const none = p.basis === "none";
-    fail(`${profile} 3 none`, [p.safe_s === null, p.source === null, docs.length + measured.length === 0].every((value) => value === none));
-    if (p.basis === "documented") {
+    // pi.dev gives the value only where nothing documented or measured states one (design/sources-side-by-side.md, 4).
+    const fromPi = p.source === "pi.dev";
+    fail(`${profile} 3 none`, [p.safe_s === null, p.source === null].every((value) => value === none) && (fromPi || none === (docs.length + measured.length === 0)));
+    if (fromPi) fail(`${profile} 3 pi`, p.basis === "documented" && p.safe_s !== null && docs.length + measured.length === 0);
+    if (p.basis === "documented" && !fromPi) {
       const first = docs.find((item) => item.lifetime_s === p.documented_s);
       fail(`${profile} 4 documented`, p.documented_s !== null && p.safe_s === p.documented_s && first !== undefined && p.source === first.source && p.date === first.date);
     }
@@ -162,7 +165,7 @@ export function lifetimeRuleBreaks(record: CacheLifetimeRecord, evaluations: rea
       fail(`${profile} 5 measured`, p.measured_s !== null && p.safe_s === p.measured_s && p.source === "providers.dev" && runs.some((run) => run.date === p.date && walk(run.results).safe === p.measured_s));
     }
     // The first source that states a value gives it: a measurement that counts, else the documentation.
-    fail(`${profile} 7 order`, p.basis === (p.measured_s !== null ? "measured" : p.documented_s !== null ? "documented" : "none"));
+    if (!fromPi) fail(`${profile} 7 order`, p.basis === (p.measured_s !== null ? "measured" : p.documented_s !== null ? "documented" : "none"));
     const both = p.documented_s !== null && p.measured_s !== null;
     fail(`${profile} 8 inside`, (p.checks_inside !== null && p.hits_inside !== null) === both && (!both || (p.hits_inside! <= p.checks_inside! && p.checks_inside! <= p.checks)));
     if (p.first_miss_s !== null) fail(`${profile} 9 first miss`, p.first_miss_s > (p.measured_s ?? -1) || (p.first_miss_s === 0 && p.measured_s === 0));
@@ -235,8 +238,11 @@ export function inputWindowRuleBreaks(
   const chosen = r.measurements.filter((item) => item.chosen);
   fail("0 chosen", r.measurements.every((item) => item.chosen === (kind !== null && item.client_kind === kind)));
   const none = r.basis === "none";
-  fail("1 none", [r.tokens === null, r.bound === null && r.scope === null && r.source === null, r.documented_tokens === null && r.measured_tokens === null].every((value) => value === none));
-  if (r.basis === "documented") {
+  // pi.dev gives the value only where nothing documented or measured states one (design/sources-side-by-side.md, 4).
+  const fromPi = r.source === "pi.dev";
+  fail("1 none", [r.tokens === null, r.bound === null && r.scope === null && r.source === null].every((value) => value === none) && (fromPi || none === (r.documented_tokens === null && r.measured_tokens === null)));
+  if (fromPi) fail("2 pi", r.basis === "documented" && r.tokens !== null && r.bound === "limit" && r.scope === "window" && r.documented_tokens === null && r.measured_tokens === null);
+  if (r.basis === "documented" && !fromPi) {
     fail("2 documented", r.tokens === r.documented_tokens && r.bound === "limit" && r.source === r.documented_source && r.date === r.documented_date && r.scope === (r.documented_field === "limit.input" ? "input" : "window"));
   }
   if (r.basis === "measured") {
