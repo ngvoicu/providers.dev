@@ -5,6 +5,7 @@ import {
   cacheResult,
   byCharacters,
   documentedCaching,
+  documentedItems,
   evaluationLifetime,
   lifetimeAsked,
   lifetimeSeconds,
@@ -17,9 +18,11 @@ import {
   type LifetimeSource,
   type RetentionEvidence,
 } from "./cache.ts";
-import { inputWindow, windowMeasurement, type DocumentedField, type LimitSource } from "./limits.ts";
+import { documentedInput, inputWindow, windowMeasurement, type DocumentedField, type LimitSource } from "./limits.ts";
 import { clone, isObject, mergePatch, type Change, type Json, type JsonObject } from "./merge.ts";
-import { controlsOf, pricingOf, retentionFromControl } from "./policies.ts";
+import { controlsOf, priceParts, pricingOf, retentionFromControl } from "./policies.ts";
+import type { Pricing } from "./policy-contract.ts";
+import { measuredLifetime, measuredOutput, measuredWindow, mirror, safeValues, type ClientKind, type Dated, type EntryReading, type SafeQuantity } from "./safe.ts";
 import {
   NS,
   type AccessRules,
@@ -588,6 +591,25 @@ export function resolve(input: ResolveInput): ResolveResult {
       }
       return { client: OTHER_CLIENT.id, client_label: OTHER_CLIENT.label };
     };
+    // The kind of a client (design/sources-side-by-side.md, 2.3): the measurements file's, where it states one (in
+    // `client_kinds`, or as `kind` of the client's object in `clients`), else the labels file's. Where both state one
+    // and they differ, the file's counts and the build says so. Null = neither states one: its evaluations feed nothing.
+    const kindsSaid = new Set<string>();
+    const clientKind = (client: string): ClientKind | null => {
+      const described = observed.clients[client];
+      const fromFile = observed.client_kinds?.[client] ?? (typeof described === "object" ? described.kind : undefined) ?? null;
+      const fromLabels = input.labels?.clients[client]?.kind ?? null;
+      if (fromFile !== null && fromLabels !== null && fromFile !== fromLabels && !kindsSaid.has(client)) {
+        kindsSaid.add(client);
+        issues.push({
+          level: "warning",
+          code: "client-kind-differs",
+          target: client,
+          message: `The measurements file gives client "${client}" the kind ${fromFile}; data/authored/measurement-labels.yaml gives it ${fromLabels}. The measurements file's kind is published and counts.`,
+        });
+      }
+      return fromFile ?? fromLabels;
+    };
     const omit = (input.labels?.omit_note_parts_mentioning ?? []).map((word) => word.toLowerCase());
     const publicNote = (note: string | undefined): string | undefined => {
       if (!note) return undefined;
@@ -657,6 +679,7 @@ export function resolve(input: ResolveInput): ResolveResult {
         late_excluded: typeof run.late_excluded === "number" ? run.late_excluded : null,
         note: note ?? null,
         source: sourceUrl(run.source),
+        client_kind: clientKind(run.client),
       };
       (evaluations.get(model) ?? evaluations.set(model, []).get(model)!).push(evaluation);
       // The lifetime is derived from the published checks. Where groundtruth gives its own reading of the same run,
@@ -699,6 +722,7 @@ export function resolve(input: ResolveInput): ResolveResult {
         note: limitNote ?? null,
         date: date ?? null,
         source: sourceUrl(limit.source),
+        client_kind: clientKind(limit.client),
       };
       const extension = modelExt(model);
       extension.limits ??= {};
@@ -748,6 +772,39 @@ export function resolve(input: ResolveInput): ResolveResult {
     const chosen = serving.find((item) => item.id === parts.model) ?? serving.sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))[0];
     return chosen ? `${parts.provider}/${chosen.id}` : null;
   };
+
+  // The draft record of every entry as it stands before step 6 publishes them: step 6 reads the corrections and the
+  // evidence of the entry whose price a subscription entry refers to, whichever of the two is published first.
+  const drafts = new Map<PublishedModel, DraftModel>();
+  for (const provider of Object.values(catalog)) for (const model of Object.values(provider.models)) drafts.set(model, modelExt(model));
+  /** The newest of dated sources, and its URL; the first listed among equals. */
+  const newestSource = (sources: readonly { date?: string | null; url: string }[]): Dated => {
+    let best: Dated = { date: null, evidence_url: null };
+    for (const source of sources) if (source.date && (best.date === null || source.date > best.date)) best = { date: source.date, evidence_url: source.url };
+    return best;
+  };
+  /** One reading of an entry (design/sources-side-by-side.md, 2.3). Without an entry, every quantity states nothing. */
+  const readingOf = (model: JsonObject | undefined, fromMeasurement: readonly string[], pricing: Pricing | null): EntryReading => {
+    const limit = model && isObject(model.limit) ? model.limit : {};
+    const window = model ? documentedInput(limit, fromMeasurement) : null;
+    const output = typeof limit.output === "number" && limit.output > 0 && !fromMeasurement.includes("output") ? limit.output : null;
+    const items = model ? documentedItems(documentedCaching(model), () => ({ source: "models.dev", date: null })) : [];
+    const lowestOf = (profile: "short" | "long"): number | null => {
+      const values = items.filter((item) => item.retention_profile === profile).map((item) => item.lifetime_s);
+      return values.length > 0 ? Math.min(...values) : null;
+    };
+    const parts = pricing ? priceParts(pricing) : null;
+    return {
+      input_window: window ? { value: window.tokens, field: window.field } : null,
+      max_output: output,
+      cache_short: lowestOf("short"),
+      cache_long: lowestOf("long"),
+      price: parts && pricing ? { parts, rules: pricing.rules } : null,
+    };
+  };
+  /** The entry as models.dev has it, before any override. Undefined on an entry providers.dev adds. */
+  const importedOf = (providerId: string, model: PublishedModel): JsonObject | undefined =>
+    drafts.get(model)?.origin === "upstream" ? (input.upstream[providerId]?.models[model.id] as JsonObject | undefined) : undefined;
 
   // 6. Deterministic order, and every record published with all of its keys.
   const sorted: Catalog = {};
@@ -835,7 +892,7 @@ export function resolve(input: ResolveInput): ResolveResult {
       const cache: EntryCache = {
         documented,
         retention,
-        lifetime: cacheLifetime(caching, own, lifetimeSource),
+        lifetime: cacheLifetime(caching, own, lifetimeSource, extension.access),
         evaluations: own,
       };
       // The lifetime an option of the retention control asks for is kept equal to the documented lifetime of its profile.
@@ -866,7 +923,7 @@ export function resolve(input: ResolveInput): ResolveResult {
         if (extension.origin === "added") return { source: "providers.dev", date: newestDate(evidence.map((source) => source.date)) ?? null };
         return { source: "models.dev", date: input.upstreamDate ?? null };
       };
-      const entryWindow = inputWindow(model.limit, fromMeasurement, measuredLimits, limitSource);
+      const entryWindow = inputWindow(model.limit, fromMeasurement, measuredLimits, limitSource, extension.access);
       for (const limit of measuredLimits) {
         if ((limit.input_accepted === null && limit.input_refused === null) || windowMeasurement(limit) !== null) continue;
         const stated = [limit.input_accepted !== null ? `input_accepted ${limit.input_accepted}` : null, limit.input_refused !== null ? `input_refused ${limit.input_refused}` : null, limit.context !== null ? `context ${limit.context}` : null].filter(Boolean).join(", ");
@@ -883,6 +940,49 @@ export function resolve(input: ResolveInput): ResolveResult {
         ...own.map((m) => m.date),
         ...(extension.limits?.measured ?? []).map((m) => m.date ?? undefined),
       ]);
+      // The safe values (design/sources-side-by-side.md): what providers.dev measured, what it states of its own and
+      // models.dev, each read from the entry; what models.dev states is read from the entry as imported, before any override.
+      const draftOwn = drafts.get(model)!;
+      const correctionsOf = (owner: DraftModel, touches: (path: string) => boolean): Dated =>
+        newestSource((owner.provenance ?? []).filter((change) => touches(change.path)).flatMap((change) => change.evidence));
+      const addedOwn = (owner: DraftModel, listed: boolean): Dated =>
+        newestSource([...(owner.evidence ?? []), ...declared].filter((source) => listed || source.kind !== "listed"));
+      const ownOf = (touches: (path: string) => boolean, listed: boolean): Dated => (extension.origin === "added" ? addedOwn(draftOwn, listed) : correctionsOf(draftOwn, touches));
+      // The price is the entry's whose price it is: on a subscription entry, the API entry it refers to (2.4).
+      const priceDraft = drafts.get(priced);
+      const ownerParts = priced === model ? { provider: id, model: model.id } : splitRef(reference ?? "");
+      const importedOwner = ownerParts && priceDraft?.origin === "upstream" ? (input.upstream[ownerParts.provider]?.models[ownerParts.model] as JsonObject | undefined) : undefined;
+      const priceOwn: Dated = (() => {
+        const declaration = pricingDeclarations.get(priced)?.evidence ?? [];
+        if (!priceDraft) return { date: null, evidence_url: null };
+        if (priceDraft.origin === "added") return newestSource([...(priceDraft.evidence ?? []), ...declaration].filter((source) => source.kind !== "listed"));
+        return newestSource([...(priceDraft.provenance ?? []).filter((change) => change.path === "cost" || change.path.startsWith("cost.")).flatMap((change) => change.evidence), ...declaration]);
+      })();
+      const ownDates: Record<SafeQuantity, Dated> = {
+        input_window: ownOf((path) => ["limit", "limit.input", "limit.context"].includes(path), true),
+        max_output: ownOf((path) => ["limit", "limit.output"].includes(path), true),
+        cache_short: ownOf((path) => path === "capabilities" || path === "capabilities.cache" || path.startsWith("capabilities.cache."), false),
+        cache_long: ownOf((path) => path === "capabilities" || path === "capabilities.cache" || path.startsWith("capabilities.cache."), false),
+        price: priceOwn,
+      };
+      const imported = importedOf(id, model);
+      const importedPrice = importedOwner ? pricingOf(importedOwner, extension.access, reference, []) : null;
+      const contextOf = isObject(model.limit) && typeof model.limit.context === "number" && model.limit.context > 0 && !fromMeasurement.includes("context") ? model.limit.context : null;
+      const kindOf = (profile: "short" | "long"): ClientKind | null => cache.lifetime.lifetimes.find((item) => item.retention_profile === profile && item.chosen)?.client_kind ?? null;
+      const safe = safeValues({
+        access: extension.access,
+        imported: { ...readingOf(imported, [], null), price: readingOf(undefined, [], importedPrice).price },
+        published: readingOf(model, fromMeasurement, pricing),
+        own: ownDates,
+        imported_date: input.upstreamDate ?? null,
+        measured: {
+          input_window: measuredWindow(entryWindow.measurements),
+          max_output: measuredOutput(extension.access, measuredLimits),
+          cache_short: measuredLifetime(own, "short", kindOf("short")),
+          cache_long: measuredLifetime(own, "long", kindOf("long")),
+        },
+        context: contextOf,
+      });
       // One fixed set of keys, in one order, on every entry.
       const published: ModelExtension = {
         origin: extension.origin,
@@ -893,13 +993,14 @@ export function resolve(input: ResolveInput): ResolveResult {
         pricing,
         request_controls: requestControls,
         limits: { measured: measuredLimits, from_measurement: fromMeasurement, input_window: entryWindow },
+        safe,
         evidence: publishEvidence(evidence),
         verified: verified ?? null,
         // What pi's catalog states for the entry: null here, always. The build lays pi's checked part over the finished
         // dataset afterwards (scripts/lib/pi-fence.ts).
         pi: null,
       };
-      model[NS] = published as unknown as Json;
+      model[NS] = mirror(published) as unknown as Json;
     }
     const draft = provExt(provider);
     const publishedProvider: ProviderExtension = {

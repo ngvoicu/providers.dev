@@ -297,7 +297,7 @@ describe("API response boundary", () => {
 
   it("shows the version and the Stability section of the OpenAPI document on /docs/api/", async () => {
     const html = await (await page("/docs/api/")).text();
-    expect(html).toContain("Version 1.3.0 ·");
+    expect(html).toContain("Version 1.4.0 ·");
     expect(html).toContain('<h2 id="stability">Stability</h2>');
     expect(html).toContain("/api/v1 only grows.");
   });
@@ -339,7 +339,7 @@ describe("API response boundary", () => {
 
   it("has every declared filter of the entry list in the catalog's form, as a control or carried, once", async () => {
     // A query that sets every parameter, so that a carried one is written.
-    const all = "q=model&provider=provider-02&family=f&canonical_id=lab/model-1&type=chat&access=api&origin=upstream&cache=yes&cache_mode=implicit&lifetime_basis=measured&min_context=1&min_output=1&max_age_months=600&evaluated=false&sort=cache_short&order=desc&limit=10&offset=10";
+    const all = "q=model&provider=provider-02&family=f&canonical_id=lab/model-1&type=chat&access=api&origin=upstream&cache=yes&cache_mode=implicit&lifetime_basis=measured&min_context=1&min_output=1&min_input_window=1&max_age_months=600&evaluated=false&disagree=false&sort=cache_short&order=desc&limit=10&offset=10";
     expect(PARAMS.map(({ name }) => name).filter((name) => !all.includes(`${name}=`))).toEqual([]);
     const html = (await (await page(`/?${all}`)).text()).match(/<form id="filters"[\s\S]*?<\/form>/)?.[0] ?? "";
     const names = [...html.matchAll(/<(?:input|select)\b[^>]*\bname="([^"]+)"/g)].map((match) => match[1]);

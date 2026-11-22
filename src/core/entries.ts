@@ -4,6 +4,7 @@ import { cacheFacts, type CacheLifetimeRecord, type CacheMode, type CacheRetenti
 import type { InputWindow } from "./limits.ts";
 import { isObject, type JsonObject } from "./merge.ts";
 import type { PiSummary } from "./pi.ts";
+import type { SafeValues } from "./safe.ts";
 import type { Pricing, RequestControls } from "./policy-contract.ts";
 import { NS, type Access, type Catalog, type ModelExtension, type ProviderExtension } from "./schema.ts";
 
@@ -33,10 +34,12 @@ export interface Summary {
   context: number | null;
   /** limit.input: the largest input this provider accepts, where it is lower than the context window. Null = not stated. */
   input: number | null;
-  /** limit.output: the most tokens one response can hold. A maximum, not a default. Null = unknown. */
+  /** The safe maximum output, `safe.max_output.value`: the most tokens one response can hold. A maximum, not a default. Null = unknown. */
   max_output: number | null;
   /** How much input a request can carry on this entry: the same object as `providers_dev.limits.input_window` of the full entry. */
   input_window: InputWindow;
+  /** The safe values of the entry: the same object as `providers_dev.safe` of the full entry. */
+  safe: SafeValues;
   cache: CacheSupport;
   cache_modes: CacheMode[];
   cache_mode_support: Record<CacheMode, Support>;
@@ -131,8 +134,9 @@ export function summarize(providerId: string, model: JsonObject, shard: number):
     origin: extension.origin === "added" ? "added" : touched ? "modified" : "upstream",
     context: count(limit.context),
     input: count(limit.input),
-    max_output: count(limit.output),
+    max_output: extension.safe.max_output.value,
     input_window: extension.limits.input_window,
+    safe: extension.safe,
     ...cacheFacts(extension.cache.documented),
     cache_retention: extension.cache.retention.support,
     cache_lifetime: extension.cache.lifetime,

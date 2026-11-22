@@ -127,6 +127,15 @@
               "minimum": 0
             }
           },
+          "query:min_input_window": {
+            "in": "query",
+            "name": "min_input_window",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
           "query:max_age_months": {
             "in": "query",
             "name": "max_age_months",
@@ -145,6 +154,14 @@
               "type": "boolean"
             }
           },
+          "query:disagree": {
+            "in": "query",
+            "name": "disagree",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
           "query:sort": {
             "in": "query",
             "name": "sort",
@@ -155,6 +172,7 @@
                 "cache_long",
                 "cache_short",
                 "context",
+                "input_window",
                 "max_output",
                 "model",
                 "name",
@@ -1539,6 +1557,9 @@
         "input_window": {
           "ref": "InputWindow"
         },
+        "safe": {
+          "ref": "SafeValues"
+        },
         "cache": {
           "type": "string",
           "enum": [
@@ -1820,6 +1841,9 @@
               "ref": "InputWindow"
             }
           }
+        },
+        "safe": {
+          "ref": "SafeValues"
         },
         "evidence": {
           "type": "array",
@@ -2315,6 +2339,7 @@
           "type": "string",
           "enum": [
             "models.dev",
+            "pi.dev",
             "providers.dev"
           ],
           "nullable": true
@@ -2475,6 +2500,18 @@
             "ref": "CacheResult"
           },
           "nullable": true
+        },
+        "client_kind": {
+          "type": "string",
+          "enum": [
+            "direct",
+            "own_client",
+            "proxy"
+          ],
+          "nullable": true
+        },
+        "chosen": {
+          "type": "boolean"
         }
       }
     },
@@ -2568,6 +2605,15 @@
         "source": {
           "type": "string",
           "format": "uri"
+        },
+        "client_kind": {
+          "type": "string",
+          "enum": [
+            "direct",
+            "own_client",
+            "proxy"
+          ],
+          "nullable": true
         }
       }
     },
@@ -4103,6 +4149,310 @@
         "source": {
           "type": "string",
           "format": "uri"
+        },
+        "client_kind": {
+          "type": "string",
+          "enum": [
+            "direct",
+            "own_client",
+            "proxy"
+          ],
+          "nullable": true
+        }
+      }
+    },
+    "SafeValues": {
+      "type": "object",
+      "properties": {
+        "input_window": {
+          "ref": "SafeValue"
+        },
+        "max_output": {
+          "ref": "SafeValue"
+        },
+        "cache_short": {
+          "ref": "SafeValue"
+        },
+        "cache_long": {
+          "ref": "SafeValue"
+        },
+        "price": {
+          "ref": "SafePrice"
+        },
+        "differing": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "cache_long",
+              "cache_short",
+              "input_window",
+              "max_output",
+              "price"
+            ]
+          }
+        }
+      }
+    },
+    "SafeValue": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "number",
+          "minimum": 0,
+          "nullable": true
+        },
+        "unit": {
+          "type": "string",
+          "enum": [
+            "seconds",
+            "tokens"
+          ]
+        },
+        "at_least": {
+          "type": "boolean"
+        },
+        "scope": {
+          "type": "string",
+          "enum": [
+            "input",
+            "window"
+          ],
+          "nullable": true
+        },
+        "window_tokens": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "nullable": true
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "measured",
+            "models.dev",
+            "pi.dev",
+            "providers.dev"
+          ],
+          "nullable": true
+        },
+        "date": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "nullable": true
+        },
+        "agreement": {
+          "type": "string",
+          "enum": [
+            "agree",
+            "differ",
+            "none",
+            "single"
+          ]
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "ref": "SourceValue"
+          }
+        }
+      }
+    },
+    "SourceValue": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string",
+          "enum": [
+            "measured",
+            "models.dev",
+            "pi.dev",
+            "providers.dev"
+          ]
+        },
+        "value": {
+          "type": "number",
+          "minimum": 0,
+          "nullable": true
+        },
+        "withheld": {
+          "type": "boolean"
+        },
+        "at_least": {
+          "type": "boolean"
+        },
+        "below": {
+          "type": "number",
+          "minimum": 0,
+          "nullable": true
+        },
+        "scope": {
+          "type": "string",
+          "enum": [
+            "input",
+            "window"
+          ],
+          "nullable": true
+        },
+        "date": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "nullable": true
+        },
+        "evidence_url": {
+          "type": "string",
+          "format": "uri",
+          "nullable": true
+        },
+        "client": {
+          "type": "string",
+          "nullable": true
+        },
+        "client_label": {
+          "type": "string",
+          "nullable": true
+        },
+        "client_kind": {
+          "type": "string",
+          "enum": [
+            "direct",
+            "own_client",
+            "proxy"
+          ],
+          "nullable": true
+        },
+        "evaluation_id": {
+          "type": "string",
+          "nullable": true
+        }
+      }
+    },
+    "SafePrice": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string",
+          "enum": [
+            "models.dev",
+            "pi.dev",
+            "providers.dev"
+          ],
+          "nullable": true
+        },
+        "date": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "nullable": true
+        },
+        "agreement": {
+          "type": "string",
+          "enum": [
+            "agree",
+            "differ",
+            "none",
+            "single"
+          ]
+        },
+        "differs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "cache_read",
+              "cache_write",
+              "input",
+              "other",
+              "output",
+              "tiers"
+            ]
+          }
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "ref": "PriceStatement"
+          }
+        }
+      }
+    },
+    "PriceStatement": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string",
+          "enum": [
+            "models.dev",
+            "pi.dev",
+            "providers.dev"
+          ]
+        },
+        "withheld": {
+          "type": "boolean"
+        },
+        "input": {
+          "type": "number",
+          "minimum": 0,
+          "nullable": true
+        },
+        "output": {
+          "type": "number",
+          "minimum": 0,
+          "nullable": true
+        },
+        "cache_read": {
+          "type": "number",
+          "minimum": 0,
+          "nullable": true
+        },
+        "cache_write": {
+          "type": "number",
+          "minimum": 0,
+          "nullable": true
+        },
+        "tiers": {
+          "type": "array",
+          "items": {
+            "ref": "PiCostTier"
+          },
+          "nullable": true
+        },
+        "date": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "nullable": true
+        },
+        "evidence_url": {
+          "type": "string",
+          "format": "uri",
+          "nullable": true
+        }
+      }
+    },
+    "PriceTier": {
+      "type": "object",
+      "properties": {
+        "input_tokens_above": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "input": {
+          "type": "number",
+          "minimum": 0,
+          "nullable": true
+        },
+        "output": {
+          "type": "number",
+          "minimum": 0,
+          "nullable": true
+        },
+        "cache_read": {
+          "type": "number",
+          "minimum": 0,
+          "nullable": true
+        },
+        "cache_write": {
+          "type": "number",
+          "minimum": 0,
+          "nullable": true
         }
       }
     },
@@ -4142,6 +4492,7 @@
           "type": "string",
           "enum": [
             "models.dev",
+            "pi.dev",
             "providers.dev"
           ],
           "nullable": true
@@ -4295,6 +4646,18 @@
         "source": {
           "type": "string",
           "format": "uri"
+        },
+        "client_kind": {
+          "type": "string",
+          "enum": [
+            "direct",
+            "own_client",
+            "proxy"
+          ],
+          "nullable": true
+        },
+        "chosen": {
+          "type": "boolean"
         }
       }
     },
@@ -4705,6 +5068,15 @@
         "source": {
           "type": "string",
           "format": "uri"
+        },
+        "client_kind": {
+          "type": "string",
+          "enum": [
+            "direct",
+            "own_client",
+            "proxy"
+          ],
+          "nullable": true
         }
       }
     },
@@ -4777,6 +5149,15 @@
         "source": {
           "type": "string",
           "format": "uri"
+        },
+        "client_kind": {
+          "type": "string",
+          "enum": [
+            "direct",
+            "own_client",
+            "proxy"
+          ],
+          "nullable": true
         }
       }
     },

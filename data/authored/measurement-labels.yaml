@@ -1,26 +1,38 @@
 # How the measurement file's client ids are named in what we publish, and which note parts are left out.
 # The raw results stay linked from every measurement for anyone who wants the full setup.
 #
+# Every client has a kind (design/sources-side-by-side.md, 2.3): `direct` (plain requests sent straight to the
+# provider), `own-client` (the vendor's own client) or `proxy` (requests through a proxy, plain or made by a coding
+# agent). It decides which measurement gives a safe value: on an API-key entry `direct` only; on a login `own-client`,
+# else `direct`, else `proxy`. Where the measurements file states a client's kind (`client_kinds`), that kind counts
+# and this one is the fallback; the build warns where the two differ (`client-kind-differs`).
+#
 # CLIProxyAPI is named (owner, 2026-11-13): a reader has to know which proxy a result went through to judge or
 # repeat it. The coding agent used on top of it is not named.
 clients:
   direct:
     id: direct
     label: Requests sent straight to the provider
+    kind: direct
   cliproxyapi:
     id: cliproxyapi
     label: Requests sent through CLIProxyAPI
+    kind: proxy
   pi+cliproxyapi:
     id: agent+cliproxyapi
     label: A coding agent, through CLIProxyAPI
+    kind: proxy
   codex-cli:
     id: codex-cli
     label: OpenAI's Codex CLI
+    kind: own-client
   devin-cli:
     id: devin-cli
     label: The Devin CLI
+    kind: own-client
   muse-code:
     id: muse-code
     label: Meta's Muse Code CLI
+    kind: own-client
 # A note is split on ";". A part that mentions one of these words is not published. Empty: nothing is left out.
 omit_note_parts_mentioning: []

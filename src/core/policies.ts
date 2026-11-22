@@ -2,6 +2,7 @@
 import { byCharacters, durationSeconds, type CacheRetention } from "./cache.ts";
 import { isObject, type Json, type JsonObject } from "./merge.ts";
 import type { Condition, PolicyEvidence, Pricing, PricingInput, PricingRule, PricingRuleInput, RequestControl, RequestControls, ResultingRate } from "./policy-contract.ts";
+import type { PriceParts, PriceTier } from "./safe.ts";
 
 // The condition keys of models.dev's cost schema (`CostConditionKeyV2Values`), as fields of a request.
 const fields: Record<string, string> = {
@@ -310,4 +311,55 @@ export function retentionFromControl(control: RequestControl): CacheRetention {
     conditions: [...control.conditions, ...(control.when === null && !control.options?.some((option) => option.when !== null) ? [] : ["See the cache.retention request control for the conditions of the control and of its options."])],
     evidence: control.evidence,
   };
+}
+
+// ---- the parts of a price that sources are compared on (design/sources-side-by-side.md, 2.6)
+
+const PART_METERS = { input: "text.input", output: "text.output", cache_read: "text.cache_read", cache_write: "text.cache_write" } as const;
+type PartName = keyof typeof PART_METERS;
+const PART_OF: Record<string, PartName> = Object.fromEntries(Object.entries(PART_METERS).map(([part, meter]) => [meter, part as PartName]));
+/** A rate in US dollars per million tokens: what every part is read in. */
+const perMillionTokens = (rule: PricingRule): boolean => rule.operation === "set" && rule.currency === "USD" && rule.unit?.name === "token" && rule.unit.quantity === 1000000;
+
+/**
+ * A price in the parts sources are compared on (2.6), read from the normalized rules: the base rule of `text.input`,
+ * `text.output`, `text.cache_read` and `text.cache_write` (`when: null`, `set`, US dollars per million tokens; where
+ * there are several, the last listed, as `price_in` is read); the tiers, from the rules of those four meters whose
+ * condition is one predicate on `request.context_tokens`, `gt N` (threshold N) or `gte N` (N less 1), one tier per
+ * threshold, ascending, null where such a rule is in another unit or its threshold is not a whole number of 0 or more;
+ * and everything else of the price, `other`, compared as a whole. Null = the record states no price (no rule).
+ */
+export function priceParts(pricing: Pricing): PriceParts | null {
+  const rules = pricing.rules;
+  if (rules === null || rules.length === 0) return null;
+  const parts: PriceParts = { input: null, output: null, cache_read: null, cache_write: null, tiers: [], other: [] };
+  const tiers = new Map<number, PriceTier>();
+  const bases: Record<PartName, number[]> = { input: [], output: [], cache_read: [], cache_write: [] };
+  let readable = true;
+  for (const rule of rules) {
+    const part = PART_OF[rule.meter];
+    if (part && rule.when === null && perMillionTokens(rule)) {
+      bases[part].push(rule.amount);
+      continue;
+    }
+    const when = rule.when;
+    if (part && rule.operation === "set" && when?.kind === "predicate" && when.field === "request.context_tokens" && (when.op === "gt" || when.op === "gte")) {
+      const threshold = typeof when.value === "number" ? (when.op === "gt" ? when.value : when.value - 1) : Number.NaN;
+      if (!perMillionTokens(rule) || !Number.isInteger(threshold) || threshold < 0) {
+        readable = false;
+        continue;
+      }
+      const tier = tiers.get(threshold) ?? { input_tokens_above: threshold, input: null, output: null, cache_read: null, cache_write: null };
+      tier[part] = rule.amount;
+      tiers.set(threshold, tier);
+      continue;
+    }
+    parts.other.push(rule);
+  }
+  for (const part of Object.keys(bases) as PartName[]) {
+    const amounts = bases[part];
+    parts[part] = (amounts.length === 1 ? amounts[0] : pricing.rule_order === "listed" ? amounts.at(-1) : undefined) ?? null;
+  }
+  parts.tiers = readable ? [...tiers.values()].sort((a, b) => a.input_tokens_above - b.input_tokens_above) : null;
+  return parts;
 }

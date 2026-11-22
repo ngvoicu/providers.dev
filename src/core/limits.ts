@@ -3,9 +3,13 @@
 // Pure: no file, no network, no clock. No dependencies beyond the JSON helpers: this file also runs in the browser.
 import { byCharacters } from "./cache.ts";
 import { isObject } from "./merge.ts";
+import { countingKind, type ClientKind, type EntryAccess } from "./safe.ts";
 import type { MeasuredLimit } from "./schema.ts";
 
+/** Who documents a value: models.dev as imported, or providers.dev (a correction, an entry it adds). */
 export type LimitSource = "providers.dev" | "models.dev";
+/** Who the safe value is from, as the record names it: a measured value is providers.dev's. Since 1.4.0 also pi.dev. */
+export type WindowSource = LimitSource | "pi.dev";
 export type DocumentedField = "limit.input" | "limit.context";
 export type WindowKind = "window" | "bracket" | "accepted";
 export type WindowBound = "limit" | "at_least";
@@ -31,6 +35,10 @@ export interface InputWindowMeasurement {
   /** `input_read` of the evaluation. Null = not checked. */
   read: number | null;
   source: string;
+  /** The kind of the client (design/sources-side-by-side.md, 2.3). Null = the client has none, and the item feeds nothing. */
+  client_kind: ClientKind | null;
+  /** True where the item is of the kind that gives the measured statement of the input window (`countingKind`). */
+  chosen: boolean;
 }
 
 /** `providers_dev.limits.input_window` of an entry and `input_window` of a summary. */
@@ -39,7 +47,7 @@ export interface InputWindow {
   basis: "documented" | "measured" | "none";
   bound: WindowBound | null;
   scope: "input" | "window" | null;
-  source: LimitSource | null;
+  source: WindowSource | null;
   date: string | null;
   documented_tokens: number | null;
   documented_field: DocumentedField | null;
@@ -112,6 +120,8 @@ export function windowMeasurement(evaluation: LimitEvaluation): InputWindowMeasu
     named,
     read,
     source: evaluation.source,
+    client_kind: evaluation.client_kind,
+    chosen: false,
   };
 }
 
@@ -166,24 +176,31 @@ export function emptyInputWindow(): InputWindow {
 }
 
 /**
- * The input window of an entry (section 4): the documented value unless a counted evaluation clearly contradicts it,
- * else the measured value (the lowest over the counted evaluations), else null. `sourceOf` says who documents the
- * field read and on which date (section 3.2); it is asked only where a value is documented, with the field read.
+ * The record of the input window of an entry, without its safe value: the documented value, every counted evaluation
+ * as an item of `measurements` with its kind and whether it is `chosen`, and the measured keys, which are those of the
+ * chosen items only (design/sources-side-by-side.md, 5.2). The safe value (`tokens`, `basis`, `bound`, `scope`,
+ * `source`, `date`) is worked out by `safeValues` and written by `mirror` (src/core/safe.ts); here it stays empty.
+ * `sourceOf` says who documents the field read and on which date (section 3.2); it is asked only where a value is
+ * documented, with the field read.
  */
 export function inputWindow(
   limit: unknown,
   fromMeasurement: readonly string[],
   measured: readonly LimitEvaluation[],
   sourceOf: (field: DocumentedField) => { source: LimitSource; date: string | null },
+  access: EntryAccess = "api",
 ): InputWindow {
   const record = emptyInputWindow();
   const documented = documentedInput(limit, fromMeasurement);
   const measurements = measured.flatMap((evaluation) => windowMeasurement(evaluation) ?? []).sort(byWindow);
-  const lowest = measurements[0];
+  const kind = countingKind(access, measurements.map((item) => item.client_kind));
+  for (const item of measurements) item.chosen = kind !== null && item.client_kind === kind;
+  const chosen = measurements.filter((item) => item.chosen);
+  const lowest = chosen[0];
 
   record.measurements = measurements;
-  record.evaluations = measurements.length;
-  record.clients = new Set(measurements.map((item) => item.client)).size;
+  record.evaluations = chosen.length;
+  record.clients = new Set(chosen.map((item) => item.client)).size;
   if (lowest) {
     record.measured_tokens = lowest.tokens;
     record.measured_bound = lowest.bound;
@@ -191,23 +208,14 @@ export function inputWindow(
     record.measured_refused = lowest.kind === "bracket" ? lowest.refused : null;
     record.measured_date = lowest.date;
   }
-
-  let contradicted = false;
   if (documented) {
     const { source, date } = sourceOf(documented.field);
     record.documented_tokens = documented.tokens;
     record.documented_field = documented.field;
     record.documented_source = source;
     record.documented_date = date;
-    // The test, applied once: basis and documented_status are both set from this one result.
-    contradicted = measurements.some((item) => windowContradicts(item, documented.tokens, documented.field));
-    if (lowest) record.documented_status = contradicted ? "contradicted" : "not_contradicted";
-  }
-
-  if (documented && !contradicted) {
-    Object.assign(record, { tokens: documented.tokens, basis: "documented", bound: "limit", scope: documented.field === "limit.input" ? "input" : "window", source: record.documented_source, date: record.documented_date });
-  } else if (lowest) {
-    Object.assign(record, { tokens: lowest.tokens, basis: "measured", bound: lowest.bound, scope: lowest.kind === "window" ? "window" : "input", source: "providers.dev", date: lowest.date });
+    // Whether the measurement that counts contradicts the documented value (4.2); no longer which of the two is safe.
+    if (lowest) record.documented_status = chosen.some((item) => windowContradicts(item, documented.tokens, documented.field)) ? "contradicted" : "not_contradicted";
   }
   return record;
 }

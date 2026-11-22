@@ -407,7 +407,7 @@ describe("resolve: measurements", () => {
   };
   const login = { id: "lab-login", name: "Lab login", access: "subscription" as const, access_basis: "a login", evidence, models: [] };
   const routes = { "lab-api": { provider: "lab" }, "lab-login": { provider: "lab-login" } };
-  const directLabel = { clients: { direct: { id: "direct", label: "Straight to the provider" } }, omit_note_parts_mentioning: [] };
+  const directLabel = { clients: { direct: { id: "direct", label: "Straight to the provider", kind: "direct" as const } }, omit_note_parts_mentioning: [] };
 
   it("puts a measurement next to the documented value without replacing it", () => {
     const { catalog } = resolve(input([], { observed, routes, labels: directLabel, additions: [login] }));
@@ -481,7 +481,7 @@ describe("resolve: measurements", () => {
         { route: "lab-login", client: "direct", model: "c", base_model: "lab/model-a", input_accepted: 900000, input_refused: 910000, date: "2026-11-12", source: "results/limits-2026-11-08/l.jsonl" },
       ],
     };
-    const labels = { clients: { direct: { id: "direct", label: "Direct" }, "tool-x": { id: "tool-x", label: "Tool X" }, "other-tool": { id: "other-tool", label: "Other tool" } }, omit_note_parts_mentioning: [] };
+    const labels = { clients: { direct: { id: "direct", label: "Direct", kind: "direct" as const }, "tool-x": { id: "tool-x", label: "Tool X", kind: "direct" as const }, "other-tool": { id: "other-tool", label: "Other tool", kind: "direct" as const } }, omit_note_parts_mentioning: [] };
     const { catalog } = resolve(input([], { observed: rows, routes, labels, additions: [login] }));
     const measured = (ref: [string, string]) => ext(catalog[ref[0]]!.models[ref[1]]!).limits.measured.map((item) => [item.client, item.date, item.input_accepted, item.input_read]);
     expect(measured(["lab", "model-a"])).toEqual([["direct", "2026-11-08", 150000, null], ["tool-x", "2026-11-12", 120000, 110000]]);
@@ -490,7 +490,7 @@ describe("resolve: measurements", () => {
     expect(ext(catalog["lab-login"]!.models.c!).evidence.map((item) => item.date)).toEqual(["2026-11-12"]);
     // Every limit evaluation has the same keys, input_read among them.
     const keys = new Set(Object.values(catalog).flatMap((provider) => Object.values(provider.models).flatMap((model) => ext(model).limits.measured.map((item) => Object.keys(item).join(",")))));
-    expect([...keys]).toEqual(["route,route_label,client,client_label,context,output,input_accepted,input_refused,input_read,output_accepted,note,date,source"]);
+    expect([...keys]).toEqual(["route,route_label,client,client_label,context,output,input_accepted,input_refused,input_read,output_accepted,note,date,source,client_kind"]);
   });
 
   it("names clients by their public label, drops note parts on the omit list and skips runs marked as lacking", () => {
@@ -502,7 +502,7 @@ describe("resolve: measurements", () => {
         { ...observed.cache[0]!, id: "other/R9", client: "mystery" },
       ],
     };
-    const labels = { clients: { "tool-x": { id: "gateway", label: "Through a gateway" } }, omit_note_parts_mentioning: ["toolx"] };
+    const labels = { clients: { "tool-x": { id: "gateway", label: "Through a gateway", kind: "direct" as const } }, omit_note_parts_mentioning: ["toolx"] };
     const { catalog, issues } = resolve(input([], { observed: labelled, routes, labels, additions: [login] }));
     const cache = ext(catalog.lab!.models["model-a"]!).cache;
     const runs = cache.evaluations;
@@ -622,7 +622,10 @@ describe("resolve: measurements", () => {
       const { catalog } = resolved();
       const now = Object.fromEntries(Object.values(catalog).flatMap((provider) => Object.values(provider.models).map((model) => {
         const extension = ext(model);
-        return [`${provider.id}/${model.id}`, { limit: model.limit ?? null, measured: extension.limits.measured, from_measurement: extension.limits.from_measurement, verified: extension.verified, origin: extension.origin }];
+        // Since 1.4.0 a limit evaluation also names its client's kind; every other key is as it was.
+        expect(extension.limits.measured.every((item) => item.client_kind === "direct")).toBe(true);
+        const measured = extension.limits.measured.map(({ client_kind: _kind, ...item }) => item);
+        return [`${provider.id}/${model.id}`, { limit: model.limit ?? null, measured, from_measurement: extension.limits.from_measurement, verified: extension.verified, origin: extension.origin }];
       })));
       expect(now).toEqual(BEFORE_INPUT_WINDOW);
     });
@@ -648,6 +651,7 @@ describe("resolve: measurements", () => {
           retention_profile: "short", basis: "measured", source: "providers.dev", date: "2026-11-05", lifetime_s: 300, mode: null, documented_as: null,
           client: "direct", client_label: "Straight to the provider", parameter: null, value: null, evaluations: 1, evaluation_ids: ["run-1"], checks: 3, hits: 3,
           tested_from_s: 300, first_miss_s: null, results: [{ kind: "timed", age_s: 300, hits: 3, checks: 3, hit_rate_pct: 100 }],
+          client_kind: "direct", chosen: true,
         },
       ]);
       expect(lifetime.short).toEqual({ safe_s: 300, basis: "measured", source: "providers.dev", date: "2026-11-05", documented_s: null, measured_s: 300, documented_status: null, clients: 1, evaluations: 1, checks: 3, hits: 3, checks_inside: null, hits_inside: null, tested_from_s: 300, first_miss_s: null });
@@ -889,7 +893,7 @@ describe("resolve: measurements", () => {
       const cache = openai({ prompt_cache_options: { ttl: "12h" } });
       expect(asked(cache)).toEqual([["long", "prompt_cache_options.ttl", "12h"]]);
       expect(cache.evaluations[0]!.request_settings).toEqual({ prompt_cache_options: { ttl: "12h" } });
-      expect(cache.lifetime.long).toMatchObject({ safe_s: 43200, basis: "documented", documented_s: 43200, measured_s: 43200, documented_status: "not_contradicted", evaluations: 1 });
+      expect(cache.lifetime.long).toMatchObject({ safe_s: 43200, basis: "measured", documented_s: 43200, measured_s: 43200, documented_status: "not_contradicted", evaluations: 1 });
       expect(cache.lifetime.short).toMatchObject({ safe_s: 1800, basis: "documented", documented_s: 1800, measured_s: null, evaluations: 0 });
       expect(cache.lifetime.lifetimes.filter((item) => item.basis === "measured").map((item) => [item.retention_profile, item.parameter, item.value, item.lifetime_s, item.first_miss_s]))
         .toEqual([["long", "prompt_cache_options.ttl", "12h", 43200, 86400]]);
@@ -899,10 +903,10 @@ describe("resolve: measurements", () => {
       expect(asked(openai({ prompt_cache_retention: "12h" }))).toEqual([["long", "prompt_cache_retention", "12h"]]);
     });
 
-    it("puts the same run with empty options in short, beside the documented 30 minutes", () => {
+    it("puts the same run with empty options in short, beside the documented 30 minutes: the measurement, which contradicts it", () => {
       const cache = openai({});
       expect(asked(cache)).toEqual([["short", null, null]]);
-      expect(cache.lifetime.short).toMatchObject({ safe_s: 1800, basis: "documented", documented_s: 1800, measured_s: 43200, documented_status: "not_contradicted", evaluations: 1 });
+      expect(cache.lifetime.short).toMatchObject({ safe_s: 43200, basis: "measured", documented_s: 1800, measured_s: 43200, documented_status: "contradicted", evaluations: 1 });
       expect(cache.lifetime.long).toMatchObject({ safe_s: 43200, basis: "documented", measured_s: null, evaluations: 0 });
       // prompt_cache_options without a ttl asks for nothing either.
       expect(asked(openai({ prompt_cache_options: {} }))).toEqual([["short", null, null]]);
@@ -954,7 +958,7 @@ describe("resolve: measurements", () => {
       catalog.lab!.models["model-c"] = { id: "model-c", name: "Model C", capabilities: { cache: { explicit: { ttl: ["60s", "1m", "2h"] } } } };
       // Two raw clients share a public id, with its one label.
       const labels = MeasurementLabels.parse({
-        clients: { direct: { id: "direct", label: "Straight to the provider" }, "direct-2": { id: "direct", label: "Straight to the provider" }, "tool-x": { id: "gateway", label: "Through a gateway" } },
+        clients: { direct: { id: "direct", label: "Straight to the provider", kind: "direct" as const }, "direct-2": { id: "direct", label: "Straight to the provider", kind: "direct" as const }, "tool-x": { id: "gateway", label: "Through a gateway", kind: "direct" as const } },
       });
       const at = (model: string) => ({ model, models_dev: `lab/${model}` });
       const runs: ObservedFile = {

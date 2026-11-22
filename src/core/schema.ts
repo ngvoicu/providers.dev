@@ -8,6 +8,7 @@ import { ModelMetadataShape } from "./metadata-contract.ts";
 import { PricingDeclarationSchema, RequestControlDeclarationsSchema, type Pricing, type RequestControls } from "./policy-contract.ts";
 import type { Change, Json, JsonObject } from "./merge.ts";
 import type { PiBlock } from "./pi.ts";
+import type { ClientKind, SafeValues } from "./safe.ts";
 
 export const UPSTREAM_SCHEMA = "models.dev v2 (experimental)";
 /** Everything we add to a provider or model lives under this one key. */
@@ -299,23 +300,38 @@ export type PiAliases = z.infer<typeof PiAliases>;
 /** What a client the labels file does not describe is published as. */
 export const OTHER_CLIENT = { id: "other", label: "Another client" } as const;
 
-// One public client id has one label: several raw clients may share an id only with the same label. So the label of
-// a published client is a function of its id, and nothing depends on which of its evaluations comes first. The id
-// `other` is taken by OTHER_CLIENT and keeps its label.
+/**
+ * The kind of a client as a file writes it (design/sources-side-by-side.md, 2.3): `direct`, `own-client` or `proxy`.
+ * `own_client`, the spelling of groundtruth's `client_kinds`, is read the same. Published as `own_client`.
+ */
+export const ClientKindText = z.enum(["direct", "own-client", "own_client", "proxy"]).transform((kind): ClientKind => (kind === "own-client" ? "own_client" : kind));
+
+// One public client id has one label and one kind: several raw clients may share an id only with the same label and
+// kind. So the label and the kind of a published client are functions of its id, and nothing depends on which of its
+// evaluations comes first. The id `other` is taken by OTHER_CLIENT and keeps its label.
 export const MeasurementLabels = z
   .strictObject({
-    clients: z.record(z.string(), z.strictObject({ id: z.string().min(1), label: z.string().min(1) })),
+    clients: z.record(z.string(), z.strictObject({ id: z.string().min(1), label: z.string().min(1), kind: ClientKindText })),
     omit_note_parts_mentioning: z.array(z.string().min(1)).default([]),
   })
   .superRefine((file, ctx) => {
-    const seen = new Map<string, { raw: string | null; label: string }>([[OTHER_CLIENT.id, { raw: null, label: OTHER_CLIENT.label }]]);
+    const seen = new Map<string, { raw: string | null; label: string; kind: ClientKind | null }>([[OTHER_CLIENT.id, { raw: null, label: OTHER_CLIENT.label, kind: null }]]);
     for (const [raw, client] of Object.entries(file.clients)) {
       const before = seen.get(client.id);
       if (!before) {
-        seen.set(client.id, { raw, label: client.label });
+        seen.set(client.id, { raw, label: client.label, kind: client.kind });
         continue;
       }
-      if (before.label === client.label) continue;
+      // `other` is a label, not a client: it has no kind of its own.
+      if (before.label === client.label && (before.raw === null || before.kind === client.kind)) continue;
+      if (before.label === client.label) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["clients", raw, "kind"],
+          message: `Public client id "${client.id}" has two kinds: "${before.raw}" (${before.kind}) and "${raw}" (${client.kind}). One public client id has one kind.`,
+        });
+        continue;
+      }
       const first = before.raw === null ? `a client the file does not describe ("${before.label}")` : `"${before.raw}" ("${before.label}")`;
       ctx.addIssue({
         code: "custom",
@@ -425,12 +441,22 @@ export const ObservedKnown = z.looseObject({
   when: z.record(z.string(), z.json()).optional(),
 });
 
+/**
+ * A client of the measurements file: a text that describes it, as today, or an object that may state its kind
+ * (design/sources-side-by-side.md, section 13, point 4). Both are read.
+ */
+export const ObservedClient = z.union([z.string(), z.looseObject({ kind: ClientKindText.optional() })]);
+
 export const ObservedFile = z
   .looseObject({
     schema: z.number(),
     repository: z.url(),
     routes: z.record(z.string(), z.string()),
-    clients: z.record(z.string(), z.string()),
+    clients: z.record(z.string(), ObservedClient),
+    /** The kind of each client, beside `clients`. Absent in files written before groundtruth added it. */
+    client_kinds: z.record(z.string(), ClientKindText).optional(),
+    /** How each route is reached: with an API key or a login. Read and checked; the entry's own access decides which kind counts. */
+    route_kinds: z.record(z.string(), z.enum(["api_key", "login"])).optional(),
     cache: z.array(ObservedRun),
     limits: z.array(ObservedLimit).default([]),
     known: z.array(ObservedKnown).default([]),
@@ -503,6 +529,8 @@ export interface MeasuredLimit {
   note: string | null;
   date: string | null;
   source: string;
+  /** The kind of the client (design/sources-side-by-side.md, 2.3). Null = the client has none: the evaluation feeds no safe value. */
+  client_kind: ClientKind | null;
 }
 
 export interface ModelExtension {
@@ -524,6 +552,8 @@ export interface ModelExtension {
     /** How much input a request can carry on this entry, and what that rests on (`inputWindow` in limits.ts). On every entry. */
     input_window: InputWindow;
   };
+  /** The safe value of each quantity and what every source states (src/core/safe.ts). On every entry. */
+  safe: SafeValues;
   evidence: PublishedEvidence[];
   /** The newest date among our evidence and measurements for this entry. Null = none. */
   verified: string | null;
@@ -560,6 +590,7 @@ export interface Issue {
     | "inherit-target-missing"
     | "unmapped-route"
     | "unmapped-client"
+    | "client-kind-differs"
     | "invalid-authored"
     | "reserved-field"
     | "lifetime-differs"

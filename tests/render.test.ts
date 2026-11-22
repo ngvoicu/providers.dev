@@ -9,10 +9,11 @@ import { canonicalModels } from "../src/core/resources.ts";
 import { resolve } from "../src/core/resolve.ts";
 import { NS, UpstreamModel, type ModelExtension } from "../src/core/schema.ts";
 import { pricingOf } from "../src/core/policies.ts";
-import { expectStandings, limitOf, NO_CACHE, piPlaces, piShort, resolveWithPi, summaryOf, valueCells } from "./helpers.ts";
+import { expectStandings, finishLifetime, finishWindow, limitOf, NO_CACHE, piPlaces, piShort, resolveWithPi, summaryOf, valueCells } from "./helpers.ts";
 import { duration, usd, usdUnrounded } from "../src/core/format.ts";
 import type { PiBlock, PiCatalog, PiModel, PiValue } from "../src/core/pi.ts";
 import type { MetaPi } from "../src/core/schema.ts";
+import type { EntryAccess } from "../src/core/safe.ts";
 
 const row = (more: Partial<Summary>): string => rowHtml(summaryOf(more), { today: { date: new Date("2026-11-13T00:00:00Z"), stale_after_days: 90 } });
 const count = (html: string, part: string): number => html.split(part).length - 1;
@@ -23,22 +24,27 @@ function run(id: string, client: string, profile: RetentionProfile, results: [nu
     id, route: "lab-api", route_label: "Lab API key", client, client_label: `Requests sent through ${client}`, date: "2026-11-04", request_settings: {},
     retention_profile: profile, parameter: null, value: null, late_excluded: 0, note: null, source: `https://example.com/results/${id}.json`,
     results: results.map(([age, hits, checks]) => cacheResult(age === 0 ? "control" : "timed", age, hits, checks)),
+    client_kind: client === "direct" ? "direct" : client === "muse-code" ? "own_client" : "proxy",
     ...more,
   };
 }
 
 /** The cache record of an entry as the build makes it: documented caching as models.dev writes it, and its evaluations. */
-function cacheOf(cache: Json | undefined, evaluations: CacheEvaluation[] = []): EntryCache {
+function cacheOf(cache: Json | undefined, evaluations: CacheEvaluation[] = [], access: EntryAccess = "api"): EntryCache {
   const caching = documentedCaching(cache === undefined ? {} : { capabilities: { cache } });
-  return { ...NO_CACHE, documented: caching.documented, lifetime: cacheLifetime(caching, evaluations, () => ({ source: "models.dev", date: "2026-11-15" })), evaluations };
+  return { ...NO_CACHE, documented: caching.documented, lifetime: finishLifetime(cacheLifetime(caching, evaluations, () => ({ source: "models.dev", date: "2026-11-15" }), access), evaluations), evaluations };
 }
 
 // The cases of the brief, as the dataset of 2026-11-15 has them (design/safe-cache-lifetime.md, section 10).
 const K1_BETA = run("cpa-8.0.53/K1-beta", "cliproxyapi", "long", [[0, 1, 1], [600, 3, 3], [1800, 2, 3], [3900, 0, 3]], { parameter: "cache_control.ttl", value: "1h", request_settings: { format: "messages", ttl: "1h", beta: "extended-cache-ttl-2025-04-11" } });
 const K1_NOBETA = run("cpa-8.0.53/K1-nobeta", "cliproxyapi", "long", [[0, 1, 1], [600, 3, 3], [1800, 3, 3], [3900, 0, 3]], { parameter: "cache_control.ttl", value: "1h", request_settings: { format: "messages", ttl: "1h" } });
+const AN_OPUS_1H = run("direct-2026-11-17/an-opus-1h", "direct", "long", [[0, 1, 1], [3600, 3, 3], [3900, 0, 3]], { date: "2026-11-17", parameter: "cache_control.ttl", value: "1h", request_settings: { format: "messages", ttl: "1h" } });
 const CASES = {
-  /** anthropic/claude-opus-5-5: long documented 1 h and not contradicted, though the client held 10 minutes. */
-  opus: cacheOf({ explicit: { ttl: ["5m", "1h"] } }, [K1_BETA, K1_NOBETA]),
+  /**
+   * anthropic/claude-opus-5-5: long documented 1 h; measured directly through the hour (a miss at 65 minutes), which
+   * agrees; the two runs through the proxy held 10 minutes and do not count on an API-key entry.
+   */
+  opus: cacheOf({ explicit: { ttl: ["5m", "1h"] } }, [K1_BETA, K1_NOBETA, AN_OPUS_1H]),
   /** openrouter/google/gemini-3.8-flash: short documented 5 minutes, contradicted; 0 s measured. */
   flash: cacheOf({ explicit: { ttl: ["5m"] } }, [run("openrouter-direct/R5", "direct", "short", [[0, 1, 1], [150, 0, 3], [300, 0, 3]])]),
   /** meta-subscription/muse-wonder-1.0: nothing documented; three clients, one never hit; a long run with a note. */
@@ -47,7 +53,7 @@ const CASES = {
     run("harness-2026-11-07/H5", "muse-code", "short", [[0, 0, 1], [150, 0, 3], [300, 0, 3]], { note: "Muse Code caches its own system prompt but never the conversation" }),
     run("harness-2026-11-07/H6", "agent+cliproxyapi", "short", [[0, 1, 1], [150, 3, 3], [7200, 3, 3]]),
     run("meta-24h-2026-11-10/M2", "agent+cliproxyapi", "long", [[0, 1, 1], [14400, 3, 3], [43200, 0, 3], [86400, 0, 3]], { parameter: "prompt_cache_retention", value: "24h", note: "No age under 4 h was tested in this run" }),
-  ]),
+  ], "subscription"),
   /** alibaba/qwen-mt-plus: documented as not caching. */
   none: cacheOf(false),
   /** Nothing documented, nothing measured. */
@@ -174,14 +180,15 @@ describe("the cache lifetime in a table row", () => {
   const text = (html: string): string => html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 
   it("prints the safe value of short and long, each with its basis in a word", () => {
-    expect(text(cell(CASES.opus))).toBe("Short 5 min documented Long 1 h documented measured 10 min");
+    expect(text(cell(CASES.opus))).toBe("Short 5 min documented Long 1 h measured documented 1 h");
     expect(text(cell(CASES.wonder))).toBe("Short 0 s measured Long 4 h measured");
-    expect(count(cell(CASES.opus), '<span class="basis documented"')).toBe(2);
+    expect(count(cell(CASES.opus), '<span class="basis documented"')).toBe(1);
+    expect(count(cell(CASES.opus), '<span class="basis measured"')).toBe(1);
     expect(count(cell(CASES.wonder), '<span class="basis measured"')).toBe(2);
   });
 
   it("names the other lifetime beside the safe one, and marks a documented one a measurement contradicts", () => {
-    expect(cell(CASES.opus)).toContain('<span class="life-other">measured 10 min</span>');
+    expect(cell(CASES.opus)).toContain('<span class="life-other">documented 1 h</span>');
     expect(cell(CASES.flash)).toContain('<span class="life-other contradicted">documented 5 min</span>');
     expect(text(cell(CASES.flash))).toBe("Short 0 s measured documented 5 min Long Unknown");
   });
@@ -191,7 +198,7 @@ describe("the cache lifetime in a table row", () => {
     expect(text(cell(CASES.none))).toBe("Short None documented Long None documented");
     expect(text(cell(CASES.flash))).toContain("Short 0 s measured");
     // The source and the date are in the title of each value.
-    expect(cell(CASES.opus)).toContain("Long retention, safe lifetime: 3,600 s, documented, models.dev, 2026-11-15. Documented: 3,600 s. Measured: 600 s (1 client, 2 evaluations). 13 of 14 checks hit inside the documented lifetime.");
+    expect(cell(CASES.opus)).toContain("Long retention, safe lifetime: 3,600 s, measured, providers.dev, 2026-11-17. Documented: 3,600 s. Measured: 3,600 s (1 client, 1 evaluation). 4 of 4 checks hit inside the documented lifetime.");
     expect(cell(CASES.flash)).toContain("Short retention, safe lifetime: 0 s, measured, providers.dev, 2026-11-04.");
   });
 
@@ -249,14 +256,14 @@ describe("the cache lifetimes on an entry page", () => {
   const bodies = (html: string): string[] => [...section(html).matchAll(/<tbody class="([^"]+)">([\s\S]*?)<\/tbody>/g)].map((match) => `${match[1]}: ${text(match[2]!)}`);
 
   it("starts with the safe lifetime of short and long, its basis, source and date", () => {
-    expect(text(tiles(page(CASES.opus)))).toContain("Cache lifetime, short 5 min documented models.dev · 2026-11-15 Cache lifetime, long 1 h documented models.dev · 2026-11-15 Measured 10 min");
+    expect(text(tiles(page(CASES.opus)))).toContain("Cache lifetime, short 5 min documented models.dev · 2026-11-15 Cache lifetime, long 1 h measured providers.dev · 2026-11-17 Documented 1 h");
     expect(text(tiles(page(CASES.flash)))).toContain("Cache lifetime, short 0 s measured providers.dev · 2026-11-04 Documented 5 min, contradicted Cache lifetime, long Unknown");
     expect(text(tiles(page(CASES.unknown)))).toContain("Cache lifetime, short Unknown Not documented or measured Cache lifetime, long Unknown");
   });
 
   it("lists every documented and measured lifetime in one table, by retention, each with its basis, source and date", () => {
     const rows = bodies(page(CASES.opus));
-    expect(rows.map((body) => body.split(":")[0])).toEqual(["profile", "item documented", "profile", "item documented", "item measured"]);
+    expect(rows.map((body) => body.split(":")[0])).toEqual(["profile", "item documented", "profile", "item documented", "item measured", "item measured"]);
     expect(rows[0]).toContain("Short retention Safe lifetime 5 min documented models.dev 2026-11-15 Documented 5 min Measured Not measured Inside the documented lifetime Not applicable");
     expect(rows[1]).toBe("item documented: 5 min documented models.dev 2026-11-15 Manual explicit As documented: 5m Not applicable");
     expect(rows[3]).toBe("item documented: 1 h documented models.dev 2026-11-15 Manual explicit As documented: 1h Not applicable");
@@ -266,7 +273,7 @@ describe("the cache lifetimes on an entry page", () => {
 
   it("shows where a documented lifetime stands beside a worse measurement, and where a measurement contradicts it", () => {
     const opus = bodies(page(CASES.opus))[2]!;
-    expect(opus).toContain("Long retention Safe lifetime 1 h documented models.dev 2026-11-15 Documentation not contradicted Documented 1 h Measured 10 min · 1 client Inside the documented lifetime 13 of 14 checks hit");
+    expect(opus).toContain("Long retention Safe lifetime 1 h measured providers.dev 2026-11-17 Documentation not contradicted Documented 1 h Measured 1 h · 1 client Inside the documented lifetime 4 of 4 checks hit");
     const flash = bodies(page(CASES.flash));
     expect(flash[0]).toContain("Short retention Safe lifetime 0 s measured providers.dev 2026-11-04 Documentation contradicted Documented 5 min Measured 0 s · 1 client Inside the documented lifetime 1 of 7 checks hit");
     // The contradicted documented lifetime stays in the list, beside the measurement.
@@ -428,8 +435,8 @@ describe("the age columns of results by age", () => {
     expect(html).toContain('<th scope="colgroup" colspan="3" class="span">');
     expect(html).toContain('<td class="profile-facts" colspan="4">');
     expect(html).toContain('<td class="heat-none" colspan="3" data-label="Results by age">');
-    // Three cells on the measured lifetime's row and on each of its two evaluations.
-    expect(html.match(/<td class="heat( unchecked)?"/g)).toHaveLength(3 * 3);
+    // Three cells on each measured lifetime's row and on each of its evaluations: the proxy's item with two, the direct one with one.
+    expect(html.match(/<td class="heat( unchecked)?"/g)).toHaveLength(3 * 5);
     // A column the ages now have shows its result: 1 h 5, 0 of 6, where the published ladder has no column for it.
     expect(html).toContain('<td class="heat" data-label="1 h 5"><span class="none" title="After 1 h 5 min: 0 of 6 re-sends served from the cache (0%)">0<small>0/6</small></span></td>');
     // With the published ladder, the same entry has its 19 columns.
@@ -495,18 +502,23 @@ describe("the input window", () => {
   const bracket = (date: string) => limitOf({ ...login, input_accepted: 915011, input_refused: 922500, date });
   const CASES = {
     /** anthropic/claude-opus-5-5 (example 9): a window documented, not measured. */
-    documented: inputWindow({ context: 1000000, output: 128000 }, [], [], sourceOf),
-    /** openai-codex/gpt-6.1-sol (example 1): an input limit documented, a bracket under it. */
-    notContradicted: inputWindow({ context: 1050000, input: 922000, output: 128000 }, [], [bracket("2026-11-13")], sourceOf),
+    documented: finishWindow(inputWindow({ context: 1000000, output: 128000 }, [], [], sourceOf)),
+    /**
+     * openai-codex/gpt-6.1-sol (example 1): an input limit documented, a bracket under it that does not contradict it,
+     * and the documented cap as the value. Since 1.4.0 the rule publishes such a record where the measurement is a
+     * window that contains the cap (2.4 of design/sources-side-by-side.md); the page prints whatever record it is given,
+     * so the safe keys are written here by hand.
+     */
+    notContradicted: { ...finishWindow(inputWindow({ context: 1050000, input: 922000, output: 128000 }, [], [bracket("2026-11-13")], sourceOf)), tokens: 922000, basis: "documented", bound: "limit", scope: "input", source: "models.dev", date: "2026-11-15" },
     /** A documented window the route names smaller (test a of 4.2). */
-    contradicted: inputWindow({ context: 1000000 }, [], [limitOf({ ...login, context: 900000, date: "2026-11-08" })], sourceOf),
+    contradicted: finishWindow(inputWindow({ context: 1000000 }, [], [limitOf({ ...login, context: 900000, date: "2026-11-08" })], sourceOf)),
     /** openai-codex/gpt-6-astra (example 3): nothing documented, a bracket. */
-    measured: inputWindow(undefined, [], [bracket("2026-11-11")], sourceOf),
+    measured: finishWindow(inputWindow(undefined, [], [bracket("2026-11-11")], sourceOf)),
     /** devin/claude-opus-5-5 (example 11): nothing known. */
     none: emptyInputWindow(),
   } satisfies Record<string, InputWindow>;
   /** claude-subscription/claude-opus-5-5 (example 6): the window the route names, written onto the added entry. */
-  const named = inputWindow({ context: 1000000, output: 128000 }, ["context", "output"], [limitOf({ ...login, context: 1000000, output: 128000, date: "2026-11-08" })], sourceOf);
+  const named = finishWindow(inputWindow({ context: 1000000, output: 128000 }, ["context", "output"], [limitOf({ ...login, context: 1000000, output: 128000, date: "2026-11-08" })], sourceOf));
 
   const { catalog } = resolve({
     upstream: { lab: { id: "lab", name: "Lab", models: { m: UpstreamModel.parse({ id: "m", name: "M" }) } } },
@@ -575,7 +587,7 @@ describe("the input window", () => {
   });
 
   it("gives each measurement its own line, in the order of the record, under one row heading", () => {
-    const two = inputWindow(undefined, [], [bracket("2026-11-11"), limitOf({ client: "direct", client_label: "Straight to the provider", input_accepted: 950000, input_read: 940000, date: "2026-11-12", source: "https://example.com/other" })], sourceOf);
+    const two = finishWindow(inputWindow(undefined, [], [bracket("2026-11-11"), limitOf({ client: "direct", client_label: "Straight to the provider", input_accepted: 950000, input_read: 940000, date: "2026-11-12", source: "https://example.com/other" })], sourceOf));
     expect(two.measurements.map((item) => item.client)).toEqual(["cliproxyapi", "direct"]);
     expect(lines(page(two)).slice(2)).toEqual([
       "Measured | at least 915,011 tokens 915,011 accepted · 922,500 refused | Requests sent through CLIProxyAPI 2026-11-11 · Raw result",
@@ -677,11 +689,11 @@ describe("the input window of a model", () => {
   const sourceOf = () => ({ source: "models.dev" as const, date: "2026-11-15" });
   const login = { route: "lab-subscription", route_label: "Lab plan", client: "cliproxyapi", client_label: "Requests sent through CLIProxyAPI" };
   /** A window documented as the context window: input and output together. */
-  const window = (context: number): InputWindow => inputWindow({ context }, [], [], sourceOf);
+  const window = (context: number): InputWindow => finishWindow(inputWindow({ context }, [], [], sourceOf));
   /** An input limit documented under a larger context window: input alone. */
-  const input = (tokens: number, context = 1050000): InputWindow => inputWindow({ context, input: tokens }, [], [], sourceOf);
+  const input = (tokens: number, context = 1050000): InputWindow => finishWindow(inputWindow({ context, input: tokens }, [], [], sourceOf));
   /** Nothing documented, a measurement that saw `accepted` taken and more refused: a lower bound. */
-  const atLeast = (accepted: number): InputWindow => inputWindow(undefined, [], [limitOf({ ...login, input_accepted: accepted, input_refused: accepted + 7500, date: "2026-11-11" })], sourceOf);
+  const atLeast = (accepted: number): InputWindow => finishWindow(inputWindow(undefined, [], [limitOf({ ...login, input_accepted: accepted, input_refused: accepted + 7500, date: "2026-11-11" })], sourceOf));
   const none = emptyInputWindow();
   /** A model of the lab "lab" with one entry per window and context, the API's own way (canonicalModels): the lab's entry first. */
   const modelOf = (windows: [string, InputWindow, number?][]) =>

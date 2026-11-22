@@ -3,6 +3,7 @@
 // A page formats these values; it does not add them up, work out a percentage or decide what is supported.
 // No dependencies beyond the JSON helpers: this file also runs in the browser.
 import { isObject, type Json, type JsonObject } from "./merge.ts";
+import { countingKind, type ClientKind, type EntryAccess } from "./safe.ts";
 
 /**
  * The ages every table of results by age has a column for, in seconds since the prompt was cached: the ladder every
@@ -72,6 +73,8 @@ export interface CacheEvaluation {
   note: string | null;
   /** The raw result. */
   source: string;
+  /** The kind of the client (design/sources-side-by-side.md, 2.3). Null = the client has none: the evaluation feeds no safe value. */
+  client_kind: ClientKind | null;
 }
 
 export interface RetentionEvidence {
@@ -110,6 +113,8 @@ export interface EntryCache {
 
 /** Who a lifetime is from: models.dev's documentation as imported, or providers.dev (a correction, an added entry, a measurement). */
 export type LifetimeSource = "providers.dev" | "models.dev";
+/** Who a safe lifetime is from, as the record names it: a measured one is providers.dev's. Since 1.4.0 also pi.dev. */
+export type SafeLifetimeSource = LifetimeSource | "pi.dev";
 
 /**
  * One lifetime of an entry: documented by a source, or measured for one client with one retention setting. One shape
@@ -138,20 +143,24 @@ export interface CacheLifetimeItem {
   tested_from_s: number | null;
   first_miss_s: number | null;
   results: CacheResult[] | null;
+  /** Measured: the kind of its client. Null on a documented item, and for a client without a kind. */
+  client_kind: ClientKind | null;
+  /** True where the item is measured and of the kind that gives the measured statement of its profile. False on every other. */
+  chosen: boolean;
 }
 
 /**
- * What the rule found of a profile's documented lifetime: contradicted (the safe value is the measured one) or not
- * contradicted (the safe value is the documented one). Set only where a lifetime above 0 is documented and measured.
+ * Whether the measurement that counts contradicts a profile's documented lifetime (design/sources-side-by-side.md,
+ * 2.5). Set only where a lifetime above 0 is documented and a kind that counts measured one.
  */
 export type DocumentedStatus = "contradicted" | "not_contradicted";
 
 /** The safe lifetime of an entry for one retention profile, and what it was chosen from. */
 export interface SafeLifetime {
-  /** Seconds a cached prompt can be relied on: `documented_s` unless an evaluation contradicts it, else `measured_s`. Null = not known. */
+  /** Seconds a cached prompt can be relied on: the safe value of `safe.cache_short` or `safe.cache_long`, copied by `mirror`. Null = not known. */
   safe_s: number | null;
   basis: "measured" | "documented" | "none";
-  source: LifetimeSource | null;
+  source: SafeLifetimeSource | null;
   date: string | null;
   documented_s: number | null;
   measured_s: number | null;
@@ -345,15 +354,6 @@ export function evaluationLifetime(evaluation: CacheEvaluation): EvaluationLifet
   return { safe_s: safe, first_miss_s: firstMiss, tested_from_s: timed[0]?.age_s ?? null };
 }
 
-/**
- * Whether one evaluation clearly contradicts a documented lifetime: at an age up to and including it (the control
- * too), fewer than half of the checks hit. Exactly half does not. Nothing contradicts a documented 0.
- */
-export function contradicts(evaluation: CacheEvaluation, documentedS: number): boolean {
-  if (documentedS <= 0) return false;
-  return evaluation.results.some((result) => result.age_s <= documentedS && 2 * result.hits < result.checks);
-}
-
 const documentedItem = (profile: RetentionProfile, lifetime: number, mode: CacheMode | null, text: string | null, from: { source: LifetimeSource; date: string | null }): CacheLifetimeItem => ({
   retention_profile: profile,
   basis: "documented",
@@ -373,6 +373,8 @@ const documentedItem = (profile: RetentionProfile, lifetime: number, mode: Cache
   tested_from_s: null,
   first_miss_s: null,
   results: null,
+  client_kind: null,
+  chosen: false,
 });
 
 /**
@@ -467,18 +469,22 @@ function measuredItem(members: readonly { evaluation: CacheEvaluation; lifetime:
     tested_from_s: lowest(members.map((member) => member.lifetime.tested_from_s)),
     first_miss_s: lowest(members.map((member) => member.lifetime.first_miss_s)),
     results,
+    client_kind: first.client_kind,
+    chosen: false,
   };
 }
 
 /**
  * The cache lifetime record of an entry: the documented items, a measured item per client and retention setting, in
- * one ordered list, and the safe value of each profile. The safe value is the documented lifetime unless a counted
- * evaluation of the profile contradicts it (`contradicts`), else the measured one (the lowest over the clients), else null.
+ * one ordered list, each measured item marked `chosen` where its client is of the kind that counts for its profile
+ * (`countingKind`), and per profile the documented and the measured lifetime, the latter over the chosen items only.
+ * The safe value of a profile is not chosen here: `safeValues` (src/core/safe.ts) does, and `mirror` writes it.
  */
 export function cacheLifetime(
   caching: DocumentedCaching,
   evaluations: readonly CacheEvaluation[],
   sourceOf: (mode: CacheMode | null) => { source: LifetimeSource; date: string | null },
+  access: EntryAccess = "api",
 ): CacheLifetimeRecord {
   const counted = evaluations.flatMap((evaluation) => {
     const lifetime = evaluationLifetime(evaluation);
@@ -487,7 +493,7 @@ export function cacheLifetime(
   const groups = new Map<string, typeof counted>();
   for (const member of counted) {
     const { retention_profile, parameter, value, client } = member.evaluation;
-    const key = JSON.stringify([retention_profile, parameter, value, client]);
+    const key = JSON.stringify([retention_profile, parameter, value, client, member.evaluation.client_kind]);
     groups.set(key, [...(groups.get(key) ?? []), member]);
   }
   const measured = [...groups.values()].map(measuredItem).sort(
@@ -497,15 +503,23 @@ export function cacheLifetime(
       (a.value === null ? 0 : lifetimeSeconds(a.value) ?? 0) - (b.value === null ? 0 : lifetimeSeconds(b.value) ?? 0) ||
       byCharacters(a.value, b.value) ||
       byCharacters(a.client, b.client) ||
-      byCharacters(a.parameter, b.parameter),
+      byCharacters(a.parameter, b.parameter) ||
+      byCharacters(a.client_kind, b.client_kind),
   );
+  // Which kind counts, per profile (design/sources-side-by-side.md, 2.3): the items of the others stay, not chosen.
+  for (const profile of RETENTION_PROFILES) {
+    const own = measured.filter((item) => item.retention_profile === profile);
+    const kind = countingKind(access, own.map((item) => item.client_kind));
+    for (const item of own) item.chosen = kind !== null && item.client_kind === kind;
+  }
   const docs = documentedItems(caching, sourceOf);
   const lifetimes = RETENTION_PROFILES.flatMap((profile) => [...docs, ...measured].filter((item) => item.retention_profile === profile));
 
   const safe = (profile: RetentionProfile): SafeLifetime => {
     const own = docs.filter((item) => item.retention_profile === profile);
-    const items = measured.filter((item) => item.retention_profile === profile);
-    const runs = counted.filter((member) => member.evaluation.retention_profile === profile).map((member) => member.evaluation);
+    const items = measured.filter((item) => item.retention_profile === profile && item.chosen);
+    const ids = new Set(items.flatMap((item) => item.evaluation_ids));
+    const runs = counted.filter((member) => ids.has(member.evaluation.id) && member.evaluation.retention_profile === profile);
     const documentedS = lowest(own.map((item) => item.lifetime_s));
     const measuredS = lowest(items.map((item) => item.lifetime_s));
     const record = emptySafeLifetime();
@@ -518,19 +532,16 @@ export function cacheLifetime(
     record.tested_from_s = lowest(items.map((item) => item.tested_from_s));
     record.first_miss_s = lowest(items.map((item) => item.first_miss_s));
     if (documentedS !== null && measuredS !== null) {
-      const inside = runs.flatMap((run) => run.results).filter((result) => result.age_s <= documentedS);
+      const inside = runs.flatMap((run) => run.evaluation.results).filter((result) => result.age_s <= documentedS);
       record.checks_inside = inside.reduce((sum, result) => sum + result.checks, 0);
       record.hits_inside = inside.reduce((sum, result) => sum + result.hits, 0);
     }
-    // The rule of design 4.1, applied once; its finding is published where there is something to find: a lifetime
-    // above 0 documented, and one measured. A documented 0 is never contradicted, and is left without a status.
-    const contradicted = documentedS !== null && runs.some((run) => contradicts(run, documentedS));
-    if (documentedS !== null && documentedS > 0 && measuredS !== null) record.documented_status = contradicted ? "contradicted" : "not_contradicted";
-    if (documentedS !== null && !contradicted) {
-      const chosen = own.find((item) => item.lifetime_s === documentedS)!;
-      Object.assign(record, { safe_s: documentedS, basis: "documented", source: chosen.source, date: chosen.date });
-    } else if (measuredS !== null) {
-      Object.assign(record, { safe_s: measuredS, basis: "measured", source: "providers.dev", date: newest(items.map((item) => item.date)) });
+    // Whether the measurement that counts contradicts the documented lifetime (design/sources-side-by-side.md, 2.5):
+    // every check still hit after it, or a check missed at an age it covers. Published where a lifetime above 0 is
+    // documented and one is measured. The safe value is not chosen here: `safeValues` does, and `mirror` copies it.
+    if (documentedS !== null && documentedS > 0 && measuredS !== null) {
+      const firstMiss = record.first_miss_s;
+      record.documented_status = documentedS < measuredS || (firstMiss !== null && documentedS >= firstMiss) ? "contradicted" : "not_contradicted";
     }
     return record;
   };

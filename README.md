@@ -119,6 +119,8 @@ What the build reports (in the console, on the *Our data* page and in `/api/v1/m
 - **addition-collides**: upstream added a provider with the id of one of ours.
 - **orphan-observation**, **unmapped-route**: evaluations that have no entry or provider to land on.
 - **unmapped-client**: an evaluation names a client that `data/authored/measurement-labels.yaml` does not describe.
+- **client-kind-differs**: the measurements file gives a client another kind than `data/authored/measurement-labels.yaml`
+  does. The measurements file's kind is published and decides which measurement counts; correct the labels file.
 - **excluded-observation**: an evaluation names an entry that a catalog-wide rule leaves out. It is not published.
 - **rule-version-unread**: an entry of a family a catalog-wide rule covers has no version the rule can read. It is
   published; correct its `canonical_id` with an override, or add the word it uses to the rule's `aliases`.

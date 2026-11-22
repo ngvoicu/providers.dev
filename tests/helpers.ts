@@ -24,6 +24,8 @@ import { addResults, documentedCache, emptyCacheLifetime, RETENTION_PROFILES, ty
 import type { Index, Summary } from "../src/core/entries.ts";
 import { controlsOf, pricingOf } from "../src/core/policies.ts";
 import { emptyInputWindow, type InputWindow } from "../src/core/limits.ts";
+import { countingKind, emptySafeValues, measuredLifetime, measuredWindow, mirror, SAFE_QUANTITIES, safeNumber, VALUE_SOURCES, type EntryAccess, type SafeValue, type SourceValue } from "../src/core/safe.ts";
+import { priceParts } from "../src/core/policies.ts";
 import { ext, type Catalog, type MeasuredLimit, type Meta, type ModelExtension, type PiAliases, type UpstreamCatalog } from "../src/core/schema.ts";
 import { piPart, type PiBlock, type PiCatalog, type PiModel, type PiReport, type PiSummary, type PiValue } from "../src/core/pi.ts";
 import { resolve, type ResolveInput, type ResolveResult } from "../src/core/resolve.ts";
@@ -44,6 +46,7 @@ export function extensionOf(more: Partial<ModelExtension> = {}): ModelExtension 
     pricing: pricingOf({}, more.access ?? "api", null, []),
     request_controls: controlsOf({}, NO_CACHE.retention, []),
     limits: { measured: [], from_measurement: [], input_window: emptyInputWindow() },
+    safe: emptySafeValues(),
     evidence: [],
     verified: null,
     pi: null,
@@ -53,14 +56,14 @@ export function extensionOf(more: Partial<ModelExtension> = {}): ModelExtension 
 
 /** A complete limit evaluation: what it did not measure is null. */
 export function limitOf(more: Partial<MeasuredLimit> = {}): MeasuredLimit {
-  return { route: "r", route_label: "R", client: "direct", client_label: "Direct", context: null, output: null, input_accepted: null, input_refused: null, input_read: null, output_accepted: null, note: null, date: null, source: "https://example.com/result", ...more };
+  return { route: "r", route_label: "R", client: "direct", client_label: "Direct", context: null, output: null, input_accepted: null, input_refused: null, input_read: null, output_accepted: null, note: null, date: null, source: "https://example.com/result", client_kind: "direct", ...more };
 }
 
 /** A complete entry summary with nothing known. */
 export function summaryOf(more: Partial<Summary> = {}): Summary {
   return {
     ref: "p/m", provider: "p", model: "m", name: "M", type: null, family: null, canonical_id: null, status: null, release_date: null,
-    access: "api", origin: "upstream", context: null, input: null, max_output: null, input_window: emptyInputWindow(),
+    access: "api", origin: "upstream", context: null, input: null, max_output: null, input_window: emptyInputWindow(), safe: emptySafeValues(),
     cache: "unknown", cache_modes: [], cache_mode_support: { implicit: "unknown", explicit: "unknown" },
     cache_retention: "unknown", cache_lifetime: emptyCacheLifetime(), evaluation_count: 0,
     price_in: null, price_out: null, price_from: null, pricing: pricingOf({}, "api", null, []), request_controls: controlsOf({}, NO_CACHE.retention, []),
@@ -71,12 +74,48 @@ export function summaryOf(more: Partial<Summary> = {}): Summary {
 
 export const evidence = [{ kind: "documented", url: "https://example.com/docs", date: "2026-11-01" }];
 
+/** A statement of a catalog (2.3), as `safeValues` makes it. */
+const stated = (source: "providers.dev" | "models.dev", value: number, date: string | null, scope: SourceValue["scope"] = null): SourceValue => ({
+  source, value, withheld: false, at_least: false, below: null, scope, date, evidence_url: null, client: null, client_label: null, client_kind: null, evaluation_id: null,
+});
+
 /**
- * What always holds for the cache lifetime record of an entry (section 2.6 of design/safe-cache-lifetime.md), checked
- * from the record, the entry's evaluations and its documented caching. Written apart from `cacheLifetime`: the walk
- * and the test for "contradicted" are redone here. Returns the rules that fail, empty when all hold.
+ * An input window record with its safe value, as the build makes it of one entry with no other source than the one
+ * its documented value names: the measured statement, the documented one, the rule, and `mirror`. `context` is the
+ * entry's published limit.context, for `window_tokens`.
  */
-export function lifetimeRuleBreaks(record: CacheLifetimeRecord, evaluations: readonly CacheEvaluation[], documented: CacheDocumentation): string[] {
+export function finishWindow(record: InputWindow, context: number | null = null): InputWindow {
+  const measured = measuredWindow(record.measurements);
+  const sources = [
+    ...(measured ? [measured.statement] : []),
+    ...(record.documented_tokens !== null && record.documented_source !== null ? [stated(record.documented_source, record.documented_tokens, record.documented_date, record.documented_field === "limit.input" ? "input" : "window")] : []),
+  ];
+  const extension = extensionOf({ limits: { measured: [], from_measurement: [], input_window: record } });
+  extension.safe.input_window = safeNumber("input_window", sources, measured?.items ?? [], context);
+  return mirror(extension).limits.input_window;
+}
+
+/** A cache lifetime record with the safe value of each profile, the same way (`finishWindow`). */
+export function finishLifetime(record: CacheLifetimeRecord, evaluations: readonly CacheEvaluation[]): CacheLifetimeRecord {
+  const extension = extensionOf({ cache: { ...NO_CACHE, lifetime: record } });
+  for (const [profile, key] of [["short", "cache_short"], ["long", "cache_long"]] as const) {
+    const kind = record.lifetimes.find((item) => item.retention_profile === profile && item.chosen)?.client_kind ?? null;
+    const measured = measuredLifetime(evaluations, profile, kind);
+    const own = record.lifetimes.filter((item) => item.retention_profile === profile && item.basis === "documented");
+    const lowest = own.reduce<(typeof own)[number] | null>((best, item) => (best === null || item.lifetime_s < best.lifetime_s ? item : best), null);
+    const sources = [...(measured ? [measured] : []), ...(lowest ? [stated(lowest.source, lowest.lifetime_s, lowest.date)] : [])];
+    extension.safe[key] = safeNumber(key, sources);
+  }
+  return mirror(extension).cache.lifetime;
+}
+
+/**
+ * What always holds for the cache lifetime record of an entry (section 2.6 of design/safe-cache-lifetime.md, with the
+ * rule of design/sources-side-by-side.md), checked from the record, the entry's evaluations, its documented caching
+ * and its access. Written apart from `cacheLifetime` and `safeValues`: the walk, which kind counts and the test for
+ * "contradicted" are redone here. Returns the rules that fail, empty when all hold.
+ */
+export function lifetimeRuleBreaks(record: CacheLifetimeRecord, evaluations: readonly CacheEvaluation[], documented: CacheDocumentation, access: EntryAccess = "api"): string[] {
   const broken: string[] = [];
   const fail = (rule: string, holds: boolean): void => {
     if (!holds) broken.push(rule);
@@ -100,37 +139,39 @@ export function lifetimeRuleBreaks(record: CacheLifetimeRecord, evaluations: rea
   for (const profile of RETENTION_PROFILES) {
     const p = record[profile];
     const docs = record.lifetimes.filter((item) => item.retention_profile === profile && item.basis === "documented");
-    const measured = record.lifetimes.filter((item) => item.retention_profile === profile && item.basis === "measured");
-    const runs = counted.filter((evaluation) => evaluation.retention_profile === profile);
+    const all = record.lifetimes.filter((item) => item.retention_profile === profile && item.basis === "measured");
+    // Which kind counts (2.3), redone: the first of the entry's order among the kinds measured.
+    const order = access === "subscription" ? ["own_client", "direct", "proxy"] : ["direct"];
+    const kind = order.find((k) => all.some((item) => item.client_kind === k)) ?? null;
+    const measured = all.filter((item) => kind !== null && item.client_kind === kind);
+    fail(`${profile} 0 chosen`, all.every((item) => item.chosen === measured.includes(item)) && docs.every((item) => !item.chosen && item.client_kind === null));
+    fail(`${profile} 0 countingKind`, countingKind(access, all.map((item) => item.client_kind)) === kind);
     fail(`${profile} 1 documented_s`, p.documented_s === min(docs.map((item) => item.lifetime_s)));
     fail(`${profile} 2 measured_s`, p.measured_s === min(measured.map((item) => item.lifetime_s)));
     fail(`${profile} 2 sums`, p.evaluations === measured.reduce((sum, item) => sum + item.evaluations, 0) && p.checks === measured.reduce((sum, item) => sum + item.checks, 0) && p.hits === measured.reduce((sum, item) => sum + item.hits, 0));
     fail(`${profile} 2 clients`, p.clients === new Set(measured.map((item) => item.client)).size);
     fail(`${profile} 2 ages`, p.tested_from_s === min(measured.map((item) => item.tested_from_s)) && p.first_miss_s === min(measured.map((item) => item.first_miss_s)));
     const none = p.basis === "none";
-    fail(`${profile} 3 none`, [p.safe_s === null, p.source === null, p.documented_s === null && p.measured_s === null, docs.length + measured.length === 0].every((value) => value === none));
+    fail(`${profile} 3 none`, [p.safe_s === null, p.source === null, docs.length + measured.length === 0].every((value) => value === none));
     if (p.basis === "documented") {
       const first = docs.find((item) => item.lifetime_s === p.documented_s);
       fail(`${profile} 4 documented`, p.documented_s !== null && p.safe_s === p.documented_s && first !== undefined && p.source === first.source && p.date === first.date);
     }
     if (p.basis === "measured") {
-      fail(`${profile} 5 measured`, p.measured_s !== null && p.safe_s === p.measured_s && p.source === "providers.dev" && p.date === (measured.map((item) => item.date!).sort().at(-1) ?? null));
+      const runs = counted.filter((run) => run.retention_profile === profile && measured.some((item) => item.evaluation_ids.includes(run.id)));
+      fail(`${profile} 5 measured`, p.measured_s !== null && p.safe_s === p.measured_s && p.source === "providers.dev" && runs.some((run) => run.date === p.date && walk(run.results).safe === p.measured_s));
     }
-    if (p.documented_s !== null) fail(`${profile} 6 not above documented`, p.safe_s !== null && p.safe_s <= p.documented_s);
-    if (p.documented_s !== null && p.measured_s === null) fail(`${profile} 7 documented only`, p.basis === "documented");
-    if (p.documented_s === null && p.measured_s !== null) fail(`${profile} 7 measured only`, p.basis === "measured");
+    // The first source that states a value gives it: a measurement that counts, else the documentation.
+    fail(`${profile} 7 order`, p.basis === (p.measured_s !== null ? "measured" : p.documented_s !== null ? "documented" : "none"));
     const both = p.documented_s !== null && p.measured_s !== null;
     fail(`${profile} 8 inside`, (p.checks_inside !== null && p.hits_inside !== null) === both && (!both || (p.hits_inside! <= p.checks_inside! && p.checks_inside! <= p.checks)));
     if (p.first_miss_s !== null) fail(`${profile} 9 first miss`, p.first_miss_s > (p.measured_s ?? -1) || (p.first_miss_s === 0 && p.measured_s === 0));
-    // 4.1, redone: the documented lifetime is the safe value unless a counted evaluation has fewer than half its checks hit at an age inside it.
-    const documentedS = p.documented_s;
-    const contradicted = documentedS !== null && documentedS > 0 && runs.some((run) => run.results.some((result) => result.age_s <= documentedS && result.hits * 2 < result.checks));
-    fail(`${profile} 4.1 rule`, p.basis === (documentedS !== null && !contradicted ? "documented" : p.measured_s !== null ? "measured" : "none"));
-    // documented_status: set exactly where a lifetime above 0 is documented and one is measured; contradicted exactly
-    // where the safe value is the measured one, not_contradicted where it is the documented one. Null everywhere else.
-    const judged = documentedS !== null && documentedS > 0 && p.measured_s !== null;
-    fail(`${profile} 4.1 status`, p.documented_status === (judged ? (contradicted ? "contradicted" : "not_contradicted") : null));
-    fail(`${profile} 4.1 status and basis`, p.documented_status === (judged ? (p.basis === "measured" ? "contradicted" : "not_contradicted") : null));
+    // documented_status (2.5), redone: set where a lifetime above 0 is documented and one is measured by a kind that
+    // counts; contradicted where every check still hit after it, or a check missed at an age it covers.
+    const S = p.documented_s;
+    const judged = S !== null && S > 0 && p.measured_s !== null;
+    const contradicted = judged && (S! < p.measured_s! || (p.first_miss_s !== null && S! >= p.first_miss_s));
+    fail(`${profile} 2.5 status`, p.documented_status === (judged ? (contradicted ? "contradicted" : "not_contradicted") : null));
   }
   for (const item of record.lifetimes.filter((entry) => entry.basis === "measured")) {
     const members = item.evaluation_ids.map((id) => byId.get(id));
@@ -143,7 +184,7 @@ export function lifetimeRuleBreaks(record: CacheLifetimeRecord, evaluations: rea
     fail(`${where} 10 walk`, item.evaluations === 1 ? summed === item.lifetime_s : summed >= item.lifetime_s);
     fail(`${where} 10 minimum`, item.lifetime_s === Math.min(...members.map((member) => walk(member!.results).safe)));
     if (item.first_miss_s !== null) fail(`${where} 9 first miss`, item.first_miss_s > item.lifetime_s || (item.first_miss_s === 0 && item.lifetime_s === 0));
-    fail(`${where} kind`, item.mode === null && item.documented_as === null && item.source === "providers.dev" && members.every((member) => member?.client === item.client && member.retention_profile === item.retention_profile && member.parameter === item.parameter && member.value === item.value));
+    fail(`${where} kind`, item.mode === null && item.documented_as === null && item.source === "providers.dev" && members.every((member) => member?.client === item.client && member.client_kind === item.client_kind && member.retention_profile === item.retention_profile && member.parameter === item.parameter && member.value === item.value));
   }
   for (const evaluation of evaluations) {
     const named = record.lifetimes.filter((item) => item.evaluation_ids.includes(evaluation.id)).length;
@@ -157,16 +198,18 @@ export function lifetimeRuleBreaks(record: CacheLifetimeRecord, evaluations: rea
 }
 
 /**
- * What always holds for the input window record of an entry (section 2.6 of design/usable-input-window.md), checked
- * from the record and the entry's own published `limit`, `limits.from_measurement` and `limits.measured`. Written
- * apart from `inputWindow`: the documented input (3.1), what each evaluation gives (3.3) and the test for
- * "contradicted" (4.2) are redone here. Returns the rules that fail, empty when all hold.
+ * What always holds for the input window record of an entry (section 2.6 of design/usable-input-window.md, with the
+ * rule of design/sources-side-by-side.md), checked from the record and the entry's own published `limit`,
+ * `limits.from_measurement`, `limits.measured` and access. Written apart from `inputWindow` and `safeValues`: the
+ * documented input (3.1), what each evaluation gives (3.3), which kind counts (2.3) and the test for "contradicted"
+ * (4.2) are redone here. Returns the rules that fail, empty when all hold.
  */
 export function inputWindowRuleBreaks(
   record: InputWindow,
   limit: unknown,
   fromMeasurement: readonly string[],
   measured: readonly (Omit<MeasuredLimit, "input_read"> & { input_read?: number | null })[],
+  access: EntryAccess = "api",
 ): string[] {
   const broken: string[] = [];
   const fail = (rule: string, holds: boolean): void => {
@@ -186,6 +229,11 @@ export function inputWindowRuleBreaks(
     return null;
   };
   const counted = measured.filter((e) => gives(e) !== null);
+  // 2.3, redone: the first kind of the entry's order among the kinds of the counted evaluations.
+  const order = access === "subscription" ? ["own_client", "direct", "proxy"] : ["direct"];
+  const kind = order.find((k) => counted.some((e) => e.client_kind === k)) ?? null;
+  const chosen = r.measurements.filter((item) => item.chosen);
+  fail("0 chosen", r.measurements.every((item) => item.chosen === (kind !== null && item.client_kind === kind)));
   const none = r.basis === "none";
   fail("1 none", [r.tokens === null, r.bound === null && r.scope === null && r.source === null, r.documented_tokens === null && r.measured_tokens === null].every((value) => value === none));
   if (r.basis === "documented") {
@@ -196,19 +244,19 @@ export function inputWindowRuleBreaks(
   }
   fail("4 documented null", (r.documented_tokens === null) === (r.documented_field === null) && (r.documented_tokens === null) === (r.documented_source === null));
   fail("4 documented value", r.documented_tokens === (documented?.tokens ?? null) && r.documented_field === (documented?.field ?? null));
-  const first = r.measurements[0];
+  const first = chosen[0];
   const empty = r.measured_tokens === null;
-  fail("5 measured null", [r.measurements.length === 0, r.evaluations === 0, r.clients === 0, r.measured_bound === null && r.measured_kind === null && r.measured_refused === null && r.measured_date === null].every((value) => value === empty));
+  fail("5 measured null", [chosen.length === 0, r.evaluations === 0, r.clients === 0, r.measured_bound === null && r.measured_kind === null && r.measured_refused === null && r.measured_date === null].every((value) => value === empty));
   if (first) {
     fail("5 first", r.measured_tokens === first.tokens && r.measured_bound === first.bound && r.measured_kind === first.kind && r.measured_date === first.date && r.measured_refused === (first.kind === "bracket" ? first.refused : null));
-    fail("5 lowest", r.measurements.every((item) => item.tokens >= first.tokens));
+    fail("5 lowest", chosen.every((item) => item.tokens >= first.tokens));
   }
-  fail("5 counts", r.evaluations === r.measurements.length && r.clients === new Set(r.measurements.map((item) => item.client)).size);
-  // 6: one item per counted evaluation, and the item is what the evaluation gives.
+  fail("5 counts", r.evaluations === chosen.length && r.clients === new Set(chosen.map((item) => item.client)).size);
+  // 6: one item per counted evaluation, of every client, and the item is what the evaluation gives.
   const unused = [...r.measurements];
   for (const e of counted) {
     const g = gives(e)!;
-    const at = unused.findIndex((item) => item.client === e.client && item.route === e.route && item.date === e.date && item.source === e.source && item.tokens === g.tokens && item.bound === g.bound && item.kind === g.kind && item.accepted === e.input_accepted && item.refused === e.input_refused && item.named === e.context && item.read === (e.input_read ?? null) && item.client_label === e.client_label && item.route_label === e.route_label);
+    const at = unused.findIndex((item) => item.client === e.client && item.client_kind === e.client_kind && item.route === e.route && item.date === e.date && item.source === e.source && item.tokens === g.tokens && item.bound === g.bound && item.kind === g.kind && item.accepted === e.input_accepted && item.refused === e.input_refused && item.named === e.context && item.read === (e.input_read ?? null) && item.client_label === e.client_label && item.route_label === e.route_label);
     fail(`6 item of ${e.client} ${e.route} ${e.date}`, at >= 0);
     if (at >= 0) unused.splice(at, 1);
   }
@@ -216,10 +264,9 @@ export function inputWindowRuleBreaks(
   const both = r.documented_tokens !== null && r.measured_tokens !== null;
   fail("7 status set", (r.documented_status !== null) === both);
   if (both) {
-    fail("7 status and basis", (r.documented_status === "contradicted") === (r.basis === "measured") && (r.documented_status === "not_contradicted") === (r.basis === "documented"));
-    // 4.2, redone from measurements.
+    // 4.2, redone from the chosen items.
     const D = r.documented_tokens!;
-    const contradicted = r.measurements.some(
+    const contradicted = chosen.some(
       (item) =>
         (item.named !== null && item.named < D) ||
         (item.kind === "window" && r.documented_field === "limit.context" && item.named !== D) ||
@@ -228,14 +275,117 @@ export function inputWindowRuleBreaks(
     );
     fail("7 rule", r.documented_status === (contradicted ? "contradicted" : "not_contradicted"));
   }
+  // 2.4, redone: the measurement first; a measured window gives way to a documented cap that is not above it.
+  if (r.measured_tokens !== null) {
+    const capped = r.measured_kind === "window" && r.documented_field === "limit.input" && r.documented_tokens! <= r.measured_tokens;
+    fail("8 measured first", r.basis === (capped ? "documented" : "measured"));
+  }
   if (r.documented_tokens !== null && r.measured_tokens === null) fail("8 documented only", r.basis === "documented");
-  if (r.documented_tokens === null && r.measured_tokens !== null) fail("8 measured only", r.basis === "measured");
   for (const item of r.measurements) {
     const where = `9 ${item.client} ${item.route}`;
     if (item.accepted !== null && item.refused !== null) fail(`${where} accepted below refused`, item.accepted < item.refused);
     if (item.accepted !== null && item.named !== null) fail(`${where} accepted within named`, item.accepted <= item.named);
     if (item.read !== null && item.accepted !== null) fail(`${where} read within accepted`, item.read <= item.accepted);
     fail(`${where} kind`, item.kind === "window" ? item.tokens === item.named && item.bound === "limit" : item.kind === "bracket" ? item.tokens === item.accepted && item.bound === "at_least" : item.tokens === item.read && item.bound === "at_least");
+  }
+  return broken;
+}
+
+/**
+ * What always holds for `safe` of every entry of a catalog (design/sources-side-by-side.md, the ten sentences of 5.1),
+ * and for the records that copy it (5.2). Written apart from `safeValues`: agreement, which kind counts and the copies
+ * are redone here from the published entry. Returns the rules that fail, as `ref: rule`, empty when all hold.
+ */
+export function safeBreaks(catalog: Catalog): string[] {
+  const broken: string[] = [];
+  const order = (source: string): number => (VALUE_SOURCES as readonly string[]).indexOf(source);
+  for (const [providerId, provider] of Object.entries(catalog)) {
+    for (const [modelId, model] of Object.entries(provider.models)) {
+      const ref = `${providerId}/${modelId}`;
+      const fail = (rule: string, holds: boolean): void => {
+        if (!holds) broken.push(`${ref}: ${rule}`);
+      };
+      const x = ext(model);
+      const safe = x.safe;
+      const kinds = (access: EntryAccess, list: readonly (string | null)[]): string | null => {
+        const sequence = access === "subscription" ? ["own_client", "direct", "proxy"] : ["direct"];
+        return sequence.find((kind) => list.includes(kind)) ?? null;
+      };
+      const chosenWindow = x.limits.input_window.measurements.filter((item) => item.chosen);
+      // The kind that gives each number quantity a measured value, redone from the evaluations.
+      const counting: Record<string, string | null> = {
+        input_window: kinds(x.access, x.limits.input_window.measurements.map((item) => item.client_kind)),
+        max_output: kinds(x.access, x.limits.measured.filter((limit) => typeof limit.output === "number" && limit.output > 0).map((limit) => limit.client_kind)),
+        cache_short: kinds(x.access, x.cache.lifetime.lifetimes.filter((item) => item.basis === "measured" && item.retention_profile === "short").map((item) => item.client_kind)),
+        cache_long: kinds(x.access, x.cache.lifetime.lifetimes.filter((item) => item.basis === "measured" && item.retention_profile === "long").map((item) => item.client_kind)),
+      };
+      fail("0 countingKind", ["input_window", "max_output", "cache_short", "cache_long"].every((quantity) => {
+        const list = quantity === "input_window" ? x.limits.input_window.measurements.map((item) => item.client_kind) : quantity === "max_output" ? x.limits.measured.filter((limit) => typeof limit.output === "number" && limit.output > 0).map((limit) => limit.client_kind) : x.cache.lifetime.lifetimes.filter((item) => item.basis === "measured" && item.retention_profile === (quantity === "cache_short" ? "short" : "long")).map((item) => item.client_kind);
+        return countingKind(x.access, list) === counting[quantity];
+      }));
+      for (const quantity of ["input_window", "max_output", "cache_short", "cache_long"] as const) {
+        const q: SafeValue = safe[quantity];
+        const where = (rule: string) => `${quantity} ${rule}`;
+        // 1. At most one item per source, in order.
+        fail(where("1 order"), q.sources.every((item, index) => index === 0 || order(item.source) > order(q.sources[index - 1]!.source)));
+        // 2. source names an item; the value is that item's. Null exactly with no item.
+        const item = q.sources.find((candidate) => candidate.source === q.source);
+        fail(where("2 source"), (q.source === null) === (q.sources.length === 0) && (q.source === null || item !== undefined));
+        if (item) fail(where("2 the item's"), q.value === (item.withheld ? null : item.value) && q.at_least === (item.withheld ? false : item.at_least) && q.scope === (item.withheld ? null : item.scope) && q.date === item.date);
+        // 3. The first item's, but for the refinement of the input window.
+        const first = q.sources[0];
+        if (first && item && item !== first) fail(where("3 refinement"), quantity === "input_window" && first.scope === "window" && !first.withheld && item.scope === "input" && item.value! <= first.value!);
+        // 4. value null exactly where nothing states one or providers.dev withholds it.
+        fail(where("4 null"), (q.value === null) === (item === undefined || item.withheld));
+        // 5. Agreement, redone.
+        const clash = (a: SourceValue, b: SourceValue): boolean => {
+          if (a.withheld || b.withheld) return a.withheld && b.source !== "measured";
+          if (a.source === "measured" && quantity === "input_window") return chosenWindow.some((m) => (m.named !== null && m.named < b.value!) || (m.kind === "window" && b.scope === "window" && m.named !== b.value) || (m.kind === "bracket" && m.refused !== null && 100 * m.refused <= 99 * b.value!) || (m.kind !== "window" && 100 * m.tokens >= 101 * b.value!));
+          if (a.source === "measured" && (quantity === "cache_short" || quantity === "cache_long")) return b.value! < a.value! || (a.below !== null && b.value! >= a.below);
+          if (quantity === "input_window" && a.scope !== b.scope) return (a.scope === "input" ? a.value! : b.value!) > (a.scope === "input" ? b.value! : a.value!);
+          return a.value !== b.value;
+        };
+        const differ = q.sources.some((a, i) => q.sources.slice(i + 1).some((b) => clash(a, b)));
+        fail(where("5 agreement"), q.agreement === (q.sources.length === 0 ? "none" : q.sources.length === 1 ? "single" : differ ? "differ" : "agree"));
+        // 6. pi.dev only where it is alone.
+        fail(where("6 pi"), q.source !== "pi.dev" || q.sources.length === 1);
+        // 9. A measured item names the measurement, of the kind that counts; every other item names none.
+        for (const candidate of q.sources) {
+          if (candidate.source === "measured") fail(where("9 measured"), candidate.client !== null && candidate.client_label !== null && candidate.client_kind !== null && candidate.client_kind === counting[quantity] && candidate.evidence_url !== null && (quantity.startsWith("cache") ? candidate.evaluation_id !== null : candidate.evaluation_id === null));
+          else fail(where("9 others"), candidate.client === null && candidate.client_label === null && candidate.client_kind === null && candidate.evaluation_id === null && candidate.below === null && !candidate.at_least);
+          fail(where("9 withheld"), !candidate.withheld || (candidate.source === "providers.dev" && candidate.value === null));
+        }
+        fail(where("9 measured present"), q.sources.some((candidate) => candidate.source === "measured") === (counting[quantity] !== null && (quantity !== "input_window" || chosenWindow.length > 0)));
+        // 10. window_tokens above the value, on the input window only.
+        fail(where("10 window_tokens"), q.window_tokens === null || (quantity === "input_window" && q.value !== null && q.window_tokens > q.value));
+      }
+      // 7. differs and differing.
+      fail("7 differs", safe.price.agreement === "differ" || safe.price.differs.length === 0);
+      fail("7 differing", JSON.stringify(safe.differing) === JSON.stringify(SAFE_QUANTITIES.filter((quantity) => safe[quantity].agreement === "differ")));
+      // 1 and 8. The price: no measured item, in order; pricing is the price of its source, whole.
+      fail("1 price order", safe.price.sources.every((item, index) => item.source !== ("measured" as string) && (index === 0 || order(item.source) > order(safe.price.sources[index - 1]!.source))));
+      fail("2 price source", (safe.price.source === null) === (safe.price.sources.length === 0) && (safe.price.source === null || safe.price.source === safe.price.sources[0]!.source));
+      const own = safe.price.sources[0];
+      const parts = priceParts(x.pricing);
+      if (!own || own.withheld) fail("8 pricing null", parts === null);
+      else fail("8 pricing", parts !== null && parts.input === own.input && parts.output === own.output && parts.cache_read === own.cache_read && parts.cache_write === own.cache_write && JSON.stringify(parts.tiers) === JSON.stringify(own.tiers));
+      // 5.2. The copies.
+      const w = x.limits.input_window;
+      const iw = safe.input_window;
+      const basisOf = (value: SafeValue): string => (value.value === null ? "none" : value.source === "measured" ? "measured" : "documented");
+      const sourceOf = (value: SafeValue): string | null => (value.value === null ? null : value.source === "measured" ? "providers.dev" : value.source);
+      fail("5.2 input_window", w.tokens === iw.value && w.basis === basisOf(iw) && w.source === sourceOf(iw) && w.scope === iw.scope && w.date === (iw.value === null ? null : iw.date) && w.bound === (iw.value === null ? null : iw.at_least ? "at_least" : "limit"));
+      const measuredWindowItem = iw.sources.find((candidate) => candidate.source === "measured");
+      fail("5.2 measured_tokens", w.measured_tokens === (measuredWindowItem?.value ?? null) && w.measurements.every((m) => m.chosen === (m.client_kind !== null && m.client_kind === counting.input_window)));
+      for (const [profile, key] of [["short", "cache_short"], ["long", "cache_long"]] as const) {
+        const p = x.cache.lifetime[profile];
+        const value = safe[key];
+        fail(`5.2 ${profile}`, p.safe_s === value.value && p.basis === basisOf(value) && p.source === sourceOf(value) && p.date === (value.value === null ? null : value.date));
+        const measured = value.sources.find((candidate) => candidate.source === "measured");
+        fail(`5.2 ${profile} measured_s`, p.measured_s === (measured?.value ?? null) && p.first_miss_s === (measured?.below ?? null));
+        fail(`5.2 ${profile} chosen`, x.cache.lifetime.lifetimes.filter((item) => item.retention_profile === profile).every((item) => item.chosen === (item.basis === "measured" && item.client_kind !== null && item.client_kind === counting[key])));
+      }
+    }
   }
   return broken;
 }

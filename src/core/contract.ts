@@ -15,6 +15,7 @@ import type { ProviderSummary, Summary } from "./entries.ts";
 import type { InputWindow, InputWindowMeasurement } from "./limits.ts";
 import type { CanonicalModel, CanonicalModelDetail, Correction, Documentation, Facets, ModelInputWindowEnd } from "./resources.ts";
 import type { PiBlock, PiCost, PiCostTier, PiDifference, PiSummary, PiValue } from "./pi.ts";
+import type { PriceStatement, PriceTier, SafePrice, SafeValue, SafeValues, SourceValue } from "./safe.ts";
 import { Access, type Exclusion, type MeasuredLimit, type ModelExtension, type ProviderExtension, type Provenance, type PublishedEvidence } from "./schema.ts";
 
 const date = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
@@ -28,6 +29,15 @@ export const EvidenceSchema = z
     note: z.string().nullable().describe("What the source says. Null = no note."),
   })
   .describe("A source for something providers.dev publishes.") satisfies z.ZodType<PublishedEvidence>;
+
+/** The kind of a client (since 1.4.0). */
+const clientKind = z
+  .enum(["direct", "own_client", "proxy"])
+  .nullable()
+  .describe("How the client reaches the provider: direct = plain requests sent straight to the provider; own_client = the vendor's own client; proxy = requests through a proxy, plain or made by a coding agent. Which kind counts for a safe value depends on the entry: on an API-key entry direct only; on a login own_client, else direct, else proxy. Null = the client has no kind, and its measurements feed no safe value. Since 1.4.0.");
+const chosen = z
+  .boolean()
+  .describe("True where the item is of the kind of client that gives the measured value of its quantity (on an API-key entry direct; on a login own_client, else direct, else proxy). False on every other item, and on a documented one: an item that is not chosen is evidence and feeds nothing. Since 1.4.0.");
 
 // ---- cache: results, evaluations, the lifetime record, retention
 export { CacheRetentionSchema } from "./cache-contract.ts";
@@ -62,10 +72,13 @@ export const CacheEvaluationSchema = z
     late_excluded: z.int().min(0).nullable().describe("Checks left out because they ran too late for their age. Null = the evaluation does not record it."),
     note: z.string().nullable().describe("Null = no note."),
     source: z.url().describe("The raw result."),
+    client_kind: clientKind,
   })
   .describe("One cache evaluation: a fresh prompt cached once, then sent again at once and at set ages.") satisfies z.ZodType<CacheEvaluation>;
 
 const lifetimeSource = z.enum(["providers.dev", "models.dev"]);
+/** Who a safe value is from, as the records name it: a measured value is providers.dev's. */
+const safeSource = z.enum(["providers.dev", "models.dev", "pi.dev"]);
 
 export const CacheLifetimeItemSchema = z
   .strictObject({
@@ -87,28 +100,30 @@ export const CacheLifetimeItemSchema = z
     tested_from_s: z.int().min(0).nullable().describe("Measured: the youngest timed age any of them checked; no younger age was checked. Null = none made a timed check, and on a documented item."),
     first_miss_s: z.int().min(0).nullable().describe("Measured: the youngest age at which any of them had a check that missed; 0 = the immediate re-send. Null = no miss, and on a documented item."),
     results: z.array(CacheResultSchema).nullable().describe("Measured: the results of its evaluations added up by exact age, the control first. lifetime_s is read from each evaluation on its own and the lowest taken, so on an item of several evaluations it can be below what these sums show. Null on a documented item."),
+    client_kind: clientKind.describe("Measured: the kind of its client (direct, own_client, proxy). Null on a documented item, and for a client with no kind. Since 1.4.0."),
+    chosen,
   })
   .describe("One lifetime of an entry: documented by a source, or measured for one client with one retention setting. One shape for both; the keys of the other kind are null, 0 or empty.") satisfies z.ZodType<CacheLifetimeItem>;
 
 export const SafeLifetimeSchema = z
   .strictObject({
-    safe_s: z.int().min(0).nullable().describe("Seconds a cached prompt can be relied on: documented_s, unless an evaluation of the profile contradicts it (at an age up to documented_s, fewer than half of its checks hit), and then measured_s; measured_s where nothing is documented. Never above documented_s. 0 = no cache to rely on (basis says whether documented or measured). Null = not known."),
-    basis: z.enum(["measured", "documented", "none"]).describe("documented: safe_s is documented_s. measured: safe_s is measured_s. none: exactly when safe_s is null."),
-    source: lifetimeSource.nullable().describe("Who the value is from. measured: always providers.dev. documented: the source of the documented item it is taken from. Null with none."),
-    date: date.nullable().describe("measured: the newest evaluation counted. documented: the date of the documented item it is taken from. Null with none, and where the source has no date."),
+    safe_s: z.int().min(0).nullable().describe("Seconds a cached prompt can be relied on: the safe value of the profile, the same as safe.cache_short.value or safe.cache_long.value of the entry. It is the value of the first source that states one, in the order measured (the most direct measurement that exists), providers.dev, models.dev, pi.dev. A measured value is the safe value also where it is above or below what a source documents. 0 = no cache to rely on. Null = not known. Since 1.4.0 the rule of safe (see the guide, Safe values); before, the documented lifetime unless an evaluation contradicted it."),
+    basis: z.enum(["measured", "documented", "none"]).describe("measured: safe_s is measured (safe's source is measured). documented: a source states it (providers.dev, models.dev or, since 1.4.0, pi.dev; source says which). none: exactly when safe_s is null."),
+    source: safeSource.nullable().describe("Who the value is from: providers.dev where it is measured or providers.dev's own; models.dev; pi.dev (since 1.4.0) where no other source states one. Null with none."),
+    date: date.nullable().describe("The date of safe's statement: of the evaluation that gives a measured value, of the evidence for providers.dev, of the import for models.dev and pi.dev. Null with none, and where the source has no date."),
     documented_s: z.int().min(0).nullable().describe("The documented lifetime of the profile: the lowest lifetime_s of its documented items. 0 = the provider documents that it does not cache. Null = none is documented."),
-    measured_s: z.int().min(0).nullable().describe("The measured lifetime of the profile: the lowest lifetime_s of its measured items, the oldest age through which every check hit in every client. 0 = no such age. Null = not measured."),
-    documented_status: z.enum(["contradicted", "not_contradicted"]).nullable().describe("What the rule found of the documented lifetime, where a lifetime above 0 is documented and one is measured. contradicted: an evaluation of the profile contradicts documented_s, and safe_s is measured_s (basis measured). not_contradicted: no evaluation contradicts it, and safe_s is documented_s (basis documented); that is not the same as confirmed. Null: nothing documented, nothing measured, or documented_s 0 (the provider documents that it does not cache, which the rule never calls contradicted; measured_s is beside it)."),
-    clients: z.int().min(0).describe("How many clients were measured. 0 = not measured."),
-    evaluations: z.int().min(0).describe("How many evaluations were counted. 0 = not measured."),
+    measured_s: z.int().min(0).nullable().describe("The measured lifetime of the profile: the lowest lifetime_s of its chosen measured items, those of the kind of client that counts on the entry (on an API-key entry direct; on a login own_client, else direct, else proxy). 0 = no age through which every check hit. Null = no client of a kind that counts measured it. Since 1.4.0 over the chosen items only; before, over every client."),
+    documented_status: z.enum(["contradicted", "not_contradicted"]).nullable().describe("Whether the measurement that counts contradicts the documented lifetime, where a lifetime above 0 is documented and one is measured by a kind that counts. contradicted: every check of the chosen evaluations still hit after documented_s (documented_s below measured_s), or a check missed at an age documented_s covers (documented_s at or above first_miss_s). not_contradicted: neither; that is not the same as confirmed. It no longer says which of the two is the safe value. Null: nothing documented, nothing measured by a kind that counts, or documented_s 0."),
+    clients: z.int().min(0).describe("How many clients of the kind that counts were measured. 0 = none."),
+    evaluations: z.int().min(0).describe("How many evaluations of the chosen items were counted. 0 = none."),
     checks: z.int().min(0).describe("Re-sends made in them, the control included."),
     hits: z.int().min(0).describe("How many of those were served from the cache."),
-    checks_inside: z.int().min(0).nullable().describe("Of checks, those at an age up to and including documented_s, the control included. Null where the profile is not both documented and measured."),
+    checks_inside: z.int().min(0).nullable().describe("Of checks, those at an age up to and including documented_s, the control included. Null where the profile is not both documented and measured by a kind that counts."),
     hits_inside: z.int().min(0).nullable().describe("How many of checks_inside were served from the cache. Null with checks_inside."),
-    tested_from_s: z.int().min(0).nullable().describe("The youngest age, after the control, that any counted evaluation checked. No age below it was checked. Null = not measured, or no timed check was made."),
-    first_miss_s: z.int().min(0).nullable().describe("The youngest age at which any check of a counted evaluation missed. 0 = the immediate re-send missed. Null = not measured, or no check missed."),
+    tested_from_s: z.int().min(0).nullable().describe("The youngest age, after the control, that any chosen evaluation checked. No age below it was checked. Null = not measured, or no timed check was made."),
+    first_miss_s: z.int().min(0).nullable().describe("The youngest age at which any check of a chosen evaluation missed. 0 = the immediate re-send missed. Null = not measured, or no check missed."),
   })
-  .describe("The safe lifetime of an entry for one retention profile, with the documented and the measured lifetime it was chosen from and what was measured.") satisfies z.ZodType<SafeLifetime>;
+  .describe("The safe lifetime of an entry for one retention profile, copied from safe, with the documented and the measured lifetime beside it and what was measured.") satisfies z.ZodType<SafeLifetime>;
 
 export const CacheLifetimeRecordSchema = z
   .strictObject({
@@ -143,6 +158,7 @@ export const MeasuredLimitSchema = z
     note: z.string().nullable().describe("Null = no note."),
     date: date.nullable().describe("The day the requests were sent: the evaluation's own date, else the date in the name of its results folder. Null = the result carries no date."),
     source: z.url(),
+    client_kind: clientKind,
   })
   .describe("One limit evaluation. Every evaluation has every field; what it did not measure is null.") satisfies z.ZodType<MeasuredLimit>;
 
@@ -165,6 +181,8 @@ export const InputWindowMeasurementSchema = z
     named: tokens.nullable().describe("context of the evaluation: the window the route names. Null = it named none."),
     read: tokens.nullable().describe("input_read of the evaluation: the largest input the reply showed was read to the end. Null = not checked."),
     source: z.url().describe("The raw result, as on the evaluation."),
+    client_kind: clientKind.describe("The kind of its client, as on the evaluation. Since 1.4.0."),
+    chosen,
   })
   .describe("One limit evaluation of the entry that counts for the input window, with the value it gives. One route, one client, one model.") satisfies z.ZodType<InputWindowMeasurement>;
 
@@ -172,27 +190,110 @@ const limitSource = z.enum(["providers.dev", "models.dev"]);
 
 export const InputWindowSchema = z
   .strictObject({
-    tokens: tokens.nullable().describe("The most input a request can carry on this entry, in tokens as the provider counts them, the client's own system prompt and tools included: documented_tokens unless a counted evaluation clearly contradicts it, else measured_tokens, else null. basis says which. Null = not known. Never 0."),
-    basis: z.enum(["documented", "measured", "none"]).describe("documented: tokens is documented_tokens. measured: tokens is measured_tokens. none: exactly when tokens is null."),
-    bound: windowBound.nullable().describe("limit: the value is the limit, as documented or as the route names it. at_least: the value is the largest input seen accepted, and the real limit is this or more; measured_refused, where set, is an input seen refused. A documented value is always limit. Null with none."),
+    tokens: tokens.nullable().describe("The most input a request can carry on this entry, in tokens as the provider counts them, the client's own system prompt and tools included: the safe value, the same as safe.input_window.value. It is the value of the first source that states one, in the order measured (the most direct measurement that exists, a lower bound included), providers.dev, models.dev, pi.dev; where that is a window and a later source states a cap on the input not above it, the cap. Null = not known. Never 0. Since 1.4.0 the rule of safe (see the guide, Safe values); before, the documented value unless an evaluation clearly contradicted it."),
+    basis: z.enum(["documented", "measured", "none"]).describe("measured: the value is measured (safe's source is measured). documented: a source states it (providers.dev, models.dev or, since 1.4.0, pi.dev; source says which). none: exactly when tokens is null."),
+    bound: windowBound.nullable().describe("limit: the value is the limit, as documented or as the route names it. at_least: the value is the largest input seen accepted, and the real limit is this or more; measured_refused, where set, is an input seen refused. A stated value is always limit. Null with none."),
     scope: z.enum(["input", "window"]).nullable().describe("input: a figure for the input alone (limit.input, or an input size seen accepted). window: a context window that input and output share (limit.context, or a window the route names): the response is counted against the same figure. Null with none."),
-    source: limitSource.nullable().describe("Who the value is from. measured: always providers.dev. documented: documented_source. Null with none."),
-    date: date.nullable().describe("measured: measured_date. documented: documented_date. Null with none, and where the source has no date."),
+    source: safeSource.nullable().describe("Who the value is from: providers.dev where it is measured or providers.dev's own; models.dev; pi.dev (since 1.4.0) where no other source states one. Null with none."),
+    date: date.nullable().describe("The date of safe's statement: of the evaluation that gives a measured value, of the evidence for providers.dev, of the import for models.dev and pi.dev. Null with none, and where the source has no date."),
     documented_tokens: tokens.nullable().describe("The documented input of the entry: limit.input where it is above 0, else limit.context where it is above 0 and not a measured value named in limits.from_measurement. 0 means none stated. Nothing is read from another entry. Null = none is documented."),
     documented_field: z.enum(["limit.input", "limit.context"]).nullable().describe("The field of the entry documented_tokens is read from. Null with documented_tokens."),
     documented_source: limitSource.nullable().describe("models.dev for an imported value; providers.dev for a correction of the field and for a value in an entry providers.dev added. Null with documented_tokens."),
     documented_date: date.nullable().describe("The import date for models.dev; the newest evidence date for providers.dev. Null = none is documented, or the source has no date."),
-    documented_status: z.enum(["contradicted", "not_contradicted"]).nullable().describe("What the rule found of the documented value, where one is documented and at least one evaluation counts. contradicted: an evaluation names a window below it, names another window than a documented limit.context, refused an input at or below 99 % of it, or accepted one at or above 101 % of it; tokens is measured_tokens. not_contradicted: none does, and tokens is documented_tokens; that is not the same as confirmed. Null in every other case."),
-    measured_tokens: tokens.nullable().describe("The measured value of the entry: the lowest tokens of measurements, whatever the client. Null = no evaluation counts."),
-    measured_bound: windowBound.nullable().describe("The bound of the measurement that gives measured_tokens (measurements[0]). Null with measured_tokens."),
+    documented_status: z.enum(["contradicted", "not_contradicted"]).nullable().describe("Whether the measurement that counts contradicts the documented value, where one is documented and a chosen item of measurements exists. contradicted: a chosen evaluation names a window below it, names another window than a documented limit.context, refused an input at or below 99 % of it, or accepted one at or above 101 % of it. not_contradicted: none does; that is not the same as confirmed. It no longer says which of the two is the safe value. Null in every other case."),
+    measured_tokens: tokens.nullable().describe("The measured value of the entry: the lowest tokens of the chosen items of measurements, those of the kind of client that counts (on an API-key entry direct; on a login own_client, else direct, else proxy). Null = no evaluation of a kind that counts. Since 1.4.0 over the chosen items only; before, whatever the client."),
+    measured_bound: windowBound.nullable().describe("The bound of the measurement that gives measured_tokens (the first chosen item). Null with measured_tokens."),
     measured_kind: windowKind.nullable().describe("Its kind. Null with measured_tokens."),
     measured_refused: tokens.nullable().describe("Its refused where its kind is bracket: the smallest input it saw refused; the limit is below this. Null otherwise."),
     measured_date: date.nullable().describe("Its date. Null with measured_tokens, and where the evaluation has no date."),
-    clients: z.int().min(0).describe("How many different clients measurements has. 0 = not measured."),
-    evaluations: z.int().min(0).describe("How many items measurements has: the limit evaluations of the entry that count. 0 = none counts."),
-    measurements: z.array(InputWindowMeasurementSchema).describe("One item per counted limit evaluation, ordered by tokens, then limit before at_least, then by client, route, date and source in plain character order, null first. The first item gives the measured_* keys. Empty = none counts. An evaluation that does not count (a refusal with nothing accepted, an accepted size with no refusal, no named window and no read check, the output alone) stays in limits.measured and is in no item."),
+    clients: z.int().min(0).describe("How many different clients the chosen items of measurements have. 0 = none."),
+    evaluations: z.int().min(0).describe("How many items of measurements are chosen. 0 = none."),
+    measurements: z.array(InputWindowMeasurementSchema).describe("One item per counted limit evaluation, of every client, ordered by tokens, then limit before at_least, then by client, route, date and source in plain character order, null first. The first chosen item gives the measured_* keys. Empty = none counts. An evaluation that does not count (a refusal with nothing accepted, an accepted size with no refusal, no named window and no read check, the output alone) stays in limits.measured and is in no item."),
   })
-  .describe("How much input a request can carry on this entry, and what that rests on: the documented value, the measured one beside it, and which the rule chose. Worked out once when the data is built. What the documentation says and what evaluations found on their dates, not a guarantee.") satisfies z.ZodType<InputWindow>;
+  .describe("How much input a request can carry on this entry, and what that rests on: the safe value, copied from safe.input_window, the documented value and the measured one beside it. Worked out once when the data is built. What the documentation says and what evaluations found on their dates, not a guarantee.") satisfies z.ZodType<InputWindow>;
+
+// ---- the safe values: one per quantity, and what every source states (since 1.4.0)
+const valueSource = z.enum(["measured", "providers.dev", "models.dev", "pi.dev"]);
+const statedScope = z.enum(["input", "window"]).nullable();
+const agreement = z
+  .enum(["agree", "differ", "single", "none"])
+  .describe("none = no source states anything. single = one does. agree = two or more, and no two contradict each other. differ = at least two contradict each other: the website shows a warning. Two numbers contradict where they are not equal, except: a cap on the input contradicts a window only where it is above it; a measured input window contradicts a stated one by the test of documented_status (a window named below it or other than a stated window, a refusal at or below 99 %, an input accepted at or above 101 %), so a lower bound below a larger stated value does not; a measured lifetime m with its first miss f contradicts a stated lifetime S where S is below m or S is at or above f; providers.dev withholding contradicts every later stated value, and a measurement contradicts no withheld one. Prices contradict per part.");
+
+export const SourceValueSchema = z
+  .strictObject({
+    source: valueSource.describe("measured = providers.dev's own evaluations of the entry, the most direct that exist. providers.dev = a correction of the imported entry, or a value of an entry providers.dev adds, with evidence. models.dev = the entry as imported. pi.dev = pi's catalog."),
+    value: z.number().min(0).nullable().describe("The number the source states: tokens or seconds. 0 is a value for a lifetime (no cache to rely on). Null exactly where withheld."),
+    withheld: z.boolean().describe("True on providers.dev where it publishes the value as unknown on purpose, against a value models.dev states. False on every other item."),
+    at_least: z.boolean().describe("A measured lower bound: the real value is this or more. False on every other item."),
+    below: z.number().min(0).nullable().describe("Measured: the smallest value seen to fail, an input refused or the youngest age with a cache miss. Null = none seen, and on every other source."),
+    scope: statedScope.describe("Input window only: input = a cap on the input alone; window = a window input and output share. Null on every other quantity."),
+    date: date.nullable().describe("measured: the day of the evaluation it names. providers.dev: the newest evidence of the corrections that touch the fields read, or of the entry it adds. models.dev: the import date. pi.dev: the day of pi's snapshot. Null = no date."),
+    evidence_url: z.url().nullable().describe("providers.dev: the evidence that gives its date. measured: the raw result of the evaluation it names. Null on the two catalogs."),
+    client: z.string().nullable().describe("Measured: the public id of the client the evaluation went through. Null on every other source."),
+    client_label: z.string().nullable().describe("Measured: its public label. Null on every other source."),
+    client_kind: clientKind.describe("Measured: its kind. Null on every other source."),
+    evaluation_id: z.string().nullable().describe("Measured: the id of the cache evaluation that gives the value, as in /evaluations/cache. Null for a limit evaluation, which has no id, and on every other source."),
+  })
+  .describe("What one source states of one quantity. Since 1.4.0.") satisfies z.ZodType<SourceValue>;
+
+export const SafeValueSchema = z
+  .strictObject({
+    value: z.number().min(0).nullable().describe("The safe value: the statement of the first source in sources (measured, providers.dev, models.dev, pi.dev) that makes one. Input window only: where that is a window and a later source states a cap on the input not above it, the cap. Null = no source states one, or providers.dev withholds it."),
+    unit: z.enum(["tokens", "seconds"]),
+    at_least: z.boolean().describe("The value is a measured lower bound: the real value is this or more."),
+    scope: statedScope.describe("Input window only: whether the value is a cap on the input or a window input and output share. Null on every other quantity, and with no value."),
+    window_tokens: z.int().positive().nullable().describe("Input window only: the window input shares with the answer, where the entry states one above value (its published limit.context, not a measured one). Null where it states none or none larger, and on every other quantity."),
+    source: valueSource.nullable().describe("The source whose statement the value is, an item of sources. Null exactly where sources is empty."),
+    date: date.nullable().describe("The date of that statement."),
+    agreement,
+    sources: z.array(SourceValueSchema).describe("One item per source that states something, in the order measured, providers.dev, models.dev, pi.dev. Empty = none does."),
+  })
+  .describe("The safe value of one quantity and every statement it was chosen from. Since 1.4.0.") satisfies z.ZodType<SafeValue>;
+
+export const PriceTierSchema = z
+  .strictObject({
+    input_tokens_above: z.int().min(0).describe("The tier holds for a request whose context is above this many tokens."),
+    input: z.number().min(0).nullable().describe("US dollars per million tokens. Null = the source states none in this tier."),
+    output: z.number().min(0).nullable(),
+    cache_read: z.number().min(0).nullable(),
+    cache_write: z.number().min(0).nullable(),
+  })
+  .describe("One price tier by size of request, as a source states it. Since 1.4.0.") satisfies z.ZodType<PriceTier>;
+
+export const PriceStatementSchema = z
+  .strictObject({
+    source: z.enum(["providers.dev", "models.dev", "pi.dev"]),
+    withheld: z.boolean().describe("True on providers.dev where it publishes the price as unknown on purpose. Every part is null then."),
+    input: z.number().min(0).nullable().describe("The base price of text input, US dollars per million tokens. Null = the source states none."),
+    output: z.number().min(0).nullable(),
+    cache_read: z.number().min(0).nullable(),
+    cache_write: z.number().min(0).nullable().describe("The base price of a cache write. Null where the source states none, or keys it by lifetime."),
+    tiers: z.array(PriceTierSchema).nullable().describe("Tiers by size of request, ascending. Empty = the source states a price and no tier. Null = its tiers cannot be read as tiers, or withheld."),
+    date: date.nullable(),
+    evidence_url: z.url().nullable().describe("providers.dev: the evidence that gives its date. Null on the catalogs."),
+  })
+  .describe("What one source states of the price, in the parts sources are compared on. Since 1.4.0.") satisfies z.ZodType<PriceStatement>;
+
+export const SafePriceSchema = z
+  .strictObject({
+    source: z.enum(["providers.dev", "models.dev", "pi.dev"]).nullable().describe("Whose price pricing is, whole: the first of providers.dev, models.dev, pi.dev that states one. A part one source lacks is never filled from another. Null = none states a price."),
+    date: date.nullable(),
+    agreement,
+    differs: z.array(z.enum(["input", "output", "cache_read", "cache_write", "tiers", "other"])).describe("The parts on which two sources contradict: a price both state that is not equal; tiers with other thresholds or a price both state in a tier that is not equal; other (every rule that is no base price and no tier), compared between providers.dev and models.dev only. Empty unless agreement is differ."),
+    sources: z.array(PriceStatementSchema).describe("One item per source that states a price, in the order providers.dev, models.dev, pi.dev."),
+  })
+  .describe("Whose price pricing is, and every source's price beside it. The price itself is pricing. Since 1.4.0.") satisfies z.ZodType<SafePrice>;
+
+export const SafeValuesSchema = z
+  .strictObject({
+    input_window: SafeValueSchema.describe("The most input one request can carry on the entry, in tokens. input_window.tokens of the record carries the same value."),
+    max_output: SafeValueSchema.describe("The most tokens one response can hold. max_output of the summary carries the same value."),
+    cache_short: SafeValueSchema.describe("Seconds a cached prompt can be relied on where the request asks for no lifetime or the shortest one. cache_lifetime.short.safe_s carries the same value."),
+    cache_long: SafeValueSchema.describe("The same where the request asks for a longer lifetime. cache_lifetime.long.safe_s carries the same value."),
+    price: SafePriceSchema,
+    differing: z.array(z.enum(["input_window", "max_output", "cache_short", "cache_long", "price"])).describe("The quantities whose agreement is differ, in this order. Empty = no warning on the entry."),
+  })
+  .describe("The safe value of each quantity, its source, whether the sources agree, and what each source states. One rule for all: the first source in the order measured, providers.dev, models.dev, pi.dev that states a value gives it. Worked out once when the data is built; the records beside it copy it. Since 1.4.0.") satisfies z.ZodType<SafeValues>;
 
 export const ProvenanceSchema = z
   .strictObject({
@@ -308,6 +409,7 @@ export const EntryExtensionSchema = z
       from_measurement: z.array(z.enum(["context", "output"])).describe("On an added entry: which of limit.context and limit.output are measured values. Empty = none."),
       input_window: InputWindowSchema,
     }),
+    safe: SafeValuesSchema,
     evidence: z.array(EvidenceSchema).describe("Sources for an added entry and for authored declarations. Empty = none."),
     verified: date.nullable().describe("The newest date of providers.dev evidence or evaluations for this entry. Null = it has none."),
     pi: PiBlockSchema.nullable().describe("What pi's catalog states for this entry. Null = pi does not list it."),
@@ -343,8 +445,9 @@ export const EntrySummarySchema = z
     origin: z.enum(["upstream", "modified", "added"]).describe("upstream = as imported. modified = imported, with providers.dev corrections or evaluations. added = an entry models.dev does not have."),
     context: z.number().nullable().describe("limit.context in tokens: the window this provider exposes for the model. Null = unknown."),
     input: z.number().nullable().describe("limit.input in tokens, stated where the input limit is lower than the window. Null = not stated."),
-    max_output: z.number().nullable().describe("limit.output in tokens: the most one response can hold. A maximum, not a default. Null = unknown."),
-    input_window: InputWindowSchema.describe("How much input a request can carry on this entry, documented or measured, and what that rests on: the same object as providers_dev.limits.input_window of the full entry. context, input and max_output beside it are limit as published, unchanged."),
+    max_output: z.number().nullable().describe("The most tokens one response can hold: the safe value, safe.max_output.value. A maximum, not a default. Null = unknown; a limit of 0 states nothing. Since 1.4.0; before, limit.output as published."),
+    input_window: InputWindowSchema.describe("How much input a request can carry on this entry, and what that rests on: the same object as providers_dev.limits.input_window of the full entry. context and input beside it are limit as published, unchanged."),
+    safe: SafeValuesSchema.describe("The safe values of the entry: the same object as providers_dev.safe of the full entry. Since 1.4.0."),
     cache: z.enum(["yes", "no", "unknown"]).describe("Prompt caching as documented. unknown = the source says nothing, which is not the same as no."),
     cache_modes: z.array(z.enum(["implicit", "explicit"])).describe("implicit = the provider caches on its own. explicit = the request marks what to cache."),
     cache_mode_support: z.strictObject({ implicit: SupportSchema, explicit: SupportSchema }).describe("Support for each mode, from providers_dev.cache.documented.modes. An omitted mode stays unknown."),
@@ -630,6 +733,12 @@ export const COMPONENTS = {
   RequestControl: RequestControlSchema,
   RequestControls: RequestControlsSchema,
   MeasuredLimit: MeasuredLimitSchema,
+  SafeValues: SafeValuesSchema,
+  SafeValue: SafeValueSchema,
+  SourceValue: SourceValueSchema,
+  SafePrice: SafePriceSchema,
+  PriceStatement: PriceStatementSchema,
+  PriceTier: PriceTierSchema,
   InputWindow: InputWindowSchema,
   InputWindowMeasurement: InputWindowMeasurementSchema,
   Provenance: ProvenanceSchema,

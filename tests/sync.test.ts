@@ -277,21 +277,21 @@ describe("publish", () => {
   it("fails the build where the measurement labels give one public client id two labels, and names both", async () => {
     const dataDir = await firstImport();
     writeAuthored(dataDir);
-    const labels = (clients: Record<string, { id: string; label: string }>) => writeFileSync(join(dataDir, "authored", "measurement-labels.yaml"), stringify({ clients }));
-    labels({ direct: { id: "direct", label: "Straight to the provider" }, "direct-2": { id: "direct", label: "Straight to the provider" }, "tool-x": { id: "gateway", label: "Through a gateway" } });
+    const labels = (clients: Record<string, { id: string; label: string; kind: string }>) => writeFileSync(join(dataDir, "authored", "measurement-labels.yaml"), stringify({ clients }));
+    labels({ direct: { id: "direct", label: "Straight to the provider", kind: "direct" }, "direct-2": { id: "direct", label: "Straight to the provider", kind: "direct" }, "tool-x": { id: "gateway", label: "Through a gateway", kind: "direct" } });
     expect(publish({ dataDir, rootDir: ROOT }).errors).toEqual([]);
     const before = readFileSync(join(dataDir, "published", "site", "data", "meta.json"), "utf8");
 
-    labels({ "cli-a": { id: "direct", label: "Label A" }, "cli-z": { id: "direct", label: "Label Z" } });
+    labels({ "cli-a": { id: "direct", label: "Label A", kind: "direct" }, "cli-z": { id: "direct", label: "Label Z", kind: "direct" } });
     const report = publish({ dataDir, rootDir: ROOT });
     expect(report.ok).toBe(false);
     expect(report.errors).toEqual([expect.stringMatching(/measurement-labels\.yaml: clients\.cli-z\.label: Public client id "direct" has two labels: "cli-a" \("Label A"\) and "cli-z" \("Label Z"\)/)]);
     expect(readFileSync(join(dataDir, "published", "site", "data", "meta.json"), "utf8")).toBe(before);
 
     // `other` is what an undescribed client is published as, with its own label.
-    labels({ "cli-a": { id: "other", label: "Label A" } });
+    labels({ "cli-a": { id: "other", label: "Label A", kind: "direct" } });
     expect(publish({ dataDir, rootDir: ROOT }).errors).toEqual([expect.stringMatching(/Public client id "other" has two labels: a client the file does not describe \("Another client"\) and "cli-a" \("Label A"\)/)]);
-    labels({ "cli-a": { id: "other", label: "Another client" } });
+    labels({ "cli-a": { id: "other", label: "Another client", kind: "direct" } });
     expect(publish({ dataDir, rootDir: ROOT }).ok).toBe(true);
   });
 

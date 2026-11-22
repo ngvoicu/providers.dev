@@ -2,7 +2,7 @@
 // parseQuery() and runQuery(), so a filter means the same thing everywhere.
 import type { Summary } from "./entries.ts";
 
-export const SORT_KEYS = ["provider", "model", "name", "context", "max_output", "price_in", "price_out", "release_date", "verified", "cache_short", "cache_long"] as const;
+export const SORT_KEYS = ["provider", "model", "name", "context", "max_output", "price_in", "price_out", "release_date", "verified", "cache_short", "cache_long", "input_window"] as const;
 export type SortKey = (typeof SORT_KEYS)[number];
 
 /** The order the website opens with: entries with providers.dev evidence first, newest first. The API's default is by provider. */
@@ -25,8 +25,10 @@ export interface Query {
   lifetime_basis?: string[];
   min_context?: number;
   min_output?: number;
+  min_input_window?: number;
   max_age_months?: number;
   evaluated?: boolean;
+  disagree?: boolean;
   sort: SortKey;
   order: "asc" | "desc";
   limit: number;
@@ -53,10 +55,12 @@ export const PARAMS: ParamDoc<keyof Query & string>[] = [
   { name: "cache_mode", kind: "list", values: ["implicit", "explicit"], description: "implicit = the provider caches on its own; explicit = the request marks what to cache." },
   { name: "lifetime_basis", kind: "list", values: ["documented", "measured"], description: "The basis of the safe cache lifetime (cache_lifetime.short.basis, cache_lifetime.long.basis). An entry matches when the basis of its short or of its long profile is one of the values. An entry with no safe lifetime in either profile (basis none) does not match." },
   { name: "min_context", kind: "integer", description: "Smallest context window, in tokens, that this provider exposes for the model (limit.context). Entries with an unknown window do not match." },
-  { name: "min_output", kind: "integer", description: "Smallest maximum response size, in tokens (limit.output). A maximum, not a default. Entries with an unknown maximum do not match." },
+  { name: "min_output", kind: "integer", description: "Smallest maximum response size, in tokens: the safe maximum output (max_output, safe.max_output.value). A maximum, not a default. Entries with an unknown maximum do not match." },
+  { name: "min_input_window", kind: "integer", description: "Smallest safe input window, in tokens (safe.input_window.value, the same as input_window.tokens): the most input one request can carry. Entries with an unknown input window do not match. Since 1.4.0." },
   { name: "max_age_months", kind: "integer", description: `Only models released in the last N months, counted back from today (UTC), 1 to ${MAX_AGE_MONTHS}. A release date given only to the month counts when that month is in range. Entries with an unknown release date do not match.` },
   { name: "evaluated", kind: "boolean", description: "true = only entries with providers.dev cache evaluations; false = only entries without." },
-  { name: "sort", kind: "enum", values: SORT_KEYS, description: "Sort key. cache_short and cache_long sort by the safe cache lifetime in seconds, cache_lifetime.short.safe_s and cache_lifetime.long.safe_s; 0 is a value. Ties are broken by provider id, then model id. Entries with no value for the key (null) come last in either order." },
+  { name: "disagree", kind: "boolean", description: "true = only entries where the sources of at least one safe value contradict each other (safe.differing is not empty: the website shows a warning); false = only the others. Since 1.4.0." },
+  { name: "sort", kind: "enum", values: SORT_KEYS, description: "Sort key. cache_short and cache_long sort by the safe cache lifetime in seconds, cache_lifetime.short.safe_s and cache_lifetime.long.safe_s; 0 is a value. input_window sorts by the safe input window, safe.input_window.value; max_output by the safe maximum output; context by limit.context. Ties are broken by provider id, then model id. Entries with no value for the key (null) come last in either order." },
   { name: "order", kind: "enum", values: ["asc", "desc"], description: "Sort direction." },
   { name: "limit", kind: "integer", description: `Entries per page, 1 to ${MAX_LIMIT}. Default ${DEFAULT_LIMIT}.` },
   { name: "offset", kind: "integer", description: "Entries to skip. Default 0." },
@@ -205,7 +209,9 @@ function matches(entry: Summary, query: Query, words: string[], releasedSince: s
   if (query.lifetime_basis && !query.lifetime_basis.some((basis) => entry.cache_lifetime.short.basis === basis || entry.cache_lifetime.long.basis === basis)) return false;
   if (query.min_context !== undefined && !(entry.context !== null && entry.context >= query.min_context)) return false;
   if (query.min_output !== undefined && !(entry.max_output !== null && entry.max_output >= query.min_output)) return false;
+  if (query.min_input_window !== undefined && !(entry.safe.input_window.value !== null && entry.safe.input_window.value >= query.min_input_window)) return false;
   if (query.evaluated !== undefined && query.evaluated !== entry.evaluation_count > 0) return false;
+  if (query.disagree !== undefined && query.disagree !== entry.safe.differing.length > 0) return false;
   if (words.length > 0) {
     const haystack = `${entry.provider} ${entry.model} ${entry.name} ${entry.family ?? ""} ${entry.canonical_id ?? ""}`.toLowerCase();
     if (!words.every((word) => haystack.includes(word))) return false;
@@ -238,6 +244,8 @@ function sortValue(entry: Summary, key: SortKey): string | number | null {
       return entry.cache_lifetime.short.safe_s;
     case "cache_long":
       return entry.cache_lifetime.long.safe_s;
+    case "input_window":
+      return entry.safe.input_window.value;
   }
 }
 

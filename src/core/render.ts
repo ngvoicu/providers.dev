@@ -249,11 +249,13 @@ function basisTag(basis: "documented" | "measured", title: string | null = BASIS
  * Who a value is from, and its date. A providers.dev date is marked stale like all our evidence, after the published
  * `stale_after_days`. `dateTitle` says what the date is where it is not the newest evaluation's or evidence's.
  */
-function lifetimeSource(source: LifetimeSource, date: string | null, basis: "documented" | "measured", today: Today, dateTitle?: string): string {
+function lifetimeSource(source: LifetimeSource | "pi.dev", date: string | null, basis: "documented" | "measured", today: Today, dateTitle?: string): string {
   const name =
     source === "models.dev"
       ? `<span class="origin upstream" title="${e(ORIGIN_TITLE.upstream)}">models.dev</span>`
-      : `<span class="origin added" title="${basis === "measured" ? "Measured by providers.dev." : "Documented, with a providers.dev correction or on an entry providers.dev added."}">providers.dev</span>`;
+      : source === "pi.dev"
+        ? '<span class="origin pi" title="From pi\'s catalog: no other source states this value.">pi.dev</span>'
+        : `<span class="origin added" title="${basis === "measured" ? "Measured by providers.dev." : "Documented, with a providers.dev correction or on an entry providers.dev added."}">providers.dev</span>`;
   const title = dateTitle ?? (basis === "measured" ? "The date of the newest evaluation." : source === "models.dev" ? "Imported from models.dev on this date." : "The date of the newest providers.dev evidence.");
   return `<span class="life-source">${name}${dateText(date, source === "providers.dev", title, today)}</span>`;
 }
@@ -730,8 +732,9 @@ const WINDOW_CASE = {
 } as const;
 
 /** The date of a value of the input window, said for what it is. */
-function windowDateTitle(basis: "documented" | "measured", source: LifetimeSource): string {
+function windowDateTitle(basis: "documented" | "measured", source: LifetimeSource | "pi.dev"): string {
   if (basis === "measured") return "The date of the evaluation that gives this value.";
+  if (source === "pi.dev") return "The day of pi's snapshot.";
   return source === "models.dev" ? "Imported from models.dev on this date." : "The date of the newest providers.dev evidence for the documented figure.";
 }
 

@@ -247,7 +247,7 @@ describe("catalog rules: in the build", () => {
       limits: [],
       known: [],
     };
-    const labels = { clients: { direct: { id: "direct", label: "Straight to the provider" } }, omit_note_parts_mentioning: [] };
+    const labels = { clients: { direct: { id: "direct", label: "Straight to the provider", kind: "direct" as const } }, omit_note_parts_mentioning: [] };
     const { catalog, issues } = resolve(input({ observed, routes: { "gateway-api": { provider: "gateway" } }, labels }));
     expect(catalog.gateway!.models["anthropic/claude-opus-5"]).toBeUndefined();
     expect(issues.filter((issue) => issue.code === "excluded-observation")).toEqual([

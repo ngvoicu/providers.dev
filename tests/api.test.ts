@@ -25,7 +25,7 @@ import { MARK } from "../src/core/page-shell.ts";
 import { CACHE_EVALUATION_PARAMS, LIMIT_EVALUATION_PARAMS, PARAMS, parseQuery, runQuery } from "../src/core/query.ts";
 import { canonicalModels, inputWindowRange, listEvaluations, withoutEntries } from "../src/core/resources.ts";
 import { ext, type Catalog, type Meta, type ModelExtension } from "../src/core/schema.ts";
-import { depsFrom, fetchReturning, fixturePi, fixtureUpstream, contractProblems, inputWindowRuleBreaks, lifetimeRuleBreaks, piShort, ROOT, summaryOf, tempDataDir, writeAuthored, writePiSnapshot } from "./helpers.ts";
+import { depsFrom, fetchReturning, fixturePi, fixtureUpstream, contractProblems, inputWindowRuleBreaks, lifetimeRuleBreaks, piShort, ROOT, safeBreaks, summaryOf, tempDataDir, writeAuthored, writePiSnapshot } from "./helpers.ts";
 
 let deps: ApiDeps;
 let published: string;
@@ -59,7 +59,8 @@ function writeFixtureLimits(dataDir: string): void {
       { ...row, client: "cli", input_accepted: 990000, note: "answered; not checked that it was read" },
     ],
   }));
-  writeFileSync(join(dataDir, "authored", "measurement-labels.yaml"), stringify({ clients: Object.fromEntries(["direct", "proxy", "agent", "cli"].map((id) => [id, { id, label: `Client ${id}` }])) }));
+  const kinds: Record<string, string> = { direct: "direct", proxy: "proxy", agent: "proxy", cli: "own-client" };
+  writeFileSync(join(dataDir, "authored", "measurement-labels.yaml"), stringify({ clients: Object.fromEntries(["direct", "proxy", "agent", "cli"].map((id) => [id, { id, label: `Client ${id}`, kind: kinds[id] }])) }));
 }
 
 const get = (path: string, init?: RequestInit): Promise<Response> => handleApi(new Request(`https://providers.dev${path}`, init), deps);
@@ -127,7 +128,7 @@ describe("GET /api/v1/entries", () => {
 
   it("adds cache_lifetime to a summary and leaves every other key as it was", () => {
     expect(Object.keys(deps.index.entries[0]!)).toEqual([
-      "ref", "provider", "model", "name", "type", "family", "canonical_id", "status", "release_date", "access", "origin", "context", "input", "max_output", "input_window",
+      "ref", "provider", "model", "name", "type", "family", "canonical_id", "status", "release_date", "access", "origin", "context", "input", "max_output", "input_window", "safe",
       "cache", "cache_modes", "cache_mode_support", "cache_retention", "cache_lifetime", "evaluation_count",
       "price_in", "price_out", "price_from", "pricing", "request_controls", "measured_input_accepted", "measured_input_refused", "measured_limit_count", "overridden_fields", "verified", "shard", "pi",
     ]);
@@ -157,9 +158,10 @@ describe("GET /api/v1/entries", () => {
       expect(full.data.models?.[model]?.providers_dev.limits.input_window).toEqual(expected);
       expect((catalog[provider]!.models[model]!.providers_dev as unknown as ModelExtension).limits.input_window).toEqual(expected);
     }
-    // The fixture's three kinds: measured over a contradicted window, documented, nothing known (model-7 has no limit).
+    // The fixture's three kinds: measured (the direct window on the login, the proxy's lower values not counted),
+    // documented, nothing known (model-7 has no limit).
     const basis = (ref: string) => deps.index.entries.find((entry) => entry.ref === ref)!.input_window;
-    expect([basis("added-login/lab/model-2").basis, basis("added-login/lab/model-2").tokens]).toEqual(["measured", 600000]);
+    expect([basis("added-login/lab/model-2").basis, basis("added-login/lab/model-2").tokens]).toEqual(["measured", 900000]);
     expect([basis("provider-02/lab/model-4").basis, basis("provider-02/lab/model-4").tokens, basis("provider-02/lab/model-4").source]).toEqual(["documented", 500000, "models.dev"]);
     expect([basis("provider-03/model-7").basis, basis("provider-03/model-7").tokens]).toEqual(["none", null]);
   });
@@ -246,9 +248,30 @@ describe("GET /api/v1/entries", () => {
     const zero = await json<Page>("/api/v1/entries?min_context=0&limit=1");
     // model-7 has no limit at all: unknown is not zero.
     expect(zero.total).toBe(601 - 30);
+    // max_output is the safe maximum output: a limit of 0 (model-0) states nothing, and is unknown.
     const output = await json<Page>("/api/v1/entries?min_output=0&provider=provider-00&limit=200");
-    expect(output.data.some((entry) => entry.max_output === 0)).toBe(true);
-    expect(output.total).toBe(19);
+    expect(output.data.some((entry) => entry.max_output === 0)).toBe(false);
+    expect(output.total).toBe(18);
+    const model0 = (await json<Page>("/api/v1/entries?provider=provider-00&q=model-0&limit=200")).data.find((entry) => entry.model === "lab/model-0")!;
+    expect([model0.max_output, model0.safe.max_output.agreement]).toEqual([null, "none"]);
+  });
+
+  it("sorts by the safe input window, filters by it and by disagreement (since 1.4.0)", async () => {
+    const all = (await json<Page>("/api/v1/entries?limit=200&sort=input_window&order=desc&provider=provider-00,added-login")).data;
+    const values = all.map((entry) => entry.safe.input_window.value);
+    const known = values.filter((value): value is number => value !== null);
+    expect(known).toEqual([...known].sort((a, b) => b - a));
+    expect(values.slice(known.length).every((value) => value === null)).toBe(true);
+    expect(values.indexOf(null)).toBe(known.length);
+    const atLeast = await json<Page>("/api/v1/entries?min_input_window=1900000&limit=200");
+    expect(atLeast.data.every((entry) => entry.safe.input_window.value !== null && entry.safe.input_window.value >= 1900000)).toBe(true);
+    expect(atLeast.total).toBe(deps.index.entries.filter((entry) => (entry.safe.input_window.value ?? 0) >= 1900000).length);
+    const differ = await json<Page>("/api/v1/entries?disagree=true&limit=200");
+    const agree = await json<Page>("/api/v1/entries?disagree=false&limit=1");
+    expect(differ.data.every((entry) => entry.safe.differing.length > 0)).toBe(true);
+    expect(differ.total + agree.total).toBe(deps.index.entries.length);
+    expect(differ.total).toBe(deps.index.entries.filter((entry) => entry.safe.differing.length > 0).length);
+    expect((await get("/api/v1/entries?disagree=maybe")).status).toBe(400);
   });
 
   it("tells unsupported caching from unknown caching", async () => {
@@ -488,14 +511,15 @@ describe("HTTP behaviour", () => {
 
   it("describes the cache lifetime record: its components and a guide section", async () => {
     const document = await json<{ info: { version: string; contact: unknown; license: unknown }; "x-guide": { id: string; title: string; paragraphs: string[] }[]; components: { schemas: Record<string, { properties?: Record<string, unknown> }> } }>("/api/v1/openapi.json");
-    expect(document.info.version).toBe("1.3.0");
+    expect(document.info.version).toBe("1.4.0");
     expect(document.info.contact).toEqual({ name: "providers.dev", email: "office@providers.dev", url: "https://providers.dev/docs/contributing/" });
     expect(document.info.license).toEqual({ name: "MIT", url: "https://providers.dev/docs/licensing/" });
     const schemas = document.components.schemas;
     expect(Object.keys(schemas.CacheLifetime!.properties!)).toEqual(["short", "long", "lifetimes"]);
     expect(Object.keys(schemas.SafeLifetime!.properties!)).toEqual(["safe_s", "basis", "source", "date", "documented_s", "measured_s", "documented_status", "clients", "evaluations", "checks", "hits", "checks_inside", "hits_inside", "tested_from_s", "first_miss_s"]);
+    expect(JSON.stringify(schemas.SafeLifetime!.properties!.source)).toContain("pi.dev");
     expect(Object.keys(schemas.CacheLifetimeItem!.properties!)).toEqual([
-      "retention_profile", "basis", "source", "date", "lifetime_s", "mode", "documented_as", "client", "client_label", "parameter", "value", "evaluations", "evaluation_ids", "checks", "hits", "tested_from_s", "first_miss_s", "results",
+      "retention_profile", "basis", "source", "date", "lifetime_s", "mode", "documented_as", "client", "client_label", "parameter", "value", "evaluations", "evaluation_ids", "checks", "hits", "tested_from_s", "first_miss_s", "results", "client_kind", "chosen",
     ]);
     expect(Object.keys(schemas.EntryCache!.properties!)).toEqual(["documented", "retention", "lifetime", "evaluations"]);
     expect(Object.keys(schemas.EntrySummary!.properties!)).toContain("cache_lifetime");
@@ -507,7 +531,8 @@ describe("HTTP behaviour", () => {
     const section = document["x-guide"].find((item) => item.id === "cache-lifetimes");
     expect(section?.title).toBe("Cache lifetimes");
     const text = section!.paragraphs.join(" ");
-    for (const words of ["lifetimes", "safe_s", "documented_s", "measured_s", "fewer than half", "hits_inside of checks_inside", "lowest over the clients", "null", "not a guarantee", "documented_status", "not_contradicted"]) expect(text).toContain(words);
+    for (const words of ["lifetimes", "safe_s", "documented_s", "measured_s", "one missed check is enough", "hits_inside of checks_inside", "lowest over the chosen items", "safe.cache_short", "kind that counts", "client_kind", "chosen", "null", "not a guarantee", "documented_status", "not_contradicted"]) expect(text).toContain(words);
+    expect(text).not.toContain("fewer than half");
     // documented_status is required and nullable: the two values of the rule, or null.
     const status = schemas.SafeLifetime as unknown as { required: string[]; properties: { documented_status: unknown } };
     expect(status.required).toContain("documented_status");
@@ -549,9 +574,9 @@ describe("pi's catalog in the API (design/pi-source.md, section d)", () => {
     expect(meta.sync.last_error ?? "").not.toMatch(/pi/);
   });
 
-  it("is version 1.3.0, with the six pi components, the keys on the entry, the summary and /meta, and a guide section after Input window", async () => {
+  it("is version 1.4.0, with the six pi components, the keys on the entry, the summary and /meta, and a guide section after Input window", async () => {
     const document = await json<{ info: { version: string; description: string }; "x-guide": { id: string; title: string; paragraphs: string[] }[]; components: { schemas: Record<string, { properties?: Record<string, unknown>; required?: string[] }> } }>("/api/v1/openapi.json");
-    expect(document.info.version).toBe("1.3.0");
+    expect(document.info.version).toBe("1.4.0");
     expect(document.info.description).toContain("A second catalog, pi's (MIT), is imported beside it: what it states for an entry is under providers_dev.pi.");
     const schemas = document.components.schemas;
     for (const name of ["PiBlock", "PiCost", "PiCostTier", "PiDifference", "PiSummary", "PiValue"]) expect(schemas[name], name).toBeDefined();
@@ -607,23 +632,24 @@ describe("pi's catalog in the API (design/pi-source.md, section d)", () => {
 describe("the input window in the OpenAPI document", () => {
   it("has the two components, the key on the entry and the summary, input_read on an evaluation, and a guide section after Unknown values", async () => {
     const document = await json<{ info: { version: string }; "x-guide": { id: string; title: string; paragraphs: string[] }[]; components: { schemas: Record<string, { properties?: Record<string, unknown>; required?: string[] }> } }>("/api/v1/openapi.json");
-    expect(document.info.version).toBe("1.3.0");
+    expect(document.info.version).toBe("1.4.0");
     const schemas = document.components.schemas;
     expect(Object.keys(schemas.InputWindow!.properties!)).toEqual([
       "tokens", "basis", "bound", "scope", "source", "date", "documented_tokens", "documented_field", "documented_source", "documented_date", "documented_status",
       "measured_tokens", "measured_bound", "measured_kind", "measured_refused", "measured_date", "clients", "evaluations", "measurements",
     ]);
     expect(schemas.InputWindow!.required).toEqual(Object.keys(schemas.InputWindow!.properties!));
-    expect(Object.keys(schemas.InputWindowMeasurement!.properties!)).toEqual(["client", "client_label", "route", "route_label", "date", "tokens", "bound", "kind", "accepted", "refused", "named", "read", "source"]);
+    expect(Object.keys(schemas.InputWindowMeasurement!.properties!)).toEqual(["client", "client_label", "route", "route_label", "date", "tokens", "bound", "kind", "accepted", "refused", "named", "read", "source", "client_kind", "chosen"]);
     expect(Object.keys(schemas.EntrySummary!.properties!)).toContain("input_window");
     expect(Object.keys(schemas.MeasuredLimit!.properties!)).toContain("input_read");
     expect(JSON.stringify(schemas.EntryExtension)).toContain("input_window");
     const ids = document["x-guide"].map((item) => item.id);
-    expect(ids.indexOf("input-window")).toBe(ids.indexOf("unknown") + 1);
+    expect(ids.indexOf("safe-values")).toBe(ids.indexOf("unknown") + 1);
+    expect(ids.indexOf("input-window")).toBe(ids.indexOf("safe-values") + 1);
     const section = document["x-guide"].find((item) => item.id === "input-window")!;
     expect(section.title).toBe("Input window");
     const text = section.paragraphs.join(" ");
-    for (const words of ["providers_dev.limits.input_window", "never 0", "system prompt", "99 %", "101 %", "912,780", "931,220", "lowest", "at_least", "measured_refused", "scope", "limit.input", "limit.context", "from_measurement", "none stated", "window", "bracket", "input_read", "limit-not-counted", "measured_input_accepted", "not contradicted is not confirmed", "probe's count"]) expect(text).toContain(words);
+    for (const words of ["providers_dev.limits.input_window", "safe.input_window", "most direct measurement", "never 0", "system prompt", "99 %", "101 %", "912,780", "931,220", "lowest", "at_least", "measured_refused", "scope", "limit.input", "limit.context", "from_measurement", "none stated", "window", "bracket", "input_read", "limit-not-counted", "measured_input_accepted", "not contradicted is not confirmed", "probe's count"]) expect(text).toContain(words);
     expect(text).toContain("912,780 or less) above an accepted one");
     expect(text).not.toContain("below an accepted one");
   });
@@ -694,8 +720,14 @@ describe("the contract", () => {
       const measured = (full.providers_dev as unknown as ModelExtension).limits.measured;
       const accepted = measured.flatMap((item) => (item.input_accepted === null ? [] : [item.input_accepted]));
       const refused = measured.flatMap((item) => (item.input_refused === null ? [] : [item.input_refused]));
+      const safe = (full.providers_dev as unknown as ModelExtension).safe;
+      // max_output is the safe maximum output since 1.4.0; a published limit.output above 0 that no measurement wrote is
+      // models.dev's or providers.dev's statement, and the safe value where nothing was measured.
+      const output = number(limit.output);
+      if (output !== null && output > 0 && !(full.providers_dev as unknown as ModelExtension).limits.from_measurement.includes("output") && safe.max_output.sources.every((item) => item.source !== "measured") && safe.max_output.value !== output) asBefore.push(`${entry.ref} max_output`);
+      if (!isDeepStrictEqual(entry.safe, safe)) asBefore.push(`${entry.ref} safe`);
       const expected = {
-        context: number(limit.context), input: number(limit.input), max_output: number(limit.output),
+        context: number(limit.context), input: number(limit.input), max_output: safe.max_output.value,
         measured_input_accepted: accepted.length > 0 ? Math.max(...accepted) : null, measured_input_refused: refused.length > 0 ? Math.min(...refused) : null, measured_limit_count: measured.length,
       };
       const actual = { context: entry.context, input: entry.input, max_output: entry.max_output, measured_input_accepted: entry.measured_input_accepted, measured_input_refused: entry.measured_input_refused, measured_limit_count: entry.measured_limit_count };
@@ -723,6 +755,11 @@ describe("the contract", () => {
     same(extensions.flatMap((extension) => extension.limits.measured), "limit evaluations");
     same(extensions.map((extension) => extension.limits.input_window), "limits.input_window");
     same(extensions.flatMap((extension) => extension.limits.input_window.measurements), "limits.input_window.measurements");
+    same(extensions.map((extension) => extension.safe), "safe");
+    same(extensions.flatMap((extension) => [extension.safe.input_window, extension.safe.max_output, extension.safe.cache_short, extension.safe.cache_long]), "a safe value");
+    same(extensions.flatMap((extension) => [extension.safe.input_window, extension.safe.max_output, extension.safe.cache_short, extension.safe.cache_long].flatMap((value) => value.sources)), "a source's value");
+    same(extensions.flatMap((extension) => extension.safe.price.sources), "a source's price");
+    expect(safeBreaks(exported)).toEqual([]);
     expect(Object.keys(extensions[0]!.limits)).toEqual(["measured", "from_measurement", "input_window"]);
     // Every limit evaluation has every key of the contract, input_read among them, on the entry and in the list.
     const limitKeys = Object.keys(MeasuredLimitSchema.shape);
@@ -743,7 +780,8 @@ describe("the contract", () => {
     const broken = Object.entries(exported).flatMap(([id, provider]) =>
       Object.entries(provider.models).flatMap(([modelId, entry]) => {
         const cache = (entry.providers_dev as unknown as ModelExtension).cache;
-        return lifetimeRuleBreaks(cache.lifetime, cache.evaluations, cache.documented).map((rule) => `${id}/${modelId}: ${rule}`);
+        const extension = entry.providers_dev as unknown as ModelExtension;
+        return lifetimeRuleBreaks(cache.lifetime, cache.evaluations, cache.documented, extension.access).map((rule) => `${id}/${modelId}: ${rule}`);
       }),
     );
     expect(broken).toEqual([]);
@@ -753,7 +791,7 @@ describe("the contract", () => {
     const windowBreaks = Object.entries(exported).flatMap(([id, provider]) =>
       Object.entries(provider.models).flatMap(([modelId, entry]) => {
         const limits = (entry.providers_dev as unknown as ModelExtension).limits;
-        return inputWindowRuleBreaks(limits.input_window, (entry as { limit?: unknown }).limit, limits.from_measurement, limits.measured).map((rule) => `${id}/${modelId}: ${rule}`);
+        return inputWindowRuleBreaks(limits.input_window, (entry as { limit?: unknown }).limit, limits.from_measurement, limits.measured, (entry.providers_dev as unknown as ModelExtension).access).map((rule) => `${id}/${modelId}: ${rule}`);
       }),
     );
     expect(windowBreaks).toEqual([]);
@@ -831,13 +869,16 @@ describe("the contract", () => {
     await holds(real);
   }, 120_000);
 
-  it("gives the fixture's added entry its documented window, contradicted by a bracket under it", () => {
+  it("gives the fixture's added login the window measured directly; the proxy's lower values are evidence and count for nothing", () => {
     const window = deps.index.entries.find((entry) => entry.ref === "added-login/lab/model-2")!;
-    const record = JSON.parse(readFileSync(join(published, "site", "api.json"), "utf8"))["added-login"].models["lab/model-2"].providers_dev.limits.input_window;
+    const extension = JSON.parse(readFileSync(join(published, "site", "api.json"), "utf8"))["added-login"].models["lab/model-2"].providers_dev as ModelExtension;
+    const record = extension.limits.input_window;
     expect(window.measured_limit_count).toBe(4);
-    // 880,000 refused is at or below 99 % of the documented 900,000: contradicted, and the lowest client decides.
-    expect(record).toMatchObject({ tokens: 600000, basis: "measured", bound: "at_least", scope: "input", documented_tokens: 900000, documented_field: "limit.context", documented_source: "providers.dev", documented_date: "2026-11-01", documented_status: "contradicted", measured_kind: "accepted", measured_date: "2026-11-11", clients: 3, evaluations: 3 });
-    expect(record.measurements.map((item: { client: string; kind: string; tokens: number }) => [item.client, item.kind, item.tokens])).toEqual([["agent", "accepted", 600000], ["proxy", "bracket", 850000], ["direct", "window", 900000]]);
+    // On a login the vendor's own client counts first; it measured nothing that counts, so direct does: the named window.
+    expect(record).toMatchObject({ tokens: 900000, basis: "measured", bound: "limit", scope: "window", documented_tokens: 900000, documented_field: "limit.context", documented_source: "providers.dev", documented_date: "2026-11-01", documented_status: "not_contradicted", measured_kind: "window", measured_date: "2026-11-10", clients: 1, evaluations: 1 });
+    expect(record.measurements.map((item) => [item.client, item.kind, item.tokens, item.client_kind, item.chosen])).toEqual([["agent", "accepted", 600000, "proxy", false], ["proxy", "bracket", 850000, "proxy", false], ["direct", "window", 900000, "direct", true]]);
+    // providers.dev's figure from the entry's file beside it agrees.
+    expect(extension.safe.input_window).toMatchObject({ value: 900000, source: "measured", agreement: "agree", sources: [{ source: "measured", client: "direct", client_kind: "direct" }, { source: "providers.dev", value: 900000, scope: "window", date: "2026-11-01" }] });
     expect(deps.meta.issues.filter((issue) => issue.code === "limit-not-counted").map((issue) => issue.target)).toEqual(["added-login/lab/model-2#limits"]);
   });
 
