@@ -139,11 +139,11 @@ The baseline is imported from models.dev; our additions, corrections and measure
 - Each source carries its own date: the import date next to `models.dev`, the newest evidence next to
   `providers.dev`, and next to `pi.dev` the import of pi's catalog (`pi.snapshot.fetched_at` of `/api/v1/meta`, which
   like the models.dev date moves only when the data changed).
-- A measurement names the client it went through: the provider directly, CLIProxyAPI, or a vendor's own CLI. Every
+- A measurement names the client it went through: the provider directly, Provimux (our distribution of CLIProxyAPI), or a vendor's own CLI. Every
   client has a kind (`direct`, `own-client`, `proxy`), from the measurements file or
   `data/authored/measurement-labels.yaml`, where a new client must be added with its kind; which kind feeds a safe
   value is decided once, in `countingKind` (`src/core/safe.ts`). The
-  coding agent used on top of CLIProxyAPI is not named ("A coding agent, through CLIProxyAPI"). The public names
+  coding agent used on top of Provimux is not named ("A coding agent, through Provimux"). The public names
   are in `data/authored/measurement-labels.yaml`; a new client id must be added there (the build warns and publishes
   it as "other"). Runs marked `lacks` are not published: they say something about a proxy build, not a provider.
 - Commit messages carry no links to agent sessions (no `Claude-Session:` line). `scripts/commit-msg` removes one;

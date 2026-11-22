@@ -22,7 +22,7 @@ import { finishWindow, inputWindowRuleBreaks } from "./helpers.ts";
 type Evaluation = Omit<MeasuredLimit, "input_read"> & { input_read?: number | null };
 
 const RESULTS = "https://github.com/ngvoicu/groundtruth/blob/main/results";
-const CLIPROXY = { client: "cliproxyapi", client_label: "Requests sent through CLIProxyAPI", client_kind: "proxy" } as const;
+const CLIPROXY = { client: "cliproxyapi", client_label: "Requests sent through Provimux", client_kind: "proxy" } as const;
 /** The worked examples on a login are on an entry whose access is subscription. */
 const LOGIN: EntryAccess = "subscription";
 const CODEX = { route: "codex-subscription", route_label: "ChatGPT plan through the Codex login" };
@@ -136,7 +136,7 @@ describe("inputWindow: the worked examples of section 7", () => {
       measured_refused: 922500, measured_date: "2026-11-13",
       clients: 1, evaluations: 1,
       measurements: [
-        { client: "cliproxyapi", client_label: "Requests sent through CLIProxyAPI",
+        { client: "cliproxyapi", client_label: "Requests sent through Provimux",
           route: "codex-subscription", route_label: "ChatGPT plan through the Codex login",
           date: "2026-11-13", tokens: 915011, bound: "at_least", kind: "bracket",
           accepted: 915011, refused: 922500, named: null, read: null,

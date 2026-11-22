@@ -496,7 +496,7 @@ describe("the context window", () => {
   const SOL = window({
     value: 921500, at_least: true, scope: "input", window_tokens: 1050000, source: "measured", date: "2026-11-17", agreement: "differ",
     sources: [
-      statement({ source: "measured", value: 921500, at_least: true, below: 922300, scope: "input", date: "2026-11-17", evidence_url: "https://example.com/limits-codex.jsonl", client: "cliproxyapi", client_label: "Requests sent through CLIProxyAPI", client_kind: "proxy" }),
+      statement({ source: "measured", value: 921500, at_least: true, below: 922300, scope: "input", date: "2026-11-17", evidence_url: "https://example.com/limits-codex.jsonl", client: "cliproxyapi", client_label: "Requests sent through Provimux", client_kind: "proxy" }),
       statement({ value: 922000, scope: "input" }),
       statement({ source: "pi.dev", value: 500000, scope: "window", date: "2026-11-20" }),
     ],
@@ -534,7 +534,7 @@ describe("the context window", () => {
   it("warns exactly where agreement is differ, and its list names the measurement: client, refused size, raw result", () => {
     const html = page(SOL);
     expect(count(html, 'class="warn-sign"')).toBe(2);
-    expect(text(listOf(html, "warn-row-input_window"))).toBe("Not all sources agree Context window Measured at least 921,500 tokens (the value on this page) 2026-11-17 Requests sent through CLIProxyAPI · 922,300 refused · Raw result models.dev 922,000 tokens 2026-11-15 pi.dev 500,000 tokens 2026-11-20 How a value is chosen");
+    expect(text(listOf(html, "warn-row-input_window"))).toBe("Not all sources agree Context window Measured at least 921,500 tokens (the value on this page) 2026-11-17 Requests sent through Provimux · 922,300 refused · Raw result models.dev 922,000 tokens 2026-11-15 pi.dev 500,000 tokens 2026-11-20 How a value is chosen");
     expect(listOf(html, "warn-row-input_window")).toContain('<a href="https://example.com/limits-codex.jsonl" rel="noopener">Raw result</a>');
     expect(page(OPUS)).not.toContain("warn-sign");
     // The same sources with agreement "agree": no warning, whatever the numbers.
@@ -550,7 +550,7 @@ describe("the context window", () => {
     // openrouter/openai/gpt-6.1-sol: a window named through the proxy on an API-key entry, not counted; one direct, counted.
     const model = structuredClone(catalog.lab!.models.m!) as JsonObject;
     const extension = model[NS] as unknown as ModelExtension;
-    const proxy = limitOf({ route: "openrouter", route_label: "OpenRouter API key", client: "cliproxyapi", client_label: "Requests sent through CLIProxyAPI", client_kind: "proxy", context: 1050000, date: "2026-11-17", source: "https://example.com/proxy.jsonl" });
+    const proxy = limitOf({ route: "openrouter", route_label: "OpenRouter API key", client: "cliproxyapi", client_label: "Requests sent through Provimux", client_kind: "proxy", context: 1050000, date: "2026-11-17", source: "https://example.com/proxy.jsonl" });
     const direct = limitOf({ route: "openrouter", route_label: "OpenRouter API key", context: 1050000, date: "2026-11-18", source: "https://example.com/direct.jsonl" });
     extension.limits.measured = [proxy, direct];
     extension.limits.input_window = inputWindow({ context: 1050000, input: 922000 }, [], [proxy, direct], () => ({ source: "models.dev", date: "2026-11-15" }));
@@ -640,7 +640,7 @@ describe("the safe values of an entry page", () => {
 
 describe("the context window of a model", () => {
   const sourceOf = () => ({ source: "models.dev" as const, date: "2026-11-15" });
-  const login = { route: "lab-subscription", route_label: "Lab plan", client: "cliproxyapi", client_label: "Requests sent through CLIProxyAPI" };
+  const login = { route: "lab-subscription", route_label: "Lab plan", client: "cliproxyapi", client_label: "Requests sent through Provimux" };
   /** A window documented as the context window: input and output together. */
   const window = (context: number): InputWindow => finishWindow(inputWindow({ context }, [], [], sourceOf));
   /** An input limit documented under a larger context window: input alone. */

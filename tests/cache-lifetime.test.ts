@@ -27,9 +27,9 @@ import type { ClientKind, EntryAccess } from "../src/core/safe.ts";
 import { finishLifetime, lifetimeRuleBreaks } from "./helpers.ts";
 
 const LABELS: Record<string, string> = {
-  cliproxyapi: "Requests sent through CLIProxyAPI",
+  cliproxyapi: "Requests sent through Provimux",
   "codex-cli": "OpenAI's Codex CLI",
-  "agent+cliproxyapi": "A coding agent, through CLIProxyAPI",
+  "agent+cliproxyapi": "A coding agent, through Provimux",
   "muse-code": "Meta's Muse Code CLI",
   direct: "Requests sent straight to the provider",
   "devin-cli": "The Devin CLI",
@@ -288,7 +288,7 @@ describe("cacheLifetime: the worked examples of section 10", () => {
         documentedOf("short", 1800, "explicit", "30m"),
         {
           retention_profile: "short", basis: "measured", source: "providers.dev", date: "2026-11-11", lifetime_s: 1800, mode: null, documented_as: null,
-          client: "cliproxyapi", client_label: "Requests sent through CLIProxyAPI", parameter: null, value: null,
+          client: "cliproxyapi", client_label: "Requests sent through Provimux", parameter: null, value: null,
           evaluations: 1, evaluation_ids: ["gpt6-2026-11-11/G5"], checks: 16, hits: 10, tested_from_s: 300, first_miss_s: 2400,
           results: [
             { kind: "control", age_s: 0, hits: 1, checks: 1, hit_rate_pct: 100 },

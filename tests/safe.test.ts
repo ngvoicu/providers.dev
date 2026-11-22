@@ -49,7 +49,7 @@ const LABELS = MeasurementLabels.parse({
   clients: {
     direct: { id: "direct", label: "Requests sent straight to the provider", kind: "direct" },
     "direct-b": { id: "direct-b", label: "Another direct probe", kind: "direct" },
-    cliproxyapi: { id: "cliproxyapi", label: "Requests sent through CLIProxyAPI", kind: "proxy" },
+    cliproxyapi: { id: "cliproxyapi", label: "Requests sent through Provimux", kind: "proxy" },
     "vendor-cli": { id: "vendor-cli", label: "The vendor's CLI", kind: "own-client" },
   },
 });

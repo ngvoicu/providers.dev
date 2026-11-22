@@ -7,8 +7,10 @@
 # else `direct`, else `proxy`. Where the measurements file states a client's kind (`client_kinds`), that kind counts
 # and this one is the fallback; the build warns where the two differ (`client-kind-differs`).
 #
-# CLIProxyAPI is named (owner, 2026-11-13): a reader has to know which proxy a result went through to judge or
-# repeat it. The coding agent used on top of it is not named.
+# The proxy is named (owner, 2026-11-13): a reader has to know which proxy a result went through to judge or
+# repeat it. The coding agent used on top of it is not named. The proxy is Provimux (owner, 2026-11-22): our
+# distribution of CLIProxyAPI, the same proxy; evaluations before 22 November 2026 went through CLIProxyAPI 8.0.53.
+# The ids stay `cliproxyapi` and `agent+cliproxyapi`, as the measurements file writes them.
 clients:
   direct:
     id: direct
@@ -16,11 +18,11 @@ clients:
     kind: direct
   cliproxyapi:
     id: cliproxyapi
-    label: Requests sent through CLIProxyAPI
+    label: Requests sent through Provimux
     kind: proxy
   pi+cliproxyapi:
     id: agent+cliproxyapi
-    label: A coding agent, through CLIProxyAPI
+    label: A coding agent, through Provimux
     kind: proxy
   codex-cli:
     id: codex-cli

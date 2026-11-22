@@ -259,7 +259,7 @@ Models that exist only because they were evaluated do not need to be listed by h
 `data/authored/routes.yaml` maps to one of our providers creates the entry.
 
 `data/authored/measurement-labels.yaml` gives each client of the measurement file its public name (for example
-"Requests sent through CLIProxyAPI") and its `kind`, required: `direct` (plain requests sent straight to the
+"Requests sent through Provimux") and its `kind`, required: `direct` (plain requests sent straight to the
 provider), `own-client` (the vendor's own client) or `proxy` (requests through a proxy, plain or made by a coding
 agent). The kind decides which measurement gives a safe value: on an API-key entry `direct` only; on a login
 `own-client`, else `direct`, else `proxy` (`countingKind` in `src/core/safe.ts`). Where the measurements file states a

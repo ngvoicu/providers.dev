@@ -118,7 +118,7 @@ describe("API response boundary", () => {
     // A value that is in no entry of the fixture: whatever the pages print of it, they read from the answer.
     const value = {
       value: 1047604, unit: "tokens", at_least: true, scope: "input", window_tokens: 1050000, source: "measured", date: "2026-11-10", agreement: "single",
-      sources: [{ source: "measured", value: 1047604, withheld: false, at_least: true, below: 1050000, scope: "input", date: "2026-11-10", evidence_url: "https://example.com/limits.jsonl", client: "cliproxyapi", client_label: "Requests sent through CLIProxyAPI", client_kind: "proxy", evaluation_id: null }],
+      sources: [{ source: "measured", value: 1047604, withheld: false, at_least: true, below: 1050000, scope: "input", date: "2026-11-10", evidence_url: "https://example.com/limits.jsonl", client: "cliproxyapi", client_label: "Requests sent through Provimux", client_kind: "proxy", evaluation_id: null }],
     };
     type Answer = { data: unknown };
     const swapped = async (path: string): Promise<Response> => {
