@@ -170,9 +170,10 @@ Before finishing a change: `npm run build && npm run check`, and look at the aff
 The site is live at `https://providers.dev`. The repository has two remotes: `upstream` (GitHub
 `ngvoicu/providers.dev`) and `origin` (the owner's Forgejo server). GitHub is where work and the daily snapshot land:
 the `Publish` workflow runs on GitHub only and commits the snapshot there (04:17 and 06:47 UTC; the second is a fallback). The Forgejo server follows
-GitHub by itself: its workflow `Follow GitHub` (`.forgejo/workflows/follow-github.yml`) fast-forwards its `main` to
-GitHub's every hour. It never forces and never merges; if the server has a commit GitHub lacks, the run fails and
-changes nothing. It has followed when the two heads are equal (`git ls-remote upstream refs/heads/main` and the same
+GitHub by itself: its workflow `Follow GitHub` (`.forgejo/workflows/follow-github.yml`) brings its `main` to
+GitHub's every hour: a fast-forward when it can be one; otherwise it first keeps the server's `main` as
+`refs/nas-backup/main-<UTC time>`, then sets it to GitHub's, in one atomic push. It never merges and only reads
+GitHub. It has followed when the two heads are equal (`git ls-remote upstream refs/heads/main` and the same
 for `origin`).
 
 - Before any work: `git pull --ff-only upstream main`.
