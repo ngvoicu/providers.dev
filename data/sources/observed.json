@@ -3392,113 +3392,6 @@
    "latest": true
   },
   {
-   "id": "cpa-8.0.53/D1",
-   "route": "devin",
-   "client": "cliproxyapi",
-   "model": "claude-opus-5-5",
-   "models_dev": null,
-   "base_model": "anthropic/claude-opus-5-5",
-   "options": {},
-   "date": "2026-11-04",
-   "source": "results/cpa-8.0.53/D1-2026-11-04T17-56-55.json",
-   "control": {
-    "warm": 1,
-    "total": 1
-   },
-   "checks": [
-    {
-     "age": "2.5m",
-     "age_s": 150,
-     "warm": 2,
-     "total": 2
-    },
-    {
-     "age": "5m",
-     "age_s": 300,
-     "warm": 3,
-     "total": 3
-    },
-    {
-     "age": "7.5m",
-     "age_s": 450,
-     "warm": 3,
-     "total": 3
-    },
-    {
-     "age": "10m",
-     "age_s": 600,
-     "warm": 3,
-     "total": 3
-    },
-    {
-     "age": "15m",
-     "age_s": 900,
-     "warm": 3,
-     "total": 3
-    },
-    {
-     "age": "20m",
-     "age_s": 1200,
-     "warm": 3,
-     "total": 3
-    },
-    {
-     "age": "25m",
-     "age_s": 1500,
-     "warm": 3,
-     "total": 3
-    },
-    {
-     "age": "30m",
-     "age_s": 1800,
-     "warm": 3,
-     "total": 3
-    },
-    {
-     "age": "40m",
-     "age_s": 2400,
-     "warm": 3,
-     "total": 3
-    },
-    {
-     "age": "50m",
-     "age_s": 3000,
-     "warm": 2,
-     "total": 3
-    },
-    {
-     "age": "1h",
-     "age_s": 3600,
-     "warm": 3,
-     "total": 3
-    },
-    {
-     "age": "75m",
-     "age_s": 4500,
-     "warm": 3,
-     "total": 3
-    },
-    {
-     "age": "90m",
-     "age_s": 5400,
-     "warm": 3,
-     "total": 3
-    },
-    {
-     "age": "2h",
-     "age_s": 7200,
-     "warm": 3,
-     "total": 3
-    }
-   ],
-   "late_excluded": 1,
-   "all_warm_through_s": 2400,
-   "last_warm_s": 7200,
-   "first_all_cold_s": null,
-   "note": "warm to 2 h here; later runs (H7, H8) did not reproduce it",
-   "latest": true
-  },
-  {
    "id": "harness-2026-11-07/H7",
    "route": "devin",
    "client": "devin-cli",
@@ -16220,6 +16113,10 @@
   {
    "id": "cpa-8.0.53/C2",
    "reason": "ran before the probe sent a per-conversation cache key"
+  },
+  {
+   "id": "cpa-8.0.53/D1",
+   "reason": "devin/claude-opus-5-5 through CLIProxyAPI 8.0.53 (plain requests, Responses format), published until 2026-11-22 as warm through 40 min and warm at 2 h; that was a misreading. CLIProxyAPI before v8.0.63 left Devin's cache-write tokens out of the prompt total (fixed by \"fix(devin): count cache-write tokens in total input\", router-for-me/CLIProxyAPI#7378, first in v8.0.63), so a miss, whose prompt is almost all cache write, was reported as the shared part alone: the priming request read 558 of 562 prompt tokens. Every check from 7.5 min to 2 h reports exactly that, 558 of 562 (50 min r1: 0 of 4), and the probe's rule (at least half of the prompt and 500 tokens) counted those as warm. Read with the full prompt they are misses. The checks at 2.5 and 5 min read 4,834 to 4,883 of 4,838 to 4,887 tokens: real hits (6 of 6; one 2.5 min check ran 33 s late). Read correctly: warm through 5 min, cold from 7.5 min, as the Devin CLI (harness-2026-11-07/H7) and pi (H8) showed. The raw file is not changed and the builder reads its warm flags as recorded, so the run is left out rather than published with a wrong lifetime. Raw file: results/cpa-8.0.53/D1-2026-11-04T17-56-55.json (and .md)"
   },
   {
    "id": "cpa-8.0.53/D4",
