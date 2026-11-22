@@ -203,6 +203,7 @@ describe("the pi import", () => {
       last_attempt_ok: true,
       upstream: "updated",
       measurements: "unchanged",
+      listed: { last_attempt_at: "2026-11-14T00:00:00.000Z", status: "absent" },
       pi: { last_attempt_at: "2026-11-14T00:00:00.000Z", status: "failed", error: report.pi.error },
     });
     expect(existsSync(join(dataDir, ".sync.lock"))).toBe(false);
@@ -297,15 +298,15 @@ describe("the pi import", () => {
     expect(filesUnder(join(dataDir, "pi"))).toEqual(piBefore);
   });
 
-  it("12. writeStepOutputs appends upstream=, measurements=, pi= and pi_revision7= to the file and keeps what it held; a skipped part gets no line", () => {
+  it("12. writeStepOutputs appends upstream=, measurements=, pi=, listed= and pi_revision7= to the file and keeps what it held; a skipped part gets no line", () => {
     const path = join(tempDataDir(), "github-output");
     writeFileSync(path, "earlier=1\n");
-    writeStepOutputs({ ok: true, upstream: { status: "updated" }, measurements: { status: "unchanged" }, pi: { status: "failed", error: "pi.dev answered HTTP 503" }, piRevision7: "snapshot" }, path);
-    expect(readFileSync(path, "utf8")).toBe("earlier=1\nupstream=updated\nmeasurements=unchanged\npi=failed\npi_revision7=snapshot\n");
+    writeStepOutputs({ ok: true, upstream: { status: "updated" }, measurements: { status: "unchanged" }, pi: { status: "failed", error: "pi.dev answered HTTP 503" }, listed: { status: "unchanged" }, piRevision7: "snapshot" }, path);
+    expect(readFileSync(path, "utf8")).toBe("earlier=1\nupstream=updated\nmeasurements=unchanged\npi=failed\nlisted=unchanged\npi_revision7=snapshot\n");
 
     // A part that did not run (`only: "pi"`) gets no line.
-    writeStepOutputs({ ok: true, upstream: { status: "skipped" }, measurements: { status: "skipped" }, pi: { status: "unchanged" }, piRevision7: "dd93eb2" }, path);
-    expect(readFileSync(path, "utf8")).toBe("earlier=1\nupstream=updated\nmeasurements=unchanged\npi=failed\npi_revision7=snapshot\npi=unchanged\npi_revision7=dd93eb2\n");
+    writeStepOutputs({ ok: true, upstream: { status: "skipped" }, measurements: { status: "skipped" }, pi: { status: "unchanged" }, listed: { status: "skipped" }, piRevision7: "dd93eb2" }, path);
+    expect(readFileSync(path, "utf8")).toBe("earlier=1\nupstream=updated\nmeasurements=unchanged\npi=failed\nlisted=unchanged\npi_revision7=snapshot\npi=unchanged\npi_revision7=dd93eb2\n");
   });
 });
 

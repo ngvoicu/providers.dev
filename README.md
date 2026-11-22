@@ -57,7 +57,7 @@ If there is no snapshot, the build stops and says so; it never falls back to sam
 
 ```
 data/upstream/    the last good import of models.dev      written only by `npm run sync`
-data/sources/     the measurements file (observed.json)   written only by `npm run sync`
+data/sources/     observed.json and listed.json (groundtruth) written only by `npm run sync`
 data/pi/          the last good import of pi's catalog    written only by `npm run sync`
 data/authored/    our providers, overrides, rules, listings  written by people
         │
@@ -381,10 +381,20 @@ pi or a measurement, and says which.
   to GitHub only; nobody has to push it to the server (doing so does no harm). The copy has followed when the two heads are equal
   (`git ls-remote` on both remotes, `refs/heads/main`).
 
-`npm run sync` imports three sources, one after the other, each on its own: models.dev into `data/upstream/`, the
-measurements file into `data/sources/`, and [pi's model catalog](https://pi.dev/api/models) (MIT) into `data/pi/`.
-models.dev is the reference; pi's catalog is a second, extra source beside it. A failure of one source never touches
-another source's snapshot.
+`npm run sync` imports four sources, one after the other, each on its own: models.dev into `data/upstream/`, the
+measurements file into `data/sources/`, groundtruth's discovery file into `data/sources/`, and
+[pi's model catalog](https://pi.dev/api/models) (MIT) into `data/pi/`. models.dev is the reference; pi's catalog is a
+second, extra source beside it. A failure of one source never touches another source's snapshot.
+
+The discovery file (`LISTED_URL` in `scripts/lib/sync.ts`) is groundtruth's `listed.json`, at the root of its
+repository beside `observed.json`: what each login's vendor listed, read daily through the owner's Provimux, for the
+listings (`/api/v1/listings`). Its structure is `ListedFile` in `src/core/schema.ts` (schema 1; strict, so that no
+account, email, token or file name can get in). It is kept as it came, as `data/sources/listed.json` with
+`listed.meta.json` beside it, and an ETag is sent. A missing file (404) is "no discovery yet": nothing changes, a copy
+held before included, and `data/sync-status.json` records `listed: { status: "absent" }`. A file that is not JSON,
+does not fit the structure, or answers another error keeps the last good copy: the part is recorded as `failed` with
+the reason, the `Publish` run warns, and the build lists a `listed-sync-failed` warning in `/api/v1/meta`. Like pi's
+part, it never changes `last_attempt_ok`.
 
 What the sync checks before it replaces the snapshot: the answer is JSON in the expected v2 structure; every
 provider and model id matches its key; the import is not empty and has not lost more than 40% of its providers or

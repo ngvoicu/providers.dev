@@ -1,10 +1,11 @@
-// The sync. It fetches models.dev, the measurements file and pi's model catalog once each, checks what came back,
-// and only then replaces that source's snapshot (data/upstream/, data/sources/, data/pi/). Anything that goes wrong
-// with a source leaves its previous snapshot exactly as it was; the three parts never affect one another.
+// The sync. It fetches models.dev, the measurements file, groundtruth's discovery file and pi's model catalog once
+// each, checks what came back, and only then replaces that source's snapshot (data/upstream/, data/sources/, data/pi/).
+// Anything that goes wrong with a source leaves its previous snapshot exactly as it was; the parts never affect one
+// another.
 import { appendFileSync, closeSync, existsSync, mkdirSync, openSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { deepEqual } from "../../src/core/merge.ts";
-import { ObservedFile, UPSTREAM_SCHEMA, UpstreamCatalog, type PiSyncRecord, type SourceMeta, type UpstreamMeta } from "../../src/core/schema.ts";
+import { ListedFile, ListedSyncRecord, ObservedFile, UPSTREAM_SCHEMA, UpstreamCatalog, type PiSyncRecord, type SourceMeta, type UpstreamMeta } from "../../src/core/schema.ts";
 import { pretty, readJson, readJsonIfExists, sha256, swapDir, writeFileAtomic } from "./files.ts";
 import { piOfSync } from "./pi-fence.ts";
 
@@ -22,6 +23,8 @@ const MIN_MODELS = 500;
 /** An import that lost more than this share of the previous snapshot is treated as broken. Shared by every part. */
 const MIN_SHARE = 0.6;
 const LOCK_STALE_MS = 30 * 60 * 1000;
+/** A discovery file larger than this is not read. */
+export const LISTED_MAX_BYTES = 8 * 1024 * 1024;
 
 export interface SyncOptions {
   dataDir: string;
@@ -47,6 +50,8 @@ export interface SyncReport {
   upstream: PartReport;
   measurements: PartReport;
   pi: PartReport;
+  /** groundtruth's discovery file. Never changes `ok`: a failure keeps the last good file and is a warning of the build. */
+  listed: PartReport;
   /** For the commit message: 7 hexadecimal characters of the stored pi snapshot's revision, else "snapshot". */
   piRevision7: string;
 }
@@ -65,6 +70,8 @@ export interface SyncStatus {
   measurements: StoredStatus;
   /** The last attempt to import pi's catalog. */
   pi?: PiSyncRecord;
+  /** The last attempt to fetch groundtruth's discovery file. */
+  listed?: ListedSyncRecord;
 }
 
 export class SyncBusyError extends Error {}
@@ -269,6 +276,51 @@ async function syncMeasurements(options: Required<Pick<SyncOptions, "dataDir" | 
   return { status: "updated", summary: [`${checked.data.cache.length} cache runs, ${checked.data.limits.length} limits`] };
 }
 
+/**
+ * groundtruth's discovery file, beside the measurements file. A missing file (404) is "no discovery yet": nothing
+ * changes, a copy held before included. A file that is not JSON or does not fit ListedFile keeps the last good copy and
+ * fails the part, which the build reports as a warning. The file is kept as it came, with data/sources/listed.meta.json.
+ */
+async function syncListed(options: Required<Pick<SyncOptions, "dataDir" | "fetch" | "now">> & SyncOptions): Promise<RanPart & { absent?: true }> {
+  const dir = join(options.dataDir, "sources");
+  const file = join(dir, "listed.json");
+  const metaFile = join(dir, "listed.meta.json");
+  const previous = readJsonIfExists<SourceMeta>(metaFile);
+  const now = options.now().toISOString();
+  const headers: Record<string, string> = { "User-Agent": "providers.dev sync" };
+  if (previous?.etag && !options.force && existsSync(file)) headers["If-None-Match"] = previous.etag;
+  const response = await options.fetch(LISTED_URL, { headers });
+  if (response.status === 404) return { status: "unchanged", absent: true, summary: ["no discovery file yet"] };
+  if (response.status === 304 && previous) {
+    writeFileAtomic(metaFile, pretty({ ...previous, checked_at: now }));
+    return { status: "unchanged" };
+  }
+  if (!response.ok) throw new Error(`the discovery file answered HTTP ${response.status}`);
+  const body = await response.text();
+  if (body.length > LISTED_MAX_BYTES) throw new Error(`the discovery file is larger than ${LISTED_MAX_BYTES} bytes`);
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(body);
+  } catch {
+    throw new Error("the discovery file is not JSON");
+  }
+  const checked = ListedFile.safeParse(parsed);
+  if (!checked.success) {
+    const first = checked.error.issues.slice(0, 3).map((issue) => `${issue.path.join(".") || "(file)"}: ${issue.message}`);
+    throw new Error(`the discovery file does not match the expected structure (${checked.error.issues.length} problems; first: ${first.join("; ")})`);
+  }
+  const digest = sha256(body);
+  if (previous?.sha256 === digest && !options.force && existsSync(file)) {
+    writeFileAtomic(metaFile, pretty({ ...previous, checked_at: now, ...etagOf(response) }));
+    return { status: "unchanged" };
+  }
+  mkdirSync(dir, { recursive: true });
+  writeFileAtomic(file, body.endsWith("\n") ? body : `${body}\n`);
+  writeFileAtomic(metaFile, pretty({ source: LISTED_URL, fetched_at: now, checked_at: now, ...etagOf(response), sha256: digest } satisfies SourceMeta));
+  const providers = Object.entries(checked.data.providers);
+  return { status: "updated", summary: [`${providers.length} providers, ${providers.reduce((sum, [, part]) => sum + part.models.length, 0)} models`] };
+}
+
 export async function sync(input: SyncOptions): Promise<SyncReport> {
   const options = { now: () => new Date(), ...input };
   mkdirSync(options.dataDir, { recursive: true });
@@ -285,13 +337,19 @@ export async function sync(input: SyncOptions): Promise<SyncReport> {
     let five: FiveFields;
     let upstream: PartReport = { status: "skipped" };
     let measurements: PartReport = { status: "skipped" };
+    let listed: PartReport = { status: "skipped" };
+    // The record of the discovery file: this attempt's, or the one in the file where the part does not run.
+    let listedRecord: ListedSyncRecord | undefined;
     let ok = true;
     if (options.only === "pi") {
       // The five fields of models.dev and the measurements, and nothing else, are kept from the file as it was
       // (absent where there were none). A file that does not parse counts as absent here.
       five = {};
       try {
-        five = fiveFieldsOf(readJsonIfExists<unknown>(statusPath));
+        const kept = readJsonIfExists<unknown>(statusPath);
+        five = fiveFieldsOf(kept);
+        const record = ListedSyncRecord.safeParse(typeof kept === "object" && kept !== null ? (kept as { listed?: unknown }).listed : undefined);
+        if (record.success) listedRecord = record.data;
       } catch (error) {
         options.log?.(`${statusPath} does not parse (${error instanceof Error ? error.message : String(error)}): it counts as absent, and its five fields are not kept.`);
       }
@@ -300,6 +358,16 @@ export async function sync(input: SyncOptions): Promise<SyncReport> {
       const ranMeasurements = await part(() => syncMeasurements(options));
       upstream = ranUpstream;
       measurements = ranMeasurements;
+      // The discovery file: after the measurements, and outside `ok`.
+      let absent = false;
+      const ranListed = await part(async () => {
+        const result = await syncListed(options);
+        absent = result.absent === true;
+        const { absent: _absent, ...report } = result;
+        return report;
+      });
+      listed = ranListed;
+      listedRecord = { last_attempt_at: options.now().toISOString(), status: absent ? "absent" : ranListed.status, ...(ranListed.error ? { error: ranListed.error } : {}) };
       ok = ranUpstream.status !== "failed" && ranMeasurements.status !== "failed";
       const errors = [ranUpstream, ranMeasurements].map((item) => item.error).filter(Boolean);
       five = {
@@ -312,12 +380,13 @@ export async function sync(input: SyncOptions): Promise<SyncReport> {
     }
     // Written before the pi part: models.dev's five fields never wait on pi, and a process that dies inside the pi part
     // leaves a record that says the attempt did not finish, never the previous attempt's success.
-    writeFileAtomic(statusPath, pretty({ ...five, pi: { last_attempt_at: options.now().toISOString(), status: "failed", error: "The pi part did not finish." } }));
+    const withListed = listedRecord ? { listed: listedRecord } : {};
+    writeFileAtomic(statusPath, pretty({ ...five, ...withListed, pi: { last_attempt_at: options.now().toISOString(), status: "failed", error: "The pi part did not finish." } }));
     const pi = await piOfSync(options);
     // And after it: a literal of three checked strings; no pi code and no schema runs between the part and the file.
     const record: PiSyncRecord = { last_attempt_at: options.now().toISOString(), status: pi.report.status, ...(pi.report.error ? { error: pi.report.error } : {}) };
-    writeFileAtomic(statusPath, pretty({ ...five, pi: record }));
-    return { ok, upstream, measurements, pi: pi.report, piRevision7: pi.revision7 };
+    writeFileAtomic(statusPath, pretty({ ...five, ...withListed, pi: record }));
+    return { ok, upstream, measurements, pi: pi.report, listed, piRevision7: pi.revision7 };
   } finally {
     release();
   }
@@ -334,12 +403,12 @@ function fiveFieldsOf(previous: unknown): FiveFields {
 }
 
 /**
- * The step outputs of the `Import` step of the Publish workflow: `upstream=…`, `measurements=…`, `pi=…` and
- * `pi_revision7=…`, one line each, appended to the file GitHub names in GITHUB_OUTPUT. A part that did not run
+ * The step outputs of the `Import` step of the Publish workflow: `upstream=…`, `measurements=…`, `pi=…`, `listed=…`
+ * and `pi_revision7=…`, one line each, appended to the file GitHub names in GITHUB_OUTPUT. A part that did not run
  * (`--only=pi`) gets no line.
  */
 export function writeStepOutputs(report: SyncReport, path: string): void {
-  const parts: [string, PartReport][] = [["upstream", report.upstream], ["measurements", report.measurements], ["pi", report.pi]];
+  const parts: [string, PartReport][] = [["upstream", report.upstream], ["measurements", report.measurements], ["pi", report.pi], ["listed", report.listed]];
   const lines = parts.flatMap(([name, part]) => (part.status === "skipped" ? [] : [`${name}=${part.status}\n`]));
   // The pi part always runs: the seven characters of the stored snapshot's revision, for the commit message.
   lines.push(`pi_revision7=${report.piRevision7}\n`);

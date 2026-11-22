@@ -553,6 +553,8 @@ export function fetchReturning(body: string, init: ResponseInit = { status: 200,
     const url = String(input);
     if (url.includes("api.github.com")) return new Response(JSON.stringify({ sha: "abc123", commit: { committer: { date: "2026-11-12T00:00:00Z" } } }));
     if (url.includes("observed.json")) return new Response("not found", { status: 404 });
+    // No discovery file yet, as on the day the reader was written.
+    if (url.includes("listed.json")) return new Response("not found", { status: 404 });
     return new Response(body, init);
   }) as typeof fetch;
 }

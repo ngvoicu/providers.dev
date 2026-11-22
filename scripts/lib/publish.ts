@@ -16,6 +16,9 @@ import {
   AuthoredProvider,
   CatalogRules,
   ext,
+  ListedFile,
+  ListedSyncRecord,
+  OTHER_CLIENT,
   MeasurementLabels,
   ObservedFile,
   OverrideFile,
@@ -205,9 +208,46 @@ export function publish(input: PublishOptions): PublishReport {
     const model = upstream.catalog[ref.slice(0, slash)]?.models[ref.slice(slash + 1)];
     return model ? [{ ref, model: model as unknown as PublishedModel }] : [];
   });
-  const built = buildListings({ catalog, upstreamDate: upstream.meta.fetched_at.slice(0, 10), authored: authoredListings, ruledOut: leftOut, pi: pi.lists });
+  // groundtruth's discovery file, as the sync kept it. A file that does not read is left out with a warning: the
+  // listings are then built as if there were none.
+  const listedPath = join(dataDir, "sources", "listed.json");
+  const listedMeta = readJsonIfExists<SourceMeta>(join(dataDir, "sources", "listed.meta.json"));
+  let listed: ListedFile | undefined;
+  if (existsSync(listedPath)) {
+    let checked: ReturnType<typeof ListedFile.safeParse> | undefined;
+    try {
+      checked = ListedFile.safeParse(JSON.parse(readFileSync(listedPath, "utf8")));
+    } catch {
+      checked = undefined;
+    }
+    if (checked?.success) listed = checked.data;
+    else issues.push({ level: "warning", code: "listed-sync-failed", target: "data/sources/listed.json", message: `The stored discovery file does not read (${checked ? checked.error.issues[0]?.message : "not JSON"}). The listings are built without it.` });
+  }
+  const listedRecord = ListedSyncRecord.safeParse((status as { listed?: unknown } | undefined)?.listed);
+  if (listedRecord.success && listedRecord.data.status === "failed") {
+    issues.push({ level: "warning", code: "listed-sync-failed", target: "data/sources/listed.json", message: `The last attempt to fetch the discovery file failed (${listedRecord.data.error ?? "no reason recorded"}). The last good copy is used${listed ? "" : "; there is none"}.` });
+  }
+  const unmapped = new Set<string>();
+  const client = (raw: string): { id: string; label: string } => {
+    const named = labels?.clients[raw];
+    if (named) return named;
+    unmapped.add(raw);
+    return { id: OTHER_CLIENT.id, label: OTHER_CLIENT.label };
+  };
+  const built = buildListings({
+    catalog,
+    upstreamDate: upstream.meta.fetched_at.slice(0, 10),
+    authored: authoredListings,
+    ruledOut: leftOut,
+    pi: pi.lists,
+    client,
+    ...(listed ? { listed: { page: `${listed.repository.replace(/\/+$/, "")}/blob/main/listed.json`, providers: listed.providers } } : {}),
+  });
   const listings = built.listings;
   issues.push(...built.issues);
+  for (const raw of [...unmapped].sort()) {
+    issues.push({ level: "warning", code: "unmapped-listing-client", target: `listed/${raw}`, message: `The discovery file names a client "${raw}" that data/authored/measurement-labels.yaml does not describe. It is published as "other".` });
+  }
 
   const draft = withPi(buildIndex(catalog, "", generatedAt, upstream.meta.fetched_at));
   const datasetVersion = sha256(compact({ catalog, exclusions, providers: draft.providers, entries: draft.entries, listings })).slice(0, 16);
@@ -270,10 +310,12 @@ export function publish(input: PublishOptions): PublishReport {
         "pi.dev": listings.filter((listing) => listing.basis === "pi.dev").length,
       },
       source: LISTED_URL,
-      fetched_at: null,
-      checked_at: null,
-      listed_at: null,
-      sync: { last_attempt_at: null, last_attempt_ok: null, last_error: null },
+      fetched_at: listed ? (listedMeta?.fetched_at ?? null) : null,
+      checked_at: listed ? (listedMeta?.checked_at ?? null) : null,
+      listed_at: listed ? (Object.values(listed.providers).map((part) => part.date).sort().at(-1) ?? null) : null,
+      sync: listedRecord.success
+        ? { last_attempt_at: listedRecord.data.last_attempt_at, last_attempt_ok: listedRecord.data.status !== "failed", last_error: listedRecord.data.error ?? null }
+        : { last_attempt_at: null, last_attempt_ok: null, last_error: null },
     },
   };
 

@@ -93,11 +93,33 @@ describe("Keep the new snapshot (release review, blocker 3)", () => {
     for (const line of named) expect(line, line).toMatch(/git (status|add)\b/);
   });
 
+  it("commits a new or changed discovery file, data/sources/listed.json, as sync: listed; a changed measurements file stays sync: measurements", () => {
+    const dir = checkout(false);
+    write(dir, "data/sources/listed.json", '{"schema":1}\n');
+    write(dir, "data/sources/listed.meta.json", '{"fetched_at":"now"}\n');
+    const result = runKeep(dir);
+    expect(result.status).toBe(0);
+    expect(git(dir, "log", "-1", "--format=%s").trim()).toBe("sync: listed");
+    expect(git(dir, "status", "--porcelain")).toBe("");
+    write(dir, "data/sources/observed.json", '{"changed":true}\n');
+    write(dir, "data/sources/listed.json", '{"schema":1,"changed":true}\n');
+    expect(runKeep(dir).status).toBe(0);
+    expect(git(dir, "log", "-1", "--format=%s").trim()).toBe("sync: measurements");
+  });
+
   it("commits nothing when only a time moved", () => {
     const dir = checkout(false);
     write(dir, "data/upstream/meta.json", JSON.stringify({ commit: "e06a33eb4d", checked_at: "later" }));
     expect(runKeep(dir).status).toBe(0);
     expect(git(dir, "log", "-1", "--format=%s").trim()).toBe("start");
+  });
+});
+
+describe("the warning about an unreadable discovery file", () => {
+  it("follows the import step's listed output, with fixed text", () => {
+    const step = steps.find((item) => item.name === "Warn about an unreadable discovery file")!;
+    expect(step.if).toBe("steps.sync.outputs.listed == 'failed'");
+    expect(step.run).toMatch(/^echo "::warning title=The discovery file could not be read::[^"$`]*"$/);
   });
 });
 

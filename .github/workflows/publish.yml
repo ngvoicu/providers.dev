@@ -53,6 +53,10 @@ jobs:
         if: steps.sync.outputs.pi == 'failed'
         run: echo "::warning title=The pi import failed::The site is built and deployed with the last good pi snapshot; models.dev was imported as usual. See the 'Import' step for the reason."
 
+      - name: Warn about an unreadable discovery file
+        if: steps.sync.outputs.listed == 'failed'
+        run: echo "::warning title=The discovery file could not be read::groundtruth's listed.json was not taken; the listings are built from the last good copy. /api/v1/meta lists the reason under issues (listed-sync-failed)."
+
       - name: Build the dataset and the site
         id: build
         run: npm run build
@@ -70,8 +74,9 @@ jobs:
           PI_REVISION7: ${{ steps.sync.outputs.pi_revision7 }}
         run: |
           # Commit only when the imported data changed, not for a new "checked at" time.
-          if [ -n "$(git status --porcelain data/upstream/providers data/sources/observed.json data/pi/providers)" ]; then
-            # The message names what changed: models.dev <commit7>, pi <revision7>, both, or the measurements.
+          if [ -n "$(git status --porcelain data/upstream/providers data/sources/observed.json data/sources/listed.json data/pi/providers)" ]; then
+            # The message names what changed: models.dev <commit7>, pi <revision7>, both, the measurements, or the
+            # discovery file.
             upstream="$(git status --porcelain data/upstream/providers)"
             pi="$(git status --porcelain data/pi/providers)"
             if [ -n "$upstream" ]; then commit7="$(node -p "require('./data/upstream/meta.json').commit?.slice(0,7) ?? 'snapshot'")"; fi
@@ -79,7 +84,8 @@ jobs:
             if [ -n "$upstream" ] && [ -n "$pi" ]; then message="sync: models.dev $commit7, pi $revision7"
             elif [ -n "$upstream" ]; then message="sync: models.dev $commit7"
             elif [ -n "$pi" ]; then message="sync: pi $revision7"
-            else message="sync: measurements"
+            elif [ -n "$(git status --porcelain data/sources/observed.json)" ]; then message="sync: measurements"
+            else message="sync: listed"
             fi
             git config user.name "providers.dev sync"
             git config user.email "actions@users.noreply.github.com"

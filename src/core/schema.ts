@@ -406,6 +406,47 @@ export const AuthoredListing = z
   });
 export type AuthoredListing = z.infer<typeof AuthoredListing>;
 
+/**
+ * groundtruth's discovery file, listed.json (schema 1), at the root of its repository beside observed.json: per
+ * provider of the catalog, the day each vendor's own model list was read, the client that read it, and the models with
+ * the fields the vendor stated. Strict on purpose: it holds no account, email, token, file name or count of logins, and
+ * a key it does not know fails the file, so nothing else can get in. A model's `description` is accepted and not
+ * published.
+ */
+export const ListedModel = ListingFields.extend({ id: nonEmpty, description: z.string().optional() });
+export const ListedFile = z
+  .strictObject({
+    schema: z.literal(1),
+    repository: z.url(),
+    providers: z.record(
+      z.string().regex(PROVIDER_ID),
+      z.strictObject({
+        date: isoDate,
+        client: z.string().regex(/^[a-z0-9][a-z0-9+._-]*$/),
+        models: z.array(ListedModel).min(1),
+      }),
+    ),
+  })
+  .superRefine((file, ctx) => {
+    for (const [provider, part] of Object.entries(file.providers)) {
+      const seen = new Set<string>();
+      part.models.forEach((model, index) => {
+        if (seen.has(model.id)) ctx.addIssue({ code: "custom", path: ["providers", provider, "models", index, "id"], message: `The model ${model.id} is listed twice for ${provider}.` });
+        seen.add(model.id);
+      });
+    }
+  });
+export type ListedFile = z.infer<typeof ListedFile>;
+
+/** The last attempt to fetch the discovery file: the `listed` key of data/sync-status.json. */
+export const ListedSyncRecord = z.strictObject({
+  last_attempt_at: z.string(),
+  /** absent: the repository has no listed.json (no discovery yet); nothing changed. */
+  status: z.enum(["updated", "unchanged", "absent", "failed"]),
+  error: z.string().optional(),
+});
+export type ListedSyncRecord = z.infer<typeof ListedSyncRecord>;
+
 // ---- measurements (observed.json from groundtruth)
 const check = z.looseObject({ age: z.string().optional(), age_s: z.number(), warm: z.number(), total: z.number() });
 export const ObservedRun = z.looseObject({
