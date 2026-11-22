@@ -534,7 +534,7 @@ export const CanonicalModelDetailSchema = z
   .strictObject({ ...canonicalModel, entries: z.array(EntrySummarySchema).describe("Every entry for the model: the lab's own API first, then subscriptions, then the rest by provider.") })
   .describe("A canonical model with every entry that serves it.") satisfies z.ZodType<CanonicalModelDetail>;
 
-// ---- listings: every model a provider and access method offers, measured or not. Since 1.4.0.
+// ---- listings: every model a provider and access method offers, measured or not. Since 1.5.0.
 const listingSource = z.enum(["listed", "providers.dev", "models.dev", "pi.dev"]);
 const fieldSource = listingSource.nullable();
 
@@ -615,7 +615,7 @@ export const ListingSchema = z
     model_count: z.int().min(0).describe("How many models the listing has."),
     models: z.array(ListingModelSchema).nullable().describe("The models, in the source's order. Null in /api/v1/listings without view=full, so that the answer has the same keys in both views."),
   })
-  .describe("The model list of one provider and access method: what the vendor's own list said, read on a date through a named client, completed by sourced statements. Not an evaluation: a listed model need not be an entry, and nothing of a listing is written into an entry. Since 1.4.0.") satisfies z.ZodType<Listing>;
+  .describe("The model list of one provider and access method: what the vendor's own list said, read on a date through a named client, completed by sourced statements. Not an evaluation: a listed model need not be an entry, and nothing of a listing is written into an entry. Since 1.5.0.") satisfies z.ZodType<Listing>;
 
 // ---- full objects. The part that comes from models.dev is theirs and grows with it, so unknown fields are allowed there.
 export const EntrySchema = z
@@ -751,7 +751,7 @@ export const MetaSchema = z
           .strictObject({ last_attempt_at: z.string().nullable(), last_attempt_ok: z.boolean().nullable(), last_error: z.string().nullable() })
           .describe("The last attempt to fetch the discovery file. All null = none is recorded. A failed attempt keeps the last good file."),
       })
-      .describe("The listings (/api/v1/listings) and the discovery file they read. Since 1.4.0."),
+      .describe("The listings (/api/v1/listings) and the discovery file they read. Since 1.5.0."),
   })
   .describe("The dataset: its version, what it holds and where it comes from.");
 

@@ -371,7 +371,7 @@ describe("the build reads it", () => {
 describe("the client id", () => {
   it("provimux is in data/authored/measurement-labels.yaml", () => {
     const labels = MeasurementLabels.parse(parse(readFileSync(join(ROOT, "data", "authored", "measurement-labels.yaml"), "utf8")));
-    expect(labels.clients.provimux).toEqual({ id: "provimux", label: "Provimux, a proxy built on CLIProxyAPI" });
+    expect(labels.clients.provimux).toEqual({ id: "provimux", label: "Provimux, a proxy built on CLIProxyAPI", kind: "proxy" });
   });
 
   it("the file's schema takes the fixture", () => {

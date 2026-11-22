@@ -514,7 +514,7 @@ describe("HTTP behaviour", () => {
 
   it("describes the cache lifetime record: its components and a guide section", async () => {
     const document = await json<{ info: { version: string; contact: unknown; license: unknown }; "x-guide": { id: string; title: string; paragraphs: string[] }[]; components: { schemas: Record<string, { properties?: Record<string, unknown> }> } }>("/api/v1/openapi.json");
-    expect(document.info.version).toBe("1.4.0");
+    expect(document.info.version).toBe("1.5.0");
     expect(document.info.contact).toEqual({ name: "providers.dev", email: "office@providers.dev", url: "https://providers.dev/docs/contributing/" });
     expect(document.info.license).toEqual({ name: "MIT", url: "https://providers.dev/docs/licensing/" });
     const schemas = document.components.schemas;
@@ -577,9 +577,9 @@ describe("pi's catalog in the API (design/pi-source.md, section d)", () => {
     expect(meta.sync.last_error ?? "").not.toMatch(/pi/);
   });
 
-  it("is version 1.4.0, with the six pi components, the keys on the entry, the summary and /meta, and a guide section after Input window", async () => {
+  it("is version 1.5.0, with the six pi components, the keys on the entry, the summary and /meta, and a guide section after Input window", async () => {
     const document = await json<{ info: { version: string; description: string }; "x-guide": { id: string; title: string; paragraphs: string[] }[]; components: { schemas: Record<string, { properties?: Record<string, unknown>; required?: string[] }> } }>("/api/v1/openapi.json");
-    expect(document.info.version).toBe("1.4.0");
+    expect(document.info.version).toBe("1.5.0");
     expect(document.info.description).toContain("A second catalog, pi's (MIT), is imported beside it: what it states for an entry is under providers_dev.pi.");
     const schemas = document.components.schemas;
     for (const name of ["PiBlock", "PiCost", "PiCostTier", "PiDifference", "PiSummary", "PiValue"]) expect(schemas[name], name).toBeDefined();
@@ -635,7 +635,7 @@ describe("pi's catalog in the API (design/pi-source.md, section d)", () => {
 describe("the input window in the OpenAPI document", () => {
   it("has the two components, the key on the entry and the summary, input_read on an evaluation, and a guide section after Unknown values", async () => {
     const document = await json<{ info: { version: string }; "x-guide": { id: string; title: string; paragraphs: string[] }[]; components: { schemas: Record<string, { properties?: Record<string, unknown>; required?: string[] }> } }>("/api/v1/openapi.json");
-    expect(document.info.version).toBe("1.4.0");
+    expect(document.info.version).toBe("1.5.0");
     const schemas = document.components.schemas;
     expect(Object.keys(schemas.InputWindow!.properties!)).toEqual([
       "tokens", "basis", "bound", "scope", "source", "date", "documented_tokens", "documented_field", "documented_source", "documented_date", "documented_status",
@@ -699,7 +699,7 @@ describe("the input window of a model", () => {
   });
 });
 
-describe("listings: the contract and the two paths (1.4.0)", () => {
+describe("listings: the contract and the two paths (1.5.0)", () => {
   /** A snapshot whose listings file holds `data`: the rest is the fixture's. */
   const withListings = (data: Listing[]): ApiDeps => ({
     ...deps,
@@ -755,7 +755,7 @@ describe("listings: the contract and the two paths (1.4.0)", () => {
     expect(Object.keys(schemas.Listing!.properties)).toEqual(["provider", "basis", "listed_at", "client", "client_label", "evidence", "model_count", "models"]);
     expect(Object.keys((schemas.Meta!.properties.listings as { properties: Record<string, unknown> }).properties)).toEqual(["count", "models", "by_basis", "source", "fetched_at", "checked_at", "listed_at", "sync"]);
     const text = document["x-guide"].find((section) => section.id === "listings")!.paragraphs.join(" ");
-    for (const words of ["Since 1.4.0", "need not be an entry", "taken whole from the first source", "no prices, allowances or quotas"]) expect(text).toContain(words);
+    for (const words of ["Since 1.5.0", "need not be an entry", "taken whole from the first source", "no prices, allowances or quotas"]) expect(text).toContain(words);
     const meta = (await (await get("/api/v1/meta")).json()) as { data: Meta };
     expect(meta.data.listings.source).toBe("https://raw.githubusercontent.com/ngvoicu/groundtruth/main/listed.json");
   });
@@ -840,7 +840,7 @@ describe("the contract", () => {
     same(extensions.flatMap((extension) => [...extension.evidence, ...extension.provenance.flatMap((change) => change.evidence)]), "evidence");
     for (const list of ["cache", "limits"]) same(((await ask(`/api/v1/evaluations/${list}?limit=200`)) as { data: object[] }).data, `the list of ${list} evaluations`);
     same(modelsFor(local.index).map(withoutEntries), "canonical models");
-    // The listings (1.4.0): every listing, model, reasoning record and sources record has the same keys, in both views.
+    // The listings (1.5.0): every listing, model, reasoning record and sources record has the same keys, in both views.
     const listings = ((await ask("/api/v1/listings?view=full&limit=200")) as { data: Listing[] }).data;
     same(listings, "listings");
     same(((await ask("/api/v1/listings?limit=200")) as { data: Listing[] }).data, "listings without view=full");

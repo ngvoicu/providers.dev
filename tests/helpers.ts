@@ -647,7 +647,7 @@ export async function contractProblems(dir: string): Promise<string[]> {
   valid(pageOf(CanonicalModelSchema), await ask("/api/v1/models?limit=200"), "models");
   valid(pageOf(CacheEvaluationRecordSchema), await ask("/api/v1/evaluations/cache?limit=200"), "cache evaluations");
   valid(pageOf(LimitEvaluationRecordSchema), await ask("/api/v1/evaluations/limits?limit=200"), "limit evaluations");
-  // The listings, in both views, and each one alone (since 1.4.0).
+  // The listings, in both views, and each one alone (since 1.5.0).
   const listings = (await ask("/api/v1/listings?view=full&limit=200")) as { data: { provider: string }[] };
   valid(pageOf(ListingSchema), listings, "listings, view=full");
   valid(pageOf(ListingSchema), await ask("/api/v1/listings?limit=200"), "listings");

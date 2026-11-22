@@ -96,7 +96,7 @@ export const LIMIT_EVALUATION_PARAMS: ParamDoc[] = [...EVALUATION_FILTERS, ...PA
 export const PROVIDER_VIEW_PARAMS: ParamDoc[] = [
   { name: "view", kind: "enum", values: ["summary", "full"], description: "summary (default) = the provider and the summaries of its entries; models is null. full = also every entry in full, under models." },
 ];
-/** The parameters of /api/v1/listings. Since 1.4.0. */
+/** The parameters of /api/v1/listings. Since 1.5.0. */
 export const LISTING_PARAMS: ParamDoc[] = [
   { name: "provider", kind: "list", description: "Provider ids, comma-separated. A listing matches any of them." },
   { name: "basis", kind: "list", values: ["listed", "providers.dev", "models.dev", "pi.dev"], description: "The source of a listing's models." },

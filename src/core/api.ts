@@ -2,7 +2,7 @@
 // built snapshot; the tests call it with the same files. It never fetches anything outside the snapshot.
 //
 // Resources: providers, entries (a model at a provider), models (canonical), evaluations and listings (every model a
-// provider offers, since 1.4.0). Every collection
+// provider offers, since 1.5.0). Every collection
 // answers `{ meta, total, limit, offset, next_offset, data }`; every single object `{ meta, data }`.
 import type { Index, Summary } from "./entries.ts";
 import { API_VERSION, openapi } from "./openapi.ts";
@@ -258,7 +258,7 @@ export async function handleApi(request: Request, deps: ApiDeps): Promise<Respon
     });
   }
 
-  // ---- listings: every model a provider offers, measured or not. Since 1.4.0.
+  // ---- listings: every model a provider offers, measured or not. Since 1.5.0.
   if (path === `${BASE}/listings`) {
     const values = params(LISTING_PARAMS);
     if (values instanceof Response) return values;

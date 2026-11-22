@@ -839,7 +839,7 @@ export interface Meta {
   license: { data: string; upstream: string; notice: string; pi: string; pi_notice: string };
   /** pi's model catalog, the second imported source. Always there: without a snapshot, `snapshot` is null and the counts 0. */
   pi: MetaPi;
-  /** The listings (/api/v1/listings) and the discovery file they read. Since 1.4.0. */
+  /** The listings (/api/v1/listings) and the discovery file they read. Since 1.5.0. */
   listings: MetaListings;
 }
 
