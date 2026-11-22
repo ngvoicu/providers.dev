@@ -584,7 +584,7 @@ export const ListingSourcesSchema = z
 export const ListingModelSchema = z
   .strictObject({
     id: z.string().min(1).describe("The id a request names on this access method."),
-    name: z.string().nullable().describe("Null = no source names it."),
+    name: z.string().nullable().describe("The name from the first source that states one; where none does, the id (its source is then the listing's basis). Never taken from the vendor's list."),
     owner: z.string().nullable().describe("The lab that makes the model. Null = not stated."),
     entry: z.strictObject({ provider: z.string(), model: z.string() }).nullable().describe("The catalog entry for this model on this provider, as in /api/v1/entries/{provider}/{model}. Null = listed, not an entry of the catalog."),
     canonical: z.string().nullable().describe("canonical_id of that entry. Null without an entry, or where the entry names none."),
@@ -596,9 +596,9 @@ export const ListingModelSchema = z
     output_modalities: z.array(z.string()).nullable().describe("The kinds of output. Null = not stated."),
     reasoning: ListingReasoningSchema.nullable().describe("Null = no source says anything about reasoning."),
     web_search: z.boolean().nullable().describe("The access method runs the vendor's own web search for this model. Null = not stated."),
-    aliases: z.array(z.string()).describe("Other ids the access method accepts for the model. Empty = none stated."),
-    variants: z.array(z.string()).describe("The vendor's own ids where it has one id per reasoning level (Devin). Empty where id itself is what a request names."),
-    plans: z.array(z.string()).describe("Plan names the vendor's own list attaches to the model, as it writes them. Empty = the list names none. No prices, allowances or quotas."),
+    aliases: z.array(z.string()).describe("Other ids the access method accepts for the model, from an authored statement. Empty = none stated. Never taken from the vendor's list."),
+    variants: z.array(z.string()).describe("The vendor's own ids where it has one id per reasoning level (Devin), from an authored statement. Empty where id itself is what a request names. Never taken from the vendor's list."),
+    plans: z.array(z.string()).describe("Plan names the vendor's own list attaches to the model, from a fixed list of single words (free, go, plus, pro, team, business, enterprise, edu, education, max), in lower case; any other name is left out. Empty = none. No prices, allowances or quotas."),
     hidden: z.boolean().nullable().describe("The vendor's list marks the model as not shown in pickers. Null = not stated."),
     sources: ListingSourcesSchema,
   })

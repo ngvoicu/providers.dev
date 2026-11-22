@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
 import { publish } from "../scripts/lib/publish.ts";
 import { sync } from "../scripts/lib/sync.ts";
 import { ListingSchema } from "../src/core/contract.ts";
-import { buildListings, kinds, type ListingModel, type ListingsInput } from "../src/core/listings.ts";
+import { buildListings, kinds, LISTED_PAGE, type ListingModel, type ListingsInput } from "../src/core/listings.ts";
 import { matchPi, piLists, type PiCatalog, type PiModel } from "../src/core/pi.ts";
 import { AuthoredListing, PiAliases, type Catalog, type PublishedModel } from "../src/core/schema.ts";
 import { fetchReturning, fixtureUpstream, ROOT, tempDataDir, writeAuthored } from "./helpers.ts";
@@ -27,19 +27,20 @@ const modelOf = (models: ListingModel[] | null, id: string): ListingModel => mod
 
 describe("the models of a listing: whole, from the first source that has a list", () => {
   const catalog = catalogOf({ p: [entry("a", { limit: { context: 1000 } }), entry("b")], q: [entry("c")], r: [entry("own", {}, { origin: "added" })] });
-  const listed = { page: "https://github.com/ngvoicu/groundtruth/blob/main/listed.json", providers: { p: { date: "2026-11-22", client: "provimux", models: [{ id: "new" }, { id: "a" }] } } };
+  const listed = { providers: { p: { date: "2026-11-22", client: "provimux", models: [{ id: "new" }, { id: "a" }] } } };
   const pi = { date: "2026-11-20", lists: [{ provider: "q", pi_provider: "q", models: [{ id: "only-pi", name: "Only pi", context_window: 5, max_output: 0, input: ["text"], reasoning: false }] }, { provider: "r", pi_provider: "r2", models: [{ id: "x", name: "X", context_window: 0, max_output: 0, input: [], reasoning: true }] }] };
   const authored = [AuthoredListing.parse({ provider: "q", list: { models: ["c", "authored-only"], reason: "The vendor's page lists two.", evidence } })];
   const { listings, issues } = build({ catalog, listed, pi, authored });
   const of = (id: string) => listings.find((listing) => listing.provider === id)!;
 
   it("listed first: the discovery's models only, in its order, with its date, client and evidence", () => {
-    expect(of("p")).toMatchObject({ basis: "listed", listed_at: "2026-11-22", client: "provimux", client_label: "provimux", model_count: 2, evidence: [{ kind: "listed", url: listed.page, date: "2026-11-22", note: null }] });
+    expect(of("p")).toMatchObject({ basis: "listed", listed_at: "2026-11-22", client: "provimux", client_label: "provimux", model_count: 2, evidence: [{ kind: "listed", url: LISTED_PAGE, date: "2026-11-22", note: null }] });
     expect(of("p").models!.map((model) => model.id)).toEqual(["new", "a"]);
   });
 
   it("a listed model without an entry is listed with entry null; one with an entry names it and takes its fields after the discovery's", () => {
-    expect(modelOf(of("p").models, "new")).toMatchObject({ entry: null, canonical: null, name: null, context_window: null });
+    // No source names it: its name is its id, from the list (no name is taken from the discovery file).
+    expect(modelOf(of("p").models, "new")).toMatchObject({ entry: null, canonical: null, name: "new", context_window: null, sources: { name: "listed" } });
     expect(modelOf(of("p").models, "a")).toMatchObject({ entry: { provider: "p", model: "a" }, name: "Name of a", context_window: 1000, sources: { name: "models.dev", context_window: "models.dev" } });
   });
 
@@ -100,7 +101,7 @@ describe("the fields of a model: each from the first source that states it", () 
   });
 
   it("listed beats an authored rule beats models.dev beats pi, field by field", () => {
-    const listed = { page: "https://example.com/listed.json", providers: { p: { date: "2026-11-22", client: "provimux", models: [{ id: "m", max_output: 32000, plans: ["plus", "pro"], hidden: false, reasoning: { levels: ["low", "medium", "high"] } }] } } };
+    const listed = { providers: { p: { date: "2026-11-22", client: "provimux", models: [{ id: "m", max_output: 32000, plans: ["plus", "pro"], hidden: false, reasoning: { levels: ["low", "medium", "high"] } }] } } };
     const authored = [AuthoredListing.parse({ provider: "p", rules: [{ models: ["m"], set: { max_output: 1, web_search: true, reasoning: { budget_max: 32000, levels: ["ignored"] } }, reason: "The vendor's page.", evidence }] })];
     const pi = { date: "2026-11-20", lists: [{ provider: "p", pi_provider: "p", models: [{ id: "m", name: "pi's name", context_window: 1, max_output: 2, input: ["text"], reasoning: false }] }] };
     const { listings } = build({ catalog: catalogOf({ p: [imported] }), listed, authored, pi });
@@ -109,7 +110,7 @@ describe("the fields of a model: each from the first source that states it", () 
     expect(model.reasoning).toMatchObject({ levels: ["low", "medium", "high"], budget_max: 32000, supported: true });
     expect(model.sources).toMatchObject({ max_output: "listed", plans: "listed", hidden: "listed", web_search: "providers.dev", context_window: "models.dev", name: "models.dev", reasoning: { levels: "listed", budget_max: "providers.dev", supported: "models.dev" } });
     // The rule's evidence is in the listing's, after the discovery's.
-    expect(listings[0]!.evidence.map((item) => item.url)).toEqual(["https://example.com/listed.json", "https://example.com/models"]);
+    expect(listings[0]!.evidence.map((item) => item.url)).toEqual([LISTED_PAGE, "https://example.com/models"]);
   });
 
   it("pi fills only what no other source states", () => {
@@ -124,7 +125,7 @@ describe("the fields of a model: each from the first source that states it", () 
     const pi = { date: "2026-11-20", lists: [{ provider: "p", pi_provider: "p", models: [{ id: "c", name: "C", context_window: 1, max_output: 999, input: [], reasoning: false }] }] };
     const { listings } = build({ catalog: catalogOf({ p: [corrected] }), pi });
     expect(listings[0]!.models![0]).toMatchObject({ context_window: 5000000, max_output: null, sources: { context_window: "providers.dev", max_output: null } });
-    const listed = { page: "https://example.com/listed.json", providers: { s: { date: "2026-11-22", client: "provimux", models: [{ id: "own" }] } } };
+    const listed = { providers: { s: { date: "2026-11-22", client: "provimux", models: [{ id: "own" }] } } };
     const own = build({ catalog: catalogOf({ s: [entry("own", { limit: { context: 900000 } }, { origin: "added" })] }), listed }).listings[0]!.models![0]!;
     expect(own).toMatchObject({ entry: { provider: "s", model: "own" }, context_window: 900000, sources: { context_window: "providers.dev", name: "providers.dev" } });
   });
@@ -232,14 +233,14 @@ describe("the review's findings 2 and 6: the Codex login", () => {
   });
 
   it("a lower source's max_input above the chosen window is dropped: 922,000 of models.dev against 400,000 listed (finding 2)", () => {
-    const listed = { page: "https://example.com/listed.json", providers: { "openai-codex": { date: "2026-11-21", client: "provimux", models: [{ id: "gpt-6.1-sol", context_window: 400000 }] } } };
+    const listed = { providers: { "openai-codex": { date: "2026-11-21", client: "provimux", models: [{ id: "gpt-6.1-sol", context_window: 400000 }] } } };
     const model = build({ catalog, listed }).listings[0]!.models![0]!;
     expect(model).toMatchObject({ context_window: 400000, max_input: null, max_output: 128000, sources: { context_window: "listed", max_input: null, max_output: "models.dev" } });
-    // An output limit above the window from a lower source goes too; one the window's own source states stays.
+    // An output limit above the window from a lower source goes too; where one source states both, the window stays.
     const big = build({ catalog, listed: { ...listed, providers: { "openai-codex": { ...listed.providers["openai-codex"], models: [{ id: "gpt-6.1-sol", context_window: 100000 }] } } } }).listings[0]!.models![0]!;
     expect(big).toMatchObject({ context_window: 100000, max_input: null, max_output: null });
     const own = build({ catalog, listed: { ...listed, providers: { "openai-codex": { ...listed.providers["openai-codex"], models: [{ id: "gpt-6.1-sol", context_window: 100000, max_output: 200000 }] } } } }).listings[0]!.models![0]!;
-    expect(own).toMatchObject({ max_output: 200000, sources: { max_output: "listed" } });
+    expect(own).toMatchObject({ context_window: 100000, max_output: null, sources: { context_window: "listed", max_output: null } });
   });
 
   it("an added entry's inherited name, owner and released are models.dev's, with models.dev's evidence in the listing (finding 6)", () => {
@@ -253,7 +254,7 @@ describe("the review's findings 2 and 6: the Codex login", () => {
       note: "models.dev's records of the models an added entry inherits name, owner and released from: gpt-6-astra from openai/gpt-6-astra, gpt-6-luna from openai/gpt-6-luna.",
     });
     // A field an added entry does not inherit stays providers.dev's.
-    const measuredOnly = build({ catalog: catalogOf({ s: [entry("own", { name: "Own", limit: { context: 900000 } }, { origin: "added", inherited: { from: "x/own", fields: ["release_date"] } })] }), listed: { page: "https://example.com/l.json", providers: { s: { date: "2026-11-22", client: "provimux", models: [{ id: "own" }] } } } }).listings[0]!.models![0]!;
+    const measuredOnly = build({ catalog: catalogOf({ s: [entry("own", { name: "Own", limit: { context: 900000 } }, { origin: "added", inherited: { from: "x/own", fields: ["release_date"] } })] }), listed: { providers: { s: { date: "2026-11-22", client: "provimux", models: [{ id: "own" }] } } } }).listings[0]!.models![0]!;
     expect(measuredOnly.sources).toMatchObject({ name: "providers.dev", context_window: "providers.dev" });
   });
 });
@@ -266,5 +267,50 @@ describe("the authored Codex listing (finding 5)", () => {
     const upstream = Object.keys((JSON.parse(readFileSync(join(ROOT, "data", "upstream", "providers", "openai-codex.json"), "utf8")) as { models: object }).models).sort();
     expect(upstream).toEqual(["gpt-6.1-sol", "gpt-6.1-terra"]);
     expect(readFileSync(join(ROOT, "data", "authored", "listings", "openai-codex.yaml"), "utf8")).toContain("replaces this list");
+  });
+});
+
+describe("one rule against contradictions in a row (second review)", () => {
+  const terra = entry("gpt-6.1-terra", { canonical_id: "openai/gpt-6.1-terra", limit: { context: 1050000, input: 922000, output: 128000 }, capabilities: { reasoning: { supported: true, effort: ["low", "medium", "high", "xhigh", "max"] } } });
+  const sol = entry("gpt-6.1-sol", { canonical_id: "openai/gpt-6.1-sol", limit: { context: 1050000, input: 922000, output: 128000 }, capabilities: { reasoning: { supported: true, effort: ["low", "medium", "high", "xhigh", "max"] } } });
+  const catalog = catalogOf({ "openai-codex": [sol, terra] });
+  const rows = (models: Record<string, unknown>[]) => build({ catalog, listed: { providers: { "openai-codex": { date: "2026-11-22", client: "provimux", models: models as never } } } }).listings[0]!.models!;
+
+  it("Terra: a listed 1,200,000 input and 1,100,000 output beside models.dev's 1,050,000 window: the lower source's window is dropped", () => {
+    const row = modelOf(rows([{ id: "gpt-6.1-sol" }, { id: "gpt-6.1-terra", max_input: 1200000, max_output: 1100000 }]), "gpt-6.1-terra");
+    expect(row).toMatchObject({ context_window: null, max_input: 1200000, max_output: 1100000, sources: { context_window: null, max_input: "listed", max_output: "listed" } });
+  });
+
+  it("Sol: a listed supported: false beside models.dev's five levels: the levels are dropped", () => {
+    const row = modelOf(rows([{ id: "gpt-6.1-sol", context_window: 40000, reasoning: { supported: false } }, { id: "gpt-6.1-terra" }]), "gpt-6.1-sol");
+    expect(row.reasoning).toMatchObject({ supported: false, levels: null });
+    expect(row.sources.reasoning).toMatchObject({ supported: "listed", levels: null });
+    // And the 40,000 window: models.dev's 922,000 input and 128,000 output above it go.
+    expect(row).toMatchObject({ context_window: 40000, max_input: null, max_output: null });
+  });
+
+  it("levels from a higher source beside a lower source's supported: false: supported is dropped", () => {
+    const off = entry("off", { capabilities: { reasoning: { supported: false } } });
+    const row = build({ catalog: catalogOf({ p: [off] }), listed: { providers: { p: { date: "2026-11-22", client: "provimux", models: [{ id: "off", reasoning: { levels: ["low", "high"] } }] } } } }).listings[0]!.models![0]!;
+    expect(row.reasoning).toMatchObject({ supported: null, levels: ["low", "high"] });
+  });
+
+  it("one source contradicting itself: the window (or supported) is kept, the other field dropped", () => {
+    const row = modelOf(rows([{ id: "gpt-6.1-sol", context_window: 100000, max_input: 200000, max_output: 300000, reasoning: { supported: false, levels: ["low"] } }, { id: "gpt-6.1-terra" }]), "gpt-6.1-sol");
+    expect(row).toMatchObject({ context_window: 100000, max_input: null, max_output: null, reasoning: { supported: false, levels: null } });
+    const self = build({ catalog: catalogOf({ p: [entry("x", { limit: { context: 1000, input: 2000, output: 3000 } })] }) }).listings[0]!.models![0]!;
+    expect(self).toMatchObject({ context_window: 1000, max_input: null, max_output: null });
+  });
+});
+
+describe("attribution (second review): an override credits providers.dev, an inherited value models.dev", () => {
+  it("gpt-6.2-astra with a providers.dev correction of its inherited name and release date", () => {
+    const astra = entry("gpt-6.2-astra", { name: "GPT 6.2 Astra Review Correction", release_date: "2026-11-16", canonical_id: "openai/gpt-6.2-astra" }, {
+      origin: "added",
+      inherited: { from: "openai/gpt-6.2-astra", fields: ["name", "description", "family", "type", "open_weights", "knowledge", "release_date", "last_updated", "canonical_id", "cost"] },
+      provenance: [{ path: "name", op: "set" }, { path: "release_date", op: "set" }],
+    });
+    const row = build({ catalog: catalogOf({ "openai-codex": [astra] }), listed: { providers: { "openai-codex": { date: "2026-11-22", client: "provimux", models: [{ id: "gpt-6.2-astra" }] } } } }).listings[0]!.models![0]!;
+    expect(row).toMatchObject({ name: "GPT 6.2 Astra Review Correction", released: "2026-11-16", owner: "openai", sources: { name: "providers.dev", released: "providers.dev", owner: "models.dev" } });
   });
 });

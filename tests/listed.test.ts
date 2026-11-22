@@ -89,7 +89,6 @@ describe("the sync of listed.json", () => {
     expect(readFileSync(stored(dataDir), "utf8")).toBe(`${body}\n`);
   });
 
-  const model = (more: Record<string, unknown>) => listedFile({ providers: { "provider-02": { date: "2026-11-22", client: "provimux", models: [{ id: "m", ...more }] } } });
   it.each<[string, () => Response, string]>([
     ["not JSON", json("<html>"), "listed.json: not JSON"],
     ["an account in a model", json(listedFile({ providers: { "provider-02": { date: "2026-11-22", client: "provimux", models: [{ id: "m", email: "ada@example.com" }] } } })), "listed.json: refused by its schema"],
@@ -99,24 +98,14 @@ describe("the sync of listed.json", () => {
     ["a model twice", json(listedFile({ providers: { "provider-02": { date: "2026-11-22", client: "provimux", models: [{ id: "m" }, { id: "m" }] } } })), "listed.json: refused by its schema"],
     ["schema 2", json({ ...listedFile(), schema: 2 }), "listed.json: refused by its schema"],
     ["HTTP 500", () => new Response("down", { status: 500 }), "listed.json: answered HTTP 500"],
-    // The review's crafted file (finding 1): an e-mail in a name and an auth file name as an alias.
-    ["the review's crafted file", json(JSON.parse(readFileSync(join(import.meta.dirname, "fixtures", "listed.crafted.json"), "utf8"))), "listed.json: refused by its schema"],
-    ["an e-mail in a name", json(model({ name: "Neon (ada@example.com, team of 3 seats)" })), "listed.json: refused by its schema"],
-    ["an auth file name as an alias", json(model({ aliases: ["codex-ada@example.com-plus.json"] })), "listed.json: refused by its schema"],
     ["an auth file name as the id", json(listedFile({ providers: { "provider-02": { date: "2026-11-22", client: "provimux", models: [{ id: "codex-ada@example.com-plus.json" }] } } })), "listed.json: refused by its schema"],
     ["a token as the id", json(listedFile({ providers: { "provider-02": { date: "2026-11-22", client: "provimux", models: [{ id: `sk-ant-oat01-${"A".repeat(80)}` }] } } })), "listed.json: refused by its schema"],
-    ["a token in a variant", json(model({ variants: ["ghp_0123456789abcdefghijABCDEFGHIJ012345"] })), "listed.json: refused by its schema"],
-    ["an e-mail as the owner", json(model({ owner: "ada@example.com" })), "listed.json: refused by its schema"],
-    ["free text in released", json(model({ released: "login of ada@example.com, team plan, 3 seats" })), "listed.json: refused by its schema"],
-    ["a name of 10,000 characters", json(model({ name: "x".repeat(10000) })), "listed.json: refused by its schema"],
-    ["a quota as a plan name (finding 7)", json(model({ plans: ["plus: 150 messages / 3h, $20/month"] })), "listed.json: refused by its schema"],
-    ["an e-mail in the description", json(model({ description: "ada@example.com" })), "listed.json: refused by its schema"],
-    ["a javascript: repository", json({ ...listedFile(), repository: "javascript:alert(1)" }), "listed.json: refused by its schema"],
-    ["an http repository", json({ ...listedFile(), repository: "http://github.com/ngvoicu/groundtruth" }), "listed.json: refused by its schema"],
-    ["a repository with a password", json({ ...listedFile(), repository: "https://ada:ghp_secret@github.com/a/b" }), "listed.json: refused by its schema"],
     ["a network error", () => { throw new Error("getaddrinfo ENOTFOUND raw.githubusercontent.com for ada@example.com"); }, "listed.json: could not be fetched"],
     // Finding 8: a valid file that lost more than 40 % of the providers of the last good one.
-    ["no provider at all", json({ ...listedFile(), providers: {} }), "listed.json: lost more than 40 % of its providers"],
+    // Second review, finding 4: a file with no provider or no model is refused, on a first sync too (below); one that
+    // lost more than 40 % of the providers or of the models of the last good copy is refused.
+    ["no provider at all", json({ ...listedFile(), providers: {} }), "listed.json: lists no model"],
+    ["one of its two models lost (a truncated array, the same providers)", json(listedFile({ providers: { "provider-02": { date: "2026-11-22", client: "provimux", models: [{ id: "model-1" }] } } })), "listed.json: lost more than 40 % of its models"],
   ])("a malformed file (%s) keeps the last good copy, fails only its part, and records a fixed reason", async (_name, answer, reason) => {
     const dataDir = tempDataDir();
     await sync({ dataDir, fetch: answering(json(listedFile())), now: at(22) });
@@ -141,6 +130,31 @@ describe("the sync of listed.json", () => {
     expect((await sync({ dataDir, fetch: answering(json(three, '"l2"')), now: at(23) })).listed.status).toBe("updated");
     const one = listedFile({ providers: { "provider-01": { date: "2026-11-24", client: "provimux", models: [{ id: "m" }] } } });
     expect((await sync({ dataDir, fetch: answering(json(one, '"l3"')), now: at(24) })).listed).toEqual({ status: "failed", error: "listed.json: lost more than 40 % of its providers" });
+  });
+
+  it("a file with no provider, or with providers and no model, is refused on a first sync too (second review, finding 4)", async () => {
+    for (const body of [{ ...listedFile(), providers: {} }]) {
+      const dataDir = tempDataDir();
+      const report = await sync({ dataDir, fetch: answering(json(body)), now: at(22) });
+      expect(report.listed).toEqual({ status: "failed", error: "listed.json: lists no model" });
+      expect(existsSync(stored(dataDir))).toBe(false);
+    }
+  });
+
+  it("a damaged stored copy never blocks a valid replacement (second review, finding 4; 941927a's behaviour)", async () => {
+    const dataDir = tempDataDir();
+    await sync({ dataDir, fetch: answering(json(listedFile())), now: at(22) });
+    writeFileSync(stored(dataDir), '{"cf-review-private-key@example.invalid":');
+    const next = listedFile({ providers: { "provider-02": { date: "2026-11-23", client: "provimux", models: [{ id: "model-1" }, { id: "model-3" }, { id: "model-5" }] } } });
+    const seen: { headers?: Record<string, string> } = {};
+    // The stored copy does not read: no ETag is sent, so the answer is the file, and it replaces the damaged copy.
+    const report = await sync({ dataDir, fetch: answering(json(next, '"l1"'), seen), now: at(23) });
+    expect(seen.headers?.["If-None-Match"]).toBeUndefined();
+    expect(report.listed.status).toBe("updated");
+    expect(readFileSync(stored(dataDir), "utf8")).toBe(`${JSON.stringify(next)}\n`);
+    // A damaged meta file beside a good copy does not block either.
+    writeFileSync(join(dataDir, "sources", "listed.meta.json"), "{");
+    expect((await sync({ dataDir, fetch: answering(json(listedFile({ providers: { "provider-02": { date: "2026-11-24", client: "provimux", models: [{ id: "model-1" }, { id: "model-3" }] } } }))), now: at(24) })).listed.status).toBe("updated");
   });
 
   it("--only=pi leaves the discovery file and its record as they were", async () => {
@@ -181,7 +195,8 @@ describe("the build reads it", () => {
     expect(own).toMatchObject({ basis: "listed", listed_at: "2026-11-22", client: "provimux", client_label: "Provimux, a proxy built on CLIProxyAPI", model_count: 2 });
     expect(own.evidence).toEqual([{ kind: "listed", url: "https://github.com/ngvoicu/groundtruth/blob/main/listed.json", date: "2026-11-22", note: null }]);
     expect(own.models!.map((model) => model.id)).toEqual(["gemini-4-neon", "model-1"]);
-    expect(own.models![0]).toMatchObject({ entry: null, context_window: 1048576, reasoning: { levels: ["low", "medium", "high"], supported: null }, variants: ["gemini-4-neon-low", "gemini-4-neon-medium", "gemini-4-neon-high"], sources: { context_window: "listed", variants: "listed" } });
+    // Only values that cannot carry text are taken: no name and no variants from the file; the name is the id.
+    expect(own.models![0]).toMatchObject({ entry: null, name: "gemini-4-neon", context_window: 1048576, reasoning: { levels: ["low", "medium", "high"], supported: null }, variants: [], sources: { name: "listed", context_window: "listed", variants: null } });
     // model-1 is an entry: the vendor's list gives the plans, models.dev the window.
     expect(own.models![1]).toMatchObject({ entry: { provider: "provider-02", model: "model-1" }, plans: ["plus", "pro"], context_window: 200000, sources: { plans: "listed", context_window: "models.dev" } });
     expect(listing("provider-03")!.basis).toBe("models.dev");
@@ -210,13 +225,74 @@ describe("the build reads it", () => {
     expect(JSON.stringify(report.meta)).not.toContain("ada@example.com");
   });
 
-  it("the review's crafted file publishes nothing of its private values: refused whole, the last good copy kept", async () => {
-    const crafted = readFileSync(join(import.meta.dirname, "fixtures", "listed.crafted.json"), "utf8");
-    const { meta, dataDir } = await built(json(listedFile()), json(crafted));
+  // Every private value of both reviews: the file is taken (it is well formed), and nothing of the value is published,
+  // because no text is taken from it. Each case is checked in everything a reader can get: /api/v1/meta, the listing
+  // files and the list of listings.
+  const SECRET = /ada@example|team of 3 seats|codex-ada|Morgan Example|202-555-0142|codex-morgan|150 messages|20 USD|sess-cfreview|acct-cfreview|sk-live-CFReviewFixture|cf-review|eyJhbGciOiJIUzI1NiJ9|ghp_|not published|qa\+/;
+  const withModel = (more: Record<string, unknown>, top: Record<string, unknown> = {}) => ({ ...listedFile({ providers: { "provider-02": { date: "2026-11-22", client: "provimux", models: [{ id: "model-1", ...more }, { id: "model-3" }] } } }), ...top });
+  it.each<[string, Record<string, unknown>]>([
+    // First review (finding 1, 7).
+    ["an e-mail in a name", withModel({ name: "Neon (ada@example.com, team of 3 seats)" })],
+    ["an auth file name as an alias", withModel({ aliases: ["codex-ada@example.com-plus.json"] })],
+    ["a token in a variant", withModel({ variants: ["ghp_0123456789abcdefghijABCDEFGHIJ012345"] })],
+    ["an e-mail as the owner", withModel({ owner: "ada@example.com" })],
+    ["free text in released", withModel({ released: "login of ada@example.com, team plan, 3 seats" })],
+    ["a name of 10,000 characters", withModel({ name: `Morgan Example ${"x".repeat(10000)}` })],
+    ["a quota as a plan name", withModel({ plans: ["plus: 150 messages / 3h, $20/month"] })],
+    ["an e-mail in the description", withModel({ description: "ada@example.com not published" })],
+    ["a javascript: repository", withModel({}, { repository: "javascript:alert('cf-review')" })],
+    ["an http repository", withModel({}, { repository: "http://cf-review.example/groundtruth" })],
+    ["a repository with a password", withModel({}, { repository: "https://ada:ghp_secret@github.com/a/b" })],
+    // Second review (followup2): what the patterns of 0afdc92 still let through.
+    ["an e-mail in reasoning.disable_with", withModel({ reasoning: { disable_with: "qa+cf-review@example.invalid" } })],
+    ["a JWT-shaped alias", withModel({ aliases: ["eyJhbGciOiJIUzI1NiJ9.exampleCFReview.fixture"] })],
+    ["a non-https repository scheme", withModel({}, { repository: "file:///Users/cfreview/private.json" })],
+    ["a token in the repository path", withModel({}, { repository: "https://github.com/ngvoicu/sk-live-CFReviewFixture" })],
+    ["an encoded e-mail in the repository path", withModel({}, { repository: "https://github.com/ngvoicu/cf-review%40example.invalid" })],
+    ["a full name and a phone number as the name", withModel({ name: "Morgan Example 202-555-0142" })],
+    ["an auth file name with no e-mail as an alias", withModel({ aliases: ["codex-morgan-example-plus.json"] })],
+    ["a session token in reasoning.disable_with", withModel({ reasoning: { disable_with: "sess-cfreview-fixture-only" } })],
+    ["a quota and a price as plan names", withModel({ plans: ["Plus 150 messages", "Pro 20 USD"] })],
+    ["an account as the owner", withModel({ owner: "acct-cfreview-private-ops" })],
+    ["a word outside the levels", withModel({ reasoning: { levels: ["low", "sess-cfreview-fixture-only"] } })],
+    ["a word outside the modalities", withModel({ input_modalities: ["text", "acct-cfreview-private-ops"] })],
+  ])("from %s nothing is published: the file is taken, only values that cannot carry text are read", async (_name, file) => {
+    const { meta, dataDir, listing } = await built(json(file));
+    expect(meta.listings.sync).toMatchObject({ last_attempt_ok: true, last_error: null });
+    const own = listing("provider-02")!;
+    expect(own.basis).toBe("listed");
+    // The evidence link is the code's constant, whatever the file's repository says.
+    expect(own.evidence).toEqual([{ kind: "listed", url: "https://github.com/ngvoicu/groundtruth/blob/main/listed.json", date: "2026-11-22", note: null }]);
     const published = join(dataDir, "published", "site", "data");
     const everything = [JSON.stringify(meta), readFileSync(join(published, "listings.json"), "utf8"), readFileSync(join(published, "listings", "provider-02.json"), "utf8")].join("");
+    expect(everything).not.toMatch(SECRET);
+    // What is kept of a list: only the allowed words.
+    const row = own.models!.find((model) => model.id === "model-1")!;
+    expect(row.aliases).toEqual([]);
+    expect(row.variants).toEqual([]);
+    expect(row.name).toBe("Model 1");
+    expect(row.sources.name).toBe("models.dev");
+  });
+
+  it("plan names: the allowed single words are kept in lower case, anything else is dropped from the row (not the file)", async () => {
+    const { listing } = await built(json(withModel({ plans: ["ChatGPT Plus", "Pro", "plus", "Plus 150 messages", "team", "Pro 20 USD"] })));
+    const row = listing("provider-02")!.models!.find((model) => model.id === "model-1")!;
+    expect(row).toMatchObject({ plans: ["pro", "plus", "team"], sources: { plans: "listed" } });
+    // A list that kept nothing states nothing.
+    const { listing: other } = await built(json(withModel({ plans: ["Plus 150 messages"] })));
+    expect(other("provider-02")!.models!.find((model) => model.id === "model-1")).toMatchObject({ plans: [], sources: { plans: null } });
+  });
+
+  it("the review's crafted file publishes nothing of its private values (its providers moved onto the fixture's)", async () => {
+    const crafted = JSON.parse(readFileSync(join(import.meta.dirname, "fixtures", "listed.crafted.json"), "utf8")) as { providers: Record<string, unknown> };
+    const ids = ["provider-02", "provider-03", "provider-04", "provider-05", "provider-06"];
+    crafted.providers = Object.fromEntries(Object.values(crafted.providers).map((part, index) => [ids[index]!, part]));
+    const { meta, dataDir, listing } = await built(json(crafted));
+    expect(listing("provider-02")!.models!.map((model) => model.id)).toEqual(["gpt-6.1-sol", "gpt-6.2-sol", "gpt-7-neon", "gpt-6-astra"]);
+    expect(listing("provider-02")!.models!.find((model) => model.id === "gpt-7-neon")).toMatchObject({ name: "gpt-7-neon", aliases: [], hidden: true });
+    const published = join(dataDir, "published", "site", "data");
+    const everything = [JSON.stringify(meta), readFileSync(join(published, "listings.json"), "utf8"), ...ids.map((id) => readFileSync(join(published, "listings", `${id}.json`), "utf8"))].join("");
     for (const words of ["ada@example.com", "team of 3 seats", "codex-ada", "not published"]) expect(everything).not.toContain(words);
-    expect(meta.listings.sync.last_error).toBe("listed.json: refused by its schema");
   });
 
   it("a provider the catalog lacks and a client the labels lack are warnings, never a failed build", async () => {

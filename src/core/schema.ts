@@ -435,27 +435,59 @@ export type AuthoredListing = z.infer<typeof AuthoredListing>;
 
 /**
  * groundtruth's discovery file, listed.json (schema 1), at the root of its repository beside observed.json: per
- * provider of the catalog, the day each vendor's own model list was read, the client that read it, and the models with
- * the fields the vendor stated. Strict on purpose: it holds no account, email, token, file name or count of logins, and
- * a key it does not know fails the file, so nothing else can get in. A model's `description` is accepted and not
- * published.
+ * provider of the catalog, the day each vendor's own model list was read, the client that read it, and the models.
+ *
+ * Only values that cannot carry text are taken from it (`takeListed` in src/core/listings.ts): the model id, with a
+ * strict pattern; the numbers; the booleans; reasoning levels, modalities and plan names from fixed lists, anything
+ * else in those lists dropped from the row. Text fields (name, owner, released, aliases, variants, description,
+ * disable_with) and the file's `repository` are accepted and never read: a listed model's name comes from its entry,
+ * else from the id, and the evidence link is a constant of the code. A key the file does not know refuses it.
  */
-export const ListedModel = ListingFields.extend({
-  id: ListingModelId,
-  description: z.string().max(1000).refine((value) => !EMAIL_SHAPED.test(value) && !TOKEN_SHAPED.test(value), "Looks like an e-mail address or a credential.").optional(),
+/** A model id from the discovery file: lower-case letters, digits and . _ : / -, at most 64, no file name. */
+export const LISTED_MODEL_ID = /^[a-z0-9][a-z0-9._:/-]{0,63}$/;
+const ignored = z.unknown().optional();
+const listedId = z
+  .string()
+  .regex(LISTED_MODEL_ID, "Not a model id.")
+  .refine((value) => !/\.(json|ya?ml|txt|env|key|pem)$/.test(value), "Looks like a file name.")
+  .refine((value) => !TOKEN_SHAPED.test(value), "Looks like a credential.");
+const count = z.int().positive();
+const words = z.array(z.string().max(64)).max(64);
+export const ListedModel = z.strictObject({
+  id: listedId,
+  context_window: count.optional(),
+  max_input: count.optional(),
+  max_output: count.optional(),
+  input_modalities: words.optional(),
+  output_modalities: words.optional(),
+  reasoning: z
+    .strictObject({
+      supported: z.boolean().optional(),
+      levels: words.optional(),
+      budget_min: z.int().min(0).optional(),
+      budget_max: z.int().min(0).optional(),
+      can_disable: z.boolean().optional(),
+      dynamic: z.boolean().optional(),
+      disable_with: ignored,
+    })
+    .optional(),
+  web_search: z.boolean().optional(),
+  plans: words.optional(),
+  hidden: z.boolean().optional(),
+  // Accepted, never read.
+  name: ignored,
+  owner: ignored,
+  released: ignored,
+  aliases: ignored,
+  variants: ignored,
+  description: ignored,
 });
-/** The repository the file is in, the link of a listing's evidence: an https address with no user name or password. */
-const repositoryUrl = z
-  .url()
-  .max(200)
-  .refine((value) => {
-    const url = new URL(value);
-    return url.protocol === "https:" && url.username === "" && url.password === "" && url.search === "" && url.hash === "";
-  }, "Use an https address with no user name, password, query or fragment.");
+export type ListedModel = z.infer<typeof ListedModel>;
 export const ListedFile = z
   .strictObject({
     schema: z.literal(1),
-    repository: repositoryUrl,
+    // Accepted, never read: the evidence link of a listed listing is LISTED_PAGE in src/core/listings.ts.
+    repository: ignored,
     providers: z.record(
       z.string().regex(PROVIDER_ID),
       z.strictObject({

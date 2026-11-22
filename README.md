@@ -398,14 +398,24 @@ part, it never changes `last_attempt_ok`.
 
 What the file may hold, for whoever writes it (groundtruth's G1): per provider id of the catalog, `date`, `client`
 and `models`; per model `id` and the fields the vendor's list stated, and nothing else. **A field the vendor did not
-state is left out, never written as `null`**: `null` is refused, and with it the whole file. Every string has a
-pattern and a length limit (a model id, a plain display name of at most 80 characters, a date, a plan name of at most
-32 characters with no figures, prices or quotas), nothing may look like an e-mail address or a credential, and
-`repository` is an `https://` address with no user name or password. A refused file is recorded with a fixed reason
-(`listed.json: refused by its schema`, `listed.json: not JSON`, `listed.json: answered HTTP 500`, ...), never the
-parser's text: no key and no value of the file reaches `data/sync-status.json` or `/api/v1/meta`. A valid file that
-lost more than 40 % of the providers of the last good one is refused too (`providers: {}` included), as for the other
-parts.
+state is left out, never written as `null`**: `null` is refused, and with it the whole file. A key the structure does
+not know refuses the file too.
+
+Only values that cannot carry text are taken from it (`takeListed` in `src/core/listings.ts`): the model id, which must
+match a strict model-id pattern (lower-case, at most 64 characters, no file name, nothing shaped like a credential) or
+the file is refused; the numbers (`context_window`, `max_input`, `max_output`, the budgets); the booleans
+(`reasoning.supported`, `can_disable`, `dynamic`, `web_search`, `hidden`); reasoning levels, modalities and plan names
+from fixed lists in the code (`LISTED_LEVELS`, `LISTED_MODALITIES`, `LISTED_PLANS`: `free`, `go`, `plus`, `pro`,
+`team`, `business`, `enterprise`, `edu`, `education`, `max`), anything else in those lists dropped from the row, not
+refusing the file. `name`, `owner`, `released`, `aliases`, `variants`, `description`, `reasoning.disable_with` and the
+file's `repository` are accepted and never read: a listed model's name comes from its entry or models.dev, else it is
+its id, and the evidence link of a listed listing is the constant `LISTED_PAGE`.
+
+A refused file is recorded with a fixed reason (`listed.json: refused by its schema`, `listed.json: not JSON`,
+`listed.json: answered HTTP 500`, `listed.json: lists no model`, ...), never the parser's text: no key and no value of
+the file reaches `data/sync-status.json` or `/api/v1/meta`. A file with no provider or no model is refused, on a first
+sync too; one that lost more than 40 % of the providers or of the models of the last good copy is refused. A stored
+copy that does not read never blocks a valid replacement: it counts as no copy.
 
 What the sync checks before it replaces the snapshot: the answer is JSON in the expected v2 structure; every
 provider and model id matches its key; the import is not empty and has not lost more than 40% of its providers or

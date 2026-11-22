@@ -10,7 +10,7 @@
 // Nothing here is written into an entry: a listing is a resource of its own, and no value of it reaches an entry's
 // `limit` or a safe value.
 
-import { ext, type AuthoredListing, type Catalog, type Issue, type ListingFields, type PublishedModel } from "./schema.ts";
+import { ext, type AuthoredListing, type Catalog, type Issue, type ListedModel, type ListingFields, type PublishedModel } from "./schema.ts";
 
 export const LISTING_SOURCES = ["listed", "providers.dev", "models.dev", "pi.dev"] as const;
 export type ListingSource = (typeof LISTING_SOURCES)[number];
@@ -120,7 +120,49 @@ export interface ListedProvider {
   date: string;
   /** The raw client id, as in the file. */
   client: string;
-  models: (ListingFields & { id: string })[];
+  models: ListedModel[];
+}
+
+/**
+ * The evidence link of a listed listing: groundtruth's discovery file on GitHub. A constant: nothing of the file, its
+ * `repository` included, decides where a published link points.
+ */
+export const LISTED_PAGE = "https://github.com/ngvoicu/groundtruth/blob/main/listed.json";
+/** The reasoning levels taken from a vendor's list; any other word is dropped from the row. */
+export const LISTED_LEVELS = ["none", "minimal", "low", "medium", "high", "xhigh", "max"] as const;
+/** The kinds of input and output taken from a vendor's list; a media type is read as its kind first (kinds()). */
+export const LISTED_MODALITIES = ["text", "image", "audio", "video", "pdf"] as const;
+/**
+ * The plan names taken from a vendor's list, single words (the values of Codex's `available_in_plans`, Claude's and
+ * Kimi's plan names), compared in lower case. Anything else is dropped from the row: a plan name never carries a
+ * figure, a price or a quota.
+ */
+export const LISTED_PLANS = ["free", "go", "plus", "pro", "team", "business", "enterprise", "edu", "education", "max"] as const;
+
+/**
+ * What the build takes from a model of the discovery file: only values that cannot carry text. Numbers and booleans as
+ * they are; levels, modalities and plans from the fixed lists above, anything else dropped; no name, owner, release
+ * date, alias, variant, description or word for "off".
+ */
+export function takeListed(model: ListedModel): Statement {
+  const out: Statement = {};
+  for (const key of ["context_window", "max_input", "max_output", "web_search", "hidden"] as const) if (model[key] !== undefined) out[key] = model[key];
+  const only = (values: readonly string[] | undefined, allowed: readonly string[], read: (value: string) => string = (value) => value.toLowerCase()) =>
+    values === undefined ? undefined : [...new Set(values.map(read).filter((value) => allowed.includes(value)))];
+  const input = only(model.input_modalities, LISTED_MODALITIES, (value) => kinds([value])[0]!.toLowerCase());
+  const output = only(model.output_modalities, LISTED_MODALITIES, (value) => kinds([value])[0]!.toLowerCase());
+  const plans = only(model.plans, LISTED_PLANS);
+  // A list that kept nothing of what the vendor wrote states nothing.
+  if (input?.length) out.input_modalities = input;
+  if (output?.length) out.output_modalities = output;
+  if (plans !== undefined && (plans.length > 0 || model.plans!.length === 0)) out.plans = plans;
+  const reasoning = model.reasoning;
+  if (reasoning) {
+    for (const key of ["supported", "budget_min", "budget_max", "can_disable", "dynamic"] as const) if (reasoning[key] !== undefined) out[`reasoning.${key}`] = reasoning[key];
+    const levels = only(reasoning.levels, LISTED_LEVELS);
+    if (levels !== undefined && (levels.length > 0 || reasoning.levels!.length === 0)) out["reasoning.levels"] = levels;
+  }
+  return out;
 }
 
 // pi's models of a provider come as plain facts, handed over by the fence (scripts/lib/pi-fence.ts). Their shape is
@@ -140,7 +182,7 @@ export interface ListingsInput {
   ruledOut?: { ref: string; model: PublishedModel }[];
   authored: AuthoredListing[];
   /** The discovery file; undefined = there is none. */
-  listed?: { page: string; providers: Record<string, ListedProvider> };
+  listed?: { providers: Record<string, ListedProvider> };
   /** The public id and label of a raw client id (data/authored/measurement-labels.yaml). */
   client?: (raw: string) => { id: string; label: string };
   /** The address models.dev is imported from: the evidence of a value an added entry inherits from models.dev. */
@@ -250,7 +292,9 @@ function entryStatements(model: PublishedModel): { providersDev: Statement; mode
     const modelsDev: Statement = {};
     for (const [key, path] of Object.entries(ENTRY_PATHS) as [keyof Statement, string][]) {
       if (!(key in read)) continue;
-      if (inherited.has(path.split(".")[0]!)) modelsDev[key] = read[key];
+      // A providers.dev override of the field credits providers.dev, inherited or not.
+      const corrected = own.provenance.some((change) => change.path === path || change.path.startsWith(`${path}.`) || path.startsWith(`${change.path}.`));
+      if (inherited.has(path.split(".")[0]!) && !corrected) modelsDev[key] = read[key];
       else providersDev[key] = read[key];
     }
     return { providersDev, modelsDev };
@@ -268,7 +312,7 @@ function entryStatements(model: PublishedModel): { providersDev: Statement; mode
 }
 
 /** The first source that states each field, and the model it makes. */
-function merged(id: string, statements: [ListingSource, Statement][], entry: { provider: string; model: string } | null, canonical: string | null): ListingModel {
+function merged(id: string, basis: ListingSource, statements: [ListingSource, Statement][], entry: { provider: string; model: string } | null, canonical: string | null): ListingModel {
   const pick = (key: keyof Statement): { value: unknown; source: ListingSource | null } => {
     for (const [source, statement] of statements) {
       if (!(key in statement)) continue;
@@ -279,14 +323,26 @@ function merged(id: string, statements: [ListingSource, Statement][], entry: { p
   };
   const plain = Object.fromEntries(PLAIN_KEYS.map((key) => [key, pick(key)])) as Record<PlainKey, { value: unknown; source: ListingSource | null }>;
   const reasoning = Object.fromEntries(REASONING_KEYS.map((key) => [key, pick(`reasoning.${key}`)])) as Record<ReasoningKey, { value: unknown; source: ListingSource | null }>;
-  // A field from a lower source never contradicts the row: an input or output limit above the window a higher source
-  // gives is not taken (the window's own source may state one; it is then kept, as stated).
+  // One rule against contradictions in a row, after merging: of two fields that contradict each other, the one from
+  // the lower source is dropped; where one source states both, the window (or `supported`) is kept and the other
+  // dropped. Two pairs can contradict: max_input or max_output above the window, and levels beside supported: false.
   const rank = (source: ListingSource | null): number => (source === null ? LISTING_SOURCES.length : LISTING_SOURCES.indexOf(source));
-  const window = plain.context_window;
+  const none = { value: null, source: null };
+  const settle = (keep: { value: unknown; source: ListingSource | null }, other: { value: unknown; source: ListingSource | null }): "keep" | "other" => (rank(other.source) < rank(keep.source) ? "other" : "keep");
   for (const key of ["max_input", "max_output"] as const) {
+    const window = plain.context_window;
     const limit = plain[key];
-    if (window.source !== null && limit.source !== null && rank(limit.source) > rank(window.source) && (limit.value as number) > (window.value as number)) plain[key] = { value: null, source: null };
+    if (window.source === null || limit.source === null || (limit.value as number) <= (window.value as number)) continue;
+    if (settle(window, limit) === "keep") plain[key] = none;
+    else plain.context_window = none;
   }
+  const levels = reasoning.levels;
+  if (reasoning.supported.value === false && levels.source !== null && (levels.value as string[]).length > 0) {
+    if (settle(reasoning.supported, levels) === "keep") reasoning.levels = none;
+    else reasoning.supported = none;
+  }
+  // A model no source names is named by its id, from the list that has it: no name is ever taken from the discovery file.
+  if (plain.name.value === null) plain.name = { value: id, source: basis };
   const list = (key: "aliases" | "variants" | "plans"): string[] => (plain[key].value as string[] | null) ?? [];
   const anyReasoning = REASONING_KEYS.some((key) => reasoning[key].source !== null);
   return {
@@ -374,7 +430,7 @@ export function buildListings(input: ListingsInput): { listings: Listing[]; issu
       basis = "listed";
       ids = discovery.models.map((model) => model.id);
       listedAt = discovery.date;
-      evidence = [{ kind: "listed", url: input.listed!.page, date: discovery.date, note: null }];
+      evidence = [{ kind: "listed", url: LISTED_PAGE, date: discovery.date, note: null }];
       client = input.client ? input.client(discovery.client) : { id: discovery.client, label: discovery.client };
     } else if (file?.list) {
       basis = "providers.dev";
@@ -420,7 +476,7 @@ export function buildListings(input: ListingsInput): { listings: Listing[]; issu
     const models = unique.map((id) => {
       const statements: [ListingSource, Statement][] = [];
       const found = discovered.get(id);
-      if (found) statements.push(["listed", statementOf(found)]);
+      if (found) statements.push(["listed", takeListed(found)]);
       rules.forEach((rule, index) => {
         if (rule.models !== "all" && !rule.models.includes(id)) return;
         applied.add(index);
@@ -439,7 +495,7 @@ export function buildListings(input: ListingsInput): { listings: Listing[]; issu
       const fromPi = piModels.get(id);
       if (fromPi) statements.push(["pi.dev", piStatement(fromPi, measured)]);
       const canonical = entry && typeof entry.canonical_id === "string" ? entry.canonical_id : null;
-      return merged(id, statements, entry ? { provider: providerId, model: id } : null, canonical);
+      return merged(id, basis, statements, entry ? { provider: providerId, model: id } : null, canonical);
     });
     if (inheritedFrom.length > 0 && input.upstreamSource) {
       evidence.push({ kind: "listed", url: input.upstreamSource, date: input.upstreamDate, note: `models.dev's records of the models an added entry inherits name, owner and released from: ${inheritedFrom.join(", ")}.` });

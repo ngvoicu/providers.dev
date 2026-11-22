@@ -285,10 +285,21 @@ async function syncListed(options: Required<Pick<SyncOptions, "dataDir" | "fetch
   const dir = join(options.dataDir, "sources");
   const file = join(dir, "listed.json");
   const metaFile = join(dir, "listed.meta.json");
-  const previous = readJsonIfExists<SourceMeta>(metaFile);
+  // What is stored may be damaged (by hand, or a disk): it is read here only as a hint, never as a reason to fail. A
+  // stored copy that does not read is as if there were none, so a valid file always replaces it.
+  const readable = <T>(path: string): T | undefined => {
+    try {
+      return readJsonIfExists<T>(path);
+    } catch {
+      return undefined;
+    }
+  };
+  const storedCopy = existsSync(file) ? ListedFile.safeParse(readable<unknown>(file)) : undefined;
+  const good = storedCopy?.success ? storedCopy.data : undefined;
+  const previous = good ? readable<SourceMeta>(metaFile) : undefined;
   const now = options.now().toISOString();
   const headers: Record<string, string> = { "User-Agent": "providers.dev sync" };
-  if (previous?.etag && !options.force && existsSync(file)) headers["If-None-Match"] = previous.etag;
+  if (previous?.etag && !options.force) headers["If-None-Match"] = previous.etag;
   // Every failure is one of the fixed reasons of LISTED_REASONS: nothing of the file, of the parser or of the network
   // error reaches data/sync-status.json, and from there /api/v1/meta.
   let response: Response;
@@ -314,14 +325,16 @@ async function syncListed(options: Required<Pick<SyncOptions, "dataDir" | "fetch
   }
   const checked = ListedFile.safeParse(parsed);
   if (!checked.success) throw new ListedRefusal(LISTED_REASONS.schema);
-  // A file that lost more than 40 % of the providers of the last good one is not trusted, as for every other part.
-  const before = existsSync(file) ? ListedFile.safeParse(readJsonIfExists<unknown>(file)) : undefined;
-  if (before?.success) {
-    const was = Object.keys(before.data.providers).length;
-    if (Object.keys(checked.data.providers).length < was * MIN_SHARE) throw new ListedRefusal(LISTED_REASONS.shrank);
+  // A file with no provider or no model says nothing a list can stand on: refused, on the first sync too. One that
+  // lost more than 40 % of the providers or of the models of the last good copy is not trusted, as for every part.
+  const modelsOf = (value: ListedFile): number => Object.values(value.providers).reduce((sum, part) => sum + part.models.length, 0);
+  if (Object.keys(checked.data.providers).length === 0 || modelsOf(checked.data) === 0) throw new ListedRefusal(LISTED_REASONS.empty);
+  if (good) {
+    if (Object.keys(checked.data.providers).length < Object.keys(good.providers).length * MIN_SHARE) throw new ListedRefusal(LISTED_REASONS.shrank);
+    if (modelsOf(checked.data) < modelsOf(good) * MIN_SHARE) throw new ListedRefusal(LISTED_REASONS.shrankModels);
   }
   const digest = sha256(body);
-  if (previous?.sha256 === digest && !options.force && existsSync(file)) {
+  if (previous?.sha256 === digest && !options.force) {
     writeFileAtomic(metaFile, pretty({ ...previous, checked_at: now, ...etagOf(response) }));
     return { status: "unchanged" };
   }
@@ -340,6 +353,8 @@ export const LISTED_REASONS = {
   json: "listed.json: not JSON",
   schema: "listed.json: refused by its schema",
   shrank: "listed.json: lost more than 40 % of its providers",
+  shrankModels: "listed.json: lost more than 40 % of its models",
+  empty: "listed.json: lists no model",
   keep: "listed.json: could not be kept",
 } as const;
 /** Whether a recorded error is one of the fixed reasons. Anything else is never published. */

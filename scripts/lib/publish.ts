@@ -245,7 +245,7 @@ export function publish(input: PublishOptions): PublishReport {
     ruledOut: leftOut,
     pi: pi.lists,
     client,
-    ...(listed ? { listed: { page: `${listed.repository.replace(/\/+$/, "")}/blob/main/listed.json`, providers: listed.providers } } : {}),
+    ...(listed ? { listed: { providers: listed.providers } } : {}),
   });
   const listings = built.listings;
   issues.push(...built.issues);
