@@ -29,7 +29,10 @@ is not an entry.
 
 It publishes metadata only. There is no chat and no inference proxy. List prices per token are shown as models.dev
 records them; a subscription entry shows the API list price of the same model, marked as an API price. Subscription
-plans, their prices and their quotas are not listed.
+plans, their prices and their quotas are not listed; the one exception is the plan names a vendor's own model list
+attaches to a model, which a listing (`/api/v1/listings`) carries as they are.
+A vendor's own model list is published as the provider's listing, never written into an entry's `limit` or into a
+safe value.
 It is not affiliated with models.dev or pi.
 
 ## Run it

@@ -73,7 +73,9 @@ The baseline is imported from models.dev; our additions, corrections and measure
   the entry it inherits from, else the lab's own API entry for its canonical model (`labEntry` in
   `src/core/resolve.ts`). Never shown as what the subscription costs. With no such API entry the record is
   `not_applicable` ("In plan"). An imported entry's own `cost` field is left as models.dev has it.
-- No subscription plans, plan prices, allowances or quota data. Access is a classification only.
+- No subscription plans, plan prices, allowances or quota data. Access is a classification only. One exception: a
+  model of a listing (`/api/v1/listings`) may carry the plan names the vendor's own model list attaches to it
+  (`plans`). Still no prices, allowances or quotas.
 - The website and the API must read the same published snapshot and use the same query code (`src/core/query.ts`).
   Do not add a second filter implementation. Pages consume API responses through `PageDeps.api`; never import a
   catalog or index into a renderer. Browser filtering must call the public API.
@@ -103,7 +105,9 @@ The baseline is imported from models.dev; our additions, corrections and measure
   and no limit is taken from another entry (an added entry's `inherited.from` gives it none). `null` is unknown; a
   limit of 0 is "none stated", a lifetime of 0 and a listed price of 0 are values. The documented items stay in the
   records beside the safe value. The safe value is a published number made by a published rule, not a verdict a page
-  writes. Vendors' own model lists are not values of an entry; they stay in evaluation notes.
+  writes. Vendors' own model lists are not values of an entry; they stay in evaluation notes. A vendor's list is
+  published as the provider's listing (`/api/v1/listings`), and is never written into an entry's `limit` or into a
+  safe value.
 - pi's values stand last. They are never written into a field of the entry (`limit`, `cost` or any other), and a safe
   value is pi's only where no other source states one: laid on by `layPi` after the fence, from the statements the
   fence reads with `piStatements`. No value a measurement, providers.dev or models.dev states differs with or without
