@@ -546,6 +546,24 @@ describe("the context window", () => {
     expect(html).not.toMatch(/2,000,000|1,500,000|1,200,000|1,300,000|1,100,000/);
   });
 
+  it("marks a limit evaluation the API says does not count (chosen false) Not counted, as the cache table does, and one that counts not", () => {
+    // openrouter/openai/gpt-6.1-sol: a window named through the proxy on an API-key entry, not counted; one direct, counted.
+    const model = structuredClone(catalog.lab!.models.m!) as JsonObject;
+    const extension = model[NS] as unknown as ModelExtension;
+    const proxy = limitOf({ route: "openrouter", route_label: "OpenRouter API key", client: "cliproxyapi", client_label: "Requests sent through CLIProxyAPI", client_kind: "proxy", context: 1050000, date: "2026-11-17", source: "https://example.com/proxy.jsonl" });
+    const direct = limitOf({ route: "openrouter", route_label: "OpenRouter API key", context: 1050000, date: "2026-11-18", source: "https://example.com/direct.jsonl" });
+    extension.limits.measured = [proxy, direct];
+    extension.limits.input_window = inputWindow({ context: 1050000, input: 922000 }, [], [proxy, direct], () => ({ source: "models.dev", date: "2026-11-15" }));
+    expect(extension.limits.input_window.measurements.map((item) => [item.client, item.chosen])).toEqual([["cliproxyapi", false], ["direct", true]]);
+    const html = entryHtml({ summary: { ...index.entries[0]!, safe: { ...emptySafeValues(), input_window: OPUS } }, provider: index.providers[0]!, model, today: { date: new Date("2026-11-18T00:00:00Z"), stale_after_days: 90 }, cache_ages_s: CACHE_AGES_S, imported: "2026-11-15" });
+    const rows = [...html.slice(html.indexOf("<h3>Limit evaluations")).matchAll(/<tr( class="not-counted")?><td data-label="Date">([\s\S]*?)<\/tr>/g)].map((match) => [Boolean(match[1]), text(match[2]!).includes("Not counted"), text(match[2]!).slice(0, 10)]);
+    expect(rows).toEqual([[true, true, "2026-11-17"], [false, false, "2026-11-18"]]);
+    // The marker is the API's: with the item counted, the same row says nothing.
+    extension.limits.input_window.measurements.forEach((item) => (item.chosen = true));
+    const counted = entryHtml({ summary: { ...index.entries[0]!, safe: { ...emptySafeValues(), input_window: OPUS } }, provider: index.providers[0]!, model, today: { date: new Date("2026-11-18T00:00:00Z"), stale_after_days: 90 }, cache_ages_s: CACHE_AGES_S, imported: "2026-11-15" });
+    expect(counted.slice(counted.indexOf("<h3>Limit evaluations"))).not.toContain("Not counted");
+  });
+
   it("is the list's Context window column, sorted by input_window, with no second window column", () => {
     const head = tableHead({ sortable: true });
     expect(head).toContain('<button type="button" data-sort="input_window"');

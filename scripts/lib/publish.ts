@@ -37,6 +37,9 @@ import { loadUpstream, type SyncStatus } from "./sync.ts";
  */
 export const STALE_AFTER_DAYS = 90;
 
+/** How many summaries one part of the index holds (data/index-parts/), about 1.2 MB of JSON each today. */
+export const INDEX_PART_SIZE = 250;
+
 export interface PublishOptions {
   dataDir: string;
   /** The folder holding LICENSES/models.dev-MIT.txt. */
@@ -277,11 +280,24 @@ function writeSnapshot(dir: string, catalog: Catalog, index: Index, meta: Meta, 
   writeFileSync(join(site, "data", "index.json"), compact(index));
   // The index holds every summary with its pricing record and grows with the catalog: it is staged as gzip too.
   writeFileSync(join(site, "data", "index.json.gz"), gzipSync(compact(index), { level: 9 }));
+  // The same index in parts, for the Worker: it parses them one after another, so that it never holds the whole
+  // text beside the parsed summaries (src/core/snapshot.ts). The head carries everything but the summaries.
+  mkdirSync(join(site, "data", "index-parts"), { recursive: true });
+  const { entries: summaries, ...head } = index;
+  const parts = Math.ceil(summaries.length / INDEX_PART_SIZE);
+  writeFileSync(join(site, "data", "index-parts", "head.json.gz"), gzipSync(compact({ ...head, parts }), { level: 9 }));
+  for (let part = 0; part < parts; part += 1) {
+    writeFileSync(join(site, "data", "index-parts", `${part}.json.gz`), gzipSync(compact(summaries.slice(part * INDEX_PART_SIZE, (part + 1) * INDEX_PART_SIZE)), { level: 9 }));
+  }
   // Every evaluation with the entry it was made on: what /api/v1/evaluations/cache and /limits answer from.
   writeFileSync(join(site, "data", "evaluations.json"), compact({ meta: short, data: listEvaluations(catalog, index) }));
   writeFileSync(join(site, "data", "corrections.json"), compact({ meta: short, data: listCorrections(catalog, index) }));
   for (const [id, provider] of Object.entries(catalog)) {
     writeFileSync(join(site, "data", "providers", `${id}.json`), compact({ meta: short, data: provider }));
+    // The provider's entries in full, alone: the Worker streams them into /api/v1/providers/{id}?view=full without
+    // parsing them (src/core/api.ts). The same bytes as `models` of the file above.
+    mkdirSync(join(site, "data", "provider-models"), { recursive: true });
+    writeFileSync(join(site, "data", "provider-models", `${id}.json`), compact(provider.models));
     const models = Object.entries(provider.models);
     mkdirSync(join(site, "data", "entries", id), { recursive: true });
     for (let start = 0; start < models.length; start += SHARD_SIZE) {

@@ -342,9 +342,11 @@ describe("resolve: access and additions", () => {
     expect(summarize("lab-coding-plan", plan["model-a"]!, 0)).toMatchObject({ price_in: 4, price_out: 20, price_from: "lab/model-a", origin: "upstream" });
     // The conditional rates come with it: base prices first, then the override.
     expect(ext(plan["model-a"]!).pricing.rules!.map((rule) => rule.amount)).toEqual([4, 20, 8]);
-    // No API entry of the same model: a listed price stays and is not called an API price, and a listed zero is the plan.
-    expect(ext(plan.listed!).pricing).toMatchObject({ billing: "unknown", reference_ref: null });
-    expect(summarize("lab-coding-plan", plan.listed!, 0)).toMatchObject({ price_in: 0.2, price_out: 1.2, price_from: null });
+    // No API entry of the same model: no price per token, whatever is listed (design/sources-side-by-side.md, 2.4); the
+    // listed figures stay in the entry's own cost, and a listed zero is the plan.
+    expect(ext(plan.listed!).pricing).toMatchObject({ billing: "not_applicable", coverage: "not_applicable", reference_ref: null, rules: null });
+    expect(plan.listed!.cost).toEqual({ text: { input: { price: 0.2 }, output: { price: 1.2 } } });
+    expect(summarize("lab-coding-plan", plan.listed!, 0)).toMatchObject({ price_in: null, price_out: null, price_from: null });
     expect(ext(plan.free!).pricing).toMatchObject({ billing: "not_applicable", coverage: "not_applicable", rules: null });
     expect(summarize("lab-coding-plan", plan.free!, 0)).toMatchObject({ price_in: null, price_out: null, price_from: null });
     // The API entries are billed by their own rates and refer to nothing.

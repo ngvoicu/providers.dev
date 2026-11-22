@@ -849,7 +849,7 @@ export function resolve(input: ResolveInput): ResolveResult {
       const priceNote = reference
         ? `The cost models.dev records for ${reference}: the API list price this subscription entry refers to. Rules are in the order models.dev applies them.`
         : "The cost models.dev records for this entry. Rules are in the order models.dev applies them: base prices, overrides in their order, then multipliers.";
-      const pricing = pricingOf(priced, extension.access, reference, sourcesOf(priced, "cost", priceNote), priceDeclaration);
+      const pricing = pricingOf(priced, extension.access, reference, sourcesOf(priced, "cost", priceNote), priceDeclaration, ownPrice);
       const requestControls = controlsOf(model, retention, sourcesOf(model, "capabilities", "Imported capabilities; corrections are recorded in providers_dev.provenance."), controlDeclarations.get(model));
       // A declaration made for this entry by name is evidence about the entry. One that reached it through a
       // provider-wide selection is not: its source stays with the control.
@@ -966,7 +966,7 @@ export function resolve(input: ResolveInput): ResolveResult {
         price: priceOwn,
       };
       const imported = importedOf(id, model);
-      const importedPrice = importedOwner ? pricingOf(importedOwner, extension.access, reference, []) : null;
+      const importedPrice = importedOwner ? pricingOf(importedOwner, extension.access, reference, [], undefined, ownPrice) : null;
       const contextOf = isObject(model.limit) && typeof model.limit.context === "number" && model.limit.context > 0 && !fromMeasurement.includes("context") ? model.limit.context : null;
       const kindOf = (profile: "short" | "long"): ClientKind | null => cache.lifetime.lifetimes.find((item) => item.retention_profile === profile && item.chosen)?.client_kind ?? null;
       const safe = safeValues({

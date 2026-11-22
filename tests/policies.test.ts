@@ -95,11 +95,13 @@ describe("uniform pricing and controls", () => {
     expect(pricingOf({}, "subscription", null, [])).toMatchObject({ coverage: "not_applicable", billing: "not_applicable", rules: null });
     expect(pricingOf({ cost }, "subscription", "p/m", [])).toMatchObject({ billing: "reference", reference_ref: "p/m" });
     // A subscription entry with no API entry to refer to: a listed zero is the plan and not a price per token, so
-    // nothing is published as a rate. A price that is listed stays, and what it bills is not claimed.
+    // nothing is published as a rate. Nor is any other listed price (design/sources-side-by-side.md, 2.4): it stays in
+    // the entry's cost; only an entry providers.dev adds with a price of its own keeps it as rules.
     const free = { text: { input: { price: 0, cache: { read: 0, write: 0 } }, output: { price: 0 } } };
     expect(pricingOf({ cost: free }, "subscription", null, evidence)).toEqual({ coverage: "not_applicable", billing: "not_applicable", reference_ref: null, rules: null, rule_order: null, unparsed: [], evidence: [{ ...evidence[0], note: "The source lists a price of 0 for this entry, which is a subscription: no price per token is published." }] });
     expect(pricingOf({ cost: free }, "api", null, evidence)).toMatchObject({ billing: "per_use", rules: [{ amount: 0 }, { amount: 0 }, { amount: 0 }, { amount: 0 }] });
-    expect(pricingOf({ cost }, "subscription", null, evidence)).toMatchObject({ billing: "unknown", reference_ref: null, coverage: "partial" });
+    expect(pricingOf({ cost }, "subscription", null, evidence)).toMatchObject({ coverage: "not_applicable", billing: "not_applicable", reference_ref: null, rules: null, evidence: [{ note: expect.stringMatching(/no API entry of the same model to refer to/) }] });
+    expect(pricingOf({ cost }, "subscription", null, evidence, undefined, true)).toMatchObject({ billing: "unknown", reference_ref: null, coverage: "partial" });
     expect(pricingOf({ cost: { future_modality: { price: 5 }, text: { input: { unit: "character", price: 1 } } } }, "api", null, [])).toMatchObject({ coverage: "partial", unparsed: [{ path: "cost.future_modality", value: { price: 5 } }], rules: [{ unit: { name: "character", quantity: 1000000 } }] });
   });
 

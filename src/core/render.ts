@@ -11,6 +11,7 @@ import {
   type RetentionProfile,
 } from "./cache.ts";
 import type { ProviderSummary, Summary } from "./entries.ts";
+import type { InputWindowMeasurement } from "./limits.ts";
 import { conditionText } from "./conditions.ts";
 import type { PricingRule, RequestControl } from "./policy-contract.ts";
 import {
@@ -490,6 +491,7 @@ function runRow(run: CacheEvaluation, today: Today, columns: readonly Column[], 
 }
 
 const NOT_COUNTED = '<span class="chip not-counted" title="On this entry another kind of client counts: what this one held gives no value. The methodology says which counts.">Not counted</span>';
+const NOT_COUNTED_LIMIT = '<span class="chip not-counted" title="On this entry another kind of client counts: the window this evaluation gives is no value of the entry. The methodology says which counts.">Not counted</span>';
 
 /**
  * The lifetime one client held with one request setting: its client and setting, its checks and results by age, the
@@ -566,12 +568,19 @@ function requestControlTable(controls: RequestControl[]): string {
 <p class="hint">Source: ${source || UNKNOWN}</p>`;
 }
 
-function measuredLimitRows(limits: MeasuredLimit[]): string {
+/**
+ * The limit evaluations of an entry, one row each. An evaluation whose item of the input window says it does not feed
+ * the value (`chosen: false` in `measurements`: another kind of client counts on this entry) says so, as the cache
+ * table does. The item is the one of the same route, client, date and raw result; the page applies no rule.
+ */
+function measuredLimitRows(limits: MeasuredLimit[], measurements: readonly InputWindowMeasurement[]): string {
   const cell = (value: number | null, label: string): string => `<td class="num" data-label="${label}">${value === null ? UNKNOWN : exact(value)}</td>`;
+  const notCounted = (limit: MeasuredLimit): boolean =>
+    measurements.some((item) => !item.chosen && item.route === limit.route && item.client === limit.client && item.date === limit.date && item.source === limit.source);
   return limits
     .map(
       (limit) =>
-        `<tr><td data-label="Date">${limit.date ? `<span class="muted date">${e(limit.date)}</span>` : UNKNOWN}</td><td class="span-row" data-label="Route and client">${e(limit.route_label)}<div class="hint">${e(limit.client_label)}</div></td>${cell(limit.context, "Context")}${cell(limit.input_accepted, "Input accepted")}${cell(limit.input_refused, "Input refused")}${cell(limit.output, "Output limit")}${cell(limit.output_accepted, "Requested output accepted")}<td data-label="Evidence"><a href="${e(limit.source)}" rel="noopener">Raw result</a></td></tr>`,
+        `<tr${notCounted(limit) ? ' class="not-counted"' : ""}><td data-label="Date">${limit.date ? `<span class="muted date">${e(limit.date)}</span>` : UNKNOWN}</td><td class="span-row" data-label="Route and client">${e(limit.route_label)}<div class="hint">${e(limit.client_label)}${notCounted(limit) ? ` ${NOT_COUNTED_LIMIT}` : ""}</div></td>${cell(limit.context, "Context")}${cell(limit.input_accepted, "Input accepted")}${cell(limit.input_refused, "Input refused")}${cell(limit.output, "Output limit")}${cell(limit.output_accepted, "Requested output accepted")}<td data-label="Evidence"><a href="${e(limit.source)}" rel="noopener">Raw result</a></td></tr>`,
     )
     .join("");
 }
@@ -789,7 +798,7 @@ export function entryHtml(view: EntryView): string {
   ${valueTable("Limit", row("input_window", note) + row("max_output"))}
   <h3>Limit evaluations <span class="hint">tokens</span></h3>
   <div class="scroll"><table class="facts stack-tablet"><thead><tr><th scope="col">Date</th><th scope="col">Route and client</th><th scope="col" class="num">Context</th><th scope="col" class="num">Input accepted</th><th scope="col" class="num">Input refused</th><th scope="col" class="num">Output limit</th><th scope="col" class="num">Requested output accepted</th><th scope="col">Evidence</th></tr></thead><tbody>${
-    measuredLimits.length > 0 ? measuredLimitRows(measuredLimits) : '<tr class="empty-row"><td colspan="8" class="muted">No limit evaluation on this entry.</td></tr>'
+    measuredLimits.length > 0 ? measuredLimitRows(measuredLimits, extension.limits.input_window.measurements) : '<tr class="empty-row"><td colspan="8" class="muted">No limit evaluation on this entry.</td></tr>'
   }</tbody></table></div>
 </section>
 

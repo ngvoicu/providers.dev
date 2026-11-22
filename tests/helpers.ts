@@ -381,6 +381,14 @@ export function safeBreaks(catalog: Catalog): string[] {
       const parts = priceParts(x.pricing);
       if (!own || own.withheld) fail("8 pricing null", parts === null);
       else fail("8 pricing", parts !== null && parts.input === own.input && parts.output === own.output && parts.cache_read === own.cache_read && parts.cache_write === own.cache_write && JSON.stringify(parts.tiers) === JSON.stringify(own.tiers));
+      // 2.4. A subscription entry is priced by the API entry it refers to, and only by it: with none to refer to, its
+      // price is unknown (no statement, no rule), whatever its own cost lists. An entry providers.dev added with a
+      // price of its own keeps it.
+      if (x.access === "subscription") {
+        const own = x.origin === "added" && model.cost !== undefined && !(x.inherited?.fields.includes("cost") ?? false);
+        if (!own && x.pricing.billing !== "reference") fail("2.4 subscription without a reference", safe.price.source === null && safe.price.sources.length === 0 && x.pricing.rules === null);
+        if (x.pricing.billing === "reference") fail("2.4 subscription reference", x.pricing.reference_ref !== null);
+      }
       // 5.2. The copies.
       const w = x.limits.input_window;
       const iw = safe.input_window;

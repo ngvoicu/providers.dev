@@ -366,6 +366,30 @@ describe("8. the price", () => {
     expect(corrected.safe("login/m").price).toMatchObject({ source: "providers.dev", differs: ["output"] });
   });
 
+  it("a subscription entry with no API entry to refer to has an unknown price, whatever it lists; its cost stays as imported", () => {
+    // login/solo lists a price and names no canonical model of an API entry: nothing to refer to.
+    const listing = upstream();
+    const cost = { text: { input: { price: 0.5, cache: { read: 0.025 } }, output: { price: 2.5 } } };
+    listing.login!.models.solo = { id: "solo", name: "Solo", cost };
+    listing.login!.models.free = { id: "free", name: "Free", cost: { text: { input: { price: 0 }, output: { price: 0 } } } };
+    const { safe, catalog } = build({ upstream: listing });
+    for (const model of ["solo", "free"]) {
+      expect(safe(`login/${model}`).price, model).toEqual({ source: null, date: null, agreement: "none", differs: [], sources: [] });
+      expect(ext(catalog.login!.models[model]!).pricing, model).toMatchObject({ coverage: "not_applicable", billing: "not_applicable", reference_ref: null, rules: null });
+    }
+    expect(catalog.login!.models.solo!.cost).toEqual(cost);
+    expect(ext(catalog.login!.models.solo!).pricing.evidence[0]!.note).toMatch(/no API entry of the same model to refer to: no price per token is published/);
+    const summary = buildIndex(catalog, "v", "2026-11-20T00:00:00Z", "2026-11-20T00:00:00Z").entries.find((entry) => entry.ref === "login/solo")!;
+    expect([summary.price_in, summary.price_out, summary.price_from, summary.safe.price.source]).toEqual([null, null, null, null]);
+    // With an API entry to refer to (login/m, lab/m), the price is that entry's.
+    expect(safe("login/m").price).toMatchObject({ source: "models.dev", sources: [{ input: 3 }] });
+    // An entry providers.dev adds with a price of its own keeps it.
+    const own: AuthoredProvider = { id: "own-login", name: "Own login", access: "subscription", access_basis: "fixture", evidence: [doc("2026-11-01")], models: [{ id: "x", fields: { cost }, evidence: [doc("2026-11-05")] }] };
+    expect(build({ upstream: listing, additions: [own] }).safe("own-login/x").price).toMatchObject({ source: "providers.dev", sources: [{ input: 0.5, output: 2.5 }] });
+    // The rule holds on every entry built here (case 9 checks it again).
+    expect(safeBreaks(catalog)).toEqual([]);
+  });
+
   it("priceParts reads base prices, tiers and the rest", () => {
     const pricing = pricingOf({ cost: { text: {
       input: { price: 3, cache: { read: 0.3, write: { "5m": 3.75, "1h": 6 } }, overrides: [{ when: { context: { gt: 200000 } }, price: 6, cache: { read: 0.6 } }] },

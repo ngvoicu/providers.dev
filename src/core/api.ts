@@ -4,7 +4,7 @@
 // Resources: providers, entries (a model at a provider), models (canonical) and evaluations. Every collection
 // answers `{ meta, total, limit, offset, next_offset, data }`; every single object `{ meta, data }`.
 import type { Index, Summary } from "./entries.ts";
-import { openapi } from "./openapi.ts";
+import { API_VERSION, openapi } from "./openapi.ts";
 import {
   DEFAULT_LIMIT,
   CORRECTION_PARAMS,
@@ -71,6 +71,53 @@ export async function representationTag(value: string): Promise<string> {
   return `"${Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("")}"`;
 }
 
+/**
+ * A JSON body written piece by piece and never assembled: each part is a string, or a stream of bytes passed through
+ * as it comes (a published file). The bytes are those of the one JSON text the parts make.
+ */
+export function streamedBody(parts: () => AsyncIterable<string | ReadableStream<Uint8Array>>): ReadableStream<Uint8Array> {
+  const encoder = new TextEncoder();
+  let iterator: AsyncIterator<string | ReadableStream<Uint8Array>> | null = null;
+  let reader: ReadableStreamDefaultReader<Uint8Array> | null = null;
+  return new ReadableStream<Uint8Array>({
+    async pull(controller) {
+      iterator ??= parts()[Symbol.asyncIterator]();
+      for (;;) {
+        if (reader) {
+          const chunk = await reader.read();
+          if (!chunk.done) {
+            controller.enqueue(chunk.value);
+            return;
+          }
+          reader = null;
+        }
+        const next = await iterator.next();
+        if (next.done) {
+          controller.close();
+          return;
+        }
+        if (typeof next.value === "string") {
+          if (next.value.length > 0) {
+            controller.enqueue(encoder.encode(next.value));
+            return;
+          }
+        } else reader = next.value.getReader();
+      }
+    },
+    async cancel(reason) {
+      await reader?.cancel(reason);
+      await iterator?.return?.();
+    },
+  });
+}
+
+/** A JSON array of `items`, one item a part. */
+export async function* jsonArray(items: readonly unknown[]): AsyncIterable<string> {
+  yield "[";
+  for (let i = 0; i < items.length; i += 1) yield `${i === 0 ? "" : ","}${JSON.stringify(items[i])}`;
+  yield "]";
+}
+
 /** The canonical models of an index, worked out once per index. */
 const modelsOf = new WeakMap<Index, CanonicalModelDetail[]>();
 export function modelsFor(index: Index): CanonicalModelDetail[] {
@@ -108,6 +155,15 @@ export async function handleApi(request: Request, deps: ApiDeps): Promise<Respon
   const sendJson = async (value: unknown): Promise<Response> => {
     const body = JSON.stringify(value);
     return send(body, await representationTag(body));
+  };
+  /**
+   * A large answer, streamed and never assembled. Its validator is made of what decides its bytes: the version of the
+   * API, the publication, the path and the query, so it is known before the body is.
+   */
+  const sendStreamed = async (parts: () => AsyncIterable<string | ReadableStream<Uint8Array>>): Promise<Response> => {
+    const tag = await representationTag(`${API_VERSION}:${meta.dataset_version}:${meta.generated_at}:${path}?${url.searchParams.toString()}`);
+    if (etagMatches(request, tag) || request.method === "HEAD") return send(null, tag);
+    return send(streamedBody(parts), tag);
   };
   const one = (data: unknown): Promise<Response> => sendJson({ meta: brief(meta), data });
   const missing = (file: string): Response => fail(meta, 503, "snapshot_incomplete", `The published snapshot has no ${file}. Try again after the next publication.`);
@@ -186,12 +242,17 @@ export async function handleApi(request: Request, deps: ApiDeps): Promise<Respon
     const values = params(PROVIDER_VIEW_PARAMS);
     if (values instanceof Response) return values;
     const entries = index.entries.filter((entry) => entry.provider === id).sort((a, b) => a.name.localeCompare(b.name) || a.model.localeCompare(b.model));
-    // The same keys in both views: `models` is null until it is asked for.
-    if (values.view !== "full") return one({ provider, entries, models: null });
-    const asset = await deps.asset(`/data/providers/${id}.json`);
-    if (!asset) return missing(`/data/providers/${id}.json`);
-    const full = (await asset.json()) as { data: { models: Record<string, unknown> } };
-    return one({ provider, entries, models: full.data.models });
+    // The same keys in both views: `models` is null until it is asked for. The full entries are the published file
+    // of the provider's models, passed through as it is; the answer is streamed, never assembled.
+    const asset = values.view === "full" ? await deps.asset(`/data/provider-models/${id}.json`) : null;
+    if (values.view === "full" && !asset?.body) return missing(`/data/provider-models/${id}.json`);
+    return sendStreamed(async function* () {
+      yield `{"meta":${JSON.stringify(brief(meta))},"data":{"provider":${JSON.stringify(provider)},"entries":`;
+      yield* jsonArray(entries);
+      yield ',"models":';
+      yield asset?.body ?? "null";
+      yield "}}";
+    });
   }
 
   // ---- entries: a model at a provider

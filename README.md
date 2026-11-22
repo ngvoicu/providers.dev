@@ -530,10 +530,17 @@ records, the value `listed` of the kind of a price's evidence, the sort key `inp
 of the safe value changed: `input_window.tokens` and `cache_lifetime.*.safe_s` are the measured value wherever
 providers.dev measured one, where before they were the documented value unless a measurement clearly contradicted it.
 The measurement that counts is the most direct one: on an API-key entry requests sent straight to the provider, on a
-login the vendor's own client and, where there is none, a proxy; the `measured_*` keys and `measured_s` follow it.
-`pricing` is the price of one source, whole; `max_output` of a summary is the safe maximum output;
-`documented_status` says whether the measurement contradicts the documented value and no longer which of the two is
-the safe value (`design/sources-side-by-side.md`).
+login the vendor's own client, where there is none requests sent straight to the provider, and where there are none
+either a proxy; the `measured_*` keys and `measured_s` follow it. `pricing` is the price of one source, whole; a
+subscription entry with no API entry to refer to has no price (`pricing` not applicable, the safe price unknown).
+`max_output` of a summary is the safe maximum output, where it was `limit.output` as published: `null` where no
+source states one (a limit of 0 states nothing), and possibly pi.dev's figure. `documented_status` says whether the
+measurement contradicts the documented value and no longer which of the two is the safe value
+(`design/sources-side-by-side.md`). On the dataset of 2026-11-22 that changed, of the summaries, `max_output` on 462
+entries (`null` on 457 whose `limit.output` is 0, pi.dev's figure on 5); of the canonical models, `max_output_min` or
+`max_output_max` on 161 of 476 (the minimum on 161, the maximum on 157) and `input_window_unknown_count` on 3
+(`openai/gpt-6.2-astra`, `openai/gpt-6.2-sol`, `xai/grok-voice-3.0`); and the price of the 3 subscription entries
+without an API entry to refer to (`github-copilot/mai-code-1.1-flash`, `mai-code-2`, `mai-code-2-flash`).
 
 That promise holds for everything providers.dev makes itself: summaries, `providers_dev` records, evaluations,
 corrections, evidence, paths and parameters. The fields imported from models.dev (`limit`, `cost`, `capabilities`,
@@ -578,8 +585,8 @@ below a refusal or read to the end, at or above 101 % of it). `null` is not know
 is "none stated". Every counted evaluation of every client is an item of `measurements`, with `client_kind` and
 `chosen`. `inputWindow` in `src/core/limits.ts` makes the record once, when the data is built; the record is described
 in `design/usable-input-window.md`, the rule in `design/sources-side-by-side.md` and in the guide of the OpenAPI
-document. `limit` stays as imported, and `context`, `input`, `max_output` and the `measured_*` keys of a
-summary keep their meaning. A limits row of the measurements file may carry `date` and `input_read` (the largest input
+document. `limit` stays as imported, and `context`, `input` and the `measured_*` keys of a summary keep their
+meaning; `max_output` of a summary is the safe maximum output since 1.4.0, not `limit.output`. A limits row of the measurements file may carry `date` and `input_read` (the largest input
 the reply showed was read to the end); a file with two rows for one route, client and model, or a row whose numbers
 contradict each other, or a token count that is not a whole number of 0 or more, is refused when read and the last
 good copy stays.
@@ -737,6 +744,27 @@ follows it within `/api/v1` (see [One contract](#one-contract)).
 and model has an extra `providers_dev` key, and entries we add can lack fields that models.dev requires.
 
 ## Deploying to Cloudflare
+
+### Worker memory
+
+A Worker isolate has 128 MiB. The API keeps well under it by holding only the index of summaries and by never
+assembling a large answer:
+
+- The two catalog exports, the raw index and the full view of a provider (`/api/v1/providers/{id}?view=full`) are
+  streamed. The full view writes its envelope around the published file of the provider's entries
+  (`data/provider-models/{id}.json`), passed through unparsed. Its ETag is made of the API version, the publication,
+  the path and the query, so it is known before the body (`sendStreamed` in `src/core/api.ts`).
+- The Worker loads the index from `data/index-parts/` (a head and parts of `INDEX_PART_SIZE` summaries), one part
+  after another, so that it never holds the whole 31 MB text beside the parsed summaries (`src/core/snapshot.ts`).
+  `data/index.json` stays published as it was.
+- Nothing a request makes is kept: one parsed publication per binding, and the canonical models of its index.
+
+Measured on 2026-11-22 with workerd 1.20261110.1 (`--max-old-space-size=128`), the release review's method: the
+inspector's used heap plus backing storage and embedder heap, sampled every 2 ms, over one warm isolate serving in
+sequence the full OpenRouter view twice, the catalog, `/api.json`, `/data/index.json`, the full Nano-GPT view, a page of
+200 OpenRouter summaries, a page of 200 models and the full OpenRouter view again. Peak: 76.15 MiB (`main` at
+`ef30d9c`: 85.13 MiB; this branch before: 138.67 MiB). After a forced collection, 26 MiB stay, the same after three
+rounds of that sequence (`main`: 23.8 MiB). `tests/memory.test.ts` holds the code to it.
 
 The Worker (`wrangler.jsonc`) serves the API and renders every public HTML route from API responses. Astro
 compiles one shared shell with CSS and scripts, plus authored methodology, licensing and contributing documents. It does not

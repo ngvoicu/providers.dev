@@ -308,6 +308,16 @@ describe("API response boundary", () => {
     expect(html).toContain("/api/v1 only grows.");
   });
 
+  it("says on /docs/api/ that a summary's max_output is the safe maximum output, and what 1.4.0 changed in numbers", async () => {
+    const text = (await (await page("/docs/api/")).text()).replace(/<[^>]+>/g, " ").replace(/&#39;|&#x27;/g, "'").replace(/\s+/g, " ");
+    expect(text).toContain("Since 1.4.0 max_output of a summary is the safe maximum output (safe.max_output.value, see Safe values), not limit.output as published");
+    expect(text).toContain("max_output of a summary is not, since 1.4.0: it is the safe maximum output, safe.max_output.value, null where no source states one");
+    expect(text).not.toMatch(/max_output of a summary (are|is) limit as published/);
+    for (const words of ["became null on 457 entries", "took pi.dev's figure on 5", "changed on 161 of 476 canonical models (the minimum on 161, the maximum on 157)", "input_window_unknown_count of a model changed on 3", "github-copilot/mai-code-1.1-flash"]) expect(text).toContain(words);
+    // The field tables say it too: the summary's own key, and the two ends of a model.
+    expect(text).toMatch(/max_output_min\*? .{0,40}The smallest max_output among its entries: the safe maximum output of each summary since 1\.4\.0/);
+  });
+
   it("renders OpenAPI changes and examples without a documentation build", async () => {
     const html = await (await page("/docs/api/", async (path) => {
       if (path !== "/api/v1/openapi.json") return api(path);

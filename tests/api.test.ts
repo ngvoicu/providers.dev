@@ -710,7 +710,8 @@ describe("the contract", () => {
     const same = (items: readonly object[], what: string): void => expect(shapes(items).length, `${what}: ${shapes(items).slice(0, 2).join(" | ")}`).toBeLessThanOrEqual(1);
     same(local.index.entries, "entry summaries");
     same(local.index.entries.map((entry) => entry.input_window), "input_window of a summary");
-    // context, input, max_output and the three measured_* keys of every summary are what they were: limit as published,
+    // context, input and the three measured_* keys of every summary are what they were (limit as published, max_output
+    // the safe maximum output since 1.4.0):
     // and the widest accepted, the narrowest refused and the number of limit evaluations, whether they count or not.
     const asBefore: string[] = [];
     for (const entry of local.index.entries) {
@@ -909,6 +910,16 @@ describe("entry pages", () => {
       now: () => new Date("2026-11-13T12:00:00Z"),
       shell: async () => new Response(pageShell),
     });
+
+  it("marks Not counted the limit evaluations whose item the API publishes with chosen false, and no other", async () => {
+    // added-login/lab/model-2, a login: the direct window counts; the proxy's bracket and the agent's read size do not;
+    // the vendor's client gave no window, so it has no item to say anything of.
+    const html = await (await page("/entries/added-login/lab/model-2")).text();
+    const rows = [...html.slice(html.indexOf("<h3>Limit evaluations")).matchAll(/<tr( class="not-counted")?><td data-label="Date">[\s\S]*?<div class="hint">([^<]*)(<span class="chip not-counted")?/g)].map((match) => [match[2]!.trim(), Boolean(match[1]) && Boolean(match[3])]);
+    expect(rows.sort()).toEqual([["Client agent", true], ["Client cli", false], ["Client direct", false], ["Client proxy", true]]);
+    const record = (await json<{ data: { entry: { providers_dev: ModelExtension } } }>("/api/v1/entries/added-login/lab/model-2")).data.entry.providers_dev.limits.input_window.measurements;
+    expect(record.filter((item) => !item.chosen).map((item) => item.client).sort()).toEqual(["agent", "proxy"]);
+  });
 
   it("gives every entry its own page, title, description and canonical address", async () => {
     const response = await page("/entries/provider-02/lab/model-4");

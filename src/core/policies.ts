@@ -100,7 +100,9 @@ const SEARCH_UNIT = { name: "search", quantity: 1000 };
  *
  * `access` and `reference` say what the rates are to the entry. An API entry is billed by them. A subscription entry
  * is not paid per token: with a `reference` the rates are the API list prices of that entry (pass the reference
- * entry as `model`); without one, a listed price of zero means only that, and the record is not applicable.
+ * entry as `model`); without one, the record is not applicable and has no rule, whatever the source lists
+ * (design/sources-side-by-side.md, 2.4: the price is unknown). The listed figures stay in the entry's own `cost`, as
+ * imported. `ownPrice`: an entry providers.dev adds with a price of its own, which keeps it.
  *
  * The rules come out in the order models.dev applies them: base prices, then its overrides in their order ("matching
  * overrides merge field by field in order"), then its multipliers ("then every matching multiplier applies"). Each
@@ -110,7 +112,7 @@ const SEARCH_UNIT = { name: "search", quantity: 1000 };
  * are `audio.input`, `audio.cache_read` and so on, each with the unit the source gives (a second, an image, a
  * megapixel; a token where it gives none). A web search is the charge `web_search`, per 1,000 searches.
  */
-export function pricingOf(model: JsonObject, access: string, reference: string | null, evidence: PolicyEvidence[], declaration?: PricingInput): Pricing {
+export function pricingOf(model: JsonObject, access: string, reference: string | null, evidence: PolicyEvidence[], declaration?: PricingInput, ownPrice = false): Pricing {
   if (declaration) return derivePricing(structuredClone(declaration));
   const cost = isObject(model.cost) ? model.cost : null;
   const subscription = access === "subscription";
@@ -244,10 +246,15 @@ export function pricingOf(model: JsonObject, access: string, reference: string |
   }
 
   const rules = [...base, ...overrides, ...multipliers];
-  // A subscription entry with no API entry to refer to: a listed zero is the plan, not a price per token. The
-  // record says where that comes from, and publishes no rate.
-  if (subscription && !reference && rules.every((rule) => rule.operation !== "set" || rule.amount === 0)) {
-    return { ...none(), evidence: evidence.map((source) => ({ ...source, note: "The source lists a price of 0 for this entry, which is a subscription: no price per token is published." })) };
+  // A subscription entry with no API entry to refer to is not paid per token, and has no price to refer to: a listed
+  // zero is the plan, and any other listed figure is not what a request costs. The record says where that comes from,
+  // and publishes no rate; the figures stay in the entry's `cost`, as imported.
+  if (subscription && !reference && !ownPrice) {
+    const zero = rules.every((rule) => rule.operation !== "set" || rule.amount === 0);
+    const note = zero
+      ? "The source lists a price of 0 for this entry, which is a subscription: no price per token is published."
+      : "The source lists a price for this entry, which is a subscription with no API entry of the same model to refer to: no price per token is published, and the listed figures stay in the entry's cost field as imported.";
+    return { ...none(), evidence: evidence.map((source) => ({ ...source, note })) };
   }
   return derivePricing({
     coverage: "partial",
