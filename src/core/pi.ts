@@ -611,9 +611,63 @@ export interface PiPartInput {
   entryOf: (ref: string) => PiEntryFacts | undefined;
 }
 
+/** One of pi's models as a model of a provider's list (src/core/listings.ts): plain facts, as pi states them. */
+export interface PiListModel {
+  /** The catalog's model id where pi's model belongs to an entry of the provider, else pi's own id. */
+  id: string;
+  name: string;
+  context_window: number;
+  max_output: number;
+  input: string[];
+  reasoning: boolean;
+}
+
+/** pi's models of one catalog provider, for its listing. */
+export interface PiList {
+  provider: string;
+  pi_provider: string;
+  models: PiListModel[];
+}
+
+/**
+ * pi's list of each catalog provider that a pi provider belongs to (section c: equal provider ids, else the alias
+ * file's same_as): the pi provider with the catalog's own id where there is one, else the first by id. Matched before
+ * any exclusion, like the blocks; a pi model that belongs to an entry of the provider takes the entry's id.
+ */
+export function piLists(pi: PiCatalog, matching: PiMatching): PiList[] {
+  const chosen = new Map<string, string>();
+  for (const provider of matching.providers) {
+    if (provider.catalog_provider === null) continue;
+    const before = chosen.get(provider.catalog_provider);
+    if (before === undefined || (provider.state === "shared" && before !== provider.catalog_provider)) chosen.set(provider.catalog_provider, provider.pi_provider);
+  }
+  const entryOf = new Map(matching.assignments.map((item) => [`${item.piProvider}\u0000${item.piModel}`, item]));
+  return [...chosen].sort(([a], [b]) => byText(a, b)).map(([provider, piProvider]) => {
+    const models = own(pi, piProvider) ?? {};
+    return {
+      provider,
+      pi_provider: piProvider,
+      models: Object.keys(models).sort(byText).map((piModel) => {
+        const model = own(models, piModel)!;
+        const assignment = entryOf.get(`${piProvider}\u0000${piModel}`);
+        return {
+          id: assignment && assignment.provider === provider ? assignment.entry : piModel,
+          name: model.name,
+          context_window: model.contextWindow,
+          max_output: model.maxTokens,
+          input: [...model.input],
+          reasoning: model.reasoning,
+        };
+      }),
+    };
+  });
+}
+
 export interface PiPart {
   /** One per pi model whose entry is published. `ref` is the entry's, provider/model of the catalog. */
   blocks: { ref: string; block: PiBlock }[];
+  /** pi's list of each catalog provider a pi provider belongs to. */
+  lists: PiList[];
   report: PiReport;
   /** The alias issues of section c. */
   issues: Issue[];
@@ -638,5 +692,5 @@ export function piPart(input: PiPartInput): PiPart {
     blocks.push({ ref, block: piBlock(assignment.piProvider, assignment.model, assignment.match, entry) });
   }
   const report = piReport(input.pi, matching, (assignment) => published.has(assignment), (ref) => ruledOut.get(ref) ?? "override");
-  return { blocks, report, issues: matching.issues };
+  return { blocks, lists: piLists(input.pi, matching), report, issues: matching.issues };
 }

@@ -778,9 +778,11 @@ describe("6. a part that fits and has no block is published whole, with the fenc
   const noBlock = (issue: { code: string }) => issue.code === "pi-no-blocks";
   /** piPart's true result as a matcher that matches nothing gives it: no block, every match counted unmatched. */
   const matchingNothing = (result: unknown) => {
-    const copy = structuredClone(result) as { blocks: unknown[]; report: { totals: { matched_id: number; matched_alias: number; unmatched: number } }; issues: { code: string }[] };
+    const copy = structuredClone(result) as { blocks: unknown[]; lists: unknown[]; report: { totals: { matched_id: number; matched_alias: number; unmatched: number } }; issues: { code: string }[] };
     const totals = copy.report.totals;
     copy.blocks = [];
+    // A matcher that matches nothing pairs no provider either: pi has no list for any provider of the catalog.
+    copy.lists = [];
     totals.unmatched += totals.matched_id + totals.matched_alias;
     totals.matched_id = 0;
     totals.matched_alias = 0;

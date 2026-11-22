@@ -205,7 +205,7 @@ export function publish(input: PublishOptions): PublishReport {
     const model = upstream.catalog[ref.slice(0, slash)]?.models[ref.slice(slash + 1)];
     return model ? [{ ref, model: model as unknown as PublishedModel }] : [];
   });
-  const built = buildListings({ catalog, upstreamDate: upstream.meta.fetched_at.slice(0, 10), authored: authoredListings, ruledOut: leftOut });
+  const built = buildListings({ catalog, upstreamDate: upstream.meta.fetched_at.slice(0, 10), authored: authoredListings, ruledOut: leftOut, pi: pi.lists });
   const listings = built.listings;
   issues.push(...built.issues);
 

@@ -5,7 +5,7 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { z } from "zod";
 import { MetaSchema, PiBlockSchema, PiStatementsSchema } from "../../src/core/contract.ts";
-import { piPart, type PiBlock, type PiEntryFacts, type PiSummary } from "../../src/core/pi.ts";
+import { piPart, type PiBlock, type PiEntryFacts, type PiList, type PiSummary } from "../../src/core/pi.ts";
 import { piStatements, type PiStatements } from "../../src/core/safe.ts";
 import type { CatalogBefore } from "../../src/core/resolve.ts";
 import { ext, noPiMeta, PiSyncRecord, type Catalog, type Issue, type Meta, type PiAliases } from "../../src/core/schema.ts";
@@ -32,6 +32,8 @@ export interface PiOfBuild {
   issues: Issue[];
   /** The text of data/published/pi-report.json; null = no pi data. */
   report: string | null;
+  /** pi's list of each catalog provider, for the listings, and the day of the import. Empty = no pi data. */
+  lists: { date: string | null; lists: PiList[] };
   state: "published" | "published_without_blocks" | "none" | "turned_away";
 }
 
@@ -52,6 +54,23 @@ const PiData = z.strictObject({
     }),
   ),
   report: z.string(),
+  // pi's lists for the listings: plain facts, each provider once.
+  lists: z.array(
+    z.strictObject({
+      provider: z.string().min(1),
+      pi_provider: z.string().min(1),
+      models: z.array(
+        z.strictObject({
+          id: z.string().min(1),
+          name: z.string().min(1),
+          context_window: z.int().min(0),
+          max_output: z.int().min(0),
+          input: z.array(z.string().min(1)),
+          reasoning: z.boolean(),
+        }),
+      ),
+    }),
+  ),
 });
 type PiData = z.infer<typeof PiData>;
 
@@ -108,6 +127,7 @@ export function piOfBuild(input: PiOfBuildInput): PiOfBuild {
         },
         counts: { entries_with_block: totals.matched_id + totals.matched_alias, left_out_models: totals.left_out, unmatched_models: totals.unmatched },
         blocks: part.blocks,
+        lists: part.lists,
         issues: part.issues as PiData["issues"],
         report: `${JSON.stringify(part.report, null, 1)}\n`,
       };
@@ -152,7 +172,7 @@ export function piOfBuild(input: PiOfBuildInput): PiOfBuild {
   }
 
   const state: PiOfBuild["state"] = turnedAway ? "turned_away" : !data ? "none" : data.blocks.length === 0 ? "published_without_blocks" : "published";
-  if (!data) return { entries: new Map(), meta: { ...noPiMeta(), sync }, issues, report: null, state };
+  if (!data) return { entries: new Map(), meta: { ...noPiMeta(), sync }, issues, report: null, lists: { date: null, lists: [] }, state };
   const entries = new Map<string, { block: PiBlock; summary: PiSummary; statements: PiStatements }>();
   for (const { ref, block } of data.blocks) entries.set(ref, { block, summary: { ref: block.ref, api: block.api, match: block.match, difference_count: block.differences.length }, statements: statements.get(ref)! });
   return {
@@ -160,6 +180,7 @@ export function piOfBuild(input: PiOfBuildInput): PiOfBuild {
     meta: { source: noPiMeta().source, snapshot: data.snapshot, sync, counts: data.counts },
     issues: [...data.issues, ...issues],
     report: data.report,
+    lists: { date: data.snapshot.fetched_at.slice(0, 10), lists: data.lists },
     state,
   };
 }
@@ -178,6 +199,13 @@ function misplaced(data: PiData, catalog: Catalog): string | null {
     if (!provider || !Object.hasOwn(provider.models, model)) return reasonOf(new Error(`a block names ${ref}, which is no entry of the catalog`));
     if (seen.has(ref)) return reasonOf(new Error(`two blocks name the entry ${ref}`));
     seen.add(ref);
+  }
+  // pi's lists are matched before any exclusion: a provider an override leaves out can have one, which the listings
+  // never read. Each provider has one list at most.
+  const listed = new Set<string>();
+  for (const { provider } of data.lists) {
+    if (listed.has(provider)) return reasonOf(new Error(`pi's lists name the provider ${provider} twice`));
+    listed.add(provider);
   }
   if (counts.entries_with_block !== blocks.length) return reasonOf(new Error(`${blocks.length} blocks, and meta.pi says ${counts.entries_with_block} entries have one`));
   const sum = counts.entries_with_block + counts.left_out_models + counts.unmatched_models;

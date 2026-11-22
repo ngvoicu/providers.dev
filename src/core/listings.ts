@@ -123,23 +123,9 @@ export interface ListedProvider {
   models: (ListingFields & { id: string })[];
 }
 
-/** One of pi's models of a provider, as plain facts (handed over by the fence, scripts/lib/pi-fence.ts). */
-export interface PiListModel {
-  /** The catalog's model id where pi's model belongs to an entry of the provider, else pi's own id. */
-  id: string;
-  name: string;
-  context_window: number | null;
-  max_output: number | null;
-  input: string[];
-  reasoning: boolean;
-}
-
-/** pi's models of one catalog provider. */
-export interface PiList {
-  provider: string;
-  pi_provider: string;
-  models: PiListModel[];
-}
+// pi's models of a provider come as plain facts, handed over by the fence (scripts/lib/pi-fence.ts). Their shape is
+// pi's module's; this module imports only the types.
+import type { PiList, PiListModel } from "./pi.ts";
 
 export interface ListingsInput {
   /** The published catalog, after every override and exclusion. */
@@ -440,8 +426,8 @@ export function buildListings(input: ListingsInput): { listings: Listing[]; issu
 /** What pi states of a model: its name, window, output limit, input kinds and whether it reasons. A 0 is no statement. */
 function piStatement(model: PiListModel): Statement {
   const out: Statement = { name: model.name, input_modalities: kinds(model.input), "reasoning.supported": model.reasoning };
-  if (model.context_window !== null && model.context_window > 0) out.context_window = model.context_window;
-  if (model.max_output !== null && model.max_output > 0) out.max_output = model.max_output;
+  if (Number.isSafeInteger(model.context_window) && model.context_window > 0) out.context_window = model.context_window;
+  if (Number.isSafeInteger(model.max_output) && model.max_output > 0) out.max_output = model.max_output;
   if (model.input.length === 0) delete out.input_modalities;
   return out;
 }

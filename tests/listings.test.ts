@@ -8,7 +8,8 @@ import { publish } from "../scripts/lib/publish.ts";
 import { sync } from "../scripts/lib/sync.ts";
 import { ListingSchema } from "../src/core/contract.ts";
 import { buildListings, kinds, type ListingModel, type ListingsInput } from "../src/core/listings.ts";
-import { AuthoredListing, type Catalog, type PublishedModel } from "../src/core/schema.ts";
+import { matchPi, piLists, type PiCatalog, type PiModel } from "../src/core/pi.ts";
+import { AuthoredListing, PiAliases, type Catalog, type PublishedModel } from "../src/core/schema.ts";
 import { fetchReturning, fixtureUpstream, ROOT, tempDataDir, writeAuthored } from "./helpers.ts";
 
 const evidence = [{ kind: "documented" as const, url: "https://example.com/models", date: "2026-11-20" }];
@@ -178,5 +179,31 @@ describe("authored statements", () => {
 describe("kinds of modalities", () => {
   it("reads a media type as its kind, keeps other words, each once in order", () => {
     expect(kinds(["text", "image/png", "image/jpeg", "application/pdf", "audio/wav", "video/mp4", "text/csv", "embedding", "image"])).toEqual(["text", "image", "pdf", "audio", "video", "embedding"]);
+  });
+});
+
+describe("pi's lists (handed over by the fence)", () => {
+  const piModel = (provider: string, id: string, more: Partial<PiModel> = {}): PiModel => ({ id, name: `Pi ${id}`, api: "openai-completions", provider, baseUrl: "", reasoning: true, input: ["text", "image"], cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 }, contextWindow: 200000, maxTokens: 0, type: "chat", ...more }) as PiModel;
+  const pi: PiCatalog = {
+    p: { a: piModel("p", "a"), "pi-only": piModel("p", "pi-only") },
+    "p-alias": { a: piModel("p-alias", "a") },
+    q2: { "q-model": piModel("q2", "q-model"), spelled: piModel("q2", "spelled") },
+    nowhere: { z: piModel("nowhere", "z") },
+  };
+  const aliases = PiAliases.parse({
+    providers: {
+      "p-alias": { same_as: "p", reason: "same host", evidence },
+      q2: { same_as: "q", reason: "same host", evidence, checked: "2026-11-22", models: { spelled: { same_as: "q-spelled" } } },
+    },
+  });
+  const before = { providers: ["p", "q"], entries: [{ provider: "p", model: "a", base_urls: [] }, { provider: "q", model: "q-spelled", base_urls: [] }] };
+
+  it("one list per catalog provider: its own pi provider before a paired one; a model of an entry takes the entry's id", () => {
+    const lists = piLists(pi, matchPi(pi, aliases, before));
+    expect(lists.map((list) => [list.provider, list.pi_provider, list.models.map((model) => model.id)])).toEqual([
+      ["p", "p", ["a", "pi-only"]],
+      ["q", "q2", ["q-model", "q-spelled"]],
+    ]);
+    expect(lists[0]!.models[0]).toEqual({ id: "a", name: "Pi a", context_window: 200000, max_output: 0, input: ["text", "image"], reasoning: true });
   });
 });
