@@ -89,27 +89,58 @@ describe("the sync of listed.json", () => {
     expect(readFileSync(stored(dataDir), "utf8")).toBe(`${body}\n`);
   });
 
-  it.each<[string, () => Response, RegExp]>([
-    ["not JSON", json("<html>"), /^the discovery file is not JSON$/],
-    ["an account in a model", json(listedFile({ providers: { "provider-02": { date: "2026-11-22", client: "provimux", models: [{ id: "m", email: "ada@example.com" }] } } })), /does not match the expected structure .*email/],
-    ["an auth file name beside a provider", json(listedFile({ providers: { "provider-02": { date: "2026-11-22", client: "provimux", auth_file: "devin-ada.json", models: [{ id: "m" }] } } })), /does not match the expected structure .*auth_file/],
-    ["a count of logins at the top", json({ ...listedFile(), logins: 2 }), /does not match the expected structure .*logins/],
-    ["a provider with no model", json(listedFile({ providers: { "provider-02": { date: "2026-11-22", client: "provimux", models: [] } } })), /does not match the expected structure/],
-    ["a model twice", json(listedFile({ providers: { "provider-02": { date: "2026-11-22", client: "provimux", models: [{ id: "m" }, { id: "m" }] } } })), /listed twice/],
-    ["schema 2", json({ ...listedFile(), schema: 2 }), /does not match the expected structure/],
-    ["HTTP 500", () => new Response("down", { status: 500 }), /^the discovery file answered HTTP 500$/],
-  ])("a malformed file (%s) keeps the last good copy, fails only its part, and is recorded", async (_name, answer, words) => {
+  const model = (more: Record<string, unknown>) => listedFile({ providers: { "provider-02": { date: "2026-11-22", client: "provimux", models: [{ id: "m", ...more }] } } });
+  it.each<[string, () => Response, string]>([
+    ["not JSON", json("<html>"), "listed.json: not JSON"],
+    ["an account in a model", json(listedFile({ providers: { "provider-02": { date: "2026-11-22", client: "provimux", models: [{ id: "m", email: "ada@example.com" }] } } })), "listed.json: refused by its schema"],
+    ["an auth file name beside a provider", json(listedFile({ providers: { "provider-02": { date: "2026-11-22", client: "provimux", auth_file: "devin-ada.json", models: [{ id: "m" }] } } })), "listed.json: refused by its schema"],
+    ["a count of logins at the top", json({ ...listedFile(), logins: 2 }), "listed.json: refused by its schema"],
+    ["a provider with no model", json(listedFile({ providers: { "provider-02": { date: "2026-11-22", client: "provimux", models: [] } } })), "listed.json: refused by its schema"],
+    ["a model twice", json(listedFile({ providers: { "provider-02": { date: "2026-11-22", client: "provimux", models: [{ id: "m" }, { id: "m" }] } } })), "listed.json: refused by its schema"],
+    ["schema 2", json({ ...listedFile(), schema: 2 }), "listed.json: refused by its schema"],
+    ["HTTP 500", () => new Response("down", { status: 500 }), "listed.json: answered HTTP 500"],
+    // The review's crafted file (finding 1): an e-mail in a name and an auth file name as an alias.
+    ["the review's crafted file", json(JSON.parse(readFileSync(join(import.meta.dirname, "fixtures", "listed.crafted.json"), "utf8"))), "listed.json: refused by its schema"],
+    ["an e-mail in a name", json(model({ name: "Neon (ada@example.com, team of 3 seats)" })), "listed.json: refused by its schema"],
+    ["an auth file name as an alias", json(model({ aliases: ["codex-ada@example.com-plus.json"] })), "listed.json: refused by its schema"],
+    ["an auth file name as the id", json(listedFile({ providers: { "provider-02": { date: "2026-11-22", client: "provimux", models: [{ id: "codex-ada@example.com-plus.json" }] } } })), "listed.json: refused by its schema"],
+    ["a token as the id", json(listedFile({ providers: { "provider-02": { date: "2026-11-22", client: "provimux", models: [{ id: `sk-ant-oat01-${"A".repeat(80)}` }] } } })), "listed.json: refused by its schema"],
+    ["a token in a variant", json(model({ variants: ["ghp_0123456789abcdefghijABCDEFGHIJ012345"] })), "listed.json: refused by its schema"],
+    ["an e-mail as the owner", json(model({ owner: "ada@example.com" })), "listed.json: refused by its schema"],
+    ["free text in released", json(model({ released: "login of ada@example.com, team plan, 3 seats" })), "listed.json: refused by its schema"],
+    ["a name of 10,000 characters", json(model({ name: "x".repeat(10000) })), "listed.json: refused by its schema"],
+    ["a quota as a plan name (finding 7)", json(model({ plans: ["plus: 150 messages / 3h, $20/month"] })), "listed.json: refused by its schema"],
+    ["an e-mail in the description", json(model({ description: "ada@example.com" })), "listed.json: refused by its schema"],
+    ["a javascript: repository", json({ ...listedFile(), repository: "javascript:alert(1)" }), "listed.json: refused by its schema"],
+    ["an http repository", json({ ...listedFile(), repository: "http://github.com/ngvoicu/groundtruth" }), "listed.json: refused by its schema"],
+    ["a repository with a password", json({ ...listedFile(), repository: "https://ada:ghp_secret@github.com/a/b" }), "listed.json: refused by its schema"],
+    ["a network error", () => { throw new Error("getaddrinfo ENOTFOUND raw.githubusercontent.com for ada@example.com"); }, "listed.json: could not be fetched"],
+    // Finding 8: a valid file that lost more than 40 % of the providers of the last good one.
+    ["no provider at all", json({ ...listedFile(), providers: {} }), "listed.json: lost more than 40 % of its providers"],
+  ])("a malformed file (%s) keeps the last good copy, fails only its part, and records a fixed reason", async (_name, answer, reason) => {
     const dataDir = tempDataDir();
     await sync({ dataDir, fetch: answering(json(listedFile())), now: at(22) });
     const before = readFileSync(stored(dataDir), "utf8");
     const report = await sync({ dataDir, fetch: answering(answer), now: at(23) });
     expect(report.upstream.status).not.toBe("failed");
     expect(report.listed.status).toBe("failed");
-    expect(report.listed.error).toMatch(words);
+    // A fixed reason: no key's name, no value and no parser text.
+    expect(report.listed.error).toBe(reason);
+    expect(JSON.stringify(statusOf(dataDir))).not.toMatch(/ada|example\.com|ghp_|sk-ant|email|auth_file|logins|Unrecognized|expected/);
     expect(readFileSync(stored(dataDir), "utf8")).toBe(before);
     expect(statusOf(dataDir).listed).toEqual({ last_attempt_at: "2026-11-23T04:17:00.000Z", status: "failed", error: report.listed.error });
     // The five fields of models.dev and the measurements say nothing of it.
     expect(statusOf(dataDir).last_error).toBe("the measurements file answered HTTP 404");
+  });
+
+  it("a file with more providers is taken, and one that keeps 60 % of them is too (finding 8)", async () => {
+    const dataDir = tempDataDir();
+    const five = listedFile({ providers: Object.fromEntries(["provider-01", "provider-02", "provider-03", "provider-04", "provider-05"].map((id) => [id, { date: "2026-11-22", client: "provimux", models: [{ id: "m" }] }])) });
+    await sync({ dataDir, fetch: answering(json(five)), now: at(22) });
+    const three = listedFile({ providers: Object.fromEntries(["provider-01", "provider-02", "provider-03"].map((id) => [id, { date: "2026-11-23", client: "provimux", models: [{ id: "m" }] }])) });
+    expect((await sync({ dataDir, fetch: answering(json(three, '"l2"')), now: at(23) })).listed.status).toBe("updated");
+    const one = listedFile({ providers: { "provider-01": { date: "2026-11-24", client: "provimux", models: [{ id: "m" }] } } });
+    expect((await sync({ dataDir, fetch: answering(json(one, '"l3"')), now: at(24) })).listed).toEqual({ status: "failed", error: "listed.json: lost more than 40 % of its providers" });
   });
 
   it("--only=pi leaves the discovery file and its record as they were", async () => {
@@ -160,10 +191,32 @@ describe("the build reads it", () => {
   it("a malformed file keeps the last good copy and raises a sync issue", async () => {
     const { meta, listing } = await built(json(listedFile()), json("{not json"));
     expect(listing("provider-02")!.basis).toBe("listed");
-    expect(meta.listings.sync).toEqual({ last_attempt_at: "2026-11-23T04:17:00.000Z", last_attempt_ok: false, last_error: "the discovery file is not JSON" });
+    expect(meta.listings.sync).toEqual({ last_attempt_at: "2026-11-23T04:17:00.000Z", last_attempt_ok: false, last_error: "listed.json: not JSON" });
     expect(meta.issues.filter((issue) => issue.code === "listed-sync-failed")).toEqual([
-      { level: "warning", code: "listed-sync-failed", target: "data/sources/listed.json", message: "The last attempt to fetch the discovery file failed (the discovery file is not JSON). The last good copy is used." },
+      { level: "warning", code: "listed-sync-failed", target: "data/sources/listed.json", message: "The last attempt to fetch the discovery file failed (listed.json: not JSON). The last good copy is used." },
     ]);
+  });
+
+  it("a recorded error that is not one of the sync's fixed reasons never reaches /api/v1/meta", async () => {
+    const dataDir = tempDataDir();
+    await sync({ dataDir, fetch: answering(json(listedFile())), now: at(22) });
+    const statusPath = join(dataDir, "sync-status.json");
+    const status = JSON.parse(readFileSync(statusPath, "utf8")) as Record<string, unknown>;
+    // As the sync of 941927a wrote it: the parser's text, with a key's name and a value.
+    writeFileSync(statusPath, JSON.stringify({ ...status, listed: { last_attempt_at: "2026-11-23T04:17:00.000Z", status: "failed", error: 'the discovery file does not match the expected structure (1 problems; first: providers.openai-codex: Unrecognized key: "ada@example.com")' } }));
+    writeAuthored(dataDir);
+    const report = publish({ dataDir, rootDir: ROOT, now: at(23) });
+    expect(report.meta!.listings.sync.last_error).toBe("listed.json: refused");
+    expect(JSON.stringify(report.meta)).not.toContain("ada@example.com");
+  });
+
+  it("the review's crafted file publishes nothing of its private values: refused whole, the last good copy kept", async () => {
+    const crafted = readFileSync(join(import.meta.dirname, "fixtures", "listed.crafted.json"), "utf8");
+    const { meta, dataDir } = await built(json(listedFile()), json(crafted));
+    const published = join(dataDir, "published", "site", "data");
+    const everything = [JSON.stringify(meta), readFileSync(join(published, "listings.json"), "utf8"), readFileSync(join(published, "listings", "provider-02.json"), "utf8")].join("");
+    for (const words of ["ada@example.com", "team of 3 seats", "codex-ada", "not published"]) expect(everything).not.toContain(words);
+    expect(meta.listings.sync.last_error).toBe("listed.json: refused by its schema");
   });
 
   it("a provider the catalog lacks and a client the labels lack are warnings, never a failed build", async () => {
@@ -173,10 +226,12 @@ describe("the build reads it", () => {
     const { meta, listing } = await built(json(file));
     expect(listing("nobody")).toBeNull();
     expect(listing("provider-02")).toMatchObject({ client: "other", client_label: "Another client" });
-    expect(meta.issues.filter((issue) => issue.code.startsWith("listed") || issue.code === "unmapped-listing-client").map((issue) => [issue.code, issue.target])).toEqual([
-      ["listed-provider-unknown", "listed/nobody"],
-      ["unmapped-listing-client", "listed/someone-else"],
+    // Counted, not named: no key and no client of the file reaches /api/v1/meta.
+    expect(meta.issues.filter((issue) => issue.code.startsWith("listed") || issue.code === "unmapped-listing-client").map((issue) => [issue.code, issue.target, issue.message])).toEqual([
+      ["listed-provider-unknown", "listed", "The discovery file lists 1 provider the catalog does not have. Its list is not published."],
+      ["unmapped-listing-client", "listed", 'The discovery file names 1 client that data/authored/measurement-labels.yaml does not describe. It is published as "other".'],
     ]);
+    expect(JSON.stringify(meta)).not.toMatch(/nobody|someone-else/);
   });
 });
 

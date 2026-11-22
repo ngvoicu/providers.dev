@@ -345,31 +345,58 @@ export type MeasurementLabels = z.infer<typeof MeasurementLabels>;
 // ---- listings (src/core/listings.ts). The fields a source can state of a listed model, written once: an authored
 // statement (data/authored/listings/) and a model of the discovery file (listed.json) take the same. A field left out
 // is not stated.
+//
+// Every string has a pattern and a length limit, and none may look like an e-mail address or a credential: what the
+// discovery file holds is published as it is, and it is written from the owner's logins. A value that fails refuses
+// the whole file (the sync keeps the last good copy).
 const nonEmpty = z.string().min(1);
+/** An e-mail address anywhere in the text. */
+export const EMAIL_SHAPED = /[^\s@]+@[^\s@]+\.[a-z]{2,}/i;
+/**
+ * A credential: a known token prefix (OpenAI and Anthropic sk-, GitHub ghp_ gho_ ghu_ ghs_ ghr_ github_pat_, Slack
+ * xox., Google AIza and ya29., a JWT's eyJ), or 24 letters and digits in a row, which no model id or name has.
+ */
+export const TOKEN_SHAPED = /(^|[^a-z0-9])(sk-|gh[opusr]_|github_pat_|xox[a-z]-|aiza|ya29\.|eyj[a-z0-9_-]{8})|[a-z0-9]{24}/i;
+const safe = (pattern: RegExp, max: number, what: string) =>
+  z
+    .string()
+    .min(1)
+    .max(max)
+    .regex(pattern, `Not ${what}.`)
+    .refine((value) => !EMAIL_SHAPED.test(value), "Looks like an e-mail address.")
+    .refine((value) => !TOKEN_SHAPED.test(value), "Looks like a credential.");
+/** A model id as a request names it: letters, digits and . _ : / @ + -, at most 128 characters. */
+export const ListingModelId = safe(/^[A-Za-z0-9][A-Za-z0-9._:/@+-]*$/, 128, "a model id");
+/** A short, plain display name: letters, digits, spaces and . , - _ / + ( ), at most 80 characters. */
+const displayName = safe(/^[A-Za-z0-9][A-Za-z0-9 .,_/+()-]*$/, 80, "a plain display name");
+/** A lab or a modality or a level: lower-case words. */
+const word = (max: number) => safe(/^[a-z0-9][a-z0-9._/+-]*$/, max, "a lower-case word");
+/** A plan name: a word or two, no figures with units, prices or quotas. */
+const planName = safe(/^[A-Za-z][A-Za-z0-9 ._+-]*$/, 32, "a short plan name");
 export const ListingFields = z.strictObject({
-  name: nonEmpty.optional(),
-  owner: nonEmpty.optional(),
-  released: nonEmpty.optional(),
+  name: displayName.optional(),
+  owner: word(64).optional(),
+  released: z.string().regex(/^\d{4}-\d{2}(-\d{2})?$/, "Use a date like 2026-11-13 or 2026-11.").optional(),
   context_window: z.int().positive().optional(),
   max_input: z.int().positive().optional(),
   max_output: z.int().positive().optional(),
-  input_modalities: z.array(nonEmpty).optional(),
-  output_modalities: z.array(nonEmpty).optional(),
+  input_modalities: z.array(word(64)).max(32).optional(),
+  output_modalities: z.array(word(64)).max(32).optional(),
   reasoning: z
     .strictObject({
       supported: z.boolean().optional(),
-      levels: z.array(nonEmpty).optional(),
+      levels: z.array(word(32)).max(16).optional(),
       budget_min: z.int().min(0).optional(),
       budget_max: z.int().min(0).optional(),
       can_disable: z.boolean().optional(),
       dynamic: z.boolean().optional(),
-      disable_with: nonEmpty.optional(),
+      disable_with: word(32).optional(),
     })
     .optional(),
   web_search: z.boolean().optional(),
-  aliases: z.array(nonEmpty).optional(),
-  variants: z.array(nonEmpty).optional(),
-  plans: z.array(nonEmpty).optional(),
+  aliases: z.array(ListingModelId).max(32).optional(),
+  variants: z.array(ListingModelId).max(32).optional(),
+  plans: z.array(planName).max(16).optional(),
   hidden: z.boolean().optional(),
 });
 export type ListingFields = z.infer<typeof ListingFields>;
@@ -384,7 +411,7 @@ export const AuthoredListing = z
     provider: z.string().regex(PROVIDER_ID),
     list: z
       .strictObject({
-        models: z.array(nonEmpty).min(1),
+        models: z.array(ListingModelId).min(1),
         reason: nonEmpty,
         evidence: z.array(Evidence).min(1),
       })
@@ -392,7 +419,7 @@ export const AuthoredListing = z
     rules: z
       .array(
         z.strictObject({
-          models: z.union([z.literal("all"), z.array(nonEmpty).min(1)]),
+          models: z.union([z.literal("all"), z.array(ListingModelId).min(1)]),
           set: ListingFields.refine((fields) => Object.keys(fields).length > 0, "Set at least one field."),
           reason: nonEmpty,
           evidence: z.array(Evidence).min(1),
@@ -413,16 +440,27 @@ export type AuthoredListing = z.infer<typeof AuthoredListing>;
  * a key it does not know fails the file, so nothing else can get in. A model's `description` is accepted and not
  * published.
  */
-export const ListedModel = ListingFields.extend({ id: nonEmpty, description: z.string().optional() });
+export const ListedModel = ListingFields.extend({
+  id: ListingModelId,
+  description: z.string().max(1000).refine((value) => !EMAIL_SHAPED.test(value) && !TOKEN_SHAPED.test(value), "Looks like an e-mail address or a credential.").optional(),
+});
+/** The repository the file is in, the link of a listing's evidence: an https address with no user name or password. */
+const repositoryUrl = z
+  .url()
+  .max(200)
+  .refine((value) => {
+    const url = new URL(value);
+    return url.protocol === "https:" && url.username === "" && url.password === "" && url.search === "" && url.hash === "";
+  }, "Use an https address with no user name, password, query or fragment.");
 export const ListedFile = z
   .strictObject({
     schema: z.literal(1),
-    repository: z.url(),
+    repository: repositoryUrl,
     providers: z.record(
       z.string().regex(PROVIDER_ID),
       z.strictObject({
         date: isoDate,
-        client: z.string().regex(/^[a-z0-9][a-z0-9+._-]*$/),
+        client: z.string().max(64).regex(/^[a-z0-9][a-z0-9+._-]*$/),
         models: z.array(ListedModel).min(1),
       }),
     ),
@@ -431,7 +469,7 @@ export const ListedFile = z
     for (const [provider, part] of Object.entries(file.providers)) {
       const seen = new Set<string>();
       part.models.forEach((model, index) => {
-        if (seen.has(model.id)) ctx.addIssue({ code: "custom", path: ["providers", provider, "models", index, "id"], message: `The model ${model.id} is listed twice for ${provider}.` });
+        if (seen.has(model.id)) ctx.addIssue({ code: "custom", path: ["providers", provider, "models", index, "id"], message: "A model is listed twice for one provider." });
         seen.add(model.id);
       });
     }

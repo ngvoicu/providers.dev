@@ -396,6 +396,17 @@ does not fit the structure, or answers another error keeps the last good copy: t
 the reason, the `Publish` run warns, and the build lists a `listed-sync-failed` warning in `/api/v1/meta`. Like pi's
 part, it never changes `last_attempt_ok`.
 
+What the file may hold, for whoever writes it (groundtruth's G1): per provider id of the catalog, `date`, `client`
+and `models`; per model `id` and the fields the vendor's list stated, and nothing else. **A field the vendor did not
+state is left out, never written as `null`**: `null` is refused, and with it the whole file. Every string has a
+pattern and a length limit (a model id, a plain display name of at most 80 characters, a date, a plan name of at most
+32 characters with no figures, prices or quotas), nothing may look like an e-mail address or a credential, and
+`repository` is an `https://` address with no user name or password. A refused file is recorded with a fixed reason
+(`listed.json: refused by its schema`, `listed.json: not JSON`, `listed.json: answered HTTP 500`, ...), never the
+parser's text: no key and no value of the file reaches `data/sync-status.json` or `/api/v1/meta`. A valid file that
+lost more than 40 % of the providers of the last good one is refused too (`providers: {}` included), as for the other
+parts.
+
 What the sync checks before it replaces the snapshot: the answer is JSON in the expected v2 structure; every
 provider and model id matches its key; the import is not empty and has not lost more than 40% of its providers or
 entries since the last one. It sends the stored ETag, so an unchanged upstream costs one small request; an ETag

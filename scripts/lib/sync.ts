@@ -289,25 +289,36 @@ async function syncListed(options: Required<Pick<SyncOptions, "dataDir" | "fetch
   const now = options.now().toISOString();
   const headers: Record<string, string> = { "User-Agent": "providers.dev sync" };
   if (previous?.etag && !options.force && existsSync(file)) headers["If-None-Match"] = previous.etag;
-  const response = await options.fetch(LISTED_URL, { headers });
-  if (response.status === 404) return { status: "unchanged", absent: true, summary: ["no discovery file yet"] };
-  if (response.status === 304 && previous) {
-    writeFileAtomic(metaFile, pretty({ ...previous, checked_at: now }));
-    return { status: "unchanged" };
+  // Every failure is one of the fixed reasons of LISTED_REASONS: nothing of the file, of the parser or of the network
+  // error reaches data/sync-status.json, and from there /api/v1/meta.
+  let response: Response;
+  let body: string;
+  try {
+    response = await options.fetch(LISTED_URL, { headers });
+    if (response.status === 404) return { status: "unchanged", absent: true, summary: ["no discovery file yet"] };
+    if (response.status === 304 && previous) {
+      writeFileAtomic(metaFile, pretty({ ...previous, checked_at: now }));
+      return { status: "unchanged" };
+    }
+    if (!response.ok) throw new ListedRefusal(LISTED_REASONS.http(response.status));
+    body = await response.text();
+  } catch (error) {
+    throw error instanceof ListedRefusal ? error : new ListedRefusal(LISTED_REASONS.fetch);
   }
-  if (!response.ok) throw new Error(`the discovery file answered HTTP ${response.status}`);
-  const body = await response.text();
-  if (body.length > LISTED_MAX_BYTES) throw new Error(`the discovery file is larger than ${LISTED_MAX_BYTES} bytes`);
+  if (body.length > LISTED_MAX_BYTES) throw new ListedRefusal(LISTED_REASONS.large);
   let parsed: unknown;
   try {
     parsed = JSON.parse(body);
   } catch {
-    throw new Error("the discovery file is not JSON");
+    throw new ListedRefusal(LISTED_REASONS.json);
   }
   const checked = ListedFile.safeParse(parsed);
-  if (!checked.success) {
-    const first = checked.error.issues.slice(0, 3).map((issue) => `${issue.path.join(".") || "(file)"}: ${issue.message}`);
-    throw new Error(`the discovery file does not match the expected structure (${checked.error.issues.length} problems; first: ${first.join("; ")})`);
+  if (!checked.success) throw new ListedRefusal(LISTED_REASONS.schema);
+  // A file that lost more than 40 % of the providers of the last good one is not trusted, as for every other part.
+  const before = existsSync(file) ? ListedFile.safeParse(readJsonIfExists<unknown>(file)) : undefined;
+  if (before?.success) {
+    const was = Object.keys(before.data.providers).length;
+    if (Object.keys(checked.data.providers).length < was * MIN_SHARE) throw new ListedRefusal(LISTED_REASONS.shrank);
   }
   const digest = sha256(body);
   if (previous?.sha256 === digest && !options.force && existsSync(file)) {
@@ -320,6 +331,21 @@ async function syncListed(options: Required<Pick<SyncOptions, "dataDir" | "fetch
   const providers = Object.entries(checked.data.providers);
   return { status: "updated", summary: [`${providers.length} providers, ${providers.reduce((sum, [, part]) => sum + part.models.length, 0)} models`] };
 }
+
+/** The reasons a discovery file is refused, fixed texts: the only error the record of the part can hold. */
+export const LISTED_REASONS = {
+  fetch: "listed.json: could not be fetched",
+  http: (status: number): string => `listed.json: answered HTTP ${Number.isSafeInteger(status) ? status : 0}`,
+  large: `listed.json: larger than ${LISTED_MAX_BYTES / 1024 / 1024} MB`,
+  json: "listed.json: not JSON",
+  schema: "listed.json: refused by its schema",
+  shrank: "listed.json: lost more than 40 % of its providers",
+  keep: "listed.json: could not be kept",
+} as const;
+/** Whether a recorded error is one of the fixed reasons. Anything else is never published. */
+export const isListedReason = (text: unknown): text is string =>
+  typeof text === "string" && (Object.values(LISTED_REASONS).includes(text as never) || /^listed\.json: answered HTTP \d{1,3}$/.test(text));
+class ListedRefusal extends Error {}
 
 export async function sync(input: SyncOptions): Promise<SyncReport> {
   const options = { now: () => new Date(), ...input };
@@ -361,7 +387,9 @@ export async function sync(input: SyncOptions): Promise<SyncReport> {
       // The discovery file: after the measurements, and outside `ok`.
       let absent = false;
       const ranListed = await part(async () => {
-        const result = await syncListed(options);
+        const result = await syncListed(options).catch((error: unknown) => {
+          throw error instanceof ListedRefusal ? error : new Error(LISTED_REASONS.keep);
+        });
         absent = result.absent === true;
         const { absent: _absent, ...report } = result;
         return report;

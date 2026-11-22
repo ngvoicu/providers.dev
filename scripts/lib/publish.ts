@@ -34,7 +34,7 @@ import {
 import { readJsonIfExists, sha256, swapDir } from "./files.ts";
 import { fenced } from "./fenced.ts";
 import { piOfBuild, type PiOfBuild } from "./pi-fence.ts";
-import { LISTED_URL, loadUpstream, type SyncStatus } from "./sync.ts";
+import { isListedReason, LISTED_URL, loadUpstream, type SyncStatus } from "./sync.ts";
 import { buildListings, type Listing } from "../../src/core/listings.ts";
 
 /**
@@ -221,11 +221,14 @@ export function publish(input: PublishOptions): PublishReport {
       checked = undefined;
     }
     if (checked?.success) listed = checked.data;
-    else issues.push({ level: "warning", code: "listed-sync-failed", target: "data/sources/listed.json", message: `The stored discovery file does not read (${checked ? checked.error.issues[0]?.message : "not JSON"}). The listings are built without it.` });
+    // A fixed text: nothing of the file reaches /api/v1/meta.
+    else issues.push({ level: "warning", code: "listed-sync-failed", target: "data/sources/listed.json", message: `The stored discovery file does not read (${checked ? "refused by its schema" : "not JSON"}). The listings are built without it.` });
   }
   const listedRecord = ListedSyncRecord.safeParse((status as { listed?: unknown } | undefined)?.listed);
-  if (listedRecord.success && listedRecord.data.status === "failed") {
-    issues.push({ level: "warning", code: "listed-sync-failed", target: "data/sources/listed.json", message: `The last attempt to fetch the discovery file failed (${listedRecord.data.error ?? "no reason recorded"}). The last good copy is used${listed ? "" : "; there is none"}.` });
+  // The recorded reason is published only where it is one of the sync's fixed texts.
+  const listedError = listedRecord.success && listedRecord.data.status === "failed" ? (isListedReason(listedRecord.data.error) ? listedRecord.data.error : "listed.json: refused") : null;
+  if (listedError !== null) {
+    issues.push({ level: "warning", code: "listed-sync-failed", target: "data/sources/listed.json", message: `The last attempt to fetch the discovery file failed (${listedError}). The last good copy is used${listed ? "" : "; there is none"}.` });
   }
   const unmapped = new Set<string>();
   const client = (raw: string): { id: string; label: string } => {
@@ -245,8 +248,9 @@ export function publish(input: PublishOptions): PublishReport {
   });
   const listings = built.listings;
   issues.push(...built.issues);
-  for (const raw of [...unmapped].sort()) {
-    issues.push({ level: "warning", code: "unmapped-listing-client", target: `listed/${raw}`, message: `The discovery file names a client "${raw}" that data/authored/measurement-labels.yaml does not describe. It is published as "other".` });
+  // Counted, not named: a name from the discovery file reaches /api/v1/meta only as a listing's published client.
+  if (unmapped.size > 0) {
+    issues.push({ level: "warning", code: "unmapped-listing-client", target: "listed", message: `The discovery file names ${unmapped.size} client${unmapped.size === 1 ? "" : "s"} that data/authored/measurement-labels.yaml does not describe. ${unmapped.size === 1 ? "It is" : "They are"} published as "other".` });
   }
 
   const draft = withPi(buildIndex(catalog, "", generatedAt, upstream.meta.fetched_at));
@@ -314,7 +318,7 @@ export function publish(input: PublishOptions): PublishReport {
       checked_at: listed ? (listedMeta?.checked_at ?? null) : null,
       listed_at: listed ? (Object.values(listed.providers).map((part) => part.date).sort().at(-1) ?? null) : null,
       sync: listedRecord.success
-        ? { last_attempt_at: listedRecord.data.last_attempt_at, last_attempt_ok: listedRecord.data.status !== "failed", last_error: listedRecord.data.error ?? null }
+        ? { last_attempt_at: listedRecord.data.last_attempt_at, last_attempt_ok: listedRecord.data.status !== "failed", last_error: listedError }
         : { last_attempt_at: null, last_attempt_ok: null, last_error: null },
     },
   };

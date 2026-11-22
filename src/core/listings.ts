@@ -323,9 +323,9 @@ export function buildListings(input: ListingsInput): { listings: Listing[]; issu
     authored.set(file.provider, file);
   }
   const listed = input.listed?.providers ?? {};
-  for (const id of Object.keys(listed).sort(byText)) {
-    if (!Object.hasOwn(catalog, id)) issues.push({ level: "warning", code: "listed-provider-unknown", target: `listed/${id}`, message: `The discovery file lists models of "${id}", which is no provider of the catalog. Its list is not published.` });
-  }
+  // Counted, not named: no key of the discovery file reaches /api/v1/meta.
+  const unknown = Object.keys(listed).filter((id) => !Object.hasOwn(catalog, id)).length;
+  if (unknown > 0) issues.push({ level: "warning", code: "listed-provider-unknown", target: "listed", message: `The discovery file lists ${unknown} provider${unknown === 1 ? "" : "s"} the catalog does not have. ${unknown === 1 ? "Its list is" : "Their lists are"} not published.` });
   const piLists = new Map((input.pi?.lists ?? []).map((list) => [list.provider, list]));
   const ruledOut = new Map<string, Map<string, PublishedModel>>();
   for (const { ref, model } of input.ruledOut ?? []) {
