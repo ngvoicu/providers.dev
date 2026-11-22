@@ -5,6 +5,7 @@ import { evidenceHtml, modelHtml, providerHtml } from "./detail-view.ts";
 import { documentHtml, fillMetaSlots, openapiHtml, type OpenApiDocument } from "./docs-view.ts";
 import type { ProviderSummary, Summary } from "./entries.ts";
 import { entryHref, escapeHtml as e, type Today } from "./format.ts";
+import type { Listing } from "./listings.ts";
 import type { JsonObject } from "./merge.ts";
 import { fillShell, PAGE_SHELL } from "./page-shell.ts";
 import { parseQuery, serializeQuery, SITE_DEFAULT } from "./query.ts";
@@ -71,8 +72,15 @@ export async function handlePage(request: Request, deps: PageDeps): Promise<Resp
     } else if (path === "/providers") {
       view = { title: "Providers", description: "Providers and access methods in the catalog.", html: providersHtml(await read<Envelope<ProviderSummary>>(`/api/v1/providers${url.search}`), url) };
     } else if (path.startsWith("/providers/")) {
-      const { provider, entries } = await one<{ provider: ProviderSummary; entries: Summary[] }>(`/api/v1${path}`);
-      view = { title: provider.name, description: `${provider.name}: ${provider.entry_count} model entries.`, html: providerHtml(provider, entries, imported, today, meta.pi) };
+      // The provider's model list, where a source has one: the API answers 404 for a provider it has no listing for.
+      const [{ provider, entries }, listing] = await Promise.all([
+        one<{ provider: ProviderSummary; entries: Summary[] }>(`/api/v1${path}`),
+        one<Listing>(`/api/v1/listings/${path.slice("/providers/".length)}`).catch((error: unknown) => {
+          if (error instanceof ApiError && error.status === 404) return null;
+          throw error;
+        }),
+      ]);
+      view = { title: provider.name, description: `${provider.name}: ${provider.entry_count} model entries.`, html: providerHtml(provider, entries, listing, imported, today, meta.pi) };
     } else if (path === "/models") {
       view = { title: "Models", description: "Canonical models and the providers that serve them.", html: modelsHtml(await read<Envelope<CanonicalModel>>(`/api/v1/models${url.search}`), url) };
     } else if (path.startsWith("/models/")) {

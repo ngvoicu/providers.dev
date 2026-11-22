@@ -80,6 +80,53 @@ describe("API response boundary", () => {
     }
   });
 
+  it("prints a provider's model list from /api/v1/listings/{provider}, as the API answers it", async () => {
+    const calls: string[] = [];
+    const listing = {
+      provider: "provider-02", basis: "listed", listed_at: "2026-11-13", client: "provimux", client_label: "API response only", model_count: 2,
+      evidence: [{ kind: "listed", url: "https://example.com/listed.json", date: "2026-11-13", note: null }],
+      models: [
+        { id: "lab/model-4", name: "Model four", entry: { provider: "provider-02", model: "lab/model-4" } },
+        { id: "not-an-entry", name: "Not an entry", entry: null, plans: ["pro"] },
+      ].map((model) => ({
+        owner: null, canonical: null, released: null, context_window: 2000000, max_input: null, max_output: null, input_modalities: null, output_modalities: null, reasoning: null,
+        web_search: null, aliases: [], variants: [], plans: [], hidden: null,
+        sources: { name: "listed", owner: null, released: null, context_window: "listed", max_input: null, max_output: null, input_modalities: null, output_modalities: null, reasoning: { supported: null, levels: null, budget_min: null, budget_max: null, can_disable: null, dynamic: null, disable_with: null }, web_search: null, aliases: null, variants: null, plans: null, hidden: null },
+        ...model,
+      })),
+    };
+    const html = await (await page("/providers/provider-02/", async (path) => {
+      calls.push(path);
+      if (path === "/api/v1/listings/provider-02") return Response.json({ meta: { dataset_version: deps.meta.dataset_version }, data: listing });
+      return api(path);
+    })).text();
+    expect(calls).toContain("/api/v1/listings/provider-02");
+    expect(html).toContain('<dt class="muted">Model list</dt><dd><a href="#model-list">2 models</a><span class="muted"> · the vendor\'s own list, 2026-11-13</span></dd>');
+    expect(html).toContain("2 models on the vendor's own list, read through API response only.");
+    expect(html).toContain('<a href="/entries/provider-02/lab/model-4">Model four</a>');
+    expect(html).toContain('<span class="listed-name">Not an entry</span>');
+    expect(html).toContain(">Listed, not evaluated</span>");
+    expect(html).toContain(">Plans: pro</div>");
+    expect(html).toContain('<span title="2,000,000 tokens. From the vendor&#39;s own list.">2M</span>');
+    // As published: the fixture's provider has models.dev's list of it.
+    const published = await (await page("/providers/provider-02/")).text();
+    expect(published).toContain("listed by models.dev for this provider.");
+    expect(published).toContain('<a href="/api/v1/listings/provider-02"><code>GET /api/v1/listings/provider-02</code></a>');
+  });
+
+  it("says a provider has no model list where the API has none for it, and fails where the API cannot answer", async () => {
+    expect((await api("/api/v1/listings/added-login")).status).toBe(404);
+    const response = await page("/providers/added-login/");
+    expect(response.status).toBe(200);
+    const html = await response.text();
+    expect(html).toContain('<dt class="muted">Model list</dt><dd><span class="muted">No list yet</span></dd>');
+    expect(html).toContain("No model list for this provider yet: no source gives one.");
+    expect(html).not.toContain("/api/v1/listings/added-login");
+    // A listing the API cannot serve is not "no list": the page is unavailable, as for any other answer it lacks.
+    const failed = await page("/providers/provider-02/", async (path) => path.startsWith("/api/v1/listings/") ? new Response(null, { status: 503 }) : api(path));
+    expect(failed.status).toBe(503);
+  });
+
   it("uses response values even when they differ from internal dataset objects", async () => {
     const response = await page("/models/lab/model-4/", async (path) => {
       const response = await api(path);
@@ -247,6 +294,17 @@ describe("API response boundary", () => {
       expect(openrouter, words).toContain(words);
       expect(source, words).toContain(words);
     }
+  });
+
+  it("says on the methodology what a model list is and where it comes from, and that a plan appears by name only", () => {
+    const methodology = readFileSync(join(ROOT, "src", "pages", "reference-content", "docs", "methodology.astro"), "utf8").replace(/\s+/g, " ");
+    expect(methodology).toContain('{ id: "listings", label: "Model lists" }');
+    expect(methodology).toContain('<h2 id="listings">Model lists</h2>');
+    for (const words of ["every model the provider offers on that access method, evaluated or not", "The list is taken whole from the first source that has one", "published in its <code>listed.json</code>", "one without says <em>Listed, not evaluated</em>", "nothing of it is written into an entry's limits or into a safe value", "never prices, allowances or quotas"]) {
+      expect(methodology, words).toContain(words);
+    }
+    expect(methodology).toContain("Plans are not tracked: a plan's name appears only where a vendor's own model list attaches it to a model");
+    expect(methodology).not.toContain("Plans, plan prices, allowances and quotas are not tracked.");
   });
 
   it("links the contributing page from the methodology, the footer and the evidence page, and states the same independence on the methodology", async () => {

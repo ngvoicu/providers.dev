@@ -4,7 +4,9 @@ import { buildIndex, type Summary } from "../src/core/entries.ts";
 import type { Json, JsonObject } from "../src/core/merge.ts";
 import { emptyInputWindow, inputWindow, type InputWindow } from "../src/core/limits.ts";
 import { entryHtml, evaluationStrip, piRechecked, rowHtml, tableHead } from "../src/core/render.ts";
-import { modelHtml } from "../src/core/detail-view.ts";
+import { listingHtml, modelHtml } from "../src/core/detail-view.ts";
+import type { ProviderSummary } from "../src/core/entries.ts";
+import type { Listing, ListingModel, ListingReasoning, ListingSource, ListingSources } from "../src/core/listings.ts";
 import { canonicalModels } from "../src/core/resources.ts";
 import { resolve } from "../src/core/resolve.ts";
 import { NS, UpstreamModel, type ModelExtension } from "../src/core/schema.ts";
@@ -1085,5 +1087,102 @@ describe("pi's catalog on an entry's page and in a row", () => {
     expect(seen(after)).toEqual(["models.dev", "2026-11-13", "pi.dev", "2026-11-12"]);
     expect(after).toContain(`<span class="muted date" title="${said} The last import, 2026-11-15 04:17 UTC, failed: this is the last good one.">2026-11-12</span>`);
     expect(page("full", failed).split('<p class="id">')[1]!.split("</p>")[0]).toContain(">2026-11-12 · last import failed</span>");
+  });
+});
+
+// The section "Model list" of a provider's page (Provimux's model-lists.md, sections 4.5 and 10, D4): the listing as
+// /api/v1/listings/{provider} gives it, printed and not worked out.
+describe("the model list of a provider", () => {
+  const today = { date: new Date("2026-11-22T00:00:00Z"), stale_after_days: 30 };
+  const provider = { id: "devin", name: "Devin" } as ProviderSummary;
+  const sources = (source: ListingSource | null): ListingSources => ({
+    name: source, owner: source, released: source, context_window: source, max_input: null, max_output: source, input_modalities: source, output_modalities: source,
+    reasoning: { supported: source, levels: source, budget_min: null, budget_max: null, can_disable: null, dynamic: null, disable_with: null },
+    web_search: null, aliases: null, variants: null, plans: null, hidden: null,
+  });
+  const reasoning = (more: Partial<ListingReasoning>): ListingReasoning => ({ supported: null, levels: null, budget_min: null, budget_max: null, can_disable: null, dynamic: null, disable_with: null, ...more });
+  const model = (more: Partial<ListingModel>): ListingModel => ({
+    id: "gemini-4-neon", name: "Gemini 4 Neon", owner: "google", entry: null, canonical: null, released: "2026-11-01", context_window: 1048576, max_input: null, max_output: 65536,
+    input_modalities: ["text", "image"], output_modalities: ["text"], reasoning: reasoning({ supported: true, levels: ["low", "medium", "high"] }), web_search: null,
+    aliases: [], variants: [], plans: [], hidden: null, sources: sources("listed"), ...more,
+  });
+  const listing = (models: ListingModel[], more: Partial<Listing> = {}): Listing => ({
+    provider: "devin", basis: "listed", listed_at: "2026-11-22", client: "provimux", client_label: "Provimux, a proxy built on CLIProxyAPI",
+    evidence: [{ kind: "listed", url: "https://github.com/ngvoicu/groundtruth/blob/main/listed.json", date: "2026-11-22", note: null }], model_count: models.length, models, ...more,
+  });
+  const rowOf = (html: string, id: string): string => html.split("<tr").find((part) => part.includes(`<code>${id}</code>`)) ?? "";
+
+  it("links a model with an entry to it, and says a model without one is listed, not evaluated, with no link", () => {
+    const html = listingHtml(provider, listing([model({ id: "swe-2", name: "SWE-2", entry: { provider: "devin", model: "swe-2" } }), model({})]), today);
+    const withEntry = rowOf(html, "swe-2");
+    expect(withEntry).toContain('<a href="/entries/devin/swe-2">SWE-2</a>');
+    expect(withEntry).toContain('<a href="/entries/devin/swe-2" title="The catalog entry devin/swe-2: its values, sources and any evaluations.">Entry page</a>');
+    expect(withEntry).not.toContain("Listed, not evaluated");
+    const without = rowOf(html, "gemini-4-neon");
+    expect(without).toContain('<span class="listed-name">Gemini 4 Neon</span>');
+    expect(without).toContain(">Listed, not evaluated</span>");
+    expect(without).not.toContain("<a ");
+  });
+
+  it("says where the list is from: its mark, its date, the client that read it and the source", () => {
+    const html = listingHtml(provider, listing([model({})]), today);
+    expect(html).toContain('<h2 id="model-list" class="!m-0">Model list</h2>');
+    expect(html).toContain('<span class="badge listed">listed</span><span class="muted date" title="The day the vendor&#39;s list was read.">2026-11-22</span>');
+    expect(html).toContain("1 model on the vendor's own list, read through Provimux, a proxy built on CLIProxyAPI. <a href=\"https://github.com/ngvoicu/groundtruth/blob/main/listed.json\">Source</a>");
+    expect(html).toContain('<a href="/api/v1/listings/devin"><code>GET /api/v1/listings/devin</code></a>');
+    const imported = listingHtml(provider, listing([model({ sources: sources("models.dev") })], { basis: "models.dev", client: null, client_label: null, evidence: [] }), today);
+    expect(imported).toContain('<span class="origin upstream">models.dev</span><span class="muted date" title="Imported from models.dev on this date.">2026-11-22</span>');
+    expect(imported).toContain("1 model listed by models.dev for this provider.");
+    expect(imported).not.toContain("Source</a>");
+  });
+
+  it("marks a list read by the discovery stale by the threshold it is given, and an imported list never", () => {
+    const old = listingHtml(provider, listing([model({})], { listed_at: "2026-10-01" }), today);
+    expect(old).toContain('<span class="stale" title="The day the vendor&#39;s list was read. More than 30 days ago.">2026-10-01 · stale</span>');
+    expect(listingHtml(provider, listing([model({})], { listed_at: "2026-10-01" }), { ...today, stale_after_days: 90 })).not.toContain("· stale");
+    expect(listingHtml(provider, listing([model({})], { basis: "models.dev", listed_at: "2026-10-01", client: null, client_label: null, evidence: [] }), today)).not.toContain("· stale");
+  });
+
+  it("prints each value as the listing has it, its source in the hover text, and Unknown where no source states it", () => {
+    const html = listingHtml(provider, listing([model({ sources: { ...sources("listed"), max_output: "models.dev" } }), model({ id: "bare", name: null, released: null, context_window: null, max_output: null, input_modalities: null, reasoning: null, sources: sources(null) })]), today);
+    const full = rowOf(html, "gemini-4-neon");
+    expect(full).toContain('<span title="1,048,576 tokens. From the vendor&#39;s own list.">1.05M</span>');
+    expect(full).toContain('<span title="65,536 tokens. From models.dev.">65.54K</span>');
+    expect(full).toContain('<span class="chip">low</span><span class="chip">medium</span><span class="chip">high</span>');
+    expect(full).toContain(">text, image</span>");
+    expect(full).toContain(">2026-11-01</span>");
+    // A model with no name is printed by its id, once.
+    const bare = html.split("<tr").find((part) => part.includes('<span class="listed-name">bare</span>')) ?? "";
+    expect(count(bare, "bare")).toBe(1);
+    expect(count(bare, ">Unknown</span>")).toBe(5);
+  });
+
+  it("tells reasoning levels, reasons with no levels stated, does not reason, no levels and unknown apart", () => {
+    const cell = (value: ListingReasoning | null): string => {
+      const html = listingHtml(provider, listing([model({ reasoning: value })]), today);
+      return html.split('data-label="Reasoning">')[1]!.split("</td>")[0]!;
+    };
+    expect(cell(reasoning({ supported: true, levels: ["low", "max"] }))).toBe('<span class="levels" title="The levels a request can ask for. From the vendor&#39;s own list."><span class="chip">low</span><span class="chip">max</span></span>');
+    expect(cell(reasoning({ supported: true }))).toContain(">Yes</span>");
+    expect(cell(reasoning({ supported: false }))).toContain(">No</span>");
+    expect(cell(reasoning({ levels: [] }))).toContain(">None</span>");
+    expect(cell(reasoning({}))).toContain(">Unknown</span>");
+    expect(cell(null)).toContain(">Unknown</span>");
+  });
+
+  it("shows the plan names the vendor's list attaches, as it writes them, and a model hidden in its picker", () => {
+    const html = listingHtml(provider, listing([model({ plans: ["plus", "pro"], hidden: true }), model({ id: "other", hidden: false })]), today);
+    expect(rowOf(html, "gemini-4-neon")).toContain(">Plans: plus, pro</div>");
+    expect(rowOf(html, "gemini-4-neon")).toContain(">Hidden in the vendor's picker</div>");
+    expect(rowOf(html, "other")).not.toContain("Plans:");
+    expect(rowOf(html, "other")).not.toContain("Hidden");
+  });
+
+  it("says plainly when no source gives a list, with no table and no link to an answer that is not there", () => {
+    const html = listingHtml(provider, null, today);
+    expect(html).toContain("No model list for this provider yet: no source gives one.");
+    expect(html).toContain('<a href="/docs/methodology/#listings">Where a model list comes from</a>');
+    expect(html).not.toContain("<table");
+    expect(html).not.toContain("/api/v1/listings");
   });
 });

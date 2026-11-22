@@ -20,6 +20,7 @@ const words = (text: string): string => escapeHtml(text).replace(/`([^`]+)`/g, "
     { id: "input-window", label: "Context window" },
     { id: "prices", label: "Prices" },
     { id: "access", label: "Access methods" },
+    { id: "listings", label: "Model lists" },
     { id: "merge", label: "Merge rules" },
     { id: "sync", label: "Daily import" },
     { id: "pi", label: "pi's catalog" },
@@ -236,7 +237,7 @@ const words = (text: string): string => escapeHtml(text).replace(/`([^`]+)`/g, "
         A subscription is not paid per token. So that a client can still work out what its usage is worth, every subscription entry shows the API list price of the same model, marked{" "}
         <em>API price</em>, and its page names the API entry the price is from. That is the entry a providers.dev entry was added from, or else the entry of the lab's own provider for the
         same canonical model. It is never what the subscription costs. Where the catalog has no API entry of that model, the entry says <em>In plan</em> and has no price, also where the
-        source lists one for it: that figure stays in the entry's data as imported, and is not a price per token. Plans and their prices are not listed.
+        source lists one for it: that figure stays in the entry's data as imported, and is not a price per token. Plan prices are not listed.
       </li>
     </ul>
 
@@ -250,8 +251,21 @@ const words = (text: string): string => escapeHtml(text).replace(/`([^`]+)`/g, "
       <code>reference_ref</code>), so that a client can work out what the usage is worth.
     </p>
     <p>
-      Access is a classification: API key, subscription, or unclassified. Plans, plan prices, allowances and quotas are not tracked. API prices are kept as imported. Where a service does not
+      Access is a classification: API key, subscription, or unclassified. Plans are not tracked: a plan's name appears only where a vendor's own model list attaches it to a model (see{" "}
+      <a href="#listings">Model lists</a>), and plan prices, allowances and quotas never do. API prices are kept as imported. Where a service does not
       disclose which underlying model it serves, the entry has no <code>canonical_id</code>.
+    </p>
+
+    <h2 id="listings">Model lists</h2>
+    <p>
+      A provider's page ends with its model list: every model the provider offers on that access method, evaluated or not, as{" "}
+      <a href="/api/v1/listings"><code>/api/v1/listings</code></a> publishes it. The list is taken whole from the first source that has one: the vendor's own list, read through a
+      login by the daily discovery of <a href="https://github.com/ngvoicu/groundtruth">groundtruth</a> and published in its <code>listed.json</code>, with the client that read it named
+      beside the list; a list providers.dev states, with evidence; the models models.dev lists for the provider; or the models pi's catalog lists for it. Each value of a model (context
+      window, output limit, reasoning levels, input, release date) is from the first of the same sources that states it, and its hover text names that source. A model the catalog has an
+      entry for links to it; one without says <em>Listed, not evaluated</em>. A list is not a set of entries: nothing of it is written into an entry's limits or into a safe value. Its date is
+      the day the list was read, or the day of the import; a list read by the discovery or stated by providers.dev is marked stale like other providers.dev evidence. Where the vendor's own list attaches plan names to a
+      model, they are shown as it writes them; never prices, allowances or quotas.
     </p>
 
     <h2 id="merge">Merge rules</h2>

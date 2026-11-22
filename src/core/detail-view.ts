@@ -3,21 +3,121 @@ import { apiLink, pageLinks, type Envelope } from "./catalog-view.ts";
 import type { ProviderSummary, Summary } from "./entries.ts";
 import { compactTokens, compactTokensDown, entryHref, escapeHtml as e, exact, isStale, plural, type Today } from "./format.ts";
 import type { WindowBound } from "./limits.ts";
+import type { Listing, ListingModel, ListingSource } from "./listings.ts";
 import { evaluationStrip, rowHtml, stripHead, tableHead } from "./render.ts";
 import type { CacheEvaluationRecord, CanonicalModelDetail, Correction, LimitEvaluationRecord } from "./resources.ts";
 import type { Meta, MetaPi } from "./schema.ts";
 
-export function providerHtml(provider: ProviderSummary, entries: Summary[], imported: string, today: Today, pi?: MetaPi): string {
+// ---- the provider's model list: /api/v1/listings/{provider}, printed as the API gives it.
+
+/** A listing's source, as a mark like the ones beside an entry's values, and in words for a hover text. */
+const LISTING_MARK: Record<ListingSource, string> = {
+  listed: '<span class="badge listed">listed</span>',
+  "providers.dev": '<span class="origin added">providers.dev</span>',
+  "models.dev": '<span class="origin upstream">models.dev</span>',
+  "pi.dev": '<span class="origin pi">pi.dev</span>',
+};
+const LISTING_SOURCE_WORD: Record<ListingSource, string> = {
+  listed: "the vendor's own list",
+  "providers.dev": "providers.dev",
+  "models.dev": "models.dev",
+  "pi.dev": "pi's catalog",
+};
+/** What the date beside the mark is, in its hover text. */
+const LISTING_DATE_WORD: Record<ListingSource, string> = {
+  listed: "The day the vendor's list was read.",
+  "providers.dev": "Date of the newest providers.dev evidence for this list.",
+  "models.dev": "Imported from models.dev on this date.",
+  "pi.dev": "Fetched from pi's catalog on this date.",
+};
+const LISTING_UNKNOWN = '<span class="unknown" title="No source states it. Unknown is not zero and not unlimited.">Unknown</span>';
+const from = (source: ListingSource | null): string => (source ? ` From ${LISTING_SOURCE_WORD[source]}.` : "");
+
+/** The facts row of the provider's page: how many models its list has, from where, and a way down to it. */
+function listingFact(listing: Listing | null): string {
+  if (!listing) return '<span class="muted">No list yet</span>';
+  const date = listing.listed_at ? `, ${e(listing.listed_at)}` : "";
+  return `<a href="#model-list">${plural(listing.model_count, "model")}</a><span class="muted"> · ${LISTING_SOURCE_WORD[listing.basis]}${date}</span>`;
+}
+
+/** The line under the heading: the source's mark and date, what the list is, and its evidence. */
+function listingFrom(listing: Listing, today: Today): string {
+  const { basis, listed_at: date } = listing;
+  // A list read or stated by providers.dev's side is evidence and can be stale; an import is never marked stale.
+  const own = basis === "listed" || basis === "providers.dev";
+  const dated = !date ? "" : own && isStale(date, today)
+    ? `<span class="stale" title="${e(`${LISTING_DATE_WORD[basis]} More than ${plural(today.stale_after_days, "day")} ago.`)}">${e(date)} · stale</span>`
+    : `<span class="muted date" title="${e(LISTING_DATE_WORD[basis])}">${e(date)}</span>`;
+  const n = plural(listing.model_count, "model");
+  const said = basis === "listed"
+    ? `${n} on the vendor's own list, read through ${e(listing.client_label ?? listing.client ?? "a client")}.`
+    : basis === "providers.dev" ? `${n} on a list providers.dev states.` : `${n} listed by ${LISTING_SOURCE_WORD[basis]} for this provider.`;
+  const sources = listing.evidence.length === 1
+    ? ` <a href="${e(listing.evidence[0]!.url)}">Source</a>`
+    : listing.evidence.length > 1 ? ` Sources: ${listing.evidence.map((item) => `<a href="${e(item.url)}">${e(item.kind)}, ${e(item.date)}</a>`).join(" · ")}` : "";
+  return `<p class="listing-from"><span class="sources side">${LISTING_MARK[basis]}${dated}</span><span>${said}${sources}</span></p>`;
+}
+
+function listingTokens(value: number | null, source: ListingSource | null): string {
+  return value === null ? LISTING_UNKNOWN : `<span title="${e(`${exact(value)} tokens.${from(source)}`)}">${compactTokens(value)}</span>`;
+}
+
+/** Reasoning as the listing states it: the levels a request can ask for; else whether the model reasons at all. */
+function listingReasoning(model: ListingModel): string {
+  const reasoning = model.reasoning;
+  if (reasoning === null) return LISTING_UNKNOWN;
+  const sources = model.sources.reasoning;
+  if (reasoning.levels !== null && reasoning.levels.length > 0) {
+    return `<span class="levels" title="${e(`The levels a request can ask for.${from(sources.levels)}`)}">${reasoning.levels.map((level) => `<span class="chip">${e(level)}</span>`).join("")}</span>`;
+  }
+  if (reasoning.supported === true) return `<span title="${e(`The model reasons. No source states the levels a request can ask for.${from(sources.supported)}`)}">Yes</span>`;
+  if (reasoning.supported === false) return `<span title="${e(`The model does not reason.${from(sources.supported)}`)}">No</span>`;
+  if (reasoning.levels !== null) return `<span class="muted" title="${e(`The source states no levels.${from(sources.levels)}`)}">None</span>`;
+  return LISTING_UNKNOWN;
+}
+
+function listingRow(model: ListingModel): string {
+  const ref = model.entry ? `${model.entry.provider}/${model.entry.model}` : null;
+  const name = e(model.name ?? model.id);
+  const head = ref ? `<a href="${e(entryHref(ref))}">${name}</a>` : `<span class="listed-name">${name}</span>`;
+  const notes = [
+    model.plans.length > 0 ? `<div class="hint" title="${e(`Plan names the vendor's list attaches to the model, as it writes them.${from(model.sources.plans)}`)}">Plans: ${model.plans.map(e).join(", ")}</div>` : "",
+    model.hidden === true ? `<div class="hint" title="${e(`The vendor's list marks the model as not shown in its model picker.${from(model.sources.hidden)}`)}">Hidden in the vendor's picker</div>` : "",
+  ].join("");
+  const entry = ref
+    ? `<a href="${e(entryHref(ref))}" title="${e(`The catalog entry ${ref}: its values, sources and any evaluations.`)}">Entry page</a>`
+    : '<span class="muted" title="The catalog has no entry for this model at this provider. It is on the list; providers.dev has not evaluated it.">Listed, not evaluated</span>';
+  const input = model.input_modalities === null ? LISTING_UNKNOWN : `<span title="${e(`What a request can send.${from(model.sources.input_modalities)}`)}">${e(model.input_modalities.join(", "))}</span>`;
+  const released = model.released === null ? LISTING_UNKNOWN : `<span class="date" title="${e(`Release date.${from(model.sources.released)}`)}">${e(model.released)}</span>`;
+  return `<tr${ref ? "" : ' class="no-entry"'}><th scope="row">${head}${model.name !== null ? `<div class="id"><code>${e(model.id)}</code></div>` : ""}${notes}</th><td class="nowrap" data-label="Entry">${entry}</td><td class="num" data-label="Context">${listingTokens(model.context_window, model.sources.context_window)}</td><td class="num" data-label="Max output">${listingTokens(model.max_output, model.sources.max_output)}</td><td data-label="Reasoning">${listingReasoning(model)}</td><td data-label="Input">${input}</td><td data-label="Released">${released}</td></tr>`;
+}
+
+/**
+ * The section "Model list" of a provider's page: every model the provider offers on this access method, evaluated or
+ * not, as `/api/v1/listings/{provider}` gives it. Null: the API has no listing for the provider. It prints the fields of
+ * the listing and works nothing out but the one thing a page may, whether a list read by providers.dev's side is stale.
+ */
+export function listingHtml(provider: ProviderSummary, listing: Listing | null, today: Today): string {
+  const how = '<a href="/docs/methodology/#listings">Where a model list comes from</a>';
+  const head = `<div class="mt-10 flex flex-wrap items-end justify-between gap-3"><h2 id="model-list" class="!m-0">Model list</h2><p class="hint">${how}${listing ? ` · ${apiLink(`/api/v1/listings/${encodeURIComponent(provider.id)}`)}` : ""}</p></div>`;
+  if (!listing) return `${head}<p class="empty listing-empty">No model list for this provider yet: no source gives one.</p>`;
+  const models = listing.models ?? [];
+  return `${head}${listingFrom(listing, today)}
+    <div class="scroll mt-3"><table class="entries listing stack-tablet"><caption class="sr-only">Models on the list of ${e(provider.name)}</caption><thead><tr><th scope="col">Model</th><th scope="col">Entry</th><th scope="col" class="num">Context</th><th scope="col" class="num">Max output</th><th scope="col">Reasoning</th><th scope="col">Input</th><th scope="col">Released</th></tr></thead><tbody>${models.map(listingRow).join("")}</tbody></table></div>${models.length === 0 ? '<p class="empty">The list names no model.</p>' : ""}`;
+}
+
+export function providerHtml(provider: ProviderSummary, entries: Summary[], listing: Listing | null, imported: string, today: Today, pi?: MetaPi): string {
   const extension = provider.providers_dev;
   const access = { api: "API key, billed by use", subscription: "Subscription login", unknown: "Unclassified" };
   return `<p class="crumbs"><a href="/providers/">Providers</a> / ${e(provider.name)}</p><h1>${e(provider.name)}</h1>
     <p class="id mt-1"><code>${e(provider.id)}</code><button type="button" class="copy" data-copy="${e(provider.id)}">Copy</button><span class="origin ${provider.origin}">${provider.origin === "added" ? "providers.dev" : "models.dev"}</span>${provider.doc ? `<a href="${e(provider.doc)}" rel="noopener">Documentation ↗</a>` : ""}</p>
-    <dl class="mt-6 grid max-w-4xl grid-cols-[9rem_1fr] gap-x-4 gap-y-3 text-[0.9rem]"><dt class="muted">Access</dt><dd><strong>${access[extension.access]}</strong><div class="hint">${e(extension.access_basis)}${extension.access_source ? ` <a href="${e(extension.access_source)}">Source</a>` : ""}</div></dd><dt class="muted">Entries</dt><dd>${exact(provider.entry_count)}, ${exact(provider.evidence_entry_count)} with providers.dev evidence</dd>
+    <dl class="mt-6 grid max-w-4xl grid-cols-[9rem_1fr] gap-x-4 gap-y-3 text-[0.9rem]"><dt class="muted">Access</dt><dd><strong>${access[extension.access]}</strong><div class="hint">${e(extension.access_basis)}${extension.access_source ? ` <a href="${e(extension.access_source)}">Source</a>` : ""}</div></dd><dt class="muted">Entries</dt><dd>${exact(provider.entry_count)}, ${exact(provider.evidence_entry_count)} with providers.dev evidence</dd><dt class="muted">Model list</dt><dd>${listingFact(listing)}</dd>
     ${provider.env.length ? `<dt class="muted">Key variables</dt><dd>${provider.env.map((name) => `<code class="mr-2">${e(name)}</code>`).join("")}</dd>` : ""}
     ${extension.note ? `<dt class="muted">Note</dt><dd>${e(extension.note)}</dd>` : ""}
     ${extension.evidence.length ? `<dt class="muted">Evidence</dt><dd>${extension.evidence.map((item) => `<div><span class="badge ${item.kind}">${e(item.kind)}</span> <a href="${e(item.url)}">Source</a> <span class="muted">${e(item.date)}</span></div>`).join("")}</dd>` : ""}</dl>
     <div class="mt-8 flex flex-wrap items-end justify-between gap-3"><h2 class="!m-0">Entries</h2><p class="hint"><a href="/?provider=${e(provider.id)}">Filter and sort in the catalog</a> · ${apiLink(`/api/v1/providers/${encodeURIComponent(provider.id)}`)}</p></div>
-    <div class="scroll mt-3"><table class="entries stack-tablet"><caption class="sr-only">Entries at ${e(provider.name)}</caption><thead>${tableHead({ hideProvider: true })}</thead><tbody>${entries.map((entry) => rowHtml(entry, { today, imported, pi, hideProvider: true })).join("")}</tbody></table></div>${entries.length === 0 ? '<p class="empty">No entries are listed for this provider. What providers.dev leaves out of the catalog is listed under <a href="/evidence/#issues">Dataset issues</a>.</p>' : ""}`;
+    <div class="scroll mt-3"><table class="entries stack-tablet"><caption class="sr-only">Entries at ${e(provider.name)}</caption><thead>${tableHead({ hideProvider: true })}</thead><tbody>${entries.map((entry) => rowHtml(entry, { today, imported, pi, hideProvider: true })).join("")}</tbody></table></div>${entries.length === 0 ? '<p class="empty">No entries are listed for this provider. What providers.dev leaves out of the catalog is listed under <a href="/evidence/#issues">Dataset issues</a>.</p>' : ""}
+    ${listingHtml(provider, listing, today)}`;
 }
 
 /** An input window as the entry table prints it: "≥" before it and rounded down where it is a lower bound; or in full. */
