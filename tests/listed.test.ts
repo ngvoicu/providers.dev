@@ -6,7 +6,8 @@ import { describe, expect, it } from "vitest";
 import { publish } from "../scripts/lib/publish.ts";
 import { LISTED_URL, OBSERVED_URL, sync } from "../scripts/lib/sync.ts";
 import { ListingSchema } from "../src/core/contract.ts";
-import type { Listing } from "../src/core/listings.ts";
+import { storedListed, type Listing } from "../src/core/listings.ts";
+import { pretty } from "../scripts/lib/files.ts";
 import { ListedFile, MeasurementLabels, type Meta } from "../src/core/schema.ts";
 import { parse } from "yaml";
 import { fixtureUpstream, ROOT, tempDataDir, writeAuthored } from "./helpers.ts";
@@ -71,22 +72,22 @@ describe("the sync of listed.json", () => {
     expect(statusOf(dataDir).listed).toEqual({ last_attempt_at: "2026-11-22T04:17:00.000Z", status: "absent" });
   });
 
-  it("a good file is kept as it came, with its meta; the next run sends its ETag and a 304 changes nothing but checked_at", async () => {
+  it("a good file is kept as the site reads it, with its meta; the next run sends its ETag and a 304 changes nothing but checked_at", async () => {
     const dataDir = tempDataDir();
     const body = JSON.stringify(listedFile());
     const first = await sync({ dataDir, fetch: answering(json(body)), now: at(22) });
     expect(first.listed).toEqual({ status: "updated", summary: ["1 providers, 2 models"] });
-    expect(readFileSync(stored(dataDir), "utf8")).toBe(`${body}\n`);
+    expect(readFileSync(stored(dataDir), "utf8")).toBe(pretty(storedListed(ListedFile.parse(JSON.parse(body)))));
     expect(JSON.parse(readFileSync(join(dataDir, "sources", "listed.meta.json"), "utf8"))).toMatchObject({ source: LISTED_URL, fetched_at: "2026-11-22T04:17:00.000Z", etag: '"l1"' });
     const seen: { headers?: Record<string, string> } = {};
     const second = await sync({ dataDir, fetch: answering(() => new Response(null, { status: 304 }), seen), now: at(23) });
     expect(seen.headers?.["If-None-Match"]).toBe('"l1"');
     expect(second.listed.status).toBe("unchanged");
-    expect(readFileSync(stored(dataDir), "utf8")).toBe(`${body}\n`);
+    expect(readFileSync(stored(dataDir), "utf8")).toBe(pretty(storedListed(ListedFile.parse(JSON.parse(body)))));
     expect(JSON.parse(readFileSync(join(dataDir, "sources", "listed.meta.json"), "utf8"))).toMatchObject({ fetched_at: "2026-11-22T04:17:00.000Z", checked_at: "2026-11-23T04:17:00.000Z" });
     // A file that went missing later is still "no discovery": the last copy stays.
     await sync({ dataDir, fetch: answering(() => new Response("gone", { status: 404 })), now: at(24) });
-    expect(readFileSync(stored(dataDir), "utf8")).toBe(`${body}\n`);
+    expect(readFileSync(stored(dataDir), "utf8")).toBe(pretty(storedListed(ListedFile.parse(JSON.parse(body)))));
   });
 
   it.each<[string, () => Response, string]>([
@@ -151,10 +152,66 @@ describe("the sync of listed.json", () => {
     const report = await sync({ dataDir, fetch: answering(json(next, '"l1"'), seen), now: at(23) });
     expect(seen.headers?.["If-None-Match"]).toBeUndefined();
     expect(report.listed.status).toBe("updated");
-    expect(readFileSync(stored(dataDir), "utf8")).toBe(`${JSON.stringify(next)}\n`);
+    expect(readFileSync(stored(dataDir), "utf8")).toBe(pretty(storedListed(ListedFile.parse(next))));
     // A damaged meta file beside a good copy does not block either.
     writeFileSync(join(dataDir, "sources", "listed.meta.json"), "{");
     expect((await sync({ dataDir, fetch: answering(json(listedFile({ providers: { "provider-02": { date: "2026-11-24", client: "provimux", models: [{ id: "model-1" }, { id: "model-3" }] } } }))), now: at(24) })).listed.status).toBe("updated");
+  });
+
+  it("the stored copy holds only what the site reads: no private text of a crafted file is ever written to data/sources/listed.json", async () => {
+    // Every private value of both reviews, in every field the site never takes, beside values it does take.
+    const crafted = {
+      schema: 1,
+      repository: "https://ada:ghp_secret@github.com/ngvoicu/sk-live-CFReviewFixture",
+      providers: {
+        "provider-02": {
+          date: "2026-11-22",
+          client: "provimux",
+          models: [
+            {
+              id: "model-1",
+              name: "Neon (ada@example.com, team of 3 seats) Morgan Example 202-555-0142",
+              owner: "acct-cfreview-private-ops",
+              released: "login of ada@example.com, team plan, 3 seats",
+              aliases: ["codex-ada@example.com-plus.json", "eyJhbGciOiJIUzI1NiJ9.exampleCFReview.fixture"],
+              variants: ["ghp_0123456789abcdefghijABCDEFGHIJ012345", "codex-morgan-example-plus.json"],
+              description: "ada@example.com not published",
+              context_window: 400000,
+              max_output: 128000,
+              input_modalities: ["text", "image/png", "acct-cfreview-private-ops"],
+              reasoning: { supported: true, levels: ["low", "high", "sess-cfreview-fixture-only"], disable_with: "qa+cf-review@example.invalid" },
+              plans: ["plus", "Plus 150 messages", "Pro 20 USD", "plus: 150 messages / 3h, $20/month"],
+              hidden: false,
+            },
+            { id: "model-3", name: "Morgan Example", aliases: ["codex-morgan-example-plus.json"] },
+          ],
+        },
+      },
+    };
+    const dataDir = tempDataDir();
+    const report = await sync({ dataDir, fetch: answering(json(crafted)), now: at(22) });
+    expect(report.listed.status).toBe("updated");
+    const text = readFileSync(stored(dataDir), "utf8");
+    for (const words of ["ada", "example.com", "Morgan", "202-555-0142", "team of 3", "acct-cfreview", "codex-", "eyJhbGci", "ghp_", "sk-live", "not published", "sess-cfreview", "qa+", "cf-review", "150 messages", "20 USD", "repository", "name", "owner", "released", "aliases", "variants", "description", "disable_with"]) {
+      expect(text, words).not.toContain(words);
+    }
+    // Only the kept values, in the file's own shape, which the build reads as it reads the file.
+    expect(JSON.parse(text)).toEqual({
+      schema: 1,
+      providers: {
+        "provider-02": {
+          date: "2026-11-22",
+          client: "provimux",
+          models: [
+            { id: "model-1", context_window: 400000, max_output: 128000, input_modalities: ["text", "image"], plans: ["plus"], hidden: false, reasoning: { supported: true, levels: ["low", "high"] } },
+            { id: "model-3" },
+          ],
+        },
+      },
+    });
+    expect(ListedFile.safeParse(JSON.parse(text)).success).toBe(true);
+    // Its meta and the sync's record hold none of it either.
+    for (const other of [readFileSync(join(dataDir, "sources", "listed.meta.json"), "utf8"), readFileSync(join(dataDir, "sync-status.json"), "utf8")]) expect(other).not.toMatch(/ada|Morgan|cf-review|ghp_|sk-live|150 messages/);
   });
 
   it("--only=pi leaves the discovery file and its record as they were", async () => {

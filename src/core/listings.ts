@@ -10,7 +10,7 @@
 // Nothing here is written into an entry: a listing is a resource of its own, and no value of it reaches an entry's
 // `limit` or a safe value.
 
-import { ext, type AuthoredListing, type Catalog, type Issue, type ListedModel, type ListingFields, type PublishedModel } from "./schema.ts";
+import { ext, type AuthoredListing, type Catalog, type Issue, type ListedFile, type ListedModel, type ListingFields, type PublishedModel } from "./schema.ts";
 
 export const LISTING_SOURCES = ["listed", "providers.dev", "models.dev", "pi.dev"] as const;
 export type ListingSource = (typeof LISTING_SOURCES)[number];
@@ -138,6 +138,28 @@ export const LISTED_MODALITIES = ["text", "image", "audio", "video", "pdf"] as c
  * figure, a price or a quota.
  */
 export const LISTED_PLANS = ["free", "go", "plus", "pro", "team", "business", "enterprise", "edu", "education", "max"] as const;
+
+/**
+ * The discovery file as the sync stores it (data/sources/listed.json, committed): what the site reads of it and
+ * nothing else. Per provider its date and client; per model the id and what takeListed takes, in the file's own shape.
+ * Every other field (name, owner, released, aliases, variants, description, disable_with, repository, and any other)
+ * is left out, so no text of the file is kept. Reading the stored copy gives what reading the file gives.
+ */
+export function storedListed(file: ListedFile): ListedFile {
+  const model = (source: ListedModel): ListedModel => {
+    const taken = takeListed(source);
+    const out: Record<string, unknown> = { id: source.id };
+    for (const key of ["context_window", "max_input", "max_output", "input_modalities", "output_modalities", "web_search", "plans", "hidden"] as const) if (key in taken) out[key] = taken[key];
+    const reasoning: Record<string, unknown> = {};
+    for (const key of ["supported", "levels", "budget_min", "budget_max", "can_disable", "dynamic"] as const) if (`reasoning.${key}` in taken) reasoning[key] = taken[`reasoning.${key}`];
+    if (Object.keys(reasoning).length > 0) out.reasoning = reasoning;
+    return out as ListedModel;
+  };
+  return {
+    schema: 1,
+    providers: Object.fromEntries(Object.entries(file.providers).map(([id, part]) => [id, { date: part.date, client: part.client, models: part.models.map(model) }])),
+  };
+}
 
 /**
  * What the build takes from a model of the discovery file: only values that cannot carry text. Numbers and booleans as

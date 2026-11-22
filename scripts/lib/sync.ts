@@ -6,6 +6,7 @@ import { appendFileSync, closeSync, existsSync, mkdirSync, openSync, readdirSync
 import { join } from "node:path";
 import { deepEqual } from "../../src/core/merge.ts";
 import { ListedFile, ListedSyncRecord, ObservedFile, UPSTREAM_SCHEMA, UpstreamCatalog, type PiSyncRecord, type SourceMeta, type UpstreamMeta } from "../../src/core/schema.ts";
+import { storedListed } from "../../src/core/listings.ts";
 import { pretty, readJson, readJsonIfExists, sha256, swapDir, writeFileAtomic } from "./files.ts";
 import { piOfSync } from "./pi-fence.ts";
 
@@ -279,7 +280,8 @@ async function syncMeasurements(options: Required<Pick<SyncOptions, "dataDir" | 
 /**
  * groundtruth's discovery file, beside the measurements file. A missing file (404) is "no discovery yet": nothing
  * changes, a copy held before included. A file that is not JSON or does not fit ListedFile keeps the last good copy and
- * fails the part, which the build reports as a warning. The file is kept as it came, with data/sources/listed.meta.json.
+ * fails the part, which the build reports as a warning. Only what the site reads of the file is kept (storedListed), with
+ * data/sources/listed.meta.json.
  */
 async function syncListed(options: Required<Pick<SyncOptions, "dataDir" | "fetch" | "now">> & SyncOptions): Promise<RanPart & { absent?: true }> {
   const dir = join(options.dataDir, "sources");
@@ -339,7 +341,9 @@ async function syncListed(options: Required<Pick<SyncOptions, "dataDir" | "fetch
     return { status: "unchanged" };
   }
   mkdirSync(dir, { recursive: true });
-  writeFileAtomic(file, body.endsWith("\n") ? body : `${body}\n`);
+  // Only what the site reads is stored (storedListed): the committed copy holds no text of the file. The digest and
+  // the ETag are the fetched file's, so an unchanged file is still recognised.
+  writeFileAtomic(file, pretty(storedListed(checked.data)));
   writeFileAtomic(metaFile, pretty({ source: LISTED_URL, fetched_at: now, checked_at: now, ...etagOf(response), sha256: digest } satisfies SourceMeta));
   const providers = Object.entries(checked.data.providers);
   return { status: "updated", summary: [`${providers.length} providers, ${providers.reduce((sum, [, part]) => sum + part.models.length, 0)} models`] };

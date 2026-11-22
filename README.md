@@ -389,8 +389,10 @@ second, extra source beside it. A failure of one source never touches another so
 The discovery file (`LISTED_URL` in `scripts/lib/sync.ts`) is groundtruth's `listed.json`, at the root of its
 repository beside `observed.json`: what each login's vendor listed, read daily through the owner's Provimux, for the
 listings (`/api/v1/listings`). Its structure is `ListedFile` in `src/core/schema.ts` (schema 1; strict, so that no
-account, email, token or file name can get in). It is kept as it came, as `data/sources/listed.json` with
-`listed.meta.json` beside it, and an ETag is sent. A missing file (404) is "no discovery yet": nothing changes, a copy
+account, email, token or file name can get in). Only what the site reads of it is stored, as `data/sources/listed.json` with
+`listed.meta.json` beside it (`storedListed` in `src/core/listings.ts`): per provider its date and client, per model
+its id and the kept values; every other field is left out, so the committed copy holds no text of the file. The
+digest and the ETag are the fetched file's, and an ETag is sent. A missing file (404) is "no discovery yet": nothing changes, a copy
 held before included, and `data/sync-status.json` records `listed: { status: "absent" }`. A file that is not JSON,
 does not fit the structure, or answers another error keeps the last good copy: the part is recorded as `failed` with
 the reason, the `Publish` run warns, and the build lists a `listed-sync-failed` warning in `/api/v1/meta`. Like pi's
