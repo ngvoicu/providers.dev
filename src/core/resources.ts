@@ -42,7 +42,7 @@ export function listCorrections(catalog: Catalog, index: Index): Correction[] {
   return [...groups.values()];
 }
 
-/** The authored reference documents: `/docs/{name}/` on the site (support: `/support/`) and `/api/v1/docs/{name}` in the API. */
+/** The authored reference documents: `/docs/{name}/` on the site (support: https://provimux.providers.dev/support/) and `/api/v1/docs/{name}` in the API. */
 export const DOCUMENTS = ["methodology", "licensing", "contributing", "support"] as const;
 
 /** Authored reference text, published through the API along with the machine-readable contract. */

@@ -888,13 +888,15 @@ compiles one shared shell with CSS and scripts, plus authored methodology, licen
 enumerate entries, providers or models. `/docs/api/` renders the actual `/api/v1/openapi.json` response, including
 its guide, parameters, schemas and examples. Authored text is also public through `/api/v1/docs/{document}`.
 
-The site has one address, `https://providers.dev`. `wrangler.jsonc` attaches two custom domains to the Worker,
-`providers.dev` and `www.providers.dev`, and turns off the `workers.dev` address and the preview URLs:
+The site has one address, `https://providers.dev`. `wrangler.jsonc` attaches three custom domains to the Worker,
+`providers.dev`, `www.providers.dev` and `provimux.providers.dev` (Provimux's own site, below), and turns off the
+`workers.dev` address and the preview URLs:
 
 ```jsonc
 "routes": [
   { "pattern": "providers.dev", "custom_domain": true },
-  { "pattern": "www.providers.dev", "custom_domain": true }
+  { "pattern": "www.providers.dev", "custom_domain": true },
+  { "pattern": "provimux.providers.dev", "custom_domain": true }
 ],
 "workers_dev": false,
 "preview_urls": false,
@@ -906,6 +908,17 @@ for `www.providers.dev`, over http or https, and a plain http request for `provi
 requests from Cloudflare's edge, told apart by the `X-Forwarded-Proto` header the edge sets: `wrangler dev` with these
 routes hands the local Worker `http://providers.dev/…` too, but no such header, so a local preview is never
 redirected. HSTS is not set.
+
+**Provimux's site, `https://provimux.providers.dev`.** Two static pages, `/` and `/support/`, built by Astro from
+`src/pages/provimux/` into `dist/provimux/` with their own layout (`src/layouts/Provimux.astro`) and files
+(`public/provimux/`: the console screenshots, icons, `robots.txt`, `sitemap.xml`). They read no dataset. On that host
+the Worker serves `dist/provimux/` as the root and nothing else: no API, no providers.dev page; any other address gets
+the site's own page with status 404, and plain http at the edge goes to https (`src/core/provimux-site.ts`). On
+providers.dev, `/support/` and `/docs/support/` get a 301 to `https://provimux.providers.dev/support/`, and anything
+under `/provimux/` a 301 to the same path on the subdomain, so the build is never a page of providers.dev. The support
+text is one component (`src/components/provimux/SupportBody.astro`), also published as `/api/v1/docs/support`. To
+preview the subdomain locally: `npx wrangler dev --port <port> --local-upstream provimux.providers.dev` (a second
+preview at the same time needs its own `--persist-to` folder).
 
 A deploy takes its credentials from the environment, never from a file: `CLOUDFLARE_API_TOKEN` (an API token that
 can edit Workers scripts and their routes and custom domains on the zone) and `CLOUDFLARE_ACCOUNT_ID`. By hand:

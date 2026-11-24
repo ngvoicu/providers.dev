@@ -66,7 +66,6 @@ describe("API response boundary", () => {
       ["/docs/methodology/", "/api/v1/docs/methodology"],
       ["/docs/licensing/", "/api/v1/docs/licensing"],
       ["/docs/contributing/", "/api/v1/docs/contributing"],
-      ["/support/", "/api/v1/docs/support"],
     ];
     for (const [path, endpoint] of routes) {
       const calls: string[] = [];
@@ -237,20 +236,14 @@ describe("API response boundary", () => {
     expect(operation.description).toContain("The methodology, licensing, contributing and support text");
   });
 
-  it("serves the support document at /support/ only, outside the main navigation", async () => {
-    const response = await page("/support/");
-    expect(response.status).toBe(200);
-    const nav = (await response.text()).match(/<nav>(.*?)<\/nav>/)![1]!;
-    expect(nav).not.toContain('aria-current="page"');
-    expect(nav).not.toContain("Support");
-    const moved = await page("/docs/support/");
-    expect(moved.status).toBe(301);
-    expect(moved.headers.get("Location")).toBe("https://providers.dev/support/");
-    expect((await page("/support/plans/")).status).toBe(404);
+  it("keeps the support document in the API and renders no support page on providers.dev: its page is on provimux.providers.dev", async () => {
+    // The Worker sends /support/ and /docs/support/ to https://provimux.providers.dev/support/ (tests/provimux-site.test.ts).
+    one(DocumentationSchema).parse(await (await api("/api/v1/docs/support")).json());
+    for (const path of ["/support/", "/docs/support/", "/support/plans/"]) expect((await page(path)).status, path).toBe(404);
   });
 
   it("says on the support page what a company can buy, with the owner's decisions as written", () => {
-    const source = readFileSync(join(ROOT, "src", "pages", "reference-content", "docs", "support.astro"), "utf8").replace(/\s+/g, " ");
+    const source = readFileSync(join(ROOT, "src", "components", "provimux", "SupportBody.astro"), "utf8").replace(/\s+/g, " ");
     for (const words of [
       "Prices are approximate, per month, in US dollars. Prices in euros on request. Prices are before VAT; VAT is added where it applies.",
       "GitHub issues and discussions, in public", "Best effort: no reply time",
@@ -264,10 +257,20 @@ describe("API response boundary", () => {
       "Setup and upgrades.", "A review of your configuration.", "Moving from CLIProxyAPI.", "Debugging.", "Priority on bugs.",
       "providers.dev does not sell, pool, share or resell access to any model or account. You bring your own API keys or cloud accounts",
       'const email = "office@providers.dev";', "mailto:${email}?subject=", "bank transfer or by card (a Stripe invoice)", "a VAT-registered business in Romania", "reverse charge",
+      'Or sponsor on GitHub: the Team and Business plans are also on <a href="https://github.com/sponsors/ngvoicu">GitHub Sponsors</a> as the $149 and $499 monthly tiers.',
+      "Write to <a href={`mailto:${email}`}>{email}</a> after sponsoring so we can set up your support.",
       "We never ask for your API keys, logins or prompts",
     ]) expect(source, words).toContain(words);
-    // The business name and VAT number go in the vendor pack, never on the page; no referral, affiliate or sponsor link.
-    for (const words of ["SRL", "S.R.L", "RO1", "RO2", "RO3", "RO4", "RO5", "RO6", "RO7", "RO8", "RO9", "github.com/sponsors", "referral", "affiliate", "cheapest", "compliant"]) expect(source, words).not.toContain(words);
+    expect(source.match(/github\.com\/sponsors\b/gi)).toHaveLength(1);
+    // The business name and VAT number go in the vendor pack, never on the page; no referral or affiliate link.
+    for (const words of ["SRL", "S.R.L", "RO1", "RO2", "RO3", "RO4", "RO5", "RO6", "RO7", "RO8", "RO9", "referral", "affiliate", "cheapest", "compliant"]) expect(source, words).not.toContain(words);
+    // The API's copy and the page are built from the one component, with the same title, lead and contents.
+    const document = readFileSync(join(ROOT, "src", "pages", "reference-content", "docs", "support.astro"), "utf8");
+    expect(document).toContain("<Doc {...SUPPORT}>");
+    expect(document).toContain("<SupportBody home={`${PROVIMUX_SITE}/`} />");
+    const supportPage = readFileSync(join(ROOT, "src", "pages", "provimux", "support", "index.astro"), "utf8");
+    expect(supportPage).toContain('<SupportBody home="/" />');
+    expect(supportPage).toContain("{SUPPORT.lead}");
   });
 
   it("says on the contributing page how to contribute, with the owner's decisions as written", () => {
@@ -291,6 +294,9 @@ describe("API response boundary", () => {
     for (const name of ["contributing", "methodology", "licensing", "support"]) {
       const raw = readFileSync(join(ROOT, "src", "pages", "reference-content", "docs", `${name}.astro`), "utf8");
       expect(raw, name).not.toMatch(/[\w,.;:)]\n\s*<(a|code|em|strong|span)\b/);
+    }
+    for (const file of [["components", "provimux", "SupportBody.astro"], ["layouts", "Provimux.astro"], ["pages", "provimux", "index.astro"], ["pages", "provimux", "support", "index.astro"], ["pages", "provimux", "not-found", "index.astro"]]) {
+      expect(readFileSync(join(ROOT, "src", ...file), "utf8"), file.join("/")).not.toMatch(/[\w,.;:)]\n\s*<(a|code|em|strong|span)\b/);
     }
     // The worked examples are entries of data/authored, as written there.
     const openrouter = readFileSync(join(ROOT, "data", "authored", "overrides", "openrouter.yaml"), "utf8");
@@ -316,7 +322,8 @@ describe("API response boundary", () => {
     expect(methodology).toContain("providers.dev takes no payment for listing, correcting or measuring an entry. A provider may supply documentation, or access for a measurement; the result is published whatever it shows.");
     expect(methodology.match(/<a href="\/docs\/contributing\/">contributing<\/a>/g)).toHaveLength(2);
     const layout = readFileSync(join(ROOT, "src", "layouts", "Base.astro"), "utf8");
-    expect(layout).toMatch(/<li><a href="\/docs\/licensing\/">Licensing and attribution<\/a><\/li>\s*<li><a href="\/docs\/contributing\/">Contributing<\/a><\/li>\s*<li><a href="\/support\/">Provimux support<\/a><\/li>\s*<li><a href="mailto:office@providers\.dev">Contact<\/a><\/li>/);
+    expect(layout).toMatch(/<li><a href="\/docs\/licensing\/">Licensing and attribution<\/a><\/li>\s*<li><a href="\/docs\/contributing\/">Contributing<\/a><\/li>\s*<li><a href="https:\/\/provimux\.providers\.dev\/">Provimux<\/a><\/li>\s*<li><a href="https:\/\/provimux\.providers\.dev\/support\/">Provimux support<\/a><\/li>\s*<li><a href="mailto:office@providers\.dev">Contact<\/a><\/li>/);
+    expect(layout).not.toContain('href="/support/"');
     expect(methodology).toContain('A provider can write to <a href="mailto:office@providers.dev">office@providers.dev</a>.');
     const evidence = await (await page("/evidence/")).text();
     expect(evidence).toContain('To propose a correction or ask for an evaluation, see <a href="/docs/contributing/">Contributing</a>.');

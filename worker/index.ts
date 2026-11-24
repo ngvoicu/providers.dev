@@ -1,6 +1,7 @@
 // Static assets contain templates and versioned data. Pages consume the public API response contract.
 import { apiHeaders, handleApi } from "../src/core/api.ts";
 import { handlePage, isPage, PAGE_SHELL } from "../src/core/pages.ts";
+import { movedToProvimux, PROVIMUX_HOST, PROVIMUX_NOT_FOUND, PROVIMUX_SITE, provimuxRoute } from "../src/core/provimux-site.ts";
 import { readSnapshot, type AssetBinding } from "../src/core/snapshot.ts";
 
 interface Env { ASSETS: AssetBinding }
@@ -9,9 +10,10 @@ const SITE_HOST = new URL(SITE).hostname;
 const WWW_HOST = `www.${SITE_HOST}`;
 
 /**
- * Where a request at Cloudflare's edge must go instead, or null to serve it. The site has one address, SITE:
+ * Where a request at Cloudflare's edge must go instead, or null to serve it. The site has one address, SITE, and
+ * Provimux's site one, PROVIMUX_SITE:
  * - www.providers.dev, over http or https, goes to SITE with the same path and query, in one step;
- * - providers.dev over plain http goes to https, same path and query.
+ * - providers.dev and provimux.providers.dev over plain http go to https, same host, path and query.
  * Only at the edge: Cloudflare sets X-Forwarded-Proto to the visitor's protocol (and overwrites any value the
  * client sent). That header is what tells the edge from `wrangler dev`: with `routes` in wrangler.jsonc a local
  * preview also sees http://providers.dev/… as the request URL and Host, but no X-Forwarded-Proto, so it is never
@@ -22,13 +24,33 @@ export function canonicalLocation(request: Request): string | null {
   if (proto !== "http" && proto !== "https") return null;
   const url = new URL(request.url);
   const www = url.hostname === WWW_HOST;
-  const plainApex = url.hostname === SITE_HOST && url.protocol === "http:" && proto === "http";
-  if (!www && !plainApex) return null;
+  const plain = (url.hostname === SITE_HOST || url.hostname === PROVIMUX_HOST) && url.protocol === "http:" && proto === "http";
+  if (!www && !plain) return null;
   // Path and query are set on SITE, never resolved against it: a path such as //other.host stays a path.
-  const target = new URL(SITE);
+  const target = new URL(url.hostname === PROVIMUX_HOST ? PROVIMUX_SITE : SITE);
   target.pathname = url.pathname;
   target.search = url.search;
   return target.toString();
+}
+
+/**
+ * provimux.providers.dev: its static pages and files from the build (src/core/provimux-site.ts), nothing else. No
+ * API, no dataset, no providers.dev page.
+ */
+async function provimux(request: Request, env: Env): Promise<Response> {
+  if (request.method !== "GET" && request.method !== "HEAD") return new Response(null, { status: 405, headers: { Allow: "GET, HEAD" } });
+  const url = new URL(request.url);
+  const route = provimuxRoute(url.pathname);
+  if ("redirect" in route) {
+    const target = new URL(route.redirect, url.origin);
+    target.search = url.search;
+    return new Response(null, { status: 301, headers: { Location: target.toString() } });
+  }
+  const response = await env.ASSETS.fetch(new Request(new URL(route.asset, url.origin), request));
+  if (route.status === 200 && (response.ok || response.status === 304)) return response;
+  // An address the site does not have, or a file it lacks: the site's own page for it, with status 404.
+  const page = route.status === 404 && response.ok ? response : await env.ASSETS.fetch(new Request(new URL(PROVIMUX_NOT_FOUND, url.origin)));
+  return new Response(request.method === "HEAD" || !page.ok ? null : page.body, { status: 404, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } });
 }
 
 export default {
@@ -37,6 +59,10 @@ export default {
     // The zone redirects nothing; the Worker sends www and plain http to SITE, before anything else.
     const location = canonicalLocation(request);
     if (location) return new Response(null, { status: 301, headers: { Location: location } });
+    if (url.hostname === PROVIMUX_HOST) return provimux(request, env);
+    // The support page and anything of Provimux's build live on provimux.providers.dev only.
+    const moved = movedToProvimux(url);
+    if (moved) return new Response(null, { status: 301, headers: { Location: moved } });
     const api = url.pathname.startsWith("/api/v1/") || url.pathname === "/api.json" || url.pathname === "/data/catalog.json";
     const data = url.pathname.startsWith("/data/");
     const page = isPage(url.pathname);

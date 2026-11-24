@@ -1,0 +1,20 @@
+---
+// provimux.providers.dev/support/: the support plans. The text is SupportBody, shared with /api/v1/docs/support.
+import Provimux from "../../../layouts/Provimux.astro";
+import SupportBody from "../../../components/provimux/SupportBody.astro";
+import { SUPPORT } from "../../../core/provimux-site.ts";
+---
+
+<Provimux title="Support · Provimux" description={SUPPORT.description} path="/support/">
+  <div class="pmx-page pmx-doc">
+    <header class="prose">
+      <p class="pmx-kicker"><a href="/">Provimux</a></p>
+      <h1>{SUPPORT.title}</h1>
+      <p class="lead !mt-3">{SUPPORT.lead}</p>
+    </header>
+    <nav class="pmx-toc" aria-label="On this page">
+      {SUPPORT.toc.map((item) => <a href={`#${item.id}`}>{item.label}</a>)}
+    </nav>
+    <SupportBody home="/" />
+  </div>
+</Provimux>

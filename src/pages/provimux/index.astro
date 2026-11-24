@@ -1,0 +1,305 @@
+---
+// provimux.providers.dev/ (served at the subdomain's root; see src/core/provimux-site.ts). Every statement here is
+// taken from Provimux's README (.github/README.md), pi-provimux's README or the provimux-ui release notes.
+import Provimux from "../../layouts/Provimux.astro";
+
+const github = "https://github.com/ngvoicu/provimux";
+const readme = `${github}#readme`;
+const cliproxyapi = "https://github.com/router-for-me/CLIProxyAPI";
+const install = "brew install ngvoicu/tap/provimux";
+
+/** One row of what Provimux adds: what CLIProxyAPI does, and what Provimux does instead. HTML. */
+interface Row { topic: string; cpa: string; pmx: string }
+const groups: { title: string; promise: string; rows: Row[] }[] = [
+  {
+    title: "Cache",
+    promise: "You pay for a prompt once and read it after that.",
+    rows: [
+      {
+        topic: "OpenRouter",
+        cpa: "A Claude-format client's cache markers are lost in translation, and a client that sends none gets none, so every such request pays for the whole prompt. Every model gets the same generic limits and the levels low, medium and high.",
+        pmx: "Cache markers added where the client sent none, a 1-hour lifetime kept through translation, one upstream per conversation (<code>X-Session-Id</code>) so the cache keeps being read, and each model's real context window, output limit and reasoning levels. Any <code>openai-compatibility</code> entry on openrouter.ai gets it.",
+      },
+      {
+        topic: "The prompt cache on OpenAI API keys",
+        cpa: "<code>prompt_cache_options</code> is removed for every Codex credential, API keys included.",
+        pmx: "A client's <code>prompt_cache_options.ttl</code> (for example <code>\"12h\"</code>) is forwarded on an OpenAI API key. Subscription logins are unchanged.",
+      },
+      {
+        topic: "A Codex WebSocket replay",
+        cpa: "A client that sends its whole conversation again has it merged with the previous turn: the model sees the conversation twice, and the request is billed at about twice the input.",
+        pmx: "The conversation is answered as it was sent, not merged.",
+      },
+    ],
+  },
+  {
+    title: "Clarity",
+    promise: "You see which account has which models, which one answered, and why a route is paused.",
+    rows: [
+      {
+        topic: "Which account answered",
+        cpa: "A client behind the proxy sees one list of models and cannot tell which account it is using.",
+        pmx: "The model list names the accounts behind each model, highest priority first (<code>/v1/models?include=accounts</code>), and every response names the one that answered (<code>X-CPA-AUTH-KIND</code>, <code>X-CPA-AUTH-PROVIDER</code>, <code>X-CPA-AUTH-HOST</code>).",
+      },
+      {
+        topic: "Each login's own model list",
+        cpa: "Claude, Codex, Meta and Devin logins and Gemini API keys offer the shared catalog, which is edited by hand: it can list a model a day late, keep a retired model that then answers 404, or list a model your plan is refused.",
+        pmx: "Each of them offers what its own account lists: retired models disappear, and new ones appear the day the provider lists them. On by default (<code>models.live-lists</code>).",
+      },
+      {
+        topic: "Limits of the models you configure",
+        cpa: "An alias of <code>claude-opus-5-5</code> on a Claude API key reports a 500,000 context window and no output limit (CLIProxyAPI 8.0.77, Codex-format model list).",
+        pmx: "The same alias reports 1,000,000 and 128,000: the limits of the catalog's model it points to.",
+      },
+      {
+        topic: "Devin",
+        cpa: "Every model is listed and enforced at 64,000 output tokens, and a quota that runs out pauses the whole login.",
+        pmx: "Each model's own output limit (for example <code>kimi-k3</code> 131,072), with <code>--local-model</code> or a list you generate; and, when you switch it on, a quota pause on the refused model only.",
+      },
+      {
+        topic: "The console",
+        cpa: "The CLI Proxy API Management Center.",
+        pmx: "provimux-ui: the same console in the providers.dev look, with Provimux's own pages Accounts, Models and Savings. Provimux downloads it and installs it only when it matches the release's checksums.",
+      },
+    ],
+  },
+];
+
+/** The console screenshots: made with example data (accounts at example.com, made-up keys). */
+const shot = (page: string, alt: string) => ({ page, alt });
+const accounts = shot("accounts", "The console's Accounts page. Chips read 10 accounts, 7 working, 1 signed out, 1 cooling down, 1 off. A Claude card lists a subscription, alex@example.com, Working, priority 10, and an API key at api.anthropic.com, Working, priority 0. A ChatGPT · OpenAI card lists a subscription that is signed out, with a Sign in again button; a second subscription, team@example.com, Working, 1 model cooling down; and an API key at api.openai.com. A Gemini API key is off.");
+const models = shot("models", "The console's Models page. Under Your names: deepseek and qwen-coder, each served by an OpenRouter API key. Under Used in the last 30 days: claude-opus-5-5 with 2 routes, first a Claude subscription, alex@example.com, priority 10, then a Claude API key at api.anthropic.com, priority 0; gpt-6.1-terra with 3 routes, one of them a subscription cooling down, 19 min left (quota); claude-sonnet-5-5 with 2 routes.");
+---
+
+<Provimux
+  title="Provimux · One key for every AI account"
+  description="A self-hosted AI gateway: one OpenAI-, Claude- and Gemini-compatible endpoint for your API keys and accounts, with the prompt cache kept in use and the account behind every answer shown."
+  path="/"
+>
+  <section class="pmx-hero">
+    <div class="pmx-page">
+      <p class="eyebrow pmx-eyebrow">Open source (MIT) · built on <a href={cliproxyapi}>CLIProxyAPI</a></p>
+      <h1>One key for every AI account.</h1>
+      <p class="pmx-lead">
+        A self-hosted AI gateway: one OpenAI-, Claude- and Gemini-compatible endpoint for your API keys and accounts, with the prompt cache kept in use and the
+        account behind every answer shown.
+      </p>
+      <p class="pmx-sub">
+        Your subscriptions and API keys behind one endpoint, open to everyone you choose. Run it on your own machine or on a server your team shares, give each
+        person their own client key, and point their tools at it.
+      </p>
+      <div class="pmx-cta">
+        <div class="pmx-command" role="group" aria-label="Install with Homebrew">
+          <code><span aria-hidden="true" class="pmx-prompt">$</span> {install}</code>
+          <button type="button" class="copy" data-copy={install} aria-label="Copy the install command">Copy</button>
+        </div>
+        <a class="button primary" href="#install">Install</a>
+        <a class="button" href="#adds">What it adds</a>
+      </div>
+      <p class="hint pmx-cta-note">macOS and Linux with Homebrew; Docker, release archives and source too. An existing CLIProxyAPI setup works as it is.</p>
+
+      <figure class="pmx-shot pmx-shot-hero">
+        <div class="pmx-frame">
+          <Fragment set:html={["light", "dark"].map((scheme) => `<img class="shot-${scheme}" src="/media/console-${accounts.page}-${scheme}.webp" srcset="/media/console-${accounts.page}-${scheme}.webp 1440w, /media/console-${accounts.page}-${scheme}-2x.webp 2880w" sizes="(min-width: 1260px) 1180px, 100vw" width="1440" height="1100" alt="${accounts.alt}" decoding="async"${scheme === "dark" ? ' loading="lazy"' : ""}>`).join("")} />
+        </div>
+        <figcaption>The console's <strong>Accounts</strong> page: every subscription and API key in one place, whether each one works now, and which one Provimux tries first. Example data.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section id="adds" class="pmx-section" aria-labelledby="adds-title">
+    <div class="pmx-page">
+      <header class="pmx-head">
+        <h2 id="adds-title">What Provimux adds to CLIProxyAPI</h2>
+        <p>
+          Each Provimux release is a <a href={cliproxyapi}>CLIProxyAPI</a> release with Provimux's changes on top. It reads the same <code>config.yaml</code>, auth folder
+          (<code>~/.cli-proxy-api</code>) and port (8317), so an existing CLIProxyAPI setup works as it is: stop CLIProxyAPI and start Provimux in its place.
+        </p>
+      </header>
+
+      <div class="pmx-compare" role="table" aria-label="What CLIProxyAPI does, and what Provimux does instead">
+        <div class="pmx-compare-head" role="row">
+          <span role="columnheader"><span class="sr-only">Topic</span></span>
+          <span role="columnheader">CLIProxyAPI</span>
+          <span role="columnheader" class="pmx-col-pmx">Provimux</span>
+        </div>
+        {groups.map((group) => (
+          <div class="pmx-group" role="rowgroup">
+            <p class="pmx-group-title" role="row"><span role="cell"><strong>{group.title}</strong> {group.promise}</span></p>
+            {group.rows.map((row) => (
+              <div class="pmx-row" role="row">
+                <h3 role="rowheader">{row.topic}</h3>
+                <p role="cell" class="pmx-cpa"><span class="pmx-label">CLIProxyAPI</span><span set:html={row.cpa} /></p>
+                <p role="cell" class="pmx-pmx"><span class="pmx-label">Provimux</span><span set:html={row.pmx} /></p>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+
+      <div class="pmx-notes">
+        <p>
+          <strong>Everything else is CLIProxyAPI's.</strong> The logins, the providers, the translation between formats and the routing are its work. The requests
+          Provimux sends to providers are CLIProxyAPI's, except where a row above says otherwise, and providers see the same client version as with CLIProxyAPI.
+        </p>
+        <p>
+          <strong>Releases follow CLIProxyAPI's.</strong> A workflow checks for a new CLIProxyAPI release every 3 hours, moves Provimux onto it, builds and tests it,
+          and publishes it on its own when the check passes; a release that fails a check waits for the maintainer. A version names its base: <code>v8.1.2-pmx.1</code> is CLIProxyAPI 8.1.2 with Provimux build 1. <a href={`${github}/releases/latest`}>Latest release</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section id="console" class="pmx-section" aria-labelledby="console-title">
+    <div class="pmx-page">
+      <header class="pmx-head">
+        <h2 id="console-title">The console</h2>
+        <p>
+          <a href="https://github.com/ngvoicu/provimux-ui">provimux-ui</a> is CLIProxyAPI's Management Center in the providers.dev look, with Provimux's own pages.
+          Nothing to install: Provimux downloads the latest release at startup and every 3 hours, and installs it only when it matches the release's <code>checksums.txt</code>.
+        </p>
+      </header>
+      <ul class="pmx-list pmx-console-list">
+        <li><strong>Models.</strong> Every model name your tools can send, and what serves it, in the order Provimux tries: subscription or API key, the account, the model sent, its priority, a recorded cooldown and the age of each login's own list.</li>
+        <li><strong>Accounts.</strong> Every subscription and API key on one page, one card per service, each with its state in one word (Working, Signed out, Cooling down), its priority, and the fix where one is needed.</li>
+        <li><strong>Your own names.</strong> Short names, and one name served by several models, saved in one action.</li>
+        <li><strong>Savings.</strong> Daily usage totals kept across restarts and estimated at public list prices: what prompt caching was worth, and what the paid keys cost.</li>
+      </ul>
+      <figure class="pmx-shot pmx-shot-wide">
+        <div class="pmx-frame">
+          <Fragment set:html={["light", "dark"].map((scheme) => `<img class="shot-${scheme}" src="/media/console-${models.page}-${scheme}.webp" srcset="/media/console-${models.page}-${scheme}.webp 1440w, /media/console-${models.page}-${scheme}-2x.webp 2880w" sizes="(min-width: 1260px) 1180px, 100vw" width="1440" height="1100" alt="${models.alt}" decoding="async" loading="lazy">`).join("")} />
+        </div>
+        <figcaption>The <strong>Models</strong> page: each name with its routes, in the order Provimux tries them. On a plain CLIProxyAPI the console runs too, and Provimux's own pages hide themselves. Example data.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section id="install" class="pmx-section" aria-labelledby="install-title">
+    <div class="pmx-page">
+      <header class="pmx-head">
+        <h2 id="install-title">Install</h2>
+        <p>With Homebrew on macOS (Apple silicon and Intel) and Linux (x64 and Arm), from the tap <a href="https://github.com/ngvoicu/homebrew-tap">ngvoicu/homebrew-tap</a>:</p>
+      </header>
+      <div class="pmx-install">
+        <div class="pmx-install-main">
+          <div class="pmx-code">
+            <pre><code>brew install ngvoicu/tap/provimux
+brew services start provimux</code></pre>
+            <button type="button" class="copy" data-copy={`${install}\nbrew services start provimux`} aria-label="Copy the two commands">Copy</button>
+          </div>
+          <p>
+            The config is <code>$(brew --prefix)/etc/provimux.conf</code>, created on the first install and never overwritten. Then open the console at <code>http://127.0.0.1:8317/management.html</code> on the same machine (from another machine, use the server's address) and sign in with your management key, <code>management.secret-key</code> in the config.
+          </p>
+          <h3>Coming from CLIProxyAPI with Homebrew</h3>
+          <p>Stop its service (both listen on port 8317) and point Provimux at its config:</p>
+          <div class="pmx-code">
+            <pre><code>brew services stop cliproxyapi
+ln -sf "$(brew --prefix)/etc/cliproxyapi.conf" "$(brew --prefix)/etc/provimux.conf"
+brew services start provimux</code></pre>
+          </div>
+        </div>
+        <div class="pmx-cards">
+          <section class="pmx-card" aria-labelledby="other-ways">
+            <h3 id="other-ways">Other ways</h3>
+            <ul>
+              <li><strong>Docker:</strong> <code>ghcr.io/ngvoicu/provimux</code>, linux/amd64 and linux/arm64, with CLIProxyAPI's paths: a CLIProxyAPI <code>docker-compose.yml</code> works with only the image name changed.</li>
+              <li><strong>Release archives</strong> for macOS, Windows, Linux and FreeBSD, each release with its <code>checksums.txt</code>.</li>
+              <li><strong>From source,</strong> with Go.</li>
+            </ul>
+            <p><a href={`${github}#install`}>Every way, step by step</a></p>
+          </section>
+          <section class="pmx-card" aria-labelledby="for-a-team">
+            <h3 id="for-a-team">For a team</h3>
+            <p>
+              Run it on a server the team can reach and point everyone's tools at <code>http://&lt;your-server&gt;:8317</code>. Each person gets their own client key
+              under <code>access.api-keys</code>; removing it shuts out only that person. Outside a network you trust, serve HTTPS.
+            </p>
+            <p><a href={`${github}#for-a-team`}>Setting it up for a team</a></p>
+          </section>
+          <section class="pmx-card" aria-labelledby="your-accounts">
+            <h3 id="your-accounts">Your accounts</h3>
+            <p>
+              Add API keys under <code>api-keys</code>: <code>claude</code>, <code>codex</code> (OpenAI), <code>gemini</code>, <code>vertex</code>, <code>xai</code>, <code>meta</code>, and <code>openai-compatibility</code> for OpenRouter and other OpenAI-compatible services. For a company, use API keys and cloud accounts
+              (for example Vertex), billed to the company under its own agreement with the provider.
+            </p>
+            <p class="hint">
+              Provimux also accepts subscription logins (<code>oauth</code>) for your own account. Whether a provider allows a third-party tool to use its subscription
+              login is that provider's decision: Anthropic's terms do not allow it, and OpenAI has not authorized it. Read your provider's terms before you add a login;
+              the account is yours and so is the risk. Provimux is not affiliated with or endorsed by Anthropic or OpenAI.
+            </p>
+          </section>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pi" class="pmx-section" aria-labelledby="pi-title">
+    <div class="pmx-page pmx-split pmx-split-pi">
+      <div class="pmx-split-text">
+        <p class="pmx-kicker">For <a href="https://pi.dev">pi</a></p>
+        <h2 id="pi-title">pi-provimux</h2>
+        <p>
+          Provimux's extension for pi. It adds Provimux as a provider in pi, <code>provimux</code>, and works the same with plain CLIProxyAPI: every model your server
+          serves appears in <code>/model</code>, with its context window, reasoning levels and, when models.dev knows it, its price.
+        </p>
+        <ul class="pmx-list">
+          <li><strong>Where each model comes from, in its name:</strong> <code>Claude Opus 5.5 · Anthropic sub, fallback api</code>. <code>sub</code> is a subscription login, <code>api</code> an API key.</li>
+          <li><strong>Which route answered, in the footer,</strong> after each answer: <code>answered: Anthropic sub</code>. This needs Provimux 8.1.1-pmx.1 or newer.</li>
+          <li><strong>Claude models in Claude's own format</strong> (<code>/v1/messages</code>) where it is safe: with pi's long cache retention, that brings Anthropic's 1-hour prompt cache.</li>
+        </ul>
+        <div class="pmx-code">
+          <pre><code>pi install npm:pi-provimux</code></pre>
+          <button type="button" class="copy" data-copy="pi install npm:pi-provimux" aria-label="Copy the pi install command">Copy</button>
+        </div>
+        <p>
+          Then, in pi, run <code>/login Provimux</code> and enter your server's address (for example <code>http://127.0.0.1:8317</code>) and your client key. It needs
+          pi 1.6.0 or newer.
+        </p>
+        <p class="pmx-links">
+          <a class="button" href="https://www.npmjs.com/package/pi-provimux">pi-provimux on npm</a>
+          <a class="button" href="https://github.com/ngvoicu/pi-provimux">Source on GitHub</a>
+        </p>
+        <p class="hint">A fork of router-for-me's <a href="https://github.com/router-for-me/pi-cliproxyapi-provider">pi-cliproxyapi-provider</a>.</p>
+      </div>
+      <figure class="pmx-term" aria-label="Example: pi's model list and footer with pi-provimux">
+        <div class="pmx-term-bar" aria-hidden="true"><span></span><span></span><span></span><em>pi</em></div>
+        <pre><code><span class="pmx-t-dim">/model</span>
+<span class="pmx-t-sel">→ claude-opus-5-5</span> <span class="pmx-t-dim">(Claude Opus 5.5 · </span><span class="pmx-t-sub">Anthropic sub</span><span class="pmx-t-dim">, fallback </span><span class="pmx-t-api">api</span><span class="pmx-t-dim">)</span> <span class="pmx-t-dim">[provimux]</span>
+  gpt-6.1-terra <span class="pmx-t-dim">(GPT 6.1 Terra · </span><span class="pmx-t-sub">OpenAI sub</span><span class="pmx-t-dim">, fallback </span><span class="pmx-t-api">api</span><span class="pmx-t-dim">)</span> <span class="pmx-t-dim">[provimux]</span>
+  anthropic/claude-opus-5.5 <span class="pmx-t-dim">(anthropic/claude-opus-5.5 · </span><span class="pmx-t-api">OpenRouter api</span><span class="pmx-t-dim">)</span> <span class="pmx-t-dim">[provimux]</span></code></pre>
+        <p class="pmx-term-foot"><span class="pmx-t-dim">footer</span> answered: <span class="pmx-t-sub">Anthropic sub</span></p>
+        <figcaption class="sr-only">An example, not a real account.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section id="support" class="pmx-section" aria-labelledby="support-title">
+    <div class="pmx-page">
+      <div class="pmx-band">
+        <div>
+          <h2 id="support-title">Support</h2>
+          <p>
+            Provimux is free and stays open source (MIT). For companies that run it, providers.dev offers support plans: a private channel to the maintainer and a first
+            reply within a stated number of business days. A reply, not a promised fix.
+          </p>
+        </div>
+        <p class="pmx-links">
+          <a class="button primary" href="/support/">Support plans</a>
+          <a class="button" href={`${github}/issues`}>Open an issue</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section id="built-on" class="pmx-section pmx-credit" aria-labelledby="built-on-title">
+    <div class="pmx-page">
+      <h2 id="built-on-title">Built on CLIProxyAPI</h2>
+      <p>
+        Provimux is built on <a href={cliproxyapi}>CLIProxyAPI</a> by <a href="https://github.com/router-for-me">Router-For.ME</a>, started by <a href="https://github.com/luispater">Luis Pater</a>. Nearly everything Provimux does is CLIProxyAPI's work: the logins, the providers, the translation between
+        formats and the routing. Its console, provimux-ui, is the <a href="https://github.com/router-for-me/Cli-Proxy-API-Management-Center">CLI Proxy API Management Center</a>,
+        also by router-for-me. Thanks to its authors and contributors.
+      </p>
+      <p><a href={readme}>Read the full README on GitHub</a></p>
+    </div>
+  </section>
+</Provimux>
