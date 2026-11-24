@@ -254,6 +254,7 @@ export function publish(input: PublishOptions): PublishReport {
     upstreamSource: upstream.meta.source,
     authored: authoredListings,
     ruledOut: leftOut,
+    excluded: exclusions.filter((item) => item.kind === "entry").map((item) => item.target),
     pi: pi.lists,
     client,
     ...(listed ? { listed: { providers: listed.providers } } : {}),

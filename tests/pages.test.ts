@@ -102,7 +102,7 @@ describe("API response boundary", () => {
       return api(path);
     })).text();
     expect(calls).toContain("/api/v1/listings/provider-02");
-    expect(html).toContain('<dt class="muted">Model list</dt><dd><a href="#model-list">2 models</a><span class="muted"> · the vendor\'s own list, 2026-11-13</span></dd>');
+    expect(html).toContain('<dt class="muted">Model list</dt><dd><a href="#model-list">2 models</a><span class="muted"> · from the vendor&#39;s own list and models.dev</span></dd>');
     expect(html).toContain("1 model on the vendor's own list, read through API response only. 1 more model from other sources' lists.");
     expect(html).toContain('<a href="/entries/provider-02/lab/model-4">Model four</a>');
     expect(html).toContain('<span class="listed-name">Not an entry</span>');
@@ -301,7 +301,7 @@ describe("API response boundary", () => {
     const methodology = readFileSync(join(ROOT, "src", "pages", "reference-content", "docs", "methodology.astro"), "utf8").replace(/\s+/g, " ");
     expect(methodology).toContain('{ id: "listings", label: "Model lists" }');
     expect(methodology).toContain('<h2 id="listings">Model lists</h2>');
-    for (const words of ["every model the provider offers on that access method, evaluated or not", "It holds every model any of four sources lists, each once", "No list is taken as the whole", "published in its <code>listed.json</code>", "one without says <em>Listed, not evaluated</em>", "nothing of it is written into an entry's limits or into a safe value", "never prices, allowances or quotas"]) {
+    for (const words of ["the models the lists providers.dev has name for that provider and access method, evaluated or not", "It joins the lists of four sources, each model once", "so the joined list too can miss a model", "A model providers.dev leaves out of the provider with evidence is not on it, whichever list names it", "No list is taken as the whole", "published in its <code>listed.json</code>", "one without says <em>Listed, not evaluated</em>", "nothing of it is written into an entry's limits or into a safe value", "never prices, allowances or quotas"]) {
       expect(methodology, words).toContain(words);
     }
     expect(methodology).toContain("Plans are not tracked: a plan's name appears only where a vendor's own model list attaches it to a model");

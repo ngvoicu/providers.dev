@@ -227,6 +227,12 @@ export interface ListingsInput {
   upstreamSource?: string;
   /** pi's lists; undefined = no pi data in this dataset. */
   pi?: { date: string | null; lists: PiList[] };
+  /**
+   * The entries an override leaves out, with evidence, by ref (`provider/model`): providers.dev states that the
+   * provider does not offer them. No source brings one back into its provider's listing. Required, so that no caller
+   * builds the listings without them: [] = none.
+   */
+  excluded: string[];
 }
 
 const REASONING_KEYS = ["supported", "levels", "budget_min", "budget_max", "can_disable", "dynamic", "disable_with"] as const;
@@ -454,6 +460,14 @@ export function buildListings(input: ListingsInput): { listings: Listing[]; issu
     (ruledOut.get(providerId) ?? ruledOut.set(providerId, new Map()).get(providerId)!).set(ref.slice(slash + 1), model);
   }
 
+  const excludedBy = new Map<string, Set<string>>();
+  for (const ref of input.excluded) {
+    const slash = ref.indexOf("/");
+    if (slash < 0) continue;
+    const providerId = ref.slice(0, slash);
+    (excludedBy.get(providerId) ?? excludedBy.set(providerId, new Set()).get(providerId)!).add(ref.slice(slash + 1));
+  }
+
   const listings: Listing[] = [];
   for (const providerId of Object.keys(catalog).sort(byText)) {
     const provider = catalog[providerId]!;
@@ -463,22 +477,42 @@ export function buildListings(input: ListingsInput): { listings: Listing[]; issu
     const imported = [...Object.keys(provider.models).filter((id) => ext(provider.models[id]!).origin === "upstream"), ...[...left.keys()].filter((id) => !Object.hasOwn(provider.models, id))].sort(byText);
     const pi = piLists.get(providerId);
 
-    // Each source's list of the provider, in the fixed order; a source with no list for it is left out.
+    // A model an override leaves out with evidence is left out whatever list names it. Where the vendor's own list
+    // names one, a person should look at the override again: a warning names it (the id is the override's own).
+    const excluded = excludedBy.get(providerId) ?? new Set<string>();
+    const kept = (source: ListingSource, ids: string[]): string[] => {
+      const named = new Set<string>();
+      return ids.filter((id) => {
+        if (!excluded.has(id)) return true;
+        if (source === "listed" && !named.has(id)) {
+          named.add(id);
+          issues.push({ level: "warning", code: "listing-excluded-listed", target: `listings/${providerId}/${id}`, message: `The vendor's own list of ${providerId} names ${id}, which an override in data/authored/overrides/ leaves out with evidence. It is left out of the listing; check whether the override still holds.` });
+        }
+        return false;
+      });
+    };
+
+    // Each source's list of the provider, in the fixed order, without the excluded models; a source with no list for
+    // it, or whose list names only excluded models, is left out.
     const present: { source: ListingSource; ids: string[]; listedAt: string | null }[] = [];
     const evidence: ListingEvidence[] = [];
     let client: { id: string; label: string } | null = null;
-    if (discovery && discovery.models.length > 0) {
-      present.push({ source: "listed", ids: discovery.models.map((model) => model.id), listedAt: discovery.date });
+    const fromDiscovery = discovery && discovery.models.length > 0 ? kept("listed", discovery.models.map((model) => model.id)) : [];
+    if (discovery && fromDiscovery.length > 0) {
+      present.push({ source: "listed", ids: fromDiscovery, listedAt: discovery.date });
       evidence.push({ kind: "listed", url: LISTED_PAGE, date: discovery.date, note: null });
       client = input.client ? input.client(discovery.client) : { id: discovery.client, label: discovery.client };
     }
-    if (file?.list) {
+    const authoredIds = file?.list ? kept("providers.dev", file.list.models) : [];
+    if (file?.list && (authoredIds.length > 0 || file.list.models.length === 0)) {
       const own = file.list.evidence.map(evidenceOf);
-      present.push({ source: "providers.dev", ids: file.list.models, listedAt: [...own.map((item) => item.date)].sort(byText).at(-1) ?? null });
+      present.push({ source: "providers.dev", ids: authoredIds, listedAt: [...own.map((item) => item.date)].sort(byText).at(-1) ?? null });
       evidence.push(...own);
     }
-    if (imported.length > 0) present.push({ source: "models.dev", ids: imported, listedAt: input.upstreamDate });
-    if (pi && pi.models.length > 0) present.push({ source: "pi.dev", ids: pi.models.map((model) => model.id), listedAt: input.pi?.date ?? null });
+    const importedIds = kept("models.dev", imported);
+    if (importedIds.length > 0) present.push({ source: "models.dev", ids: importedIds, listedAt: input.upstreamDate });
+    const piIds = pi ? kept("pi.dev", pi.models.map((model) => model.id)) : [];
+    if (piIds.length > 0) present.push({ source: "pi.dev", ids: piIds, listedAt: input.pi?.date ?? null });
     if (present.length === 0) continue;
     const basis = present[0]!.source;
 

@@ -333,7 +333,8 @@ provider's imported models, those a catalog rule leaves out of the catalog inclu
 lists as entries, not what a provider offers) and `pi.dev`. Since API 1.6.0 its models are every model any of the four
 lists for the provider, each once: a login reads only what its own subscription offers, so no list is taken as the
 whole. Each model names the lists that have it (`listed_by`), and the listing gives each source's list with its date
-and size (`lists`); `basis` is the highest-ranked source with a list. Each field of a model is from the first source
+and size (`lists`); `basis` is the highest-ranked source with a list. A model an override leaves out with evidence is
+in no listing of its provider, whichever list names it. Each field of a model is from the first source
 that states it, and the model names that source per field. Nothing of a listing is written into an entry.
 
 `data/authored/listings/<provider>.yaml` holds what providers.dev states, each statement with a reason and evidence:
@@ -359,6 +360,9 @@ rules:                    # optional: fields of models, by id or for every model
 `hidden`. A rule comes after the discovery and before models.dev; of two rules, the first that states a field gives it.
 A statement without evidence, or a key the file does not know, fails `npm run data`. A rule for a model the listing
 does not name raises `listing-rule-orphan`, and a file for a provider the catalog lacks `listing-provider-unknown`.
+A model an override in `data/authored/overrides/` leaves out with evidence is left out of its provider's listing
+whatever list names it (this folder's, models.dev's, pi's or the vendor's own); where the vendor's own list names it,
+`listing-excluded-listed` asks for the override to be checked again.
 No value is copied from router-for-me's model files: each comes from the vendor's list or documentation, models.dev,
 pi or a measurement, and says which.
 

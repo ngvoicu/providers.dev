@@ -608,7 +608,7 @@ export const ListingModelSchema = z
 export const ListingListSchema = z
   .strictObject({
     listed_at: date.nullable().describe("The day the source was read: the discovery's date for listed, the import's date for models.dev and pi.dev, the newest evidence date for providers.dev. Null = not known."),
-    model_count: z.int().min(0).describe("How many models this source's list names for the provider."),
+    model_count: z.int().min(0).describe("How many models this source's list names for the provider, less any providers.dev leaves out with evidence."),
   })
   .describe("One source's list of a provider. Since 1.6.0.") satisfies z.ZodType<ListingList>;
 

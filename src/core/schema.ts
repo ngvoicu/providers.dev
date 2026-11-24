@@ -781,6 +781,7 @@ export interface Issue {
     | "listing-provider-unknown"
     | "listing-rule-orphan"
     | "listing-model-twice"
+    | "listing-excluded-listed"
     | "listed-provider-unknown"
     | "listed-sync-failed"
     | "unmapped-listing-client";

@@ -33,11 +33,13 @@ const LISTING_DATE_WORD: Record<ListingSource, string> = {
 const LISTING_UNKNOWN = '<span class="unknown" title="No source states it. Unknown is not zero and not unlimited.">Unknown</span>';
 const from = (source: ListingSource | null): string => (source ? ` From ${LISTING_SOURCE_WORD[source]}.` : "");
 
-/** The facts row of the provider's page: how many models its list has, from where, and a way down to it. */
+/** The facts row of the provider's page: how many models its list has, from which sources' lists, and a way down to it. */
 function listingFact(listing: Listing | null): string {
   if (!listing) return '<span class="muted">No list yet</span>';
+  const sources = (Object.keys(listing.lists) as ListingSource[]).filter((source) => listing.lists[source] !== null);
   const date = listing.listed_at ? `, ${e(listing.listed_at)}` : "";
-  return `<a href="#model-list">${plural(listing.model_count, "model")}</a><span class="muted"> · ${LISTING_SOURCE_WORD[listing.basis]}${date}</span>`;
+  const from = sources.length > 1 ? `from ${sources.slice(0, -1).map((source) => LISTING_SOURCE_WORD[source]).join(", ")} and ${LISTING_SOURCE_WORD[sources.at(-1)!]}` : `${LISTING_SOURCE_WORD[listing.basis]}${date}`;
+  return `<a href="#model-list">${plural(listing.model_count, "model")}</a><span class="muted"> · ${e(from)}</span>`;
 }
 
 /** The line under the heading: the source's mark and date, what the list is, and its evidence. */

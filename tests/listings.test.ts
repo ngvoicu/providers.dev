@@ -23,7 +23,7 @@ function entry(id: string, fields: Record<string, unknown> = {}, own: { origin?:
 function catalogOf(providers: Record<string, PublishedModel[]>): Catalog {
   return Object.fromEntries(Object.entries(providers).map(([id, models]) => [id, { id, name: id, models: Object.fromEntries(models.map((model) => [model.id, model])) }])) as unknown as Catalog;
 }
-const build = (input: Partial<ListingsInput> & { catalog: Catalog }) => buildListings({ upstreamDate: "2026-11-21", authored: [], ...input });
+const build = (input: Partial<ListingsInput> & { catalog: Catalog }) => buildListings({ upstreamDate: "2026-11-21", authored: [], excluded: [], ...input });
 const modelOf = (models: ListingModel[] | null, id: string): ListingModel => models!.find((model) => model.id === id)!;
 
 describe("the models of a listing: every source's list, each model once, with the lists that name it (1.6.0)", () => {
@@ -127,6 +127,61 @@ describe("the models of a listing: every source's list, each model once, with th
     expect(new Set(models.map((model) => Object.keys(model).join(","))).size).toBe(1);
     expect(new Set(models.map((model) => Object.keys(model.sources).join(","))).size).toBe(1);
     expect(new Set(models.map((model) => Object.keys(model.sources.reasoning).join(","))).size).toBe(1);
+  });
+});
+
+describe("a model an override leaves out with evidence: in no list of its provider (review of 8f24534)", () => {
+  // The reviewer's case: Xiaomi's override leaves out mimo-v2.5 (retired); pi's catalog still names it.
+  const catalog = catalogOf({ xiaomi: [entry("mimo-v2.6")], other: [entry("mimo-v2.5")] });
+  const excluded = ["xiaomi/mimo-v2.5", "xiaomi/mimo-v2.5-pro"];
+  const piModel = (id: string) => ({ id, name: `pi ${id}`, context_window: 32768, max_output: 4096, input: ["text"], reasoning: false });
+  const pi = { date: "2026-11-23", lists: [{ provider: "xiaomi", pi_provider: "xiaomi", models: [piModel("mimo-v2.5"), piModel("mimo-v2.6")] }, { provider: "other", pi_provider: "other", models: [piModel("mimo-v2.5")] }] };
+
+  it("pi naming an excluded model does not bring it back; the same id at another provider is not affected", () => {
+    const { listings, issues } = build({ catalog, pi, excluded });
+    const xiaomi = listings.find((listing) => listing.provider === "xiaomi")!;
+    expect(xiaomi.models!.map((model) => [model.id, model.listed_by])).toEqual([["mimo-v2.6", ["models.dev", "pi.dev"]]]);
+    expect(xiaomi.lists).toMatchObject({ "models.dev": { model_count: 1 }, "pi.dev": { model_count: 1 } });
+    expect(listings.find((listing) => listing.provider === "other")!.models!.map((model) => model.id)).toEqual(["mimo-v2.5"]);
+    expect(issues).toEqual([]);
+    // Without the exclusion (the build before the fix), pi's list brought it back.
+    expect(build({ catalog, pi }).listings.find((listing) => listing.provider === "xiaomi")!.models!.map((model) => model.id)).toEqual(["mimo-v2.6", "mimo-v2.5"]);
+  });
+
+  it("an authored list naming an excluded model does not bring it back", () => {
+    const authored = [AuthoredListing.parse({ provider: "xiaomi", list: { models: ["mimo-v2.5-pro", "mimo-v2.6"], reason: "Two models.", evidence } })];
+    const xiaomi = build({ catalog, authored, excluded }).listings.find((listing) => listing.provider === "xiaomi")!;
+    expect(xiaomi.models!.map((model) => [model.id, model.listed_by])).toEqual([["mimo-v2.6", ["providers.dev", "models.dev"]]]);
+    expect(xiaomi.lists["providers.dev"]).toEqual({ listed_at: "2026-11-20", model_count: 1 });
+  });
+
+  it("discovery naming an excluded model: left out, with a warning naming the provider and the id, once", () => {
+    const listed = { providers: { xiaomi: { date: "2026-11-24", client: "provimux", models: [{ id: "mimo-v2.5" }, { id: "mimo-v2.6" }, { id: "mimo-v2.5" }] } } };
+    const { listings, issues } = build({ catalog, pi, listed, excluded });
+    const xiaomi = listings.find((listing) => listing.provider === "xiaomi")!;
+    expect(xiaomi).toMatchObject({ basis: "listed", model_count: 1, lists: { listed: { listed_at: "2026-11-24", model_count: 1 } } });
+    expect(xiaomi.models!.map((model) => [model.id, model.listed_by])).toEqual([["mimo-v2.6", ["listed", "models.dev", "pi.dev"]]]);
+    expect(issues).toEqual([{ level: "warning", code: "listing-excluded-listed", target: "listings/xiaomi/mimo-v2.5", message: "The vendor's own list of xiaomi names mimo-v2.5, which an override in data/authored/overrides/ leaves out with evidence. It is left out of the listing; check whether the override still holds." }]);
+    // A discovery naming only excluded models gives no list: the listing stands on the other sources.
+    const only = build({ catalog, listed: { providers: { xiaomi: { date: "2026-11-24", client: "provimux", models: [{ id: "mimo-v2.5" }] } } }, excluded });
+    const left = only.listings.find((listing) => listing.provider === "xiaomi")!;
+    expect(left).toMatchObject({ basis: "models.dev", client: null, evidence: [], lists: { listed: null } });
+    expect(only.issues.map((issue) => issue.code)).toEqual(["listing-excluded-listed"]);
+  });
+
+  it("the build passes the overrides' exclusions: the real Xiaomi override with a pi list naming mimo-v2.5", async () => {
+    const dataDir = tempDataDir();
+    await sync({ dataDir, fetch: fetchReturning(JSON.stringify(fixtureUpstream())) });
+    writeAuthored(dataDir);
+    mkdirSync(join(dataDir, "authored", "overrides"), { recursive: true });
+    writeFileSync(join(dataDir, "authored", "overrides", "provider-03.yaml"), stringify({ provider: "provider-03", rules: [{ models: ["model-1"], exclude: true, reason: "Retired.", evidence }] }));
+    mkdirSync(join(dataDir, "sources"), { recursive: true });
+    writeFileSync(join(dataDir, "sources", "listed.json"), JSON.stringify({ schema: 1, providers: { "provider-03": { date: "2026-11-24", client: "provimux", models: [{ id: "model-1" }, { id: "model-2" }] } } }));
+    const report = publish({ dataDir, rootDir: ROOT });
+    expect(report.errors).toEqual([]);
+    const file = JSON.parse(readFileSync(join(dataDir, "published", "site", "data", "listings", "provider-03.json"), "utf8")) as { data: { models: ListingModel[] } };
+    expect(file.data.models.map((model) => model.id)).not.toContain("model-1");
+    expect(report.meta!.issues.filter((issue) => issue.code === "listing-excluded-listed").map((issue) => issue.target)).toEqual(["listings/provider-03/model-1"]);
   });
 });
 
