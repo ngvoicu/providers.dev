@@ -48,10 +48,13 @@ function listingFrom(listing: Listing, today: Today): string {
   const dated = !date ? "" : own && isStale(date, today)
     ? `<span class="stale" title="${e(`${LISTING_DATE_WORD[basis]} More than ${plural(today.stale_after_days, "day")} ago.`)}">${e(date)} · stale</span>`
     : `<span class="muted date" title="${e(LISTING_DATE_WORD[basis])}">${e(date)}</span>`;
-  const n = plural(listing.model_count, "model");
-  const said = basis === "listed"
+  // The models of this source's list; since API 1.6.0 the listing also holds the models only other sources list.
+  const inBasis = listing.lists[basis]?.model_count ?? listing.model_count;
+  const n = plural(inBasis, "model");
+  const more = listing.model_count > inBasis ? ` ${plural(listing.model_count - inBasis, "more model")} from other sources' lists.` : "";
+  const said = (basis === "listed"
     ? `${n} on the vendor's own list, read through ${e(listing.client_label ?? listing.client ?? "a client")}.`
-    : basis === "providers.dev" ? `${n} on a list providers.dev states.` : `${n} listed by ${LISTING_SOURCE_WORD[basis]} for this provider.`;
+    : basis === "providers.dev" ? `${n} on a list providers.dev states.` : `${n} listed by ${LISTING_SOURCE_WORD[basis]} for this provider.`) + more;
   const sources = listing.evidence.length === 1
     ? ` <a href="${e(listing.evidence[0]!.url)}">Source</a>`
     : listing.evidence.length > 1 ? ` Sources: ${listing.evidence.map((item) => `<a href="${e(item.url)}">${e(item.kind)}, ${e(item.date)}</a>`).join(" · ")}` : "";

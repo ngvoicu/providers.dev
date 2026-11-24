@@ -1,5 +1,6 @@
-// The listings (src/core/listings.ts; Provimux's model-lists.md, sections 4.1 and 4.4): the whole list from the first
-// source that has one, each field from the first source that states it, every key on every object.
+// The listings (src/core/listings.ts; Provimux's model-lists.md, sections 4.1 and 4.4): every source's list, each model
+// once with the lists that name it (since 1.6.0), each field from the first source that states it, every key on every
+// object.
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { parse, stringify } from "yaml";
@@ -25,17 +26,24 @@ function catalogOf(providers: Record<string, PublishedModel[]>): Catalog {
 const build = (input: Partial<ListingsInput> & { catalog: Catalog }) => buildListings({ upstreamDate: "2026-11-21", authored: [], ...input });
 const modelOf = (models: ListingModel[] | null, id: string): ListingModel => models!.find((model) => model.id === id)!;
 
-describe("the models of a listing: whole, from the first source that has a list", () => {
+describe("the models of a listing: every source's list, each model once, with the lists that name it (1.6.0)", () => {
   const catalog = catalogOf({ p: [entry("a", { limit: { context: 1000 } }), entry("b")], q: [entry("c")], r: [entry("own", {}, { origin: "added" })] });
   const listed = { providers: { p: { date: "2026-11-22", client: "provimux", models: [{ id: "new" }, { id: "a" }] } } };
   const pi = { date: "2026-11-20", lists: [{ provider: "q", pi_provider: "q", models: [{ id: "only-pi", name: "Only pi", context_window: 5, max_output: 0, input: ["text"], reasoning: false }] }, { provider: "r", pi_provider: "r2", models: [{ id: "x", name: "X", context_window: 0, max_output: 0, input: [], reasoning: true }] }] };
   const authored = [AuthoredListing.parse({ provider: "q", list: { models: ["c", "authored-only"], reason: "The vendor's page lists two.", evidence } })];
   const { listings, issues } = build({ catalog, listed, pi, authored });
   const of = (id: string) => listings.find((listing) => listing.provider === id)!;
+  const ids = (id: string) => of(id).models!.map((model) => [model.id, model.listed_by]);
 
-  it("listed first: the discovery's models only, in its order, with its date, client and evidence", () => {
-    expect(of("p")).toMatchObject({ basis: "listed", listed_at: "2026-11-22", client: "provimux", client_label: "provimux", model_count: 2, evidence: [{ kind: "listed", url: LISTED_PAGE, date: "2026-11-22", note: null }] });
-    expect(of("p").models!.map((model) => model.id)).toEqual(["new", "a"]);
+  it("discovery plus models.dev, where discovery lacks one model: the model stays, listed by models.dev, after the discovery's own", () => {
+    expect(of("p")).toMatchObject({
+      basis: "listed", listed_at: "2026-11-22", client: "provimux", client_label: "provimux", model_count: 3,
+      lists: { listed: { listed_at: "2026-11-22", model_count: 2 }, "providers.dev": null, "models.dev": { listed_at: "2026-11-21", model_count: 2 }, "pi.dev": null },
+      evidence: [{ kind: "listed", url: LISTED_PAGE, date: "2026-11-22", note: null }],
+    });
+    expect(ids("p")).toEqual([["new", ["listed"]], ["a", ["listed", "models.dev"]], ["b", ["models.dev"]]]);
+    // b keeps everything models.dev states of it, and its entry.
+    expect(modelOf(of("p").models, "b")).toMatchObject({ entry: { provider: "p", model: "b" }, name: "Name of b", sources: { name: "models.dev" } });
   });
 
   it("a listed model without an entry is listed with entry null; one with an entry names it and takes its fields after the discovery's", () => {
@@ -44,19 +52,61 @@ describe("the models of a listing: whole, from the first source that has a list"
     expect(modelOf(of("p").models, "a")).toMatchObject({ entry: { provider: "p", model: "a" }, name: "Name of a", context_window: 1000, sources: { name: "models.dev", context_window: "models.dev" } });
   });
 
-  it("then an authored list, then models.dev's entries, then pi's models; never a mix of two lists", () => {
-    expect(of("q")).toMatchObject({ basis: "providers.dev", listed_at: "2026-11-20", client: null });
-    expect(of("q").models!.map((model) => model.id)).toEqual(["c", "authored-only"]);
-    // r has only an added entry: no models.dev list, so pi's.
-    expect(of("r")).toMatchObject({ basis: "pi.dev", listed_at: "2026-11-20", evidence: [] });
-    expect(of("r").models!.map((model) => model.id)).toEqual(["x"]);
+  it("an authored list, models.dev's entries and pi's models together: the authored list first, basis providers.dev", () => {
+    expect(of("q")).toMatchObject({ basis: "providers.dev", listed_at: "2026-11-20", client: null, model_count: 3, lists: { listed: null, "providers.dev": { listed_at: "2026-11-20", model_count: 2 }, "models.dev": { listed_at: "2026-11-21", model_count: 1 }, "pi.dev": { listed_at: "2026-11-20", model_count: 1 } } });
+    expect(ids("q")).toEqual([["c", ["providers.dev", "models.dev"]], ["authored-only", ["providers.dev"]], ["only-pi", ["pi.dev"]]]);
+    // A model only a list names is named by its id, from that list.
+    expect(modelOf(of("q").models, "authored-only")).toMatchObject({ name: "authored-only", sources: { name: "providers.dev" } });
     expect(issues).toEqual([]);
+  });
+
+  it("a provider with only pi.dev: pi's models, basis pi.dev, the import's date and no evidence", () => {
+    // r has only an added entry: no models.dev list, so pi's alone.
+    expect(of("r")).toMatchObject({ basis: "pi.dev", listed_at: "2026-11-20", evidence: [], model_count: 1, lists: { listed: null, "providers.dev": null, "models.dev": null, "pi.dev": { listed_at: "2026-11-20", model_count: 1 } } });
+    expect(ids("r")).toEqual([["x", ["pi.dev"]]]);
+    expect(modelOf(of("r").models, "x")).toMatchObject({ name: "X", entry: null, sources: { name: "pi.dev" } });
+  });
+
+  it("a provider with all four: every model once, in the order of the sources, each naming its lists, each field as before", () => {
+    const all = build({
+      catalog: catalogOf({ f: [entry("m1", { limit: { context: 200000, output: 64000 } }), entry("m3", { limit: { context: 100000 } })] }),
+      listed: { providers: { f: { date: "2026-11-24", client: "provimux", models: [{ id: "m1", max_output: 32000 }, { id: "m0" }] } } },
+      authored: [AuthoredListing.parse({ provider: "f", list: { models: ["m2", "m1"], reason: "The vendor's page.", evidence } })],
+      pi: { date: "2026-11-23", lists: [{ provider: "f", pi_provider: "f", models: [{ id: "m4", name: "Pi m4", context_window: 128000, max_output: 8000, input: ["text"], reasoning: true }, { id: "m3", name: "Pi m3", context_window: 1, max_output: 0, input: [], reasoning: false }] }] },
+    });
+    expect(all.issues).toEqual([]);
+    const f = all.listings[0]!;
+    expect(f).toMatchObject({
+      basis: "listed", listed_at: "2026-11-24", model_count: 5,
+      lists: { listed: { listed_at: "2026-11-24", model_count: 2 }, "providers.dev": { listed_at: "2026-11-20", model_count: 2 }, "models.dev": { listed_at: "2026-11-21", model_count: 2 }, "pi.dev": { listed_at: "2026-11-23", model_count: 2 } },
+    });
+    expect(f.models!.map((model) => [model.id, model.listed_by])).toEqual([
+      ["m1", ["listed", "providers.dev", "models.dev"]],
+      ["m0", ["listed"]],
+      ["m2", ["providers.dev"]],
+      ["m3", ["models.dev", "pi.dev"]],
+      ["m4", ["pi.dev"]],
+    ]);
+    // The evidence of the discovery and of the authored list, both.
+    expect(f.evidence.map((item) => item.url)).toEqual([LISTED_PAGE, "https://example.com/models"]);
+    // Fields keep their own rule: the first source that states each, whichever lists name the model.
+    expect(modelOf(f.models, "m1")).toMatchObject({ max_output: 32000, context_window: 200000, sources: { max_output: "listed", context_window: "models.dev" } });
+    expect(modelOf(f.models, "m3")).toMatchObject({ name: "Name of m3", context_window: 100000, reasoning: { supported: false }, sources: { name: "models.dev", context_window: "models.dev", reasoning: { supported: "pi.dev" } } });
+    expect(modelOf(f.models, "m4")).toMatchObject({ name: "Pi m4", context_window: 128000, max_output: 8000, entry: null, sources: { context_window: "pi.dev" } });
+    expect(ListingSchema.safeParse(f).error).toBeUndefined();
+  });
+
+  it("a model a list names twice is listed once, with one warning naming that list", () => {
+    const twice = build({ catalog: catalogOf({ p: [entry("a")] }), listed: { providers: { p: { date: "2026-11-22", client: "provimux", models: [{ id: "a" }, { id: "a" }] } } } });
+    expect(twice.listings[0]!.models!.map((model) => [model.id, model.listed_by])).toEqual([["a", ["listed", "models.dev"]]]);
+    expect(twice.listings[0]!.lists.listed).toEqual({ listed_at: "2026-11-22", model_count: 1 });
+    expect(twice.issues.map((issue) => [issue.code, issue.message])).toEqual([["listing-model-twice", "The listed list of p names a more than once. It is listed once."]]);
   });
 
   it("models.dev's list is the provider's imported entries, by id, dated by the import", () => {
     const { listings: only } = build({ catalog: catalogOf({ m: [entry("z"), entry("y"), entry("mine", {}, { origin: "added" })] }) });
     expect(only).toHaveLength(1);
-    expect(only[0]).toMatchObject({ provider: "m", basis: "models.dev", listed_at: "2026-11-21", evidence: [], client: null });
+    expect(only[0]).toMatchObject({ provider: "m", basis: "models.dev", listed_at: "2026-11-21", evidence: [], client: null, lists: { listed: null, "providers.dev": null, "models.dev": { listed_at: "2026-11-21", model_count: 2 }, "pi.dev": null } });
     expect(only[0]!.models!.map((model) => model.id)).toEqual(["y", "z"]);
   });
 
@@ -259,6 +309,37 @@ describe("the review's findings 2 and 6: the Codex login", () => {
   });
 });
 
+describe("openai-codex once the discovery lists it (1.6.0)", () => {
+  // The catalog's openai-codex: models.dev's two entries and the four providers.dev added; the authored list of six;
+  // a discovery file that names three of them and gpt-6.1-terra not.
+  const inherits = (id: string) => ({ from: `openai/${id}`, fields: ["name", "release_date", "canonical_id", "cost"] });
+  const added = (id: string) => entry(id, { name: id.toUpperCase(), canonical_id: `openai/${id}` }, { origin: "added", inherited: inherits(id), measured: 921500 });
+  const catalog = catalogOf({ "openai-codex": [
+    entry("gpt-6.1-sol", { canonical_id: "openai/gpt-6.1-sol", limit: { context: 1050000, input: 922000, output: 128000 } }),
+    entry("gpt-6.1-terra", { canonical_id: "openai/gpt-6.1-terra", limit: { context: 1050000, input: 922000, output: 128000 } }),
+    added("gpt-6-astra"), added("gpt-6-luna"), added("gpt-6.2-astra"), added("gpt-6.2-sol"),
+  ] });
+  const authored = [AuthoredListing.parse({ provider: "openai-codex", list: { models: ["gpt-6.1-sol", "gpt-6.1-terra", "gpt-6-astra", "gpt-6-luna", "gpt-6.2-astra", "gpt-6.2-sol"], reason: "Six models.", evidence } })];
+  const listed = { providers: { "openai-codex": { date: "2026-11-24", client: "provimux", models: [{ id: "gpt-6.2-sol", plans: ["plus", "pro"] }, { id: "gpt-6.2-astra" }, { id: "gpt-6.1-sol" }] } } };
+
+  it("keeps gpt-6.1-terra, which the discovery lacks, as listed by providers.dev and models.dev, with models.dev's fields", () => {
+    const { listings, issues } = build({ catalog, authored, listed });
+    expect(issues).toEqual([]);
+    const codex = listings[0]!;
+    expect(codex).toMatchObject({ basis: "listed", listed_at: "2026-11-24", model_count: 6, lists: { listed: { listed_at: "2026-11-24", model_count: 3 }, "providers.dev": { listed_at: "2026-11-20", model_count: 6 }, "models.dev": { listed_at: "2026-11-21", model_count: 2 }, "pi.dev": null } });
+    expect(codex.models!.map((model) => [model.id, model.listed_by])).toEqual([
+      ["gpt-6.2-sol", ["listed", "providers.dev"]],
+      ["gpt-6.2-astra", ["listed", "providers.dev"]],
+      ["gpt-6.1-sol", ["listed", "providers.dev", "models.dev"]],
+      ["gpt-6.1-terra", ["providers.dev", "models.dev"]],
+      ["gpt-6-astra", ["providers.dev"]],
+      ["gpt-6-luna", ["providers.dev"]],
+    ]);
+    expect(modelOf(codex.models, "gpt-6.1-terra")).toMatchObject({ entry: { provider: "openai-codex", model: "gpt-6.1-terra" }, context_window: 1050000, max_output: 128000, plans: [], sources: { context_window: "models.dev" } });
+    expect(modelOf(codex.models, "gpt-6.2-sol")).toMatchObject({ plans: ["plus", "pro"], sources: { plans: "listed" } });
+  });
+});
+
 describe("the authored Codex listing (finding 5)", () => {
   it("lists the six models of the catalog's openai-codex: models.dev's two and the four providers.dev measured, each with evidence", () => {
     const file = AuthoredListing.parse(parse(readFileSync(join(ROOT, "data", "authored", "listings", "openai-codex.yaml"), "utf8")));
@@ -266,7 +347,7 @@ describe("the authored Codex listing (finding 5)", () => {
     expect(file.list!.evidence.map((item) => item.kind)).toEqual(["listed", "measured", "measured", "measured", "measured"]);
     const upstream = Object.keys((JSON.parse(readFileSync(join(ROOT, "data", "upstream", "providers", "openai-codex.json"), "utf8")) as { models: object }).models).sort();
     expect(upstream).toEqual(["gpt-6.1-sol", "gpt-6.1-terra"]);
-    expect(readFileSync(join(ROOT, "data", "authored", "listings", "openai-codex.yaml"), "utf8")).toContain("replaces this list");
+    expect(readFileSync(join(ROOT, "data", "authored", "listings", "openai-codex.yaml"), "utf8")).toContain("union of every source's list");
   });
 });
 

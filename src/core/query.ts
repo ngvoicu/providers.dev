@@ -105,7 +105,7 @@ export const PROVIDER_VIEW_PARAMS: ParamDoc[] = [
 /** The parameters of /api/v1/listings. Since 1.5.0. */
 export const LISTING_PARAMS: ParamDoc[] = [
   { name: "provider", kind: "list", description: "Provider ids, comma-separated. A listing matches any of them." },
-  { name: "basis", kind: "list", values: ["listed", "providers.dev", "models.dev", "pi.dev"], description: "The source of a listing's models." },
+  { name: "basis", kind: "list", values: ["listed", "providers.dev", "models.dev", "pi.dev"], description: "basis of a listing: the highest-ranked source that has a list for the provider." },
   { name: "view", kind: "enum", values: ["summary", "full"], description: `summary (default) = each listing without its models; models is null. full = each listing with its models, at most ${FULL_LISTING_LIMIT} a page.` },
   { name: "limit", kind: "integer", description: `Listings per page. With view=summary 1 to ${MAX_LIMIT}, default ${DEFAULT_LIMIT}; with view=full 1 to ${FULL_LISTING_LIMIT}, default ${FULL_LISTING_LIMIT} (since 1.5.1: a larger limit returns 400).` },
   { name: "offset", kind: "integer", description: "Listings to skip. Default 0." },

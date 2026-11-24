@@ -4,8 +4,9 @@
 //
 // The sources, in one fixed order: `listed` (groundtruth's discovery, listed.json), `providers.dev` (an authored list
 // or statement, data/authored/listings/), `models.dev` (the imported entries of the provider), `pi.dev` (pi's models
-// of the provider). The models of a listing are taken whole from the first source that has a list for the provider;
-// each field of a model from the first source that states it, and the model names that source.
+// of the provider). The models of a listing are every model any of them lists for the provider (since 1.6.0; before,
+// the first source's list was taken whole), and each model names the sources that list it (`listed_by`); each field of
+// a model is from the first source that states it, and the model names that source per field.
 //
 // Nothing here is written into an entry: a listing is a resource of its own, and no value of it reaches an entry's
 // `limit` or a safe value.
@@ -77,8 +78,21 @@ export interface ListingModel {
   plans: string[];
   /** The vendor's list marks the model as not shown in pickers. Null = not stated. */
   hidden: boolean | null;
+  /** The sources whose list names this model, in the fixed order of LISTING_SOURCES. Never empty. Since 1.6.0. */
+  listed_by: ListingSource[];
   sources: ListingSources;
 }
+
+/** One source's list of a provider, in a listing: when it was read and how many models it names. */
+export interface ListingList {
+  /** The day the source was read: the discovery's date, the import's date, or the newest evidence of an authored list. */
+  listed_at: string | null;
+  /** How many models this source's list names. */
+  model_count: number;
+}
+
+/** Per source, its list of the provider. Null = the source has no list for it. Since 1.6.0. */
+export type ListingLists = { [K in ListingSource]: ListingList | null };
 
 export interface ListingEvidence {
   kind: "documented" | "measured" | "listed";
@@ -89,10 +103,12 @@ export interface ListingEvidence {
 
 export interface Listing {
   provider: string;
-  /** The source of the listing's models. */
+  /** The highest-ranked source that has a list for the provider. Since 1.6.0 not the only one: see `lists`. */
   basis: ListingSource;
   /** The date that source was read: the discovery's date, the import's date, or the newest evidence of an authored list. */
   listed_at: string | null;
+  /** Every source's list, with its date. Since 1.6.0. */
+  lists: ListingLists;
   /** For `listed`: the public id of the client that read the vendor's list. Null otherwise. */
   client: string | null;
   client_label: string | null;
@@ -334,7 +350,7 @@ function entryStatements(model: PublishedModel): { providersDev: Statement; mode
 }
 
 /** The first source that states each field, and the model it makes. */
-function merged(id: string, basis: ListingSource, statements: [ListingSource, Statement][], entry: { provider: string; model: string } | null, canonical: string | null): ListingModel {
+function merged(id: string, listedBy: ListingSource[], statements: [ListingSource, Statement][], entry: { provider: string; model: string } | null, canonical: string | null): ListingModel {
   const pick = (key: keyof Statement): { value: unknown; source: ListingSource | null } => {
     for (const [source, statement] of statements) {
       if (!(key in statement)) continue;
@@ -363,8 +379,9 @@ function merged(id: string, basis: ListingSource, statements: [ListingSource, St
     if (settle(reasoning.supported, levels) === "keep") reasoning.levels = none;
     else reasoning.supported = none;
   }
-  // A model no source names is named by its id, from the list that has it: no name is ever taken from the discovery file.
-  if (plain.name.value === null) plain.name = { value: id, source: basis };
+  // A model no source names is named by its id, from the first list that has it: no name is ever taken from the
+  // discovery file.
+  if (plain.name.value === null) plain.name = { value: id, source: listedBy[0]! };
   const list = (key: "aliases" | "variants" | "plans"): string[] => (plain[key].value as string[] | null) ?? [];
   const anyReasoning = REASONING_KEYS.some((key) => reasoning[key].source !== null);
   return {
@@ -385,6 +402,7 @@ function merged(id: string, basis: ListingSource, statements: [ListingSource, St
     variants: list("variants"),
     plans: list("plans"),
     hidden: plain.hidden.value as boolean | null,
+    listed_by: listedBy,
     sources: {
       name: plain.name.source,
       owner: plain.owner.source,
@@ -409,7 +427,9 @@ const evidenceOf = (item: { kind: ListingEvidence["kind"]; url: string; date: st
 
 /**
  * Every listing of the dataset, by provider id, and what does not fit. A provider has a listing where any source has a
- * list for it: its models from the first such source, whole; each field from the first source that states it.
+ * list for it: its models are every model any source lists, the highest source's first, in its order, then each next
+ * source's models not yet named, in its order; each model names the sources that list it; each field is from the first
+ * source that states it.
  */
 export function buildListings(input: ListingsInput): { listings: Listing[]; issues: Issue[] } {
   const issues: Issue[] = [];
@@ -443,52 +463,50 @@ export function buildListings(input: ListingsInput): { listings: Listing[]; issu
     const imported = [...Object.keys(provider.models).filter((id) => ext(provider.models[id]!).origin === "upstream"), ...[...left.keys()].filter((id) => !Object.hasOwn(provider.models, id))].sort(byText);
     const pi = piLists.get(providerId);
 
-    let basis: ListingSource;
-    let ids: string[];
-    let listedAt: string | null;
-    let evidence: ListingEvidence[];
+    // Each source's list of the provider, in the fixed order; a source with no list for it is left out.
+    const present: { source: ListingSource; ids: string[]; listedAt: string | null }[] = [];
+    const evidence: ListingEvidence[] = [];
     let client: { id: string; label: string } | null = null;
     if (discovery && discovery.models.length > 0) {
-      basis = "listed";
-      ids = discovery.models.map((model) => model.id);
-      listedAt = discovery.date;
-      evidence = [{ kind: "listed", url: LISTED_PAGE, date: discovery.date, note: null }];
+      present.push({ source: "listed", ids: discovery.models.map((model) => model.id), listedAt: discovery.date });
+      evidence.push({ kind: "listed", url: LISTED_PAGE, date: discovery.date, note: null });
       client = input.client ? input.client(discovery.client) : { id: discovery.client, label: discovery.client };
-    } else if (file?.list) {
-      basis = "providers.dev";
-      ids = file.list.models;
-      evidence = file.list.evidence.map(evidenceOf);
-      listedAt = [...evidence.map((item) => item.date)].sort(byText).at(-1) ?? null;
-    } else if (imported.length > 0) {
-      basis = "models.dev";
-      ids = imported;
-      listedAt = input.upstreamDate;
-      evidence = [];
-    } else if (pi && pi.models.length > 0) {
-      basis = "pi.dev";
-      ids = pi.models.map((model) => model.id);
-      listedAt = input.pi?.date ?? null;
-      evidence = [];
-    } else continue;
-
-    // One model per id: the first time the source names it.
-    const seen = new Set<string>();
-    const unique: string[] = [];
-    for (const id of ids) {
-      if (seen.has(id)) {
-        issues.push({ level: "warning", code: "listing-model-twice", target: `listings/${providerId}/${id}`, message: `The ${basis} list of ${providerId} names ${id} more than once. It is listed once.` });
-        continue;
-      }
-      seen.add(id);
-      unique.push(id);
     }
+    if (file?.list) {
+      const own = file.list.evidence.map(evidenceOf);
+      present.push({ source: "providers.dev", ids: file.list.models, listedAt: [...own.map((item) => item.date)].sort(byText).at(-1) ?? null });
+      evidence.push(...own);
+    }
+    if (imported.length > 0) present.push({ source: "models.dev", ids: imported, listedAt: input.upstreamDate });
+    if (pi && pi.models.length > 0) present.push({ source: "pi.dev", ids: pi.models.map((model) => model.id), listedAt: input.pi?.date ?? null });
+    if (present.length === 0) continue;
+    const basis = present[0]!.source;
+
+    // Every model any list names, once: the highest list's first, in its order, then each next list's new ones. Each
+    // list counts a model once: the first time it names it.
+    const listedBy = new Map<string, ListingSource[]>();
+    const lists: ListingLists = { listed: null, "providers.dev": null, "models.dev": null, "pi.dev": null };
+    for (const { source, ids, listedAt } of present) {
+      const once = new Set<string>();
+      for (const id of ids) {
+        if (once.has(id)) {
+          issues.push({ level: "warning", code: "listing-model-twice", target: `listings/${providerId}/${id}`, message: `The ${source} list of ${providerId} names ${id} more than once. It is listed once.` });
+          continue;
+        }
+        once.add(id);
+        (listedBy.get(id) ?? listedBy.set(id, []).get(id)!).push(source);
+      }
+      lists[source] = { listed_at: listedAt, model_count: once.size };
+    }
+    const unique = [...listedBy.keys()];
+    const seen = new Set(unique);
 
     // The rules that apply, each one's evidence once in the listing's evidence.
     const rules = file?.rules ?? [];
     for (const rule of rules) {
       if (rule.models === "all") continue;
       for (const id of rule.models) {
-        if (!seen.has(id)) issues.push({ level: "warning", code: "listing-rule-orphan", target: `listings/${providerId}/${id}`, message: `data/authored/listings/${providerId}.yaml has a rule for ${id}, which the ${basis} list of ${providerId} does not name. The rule does nothing for it.` });
+        if (!seen.has(id)) issues.push({ level: "warning", code: "listing-rule-orphan", target: `listings/${providerId}/${id}`, message: `data/authored/listings/${providerId}.yaml has a rule for ${id}, which no list of ${providerId} names. The rule does nothing for it.` });
       }
     }
     const applied = new Set<number>();
@@ -517,7 +535,7 @@ export function buildListings(input: ListingsInput): { listings: Listing[]; issu
       const fromPi = piModels.get(id);
       if (fromPi) statements.push(["pi.dev", piStatement(fromPi, measured)]);
       const canonical = entry && typeof entry.canonical_id === "string" ? entry.canonical_id : null;
-      return merged(id, basis, statements, entry ? { provider: providerId, model: id } : null, canonical);
+      return merged(id, listedBy.get(id)!, statements, entry ? { provider: providerId, model: id } : null, canonical);
     });
     if (inheritedFrom.length > 0 && input.upstreamSource) {
       evidence.push({ kind: "listed", url: input.upstreamSource, date: input.upstreamDate, note: `models.dev's records of the models an added entry inherits name, owner and released from: ${inheritedFrom.join(", ")}.` });
@@ -527,7 +545,7 @@ export function buildListings(input: ListingsInput): { listings: Listing[]; issu
         if (!evidence.some((known) => JSON.stringify(known) === JSON.stringify(item))) evidence.push(item);
       }
     }
-    listings.push({ provider: providerId, basis, listed_at: listedAt, client: client?.id ?? null, client_label: client?.label ?? null, evidence, model_count: models.length, models });
+    listings.push({ provider: providerId, basis, listed_at: lists[basis]!.listed_at, lists, client: client?.id ?? null, client_label: client?.label ?? null, evidence, model_count: models.length, models });
   }
   return { listings, issues };
 }

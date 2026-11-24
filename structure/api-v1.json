@@ -5787,6 +5787,9 @@
           "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
           "nullable": true
         },
+        "lists": {
+          "ref": "ListingLists"
+        },
         "client": {
           "type": "string",
           "nullable": true
@@ -5907,6 +5910,19 @@
         "hidden": {
           "type": "boolean",
           "nullable": true
+        },
+        "listed_by": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "listed",
+              "models.dev",
+              "pi.dev",
+              "providers.dev"
+            ]
+          }
         },
         "sources": {
           "ref": "ListingSources"
@@ -6160,6 +6176,41 @@
             "pi.dev",
             "providers.dev"
           ],
+          "nullable": true
+        }
+      }
+    },
+    "ListingList": {
+      "type": "object",
+      "properties": {
+        "listed_at": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "nullable": true
+        },
+        "model_count": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "ListingLists": {
+      "type": "object",
+      "properties": {
+        "listed": {
+          "ref": "ListingList",
+          "nullable": true
+        },
+        "providers.dev": {
+          "ref": "ListingList",
+          "nullable": true
+        },
+        "models.dev": {
+          "ref": "ListingList",
+          "nullable": true
+        },
+        "pi.dev": {
+          "ref": "ListingList",
           "nullable": true
         }
       }

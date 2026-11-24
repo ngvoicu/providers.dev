@@ -15,7 +15,7 @@ import type { ProviderSummary, Summary } from "./entries.ts";
 import type { InputWindow, InputWindowMeasurement } from "./limits.ts";
 import type { CanonicalModel, CanonicalModelDetail, Correction, Documentation, Facets, ModelInputWindowEnd } from "./resources.ts";
 import type { PiBlock, PiCost, PiCostTier, PiDifference, PiSummary, PiValue } from "./pi.ts";
-import type { Listing, ListingModel, ListingReasoning, ListingReasoningSources, ListingSources } from "./listings.ts";
+import type { Listing, ListingList, ListingLists, ListingModel, ListingReasoning, ListingReasoningSources, ListingSources } from "./listings.ts";
 import type { PiStatements, PriceStatement, PriceTier, SafePrice, SafeValue, SafeValues, SourceValue } from "./safe.ts";
 import { Access, type Exclusion, type MeasuredLimit, type ModelExtension, type ProviderExtension, type Provenance, type PublishedEvidence } from "./schema.ts";
 
@@ -584,7 +584,7 @@ export const ListingSourcesSchema = z
 export const ListingModelSchema = z
   .strictObject({
     id: z.string().min(1).describe("The id a request names on this access method."),
-    name: z.string().nullable().describe("The name from the first source that states one; where none does, the id (its source is then the listing's basis). Never taken from the vendor's list."),
+    name: z.string().nullable().describe("The name from the first source that states one; where none does, the id (its source is then the first of listed_by). Never taken from the vendor's list."),
     owner: z.string().nullable().describe("The lab that makes the model. Null = not stated."),
     entry: z.strictObject({ provider: z.string(), model: z.string() }).nullable().describe("The catalog entry for this model on this provider, as in /api/v1/entries/{provider}/{model}. Null = listed, not an entry of the catalog."),
     canonical: z.string().nullable().describe("canonical_id of that entry. Null without an entry, or where the entry names none."),
@@ -600,22 +600,35 @@ export const ListingModelSchema = z
     variants: z.array(z.string()).describe("The vendor's own ids where it has one id per reasoning level (Devin), from an authored statement. Empty where id itself is what a request names. Never taken from the vendor's list."),
     plans: z.array(z.string()).describe("Plan names the vendor's own list attaches to the model, from a fixed list of single words (free, go, plus, pro, team, business, enterprise, edu, education, max), in lower case; any other name is left out. Empty = none. No prices, allowances or quotas."),
     hidden: z.boolean().nullable().describe("The vendor's list marks the model as not shown in pickers. Null = not stated."),
+    listed_by: z.array(listingSource).min(1).describe("The sources whose list of the provider names this model, in the fixed order listed, providers.dev, models.dev, pi.dev. listed: the vendor's own list, read through a client by groundtruth's discovery (on a subscription login, the model is offered on that subscription). The others are public or authored lists. Never empty. The date of each list is in the listing's lists. Since 1.6.0. Other values may be added."),
     sources: ListingSourcesSchema,
   })
   .describe("One model of a listing: what the sources state of it on this access method. A listed model need not be an entry.") satisfies z.ZodType<ListingModel>;
 
+export const ListingListSchema = z
+  .strictObject({
+    listed_at: date.nullable().describe("The day the source was read: the discovery's date for listed, the import's date for models.dev and pi.dev, the newest evidence date for providers.dev. Null = not known."),
+    model_count: z.int().min(0).describe("How many models this source's list names for the provider."),
+  })
+  .describe("One source's list of a provider. Since 1.6.0.") satisfies z.ZodType<ListingList>;
+
+export const ListingListsSchema = z
+  .strictObject({ listed: ListingListSchema.nullable(), "providers.dev": ListingListSchema.nullable(), "models.dev": ListingListSchema.nullable(), "pi.dev": ListingListSchema.nullable() })
+  .describe("Per source, its list of the provider, with its date and size. Null = the source has no list for it. At least one is not null: the one basis names. Since 1.6.0.") satisfies z.ZodType<ListingLists>;
+
 export const ListingSchema = z
   .strictObject({
     provider: z.string().describe("The provider id, as in /api/v1/providers/{provider}."),
-    basis: listingSource.describe("The source the listing's models are taken from, whole: listed (the vendor's own list, read by groundtruth's discovery), providers.dev (an authored list), models.dev (the imported entries of the provider), pi.dev (pi's models of the provider). The first of these four that has a list for the provider. Other values may be added."),
-    listed_at: date.nullable().describe("The day that source was read: the discovery's date for listed, the import's date for models.dev and pi.dev, the newest evidence date for providers.dev. Null = not known."),
+    basis: listingSource.describe("The highest-ranked source that has a list for the provider, of four in a fixed order: listed (the vendor's own list, read by groundtruth's discovery), providers.dev (an authored list), models.dev (the imported entries of the provider), pi.dev (pi's models of the provider). Since 1.6.0 the listing's models are those of every source with a list (lists), not of basis alone: a model basis does not name can be in models, and listed_by says which lists name each. Until 1.5.1 the models were taken whole from basis. Other values may be added."),
+    listed_at: date.nullable().describe("The day basis was read: the discovery's date for listed, the import's date for models.dev and pi.dev, the newest evidence date for providers.dev. Null = not known. The date of every source is in lists."),
+    lists: ListingListsSchema,
     client: z.string().nullable().describe("For listed: the public id of the client that read the vendor's list, as in data/authored/measurement-labels.yaml. Null otherwise."),
     client_label: z.string().nullable().describe("Its public label. Null with client."),
-    evidence: z.array(EvidenceSchema).describe("Where the list comes from: the discovery file for listed, the authored evidence for providers.dev. Empty for an imported list, whose date is listed_at."),
-    model_count: z.int().min(0).describe("How many models the listing has."),
-    models: z.array(ListingModelSchema).nullable().describe("The models, in the source's order. Null in /api/v1/listings without view=full, so that the answer has the same keys in both views."),
+    evidence: z.array(EvidenceSchema).describe("Where the lists come from: the discovery file for listed, the authored evidence for providers.dev. Nothing for an imported list, whose date is in lists."),
+    model_count: z.int().min(0).describe("How many models the listing has: every model any source lists, each once."),
+    models: z.array(ListingModelSchema).nullable().describe("Every model any source lists for the provider, each once: the models of basis first, in its order, then each next source's models not named before, in its order (since 1.6.0). Null in /api/v1/listings without view=full, so that the answer has the same keys in both views."),
   })
-  .describe("The model list of one provider and access method: what the vendor's own list said, read on a date through a named client, completed by sourced statements. Not an evaluation: a listed model need not be an entry, and nothing of a listing is written into an entry. Since 1.5.0.") satisfies z.ZodType<Listing>;
+  .describe("The model list of one provider and access method: every model the vendor's own list (read on a date through a named client), an authored list, models.dev and pi name for it, each with the sources that list it, completed by sourced statements. Not an evaluation: a listed model need not be an entry, and nothing of a listing is written into an entry. Since 1.5.0.") satisfies z.ZodType<Listing>;
 
 // ---- full objects. The part that comes from models.dev is theirs and grows with it, so unknown fields are allowed there.
 export const EntrySchema = z
@@ -742,7 +755,7 @@ export const MetaSchema = z
         models: z.int().min(0).describe("Models in them, all listings together."),
         by_basis: z
           .strictObject({ listed: z.int().min(0), "providers.dev": z.int().min(0), "models.dev": z.int().min(0), "pi.dev": z.int().min(0) })
-          .describe("Listings by the source of their models."),
+          .describe("Listings by basis: the highest-ranked source that has a list for the provider."),
         source: z.string().describe("The address groundtruth's discovery file, listed.json, is fetched from."),
         fetched_at: z.string().nullable().describe("When the discovery file this dataset is built on was fetched. Null = there is none."),
         checked_at: z.string().nullable().describe("When it was last confirmed unchanged. Null = there is none."),
@@ -874,4 +887,6 @@ export const COMPONENTS = {
   ListingReasoning: ListingReasoningSchema,
   ListingSources: ListingSourcesSchema,
   ListingReasoningSources: ListingReasoningSourcesSchema,
+  ListingList: ListingListSchema,
+  ListingLists: ListingListsSchema,
 } as const;

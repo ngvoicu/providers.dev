@@ -1,7 +1,8 @@
 # data/authored/listings/openai-codex.yaml
-# The models a ChatGPT plan's Codex login offers, until groundtruth's discovery publishes Codex's own list in
-# listed.json. Discovery comes first: as soon as listed.json has a list for openai-codex, it replaces this list
-# whole, and this file can be deleted.
+# The models a ChatGPT plan's Codex login offers, as providers.dev measured them. Since API 1.6.0 a listing is the
+# union of every source's list: when listed.json has a list for openai-codex, its models come first and these stay
+# beside them (a model discovery does not name is shown as listed by providers.dev). Remove a model here only with
+# evidence that the login no longer offers it.
 #
 # Why it exists: models.dev lists two models for openai-codex (gpt-6.1-sol, gpt-6.1-terra), and providers.dev
 # measured four more through the Codex login (the entries it added: gpt-6-astra, gpt-6-luna, gpt-6.2-astra,
@@ -20,8 +21,8 @@ list:
     - gpt-6.2-sol
   reason: >-
     models.dev lists gpt-6.1-sol and gpt-6.1-terra for openai-codex; providers.dev's evaluations reached
-    gpt-6-astra, gpt-6-luna, gpt-6.2-astra and gpt-6.2-sol through a Codex login. Until the discovery publishes
-    Codex's own list, these six are the list.
+    gpt-6-astra, gpt-6-luna, gpt-6.2-astra and gpt-6.2-sol through a Codex login. These six stay in the listing
+    beside the list the discovery publishes.
   evidence:
     - kind: listed
       url: https://models.dev/experimental/v2.0/api.json?include=openai-codex

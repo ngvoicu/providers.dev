@@ -2,7 +2,8 @@
 // data/published/ directories built from the same models.dev snapshot and the same measurements must be the same in
 // everything once what the pi work adds is taken off on both sides (providers_dev.pi of an entry, pi of a summary,
 // pi's items of `safe` with `withoutPi` and the copies of `safe` made again with `mirror`, meta.pi, meta.license.pi
-// and pi_notice, the issues whose code starts with "pi-") and what every build renews (dataset_version, generated_at).
+// and pi_notice, the issues whose code starts with "pi-", the counts of meta.listings that pi's lists add to) and what
+// every build renews (dataset_version, generated_at).
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { isDeepStrictEqual } from "node:util";
@@ -115,7 +116,10 @@ function piCounts(catalog: Catalog): { values: number; items: number } {
 const withoutPiOfMeta = (meta: Meta): unknown => {
   const { pi: _pi, dataset_version: _version, generated_at: _generated, license, issues, ...rest } = meta;
   const { pi: _license, pi_notice: _notice, ...ownLicense } = license;
-  return { ...rest, license: ownLicense, issues: issues.filter((issue) => !issue.code.startsWith("pi-")) };
+  // pi is a source of the listings, whose models are the union of every source's (since API 1.6.0): the counts of
+  // listings and of their models, and the listings whose basis is pi.dev, are pi's part of meta.listings.
+  const { count: _count, models: _models, by_basis: { "pi.dev": _byPi, ...byBasis }, ...listings } = rest.listings;
+  return { ...rest, listings: { ...listings, by_basis: byBasis }, license: ownLicense, issues: issues.filter((issue) => !issue.code.startsWith("pi-")) };
 };
 
 export function comparePublished(beforeDir: string, afterDir: string): Comparison {

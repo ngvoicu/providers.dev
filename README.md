@@ -330,9 +330,11 @@ A listing (`/api/v1/listings`, since API 1.5.0) is the model list of one provide
 offers, evaluated or not. It is built in `src/core/listings.ts` from four sources, in this order: `listed` (the
 vendor's own list, from groundtruth's discovery file `listed.json`), `providers.dev` (this folder), `models.dev` (the
 provider's imported models, those a catalog rule leaves out of the catalog included: a rule says what providers.dev
-lists as entries, not what a provider offers) and `pi.dev`. The models are taken whole from the first source that has
-a list for the provider; each field of a model from the first source that states it, and the model names that source
-per field. Nothing of a listing is written into an entry.
+lists as entries, not what a provider offers) and `pi.dev`. Since API 1.6.0 its models are every model any of the four
+lists for the provider, each once: a login reads only what its own subscription offers, so no list is taken as the
+whole. Each model names the lists that have it (`listed_by`), and the listing gives each source's list with its date
+and size (`lists`); `basis` is the highest-ranked source with a list. Each field of a model is from the first source
+that states it, and the model names that source per field. Nothing of a listing is written into an entry.
 
 `data/authored/listings/<provider>.yaml` holds what providers.dev states, each statement with a reason and evidence:
 
@@ -628,7 +630,13 @@ with its source.
 full failed with 500 on Cloudflare (each listing in full is a file, each file a subrequest; see
 [Worker subrequests](#worker-subrequests)). `view=summary` keeps 1 to 200, default 50. The OpenAPI schema of `limit`
 is shared by both views and stays as recorded (maximum 200, default 50); its description gives the range in full.
-
+1.6.0 made a listing the union of its sources: its `models` are every model the vendor's own list, an authored list,
+models.dev and pi list for the provider, each once, where until 1.5.1 they were the list of `basis` taken whole. It
+added `listed_by` to `ListingModel` (the sources whose list names the model, in the fixed order), `lists` to `Listing`
+(per source its list's `listed_at` and `model_count`, or `null`) and the components `ListingList` and `ListingLists`.
+`basis` stays: the highest-ranked source that has a list, with its date in `listed_at`; it no longer means that the
+list is whole. A model no source names takes its id as its name from the first list that has it. The fields of a model
+are chosen as before.
 That promise holds for everything providers.dev makes itself: summaries, `providers_dev` records, evaluations,
 corrections, evidence, paths and parameters. The fields imported from models.dev (`limit`, `cost`, `capabilities`,
 `modalities` and the like) follow the models.dev v2 schema, which models.dev calls experimental. When models.dev

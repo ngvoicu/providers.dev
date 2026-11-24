@@ -6,7 +6,7 @@ import { emptyInputWindow, inputWindow, type InputWindow } from "../src/core/lim
 import { entryHtml, evaluationStrip, piRechecked, rowHtml, tableHead } from "../src/core/render.ts";
 import { listingHtml, modelHtml } from "../src/core/detail-view.ts";
 import type { ProviderSummary } from "../src/core/entries.ts";
-import type { Listing, ListingModel, ListingReasoning, ListingSource, ListingSources } from "../src/core/listings.ts";
+import type { Listing, ListingLists, ListingModel, ListingReasoning, ListingSource, ListingSources } from "../src/core/listings.ts";
 import { canonicalModels } from "../src/core/resources.ts";
 import { resolve } from "../src/core/resolve.ts";
 import { NS, UpstreamModel, type ModelExtension } from "../src/core/schema.ts";
@@ -1104,12 +1104,18 @@ describe("the model list of a provider", () => {
   const model = (more: Partial<ListingModel>): ListingModel => ({
     id: "gemini-4-neon", name: "Gemini 4 Neon", owner: "google", entry: null, canonical: null, released: "2026-11-01", context_window: 1048576, max_input: null, max_output: 65536,
     input_modalities: ["text", "image"], output_modalities: ["text"], reasoning: reasoning({ supported: true, levels: ["low", "medium", "high"] }), web_search: null,
-    aliases: [], variants: [], plans: [], hidden: null, sources: sources("listed"), ...more,
+    aliases: [], variants: [], plans: [], hidden: null, listed_by: ["listed"], sources: sources("listed"), ...more,
   });
-  const listing = (models: ListingModel[], more: Partial<Listing> = {}): Listing => ({
-    provider: "devin", basis: "listed", listed_at: "2026-11-22", client: "provimux", client_label: "Provimux, a proxy built on CLIProxyAPI",
-    evidence: [{ kind: "listed", url: "https://github.com/ngvoicu/groundtruth/blob/main/listed.json", date: "2026-11-22", note: null }], model_count: models.length, models, ...more,
-  });
+  // One source's list, as basis says, unless the test gives lists.
+  const listing = (models: ListingModel[], more: Partial<Listing> = {}): Listing => {
+    const basis = more.basis ?? "listed";
+    const listedAt = more.listed_at ?? "2026-11-22";
+    const lists: ListingLists = { listed: null, "providers.dev": null, "models.dev": null, "pi.dev": null, [basis]: { listed_at: listedAt, model_count: models.length } };
+    return {
+      provider: "devin", basis, listed_at: listedAt, lists, client: "provimux", client_label: "Provimux, a proxy built on CLIProxyAPI",
+      evidence: [{ kind: "listed", url: "https://github.com/ngvoicu/groundtruth/blob/main/listed.json", date: "2026-11-22", note: null }], model_count: models.length, models, ...more,
+    };
+  };
   const rowOf = (html: string, id: string): string => html.split("<tr").find((part) => part.includes(`<code>${id}</code>`)) ?? "";
 
   it("links a model with an entry to it, and says a model without one is listed, not evaluated, with no link", () => {
@@ -1130,7 +1136,7 @@ describe("the model list of a provider", () => {
     expect(html).toContain('<span class="badge listed">listed</span><span class="muted date" title="The day the vendor&#39;s list was read.">2026-11-22</span>');
     expect(html).toContain("1 model on the vendor's own list, read through Provimux, a proxy built on CLIProxyAPI. <a href=\"https://github.com/ngvoicu/groundtruth/blob/main/listed.json\">Source</a>");
     expect(html).toContain('<a href="/api/v1/listings/devin"><code>GET /api/v1/listings/devin</code></a>');
-    const imported = listingHtml(provider, listing([model({ sources: sources("models.dev") })], { basis: "models.dev", client: null, client_label: null, evidence: [] }), today);
+    const imported = listingHtml(provider, listing([model({ listed_by: ["models.dev"], sources: sources("models.dev") })], { basis: "models.dev", client: null, client_label: null, evidence: [] }), today);
     expect(imported).toContain('<span class="origin upstream">models.dev</span><span class="muted date" title="Imported from models.dev on this date.">2026-11-22</span>');
     expect(imported).toContain("1 model listed by models.dev for this provider.");
     expect(imported).not.toContain("Source</a>");
@@ -1176,6 +1182,14 @@ describe("the model list of a provider", () => {
     expect(rowOf(html, "gemini-4-neon")).toContain(">Hidden in the vendor's picker</div>");
     expect(rowOf(html, "other")).not.toContain("Plans:");
     expect(rowOf(html, "other")).not.toContain("Hidden");
+  });
+
+  it("counts the models of the list it names, and says how many more other sources' lists add (1.6.0)", () => {
+    const lists: ListingLists = { listed: { listed_at: "2026-11-22", model_count: 1 }, "providers.dev": null, "models.dev": { listed_at: "2026-11-21", model_count: 2 }, "pi.dev": null };
+    const html = listingHtml(provider, listing([model({ id: "a" }), model({ id: "b", listed_by: ["models.dev"] }), model({ id: "c", listed_by: ["models.dev"] })], { lists }), today);
+    expect(html).toContain("1 model on the vendor's own list, read through Provimux, a proxy built on CLIProxyAPI. 2 more models from other sources' lists.");
+    // One list: nothing more is said.
+    expect(listingHtml(provider, listing([model({})]), today)).not.toContain("from other sources");
   });
 
   it("says plainly when no source gives a list, with no table and no link to an answer that is not there", () => {

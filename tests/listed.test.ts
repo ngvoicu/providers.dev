@@ -245,13 +245,19 @@ describe("the build reads it", () => {
     expect(meta.issues.filter((issue) => issue.code.startsWith("listed"))).toEqual([]);
   });
 
-  it("a listed list replaces the lower sources for its provider only, named by its client", async () => {
+  it("a listed list comes first for its provider only, named by its client; the lower sources' models stay after it (1.6.0)", async () => {
     const { meta, listing } = await built(json(listedFile()));
     const own = listing("provider-02")!;
     expect(ListingSchema.safeParse(own).error).toBeUndefined();
-    expect(own).toMatchObject({ basis: "listed", listed_at: "2026-11-22", client: "provimux", client_label: "Provimux, a proxy built on CLIProxyAPI", model_count: 2 });
+    expect(own).toMatchObject({ basis: "listed", listed_at: "2026-11-22", client: "provimux", client_label: "Provimux, a proxy built on CLIProxyAPI", lists: { listed: { listed_at: "2026-11-22", model_count: 2 }, "providers.dev": null } });
     expect(own.evidence).toEqual([{ kind: "listed", url: "https://github.com/ngvoicu/groundtruth/blob/main/listed.json", date: "2026-11-22", note: null }]);
-    expect(own.models!.map((model) => model.id)).toEqual(["gemini-4-neon", "model-1"]);
+    expect(own.models!.slice(0, 2).map((model) => [model.id, model.listed_by])).toEqual([["gemini-4-neon", ["listed"]], ["model-1", ["listed", "models.dev"]]]);
+    // Every model of models.dev's list the discovery lacks stays, after the discovery's, listed by models.dev.
+    const rest = own.models!.slice(2);
+    expect(rest.length).toBe(own.lists["models.dev"]!.model_count - 1);
+    expect(rest.length).toBeGreaterThan(0);
+    for (const model of rest) expect(model.listed_by[0]).toBe("models.dev");
+    expect(own.model_count).toBe(own.models!.length);
     // Only values that cannot carry text are taken: no name and no variants from the file; the name is the id.
     expect(own.models![0]).toMatchObject({ entry: null, name: "gemini-4-neon", context_window: 1048576, reasoning: { levels: ["low", "medium", "high"], supported: null }, variants: [], sources: { name: "listed", context_window: "listed", variants: null } });
     // model-1 is an entry: the vendor's list gives the plans, models.dev the window.
@@ -345,7 +351,7 @@ describe("the build reads it", () => {
     const ids = ["provider-02", "provider-03", "provider-04", "provider-05", "provider-06"];
     crafted.providers = Object.fromEntries(Object.values(crafted.providers).map((part, index) => [ids[index]!, part]));
     const { meta, dataDir, listing } = await built(json(crafted));
-    expect(listing("provider-02")!.models!.map((model) => model.id)).toEqual(["gpt-6.1-sol", "gpt-6.2-sol", "gpt-7-neon", "gpt-6-astra"]);
+    expect(listing("provider-02")!.models!.filter((model) => model.listed_by.includes("listed")).map((model) => model.id)).toEqual(["gpt-6.1-sol", "gpt-6.2-sol", "gpt-7-neon", "gpt-6-astra"]);
     expect(listing("provider-02")!.models!.find((model) => model.id === "gpt-7-neon")).toMatchObject({ name: "gpt-7-neon", aliases: [], hidden: true });
     const published = join(dataDir, "published", "site", "data");
     const everything = [JSON.stringify(meta), readFileSync(join(published, "listings.json"), "utf8"), ...ids.map((id) => readFileSync(join(published, "listings", `${id}.json`), "utf8"))].join("");

@@ -25,7 +25,7 @@ import { handlePage } from "../src/core/pages.ts";
 import { MARK } from "../src/core/page-shell.ts";
 import { CACHE_EVALUATION_PARAMS, LIMIT_EVALUATION_PARAMS, PARAMS, parseQuery, runQuery } from "../src/core/query.ts";
 import { canonicalModels, inputWindowRange, listEvaluations, withoutEntries } from "../src/core/resources.ts";
-import type { Listing } from "../src/core/listings.ts";
+import type { Listing, ListingSource } from "../src/core/listings.ts";
 import { ext, type Catalog, type Meta, type ModelExtension } from "../src/core/schema.ts";
 import { depsFrom, fetchReturning, fixturePi, fixtureUpstream, contractProblems, inputWindowRuleBreaks, lifetimeRuleBreaks, piShort, ROOT, safeBreaks, summaryOf, tempDataDir, writeAuthored, writePiSnapshot } from "./helpers.ts";
 
@@ -514,7 +514,7 @@ describe("HTTP behaviour", () => {
 
   it("describes the cache lifetime record: its components and a guide section", async () => {
     const document = await json<{ info: { version: string; contact: unknown; license: unknown }; "x-guide": { id: string; title: string; paragraphs: string[] }[]; components: { schemas: Record<string, { properties?: Record<string, unknown> }> } }>("/api/v1/openapi.json");
-    expect(document.info.version).toBe("1.5.1");
+    expect(document.info.version).toBe("1.6.0");
     expect(document.info.contact).toEqual({ name: "providers.dev", email: "office@providers.dev", url: "https://providers.dev/docs/contributing/" });
     expect(document.info.license).toEqual({ name: "MIT", url: "https://providers.dev/docs/licensing/" });
     const schemas = document.components.schemas;
@@ -577,9 +577,9 @@ describe("pi's catalog in the API (design/pi-source.md, section d)", () => {
     expect(meta.sync.last_error ?? "").not.toMatch(/pi/);
   });
 
-  it("is version 1.5.1, with the six pi components, the keys on the entry, the summary and /meta, and a guide section after Input window", async () => {
+  it("is version 1.6.0, with the six pi components, the keys on the entry, the summary and /meta, and a guide section after Input window", async () => {
     const document = await json<{ info: { version: string; description: string }; "x-guide": { id: string; title: string; paragraphs: string[] }[]; components: { schemas: Record<string, { properties?: Record<string, unknown>; required?: string[] }> } }>("/api/v1/openapi.json");
-    expect(document.info.version).toBe("1.5.1");
+    expect(document.info.version).toBe("1.6.0");
     expect(document.info.description).toContain("A second catalog, pi's (MIT), is imported beside it: what it states for an entry is under providers_dev.pi.");
     const schemas = document.components.schemas;
     for (const name of ["PiBlock", "PiCost", "PiCostTier", "PiDifference", "PiSummary", "PiValue"]) expect(schemas[name], name).toBeDefined();
@@ -635,7 +635,7 @@ describe("pi's catalog in the API (design/pi-source.md, section d)", () => {
 describe("the input window in the OpenAPI document", () => {
   it("has the two components, the key on the entry and the summary, input_read on an evaluation, and a guide section after Unknown values", async () => {
     const document = await json<{ info: { version: string }; "x-guide": { id: string; title: string; paragraphs: string[] }[]; components: { schemas: Record<string, { properties?: Record<string, unknown>; required?: string[] }> } }>("/api/v1/openapi.json");
-    expect(document.info.version).toBe("1.5.1");
+    expect(document.info.version).toBe("1.6.0");
     const schemas = document.components.schemas;
     expect(Object.keys(schemas.InputWindow!.properties!)).toEqual([
       "tokens", "basis", "bound", "scope", "source", "date", "documented_tokens", "documented_field", "documented_source", "documented_date", "documented_status",
@@ -711,8 +711,8 @@ describe("listings: the contract and the two paths (1.5.0)", () => {
   });
   const ask = async (local: ApiDeps, path: string): Promise<Response> => handleApi(new Request(`https://providers.dev${path}`), local);
   const sources = { name: null, owner: null, released: null, context_window: null, max_input: null, max_output: null, input_modalities: null, output_modalities: null, reasoning: { supported: null, levels: null, budget_min: null, budget_max: null, can_disable: null, dynamic: null, disable_with: null }, web_search: null, aliases: null, variants: null, plans: null, hidden: null };
-  const model = { id: "m", name: null, owner: null, entry: null, canonical: null, released: null, context_window: null, max_input: null, max_output: null, input_modalities: null, output_modalities: null, reasoning: null, web_search: null, aliases: [], variants: [], plans: [], hidden: null, sources };
-  const listing = (provider: string): Listing => ({ provider, basis: "listed", listed_at: "2026-11-22", client: "provimux", client_label: "Provimux", evidence: [], model_count: 1, models: [model] });
+  const model = { id: "m", name: null, owner: null, entry: null, canonical: null, released: null, context_window: null, max_input: null, max_output: null, input_modalities: null, output_modalities: null, reasoning: null, web_search: null, aliases: [], variants: [], plans: [], hidden: null, listed_by: ["listed"] as ListingSource[], sources };
+  const listing = (provider: string): Listing => ({ provider, basis: "listed", listed_at: "2026-11-22", lists: { listed: { listed_at: "2026-11-22", model_count: 1 }, "providers.dev": null, "models.dev": null, "pi.dev": null }, client: "provimux", client_label: "Provimux", evidence: [], model_count: 1, models: [model] });
 
   it("answers an empty page when there is no listing", async () => {
     const response = await ask(withListings([]), "/api/v1/listings?view=full");
@@ -775,11 +775,13 @@ describe("listings: the contract and the two paths (1.5.0)", () => {
     const document = (await (await get("/api/v1/openapi.json")).json()) as { paths: Record<string, unknown>; "x-guide": { id: string; paragraphs: string[] }[]; components: { schemas: Record<string, { properties: Record<string, unknown>; required: string[] }> } };
     expect(Object.keys(document.paths)).toEqual(expect.arrayContaining(["/api/v1/listings", "/api/v1/listings/{provider}"]));
     const schemas = document.components.schemas;
-    for (const name of ["Listing", "ListingModel", "ListingReasoning", "ListingSources", "ListingReasoningSources"]) expect(schemas[name]!.required, name).toEqual(Object.keys(schemas[name]!.properties));
-    expect(Object.keys(schemas.Listing!.properties)).toEqual(["provider", "basis", "listed_at", "client", "client_label", "evidence", "model_count", "models"]);
+    for (const name of ["Listing", "ListingModel", "ListingReasoning", "ListingSources", "ListingReasoningSources", "ListingList", "ListingLists"]) expect(schemas[name]!.required, name).toEqual(Object.keys(schemas[name]!.properties));
+    expect(Object.keys(schemas.Listing!.properties)).toEqual(["provider", "basis", "listed_at", "lists", "client", "client_label", "evidence", "model_count", "models"]);
+    expect(Object.keys(schemas.ListingModel!.properties).slice(-2)).toEqual(["listed_by", "sources"]);
+    expect(Object.keys(schemas.ListingLists!.properties)).toEqual(["listed", "providers.dev", "models.dev", "pi.dev"]);
     expect(Object.keys((schemas.Meta!.properties.listings as { properties: Record<string, unknown> }).properties)).toEqual(["count", "models", "by_basis", "source", "fetched_at", "checked_at", "listed_at", "sync"]);
     const text = document["x-guide"].find((section) => section.id === "listings")!.paragraphs.join(" ");
-    for (const words of ["Since 1.5.0", "need not be an entry", "taken whole from the first source", "no prices, allowances or quotas"]) expect(text).toContain(words);
+    for (const words of ["Since 1.5.0", "need not be an entry", "Since 1.6.0 the models of a listing are every model any of the four lists", "listed_by", "Until 1.5.1 the models were taken whole from basis", "no prices, allowances or quotas"]) expect(text).toContain(words);
     const meta = (await (await get("/api/v1/meta")).json()) as { data: Meta };
     expect(meta.data.listings.source).toBe("https://raw.githubusercontent.com/ngvoicu/groundtruth/main/listed.json");
   });

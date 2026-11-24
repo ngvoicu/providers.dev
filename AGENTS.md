@@ -113,7 +113,8 @@ The baseline is imported from models.dev; our additions, corrections and measure
   fence reads with `piStatements`. No value a measurement, providers.dev or models.dev states differs with or without
   pi's data (`npm run compare:published`). The listings are the one other place: pi is the fourth source of a listing
   (`/api/v1/listings`), after the vendor's list, providers.dev and models.dev, and a field it gives is marked `pi.dev`
-  in the model's `sources`. A listing is not an entry. Where pi stands beside each value
+  in the model's `sources`. A listing's models are the union of the four sources' lists (since API 1.6.0); `listed_by`
+  names the lists that have a model, and no list is taken as the whole. A listing is not an entry. Where pi stands beside each value
   is worked out once, in `piValues` (`src/core/pi.ts`), into `providers_dev.pi.values`, from the same reading as
   `differences`; a page prints the `standing` and compares nothing (`design/pi-merged.md`).
 - The safe value, like every figure the site shows, is worked out once, when the data is built, and published in the
