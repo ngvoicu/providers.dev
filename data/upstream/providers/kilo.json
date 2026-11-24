@@ -2632,24 +2632,8 @@
    "modalities": {
     "input": [
      "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/tiff",
-     "image/x-icon",
-     "image/x-icns",
-     "image/sgi",
-     "image/jp2",
-     "image/heic",
-     "audio/mpeg",
-     "audio/wav",
-     "audio/aac",
-     "audio/x-m4a",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/quicktime"
+     "image",
+     "video"
     ],
     "output": [
      "text"
@@ -2719,24 +2703,8 @@
    "modalities": {
     "input": [
      "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/tiff",
-     "image/x-icon",
-     "image/x-icns",
-     "image/sgi",
-     "image/jp2",
-     "image/heic",
-     "audio/mpeg",
-     "audio/wav",
-     "audio/aac",
-     "audio/x-m4a",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/quicktime"
+     "image",
+     "video"
     ],
     "output": [
      "text"
@@ -3969,7 +3937,7 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.047,
+      "price": 0.0456,
       "cache": {
        "read": 0.035
       }
@@ -4016,7 +3984,7 @@
    "release_date": "2026-08-21",
    "limit": {
     "context": 1048576,
-    "output": 262144
+    "output": 393216
    },
    "capabilities": {
     "temperature": true,
@@ -4041,13 +4009,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.2156,
+      "price": 0.44,
       "cache": {
-       "read": 0.00686
+       "read": 0.028
       }
      },
      "output": {
-      "price": 0.6468
+      "price": 1.32
      }
     }
    },
@@ -4258,13 +4226,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.14,
+      "price": 0.0507,
       "cache": {
-       "read": 0.0042
+       "read": 0.001014
       }
      },
      "output": {
-      "price": 0.42
+      "price": 0.2028
      }
     }
    },
@@ -4599,74 +4567,12 @@
    "last_updated": "2026-09-10",
    "recommended_api": "chat-completions"
   },
-  "dots-studio/dots-3-note-preview:free": {
-   "id": "dots-studio/dots-3-note-preview:free",
-   "name": "Dots Studio: Dots3-Note Preview (free)",
-   "description": "Dots3-Note Preview is an open-weight mixture-of-experts model from Dots Studio, with 16B active parameters out of 280B total. It is the lightest model in the Dots 3 family and is...",
-   "type": "chat",
-   "release_date": "2026-08-14",
-   "limit": {
-    "context": 512000,
-    "output": 460800
-   },
-   "capabilities": {
-    "temperature": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "none",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.kilo.ai/api/gateway",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": []
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-08-14",
-   "recommended_api": "chat-completions"
-  },
   "elorian/glimpse": {
    "id": "elorian/glimpse",
    "name": "Elorian: Glimpse",
    "description": "Glimpse is a multimodal visual reasoning model from Elorian, built for visual understanding and complex visual reasoning in the physical world. It reasons directly over images and video rather than...",
    "type": "chat",
+   "family": "glimpse",
    "release_date": "2026-10-17",
    "limit": {
     "context": 262144,
@@ -4919,7 +4825,7 @@
    "canonical_id": "google/gemini-2.5-flash-image",
    "release_date": "2025-08-26",
    "limit": {
-    "context": 65536,
+    "context": 32768,
     "output": 8192
    },
    "capabilities": {
@@ -7212,6 +7118,85 @@
    "last_updated": "2026-11-18",
    "recommended_api": "chat-completions"
   },
+  "google/gemini-4-neon-fast": {
+   "id": "google/gemini-4-neon-fast",
+   "name": "Google: Gemini 4 Neon (Fast)",
+   "description": "Gemini 4 Neon is Google's fast multimodal reasoning model for coding, agentic workflows, and complex tasks, delivering high-quality results with low latency. It accepts text, images, video, and documents, with tool calling and structured outputs for building responsive applications.",
+   "type": "chat",
+   "family": "gemini",
+   "canonical_id": "google/gemini-4-neon",
+   "release_date": "2026-11-18",
+   "limit": {
+    "context": 1000000,
+    "output": 1000000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 5.4,
+      "cache": {
+       "read": 0.27
+      }
+     },
+     "output": {
+      "price": 27,
+      "reasoning": 0
+     }
+    },
+    "web_search": {
+     "price": 14
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image",
+     "application/pdf",
+     "video"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.kilo.ai/api/gateway",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-03",
+   "last_updated": "2026-11-18",
+   "recommended_api": "chat-completions"
+  },
   "google/gemini-nano-banana-2.1": {
    "id": "google/gemini-nano-banana-2.1",
    "name": "Nano Banana 2.1",
@@ -7790,13 +7775,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.05,
+      "price": 0.047,
       "cache": {
-       "read": 0.025
+       "read": 0.023
       }
      },
      "output": {
-      "price": 0.18
+      "price": 0.169
      }
     }
    },
@@ -10182,6 +10167,7 @@
    "description": "Muse Ember is the smallest and most efficient model from Meta that’s designed for complex reasoning execution and the work agents repeat all day: tool calls, coding agent subtasks, routing,...",
    "type": "chat",
    "family": "muse-ember",
+   "canonical_id": "meta/muse-ember-1.0",
    "release_date": "2026-11-09",
    "limit": {
     "context": 1048576,
@@ -10189,6 +10175,8 @@
    },
    "capabilities": {
     "temperature": true,
+    "top_k": false,
+    "top_p": true,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -10226,10 +10214,14 @@
    "modalities": {
     "input": [
      "text",
-     "image",
-     "video",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "video/mp4",
      "application/pdf",
-     "audio"
+     "audio/mpeg",
+     "audio/wav"
     ],
     "output": [
      "text"
@@ -10808,6 +10800,7 @@
    "description": "Muse Wonder is a frontier reasoning model from Meta, designed for complex personal and professional agentic tasks. It accepts text, images, video, audio, and PDF documents and returns text, with...",
    "type": "chat",
    "family": "muse-wonder",
+   "canonical_id": "meta/muse-wonder-1.0",
    "release_date": "2026-10-12",
    "limit": {
     "context": 1048576,
@@ -10815,6 +10808,8 @@
    },
    "capabilities": {
     "temperature": true,
+    "top_k": false,
+    "top_p": true,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -12178,77 +12173,6 @@
    "last_updated": "2026-10-05",
    "recommended_api": "chat-completions"
   },
-  "mistralai/mistral-medium-3": {
-   "id": "mistralai/mistral-medium-3",
-   "name": "Mistral Medium 3",
-   "description": "Mistral model for multilingual chat, reasoning, and tool-assisted workflows",
-   "type": "chat",
-   "family": "mistral-medium",
-   "canonical_id": "mistral/mistral-medium-3",
-   "release_date": "2025-05-07",
-   "limit": {
-    "context": 131072,
-    "output": 104857
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.44,
-      "cache": {
-       "read": 0.044
-      }
-     },
-     "output": {
-      "price": 2.2
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/gif",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.kilo.ai/api/gateway",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": []
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-03-31",
-   "last_updated": "2025-05-07",
-   "recommended_api": "chat-completions"
-  },
   "mistralai/mistral-medium-3-5": {
    "id": "mistralai/mistral-medium-3-5",
    "name": "Mistral Medium 3.5",
@@ -12321,77 +12245,6 @@
    },
    "open_weights": true,
    "last_updated": "2026-04-28",
-   "recommended_api": "chat-completions"
-  },
-  "mistralai/mistral-medium-3.1": {
-   "id": "mistralai/mistral-medium-3.1",
-   "name": "Mistral Medium 3.1",
-   "description": "Mistral model for multilingual chat, reasoning, and tool-assisted workflows",
-   "type": "chat",
-   "family": "mistral-medium",
-   "canonical_id": "mistral/mistral-medium-3.1",
-   "release_date": "2025-08-12",
-   "limit": {
-    "context": 131072,
-    "output": 104857
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.44,
-      "cache": {
-       "read": 0.044
-      }
-     },
-     "output": {
-      "price": 2.2
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/gif",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://api.kilo.ai/api/gateway",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": []
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-06-30",
-   "last_updated": "2025-08-12",
    "recommended_api": "chat-completions"
   },
   "mistralai/mistral-nemo": {
@@ -19726,14 +19579,18 @@
    "name": "OpenAI: GPT-6 Astra Pro",
    "description": "GPT-6 Astra Pro is the same underlying model as [GPT-6 Astra](https://openrouter.ai/openai/gpt-6-astra), served with `reasoning.mode` set to `pro` for higher-quality responses on complex tasks. Learn more in OpenAI's docs: https://developers.openai.com/api/docs/guides/reasoning#reasoning-mode",
    "type": "chat",
-   "family": "gpt-pro",
+   "family": "gpt-astra",
+   "canonical_id": "openai/gpt-6-astra",
    "release_date": "2026-09-04",
    "limit": {
     "context": 1050000,
+    "input": 922000,
     "output": 128000
    },
    "capabilities": {
     "temperature": false,
+    "top_k": false,
+    "top_p": false,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -19770,12 +19627,12 @@
    },
    "modalities": {
     "input": [
-     "application/pdf",
+     "text",
      "image/jpeg",
      "image/png",
      "image/gif",
      "image/webp",
-     "text"
+     "application/pdf"
     ],
     "output": [
      "text"
@@ -19796,6 +19653,7 @@
     }
    },
    "open_weights": false,
+   "knowledge": "2026-04-30",
    "last_updated": "2026-09-04",
    "recommended_api": "chat-completions"
   },
@@ -19973,14 +19831,18 @@
    "name": "OpenAI: GPT-6 Luna Pro",
    "description": "GPT-6 Luna Pro is the same underlying model as [GPT-6 Luna](https://openrouter.ai/openai/gpt-6-luna), served with `reasoning.mode` set to `pro` for higher-quality responses on complex tasks. Learn more in OpenAI's docs: https://developers.openai.com/api/docs/guides/reasoning#reasoning-mode",
    "type": "chat",
-   "family": "gpt-pro",
+   "family": "gpt-luna",
+   "canonical_id": "openai/gpt-6-luna",
    "release_date": "2026-09-22",
    "limit": {
     "context": 1050000,
+    "input": 922000,
     "output": 128000
    },
    "capabilities": {
     "temperature": false,
+    "top_k": false,
+    "top_p": true,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -20018,12 +19880,12 @@
    },
    "modalities": {
     "input": [
-     "application/pdf",
+     "text",
      "image/jpeg",
      "image/png",
      "image/gif",
      "image/webp",
-     "text"
+     "application/pdf"
     ],
     "output": [
      "text"
@@ -20044,6 +19906,7 @@
     }
    },
    "open_weights": false,
+   "knowledge": "2026-05-18",
    "last_updated": "2026-09-22",
    "recommended_api": "chat-completions"
   },
@@ -20221,14 +20084,18 @@
    "name": "OpenAI: GPT-6 Sol Pro",
    "description": "GPT-6 Sol Pro is the same underlying model as [GPT-6 Sol](https://openrouter.ai/openai/gpt-6-sol), served with `reasoning.mode` set to `pro` for higher-quality responses on complex tasks. Learn more in OpenAI's docs: https://developers.openai.com/api/docs/guides/reasoning#reasoning-mode",
    "type": "chat",
-   "family": "gpt-pro",
+   "family": "gpt-sol",
+   "canonical_id": "openai/gpt-6-sol",
    "release_date": "2026-09-22",
    "limit": {
     "context": 1050000,
+    "input": 922000,
     "output": 128000
    },
    "capabilities": {
     "temperature": false,
+    "top_k": false,
+    "top_p": true,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -20266,12 +20133,12 @@
    },
    "modalities": {
     "input": [
-     "application/pdf",
+     "text",
      "image/jpeg",
      "image/png",
      "image/gif",
      "image/webp",
-     "text"
+     "application/pdf"
     ],
     "output": [
      "text"
@@ -20292,6 +20159,7 @@
     }
    },
    "open_weights": false,
+   "knowledge": "2026-04-20",
    "last_updated": "2026-09-22",
    "recommended_api": "chat-completions"
   },
@@ -20467,14 +20335,18 @@
    "name": "OpenAI: GPT-6.1 Sol Pro",
    "description": "GPT-6.1 Sol Pro is the same underlying model as [GPT-6.1 Sol](https://openrouter.ai/openai/gpt-6.1-sol), served with `reasoning.mode` set to `pro` for higher-quality responses on complex tasks. **Cost note:** pro mode spends far more...",
    "type": "chat",
-   "family": "gpt-pro",
+   "family": "gpt-sol",
+   "canonical_id": "openai/gpt-6.1-sol",
    "release_date": "2026-09-29",
    "limit": {
     "context": 1050000,
+    "input": 922000,
     "output": 128000
    },
    "capabilities": {
     "temperature": false,
+    "top_k": false,
+    "top_p": false,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -20511,12 +20383,12 @@
    },
    "modalities": {
     "input": [
-     "application/pdf",
+     "text",
      "image/jpeg",
      "image/png",
      "image/gif",
      "image/webp",
-     "text"
+     "application/pdf"
     ],
     "output": [
      "text"
@@ -20537,6 +20409,7 @@
     }
    },
    "open_weights": false,
+   "knowledge": "2026-04-30",
    "last_updated": "2026-09-29",
    "recommended_api": "chat-completions"
   },
@@ -20714,14 +20587,18 @@
    "name": "OpenAI: GPT-6.1 Terra Pro",
    "description": "GPT-6.1 Terra Pro is the same underlying model as [GPT-6.1 Terra](https://openrouter.ai/openai/gpt-6.1-terra), served with `reasoning.mode` set to `pro` for higher-quality responses on complex tasks. **Cost note:** pro mode spends far more...",
    "type": "chat",
-   "family": "gpt-pro",
+   "family": "gpt-terra",
+   "canonical_id": "openai/gpt-6.1-terra",
    "release_date": "2026-10-26",
    "limit": {
     "context": 1050000,
+    "input": 922000,
     "output": 128000
    },
    "capabilities": {
     "temperature": false,
+    "top_k": false,
+    "top_p": true,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -20758,9 +20635,12 @@
    },
    "modalities": {
     "input": [
-     "application/pdf",
-     "image",
-     "text"
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
     ],
     "output": [
      "text"
@@ -20781,6 +20661,7 @@
     }
    },
    "open_weights": false,
+   "knowledge": "2026-06-01",
    "last_updated": "2026-10-26",
    "recommended_api": "chat-completions"
   },
@@ -20956,14 +20837,18 @@
    "name": "OpenAI: GPT-6.2 Astra Pro",
    "description": "GPT-6.2 Astra Pro is the same underlying model as [GPT-6.2 Astra](https://openrouter.ai/openai/gpt-6.2-astra), served with `reasoning.mode` set to `pro` for higher-quality responses on complex tasks. **Cost note:** pro mode spends far more...",
    "type": "chat",
-   "family": "gpt-pro",
+   "family": "gpt-astra",
+   "canonical_id": "openai/gpt-6.2-astra",
    "release_date": "2026-11-17",
    "limit": {
     "context": 1050000,
+    "input": 922000,
     "output": 128000
    },
    "capabilities": {
     "temperature": false,
+    "top_k": false,
+    "top_p": false,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -21000,9 +20885,12 @@
    },
    "modalities": {
     "input": [
-     "application/pdf",
-     "image",
-     "text"
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
     ],
     "output": [
      "text"
@@ -21023,12 +20911,13 @@
     }
    },
    "open_weights": false,
+   "knowledge": "2026-05-18",
    "last_updated": "2026-11-17",
    "recommended_api": "chat-completions"
   },
   "openai/gpt-6.2-sol": {
    "id": "openai/gpt-6.2-sol",
-   "name": "OpenAI: GPT-6.2 Sol (new)",
+   "name": "OpenAI: GPT-6.2 Sol",
    "description": "GPT-6.2 Sol is an upgrade to GPT-6.1 Sol from OpenAI, positioned below the flagship GPT-6.2 Astra in the GPT-6.2 series. It is an efficient, versatile model for everyday work, suited...",
    "type": "chat",
    "family": "gpt-sol",
@@ -21198,14 +21087,18 @@
    "name": "OpenAI: GPT-6.2 Sol Pro",
    "description": "GPT-6.2 Sol Pro is the same underlying model as [GPT-6.2 Sol](https://openrouter.ai/openai/gpt-6.2-sol), served with `reasoning.mode` set to `pro` for higher-quality responses on complex tasks. **Cost note:** pro mode spends far more...",
    "type": "chat",
-   "family": "gpt-pro",
+   "family": "gpt-sol",
+   "canonical_id": "openai/gpt-6.2-sol",
    "release_date": "2026-11-17",
    "limit": {
     "context": 1050000,
+    "input": 922000,
     "output": 128000
    },
    "capabilities": {
     "temperature": false,
+    "top_k": false,
+    "top_p": false,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -21242,9 +21135,12 @@
    },
    "modalities": {
     "input": [
-     "application/pdf",
-     "image",
-     "text"
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
     ],
     "output": [
      "text"
@@ -21265,6 +21161,7 @@
     }
    },
    "open_weights": false,
+   "knowledge": "2026-06-01",
    "last_updated": "2026-11-17",
    "recommended_api": "chat-completions"
   },
@@ -26121,7 +26018,7 @@
    "release_date": "2026-08-14",
    "limit": {
     "context": 262144,
-    "output": 131072
+    "output": 235929
    },
    "capabilities": {
     "temperature": true,
@@ -28756,7 +28653,7 @@
    "limit": {
     "context": 1048576,
     "input": 983040,
-    "output": 65536
+    "output": 64000
    },
    "capabilities": {
     "temperature": true,
@@ -31991,8 +31888,8 @@
    "canonical_id": "zhipuai/glm-5.3-flash",
    "release_date": "2026-08-26",
    "limit": {
-    "context": 1048576,
-    "output": 943718
+    "context": 1048575,
+    "output": 943717
    },
    "capabilities": {
     "temperature": true,
@@ -32134,7 +32031,8 @@
    "name": "Z.ai: GLM 5.3 FlashX Legal",
    "description": "GLM-5.3-FlashX-Legal (GLM-Legal) is Z.ai's legal-domain variant of GLM-5.3-FlashX, a native multimodal model that accepts text, image, and video input and produces text. It adds legal-domain mid-training and post-training with reinforcement...",
    "type": "chat",
-   "family": "glm",
+   "family": "glm-flash-legal",
+   "canonical_id": "zhipuai/glm-5.3-flashx-legal",
    "release_date": "2026-11-02",
    "limit": {
     "context": 1048576,
@@ -32142,6 +32040,8 @@
    },
    "capabilities": {
     "temperature": true,
+    "top_k": false,
+    "top_p": true,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -32814,7 +32714,7 @@
    "release_date": "2026-08-01",
    "limit": {
     "context": 1048576,
-    "output": 943718
+    "output": 131072
    },
    "capabilities": {
     "temperature": true,
@@ -32837,7 +32737,7 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.047,
+      "price": 0.0456,
       "cache": {
        "read": 0.035
       }

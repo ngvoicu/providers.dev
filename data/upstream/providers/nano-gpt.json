@@ -8960,24 +8960,8 @@
    "modalities": {
     "input": [
      "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "image/tiff",
-     "image/x-icon",
-     "image/x-icns",
-     "image/sgi",
-     "image/jp2",
-     "image/heic",
-     "audio/mpeg",
-     "audio/wav",
-     "audio/aac",
-     "audio/x-m4a",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/quicktime"
+     "image",
+     "video"
     ],
     "output": [
      "text"
@@ -10526,13 +10510,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.05,
+      "price": 0.04532,
       "cache": {
-       "read": 0.013
+       "read": 0.001442
       }
      },
      "output": {
-      "price": 0.16
+      "price": 0.13596
      }
     }
    },
@@ -10599,13 +10583,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.05,
+      "price": 0.04532,
       "cache": {
-       "read": 0.013
+       "read": 0.001442
       }
      },
      "output": {
-      "price": 0.16
+      "price": 0.13596
      }
     }
    },
@@ -12298,6 +12282,7 @@
    "name": "Elorian Glimpse",
    "description": "Glimpse is Elorian's visual reasoning model for understanding images and video and answering in text. It can analyze charts, count objects, follow events over time, and reason about spatial relationships and physical cause and effect. It supports tool calling and structured output across a shared 262,144-token context window, with up to 256,000 output tokens within the remaining context.",
    "type": "chat",
+   "family": "glimpse",
    "release_date": "2026-10-17",
    "limit": {
     "context": 262144,
@@ -19895,16 +19880,20 @@
   "meta/muse-ember": {
    "id": "meta/muse-ember",
    "name": "Muse Ember",
-   "description": "Meta's Muse Ember is the smallest and most efficient Muse model, built for the work agents repeat all day: tool calls, coding-agent subtasks, routing, and extraction. It accepts text, images, audio, video, and PDF documents across a one-million-token context window, supports tool calling and structured output, and always reasons before answering.",
+   "description": "Muse Ember is Meta's smallest and most efficient reasoning model, built for the work agents repeat all day: tool calls, coding subtasks, routing, extraction, and long-document parsing. It pairs with Muse Wonder or Muse Spark, which plan while Muse Ember handles the volume.",
    "type": "chat",
    "family": "muse-ember",
-   "release_date": "2026-11-11",
+   "canonical_id": "meta/muse-ember-1.0",
+   "release_date": "2026-11-09",
    "limit": {
     "context": 1048576,
     "input": 1048576,
     "output": 1048576
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -19939,10 +19928,14 @@
    "modalities": {
     "input": [
      "text",
-     "image",
-     "video",
-     "audio",
-     "application/pdf"
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "video/mp4",
+     "application/pdf",
+     "audio/mpeg",
+     "audio/wav"
     ],
     "output": [
      "text"
@@ -19963,7 +19956,7 @@
     }
    },
    "open_weights": false,
-   "last_updated": "2026-11-11",
+   "last_updated": "2026-11-09",
    "recommended_api": "chat-completions"
   },
   "meta/muse-glimmer-30b": {
@@ -20508,9 +20501,10 @@
   "meta/muse-wonder": {
    "id": "meta/muse-wonder",
    "name": "Muse Wonder",
-   "description": "Meta's Muse Wonder is a frontier reasoning model designed for complex personal and professional agentic tasks. It accepts text, images, audio, video, and PDF documents across a one-million-token context window, supports tool calling and structured output, and always reasons before answering.",
+   "description": "Muse Wonder is a frontier multimodal reasoning model from Meta for personal and professional agents, long-horizon coding, and computer use. It combines Active Memory, which carries relevant context across conversations, with Active Focus, which keeps it working through blockers toward a goal.",
    "type": "chat",
    "family": "muse-wonder",
+   "canonical_id": "meta/muse-wonder-1.0",
    "release_date": "2026-10-12",
    "limit": {
     "context": 1048576,
@@ -20518,6 +20512,9 @@
     "output": 1048576
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -20552,10 +20549,14 @@
    "modalities": {
     "input": [
      "text",
-     "image",
-     "video",
-     "audio",
-     "application/pdf"
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "video/mp4",
+     "application/pdf",
+     "audio/mpeg",
+     "audio/wav"
     ],
     "output": [
      "text"
@@ -22894,138 +22895,6 @@
    },
    "open_weights": false,
    "last_updated": "2026-10-16",
-   "recommended_api": "chat-completions"
-  },
-  "moonshotai/Kimi-K2-Instruct-0905": {
-   "id": "moonshotai/Kimi-K2-Instruct-0905",
-   "name": "Kimi K2 0905",
-   "description": "Kimi model for long-context chat, coding, and agentic reasoning",
-   "type": "chat",
-   "family": "kimi",
-   "canonical_id": "moonshotai/kimi-k2-0905",
-   "release_date": "2025-09-05",
-   "limit": {
-    "context": 262144,
-    "input": 262144,
-    "output": 100352
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.4,
-      "cache": {
-       "read": 0.2
-      }
-     },
-     "output": {
-      "price": 1.8
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://nano-gpt.com/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": []
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-09-05",
-   "recommended_api": "chat-completions"
-  },
-  "moonshotai/kimi-k2-instruct": {
-   "id": "moonshotai/kimi-k2-instruct",
-   "name": "Kimi K2 Instruct",
-   "description": "Non-thinking Kimi K2 MoE instruction model for coding and tool-using agents",
-   "type": "chat",
-   "family": "kimi",
-   "canonical_id": "moonshotai/kimi-k2-instruct",
-   "release_date": "2025-07-11",
-   "limit": {
-    "context": 256000,
-    "input": 256000,
-    "output": 8192
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.4,
-      "cache": {
-       "read": 0.2
-      }
-     },
-     "output": {
-      "price": 1.8
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://nano-gpt.com/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": []
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "last_updated": "2025-07-11",
    "recommended_api": "chat-completions"
   },
   "moonshotai/kimi-k2.5": {
@@ -27319,9 +27188,10 @@
   "openai/gpt-6-astra-pro": {
    "id": "openai/gpt-6-astra-pro",
    "name": "GPT 6 Astra Pro",
-   "description": "GPT 6 Astra in Pro reasoning mode. Uses additional model work for difficult tasks, with higher latency and token usage at the same per-token rates. Reasoning effort remains independently configurable.",
+   "description": "GPT-6 Astra is OpenAI's most capable model for complex reasoning, coding, computer use, research, and document creation.",
    "type": "chat",
-   "family": "gpt-pro",
+   "family": "gpt-astra",
+   "canonical_id": "openai/gpt-6-astra",
    "release_date": "2026-09-04",
    "limit": {
     "context": 1050000,
@@ -27332,6 +27202,9 @@
     "cache": {
      "implicit": true
     },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -27366,8 +27239,9 @@
    "modalities": {
     "input": [
      "text",
-     "image/png",
      "image/jpeg",
+     "image/png",
+     "image/gif",
      "image/webp",
      "application/pdf"
     ],
@@ -27390,6 +27264,7 @@
     }
    },
    "open_weights": false,
+   "knowledge": "2026-04-30",
    "last_updated": "2026-09-04",
    "recommended_api": "chat-completions"
   },
@@ -27480,9 +27355,10 @@
   "openai/gpt-6-luna-pro": {
    "id": "openai/gpt-6-luna-pro",
    "name": "GPT 6 Luna Pro",
-   "description": "GPT-6 Luna Pro uses the same underlying model as GPT-6 Luna with Pro reasoning mode enabled for higher-quality responses on complex tasks.",
+   "description": "OpenAI's most efficient model for focused, high-volume tasks",
    "type": "chat",
-   "family": "gpt-pro",
+   "family": "gpt-luna",
+   "canonical_id": "openai/gpt-6-luna",
    "release_date": "2026-09-22",
    "limit": {
     "context": 1050000,
@@ -27493,6 +27369,9 @@
     "cache": {
      "implicit": true
     },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -27527,8 +27406,9 @@
    "modalities": {
     "input": [
      "text",
-     "image/png",
      "image/jpeg",
+     "image/png",
+     "image/gif",
      "image/webp",
      "application/pdf"
     ],
@@ -27551,6 +27431,7 @@
     }
    },
    "open_weights": false,
+   "knowledge": "2026-05-18",
    "last_updated": "2026-09-22",
    "recommended_api": "chat-completions"
   },
@@ -27641,9 +27522,10 @@
   "openai/gpt-6-sol-pro": {
    "id": "openai/gpt-6-sol-pro",
    "name": "GPT 6 Sol Pro",
-   "description": "GPT-6 Sol Pro uses the same underlying model as GPT-6 Sol with Pro reasoning mode enabled for higher-quality responses on complex tasks.",
+   "description": "OpenAI model for complex coding and agentic workflows",
    "type": "chat",
-   "family": "gpt-pro",
+   "family": "gpt-sol",
+   "canonical_id": "openai/gpt-6-sol",
    "release_date": "2026-09-22",
    "limit": {
     "context": 1050000,
@@ -27654,6 +27536,9 @@
     "cache": {
      "implicit": true
     },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -27688,8 +27573,9 @@
    "modalities": {
     "input": [
      "text",
-     "image/png",
      "image/jpeg",
+     "image/png",
+     "image/gif",
      "image/webp",
      "application/pdf"
     ],
@@ -27712,6 +27598,7 @@
     }
    },
    "open_weights": false,
+   "knowledge": "2026-04-20",
    "last_updated": "2026-09-22",
    "recommended_api": "chat-completions"
   },
@@ -27801,9 +27688,10 @@
   "openai/gpt-6.1-sol-pro": {
    "id": "openai/gpt-6.1-sol-pro",
    "name": "GPT 6.1 Sol Pro",
-   "description": "GPT-6.1 Sol Pro uses the same underlying model as GPT-6.1 Sol with Pro reasoning mode enabled for higher-quality responses on complex tasks.",
+   "description": "Near-Astra performance for complex coding, computer use, and professional work at a lower cost.",
    "type": "chat",
-   "family": "gpt-pro",
+   "family": "gpt-sol",
+   "canonical_id": "openai/gpt-6.1-sol",
    "release_date": "2026-09-29",
    "limit": {
     "context": 1050000,
@@ -27814,6 +27702,9 @@
     "cache": {
      "implicit": true
     },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -27848,8 +27739,9 @@
    "modalities": {
     "input": [
      "text",
-     "image/png",
      "image/jpeg",
+     "image/png",
+     "image/gif",
      "image/webp",
      "application/pdf"
     ],
@@ -27872,6 +27764,7 @@
     }
    },
    "open_weights": false,
+   "knowledge": "2026-04-30",
    "last_updated": "2026-09-29",
    "recommended_api": "chat-completions"
   },
@@ -27962,16 +27855,20 @@
   "openai/gpt-6.1-terra-pro": {
    "id": "openai/gpt-6.1-terra-pro",
    "name": "GPT 6.1 Terra Pro",
-   "description": "GPT-6.1 Terra Pro uses the same underlying model as GPT-6.1 Terra with Pro reasoning mode enabled for higher-quality responses on complex tasks.",
+   "description": "Fast, efficient model for visual reasoning, precise computer use, and clear, natural writing.",
    "type": "chat",
-   "family": "gpt-pro",
-   "release_date": "2026-10-27",
+   "family": "gpt-terra",
+   "canonical_id": "openai/gpt-6.1-terra",
+   "release_date": "2026-10-26",
    "limit": {
     "context": 1050000,
     "input": 1050000,
     "output": 128000
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -28006,7 +27903,10 @@
    "modalities": {
     "input": [
      "text",
-     "image",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
      "application/pdf"
     ],
     "output": [
@@ -28028,7 +27928,8 @@
     }
    },
    "open_weights": false,
-   "last_updated": "2026-10-27",
+   "knowledge": "2026-06-01",
+   "last_updated": "2026-10-26",
    "recommended_api": "chat-completions"
   },
   "openai/gpt-6.2-astra": {
@@ -28110,16 +28011,20 @@
   "openai/gpt-6.2-astra-pro": {
    "id": "openai/gpt-6.2-astra-pro",
    "name": "GPT 6.2 Astra Pro",
-   "description": "GPT-6.2 Astra in Pro reasoning mode. Uses additional model work for difficult tasks, with higher latency and token usage at the same per-token rates. Reasoning effort remains independently configurable.",
+   "description": "A frontier reasoning model for coding, computer use, and professional work such as slides, spreadsheets, and documents.",
    "type": "chat",
-   "family": "gpt-pro",
-   "release_date": "2026-11-18",
+   "family": "gpt-astra",
+   "canonical_id": "openai/gpt-6.2-astra",
+   "release_date": "2026-11-17",
    "limit": {
     "context": 922000,
     "input": 922000,
     "output": 128000
    },
    "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -28175,7 +28080,8 @@
     }
    },
    "open_weights": false,
-   "last_updated": "2026-11-18",
+   "knowledge": "2026-05-18",
+   "last_updated": "2026-11-17",
    "recommended_api": "chat-completions"
   },
   "openai/gpt-6.2-sol": {
@@ -28257,16 +28163,20 @@
   "openai/gpt-6.2-sol-pro": {
    "id": "openai/gpt-6.2-sol-pro",
    "name": "GPT 6.2 Sol Pro",
-   "description": "GPT-6.2 Sol in Pro reasoning mode. Uses additional model work for difficult tasks, with higher latency and token usage at the same per-token rates. Reasoning effort remains independently configurable.",
+   "description": "An efficient reasoning model for everyday work, multistep agentic workflows, and coding.",
    "type": "chat",
-   "family": "gpt-pro",
-   "release_date": "2026-11-18",
+   "family": "gpt-sol",
+   "canonical_id": "openai/gpt-6.2-sol",
+   "release_date": "2026-11-17",
    "limit": {
     "context": 922000,
     "input": 922000,
     "output": 128000
    },
    "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -28322,7 +28232,8 @@
     }
    },
    "open_weights": false,
-   "last_updated": "2026-11-18",
+   "knowledge": "2026-06-01",
+   "last_updated": "2026-11-17",
    "recommended_api": "chat-completions"
   },
   "openai/gpt-astra-latest": {
@@ -37715,7 +37626,7 @@
    "limit": {
     "context": 1048576,
     "input": 1048576,
-    "output": 65536
+    "output": 64000
    },
    "capabilities": {
     "temperature": true,
@@ -37739,13 +37650,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.834,
+      "price": 0.7506,
       "cache": {
-       "read": 0.042
+       "read": 0.0378
       }
      },
      "output": {
-      "price": 2.501
+      "price": 2.2509
      }
     }
    },
@@ -38225,7 +38136,7 @@
       "price": 30
      },
      "output": {
-      "price": 30
+      "price": 0
      }
     }
    },
@@ -42474,9 +42385,10 @@
   "z-ai/glm-5.3-flashx-legal": {
    "id": "z-ai/glm-5.3-flashx-legal",
    "name": "GLM 5.3 FlashX Legal",
-   "description": "GLM 5.3 FlashX Legal is Z.AI's model trained for legal document analysis, contract review, legal reasoning and initial drafts. It accepts text and images and returns text, with always-on reasoning, tool calling, JSON output, a 1M-token context window and up to 131,072 output tokens. External legal databases and document-editing tools require your own integrations.",
+   "description": "GLM-5.3-FlashX tuned for legal workflows: legal research, contract review and document drafting",
    "type": "chat",
-   "family": "glm",
+   "family": "glm-flash-legal",
+   "canonical_id": "zhipuai/glm-5.3-flashx-legal",
    "release_date": "2026-11-02",
    "limit": {
     "context": 1048576,
@@ -42484,6 +42396,9 @@
     "output": 131072
    },
    "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
     "structured_output": false,
     "system_updates": false,
     "effort_updates": false,
