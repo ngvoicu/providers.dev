@@ -364,16 +364,19 @@
   "Qwen/Qwen3.8-Max-0902": {
    "id": "Qwen/Qwen3.8-Max-0902",
    "name": "Qwen3.8 Max 0902",
-   "description": "Flagship Qwen model for complex reasoning, coding, and agentic workflows",
+   "description": "2026-09-02 upgraded snapshot of Qwen3.8 Max with stronger coding, collaborative agents, and multimodal document understanding",
    "type": "chat",
    "family": "qwen-max",
-   "release_date": "2026-10-20",
+   "canonical_id": "alibaba/qwen3.8-max-0902",
+   "release_date": "2026-09-02",
    "limit": {
     "context": 1000000,
     "output": 131072
    },
    "capabilities": {
     "temperature": true,
+    "top_k": true,
+    "top_p": true,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -421,8 +424,75 @@
      }
     }
    },
-   "open_weights": true,
-   "last_updated": "2026-10-25",
+   "open_weights": false,
+   "last_updated": "2026-09-02",
+   "recommended_api": "chat-completions"
+  },
+  "Qwen/Qwen4-Max": {
+   "id": "Qwen/Qwen4-Max",
+   "name": "Qwen4 Max",
+   "description": "Flagship multimodal model for coding, office productivity, frontend design, and complex agentic tasks",
+   "type": "chat",
+   "family": "qwen-max",
+   "canonical_id": "alibaba/qwen4-max",
+   "release_date": "2026-11-16",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.5,
+      "cache": {
+       "read": 0.075
+      }
+     },
+     "output": {
+      "price": 4.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image",
+     "video"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://llm.chutes.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-16",
    "recommended_api": "chat-completions"
   },
   "deepseek-ai/DeepSeek-V3.2-TEE": {
@@ -650,13 +720,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.195,
+      "price": 0.3,
       "cache": {
-       "read": 0.02
+       "read": 0.03
       }
      },
      "output": {
-      "price": 0.78
+      "price": 1.2
      }
     }
    },
@@ -1279,13 +1349,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.8,
+      "price": 1.225,
       "cache": {
-       "read": 0.16
+       "read": 0.245
       }
      },
      "output": {
-      "price": 2.5
+      "price": 3.85
      }
     }
    },

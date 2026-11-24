@@ -690,159 +690,6 @@
    "last_updated": "2025-06-05",
    "recommended_api": "embeddings"
   },
-  "alibaba/qwen3-max-thinking": {
-   "id": "alibaba/qwen3-max-thinking",
-   "name": "Qwen 3 Max Thinking",
-   "description": "Qwen reasoning model for deliberate problem solving, math, and coding",
-   "type": "chat",
-   "family": "qwen-max",
-   "release_date": "2026-01-23",
-   "limit": {
-    "context": 256000,
-    "output": 65536
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "budget": {
-      "min": 1,
-      "max": 81920
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.2,
-      "cache": {
-       "read": 0.24
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 32001
-         }
-        },
-        "price": 2.4,
-        "cache": {
-         "read": 0.48
-        }
-       },
-       {
-        "when": {
-         "context": {
-          "gt": 128001
-         }
-        },
-        "price": 3,
-        "cache": {
-         "read": 0.6
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 6,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 32001
-         }
-        },
-        "price": 12
-       },
-       {
-        "when": {
-         "context": {
-          "gt": 128001
-         }
-        },
-        "price": 15
-       }
-      ]
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://ai-gateway.vercel.sh/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/gateway",
-      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    },
-    "responses": {
-     "base_url": "https://ai-gateway.vercel.sh/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/open-responses",
-      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://ai-gateway.vercel.sh/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/messages"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2025-01",
-   "recommended_api": "chat-completions"
-  },
   "alibaba/qwen3-next-80b-a3b-instruct": {
    "id": "alibaba/qwen3-next-80b-a3b-instruct",
    "name": "Qwen3 Next 80B A3B Instruct",
@@ -3084,6 +2931,7 @@
     "temperature": true,
     "top_k": true,
     "top_p": true,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -3134,6 +2982,7 @@
       "opencodeai": "@opencode/ai/providers/vercel-ai-gateway"
      },
      "capabilities": {
+      "system_updates": true,
       "tools": {
        "choice": [
         "auto",
@@ -6743,6 +6592,57 @@
    "last_updated": "2026-09-28",
    "recommended_api": "chat-completions"
   },
+  "baseten/bison-1": {
+   "id": "baseten/bison-1",
+   "name": "Bison-1",
+   "description": "Bison-1 is a 31B decision model from Baseten's Base Labs, post-trained from Gemma 4 31B for classification, routing, and scoring. It answers choice, yes/no, and ordered scoring questions about text and images with probabilities over predefined options rather than generated text, with a 131,072-token context window.",
+   "type": "decision",
+   "release_date": "2026-11-20",
+   "limit": {
+    "context": 131072
+   },
+   "capabilities": {
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "decisions": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/decisions"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-20",
+   "recommended_api": "decisions"
+  },
   "baseten/elephant-1": {
    "id": "baseten/elephant-1",
    "name": "Elephant-1",
@@ -6792,6 +6692,57 @@
    },
    "open_weights": false,
    "last_updated": "2026-10-21",
+   "recommended_api": "decisions"
+  },
+  "baseten/groundhog-1": {
+   "id": "baseten/groundhog-1",
+   "name": "Groundhog-1",
+   "description": "Groundhog-1 is a 26B mixture-of-experts decision model (about 4B active parameters) from Baseten's Base Labs, post-trained from Gemma 4 26B A4B for classification, routing, and scoring. It answers choice, yes/no, and ordered scoring questions about text and images with probabilities over predefined options rather than generated text, with a 131,072-token context window at low latency and cost.",
+   "type": "decision",
+   "release_date": "2026-11-20",
+   "limit": {
+    "context": 131072
+   },
+   "capabilities": {
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.035
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "decisions": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/decisions"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-20",
    "recommended_api": "decisions"
   },
   "baseten/joey-1": {
@@ -14470,6 +14421,7 @@
     "temperature": false,
     "top_k": false,
     "top_p": false,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -14587,6 +14539,7 @@
     "temperature": false,
     "top_k": false,
     "top_p": false,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -14705,6 +14658,7 @@
     "temperature": false,
     "top_k": false,
     "top_p": false,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -17982,61 +17936,6 @@
    "open_weights": false,
    "last_updated": "2026-02-05",
    "recommended_api": "videos"
-  },
-  "liquid/d1-ultra": {
-   "id": "liquid/d1-ultra",
-   "name": "Liquid d1 Ultra",
-   "description": "Liquid d1-ultra is a multimodal decision model for classification, routing, and scoring across text and images, with a 32,768-token context window. It returns calibrated probabilities for yes/no, multiple-choice, and scale-based questions in a single forward pass without generating output tokens. It is designed for demanding real-world tasks such as visual defect inspection and evaluating damage claims against customer photos.",
-   "type": "decision",
-   "family": "liquid",
-   "release_date": "2026-10-15",
-   "limit": {
-    "context": 32768
-   },
-   "capabilities": {
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.042
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/webp",
-     "image/gif"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "decisions": {
-     "base_url": "https://ai-gateway.vercel.sh/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/decisions"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-10-15",
-   "recommended_api": "decisions"
   },
   "liquid/d1.2": {
    "id": "liquid/d1.2",
@@ -22145,7 +22044,7 @@
     }
    },
    "open_weights": true,
-   "knowledge": "2024-11",
+   "knowledge": "2023-10",
    "last_updated": "2025-12-02",
    "recommended_api": "chat-completions"
   },
@@ -32586,7 +32485,8 @@
     "temperature": true,
     "top_k": false,
     "top_p": true,
-    "system_updates": false,
+    "structured_output": true,
+    "system_updates": true,
     "effort_updates": false,
     "tools": {
      "supported": true
@@ -32674,7 +32574,9 @@
         "lark",
         "regex"
        ],
-       "updates": []
+       "updates": [
+        "add"
+       ]
       }
      }
     },
@@ -32749,7 +32651,8 @@
     "temperature": true,
     "top_k": false,
     "top_p": true,
-    "system_updates": false,
+    "structured_output": true,
+    "system_updates": true,
     "effort_updates": false,
     "tools": {
      "supported": true
@@ -32837,7 +32740,9 @@
         "lark",
         "regex"
        ],
-       "updates": []
+       "updates": [
+        "add"
+       ]
       }
      }
     },
@@ -36283,8 +36188,10 @@
   "paperinstruments/ultramarine-1-flash": {
    "id": "paperinstruments/ultramarine-1-flash",
    "name": "Ultramarine 1 Flash",
-   "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
+   "description": "Paper Instruments' agentic model for professional knowledge work, RL-trained on GLM-5.3 Flash",
    "type": "chat",
+   "family": "ultramarine",
+   "canonical_id": "paperinstruments/ultramarine-1-flash",
    "release_date": "2026-11-12",
    "limit": {
     "context": 1048576,
@@ -36294,6 +36201,9 @@
     "cache": {
      "implicit": true
     },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -36327,7 +36237,10 @@
    "modalities": {
     "input": [
      "text",
-     "image"
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/gif"
     ],
     "output": [
      "text"
@@ -41830,6 +41743,9 @@
        ],
        "updates": []
       }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
      }
     },
     "responses": {
@@ -41940,6 +41856,7 @@
       "opencodeai": "@opencode/ai/providers/vercel-ai-gateway"
      },
      "capabilities": {
+      "system_updates": true,
       "tools": {
        "choice": [
         "auto",
@@ -41949,6 +41866,9 @@
        ],
        "updates": []
       }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
      }
     },
     "responses": {
@@ -42071,6 +41991,9 @@
        ],
        "updates": []
       }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
      }
     },
     "responses": {

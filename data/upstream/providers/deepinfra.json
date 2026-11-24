@@ -7967,6 +7967,84 @@
    "last_updated": "2026-11-04",
    "recommended_api": "chat-completions"
   },
+  "tencent/Hy4-flash": {
+   "id": "tencent/Hy4-flash",
+   "name": "Hy4 flash",
+   "description": "Tencent's lower-cost Hy4 tier for everyday agent and productivity tasks, with image understanding and a 1M-token context window.",
+   "type": "chat",
+   "family": "hy-flash",
+   "canonical_id": "tencent/hy4-flash",
+   "release_date": "2026-11-16",
+   "limit": {
+    "context": 1048576,
+    "input": 983040,
+    "output": 65536
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "prompt_cache_key": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.07,
+      "cache": {
+       "read": 0.003
+      }
+     },
+     "output": {
+      "price": 0.281
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp",
+     "image/gif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.deepinfra.com/v1/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/deepinfra",
+      "opencodeai": "@opencode/ai/providers/deepinfra"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-16",
+   "recommended_api": "chat-completions"
+  },
   "tencent/Hy4-preview": {
    "id": "tencent/Hy4-preview",
    "name": "Hy4 preview",
@@ -8218,11 +8296,95 @@
       "tools": {
        "updates": []
       }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
      }
     }
    },
    "open_weights": true,
    "last_updated": "2026-07-15",
+   "recommended_api": "chat-completions"
+  },
+  "thinkingmachines/Inkling-2-Mini": {
+   "id": "thinkingmachines/Inkling-2-Mini",
+   "name": "Inkling 2 Mini",
+   "description": "Looped MoE reasoning model (26.4B total, 3.4B active) for agentic coding, vision, and knowledge work",
+   "type": "chat",
+   "family": "inkling-mini",
+   "canonical_id": "thinkingmachines/inkling-2-mini",
+   "release_date": "2026-11-20",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "prompt_cache_key": true,
+    "system_updates": true,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.075,
+      "cache": {
+       "read": 0.015
+      }
+     },
+     "output": {
+      "price": 0.3
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.deepinfra.com/v1/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/deepinfra",
+      "opencodeai": "@opencode/ai/providers/deepinfra"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-11-20",
    "recommended_api": "chat-completions"
   },
   "thinkingmachines/Inkling-2-Small": {
@@ -8246,7 +8408,7 @@
     "top_p": true,
     "structured_output": true,
     "prompt_cache_key": true,
-    "system_updates": false,
+    "system_updates": true,
     "effort_updates": false,
     "tools": {
      "supported": true
@@ -8296,6 +8458,9 @@
       "tools": {
        "updates": []
       }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
      }
     }
    },
@@ -8368,6 +8533,9 @@
       "tools": {
        "updates": []
       }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
      }
     }
    },

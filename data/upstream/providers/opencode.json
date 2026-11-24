@@ -5009,7 +5009,8 @@
      "video/mpg",
      "video/webm",
      "video/wmv",
-     "video/3gpp"
+     "video/3gpp",
+     "application/pdf"
     ],
     "output": [
      "text",
@@ -5096,7 +5097,8 @@
      "video/3gpp"
     ],
     "output": [
-     "video/mp4"
+     "video/mp4",
+     "text"
     ]
    },
    "api": {
@@ -10005,6 +10007,167 @@
    "last_updated": "2026-08-07",
    "recommended_api": "images"
   },
+  "grok-imagine-video-1.5": {
+   "id": "grok-imagine-video-1.5",
+   "name": "Grok Imagine Video 1.5",
+   "description": "Video model for text-to-video, image-to-video, and reference-to-video generation with optional voice references",
+   "type": "video",
+   "family": "grok-imagine-video",
+   "canonical_id": "xai/grok-imagine-video-1.5",
+   "release_date": "2026-05-30",
+   "limit": {
+    "context": 1024,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "image": {
+     "input": {
+      "unit": "image",
+      "price": 0.01
+     }
+    },
+    "video": {
+     "output": {
+      "unit": "second",
+      "price": 0.08,
+      "overrides": [
+       {
+        "when": {
+         "resolution": {
+          "equals": "720p"
+         }
+        },
+        "price": 0.14
+       },
+       {
+        "when": {
+         "resolution": {
+          "equals": "1080p"
+         }
+        },
+        "price": 0.25
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp",
+     "audio"
+    ],
+    "output": [
+     "video/mp4"
+    ]
+   },
+   "api": {
+    "videos": {
+     "base_url": "https://opencode.ai/inference/xai/v1",
+     "sdk": {
+      "opencodeai": "@opencode/ai/providers/xai/videos"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-05-30",
+   "recommended_api": "videos"
+  },
+  "grok-imagine-video-1.5-lite": {
+   "id": "grok-imagine-video-1.5-lite",
+   "name": "Grok Imagine Video 1.5 Lite",
+   "description": "Cost-efficient video model for text-to-video and image-to-video generation",
+   "type": "video",
+   "family": "grok-imagine-video-lite",
+   "canonical_id": "xai/grok-imagine-video-1.5-lite",
+   "release_date": "2026-10-01",
+   "limit": {
+    "context": 1024,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "image": {
+     "input": {
+      "unit": "image",
+      "price": 0.01
+     }
+    },
+    "video": {
+     "output": {
+      "unit": "second",
+      "price": 0.02,
+      "overrides": [
+       {
+        "when": {
+         "resolution": {
+          "equals": "720p"
+         }
+        },
+        "price": 0.03
+       },
+       {
+        "when": {
+         "resolution": {
+          "equals": "1080p"
+         }
+        },
+        "price": 0.14
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp"
+    ],
+    "output": [
+     "video/mp4"
+    ]
+   },
+   "api": {
+    "videos": {
+     "base_url": "https://opencode.ai/inference/xai/v1",
+     "sdk": {
+      "opencodeai": "@opencode/ai/providers/xai/videos"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-10-01",
+   "recommended_api": "videos"
+  },
   "hy3-free": {
    "id": "hy3-free",
    "name": "Hy3 Free",
@@ -10470,6 +10633,64 @@
    },
    "open_weights": false,
    "last_updated": "2026-09-15",
+   "recommended_api": "systemone"
+  },
+  "jev-1.14": {
+   "id": "jev-1.14",
+   "name": "Jev 1.14",
+   "description": "System One model for fast, typed probabilistic decisions over text or structured state",
+   "type": "decision",
+   "family": "jev",
+   "canonical_id": "typesafe/jev-1.14.0",
+   "release_date": "2026-10-14",
+   "limit": {
+    "context": 64000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.042
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg"
+    ],
+    "output": [
+     "decision"
+    ]
+   },
+   "api": {
+    "systemone": {
+     "base_url": "https://opencode.ai/inference/systemone/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/typesafe-ai",
+      "opencodeai": "@opencode/ai/providers/opencode/decisions"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-10-14",
    "recommended_api": "systemone"
   },
   "kimi-k2": {
@@ -11060,6 +11281,106 @@
    "last_updated": "2026-07-16",
    "recommended_api": "chat-completions"
   },
+  "kimi-k3.1-pro": {
+   "id": "kimi-k3.1-pro",
+   "name": "Kimi K3.1 Pro",
+   "description": "Multimodal Kimi model with a 1M-token context window and always-on reasoning, for coding, 3D creation and financial research",
+   "type": "chat",
+   "family": "kimi-pro",
+   "canonical_id": "moonshotai/kimi-k3.1-pro",
+   "release_date": "2026-10-23",
+   "limit": {
+    "context": 1048576,
+    "output": 1048576
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ],
+     "default": {
+      "type": "effort",
+      "value": "max"
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.2,
+       "write": 2
+      }
+     },
+     "output": {
+      "price": 10
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/heic",
+     "image/heif",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://opencode.ai/inference/openai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required"
+       ],
+       "strict": true,
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-10-23",
+   "recommended_api": "chat-completions"
+  },
   "laguna-s-2.1-free": {
    "id": "laguna-s-2.1-free",
    "name": "Laguna S 2.1 Free",
@@ -11605,6 +11926,7 @@
    "type": "chat",
    "family": "longcat-free",
    "canonical_id": "meituan/longcat-2.5",
+   "status": "deprecated",
    "release_date": "2026-11-02",
    "limit": {
     "context": 1000000,
@@ -14512,6 +14834,108 @@
    "open_weights": false,
    "last_updated": "2026-08-03",
    "recommended_api": "chat-completions"
+  },
+  "qwen4-max-free": {
+   "id": "qwen4-max-free",
+   "name": "Qwen4 Max Free",
+   "description": "Flagship multimodal model for coding, office productivity, frontend design, and complex agentic tasks",
+   "type": "chat",
+   "family": "qwen-max-free",
+   "canonical_id": "alibaba/qwen4-max",
+   "status": "deprecated",
+   "release_date": "2026-11-16",
+   "limit": {
+    "context": 1000000,
+    "output": 262144
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true,
+     "explicit": {
+      "ttl": [
+       "5m",
+       "1h"
+      ]
+     }
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": true,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "high",
+      "xhigh"
+     ],
+     "budget": {
+      "max": 262144
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0,
+      "cache": {
+       "read": 0,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/x-matroska",
+     "video/quicktime",
+     "video/x-flv",
+     "video/x-ms-wmv"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "messages": {
+     "base_url": "https://opencode.ai/inference/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-16",
+   "recommended_api": "messages"
   },
   "ring-2.6-1t-free": {
    "id": "ring-2.6-1t-free",
