@@ -6,6 +6,64 @@
   "BASETEN_API_KEY"
  ],
  "models": {
+  "decision-models/baseten-bison-latest": {
+   "id": "decision-models/baseten-bison-latest",
+   "name": "bison-1",
+   "description": "Base Labs' 31B open-weight decision model on Gemma 4 31B that returns calibrated probabilities for typed choice, score and yes/no questions about long text and images",
+   "type": "decision",
+   "family": "bison",
+   "canonical_id": "baseten/bison-1",
+   "release_date": "2026-11-20",
+   "limit": {
+    "context": 32768
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp"
+    ],
+    "output": [
+     "decision"
+    ]
+   },
+   "api": {
+    "systemone": {
+     "base_url": "https://inference.baseten.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/typesafe-ai",
+      "opencodeai": "@opencode/ai/providers/baseten/decisions"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-11-20",
+   "recommended_api": "systemone"
+  },
   "decision-models/baseten-elephant-9b-latest": {
    "id": "decision-models/baseten-elephant-9b-latest",
    "name": "elephant-1",
@@ -62,6 +120,122 @@
    },
    "open_weights": true,
    "last_updated": "2026-10-19",
+   "recommended_api": "systemone"
+  },
+  "decision-models/baseten-groundhog-latest": {
+   "id": "decision-models/baseten-groundhog-latest",
+   "name": "groundhog-1",
+   "description": "Base Labs' 26B mixture-of-experts open-weight decision model (about 4B active) on Gemma 4 26B A4B that returns calibrated probabilities for typed choice, score and yes/no questions about long text and images",
+   "type": "decision",
+   "family": "groundhog",
+   "canonical_id": "baseten/groundhog-1",
+   "release_date": "2026-11-20",
+   "limit": {
+    "context": 16384
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.035
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp"
+    ],
+    "output": [
+     "decision"
+    ]
+   },
+   "api": {
+    "systemone": {
+     "base_url": "https://inference.baseten.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/typesafe-ai",
+      "opencodeai": "@opencode/ai/providers/baseten/decisions"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-11-20",
+   "recommended_api": "systemone"
+  },
+  "decision-models/baseten-joey-2b-latest": {
+   "id": "decision-models/baseten-joey-2b-latest",
+   "name": "joey-1",
+   "description": "Base Labs' 2B open-weight decision model on Qwen3.5-2B that returns calibrated probabilities for typed choice, score and yes/no questions about text and images",
+   "type": "decision",
+   "family": "joey",
+   "canonical_id": "baseten/joey-1",
+   "release_date": "2026-10-27",
+   "limit": {
+    "context": 16384
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.01
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp"
+    ],
+    "output": [
+     "decision"
+    ]
+   },
+   "api": {
+    "systemone": {
+     "base_url": "https://inference.baseten.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/typesafe-ai",
+      "opencodeai": "@opencode/ai/providers/baseten/decisions"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-10-27",
    "recommended_api": "systemone"
   },
   "decision-models/baseten-mammoth-27b-latest": {
@@ -311,7 +485,7 @@
    "release_date": "2026-09-10",
    "limit": {
     "context": 1048576,
-    "output": 32768
+    "output": 262144
    },
    "capabilities": {
     "cache": {
@@ -424,8 +598,8 @@
      "effort": [
       "none",
       "low",
-      "medium",
       "high",
+      "xhigh",
       "max"
      ]
     }
@@ -519,8 +693,8 @@
      "effort": [
       "none",
       "low",
-      "medium",
       "high",
+      "xhigh",
       "max"
      ]
     }
@@ -594,7 +768,7 @@
    "release_date": "2026-09-10",
    "limit": {
     "context": 1048576,
-    "output": 32768
+    "output": 131072
    },
    "capabilities": {
     "cache": {
@@ -675,6 +849,96 @@
    "open_weights": true,
    "knowledge": "2025-05",
    "last_updated": "2026-09-10",
+   "recommended_api": "chat-completions"
+  },
+  "meta-models/muse-spark-open": {
+   "id": "meta-models/muse-spark-open",
+   "name": "Muse Spark Open",
+   "description": "Muse Spark Open is an 816B total / 42B active open-weight multimodal reasoning model from Meta for coding and long-horizon agentic work, with 1M-token context.",
+   "type": "chat",
+   "family": "muse-spark",
+   "canonical_id": "meta/muse-spark-open",
+   "release_date": "2026-10-15",
+   "limit": {
+    "context": 1048576,
+    "output": 1048576
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.25,
+      "cache": {
+       "read": 0.15
+      }
+     },
+     "output": {
+      "price": 4.25
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://inference.baseten.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/baseten"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "messages": {
+     "base_url": "https://inference.baseten.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2026-01-04",
+   "last_updated": "2026-10-15",
    "recommended_api": "chat-completions"
   },
   "moonshotai/Kimi-K3": {
@@ -783,7 +1047,7 @@
    "release_date": "2026-10-23",
    "limit": {
     "context": 1048576,
-    "output": 262144
+    "output": 1048576
    },
    "capabilities": {
     "cache": {
@@ -799,7 +1063,14 @@
      "supported": true
     },
     "reasoning": {
-     "supported": true
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "max"
+     ]
     }
    },
    "cost": {
@@ -835,6 +1106,9 @@
       "tools": {
        "updates": []
       }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
      }
     },
     "messages": {
@@ -942,6 +1216,91 @@
    "last_updated": "2026-06-04",
    "recommended_api": "chat-completions"
   },
+  "nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B": {
+   "id": "nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B",
+   "name": "Nemotron 3.5 Super VL",
+   "description": "NVIDIA vision-language reasoning model for text, image, and video understanding and agentic tool use",
+   "type": "chat",
+   "family": "nemotron-super",
+   "canonical_id": "nvidia/nemotron-3.5-super-vl-120b-a12b",
+   "release_date": "2026-10-15",
+   "limit": {
+    "context": 1048576,
+    "output": 1048576
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.2,
+      "cache": {
+       "read": 0.04
+      }
+     },
+     "output": {
+      "price": 0.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://inference.baseten.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/baseten"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "messages": {
+     "base_url": "https://inference.baseten.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-10-15",
+   "recommended_api": "chat-completions"
+  },
   "openai/gpt-oss-120b": {
    "id": "openai/gpt-oss-120b",
    "name": "OpenAI GPT 120B",
@@ -1033,6 +1392,98 @@
    "open_weights": true,
    "knowledge": "2024-06",
    "last_updated": "2025-08-05",
+   "recommended_api": "chat-completions"
+  },
+  "reflection/Beam-1.0": {
+   "id": "reflection/Beam-1.0",
+   "name": "Beam",
+   "description": "Sparse mixture-of-experts reasoning model with 23B active parameters for coding and agentic workflows",
+   "type": "chat",
+   "family": "beam",
+   "canonical_id": "reflection/beam-1.0-501b-a23b",
+   "release_date": "2026-10-05",
+   "limit": {
+    "context": 1048576,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "minimal",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.4,
+      "cache": {
+       "read": 0.04
+      }
+     },
+     "output": {
+      "price": 1.2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://inference.baseten.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/baseten"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "messages": {
+     "base_url": "https://inference.baseten.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2026-06-30",
+   "last_updated": "2026-10-16",
    "recommended_api": "chat-completions"
   },
   "zai-org/GLM-5.2": {

@@ -465,7 +465,7 @@
    "status": "deprecated",
    "release_date": "2025-08-26",
    "limit": {
-    "context": 32768,
+    "context": 65536,
     "output": 32768
    },
    "capabilities": {
@@ -1794,7 +1794,17 @@
      "image/jpeg",
      "image/webp",
      "image/heic",
-     "image/heif"
+     "image/heif",
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp",
+     "application/pdf"
     ],
     "output": [
      "text",
@@ -2662,6 +2672,14 @@
          }
         },
         "output": 1.8
+       },
+       "audio": {
+        "input": {
+         "price": 1.8,
+         "cache": {
+          "read": 1.6666666666666667
+         }
+        }
        }
       }
      },
@@ -2680,10 +2698,27 @@
          }
         },
         "output": 0.5
+       },
+       "audio": {
+        "input": {
+         "price": 0.5,
+         "cache": {
+          "read": 0.6666666666666666
+         }
+        }
        }
       }
      }
     ],
+    "audio": {
+     "input": {
+      "price": 0.3,
+      "cache": {
+       "read": 0.03,
+       "storage": 1
+      }
+     }
+    },
     "web_search": {
      "price": 14
     }
@@ -5298,6 +5333,10 @@
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
+    "service_tier": [
+     "flex",
+     "priority"
+    ],
     "tools": {
      "supported": true
     },
@@ -5308,7 +5347,11 @@
       "low",
       "medium",
       "high"
-     ]
+     ],
+     "default": {
+      "type": "effort",
+      "value": "minimal"
+     }
     }
    },
    "cost": {
@@ -5323,6 +5366,72 @@
      "output": {
       "price": 2.5
      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": {
+        "input": {
+         "price": 1.8,
+         "cache": {
+          "read": 1.6666666666666667
+         }
+        },
+        "output": 1.8
+       },
+       "audio": {
+        "input": {
+         "price": 1.8,
+         "cache": {
+          "read": 1.6666666666666667
+         }
+        }
+       }
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": {
+        "input": {
+         "price": 0.5,
+         "cache": {
+          "read": 0.6666666666666666
+         }
+        },
+        "output": 0.5
+       },
+       "audio": {
+        "input": {
+         "price": 0.5,
+         "cache": {
+          "read": 0.6666666666666666
+         }
+        }
+       }
+      }
+     }
+    ],
+    "audio": {
+     "input": {
+      "price": 0.3,
+      "cache": {
+       "read": 0.03,
+       "storage": 1
+      }
+     }
+    },
+    "web_search": {
+     "price": 14
     }
    },
    "modalities": {
@@ -5770,6 +5879,9 @@
        }
       ]
      }
+    },
+    "web_search": {
+     "price": 14
     }
    },
    "modalities": {
@@ -5933,10 +6045,20 @@
        }
       },
       "factor": {
-       "text": 2
+       "text": 2,
+       "audio": 2
       }
      }
     ],
+    "audio": {
+     "input": {
+      "price": 1,
+      "cache": {
+       "read": 0.1,
+       "storage": 0.5
+      }
+     }
+    },
     "web_search": {
      "price": 14
     }
@@ -6083,10 +6205,16 @@
        }
       },
       "factor": {
-       "text": 2
+       "text": 2,
+       "audio": 2
       }
      }
     ],
+    "audio": {
+     "input": {
+      "price": 1
+     }
+    },
     "web_search": {
      "price": 14
     }
@@ -6419,7 +6547,7 @@
    "canonical_id": "google/lyria-3-clip-preview",
    "release_date": "2026-03-25",
    "limit": {
-    "context": 1048576,
+    "context": 131072,
     "output": 65536
    },
    "capabilities": {
@@ -6435,16 +6563,6 @@
     },
     "reasoning": {
      "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
     }
    },
    "modalities": {
@@ -6489,7 +6607,7 @@
    "canonical_id": "google/lyria-3-pro-preview",
    "release_date": "2026-03-25",
    "limit": {
-    "context": 1048576,
+    "context": 131072,
     "output": 65536
    },
    "capabilities": {
@@ -6505,16 +6623,6 @@
     },
     "reasoning": {
      "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
     }
    },
    "modalities": {
@@ -6559,7 +6667,7 @@
    "canonical_id": "google/lyria-3.5",
    "release_date": "2026-09-03",
    "limit": {
-    "context": 1048576,
+    "context": 131072,
     "output": 65536
    },
    "capabilities": {

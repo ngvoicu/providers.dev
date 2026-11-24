@@ -95,156 +95,6 @@
    "last_updated": "2026-02-12",
    "recommended_api": "chat-completions"
   },
-  "deepseek-v3.2": {
-   "id": "deepseek-v3.2",
-   "name": "DeepSeek V3.2",
-   "description": "DeepSeek chat model for instruction following, coding, and analysis",
-   "type": "chat",
-   "family": "deepseek",
-   "status": "deprecated",
-   "release_date": "2025-12-03",
-   "limit": {
-    "context": 131072,
-    "output": 65536
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/alibaba/chat"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": []
-      }
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-01",
-   "last_updated": "2025-12-05",
-   "recommended_api": "chat-completions"
-  },
-  "deepseek-v4-flash": {
-   "id": "deepseek-v4-flash",
-   "name": "DeepSeek V4 Flash",
-   "description": "Fast DeepSeek V4 lane for economical reasoning, coding, and long-context work",
-   "type": "chat",
-   "family": "deepseek-flash",
-   "canonical_id": "deepseek/deepseek-v4-flash",
-   "status": "deprecated",
-   "release_date": "2026-04-24",
-   "limit": {
-    "context": 1000000,
-    "output": 384000
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "high",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/alibaba/chat"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": []
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-05",
-   "last_updated": "2026-04-24",
-   "recommended_api": "chat-completions"
-  },
   "deepseek-v4-flash-0731": {
    "id": "deepseek-v4-flash-0731",
    "name": "DeepSeek V4 Flash 0731",
@@ -1616,7 +1466,8 @@
    "release_date": "2026-06-12",
    "limit": {
     "context": 262144,
-    "output": 262144
+    "input": 229376,
+    "output": 16384
    },
    "capabilities": {
     "temperature": false,
@@ -2682,24 +2533,24 @@
    "last_updated": "2026-08-03",
    "recommended_api": "chat-completions"
   },
-  "qwen3.8-max-preview": {
-   "id": "qwen3.8-max-preview",
-   "name": "Qwen3.8 Max Preview",
-   "description": "Preview Qwen flagship for million-token multimodal reasoning and long-horizon agentic workflows",
+  "qwen4-max": {
+   "id": "qwen4-max",
+   "name": "Qwen4 Max",
+   "description": "Flagship multimodal model for coding, office productivity, frontend design, and complex agentic tasks",
    "type": "chat",
    "family": "qwen-max",
-   "canonical_id": "alibaba/qwen3.8-max-preview",
-   "status": "deprecated",
-   "release_date": "2026-07-19",
+   "canonical_id": "alibaba/qwen4-max",
+   "release_date": "2026-11-16",
    "limit": {
     "context": 1000000,
-    "output": 131072
+    "output": 262144
    },
    "capabilities": {
     "temperature": true,
     "top_k": true,
     "top_p": true,
     "structured_output": true,
+    "stream_usage": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -2708,24 +2559,25 @@
     "reasoning": {
      "supported": true,
      "effort": [
+      "none",
       "low",
-      "medium",
+      "high",
       "xhigh"
      ],
      "budget": {
-      "min": 0,
+      "min": 1,
       "max": 262144
+     },
+     "default": {
+      "type": "effort",
+      "value": "high"
      }
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
+      "price": 0
      },
      "output": {
       "price": 0
@@ -2746,7 +2598,8 @@
      "video/x-matroska",
      "video/quicktime",
      "video/x-flv",
-     "video/x-ms-wmv"
+     "video/x-ms-wmv",
+     "application/pdf"
     ],
     "output": [
      "text"
@@ -2763,7 +2616,8 @@
       "tools": {
        "choice": [
         "auto",
-        "none"
+        "none",
+        "tool"
        ],
        "updates": []
       }
@@ -2771,10 +2625,45 @@
      "compatibility": {
       "reasoning_field": "reasoning_content"
      }
+    },
+    "responses": {
+     "base_url": "https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/alibaba/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://token-plan.cn-beijing.maas.aliyuncs.com/apps/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/alibaba/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
     }
    },
    "open_weights": false,
-   "last_updated": "2026-07-19",
+   "last_updated": "2026-11-16",
    "recommended_api": "chat-completions"
   },
   "qwen4-max-preview": {

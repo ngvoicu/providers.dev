@@ -6,6 +6,83 @@
   "STEPFUN_API_KEY"
  ],
  "models": {
+  "step-1o-turbo-vision": {
+   "id": "step-1o-turbo-vision",
+   "name": "Step-1o Turbo Vision",
+   "description": "Fast StepFun vision model for image and video understanding with text output",
+   "type": "chat",
+   "family": "step-vision",
+   "canonical_id": "stepfun/step-1o-turbo-vision",
+   "release_date": "2025-01-21",
+   "limit": {
+    "context": 32768,
+    "output": 32768
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": {
+      "min_tokens": 256
+     }
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.36,
+      "cache": {
+       "read": 0.07
+      }
+     },
+     "output": {
+      "price": 1.15
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "video/mp4"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.stepfun.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-01-21",
+   "recommended_api": "chat-completions"
+  },
   "step-3.5-flash": {
    "id": "step-3.5-flash",
    "name": "Step 3.5 Flash",
@@ -413,61 +490,6 @@
    "last_updated": "2026-09-20",
    "recommended_api": "chat-completions"
   },
-  "step-tts-2": {
-   "id": "step-tts-2",
-   "name": "Step TTS 2",
-   "description": "Speech generation model for controllable voice, narration, and audio delivery",
-   "type": "speech",
-   "family": "step-tts",
-   "release_date": "2026-03-01",
-   "limit": {
-    "context": 0,
-    "output": 0
-   },
-   "capabilities": {
-    "temperature": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 40,
-      "unit": "character"
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "audio/wav",
-     "audio/mpeg",
-     "audio/flac",
-     "audio/opus",
-     "audio/pcm"
-    ]
-   },
-   "api": {
-    "speech": {
-     "base_url": "https://api.stepfun.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/protocols/openai-speech"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-07-02",
-   "recommended_api": "speech"
-  },
   "stepaudio-2.5-asr": {
    "id": "stepaudio-2.5-asr",
    "name": "StepAudio 2.5 ASR",
@@ -494,7 +516,7 @@
     "audio": {
      "input": {
       "unit": "minute",
-      "price": 0.00036667
+      "price": 0.00083333
      }
     }
    },
@@ -513,12 +535,82 @@
    "api": {
     "transcriptions": {
      "base_url": "https://api.stepfun.ai/v1",
+     "path": "/audio/asr/sse",
      "sdk": {}
     }
    },
    "open_weights": false,
    "last_updated": "2026-07-02",
    "recommended_api": "transcriptions"
+  },
+  "stepaudio-2.5-chat": {
+   "id": "stepaudio-2.5-chat",
+   "name": "StepAudio 2.5 Chat",
+   "description": "Speech-understanding chat model that reads tone, hesitation and laughter in audio input and replies in text",
+   "type": "chat",
+   "family": "step-audio",
+   "canonical_id": "stepfun/stepaudio-2.5-chat",
+   "release_date": "2026-05-09",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": {
+      "min_tokens": 256
+     }
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.5,
+      "cache": {
+       "read": 0.3
+      }
+     },
+     "output": {
+      "price": 3.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "audio/mpeg",
+     "audio/wav"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.stepfun.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-05-09",
+   "recommended_api": "chat-completions"
   },
   "stepaudio-2.5-tts": {
    "id": "stepaudio-2.5-tts",
@@ -573,6 +665,114 @@
    },
    "open_weights": false,
    "last_updated": "2026-07-02",
+   "recommended_api": "speech"
+  },
+  "stepaudio-3-asr-max": {
+   "id": "stepaudio-3-asr-max",
+   "name": "StepAudio 3 ASR Max",
+   "description": "StepFun's largest speech recognition model, with context-aware transcription of names, terms, dialects and singing",
+   "type": "transcription",
+   "family": "step-asr",
+   "release_date": "2026-09-15",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "audio": {
+     "input": {
+      "unit": "minute",
+      "price": 0.01
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "audio/ogg",
+     "audio/mpeg",
+     "audio/wav",
+     "audio/pcm",
+     "audio/mp4"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "transcriptions": {
+     "base_url": "https://api.stepfun.ai/v1",
+     "path": "/audio/asr/sse",
+     "sdk": {}
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-09-15",
+   "recommended_api": "transcriptions"
+  },
+  "stepaudio-3-tts": {
+   "id": "stepaudio-3-tts",
+   "name": "StepAudio 3 TTS",
+   "description": "Low-latency streaming speech generation with human-like delivery, laughter, hesitation and self-correction",
+   "type": "speech",
+   "family": "step-tts",
+   "release_date": "2026-09-15",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 14,
+      "unit": "character"
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "audio/wav",
+     "audio/mpeg",
+     "audio/flac",
+     "audio/opus",
+     "audio/pcm"
+    ]
+   },
+   "api": {
+    "speech": {
+     "base_url": "https://api.stepfun.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/protocols/openai-speech"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-09-15",
    "recommended_api": "speech"
   }
  }

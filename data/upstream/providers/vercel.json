@@ -436,7 +436,7 @@
    "release_date": "2026-02-03",
    "limit": {
     "context": 256000,
-    "output": 256000
+    "output": 65536
    },
    "capabilities": {
     "temperature": true,
@@ -2162,7 +2162,7 @@
    "release_date": "2026-08-14",
    "limit": {
     "context": 262144,
-    "output": 262144
+    "output": 32768
    },
    "capabilities": {
     "cache": {
@@ -3829,25 +3829,16 @@
    "release_date": "2024-12-03",
    "limit": {
     "context": 300000,
-    "output": 10000
+    "output": 8192
    },
    "capabilities": {
     "cache": {
-     "implicit": true,
-     "explicit": {
-      "ttl": [
-       "5m"
-      ],
-      "max_breakpoints": 4,
-      "targets": [
-       "system",
-       "messages"
-      ]
-     }
+     "implicit": true
     },
     "temperature": true,
     "top_k": true,
     "top_p": true,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -3862,8 +3853,7 @@
      "input": {
       "price": 0.06,
       "cache": {
-       "read": 0.015,
-       "write": 0
+       "read": 0.015
       }
      },
      "output": {
@@ -3874,23 +3864,11 @@
    "modalities": {
     "input": [
      "text",
-     "image/jpeg",
      "image/png",
+     "image/jpeg",
      "image/gif",
      "image/webp",
-     "video/mp4",
-     "video/quicktime",
-     "video/x-matroska",
-     "video/webm",
-     "video/x-flv",
-     "video/mpeg",
-     "video/x-ms-wmv",
-     "video/3gpp",
-     "application/pdf",
-     "text/csv",
-     "text/plain",
-     "text/html",
-     "text/markdown"
+     "application/pdf"
     ],
     "output": [
      "text"
@@ -3907,6 +3885,43 @@
       "tools": {
        "choice": [
         "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/open-responses",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
         "required",
         "tool"
        ],
@@ -3930,25 +3945,16 @@
    "release_date": "2024-12-03",
    "limit": {
     "context": 128000,
-    "output": 10000
+    "output": 8192
    },
    "capabilities": {
     "cache": {
-     "implicit": true,
-     "explicit": {
-      "ttl": [
-       "5m"
-      ],
-      "max_breakpoints": 4,
-      "targets": [
-       "system",
-       "messages"
-      ]
-     }
+     "implicit": true
     },
     "temperature": true,
     "top_k": true,
     "top_p": true,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -3963,8 +3969,7 @@
      "input": {
       "price": 0.035,
       "cache": {
-       "read": 0.00875,
-       "write": 0
+       "read": 0.0087
       }
      },
      "output": {
@@ -3991,6 +3996,43 @@
       "tools": {
        "choice": [
         "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/open-responses",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
         "required",
         "tool"
        ],
@@ -4014,25 +4056,16 @@
    "release_date": "2024-12-03",
    "limit": {
     "context": 300000,
-    "output": 10000
+    "output": 8192
    },
    "capabilities": {
     "cache": {
-     "implicit": true,
-     "explicit": {
-      "ttl": [
-       "5m"
-      ],
-      "max_breakpoints": 4,
-      "targets": [
-       "system",
-       "messages"
-      ]
-     }
+     "implicit": true
     },
     "temperature": true,
     "top_k": true,
     "top_p": true,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -4047,8 +4080,7 @@
      "input": {
       "price": 0.8,
       "cache": {
-       "read": 0.2,
-       "write": 0
+       "read": 0.2
       }
      },
      "output": {
@@ -4059,23 +4091,11 @@
    "modalities": {
     "input": [
      "text",
-     "image/jpeg",
      "image/png",
+     "image/jpeg",
      "image/gif",
      "image/webp",
-     "video/mp4",
-     "video/quicktime",
-     "video/x-matroska",
-     "video/webm",
-     "video/x-flv",
-     "video/mpeg",
-     "video/x-ms-wmv",
-     "video/3gpp",
-     "application/pdf",
-     "text/csv",
-     "text/plain",
-     "text/html",
-     "text/markdown"
+     "application/pdf"
     ],
     "output": [
      "text"
@@ -4092,6 +4112,43 @@
       "tools": {
        "choice": [
         "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/open-responses",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
         "required",
         "tool"
        ],
@@ -4204,6 +4261,9 @@
      "output": {
       "price": 50
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -4329,6 +4389,9 @@
      "output": {
       "price": 50
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -4449,6 +4512,9 @@
      "output": {
       "price": 40
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -4569,6 +4635,9 @@
      "output": {
       "price": 80
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -4686,6 +4755,9 @@
      "output": {
       "price": 5
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -4836,6 +4908,9 @@
        }
       ]
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -4962,6 +5037,9 @@
      "output": {
       "price": 25
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -5087,6 +5165,9 @@
      "output": {
       "price": 25
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -5212,6 +5293,9 @@
      "output": {
       "price": 25
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -5337,6 +5421,9 @@
      "output": {
       "price": 25
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -5463,6 +5550,9 @@
      "output": {
       "price": 50
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -5589,6 +5679,9 @@
      "output": {
       "price": 25
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -5715,6 +5808,9 @@
      "output": {
       "price": 50
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -5840,6 +5936,9 @@
      "output": {
       "price": 20
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -5960,6 +6059,9 @@
      "output": {
       "price": 40
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -6269,6 +6371,9 @@
        }
       ]
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -6394,6 +6499,9 @@
      "output": {
       "price": 10
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -6519,6 +6627,9 @@
      "output": {
       "price": 10
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -6597,6 +6708,7 @@
    "name": "Bison-1",
    "description": "Bison-1 is a 31B decision model from Baseten's Base Labs, post-trained from Gemma 4 31B for classification, routing, and scoring. It answers choice, yes/no, and ordered scoring questions about text and images with probabilities over predefined options rather than generated text, with a 131,072-token context window.",
    "type": "decision",
+   "family": "bison",
    "release_date": "2026-11-20",
    "limit": {
     "context": 131072
@@ -6699,6 +6811,7 @@
    "name": "Groundhog-1",
    "description": "Groundhog-1 is a 26B mixture-of-experts decision model (about 4B active parameters) from Baseten's Base Labs, post-trained from Gemma 4 26B A4B for classification, routing, and scoring. It answers choice, yes/no, and ordered scoring questions about text and images with probabilities over predefined options rather than generated text, with a 131,072-token context window at low latency and cost.",
    "type": "decision",
+   "family": "groundhog",
    "release_date": "2026-11-20",
    "limit": {
     "context": 131072
@@ -6750,6 +6863,7 @@
    "name": "Joey-1",
    "description": "Joey-1 is a 2B decision model from Baseten's Base Labs for classification, routing, and scoring. It evaluates text context against choice, yes/no, and ordered scoring questions, returning answer probabilities and confidence in a single forward pass without generating free-form text.",
    "type": "decision",
+   "family": "joey",
    "release_date": "2026-10-29",
    "limit": {
     "context": 16384
@@ -7597,7 +7711,7 @@
    "release_date": "2026-06-23",
    "limit": {
     "context": 262144,
-    "output": 262144
+    "output": 256000
    },
    "capabilities": {
     "cache": {
@@ -9298,11 +9412,10 @@
    "type": "chat",
    "family": "deepseek-r",
    "canonical_id": "deepseek/deepseek-r1",
-   "status": "deprecated",
    "release_date": "2025-01-20",
    "limit": {
     "context": 128000,
-    "output": 32768
+    "output": 8192
    },
    "capabilities": {
     "temperature": true,
@@ -9311,7 +9424,7 @@
     "system_updates": false,
     "effort_updates": false,
     "tools": {
-     "supported": false
+     "supported": true
     },
     "reasoning": {
      "supported": true
@@ -9341,6 +9454,53 @@
      "sdk": {
       "aisdk": "@ai-sdk/gateway",
       "opencodeai": "@opencode/ai/providers/vercel-ai-gateway"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/open-responses",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
      }
     }
    },
@@ -9899,7 +10059,7 @@
    "release_date": "2026-08-21",
    "limit": {
     "context": 1048576,
-    "output": 1048576
+    "output": 384000
    },
    "capabilities": {
     "cache": {
@@ -10019,7 +10179,7 @@
    "release_date": "2026-04-24",
    "limit": {
     "context": 1048600,
-    "output": 1048600
+    "output": 384000
    },
    "capabilities": {
     "cache": {
@@ -10136,7 +10296,7 @@
    "release_date": "2026-08-13",
    "limit": {
     "context": 1048600,
-    "output": 1048600
+    "output": 384000
    },
    "capabilities": {
     "cache": {
@@ -10252,7 +10412,7 @@
    "release_date": "2026-09-10",
    "limit": {
     "context": 1048576,
-    "output": 1048576
+    "output": 384000
    },
    "capabilities": {
     "cache": {
@@ -11600,6 +11760,7 @@
    "name": "Glimpse",
    "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
    "type": "chat",
+   "family": "glimpse",
    "release_date": "2026-10-16",
    "limit": {
     "context": 220000,
@@ -11682,7 +11843,7 @@
    "release_date": "2026-09-22",
    "limit": {
     "context": 1048576,
-    "output": 1048576
+    "output": 131072
    },
    "capabilities": {
     "cache": {
@@ -12247,6 +12408,9 @@
     "top_p": true,
     "system_updates": false,
     "effort_updates": false,
+    "service_tier": [
+     "flex"
+    ],
     "tools": {
      "supported": false
     },
@@ -12266,6 +12430,25 @@
       "price": 2.5
      }
     },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": {
+        "input": {
+         "price": 0.5
+        },
+        "output": {
+         "price": 0.5
+        }
+       }
+      }
+     }
+    ],
     "image": {
      "output": {
       "unit": "image",
@@ -12324,6 +12507,10 @@
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
+    "service_tier": [
+     "flex",
+     "priority"
+    ],
     "tools": {
      "supported": true
     },
@@ -12351,6 +12538,38 @@
      "output": {
       "price": 0.4
      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 1.8
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": {
+        "input": {
+         "price": 0.5
+        },
+        "output": {
+         "price": 0.5
+        }
+       }
+      }
+     }
+    ],
+    "web_search": {
+     "price": 35
     }
    },
    "modalities": {
@@ -12629,6 +12848,10 @@
     "temperature": true,
     "system_updates": false,
     "effort_updates": false,
+    "service_tier": [
+     "flex",
+     "priority"
+    ],
     "tools": {
      "supported": true
     },
@@ -12654,6 +12877,38 @@
      "output": {
       "price": 3
      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 1.8
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": {
+        "input": {
+         "price": 0.5
+        },
+        "output": {
+         "price": 0.5
+        }
+       }
+      }
+     }
+    ],
+    "web_search": {
+     "price": 14
     }
    },
    "modalities": {
@@ -12752,6 +13007,9 @@
     "top_p": true,
     "system_updates": false,
     "effort_updates": false,
+    "service_tier": [
+     "flex"
+    ],
     "tools": {
      "supported": false
     },
@@ -12771,6 +13029,25 @@
       "price": 12
      }
     },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": {
+        "input": {
+         "price": 0.5
+        },
+        "output": {
+         "price": 0.5
+        }
+       }
+      }
+     }
+    ],
     "image": {
      "output": {
       "unit": "image",
@@ -12786,6 +13063,9 @@
        }
       ]
      }
+    },
+    "web_search": {
+     "price": 14
     }
    },
    "modalities": {
@@ -12893,6 +13173,9 @@
        }
       ]
      }
+    },
+    "web_search": {
+     "price": 14
     }
    },
    "modalities": {
@@ -12946,6 +13229,10 @@
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
+    "service_tier": [
+     "flex",
+     "priority"
+    ],
     "tools": {
      "supported": true
     },
@@ -12971,6 +13258,51 @@
      "output": {
       "price": 1.5
      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": {
+        "input": {
+         "price": 1.8,
+         "cache": {
+          "read": 1.5
+         }
+        },
+        "output": {
+         "price": 1.8
+        }
+       }
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": {
+        "input": {
+         "price": 0.5,
+         "cache": {
+          "read": 0.4166666667
+         }
+        },
+        "output": {
+         "price": 0.5
+        }
+       }
+      }
+     }
+    ],
+    "web_search": {
+     "price": 14
     }
    },
    "modalities": {
@@ -13099,21 +13431,19 @@
       "unit": "image",
       "price": 0.034
      }
+    },
+    "web_search": {
+     "price": 14
     }
    },
    "modalities": {
     "input": [
      "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/heic",
-     "image/heif"
+     "image"
     ],
     "output": [
      "text",
-     "image/png",
-     "image/jpeg"
+     "image"
     ]
    },
    "api": {
@@ -13152,6 +13482,10 @@
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
+    "service_tier": [
+     "flex",
+     "priority"
+    ],
     "tools": {
      "supported": true
     },
@@ -13198,6 +13532,38 @@
        }
       ]
      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 1.8
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": {
+        "input": {
+         "price": 0.5
+        },
+        "output": {
+         "price": 0.5
+        }
+       }
+      }
+     }
+    ],
+    "web_search": {
+     "price": 14
     }
    },
    "modalities": {
@@ -13297,6 +13663,10 @@
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
+    "service_tier": [
+     "flex",
+     "priority"
+    ],
     "tools": {
      "supported": true
     },
@@ -13322,6 +13692,41 @@
      "output": {
       "price": 9
      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 1.8
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": {
+        "input": {
+         "price": 0.5,
+         "cache": {
+          "read": 0.5333333333
+         }
+        },
+        "output": {
+         "price": 0.5
+        }
+       }
+      }
+     }
+    ],
+    "web_search": {
+     "price": 14
     }
    },
    "modalities": {
@@ -13421,6 +13826,10 @@
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
+    "service_tier": [
+     "flex",
+     "priority"
+    ],
     "tools": {
      "supported": true
     },
@@ -13445,6 +13854,31 @@
      "output": {
       "price": 2.5
      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 1.8
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": 0.5
+      }
+     }
+    ],
+    "web_search": {
+     "price": 14
     }
    },
    "modalities": {
@@ -13669,6 +14103,10 @@
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
+    "service_tier": [
+     "flex",
+     "priority"
+    ],
     "tools": {
      "supported": true
     },
@@ -13694,6 +14132,41 @@
      "output": {
       "price": 3.75
      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 1.8
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": {
+        "input": {
+         "price": 0.5,
+         "cache": {
+          "read": 0.5333333333
+         }
+        },
+        "output": {
+         "price": 0.5
+        }
+       }
+      }
+     }
+    ],
+    "web_search": {
+     "price": 14
     }
    },
    "modalities": {
@@ -13778,6 +14251,7 @@
    "type": "chat",
    "family": "gemini-flash",
    "canonical_id": "google/gemini-3.7-flash",
+   "status": "deprecated",
    "release_date": "2026-08-13",
    "limit": {
     "context": 1000000,
@@ -13793,6 +14267,10 @@
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
+    "service_tier": [
+     "flex",
+     "priority"
+    ],
     "tools": {
      "supported": true
     },
@@ -13816,6 +14294,31 @@
      "output": {
       "price": 3.75
      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 1.8
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": 0.5
+      }
+     }
+    ],
+    "web_search": {
+     "price": 14
     }
    },
    "modalities": {
@@ -13915,6 +14418,10 @@
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
+    "service_tier": [
+     "flex",
+     "priority"
+    ],
     "tools": {
      "supported": true
     },
@@ -13938,6 +14445,31 @@
      "output": {
       "price": 3.75
      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 1.8
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": 0.5
+      }
+     }
+    ],
+    "web_search": {
+     "price": 14
     }
    },
    "modalities": {
@@ -14290,7 +14822,7 @@
    "release_date": "2026-10-13",
    "limit": {
     "context": 1000000,
-    "output": 1000000
+    "output": 65536
    },
    "capabilities": {
     "cache": {
@@ -14302,6 +14834,9 @@
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
+    "service_tier": [
+     "priority"
+    ],
     "tools": {
      "supported": true
     },
@@ -14325,6 +14860,21 @@
      "output": {
       "price": 10
      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 1.8
+      }
+     }
+    ],
+    "web_search": {
+     "price": 14
     }
    },
    "modalities": {
@@ -14412,7 +14962,7 @@
    "release_date": "2026-11-10",
    "limit": {
     "context": 1000000,
-    "output": 1000000
+    "output": 65536
    },
    "capabilities": {
     "cache": {
@@ -14424,6 +14974,9 @@
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
+    "service_tier": [
+     "priority"
+    ],
     "tools": {
      "supported": true
     },
@@ -14447,6 +15000,21 @@
      "output": {
       "price": 10
      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 1.8
+      }
+     }
+    ],
+    "web_search": {
+     "price": 14
     }
    },
    "modalities": {
@@ -14530,7 +15098,7 @@
    "release_date": "2026-11-12",
    "limit": {
     "context": 1000000,
-    "output": 1000000
+    "output": 65536
    },
    "capabilities": {
     "cache": {
@@ -14542,6 +15110,9 @@
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
+    "service_tier": [
+     "priority"
+    ],
     "tools": {
      "supported": true
     },
@@ -14566,6 +15137,21 @@
      "output": {
       "price": 7.5
      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 1.8
+      }
+     }
+    ],
+    "web_search": {
+     "price": 14
     }
    },
    "modalities": {
@@ -14649,7 +15235,144 @@
    "release_date": "2026-11-18",
    "limit": {
     "context": 1000000,
-    "output": 1000000
+    "output": 65536
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "service_tier": [
+     "priority"
+    ],
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 3,
+      "cache": {
+       "read": 0.15
+      }
+     },
+     "output": {
+      "price": 15
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 1.8
+      }
+     }
+    ],
+    "web_search": {
+     "price": 14
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/gateway",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/open-responses",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-03",
+   "last_updated": "2026-11-18",
+   "recommended_api": "chat-completions"
+  },
+  "google/gemini-4-neon-fast": {
+   "id": "google/gemini-4-neon-fast",
+   "name": "Gemini 4 Neon (Fast)",
+   "description": "Google's Gemini 4 model for fast, frontier-level coding, knowledge work and science workflows, with four thinking levels and a 1M-token context window",
+   "type": "chat",
+   "family": "gemini",
+   "canonical_id": "google/gemini-4-neon",
+   "release_date": "2026-11-18",
+   "limit": {
+    "context": 1000000,
+    "output": 65536
    },
    "capabilities": {
     "cache": {
@@ -14677,14 +15400,17 @@
    "cost": {
     "text": {
      "input": {
-      "price": 3,
+      "price": 5.4,
       "cache": {
-       "read": 0.15
+       "read": 0.27
       }
      },
      "output": {
-      "price": 15
+      "price": 27
      }
+    },
+    "web_search": {
+     "price": 14
     }
    },
    "modalities": {
@@ -14998,6 +15724,9 @@
        }
       ]
      }
+    },
+    "web_search": {
+     "price": 14
     }
    },
    "modalities": {
@@ -16300,6 +17029,7 @@
    "description": "Reasoning model for deliberate analysis, multi-step problem solving, and tool use",
    "type": "chat",
    "family": "mercury",
+   "status": "deprecated",
    "release_date": "2026-10-19",
    "limit": {
     "context": 1000000,
@@ -18796,15 +19526,19 @@
    "description": "Open Llama multimodal model for image understanding and text reasoning",
    "type": "chat",
    "family": "muse-ember",
+   "canonical_id": "meta/muse-ember-1.0",
    "release_date": "2026-11-09",
    "limit": {
     "context": 1048576,
-    "output": 1048576
+    "output": 524288
    },
    "capabilities": {
     "cache": {
      "implicit": true
     },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -19094,7 +19828,7 @@
    "release_date": "2026-04-08",
    "limit": {
     "context": 1048576,
-    "output": 1048576
+    "output": 131072
    },
    "capabilities": {
     "cache": {
@@ -19217,7 +19951,7 @@
    "release_date": "2026-08-05",
    "limit": {
     "context": 1048576,
-    "output": 1048576
+    "output": 131072
    },
    "capabilities": {
     "cache": {
@@ -19458,7 +20192,7 @@
    "release_date": "2026-09-02",
    "limit": {
     "context": 1048576,
-    "output": 1048576
+    "output": 131072
    },
    "capabilities": {
     "cache": {
@@ -19701,7 +20435,7 @@
    "release_date": "2026-10-15",
    "limit": {
     "context": 1048576,
-    "output": 1048576
+    "output": 131072
    },
    "capabilities": {
     "cache": {
@@ -19823,7 +20557,7 @@
    "release_date": "2026-10-12",
    "limit": {
     "context": 1048576,
-    "output": 1048576
+    "output": 131072
    },
    "capabilities": {
     "cache": {
@@ -21187,7 +21921,7 @@
    "release_date": "2026-06-01",
    "limit": {
     "context": 1000000,
-    "output": 1000000
+    "output": 512000
    },
    "capabilities": {
     "cache": {
@@ -22055,7 +22789,7 @@
    "type": "chat",
    "family": "mistral-large",
    "canonical_id": "mistral/mistral-large-4",
-   "release_date": "2026-10-06",
+   "release_date": "2026-10-05",
    "limit": {
     "context": 1048576,
     "output": 262144
@@ -22162,8 +22896,8 @@
      }
     }
    },
-   "open_weights": false,
-   "last_updated": "2026-10-06",
+   "open_weights": true,
+   "last_updated": "2026-10-05",
    "recommended_api": "chat-completions"
   },
   "mistral/mistral-medium-3.5": {
@@ -22173,7 +22907,7 @@
    "type": "chat",
    "family": "mistral-medium",
    "canonical_id": "mistral/mistral-medium-3-5",
-   "release_date": "2026-04-30",
+   "release_date": "2026-04-28",
    "limit": {
     "context": 262144,
     "output": 256000
@@ -22279,8 +23013,8 @@
      }
     }
    },
-   "open_weights": false,
-   "last_updated": "2026-04-30",
+   "open_weights": true,
+   "last_updated": "2026-04-28",
    "recommended_api": "chat-completions"
   },
   "mistral/mistral-nemo": {
@@ -22293,7 +23027,7 @@
    "release_date": "2024-07-18",
    "limit": {
     "context": 131072,
-    "output": 131072
+    "output": 128000
    },
    "capabilities": {
     "temperature": true,
@@ -22840,7 +23574,7 @@
    "release_date": "2025-07-11",
    "limit": {
     "context": 131072,
-    "output": 131072
+    "output": 98304
    },
    "capabilities": {
     "temperature": true,
@@ -23918,13 +24652,14 @@
    "canonical_id": "morph/morph-v3-fast",
    "release_date": "2025-07-07",
    "limit": {
-    "context": 262144,
-    "output": 131072
+    "context": 81920,
+    "output": 16384
    },
    "capabilities": {
-    "temperature": true,
+    "temperature": false,
     "top_k": false,
     "top_p": false,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -23959,6 +24694,20 @@
       "aisdk": "@ai-sdk/gateway",
       "opencodeai": "@opencode/ai/providers/vercel-ai-gateway"
      }
+    },
+    "responses": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/open-responses",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/responses"
+     }
+    },
+    "messages": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/messages"
+     }
     }
    },
    "open_weights": false,
@@ -23974,13 +24723,14 @@
    "canonical_id": "morph/morph-v3-large",
    "release_date": "2025-07-07",
    "limit": {
-    "context": 262144,
-    "output": 131072
+    "context": 81920,
+    "output": 16384
    },
    "capabilities": {
-    "temperature": true,
+    "temperature": false,
     "top_k": false,
     "top_p": false,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -24014,6 +24764,20 @@
      "sdk": {
       "aisdk": "@ai-sdk/gateway",
       "opencodeai": "@opencode/ai/providers/vercel-ai-gateway"
+     }
+    },
+    "responses": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/open-responses",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/responses"
+     }
+    },
+    "messages": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/messages"
      }
     }
    },
@@ -24132,6 +24896,7 @@
    "type": "decision",
    "family": "drex",
    "canonical_id": "nace-ai/drex-v2.0",
+   "status": "deprecated",
    "release_date": "2026-10-06",
    "limit": {
     "context": 262144
@@ -24617,7 +25382,7 @@
    "release_date": "2026-10-15",
    "limit": {
     "context": 1048576,
-    "output": 1048576
+    "output": 8192
    },
    "capabilities": {
     "cache": {
@@ -24735,7 +25500,7 @@
    "release_date": "2025-10-28",
    "limit": {
     "context": 131072,
-    "output": 131072
+    "output": 128000
    },
    "capabilities": {
     "temperature": true,
@@ -25140,6 +25905,9 @@
      "output": {
       "price": 14
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -25406,6 +26174,9 @@
      "output": {
       "price": 2.8
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -25539,9 +26310,14 @@
         "equals": "priority"
        }
       },
-      "factor": 2
+      "factor": {
+       "text": 2
+      }
      }
-    ]
+    ],
+    "web_search": {
+     "price": 14
+    }
    },
    "modalities": {
     "input": [
@@ -25814,6 +26590,9 @@
      "output": {
       "price": 17
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -26080,6 +26859,9 @@
      "output": {
       "price": 1
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -26163,6 +26945,7 @@
    "type": "transcription",
    "family": "gpt-transcribe-mini",
    "canonical_id": "openai/gpt-4o-mini-transcribe",
+   "status": "deprecated",
    "release_date": "2025-03-20",
    "limit": {
     "context": 16000,
@@ -26232,6 +27015,7 @@
    "type": "transcription",
    "family": "gpt-transcribe",
    "canonical_id": "openai/gpt-4o-transcribe",
+   "status": "deprecated",
    "release_date": "2025-03-20",
    "limit": {
     "context": 16000,
@@ -26521,6 +27305,9 @@
      "output": {
       "price": 10
      }
+    },
+    "web_search": {
+     "price": 14
     }
    },
    "modalities": {
@@ -26654,6 +27441,9 @@
      "output": {
       "price": 20
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -26965,6 +27755,9 @@
      "output": {
       "price": 3.6
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -27250,6 +28043,9 @@
      "output": {
       "price": 120
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -27372,6 +28168,9 @@
      "output": {
       "price": 10
      }
+    },
+    "web_search": {
+     "price": 14
     }
    },
    "modalities": {
@@ -27505,6 +28304,9 @@
      "output": {
       "price": 10
      }
+    },
+    "web_search": {
+     "price": 14
     }
    },
    "modalities": {
@@ -27637,6 +28439,9 @@
      "output": {
       "price": 2
      }
+    },
+    "web_search": {
+     "price": 14
     }
    },
    "modalities": {
@@ -27742,6 +28547,10 @@
     "temperature": true,
     "system_updates": true,
     "effort_updates": false,
+    "service_tier": [
+     "flex",
+     "priority"
+    ],
     "tools": {
      "supported": true
     },
@@ -27766,6 +28575,31 @@
      "output": {
       "price": 10
      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": 0.5
+      }
+     }
+    ],
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -27894,6 +28728,9 @@
      "output": {
       "price": 20
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -28002,6 +28839,10 @@
     "structured_output": true,
     "system_updates": true,
     "effort_updates": false,
+    "service_tier": [
+     "flex",
+     "priority"
+    ],
     "tools": {
      "supported": true
     },
@@ -28027,6 +28868,31 @@
      "output": {
       "price": 14
      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": 0.5
+      }
+     }
+    ],
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -28160,6 +29026,9 @@
      "output": {
       "price": 14
      }
+    },
+    "web_search": {
+     "price": 14
     }
    },
    "modalities": {
@@ -28294,6 +29163,9 @@
      "output": {
       "price": 28
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -28420,6 +29292,9 @@
      "output": {
       "price": 168
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -28529,6 +29404,9 @@
     "structured_output": true,
     "system_updates": true,
     "effort_updates": false,
+    "service_tier": [
+     "priority"
+    ],
     "tools": {
      "supported": true
     },
@@ -28554,6 +29432,21 @@
      "output": {
       "price": 14
      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     }
+    ],
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -28688,6 +29581,9 @@
      "output": {
       "price": 28
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -28797,6 +29693,10 @@
     "structured_output": true,
     "system_updates": true,
     "effort_updates": false,
+    "service_tier": [
+     "flex",
+     "priority"
+    ],
     "tools": {
      "supported": true
     },
@@ -28845,6 +29745,41 @@
        }
       ]
      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": {
+        "input": {
+         "price": 0.5,
+         "cache": {
+          "read": 0.52
+         }
+        },
+        "output": {
+         "price": 0.5
+        }
+       }
+      }
+     }
+    ],
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -28979,6 +29914,9 @@
      "output": {
       "price": 30
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -29088,6 +30026,10 @@
     "structured_output": true,
     "system_updates": true,
     "effort_updates": false,
+    "service_tier": [
+     "flex",
+     "priority"
+    ],
     "tools": {
      "supported": true
     },
@@ -29113,6 +30055,31 @@
      "output": {
       "price": 4.5
      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": 0.5
+      }
+     }
+    ],
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -29247,6 +30214,9 @@
      "output": {
       "price": 9
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -29356,6 +30326,9 @@
     "structured_output": true,
     "system_updates": true,
     "effort_updates": false,
+    "service_tier": [
+     "flex"
+    ],
     "tools": {
      "supported": true
     },
@@ -29381,6 +30354,21 @@
      "output": {
       "price": 1.25
      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": 0.5
+      }
+     }
+    ],
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -29487,6 +30475,9 @@
     "structured_output": false,
     "system_updates": true,
     "effort_updates": false,
+    "service_tier": [
+     "flex"
+    ],
     "tools": {
      "supported": true
     },
@@ -29527,6 +30518,21 @@
        }
       ]
      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": 0.5
+      }
+     }
+    ],
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -29636,6 +30642,10 @@
     "structured_output": true,
     "system_updates": true,
     "effort_updates": false,
+    "service_tier": [
+     "flex",
+     "priority"
+    ],
     "tools": {
      "supported": true
     },
@@ -29684,6 +30694,31 @@
        }
       ]
      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2.5
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": 0.5
+      }
+     }
+    ],
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -29818,6 +30853,9 @@
      "output": {
       "price": 75
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -29924,6 +30962,9 @@
     "structured_output": true,
     "system_updates": true,
     "effort_updates": false,
+    "service_tier": [
+     "flex"
+    ],
     "tools": {
      "supported": true
     },
@@ -29964,6 +31005,21 @@
        }
       ]
      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": 0.5
+      }
+     }
+    ],
+    "web_search": {
+     "price": 14
     }
    },
    "modalities": {
@@ -30074,6 +31130,10 @@
     "structured_output": true,
     "system_updates": true,
     "effort_updates": false,
+    "service_tier": [
+     "flex",
+     "priority"
+    ],
     "tools": {
      "supported": true
     },
@@ -30125,6 +31185,51 @@
        }
       ]
      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": {
+        "input": {
+         "price": 2,
+         "cache": {
+          "read": 2
+         }
+        },
+        "output": {
+         "price": 2
+        }
+       }
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": {
+        "input": {
+         "price": 0.5,
+         "cache": {
+          "read": 0.5
+         }
+        },
+        "output": {
+         "price": 0.5
+        }
+       }
+      }
+     }
+    ],
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -30291,6 +31396,9 @@
        }
       ]
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -30406,6 +31514,10 @@
     "structured_output": true,
     "system_updates": true,
     "effort_updates": false,
+    "service_tier": [
+     "flex",
+     "priority"
+    ],
     "tools": {
      "supported": true
     },
@@ -30457,6 +31569,51 @@
        }
       ]
      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": {
+        "input": {
+         "price": 2,
+         "cache": {
+          "read": 2
+         }
+        },
+        "output": {
+         "price": 2
+        }
+       }
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": {
+        "input": {
+         "price": 0.5,
+         "cache": {
+          "read": 0.5
+         }
+        },
+        "output": {
+         "price": 0.5
+        }
+       }
+      }
+     }
+    ],
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -30623,6 +31780,9 @@
        }
       ]
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -30738,6 +31898,10 @@
     "structured_output": true,
     "system_updates": true,
     "effort_updates": false,
+    "service_tier": [
+     "flex",
+     "priority"
+    ],
     "tools": {
      "supported": true
     },
@@ -30789,6 +31953,51 @@
        }
       ]
      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": {
+        "input": {
+         "price": 2,
+         "cache": {
+          "read": 2
+         }
+        },
+        "output": {
+         "price": 2
+        }
+       }
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": {
+        "input": {
+         "price": 0.5,
+         "cache": {
+          "read": 0.5
+         }
+        },
+        "output": {
+         "price": 0.5
+        }
+       }
+      }
+     }
+    ],
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -30955,6 +32164,9 @@
        }
       ]
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -31070,6 +32282,11 @@
     "structured_output": true,
     "system_updates": true,
     "effort_updates": false,
+    "service_tier": [
+     "flex",
+     "priority",
+     "ultrafast"
+    ],
     "tools": {
      "supported": true
     },
@@ -31120,6 +32337,71 @@
        }
       ]
      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": {
+        "input": {
+         "price": 2,
+         "cache": {
+          "read": 2
+         }
+        },
+        "output": {
+         "price": 2
+        }
+       }
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": {
+        "input": {
+         "price": 0.5,
+         "cache": {
+          "read": 0.5
+         }
+        },
+        "output": {
+         "price": 0.5
+        }
+       }
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "ultrafast"
+       }
+      },
+      "factor": {
+       "text": {
+        "input": {
+         "price": 6,
+         "cache": {
+          "read": 6
+         }
+        },
+        "output": {
+         "price": 6
+        }
+       }
+      }
+     }
+    ],
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -31286,6 +32568,9 @@
        }
       ]
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -31401,6 +32686,10 @@
     "structured_output": true,
     "system_updates": true,
     "effort_updates": false,
+    "service_tier": [
+     "flex",
+     "priority"
+    ],
     "tools": {
      "supported": true
     },
@@ -31452,6 +32741,51 @@
        }
       ]
      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": {
+        "input": {
+         "price": 2,
+         "cache": {
+          "read": 2
+         }
+        },
+        "output": {
+         "price": 2
+        }
+       }
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": {
+        "input": {
+         "price": 0.5,
+         "cache": {
+          "read": 0.5
+         }
+        },
+        "output": {
+         "price": 0.5
+        }
+       }
+      }
+     }
+    ],
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -31706,6 +33040,9 @@
        }
       ]
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -31822,6 +33159,10 @@
     "structured_output": true,
     "system_updates": true,
     "effort_updates": false,
+    "service_tier": [
+     "flex",
+     "priority"
+    ],
     "tools": {
      "supported": true
     },
@@ -31873,6 +33214,51 @@
        }
       ]
      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": {
+        "input": {
+         "price": 2,
+         "cache": {
+          "read": 2
+         }
+        },
+        "output": {
+         "price": 2
+        }
+       }
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": {
+        "input": {
+         "price": 0.5,
+         "cache": {
+          "read": 0.5
+         }
+        },
+        "output": {
+         "price": 0.5
+        }
+       }
+      }
+     }
+    ],
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -32040,6 +33426,9 @@
        }
       ]
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -32156,6 +33545,11 @@
     "structured_output": true,
     "system_updates": true,
     "effort_updates": false,
+    "service_tier": [
+     "flex",
+     "priority",
+     "ultrafast"
+    ],
     "tools": {
      "supported": true
     },
@@ -32206,6 +33600,71 @@
        }
       ]
      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": {
+        "input": {
+         "price": 2,
+         "cache": {
+          "read": 2
+         }
+        },
+        "output": {
+         "price": 2
+        }
+       }
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": {
+        "input": {
+         "price": 0.5,
+         "cache": {
+          "read": 0.5
+         }
+        },
+        "output": {
+         "price": 0.5
+        }
+       }
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "ultrafast"
+       }
+      },
+      "factor": {
+       "text": {
+        "input": {
+         "price": 6,
+         "cache": {
+          "read": 6
+         }
+        },
+        "output": {
+         "price": 6
+        }
+       }
+      }
+     }
+    ],
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -32372,6 +33831,9 @@
        }
       ]
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -32488,6 +33950,10 @@
     "structured_output": true,
     "system_updates": true,
     "effort_updates": false,
+    "service_tier": [
+     "flex",
+     "priority"
+    ],
     "tools": {
      "supported": true
     },
@@ -32539,6 +34005,51 @@
        }
       ]
      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": {
+        "input": {
+         "price": 2,
+         "cache": {
+          "read": 2
+         }
+        },
+        "output": {
+         "price": 2
+        }
+       }
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": {
+       "text": {
+        "input": {
+         "price": 0.5,
+         "cache": {
+          "read": 0.5
+         }
+        },
+        "output": {
+         "price": 0.5
+        }
+       }
+      }
+     }
+    ],
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -32705,6 +34216,9 @@
        }
       ]
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -32820,6 +34334,10 @@
     "structured_output": true,
     "system_updates": true,
     "effort_updates": false,
+    "service_tier": [
+     "priority",
+     "ultrafast"
+    ],
     "tools": {
      "supported": true
     },
@@ -32870,6 +34388,51 @@
        }
       ]
      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": {
+        "input": {
+         "price": 2,
+         "cache": {
+          "read": 2
+         }
+        },
+        "output": {
+         "price": 2
+        }
+       }
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "ultrafast"
+       }
+      },
+      "factor": {
+       "text": {
+        "input": {
+         "price": 3,
+         "cache": {
+          "read": 3
+         }
+        },
+        "output": {
+         "price": 3
+        }
+       }
+      }
+     }
+    ],
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -33036,6 +34599,9 @@
        }
       ]
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -33152,6 +34718,10 @@
     "structured_output": true,
     "system_updates": true,
     "effort_updates": false,
+    "service_tier": [
+     "priority",
+     "ultrafast"
+    ],
     "tools": {
      "supported": true
     },
@@ -33202,6 +34772,51 @@
        }
       ]
      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": {
+        "input": {
+         "price": 2,
+         "cache": {
+          "read": 2
+         }
+        },
+        "output": {
+         "price": 2
+        }
+       }
+      }
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "ultrafast"
+       }
+      },
+      "factor": {
+       "text": {
+        "input": {
+         "price": 3,
+         "cache": {
+          "read": 3
+         }
+        },
+        "output": {
+         "price": 3
+        }
+       }
+      }
+     }
+    ],
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -33368,6 +34983,9 @@
        }
       ]
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -33972,6 +35590,9 @@
       "unit": "second",
       "price": 0.0008334
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -34035,6 +35656,9 @@
       "unit": "second",
       "price": 0.0008334
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -34622,6 +36246,9 @@
      "output": {
       "price": 64
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -34703,6 +36330,9 @@
      "output": {
       "price": 64
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -34792,6 +36422,9 @@
      "output": {
       "price": 64
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -34873,6 +36506,9 @@
      "output": {
       "price": 20
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -35075,6 +36711,9 @@
      "output": {
       "price": 60
      }
+    },
+    "web_search": {
+     "price": 14
     }
    },
    "modalities": {
@@ -35367,6 +37006,9 @@
      "output": {
       "price": 14
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -35494,6 +37136,9 @@
      "output": {
       "price": 4.4
      }
+    },
+    "web_search": {
+     "price": 14
     }
    },
    "modalities": {
@@ -35605,6 +37250,9 @@
      "output": {
       "price": 80
      }
+    },
+    "web_search": {
+     "price": 10
     }
    },
    "modalities": {
@@ -35750,7 +37398,7 @@
      }
     ],
     "web_search": {
-     "price": 10
+     "price": 14
     }
    },
    "modalities": {
@@ -36134,6 +37782,7 @@
    "type": "transcription",
    "family": "whisper",
    "canonical_id": "openai/whisper-1",
+   "status": "deprecated",
    "release_date": "2023-03-01",
    "limit": {
     "context": 0,
@@ -36486,6 +38135,9 @@
      "output": {
       "price": 0
      }
+    },
+    "web_search": {
+     "price": 1
     }
    },
    "modalities": {
@@ -36540,6 +38192,9 @@
      "output": {
       "price": 0
      }
+    },
+    "web_search": {
+     "price": 1
     }
    },
    "modalities": {
@@ -36592,6 +38247,9 @@
      "output": {
       "price": 0
      }
+    },
+    "web_search": {
+     "price": 1
     }
    },
    "modalities": {
@@ -36646,6 +38304,9 @@
      "output": {
       "price": 0
      }
+    },
+    "web_search": {
+     "price": 1
     }
    },
    "modalities": {
@@ -36807,6 +38468,9 @@
      "output": {
       "price": 2.5
      }
+    },
+    "web_search": {
+     "price": 2.5
     }
    },
    "modalities": {
@@ -38025,7 +39689,7 @@
    "release_date": "2026-09-11",
    "limit": {
     "context": 1000000,
-    "output": 1000000
+    "output": 128000
    },
    "capabilities": {
     "cache": {
@@ -38280,7 +39944,7 @@
    "release_date": "2026-09-11",
    "limit": {
     "context": 1000000,
-    "output": 1000000
+    "output": 128000
    },
    "capabilities": {
     "cache": {
@@ -38420,7 +40084,7 @@
    "release_date": "2026-08-03",
    "limit": {
     "context": 256000,
-    "output": 256000
+    "output": 65536
    },
    "capabilities": {
     "cache": {
@@ -38459,6 +40123,9 @@
      "output": {
       "price": 4
      }
+    },
+    "web_search": {
+     "price": 7
     }
    },
    "modalities": {
@@ -38782,6 +40449,9 @@
     },
     "system_updates": false,
     "effort_updates": false,
+    "service_tier": [
+     "priority"
+    ],
     "tools": {
      "supported": true
     },
@@ -38828,6 +40498,21 @@
        }
       ]
      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     }
+    ],
+    "web_search": {
+     "price": 5
     }
    },
    "modalities": {
@@ -38965,6 +40650,9 @@
        }
       ]
      }
+    },
+    "web_search": {
+     "price": 5
     }
    },
    "modalities": {
@@ -39049,7 +40737,7 @@
    "release_date": "2026-03-09",
    "limit": {
     "context": 2000000,
-    "output": 2000000
+    "output": 30000
    },
    "capabilities": {
     "cache": {
@@ -39060,6 +40748,9 @@
     "top_p": true,
     "system_updates": false,
     "effort_updates": false,
+    "service_tier": [
+     "priority"
+    ],
     "tools": {
      "supported": true
     },
@@ -39101,6 +40792,21 @@
        }
       ]
      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     }
+    ],
+    "web_search": {
+     "price": 5
     }
    },
    "modalities": {
@@ -39233,6 +40939,9 @@
        }
       ]
      }
+    },
+    "web_search": {
+     "price": 5
     }
    },
    "modalities": {
@@ -39317,7 +41026,7 @@
    "release_date": "2026-03-09",
    "limit": {
     "context": 2000000,
-    "output": 2000000
+    "output": 30000
    },
    "capabilities": {
     "cache": {
@@ -39328,6 +41037,9 @@
     "top_p": true,
     "system_updates": false,
     "effort_updates": false,
+    "service_tier": [
+     "priority"
+    ],
     "tools": {
      "supported": true
     },
@@ -39375,6 +41087,21 @@
        }
       ]
      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     }
+    ],
+    "web_search": {
+     "price": 5
     }
    },
    "modalities": {
@@ -39513,6 +41240,9 @@
        }
       ]
      }
+    },
+    "web_search": {
+     "price": 5
     }
    },
    "modalities": {
@@ -39597,7 +41327,7 @@
    "release_date": "2026-04-17",
    "limit": {
     "context": 1000000,
-    "output": 1000000
+    "output": 30000
    },
    "capabilities": {
     "cache": {
@@ -39609,6 +41339,9 @@
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
+    "service_tier": [
+     "priority"
+    ],
     "tools": {
      "supported": true
     },
@@ -39655,6 +41388,21 @@
        }
       ]
      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     }
+    ],
+    "web_search": {
+     "price": 5
     }
    },
    "modalities": {
@@ -39751,6 +41499,9 @@
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
+    "service_tier": [
+     "priority"
+    ],
     "tools": {
      "supported": true
     },
@@ -39797,6 +41548,21 @@
        }
       ]
      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     }
+    ],
+    "web_search": {
+     "price": 5
     }
    },
    "modalities": {
@@ -39893,6 +41659,9 @@
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
+    "service_tier": [
+     "priority"
+    ],
     "tools": {
      "supported": true
     },
@@ -39940,6 +41709,21 @@
        }
       ]
      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     }
+    ],
+    "web_search": {
+     "price": 5
     }
    },
    "modalities": {
@@ -40036,6 +41820,9 @@
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
+    "service_tier": [
+     "priority"
+    ],
     "tools": {
      "supported": true
     },
@@ -40083,6 +41870,21 @@
        }
       ]
      }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     }
+    ],
+    "web_search": {
+     "price": 5
     }
    },
    "modalities": {
@@ -40932,7 +42734,7 @@
    "release_date": "2026-09-16",
    "limit": {
     "context": 1000000,
-    "output": 1000000
+    "output": 65536
    },
    "capabilities": {
     "cache": {
@@ -41211,7 +43013,7 @@
    "release_date": "2026-07-06",
    "limit": {
     "context": 262144,
-    "output": 262144
+    "output": 128000
    },
    "capabilities": {
     "cache": {
@@ -41429,7 +43231,7 @@
      }
     }
    },
-   "open_weights": false,
+   "open_weights": true,
    "last_updated": "2026-11-04",
    "recommended_api": "chat-completions"
   },
@@ -41546,7 +43348,7 @@
      }
     }
    },
-   "open_weights": false,
+   "open_weights": true,
    "last_updated": "2026-11-16",
    "recommended_api": "chat-completions"
   },
@@ -41787,6 +43589,129 @@
    },
    "open_weights": true,
    "last_updated": "2026-07-15",
+   "recommended_api": "chat-completions"
+  },
+  "thinkingmachines/inkling-2-mini": {
+   "id": "thinkingmachines/inkling-2-mini",
+   "name": "Inkling 2 Mini",
+   "description": "Looped MoE reasoning model (26.4B total, 3.4B active) for agentic coding, vision, and knowledge work",
+   "type": "chat",
+   "family": "inkling-mini",
+   "canonical_id": "thinkingmachines/inkling-2-mini",
+   "release_date": "2026-11-20",
+   "limit": {
+    "context": 1048576,
+    "output": 65536
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.075,
+      "cache": {
+       "read": 0.015
+      }
+     },
+     "output": {
+      "price": 0.3
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/gateway",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway"
+     },
+     "capabilities": {
+      "system_updates": true,
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "responses": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/open-responses",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://ai-gateway.vercel.sh/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/vercel-ai-gateway/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-11-20",
    "recommended_api": "chat-completions"
   },
   "thinkingmachines/inkling-2-small": {
@@ -43329,7 +45254,7 @@
    "type": "chat",
    "family": "mimo-pro",
    "canonical_id": "xiaomi/mimo-v2.6-pro-ultraspeed",
-   "release_date": "2026-09-21",
+   "release_date": "2026-09-22",
    "limit": {
     "context": 1048576,
     "output": 131072
@@ -43441,7 +45366,7 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2026-09-21",
+   "last_updated": "2026-09-22",
    "recommended_api": "chat-completions"
   },
   "zai/glm-4.5": {
@@ -44820,7 +46745,7 @@
    "release_date": "2026-08-14",
    "limit": {
     "context": 1000000,
-    "output": 1000000
+    "output": 131072
    },
    "capabilities": {
     "cache": {
@@ -45285,7 +47210,8 @@
    "name": "GLM 5.3 FlashX Legal",
    "description": "GLM vision model for visual reasoning, documents, and multimodal agents",
    "type": "chat",
-   "family": "glm",
+   "family": "glm-flash-legal",
+   "canonical_id": "zhipuai/glm-5.3-flashx-legal",
    "release_date": "2026-11-02",
    "limit": {
     "context": 1000000,
@@ -45295,6 +47221,9 @@
     "cache": {
      "implicit": true
     },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {

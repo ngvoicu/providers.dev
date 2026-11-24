@@ -2344,6 +2344,129 @@
    "last_updated": "2026-09-18",
    "recommended_api": "chat-completions"
   },
+  "glm-5.3-flashx-legal": {
+   "id": "glm-5.3-flashx-legal",
+   "name": "GLM-5.3-FlashX-Legal",
+   "description": "GLM-5.3-FlashX tuned for legal workflows: legal research, contract review and document drafting",
+   "type": "chat",
+   "family": "glm-flash-legal",
+   "canonical_id": "zhipuai/glm-5.3-flashx-legal",
+   "release_date": "2026-11-02",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ],
+     "default": {
+      "type": "effort",
+      "value": "max"
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.37,
+      "cache": {
+       "read": 0.075,
+       "write": 0
+      }
+     },
+     "output": {
+      "price": 1.25
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "video/mp4",
+     "video/x-matroska",
+     "video/quicktime",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.z.ai/api/paas/v4",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/zai/chat"
+     },
+     "capabilities": {
+      "system_updates": true,
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens",
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "messages": {
+     "base_url": "https://api.z.ai/api/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://api.z.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-02",
+   "recommended_api": "chat-completions"
+  },
   "glm-5v-turbo": {
    "id": "glm-5v-turbo",
    "name": "GLM-5V-Turbo",

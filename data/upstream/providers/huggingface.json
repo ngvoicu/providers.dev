@@ -174,44 +174,50 @@
    "last_updated": "2023-09-12",
    "recommended_api": "embeddings"
   },
-  "MiniMaxAI/MiniMax-M1-80k": {
-   "id": "MiniMaxAI/MiniMax-M1-80k",
-   "name": "MiniMax M1 80K",
-   "description": "MiniMax model for chat, coding, office work, and agentic tasks",
+  "CohereLabs/command-a-plus-05-2026-bf16": {
+   "id": "CohereLabs/command-a-plus-05-2026-bf16",
+   "name": "Command A Plus",
+   "description": "Cohere's stronger command model for multilingual agents and enterprise workflows",
    "type": "chat",
-   "family": "minimax-m",
-   "canonical_id": "minimax/minimax-m1-80k",
-   "release_date": "2025-06-17",
+   "family": "command-a-plus",
+   "canonical_id": "cohere/command-a-plus-05-2026",
+   "release_date": "2026-05-20",
    "limit": {
-    "context": 1000000,
-    "output": 80000
+    "context": 192000,
+    "output": 64000
    },
    "capabilities": {
     "temperature": true,
-    "top_k": false,
+    "top_k": true,
     "top_p": true,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": true
+     "supported": true,
+     "toggle": true
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.55
+      "price": 0.3
      },
      "output": {
-      "price": 2.2
+      "price": 1.5
      }
     }
    },
    "modalities": {
     "input": [
-     "text"
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/gif"
     ],
     "output": [
      "text"
@@ -247,7 +253,75 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2025-06-17",
+   "knowledge": "2025-04-01",
+   "last_updated": "2026-06-09",
+   "recommended_api": "chat-completions"
+  },
+  "Gryphe/MythoMax-L2-13b": {
+   "id": "Gryphe/MythoMax-L2-13b",
+   "name": "MythoMax L2 13B",
+   "description": "Llama 2 merge combining MythoLogic and Huginn for creative writing and roleplay",
+   "type": "chat",
+   "family": "mythomax",
+   "canonical_id": "gryphe/mythomax-l2-13b",
+   "release_date": "2023-08-10",
+   "limit": {
+    "context": 4096,
+    "output": 3200
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.08
+     },
+     "output": {
+      "price": 0.11
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2023-08-10",
    "recommended_api": "chat-completions"
   },
   "MiniMaxAI/MiniMax-M2": {
@@ -413,8 +487,8 @@
    "canonical_id": "minimax/MiniMax-M2.5",
    "release_date": "2026-02-12",
    "limit": {
-    "context": 204800,
-    "output": 131072
+    "context": 65536,
+    "output": 65536
    },
    "capabilities": {
     "temperature": true,
@@ -574,8 +648,8 @@
    "canonical_id": "minimax/MiniMax-M3",
    "release_date": "2026-06-01",
    "limit": {
-    "context": 524288,
-    "output": 512000
+    "context": 262144,
+    "output": 262144
    },
    "capabilities": {
     "temperature": true,
@@ -594,10 +668,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.3
+      "price": 0.23
      },
      "output": {
-      "price": 1.2
+      "price": 0.96
      }
     }
    },
@@ -734,6 +808,84 @@
    "last_updated": "2026-10-19",
    "recommended_api": "chat-completions"
   },
+  "NousResearch/Hermes-3-Llama-3.1-70B": {
+   "id": "NousResearch/Hermes-3-Llama-3.1-70B",
+   "name": "Hermes 3 70B Instruct",
+   "description": "Open Llama instruction model for multilingual chat, reasoning, and coding",
+   "type": "chat",
+   "family": "hermes",
+   "canonical_id": "nousresearch/hermes-3-llama-3.1-70b",
+   "release_date": "2024-08-18",
+   "limit": {
+    "context": 131072,
+    "output": 16384
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.7
+     },
+     "output": {
+      "price": 0.7
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2023-12-31",
+   "last_updated": "2024-08-18",
+   "recommended_api": "chat-completions"
+  },
   "Qwen/Qwen2.5-Coder-32B-Instruct": {
    "id": "Qwen/Qwen2.5-Coder-32B-Instruct",
    "name": "Qwen2.5-Coder-32B-Instruct",
@@ -743,7 +895,7 @@
    "canonical_id": "alibaba/qwen2.5-coder-32b-instruct",
    "release_date": "2024-11-12",
    "limit": {
-    "context": 131072,
+    "context": 32768,
     "output": 8192
    },
    "capabilities": {
@@ -763,10 +915,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.06
+      "price": 0.66
      },
      "output": {
-      "price": 0.2
+      "price": 1
      }
     }
    },
@@ -811,84 +963,6 @@
    "last_updated": "2024-11-12",
    "recommended_api": "chat-completions"
   },
-  "Qwen/Qwen3-235B-A22B": {
-   "id": "Qwen/Qwen3-235B-A22B",
-   "name": "Qwen3 235B-A22B",
-   "description": "Large open Qwen MoE for multilingual reasoning, coding, and tool use",
-   "type": "chat",
-   "family": "qwen",
-   "canonical_id": "alibaba/qwen3-235b-a22b",
-   "release_date": "2025-04-28",
-   "limit": {
-    "context": 40960,
-    "output": 16384
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.2
-     },
-     "output": {
-      "price": 0.8
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://router.huggingface.co/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": []
-      }
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     }
-    },
-    "responses": {
-     "base_url": "https://router.huggingface.co/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": []
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-04-28",
-   "recommended_api": "chat-completions"
-  },
   "Qwen/Qwen3-235B-A22B-Instruct-2507": {
    "id": "Qwen/Qwen3-235B-A22B-Instruct-2507",
    "name": "Qwen3 235B-A22B Instruct 2507",
@@ -898,7 +972,7 @@
    "canonical_id": "alibaba/qwen3-235b-a22b-instruct-2507",
    "release_date": "2025-07-21",
    "limit": {
-    "context": 262144,
+    "context": 131072,
     "output": 16384
    },
    "capabilities": {
@@ -918,10 +992,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.855
+      "price": 0.14
      },
      "output": {
-      "price": 2.565
+      "price": 0.8
      }
     }
    },
@@ -1206,7 +1280,7 @@
    "canonical_id": "alibaba/qwen3-32b",
    "release_date": "2025-04-28",
    "limit": {
-    "context": 131072,
+    "context": 40960,
     "output": 16384
    },
    "capabilities": {
@@ -1226,10 +1300,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.29
+      "price": 0.08
      },
      "output": {
-      "price": 0.59
+      "price": 0.28
      }
     }
    },
@@ -1445,7 +1519,7 @@
    "canonical_id": "alibaba/qwen3-coder-480b-a35b-instruct",
    "release_date": "2025-07-22",
    "limit": {
-    "context": 262144,
+    "context": 256000,
     "output": 65536
    },
    "capabilities": {
@@ -1464,10 +1538,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 2
+      "price": 0.35
      },
      "output": {
-      "price": 2
+      "price": 1.5
      }
     }
    },
@@ -1870,95 +1944,6 @@
      },
      "output": {
       "price": 1.5
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://router.huggingface.co/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": []
-      }
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     }
-    },
-    "responses": {
-     "base_url": "https://router.huggingface.co/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": []
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-03-31",
-   "last_updated": "2025-09-23",
-   "recommended_api": "chat-completions"
-  },
-  "Qwen/Qwen3-VL-235B-A22B-Thinking": {
-   "id": "Qwen/Qwen3-VL-235B-A22B-Thinking",
-   "name": "Qwen3 VL 235B A22B Thinking",
-   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
-   "type": "chat",
-   "family": "qwen-vl",
-   "canonical_id": "alibaba/qwen3-vl-235b-a22b-thinking",
-   "release_date": "2025-09-23",
-   "limit": {
-    "context": 131072,
-    "output": 32768
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.98
-     },
-     "output": {
-      "price": 3.95
      }
     }
    },
@@ -2690,7 +2675,7 @@
    "canonical_id": "alibaba/qwen3.8-2.4t-a95b",
    "release_date": "2026-08-12",
    "limit": {
-    "context": 262144,
+    "context": 1000000,
     "output": 131072
    },
    "capabilities": {
@@ -2715,10 +2700,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 2.5
+      "price": 2
      },
      "output": {
-      "price": 6.25
+      "price": 6
      }
     }
    },
@@ -2851,6 +2836,162 @@
    "last_updated": "2026-08-14",
    "recommended_api": "chat-completions"
   },
+  "Qwen/Qwen3.8-Flash-Next-FP8": {
+   "id": "Qwen/Qwen3.8-Flash-Next-FP8",
+   "name": "Qwen3.8 Flash Next",
+   "description": "Open-weight experimental preview of the Qwen4 architecture: hybrid-attention MoE (125B total, 6B active) with vision encoder for coding, agent tasks, and image and video understanding",
+   "type": "chat",
+   "family": "qwen-flash",
+   "canonical_id": "alibaba/qwen3.8-flash-next",
+   "release_date": "2026-08-27",
+   "limit": {
+    "context": 1048576,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.15
+     },
+     "output": {
+      "price": 0.47
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-27",
+   "recommended_api": "chat-completions"
+  },
+  "Undi95/ReMM-SLERP-L2-13B": {
+   "id": "Undi95/ReMM-SLERP-L2-13B",
+   "name": "ReMM SLERP 13B",
+   "description": "Open-weight instruction model for adaptable chat and self-hosted production workloads",
+   "type": "chat",
+   "family": "remm",
+   "canonical_id": "undi95/remm-slerp-l2-13b",
+   "release_date": "2023-07-22",
+   "limit": {
+    "context": 6144,
+    "output": 5529
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.3
+     },
+     "output": {
+      "price": 0.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2023-06-30",
+   "last_updated": "2023-07-22",
+   "recommended_api": "chat-completions"
+  },
   "XiaomiMiMo/MiMo-V2.5": {
    "id": "XiaomiMiMo/MiMo-V2.5",
    "name": "MiMo-V2.5",
@@ -2887,10 +3028,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.4
+      "price": 0.14
      },
      "output": {
-      "price": 2
+      "price": 0.28
      }
     }
    },
@@ -3021,6 +3162,207 @@
    "last_updated": "2026-04-22",
    "recommended_api": "chat-completions"
   },
+  "aisingapore/Gemma-SEA-LION-v4-27B-IT": {
+   "id": "aisingapore/Gemma-SEA-LION-v4-27B-IT",
+   "name": "Gemma-SEA-LION-v4-27B-IT",
+   "description": "Gemma 3 27B tuned by AI Singapore for Southeast Asian languages and instruction following",
+   "type": "chat",
+   "family": "sea-lion",
+   "canonical_id": "aisingapore/gemma-sea-lion-v4-27b-it",
+   "release_date": "2025-09-23",
+   "limit": {
+    "context": 131072,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.2
+     },
+     "output": {
+      "price": 0.4
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-09-23",
+   "recommended_api": "chat-completions"
+  },
+  "alpindale/WizardLM-2-8x22B": {
+   "id": "alpindale/WizardLM-2-8x22B",
+   "name": "WizardLM 2 8x22B",
+   "description": "Microsoft WizardLM instruction-tuned Mixtral MoE for multilingual dialogue and complex tasks",
+   "type": "chat",
+   "family": "wizardlm",
+   "canonical_id": "microsoft/wizardlm-2-8x22b",
+   "release_date": "2024-04-15",
+   "limit": {
+    "context": 65535,
+    "output": 8000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.62
+     },
+     "output": {
+      "price": 0.62
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2024-04-15",
+   "recommended_api": "chat-completions"
+  },
+  "anthracite-org/magnum-v4-72b": {
+   "id": "anthracite-org/magnum-v4-72b",
+   "name": "Magnum v4 72B",
+   "description": "Open-weight instruction model for adaptable chat and self-hosted production workloads",
+   "type": "chat",
+   "family": "magnum",
+   "canonical_id": "anthracite-org/magnum-v4-72b",
+   "release_date": "2024-10-22",
+   "limit": {
+    "context": 32768,
+    "output": 4096
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2.5
+     },
+     "output": {
+      "price": 5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-06-30",
+   "last_updated": "2024-10-22",
+   "recommended_api": "chat-completions"
+  },
   "deepseek-ai/DeepSeek-R1": {
    "id": "deepseek-ai/DeepSeek-R1",
    "name": "DeepSeek-R1",
@@ -3127,10 +3469,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 3
+      "price": 0.5
      },
      "output": {
-      "price": 5
+      "price": 2.15
      }
     }
    },
@@ -3185,7 +3527,7 @@
    "canonical_id": "deepseek/deepseek-v3",
    "release_date": "2024-12-26",
    "limit": {
-    "context": 64000,
+    "context": 163840,
     "output": 8192
    },
    "capabilities": {
@@ -3205,10 +3547,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.4
+      "price": 0.32
      },
      "output": {
-      "price": 1.3
+      "price": 0.89
      }
     }
    },
@@ -4074,6 +4416,73 @@
    "last_updated": "2026-10-17",
    "recommended_api": "chat-completions"
   },
+  "dphn/Dolphin-Mistral-24B-Venice-Edition": {
+   "id": "dphn/Dolphin-Mistral-24B-Venice-Edition",
+   "name": "Uncensored",
+   "description": "Mistral model for multilingual chat, reasoning, and tool-assisted workflows",
+   "type": "chat",
+   "family": "dolphin",
+   "canonical_id": "cognitivecomputations/dolphin-mistral-24b-venice-edition",
+   "release_date": "2025-07-09",
+   "limit": {
+    "context": 128000,
+    "output": 8192
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.2
+     },
+     "output": {
+      "price": 0.9
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-04-30",
+   "last_updated": "2025-07-09",
+   "recommended_api": "chat-completions"
+  },
   "google/gemma-2-27b-it": {
    "id": "google/gemma-2-27b-it",
    "name": "Gemma 2 27B",
@@ -4554,6 +4963,399 @@
    "open_weights": true,
    "knowledge": "2025-01",
    "last_updated": "2026-04-02",
+   "recommended_api": "chat-completions"
+  },
+  "ibm-granite/granite-4.2-8b": {
+   "id": "ibm-granite/granite-4.2-8b",
+   "name": "Granite 4.2 8B",
+   "description": "Reasoning model for deliberate analysis, multi-step problem solving, and tool use",
+   "type": "chat",
+   "family": "granite",
+   "canonical_id": "ibm/granite-4.2-8b",
+   "release_date": "2026-08-25",
+   "limit": {
+    "context": 131072,
+    "output": 117964
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.06
+     },
+     "output": {
+      "price": 0.25
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-25",
+   "recommended_api": "chat-completions"
+  },
+  "inclusionAI/Ling-3.0-flash": {
+   "id": "inclusionAI/Ling-3.0-flash",
+   "name": "Ling 3.0 Flash",
+   "description": "Hybrid-linear MoE reasoning model with 124B total and 5.1B active parameters for efficient agents",
+   "type": "chat",
+   "family": "ling-flash",
+   "canonical_id": "inclusionai/ling-3.0-flash",
+   "release_date": "2026-07-23",
+   "limit": {
+    "context": 262144,
+    "output": 32768
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.06
+     },
+     "output": {
+      "price": 0.18
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-07-23",
+   "recommended_api": "chat-completions"
+  },
+  "inclusionAI/Ling-3.0-flash-Fin": {
+   "id": "inclusionAI/Ling-3.0-flash-Fin",
+   "name": "Ling 3.0 Flash Fin",
+   "description": "Finance-enhanced model for financial research, multi-step investment workflows, and long-horizon planning and execution",
+   "type": "chat",
+   "family": "ling-flash",
+   "canonical_id": "inclusionai/ling-3.0-flash-fin",
+   "release_date": "2026-08-27",
+   "limit": {
+    "context": 262144,
+    "output": 32768
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.075
+     },
+     "output": {
+      "price": 0.22
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-09-03",
+   "recommended_api": "chat-completions"
+  },
+  "inclusionAI/Ling-3.0-flash-VL": {
+   "id": "inclusionAI/Ling-3.0-flash-VL",
+   "name": "Ling 3.0 Flash VL",
+   "description": "Native multimodal hybrid MoE model for image and video understanding, reasoning, and visual agents",
+   "type": "chat",
+   "family": "ling-flash",
+   "canonical_id": "inclusionai/ling-3.0-flash-vl",
+   "release_date": "2026-09-10",
+   "limit": {
+    "context": 262144,
+    "output": 32768
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.075
+     },
+     "output": {
+      "price": 0.22
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-09-10",
+   "recommended_api": "chat-completions"
+  },
+  "inclusionAI/Ling-3.1-flash": {
+   "id": "inclusionAI/Ling-3.1-flash",
+   "name": "Ling 3.1 Flash",
+   "description": "Efficient model for low-latency assistance, extraction, and routine automation",
+   "type": "chat",
+   "family": "ling-flash",
+   "canonical_id": "inclusionai/ling-3.1-flash",
+   "release_date": "2026-09-29",
+   "limit": {
+    "context": 1000000,
+    "output": 32768
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.3
+     },
+     "output": {
+      "price": 0.9
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-09-29",
    "recommended_api": "chat-completions"
   },
   "intfloat/multilingual-e5-large": {
@@ -5056,6 +5858,170 @@
    "last_updated": "2024-12-06",
    "recommended_api": "chat-completions"
   },
+  "meta-llama/Llama-4-Maverick-17B-128E-Instruct": {
+   "id": "meta-llama/Llama-4-Maverick-17B-128E-Instruct",
+   "name": "Llama 4 Maverick 17B Instruct",
+   "description": "Open multimodal Llama for strong reasoning with efficient everyday serving",
+   "type": "chat",
+   "family": "llama",
+   "canonical_id": "meta/llama-4-maverick-17b-instruct",
+   "release_date": "2025-04-05",
+   "limit": {
+    "context": 524288,
+    "output": 16384
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.35
+     },
+     "output": {
+      "price": 1
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-08",
+   "last_updated": "2025-04-05",
+   "recommended_api": "chat-completions"
+  },
+  "meta-llama/Llama-4-Scout-17B-16E-Instruct": {
+   "id": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+   "name": "Llama 4 Scout 17B Instruct",
+   "description": "Open Llama with long-context vision for efficient multimodal agents",
+   "type": "chat",
+   "family": "llama",
+   "canonical_id": "meta/llama-4-scout-17b-instruct",
+   "release_date": "2025-04-05",
+   "limit": {
+    "context": 327680,
+    "output": 16384
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1
+     },
+     "output": {
+      "price": 0.3
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-08",
+   "last_updated": "2025-04-05",
+   "recommended_api": "chat-completions"
+  },
   "meta-llama/Llama-Guard-4-12B": {
    "id": "meta-llama/Llama-Guard-4-12B",
    "name": "Llama Guard 4 12B",
@@ -5123,6 +6089,262 @@
    "last_updated": "2025-04-29",
    "recommended_api": "chat-completions"
   },
+  "meta-models/Muse-Glimmer-30B": {
+   "id": "meta-models/Muse-Glimmer-30B",
+   "name": "Muse Glimmer 30B",
+   "description": "Muse Glimmer is a 30-billion-parameter open-weight multimodal model from Meta Superintelligence Labs, distilled from Muse Spark for always-on local agents, tool use, coding, and image understanding.",
+   "type": "chat",
+   "family": "muse-glimmer",
+   "canonical_id": "meta/muse-glimmer-30b",
+   "release_date": "2026-08-10",
+   "limit": {
+    "context": 131072,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.3
+     },
+     "output": {
+      "price": 1.2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2026-01-04",
+   "last_updated": "2026-08-10",
+   "recommended_api": "chat-completions"
+  },
+  "meta-models/Muse-Spark-Open-816B-A42B": {
+   "id": "meta-models/Muse-Spark-Open-816B-A42B",
+   "name": "Muse Spark Open",
+   "description": "Muse Spark Open is an 816B total / 42B active open-weight multimodal reasoning model from Meta for coding and long-horizon agentic work, with 1M-token context.",
+   "type": "chat",
+   "family": "muse-spark",
+   "canonical_id": "meta/muse-spark-open",
+   "release_date": "2026-10-15",
+   "limit": {
+    "context": 1048576,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.25
+     },
+     "output": {
+      "price": 4.25
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2026-01-04",
+   "last_updated": "2026-10-15",
+   "recommended_api": "chat-completions"
+  },
+  "mistralai/Mistral-Large-4-1T-A52B": {
+   "id": "mistralai/Mistral-Large-4-1T-A52B",
+   "name": "Mistral Large 4",
+   "description": "Mistral's 1T-parameter multimodal MoE for reasoning, coding, and agentic work",
+   "type": "chat",
+   "family": "mistral-large",
+   "canonical_id": "mistral/mistral-large-4",
+   "release_date": "2026-10-05",
+   "limit": {
+    "context": 1048576,
+    "output": 262144
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.7
+     },
+     "output": {
+      "price": 2.1
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/gif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-10-05",
+   "recommended_api": "chat-completions"
+  },
   "moonshotai/Kimi-K2-Instruct": {
    "id": "moonshotai/Kimi-K2-Instruct",
    "name": "Kimi-K2-Instruct",
@@ -5151,10 +6373,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 1
+      "price": 0.57
      },
      "output": {
-      "price": 3
+      "price": 2.3
      }
     }
    },
@@ -5228,10 +6450,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 1
+      "price": 0.6
      },
      "output": {
-      "price": 3
+      "price": 2.5
      }
     }
    },
@@ -5502,16 +6724,7 @@
      "image/webp",
      "image/bmp",
      "image/heic",
-     "image/heif",
-     "video/mp4",
-     "video/mpeg",
-     "video/mov",
-     "video/avi",
-     "video/x-flv",
-     "video/mpg",
-     "video/webm",
-     "video/wmv",
-     "video/3gpp"
+     "image/heif"
     ],
     "output": [
      "text"
@@ -5815,6 +7028,490 @@
    "last_updated": "2026-10-23",
    "recommended_api": "chat-completions"
   },
+  "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16": {
+   "id": "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16",
+   "name": "Nemotron 3 Nano 30B A3B",
+   "description": "Small Nemotron 3 MoE for efficient coding, math, and long-context agents",
+   "type": "chat",
+   "family": "nemotron-nano",
+   "canonical_id": "nvidia/nemotron-3-nano-30b-a3b",
+   "release_date": "2025-12-15",
+   "limit": {
+    "context": 262144,
+    "output": 262144
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.06
+     },
+     "output": {
+      "price": 0.24
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-06-25",
+   "last_updated": "2025-12-15",
+   "recommended_api": "chat-completions"
+  },
+  "nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-FP8": {
+   "id": "nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-FP8",
+   "name": "Nemotron 3 Super 120B A12B",
+   "description": "Nemotron middle tier for collaborative agents and high-volume reasoning workloads",
+   "type": "chat",
+   "family": "nemotron-super",
+   "canonical_id": "nvidia/nemotron-3-super-120b-a12b",
+   "release_date": "2026-03-11",
+   "limit": {
+    "context": 262144,
+    "output": 262144
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.075
+     },
+     "output": {
+      "price": 0.4
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-06",
+   "last_updated": "2026-03-11",
+   "recommended_api": "chat-completions"
+  },
+  "nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-BF16": {
+   "id": "nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-BF16",
+   "name": "Nemotron 3 Ultra 550B A55B",
+   "description": "Largest Nemotron 3 model for maximum open-weight reasoning and agent accuracy",
+   "type": "chat",
+   "family": "nemotron-ultra",
+   "canonical_id": "nvidia/nemotron-3-ultra-550b-a55b",
+   "release_date": "2026-06-04",
+   "limit": {
+    "context": 262144,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.5
+     },
+     "output": {
+      "price": 2.15
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-09",
+   "last_updated": "2026-06-04",
+   "recommended_api": "chat-completions"
+  },
+  "nvidia/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-BF16": {
+   "id": "nvidia/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-BF16",
+   "name": "Nemotron 3.5 Lightning 30B A3B",
+   "description": "Fast NVIDIA Nemotron MoE for reliable agentic tasks across enterprise workloads",
+   "type": "chat",
+   "family": "nemotron-lightning",
+   "canonical_id": "nvidia/nemotron-3.5-lightning",
+   "release_date": "2026-08-11",
+   "limit": {
+    "context": 262144,
+    "output": 262144
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.05
+     },
+     "output": {
+      "price": 0.2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-09",
+   "last_updated": "2026-08-11",
+   "recommended_api": "chat-completions"
+  },
+  "nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-BF16": {
+   "id": "nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-BF16",
+   "name": "Nemotron 3.5 Super VL 120B A12B",
+   "description": "NVIDIA vision-language reasoning model for text, image, and video understanding and agentic tool use",
+   "type": "chat",
+   "family": "nemotron-super",
+   "canonical_id": "nvidia/nemotron-3.5-super-vl-120b-a12b",
+   "release_date": "2026-10-15",
+   "limit": {
+    "context": 1048576,
+    "output": 8192
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.2
+     },
+     "output": {
+      "price": 0.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-10-15",
+   "recommended_api": "chat-completions"
+  },
+  "nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-NVFP4": {
+   "id": "nvidia/NVIDIA-Nemotron-3.5-Super-VL-120B-A12B-NVFP4",
+   "name": "Nemotron 3.5 Super VL 120B A12B",
+   "description": "NVIDIA vision-language reasoning model for text, image, and video understanding and agentic tool use",
+   "type": "chat",
+   "family": "nemotron-super",
+   "canonical_id": "nvidia/nemotron-3.5-super-vl-120b-a12b",
+   "release_date": "2026-10-15",
+   "limit": {
+    "context": 1048576,
+    "output": 8192
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.2
+     },
+     "output": {
+      "price": 0.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-10-15",
+   "recommended_api": "chat-completions"
+  },
   "openai/gpt-oss-120b": {
    "id": "openai/gpt-oss-120b",
    "name": "GPT OSS 120B",
@@ -5979,6 +7676,173 @@
    "open_weights": true,
    "knowledge": "2024-06",
    "last_updated": "2025-08-05",
+   "recommended_api": "chat-completions"
+  },
+  "openai/gpt-oss-safeguard-20b": {
+   "id": "openai/gpt-oss-safeguard-20b",
+   "name": "GPT OSS Safeguard 20B",
+   "description": "Safety model for policy screening, moderation, and risk-aware routing workflows",
+   "type": "chat",
+   "family": "gpt-oss-safeguard",
+   "canonical_id": "openai/gpt-oss-safeguard-20b",
+   "release_date": "2025-10-29",
+   "limit": {
+    "context": 131072,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.07
+     },
+     "output": {
+      "price": 0.2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-10-29",
+   "recommended_api": "chat-completions"
+  },
+  "reflection/Beam-1.0-501B-A23B": {
+   "id": "reflection/Beam-1.0-501B-A23B",
+   "name": "Beam 1.0 501B A23B",
+   "description": "Sparse mixture-of-experts reasoning model with 23B active parameters for coding and agentic workflows",
+   "type": "chat",
+   "family": "beam",
+   "canonical_id": "reflection/beam-1.0-501b-a23b",
+   "release_date": "2026-10-05",
+   "limit": {
+    "context": 1048576,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.4
+     },
+     "output": {
+      "price": 1.2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2026-06-30",
+   "last_updated": "2026-10-16",
    "recommended_api": "chat-completions"
   },
   "stepfun-ai/Step-3.5-Flash": {
@@ -6240,7 +8104,7 @@
    "release_date": "2026-11-04",
    "limit": {
     "context": 1048576,
-    "input": 983010,
+    "input": 983040,
     "output": 65536
    },
    "capabilities": {
@@ -6264,10 +8128,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.417
+      "price": 0.834
      },
      "output": {
-      "price": 1.2505
+      "price": 2.501
      }
     }
    },
@@ -6312,7 +8176,7 @@
      }
     }
    },
-   "open_weights": false,
+   "open_weights": true,
    "last_updated": "2026-11-04",
    "recommended_api": "chat-completions"
   },
@@ -6350,10 +8214,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.035
+      "price": 0.07
      },
      "output": {
-      "price": 0.1405
+      "price": 0.281
      }
     }
    },
@@ -6398,7 +8262,7 @@
      }
     }
    },
-   "open_weights": false,
+   "open_weights": true,
    "last_updated": "2026-11-16",
    "recommended_api": "chat-completions"
   },
@@ -6412,7 +8276,8 @@
    "release_date": "2026-08-28",
    "limit": {
     "context": 1000000,
-    "output": 64000
+    "input": 983040,
+    "output": 65536
    },
    "capabilities": {
     "temperature": true,
@@ -7446,7 +9311,7 @@
    "canonical_id": "zhipuai/glm-4.7-flash",
    "release_date": "2026-01-19",
    "limit": {
-    "context": 200000,
+    "context": 202752,
     "output": 128000
    },
    "capabilities": {
@@ -7465,10 +9330,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0
+      "price": 0.06
      },
      "output": {
-      "price": 0
+      "price": 0.4
      }
     }
    },
@@ -7684,7 +9549,7 @@
    "canonical_id": "zhipuai/glm-5.2",
    "release_date": "2026-06-13",
    "limit": {
-    "context": 262144,
+    "context": 1048576,
     "output": 131072
    },
    "capabilities": {
@@ -7704,10 +9569,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 1.4
+      "price": 0.62
      },
      "output": {
-      "price": 4.4
+      "price": 2.42
      }
     }
    },

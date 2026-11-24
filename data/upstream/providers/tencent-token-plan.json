@@ -6,6 +6,257 @@
   "TENCENT_TOKEN_PLAN_API_KEY"
  ],
  "models": {
+  "deepseek-v4-pro-0813": {
+   "id": "deepseek-v4-pro-0813",
+   "name": "DeepSeek V4 Pro 0813",
+   "description": "DeepSeek V4 Pro snapshot with million-token context and support for thinking and non-thinking modes",
+   "type": "chat",
+   "family": "deepseek-pro",
+   "canonical_id": "deepseek/deepseek-v4-pro-0813",
+   "release_date": "2026-08-13",
+   "limit": {
+    "context": 1000000,
+    "output": 384000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.673723,
+      "cache": {
+       "read": 0.022457
+      }
+     },
+     "output": {
+      "price": 2.02117
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "utc_days": {
+        "in": [
+         "mon",
+         "tue",
+         "wed",
+         "thu",
+         "fri"
+        ]
+       },
+       "any": [
+        {
+         "all": [
+          {
+           "utc_hours": {
+            "gte": "01:00"
+           }
+          },
+          {
+           "utc_hours": {
+            "lt": "04:00"
+           }
+          }
+         ]
+        },
+        {
+         "all": [
+          {
+           "utc_hours": {
+            "gte": "06:00"
+           }
+          },
+          {
+           "utc_hours": {
+            "lt": "10:00"
+           }
+          }
+         ]
+        }
+       ]
+      },
+      "factor": 2
+     }
+    ]
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://tokenhub.tencentmaas.com/plan/v3",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-22",
+   "recommended_api": "chat-completions"
+  },
+  "deepseek-v4.1-flash-1017": {
+   "id": "deepseek-v4.1-flash-1017",
+   "name": "DeepSeek V4.1 Flash 1017",
+   "description": "October 17 update of DeepSeek V4.1 Flash with improved reasoning, coding, agentic tasks, and visual understanding",
+   "type": "chat",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
+   "release_date": "2026-10-17",
+   "limit": {
+    "context": 1000000,
+    "output": 384000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.149716,
+      "cache": {
+       "read": 0.002994
+      }
+     },
+     "output": {
+      "price": 0.598865
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "utc_days": {
+        "in": [
+         "mon",
+         "tue",
+         "wed",
+         "thu",
+         "fri"
+        ]
+       },
+       "any": [
+        {
+         "all": [
+          {
+           "utc_hours": {
+            "gte": "01:00"
+           }
+          },
+          {
+           "utc_hours": {
+            "lt": "04:00"
+           }
+          }
+         ]
+        },
+        {
+         "all": [
+          {
+           "utc_hours": {
+            "gte": "06:00"
+           }
+          },
+          {
+           "utc_hours": {
+            "lt": "10:00"
+           }
+          }
+         ]
+        }
+       ]
+      },
+      "factor": 2
+     }
+    ]
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://tokenhub.tencentmaas.com/plan/v3",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-10-17",
+   "recommended_api": "chat-completions"
+  },
   "deepseek/deepseek-flash": {
    "id": "deepseek/deepseek-flash",
    "name": "DeepSeek V4.1 Flash 1017",
@@ -572,9 +823,13 @@
     "output": 128000
    },
    "capabilities": {
+    "cache": {
+     "implicit": true
+    },
     "temperature": true,
     "top_k": true,
     "top_p": true,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -582,25 +837,11 @@
     },
     "reasoning": {
      "supported": true,
-     "toggle": true,
      "effort": [
       "none",
+      "low",
       "high"
      ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0,
-      "cache": {
-       "read": 0,
-       "write": 0
-      }
-     },
-     "output": {
-      "price": 0
-     }
     }
    },
    "modalities": {
@@ -629,6 +870,83 @@
    "last_updated": "2026-07-06",
    "recommended_api": "chat-completions"
   },
+  "hy3-202608": {
+   "id": "hy3-202608",
+   "name": "Hy3 (202608)",
+   "description": "Tencent Hy reasoning model for coding, instruction following, and agent tasks",
+   "type": "chat",
+   "family": "hy",
+   "canonical_id": "tencent/hy3",
+   "release_date": "2026-07-06",
+   "limit": {
+    "context": 256000,
+    "input": 192000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.149716,
+      "cache": {
+       "read": 0.037429
+      }
+     },
+     "output": {
+      "price": 0.598865
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://tokenhub.tencentmaas.com/plan/v3",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-07-06",
+   "recommended_api": "chat-completions"
+  },
   "hy4": {
    "id": "hy4",
    "name": "Hy4",
@@ -639,13 +957,17 @@
    "release_date": "2026-11-04",
    "limit": {
     "context": 1048576,
-    "input": 983010,
+    "input": 983040,
     "output": 65536
    },
    "capabilities": {
+    "cache": {
+     "implicit": true
+    },
     "temperature": true,
     "top_k": true,
     "top_p": true,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -662,13 +984,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.834,
+      "price": 0.898298,
       "cache": {
-       "read": 0.042
+       "read": 0.044915
       }
      },
      "output": {
-      "price": 2.501
+      "price": 2.694894
      }
     }
    },
@@ -698,26 +1020,31 @@
      }
     }
    },
-   "open_weights": false,
+   "open_weights": true,
    "last_updated": "2026-11-04",
    "recommended_api": "chat-completions"
   },
-  "hy4-preview": {
-   "id": "hy4-preview",
-   "name": "Hy4 preview",
-   "description": "A next-generation productivity model with significantly enhanced Agent and complex task execution capabilities.",
+  "hy4-flash": {
+   "id": "hy4-flash",
+   "name": "Hy4 flash",
+   "description": "Tencent's lower-cost Hy4 tier for everyday agent and productivity tasks, with image understanding and a 1M-token context window.",
    "type": "chat",
-   "family": "hy",
-   "canonical_id": "tencent/hy4-preview",
-   "release_date": "2026-08-28",
+   "family": "hy-flash",
+   "canonical_id": "tencent/hy4-flash",
+   "release_date": "2026-11-16",
    "limit": {
-    "context": 1024000,
-    "output": 64000
+    "context": 1048576,
+    "input": 983040,
+    "output": 65536
    },
    "capabilities": {
+    "cache": {
+     "implicit": true
+    },
     "temperature": true,
     "top_k": true,
     "top_p": true,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -725,7 +1052,6 @@
     },
     "reasoning": {
      "supported": true,
-     "toggle": true,
      "effort": [
       "none",
       "high"
@@ -735,13 +1061,94 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.90078512,
+      "price": 0.074858,
       "cache": {
-       "read": 0.04503926
+       "read": 0.002994
       }
      },
      "output": {
-      "price": 2.70235537
+      "price": 0.299433
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp",
+     "image/gif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://tokenhub.tencentmaas.com/plan/v3",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-11-16",
+   "recommended_api": "chat-completions"
+  },
+  "hy4-preview": {
+   "id": "hy4-preview",
+   "name": "Hy4 preview",
+   "description": "A next-generation productivity model with significantly enhanced Agent and complex task execution capabilities.",
+   "type": "chat",
+   "family": "hy",
+   "canonical_id": "tencent/hy4-preview",
+   "status": "deprecated",
+   "release_date": "2026-08-28",
+   "limit": {
+    "context": 1048576,
+    "input": 983040,
+    "output": 65536
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.898298,
+      "cache": {
+       "read": 0.044915
+      }
+     },
+     "output": {
+      "price": 2.694894
      }
     }
    },
@@ -862,7 +1269,7 @@
   "kimi-k3": {
    "id": "kimi-k3",
    "name": "Kimi K3",
-   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
+   "description": "Multimodal Kimi model with 1M context and always-on thinking for long-horizon agent work",
    "type": "chat",
    "family": "kimi",
    "canonical_id": "moonshotai/kimi-k3",
@@ -896,13 +1303,17 @@
    "cost": {
     "text": {
      "input": {
-      "price": 3.00261708,
+      "price": 2.994326,
       "cache": {
-       "read": 0.30026171
+       "read": 0.299433,
+       "write": {
+        "5m": 2.994326,
+        "1h": 5.988652
+       }
       }
      },
      "output": {
-      "price": 15.01308541
+      "price": 14.971631
      }
     }
    },

@@ -877,6 +877,77 @@
    "last_updated": "2025-01-01",
    "recommended_api": "chat-completions"
   },
+  "deepseek-v3.2": {
+   "id": "deepseek-v3.2",
+   "name": "DeepSeek V3.2",
+   "description": "Hybrid-reasoning DeepSeek model with thinking and non-thinking modes, sparse attention, and tool-use",
+   "type": "chat",
+   "family": "deepseek",
+   "canonical_id": "deepseek/deepseek-v3.2",
+   "release_date": "2025-12-01",
+   "limit": {
+    "context": 131072,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.299433
+     },
+     "output": {
+      "price": 0.449149
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/alibaba/chat"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-07",
+   "last_updated": "2025-12-01",
+   "recommended_api": "chat-completions"
+  },
   "deepseek-v4-flash": {
    "id": "deepseek-v4-flash",
    "name": "DeepSeek V4 Flash",
@@ -954,6 +1025,143 @@
    "open_weights": true,
    "knowledge": "2025-05",
    "last_updated": "2026-04-24",
+   "recommended_api": "chat-completions"
+  },
+  "deepseek-v4-flash-0731": {
+   "id": "deepseek-v4-flash-0731",
+   "name": "DeepSeek V4 Flash 0731",
+   "description": "Official DeepSeek V4 Flash release with enhanced agentic capabilities and integrated DSpark speculative decoding",
+   "type": "chat",
+   "family": "deepseek-flash",
+   "canonical_id": "deepseek/deepseek-v4-flash-0731",
+   "release_date": "2026-07-31",
+   "limit": {
+    "context": 1000000,
+    "output": 384000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": {
+      "min_tokens": 1024
+     }
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "stream_usage": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ],
+     "default": {
+      "type": "effort",
+      "value": "high"
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.449149
+     },
+     "output": {
+      "price": 1.347447
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "utc_hours": {
+        "gte": "14:00"
+       }
+      },
+      "factor": {
+       "text": 0.5
+      }
+     }
+    ],
+    "web_search": {
+     "price": 0.573411
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/alibaba/chat"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "responses": {
+     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/alibaba/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://dashscope.aliyuncs.com/apps/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/alibaba/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-05",
+   "last_updated": "2026-07-31",
    "recommended_api": "chat-completions"
   },
   "deepseek-v4-pro": {
@@ -2001,6 +2209,122 @@
    "last_updated": "2026-08-14",
    "recommended_api": "chat-completions"
   },
+  "glm-5.3-prime": {
+   "id": "glm-5.3-prime",
+   "name": "GLM-5.3 Prime",
+   "description": "Flagship GLM model for long-horizon coding, agents, and complex project delivery",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-5.3",
+   "release_date": "2026-08-14",
+   "limit": {
+    "context": 1000000,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": {
+      "min_tokens": 1024
+     }
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "stream_usage": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ],
+     "default": {
+      "type": "effort",
+      "value": "max"
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2.395461
+     },
+     "output": {
+      "price": 8.384113
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/alibaba/chat"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "responses": {
+     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/alibaba/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://dashscope.aliyuncs.com/apps/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/alibaba/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-14",
+   "recommended_api": "chat-completions"
+  },
   "happyhorse-1.0-i2v": {
    "id": "happyhorse-1.0-i2v",
    "name": "HappyHorse-1.0 Image-to-Video",
@@ -2830,7 +3154,8 @@
    "release_date": "2026-06-12",
    "limit": {
     "context": 262144,
-    "output": 262144
+    "input": 229376,
+    "output": 16384
    },
    "capabilities": {
     "cache": {
@@ -2949,7 +3274,7 @@
   "kimi-k3": {
    "id": "kimi-k3",
    "name": "Kimi K3",
-   "description": "Multimodal Kimi model with 1M context and toggleable max-effort thinking for long-horizon agent work",
+   "description": "Multimodal Kimi model with 1M context and always-on thinking for long-horizon agent work",
    "type": "chat",
    "family": "kimi",
    "canonical_id": "moonshotai/kimi-k3",
@@ -3079,6 +3404,278 @@
    },
    "open_weights": true,
    "last_updated": "2026-07-16",
+   "recommended_api": "chat-completions"
+  },
+  "kimi-k3.1-pro": {
+   "id": "kimi-k3.1-pro",
+   "name": "Kimi K3.1 Pro",
+   "description": "Multimodal Kimi model with a 1M-token context window and always-on reasoning, for coding, 3D creation and financial research",
+   "type": "chat",
+   "family": "kimi-pro",
+   "canonical_id": "moonshotai/kimi-k3.1-pro",
+   "release_date": "2026-10-23",
+   "limit": {
+    "context": 1048576,
+    "output": 1048576
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": {
+      "min_tokens": 1024
+     }
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "stream_usage": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "max"
+     ],
+     "default": {
+      "type": "effort",
+      "value": "max"
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.946312,
+      "cache": {
+       "read": 0.194631
+      }
+     },
+     "output": {
+      "price": 10.180709
+     }
+    },
+    "web_search": {
+     "price": 0.573411
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/heic",
+     "image/heif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/alibaba/chat"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "responses": {
+     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/alibaba/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://dashscope.aliyuncs.com/apps/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/alibaba/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-10-23",
+   "recommended_api": "chat-completions"
+  },
+  "kimi-k3.1-pro-prime": {
+   "id": "kimi-k3.1-pro-prime",
+   "name": "Kimi K3.1 Pro Prime",
+   "description": "Multimodal Kimi model with a 1M-token context window and always-on reasoning, for coding, 3D creation and financial research",
+   "type": "chat",
+   "family": "kimi-pro",
+   "canonical_id": "moonshotai/kimi-k3.1-pro",
+   "release_date": "2026-10-23",
+   "limit": {
+    "context": 1048576,
+    "output": 1048576
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": {
+      "min_tokens": 1024
+     }
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "stream_usage": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "max"
+     ],
+     "default": {
+      "type": "effort",
+      "value": "max"
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 3.892624,
+      "cache": {
+       "read": 0.194631
+      }
+     },
+     "output": {
+      "price": 20.361418
+     }
+    },
+    "web_search": {
+     "price": 0.573411
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "image/heic",
+     "image/heif"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/alibaba/chat"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "responses": {
+     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/alibaba/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://dashscope.aliyuncs.com/apps/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/alibaba/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-10-23",
    "recommended_api": "chat-completions"
   },
   "kimi/kimi-k2.5": {
@@ -3232,79 +3829,6 @@
    },
    "open_weights": true,
    "last_updated": "2025-01-01",
-   "recommended_api": "chat-completions"
-  },
-  "qvq-max": {
-   "id": "qvq-max",
-   "name": "QVQ Max",
-   "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
-   "type": "chat",
-   "family": "qvq",
-   "status": "deprecated",
-   "release_date": "2025-03-25",
-   "limit": {
-    "context": 131072,
-    "output": 8192
-   },
-   "capabilities": {
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.147
-     },
-     "output": {
-      "price": 4.588
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/alibaba/chat"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": []
-      }
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2024-04",
-   "last_updated": "2025-03-25",
    "recommended_api": "chat-completions"
   },
   "qwen-deep-research": {
@@ -3811,73 +4335,6 @@
    "last_updated": "2025-01-25",
    "recommended_api": "chat-completions"
   },
-  "qwen-math-plus": {
-   "id": "qwen-math-plus",
-   "name": "Qwen Math Plus",
-   "description": "Qwen instruction model for multilingual chat, reasoning, and tool use",
-   "type": "chat",
-   "family": "qwen-math-plus",
-   "status": "deprecated",
-   "release_date": "2024-08-16",
-   "limit": {
-    "context": 4096,
-    "output": 3072
-   },
-   "capabilities": {
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.574
-     },
-     "output": {
-      "price": 1.721
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/alibaba/chat"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": []
-      }
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2024-04",
-   "last_updated": "2024-09-19",
-   "recommended_api": "chat-completions"
-  },
   "qwen-math-turbo": {
    "id": "qwen-math-turbo",
    "name": "Qwen Math Turbo",
@@ -4101,225 +4558,6 @@
    "knowledge": "2024-04",
    "last_updated": "2025-01",
    "recommended_api": "chat-completions"
-  },
-  "qwen-mt-turbo": {
-   "id": "qwen-mt-turbo",
-   "name": "Qwen-MT Turbo",
-   "description": "Translation model for multilingual conversion, localization, and cross-language workflows",
-   "type": "chat",
-   "family": "qwen-mt-turbo",
-   "status": "deprecated",
-   "release_date": "2025-01",
-   "limit": {
-    "context": 16384,
-    "output": 8192
-   },
-   "capabilities": {
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": false
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.101
-     },
-     "output": {
-      "price": 0.28
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/alibaba/chat"
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2024-04",
-   "last_updated": "2025-01",
-   "recommended_api": "chat-completions"
-  },
-  "qwen-omni-turbo": {
-   "id": "qwen-omni-turbo",
-   "name": "Qwen-Omni Turbo",
-   "description": "Qwen omni model for text, vision, audio, and multimodal agent tasks",
-   "type": "chat",
-   "family": "qwen-omni",
-   "status": "deprecated",
-   "release_date": "2025-01-19",
-   "limit": {
-    "context": 32768,
-    "output": 2048
-   },
-   "capabilities": {
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.058
-     },
-     "output": {
-      "price": 0.23
-     }
-    },
-    "audio": {
-     "input": {
-      "price": 3.584
-     },
-     "output": {
-      "price": 7.168
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic",
-     "audio/amr",
-     "audio/wav",
-     "audio/3gpp",
-     "audio/aac",
-     "audio/mpeg",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/x-matroska",
-     "video/quicktime",
-     "video/x-flv",
-     "video/x-ms-wmv"
-    ],
-    "output": [
-     "text",
-     "audio/wav"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/alibaba/chat"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": []
-      }
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2024-04",
-   "last_updated": "2025-03-26",
-   "recommended_api": "chat-completions"
-  },
-  "qwen-omni-turbo-realtime": {
-   "id": "qwen-omni-turbo-realtime",
-   "name": "Qwen-Omni Turbo Realtime",
-   "description": "Qwen omni model for text, vision, audio, and multimodal agent tasks",
-   "type": "realtime",
-   "family": "qwen-omni-realtime",
-   "status": "deprecated",
-   "release_date": "2025-05-08",
-   "limit": {
-    "context": 32768,
-    "output": 2048
-   },
-   "capabilities": {
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.23
-     },
-     "output": {
-      "price": 0.918
-     }
-    },
-    "audio": {
-     "input": {
-      "price": 3.584
-     },
-     "output": {
-      "price": 7.168
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "audio/L16"
-    ],
-    "output": [
-     "text",
-     "audio/L16"
-    ]
-   },
-   "api": {
-    "realtime": {
-     "base_url": "wss://dashscope.aliyuncs.com/api-ws/v1/realtime",
-     "sdk": {},
-     "capabilities": {
-      "tools": {
-       "updates": []
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2024-04",
-   "last_updated": "2025-05-08",
-   "recommended_api": "realtime"
   },
   "qwen-plus": {
    "id": "qwen-plus",
@@ -4579,151 +4817,6 @@
    "last_updated": "2024-01",
    "recommended_api": "chat-completions"
   },
-  "qwen-turbo": {
-   "id": "qwen-turbo",
-   "name": "Qwen Turbo",
-   "description": "Efficient Qwen model for fast chat, extraction, and high-volume workloads",
-   "type": "chat",
-   "family": "qwen-turbo",
-   "status": "deprecated",
-   "release_date": "2024-11-01",
-   "limit": {
-    "context": 1000000,
-    "output": 16384
-   },
-   "capabilities": {
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "budget": {
-      "max": 38912
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.044
-     },
-     "output": {
-      "price": 0.087,
-      "reasoning": 0.431
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/alibaba/chat"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": []
-      }
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2024-04",
-   "last_updated": "2025-07-15",
-   "recommended_api": "chat-completions"
-  },
-  "qwen-vl-max": {
-   "id": "qwen-vl-max",
-   "name": "Qwen-VL Max",
-   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
-   "type": "chat",
-   "family": "qwen-vl-max",
-   "status": "deprecated",
-   "release_date": "2024-04-08",
-   "limit": {
-    "context": 131072,
-    "output": 8192
-   },
-   "capabilities": {
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.23
-     },
-     "output": {
-      "price": 0.574
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/alibaba/chat"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": []
-      }
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2024-04",
-   "last_updated": "2025-08-13",
-   "recommended_api": "chat-completions"
-  },
   "qwen-vl-ocr": {
    "id": "qwen-vl-ocr",
    "name": "Qwen-VL OCR",
@@ -4791,457 +4884,6 @@
    "last_updated": "2026-09-11",
    "recommended_api": "chat-completions"
   },
-  "qwen-vl-plus": {
-   "id": "qwen-vl-plus",
-   "name": "Qwen-VL Plus",
-   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
-   "type": "chat",
-   "family": "qwen-vl-plus",
-   "status": "deprecated",
-   "release_date": "2024-01-25",
-   "limit": {
-    "context": 131072,
-    "output": 8192
-   },
-   "capabilities": {
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.115
-     },
-     "output": {
-      "price": 0.287
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/alibaba/chat"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": []
-      }
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2024-04",
-   "last_updated": "2025-08-15",
-   "recommended_api": "chat-completions"
-  },
-  "qwen2-5-omni-7b": {
-   "id": "qwen2-5-omni-7b",
-   "name": "Qwen2.5-Omni 7B",
-   "description": "Qwen omni model for text, vision, audio, and multimodal agent tasks",
-   "type": "chat",
-   "family": "qwen-omni",
-   "status": "deprecated",
-   "release_date": "2024-12",
-   "limit": {
-    "context": 32768,
-    "output": 2048
-   },
-   "capabilities": {
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.087
-     },
-     "output": {
-      "price": 0.345
-     }
-    },
-    "audio": {
-     "input": {
-      "price": 5.448
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic",
-     "audio/amr",
-     "audio/wav",
-     "audio/3gpp",
-     "audio/aac",
-     "audio/mpeg",
-     "video/mp4",
-     "video/x-msvideo",
-     "video/x-matroska",
-     "video/quicktime",
-     "video/x-flv",
-     "video/x-ms-wmv"
-    ],
-    "output": [
-     "text",
-     "audio/wav"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/alibaba/chat"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": []
-      }
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2024-04",
-   "last_updated": "2024-12",
-   "recommended_api": "chat-completions"
-  },
-  "qwen3-14b": {
-   "id": "qwen3-14b",
-   "name": "Qwen3 14B",
-   "description": "Qwen instruction model for multilingual chat, reasoning, and tool use",
-   "type": "chat",
-   "family": "qwen",
-   "status": "deprecated",
-   "release_date": "2025-04",
-   "limit": {
-    "context": 131072,
-    "output": 8192
-   },
-   "capabilities": {
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "budget": {
-      "max": 38912
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.144
-     },
-     "output": {
-      "price": 0.574,
-      "reasoning": 1.434
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/alibaba/chat"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": []
-      }
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-04",
-   "recommended_api": "chat-completions"
-  },
-  "qwen3-235b-a22b": {
-   "id": "qwen3-235b-a22b",
-   "name": "Qwen3 235B-A22B",
-   "description": "Qwen instruction model for multilingual chat, reasoning, and tool use",
-   "type": "chat",
-   "family": "qwen",
-   "status": "deprecated",
-   "release_date": "2025-04",
-   "limit": {
-    "context": 131072,
-    "output": 16384
-   },
-   "capabilities": {
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "budget": {
-      "max": 38912
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.287
-     },
-     "output": {
-      "price": 1.147,
-      "reasoning": 2.868
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/alibaba/chat"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": []
-      }
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-04",
-   "recommended_api": "chat-completions"
-  },
-  "qwen3-32b": {
-   "id": "qwen3-32b",
-   "name": "Qwen3 32B",
-   "description": "Qwen instruction model for multilingual chat, reasoning, and tool use",
-   "type": "chat",
-   "family": "qwen",
-   "status": "deprecated",
-   "release_date": "2025-04",
-   "limit": {
-    "context": 131072,
-    "output": 16384
-   },
-   "capabilities": {
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "budget": {
-      "max": 38912
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.287
-     },
-     "output": {
-      "price": 1.147,
-      "reasoning": 2.868
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/alibaba/chat"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": []
-      }
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-04",
-   "recommended_api": "chat-completions"
-  },
-  "qwen3-8b": {
-   "id": "qwen3-8b",
-   "name": "Qwen3 8B",
-   "description": "Qwen instruction model for multilingual chat, reasoning, and tool use",
-   "type": "chat",
-   "family": "qwen",
-   "status": "deprecated",
-   "release_date": "2025-04",
-   "limit": {
-    "context": 131072,
-    "output": 8192
-   },
-   "capabilities": {
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "budget": {
-      "max": 38912
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.072
-     },
-     "output": {
-      "price": 0.287,
-      "reasoning": 0.717
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/alibaba/chat"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": []
-      }
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-04",
-   "recommended_api": "chat-completions"
-  },
   "qwen3-asr-flash": {
    "id": "qwen3-asr-flash",
    "name": "Qwen3-ASR Flash",
@@ -5294,212 +4936,6 @@
    "open_weights": false,
    "knowledge": "2024-04",
    "last_updated": "2025-09-08",
-   "recommended_api": "chat-completions"
-  },
-  "qwen3-coder-30b-a3b-instruct": {
-   "id": "qwen3-coder-30b-a3b-instruct",
-   "name": "Qwen3-Coder 30B-A3B Instruct",
-   "description": "Qwen coding model for software agents, repository edits, and code reasoning",
-   "type": "chat",
-   "family": "qwen-coder",
-   "status": "deprecated",
-   "release_date": "2025-04",
-   "limit": {
-    "context": 262144,
-    "output": 65536
-   },
-   "capabilities": {
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.216,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 32000
-         }
-        },
-        "price": 0.323
-       },
-       {
-        "when": {
-         "context": {
-          "gt": 128000
-         }
-        },
-        "price": 0.538
-       }
-      ]
-     },
-     "output": {
-      "price": 0.861,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 32000
-         }
-        },
-        "price": 1.291
-       },
-       {
-        "when": {
-         "context": {
-          "gt": 128000
-         }
-        },
-        "price": 2.151
-       }
-      ]
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/alibaba/chat"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": []
-      }
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-04",
-   "recommended_api": "chat-completions"
-  },
-  "qwen3-coder-480b-a35b-instruct": {
-   "id": "qwen3-coder-480b-a35b-instruct",
-   "name": "Qwen3-Coder 480B-A35B Instruct",
-   "description": "Qwen coding model for software agents, repository edits, and code reasoning",
-   "type": "chat",
-   "family": "qwen-coder",
-   "status": "deprecated",
-   "release_date": "2025-04",
-   "limit": {
-    "context": 262144,
-    "output": 65536
-   },
-   "capabilities": {
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.861,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 32000
-         }
-        },
-        "price": 1.291
-       },
-       {
-        "when": {
-         "context": {
-          "gt": 128000
-         }
-        },
-        "price": 2.151
-       }
-      ]
-     },
-     "output": {
-      "price": 3.441,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 32000
-         }
-        },
-        "price": 5.161
-       },
-       {
-        "when": {
-         "context": {
-          "gt": 128000
-         }
-        },
-        "price": 8.602
-       }
-      ]
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/alibaba/chat"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": []
-      }
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-04",
    "recommended_api": "chat-completions"
   },
   "qwen3-coder-flash": {
@@ -5704,372 +5140,6 @@
    "last_updated": "2025-07-28",
    "recommended_api": "chat-completions"
   },
-  "qwen3-coder-plus": {
-   "id": "qwen3-coder-plus",
-   "name": "Qwen3 Coder Plus",
-   "description": "Hosted Qwen coder for software agents, repo edits, and long-context code",
-   "type": "chat",
-   "family": "qwen-coder-plus",
-   "status": "deprecated",
-   "release_date": "2025-07-23",
-   "limit": {
-    "context": 1048576,
-    "output": 65536
-   },
-   "capabilities": {
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.574,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 32000
-         }
-        },
-        "price": 0.861
-       },
-       {
-        "when": {
-         "context": {
-          "gt": 128000
-         }
-        },
-        "price": 1.435
-       },
-       {
-        "when": {
-         "context": {
-          "gt": 256000
-         }
-        },
-        "price": 2.87
-       }
-      ]
-     },
-     "output": {
-      "price": 2.296,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 32000
-         }
-        },
-        "price": 3.444
-       },
-       {
-        "when": {
-         "context": {
-          "gt": 128000
-         }
-        },
-        "price": 5.74
-       },
-       {
-        "when": {
-         "context": {
-          "gt": 256000
-         }
-        },
-        "price": 28.7
-       }
-      ]
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/alibaba/chat"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": []
-      }
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2026-09-11",
-   "recommended_api": "chat-completions"
-  },
-  "qwen3-max": {
-   "id": "qwen3-max",
-   "name": "Qwen3 Max",
-   "description": "Flagship Qwen model for complex reasoning, coding, and agentic workflows",
-   "type": "chat",
-   "family": "qwen-max",
-   "status": "deprecated",
-   "release_date": "2026-01-23",
-   "limit": {
-    "context": 262144,
-    "output": 65536
-   },
-   "capabilities": {
-    "temperature": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "budget": {
-      "max": 81920
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.359,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 32000
-         }
-        },
-        "price": 0.574
-       },
-       {
-        "when": {
-         "context": {
-          "gt": 128000
-         }
-        },
-        "price": 1.004
-       }
-      ]
-     },
-     "output": {
-      "price": 1.434,
-      "reasoning": 1.434,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gt": 32000
-         }
-        },
-        "price": 2.294,
-        "reasoning": 2.294
-       },
-       {
-        "when": {
-         "context": {
-          "gt": 128000
-         }
-        },
-        "price": 4.014,
-        "reasoning": 4.014
-       }
-      ]
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/alibaba/chat"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": []
-      }
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens",
-      "reasoning_field": "reasoning_content"
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-04",
-   "last_updated": "2026-09-22",
-   "recommended_api": "chat-completions"
-  },
-  "qwen3-next-80b-a3b-instruct": {
-   "id": "qwen3-next-80b-a3b-instruct",
-   "name": "Qwen3-Next 80B-A3B Instruct",
-   "description": "Qwen instruction model for multilingual chat, reasoning, and tool use",
-   "type": "chat",
-   "family": "qwen",
-   "status": "deprecated",
-   "release_date": "2025-09",
-   "limit": {
-    "context": 131072,
-    "output": 32768
-   },
-   "capabilities": {
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.144
-     },
-     "output": {
-      "price": 0.574
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/alibaba/chat"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": []
-      }
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-09",
-   "recommended_api": "chat-completions"
-  },
-  "qwen3-next-80b-a3b-thinking": {
-   "id": "qwen3-next-80b-a3b-thinking",
-   "name": "Qwen3-Next 80B-A3B (Thinking)",
-   "description": "Qwen reasoning model for deliberate problem solving, math, and coding",
-   "type": "chat",
-   "family": "qwen",
-   "status": "deprecated",
-   "release_date": "2025-09",
-   "limit": {
-    "context": 131072,
-    "output": 32768
-   },
-   "capabilities": {
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "budget": {}
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.144
-     },
-     "output": {
-      "price": 1.434
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/alibaba/chat"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": []
-      }
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-09",
-   "recommended_api": "chat-completions"
-  },
   "qwen3-omni-flash": {
    "id": "qwen3-omni-flash",
    "name": "Qwen3-Omni Flash",
@@ -6178,148 +5248,6 @@
    "open_weights": false,
    "knowledge": "2024-04",
    "last_updated": "2025-09-15",
-   "recommended_api": "chat-completions"
-  },
-  "qwen3-omni-flash-realtime": {
-   "id": "qwen3-omni-flash-realtime",
-   "name": "Qwen3-Omni Flash Realtime",
-   "description": "Qwen omni model for text, vision, audio, and multimodal agent tasks",
-   "type": "realtime",
-   "family": "qwen-omni-realtime-flash",
-   "status": "deprecated",
-   "release_date": "2025-09-15",
-   "limit": {
-    "context": 65536,
-    "output": 16384
-   },
-   "capabilities": {
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.23
-     },
-     "output": {
-      "price": 0.918
-     }
-    },
-    "audio": {
-     "input": {
-      "price": 3.584
-     },
-     "output": {
-      "price": 7.168
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "audio/L16"
-    ],
-    "output": [
-     "text",
-     "audio/L16"
-    ]
-   },
-   "api": {
-    "realtime": {
-     "base_url": "wss://dashscope.aliyuncs.com/api-ws/v1/realtime",
-     "sdk": {},
-     "capabilities": {
-      "tools": {
-       "updates": []
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2024-04",
-   "last_updated": "2025-09-15",
-   "recommended_api": "realtime"
-  },
-  "qwen3-vl-235b-a22b": {
-   "id": "qwen3-vl-235b-a22b",
-   "name": "Qwen3-VL 235B-A22B",
-   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
-   "type": "chat",
-   "family": "qwen-vl",
-   "status": "deprecated",
-   "release_date": "2025-04",
-   "limit": {
-    "context": 131072,
-    "output": 32768
-   },
-   "capabilities": {
-    "temperature": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.286705
-     },
-     "output": {
-      "price": 1.14682,
-      "reasoning": 2.867051
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/bmp",
-     "image/jpeg",
-     "image/png",
-     "image/tiff",
-     "image/webp",
-     "image/heic"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/alibaba/chat"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": []
-      }
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2025-04",
-   "last_updated": "2025-04",
    "recommended_api": "chat-completions"
   },
   "qwen3-vl-30b-a3b": {
@@ -6571,12 +5499,454 @@
    "last_updated": "2025-09-23",
    "recommended_api": "chat-completions"
   },
+  "qwen3.5-122b-a10b": {
+   "id": "qwen3.5-122b-a10b",
+   "name": "Qwen3.5 122B-A10B",
+   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.5-122b-a10b",
+   "release_date": "2026-02-23",
+   "limit": {
+    "context": 262144,
+    "output": 65536
+   },
+   "capabilities": {
+    "cache": false,
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "stream_usage": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "budget": {
+      "max": 81920
+     },
+     "default": {
+      "type": "toggle",
+      "value": true
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.119773,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 128000
+         }
+        },
+        "price": 0.299433
+       }
+      ]
+     },
+     "output": {
+      "price": 0.958184,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 128000
+         }
+        },
+        "price": 2.395461
+       }
+      ]
+     }
+    },
+    "web_search": {
+     "price": 0.573411
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/x-matroska",
+     "video/quicktime",
+     "video/x-flv",
+     "video/x-ms-wmv"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/alibaba/chat"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/alibaba/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://dashscope.aliyuncs.com/apps/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/alibaba/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-02-23",
+   "recommended_api": "chat-completions"
+  },
+  "qwen3.5-27b": {
+   "id": "qwen3.5-27b",
+   "name": "Qwen3.5 27B",
+   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.5-27b",
+   "release_date": "2026-02-23",
+   "limit": {
+    "context": 262144,
+    "output": 65536
+   },
+   "capabilities": {
+    "cache": false,
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "stream_usage": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "budget": {
+      "max": 81920
+     },
+     "default": {
+      "type": "toggle",
+      "value": true
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.08983,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 128000
+         }
+        },
+        "price": 0.269489
+       }
+      ]
+     },
+     "output": {
+      "price": 0.718638,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 128000
+         }
+        },
+        "price": 2.155915
+       }
+      ]
+     }
+    },
+    "web_search": {
+     "price": 0.573411
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/x-matroska",
+     "video/quicktime",
+     "video/x-flv",
+     "video/x-ms-wmv"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/alibaba/chat"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/alibaba/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://dashscope.aliyuncs.com/apps/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/alibaba/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-02-23",
+   "recommended_api": "chat-completions"
+  },
+  "qwen3.5-35b-a3b": {
+   "id": "qwen3.5-35b-a3b",
+   "name": "Qwen3.5 35B-A3B",
+   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.5-35b-a3b",
+   "release_date": "2026-02-23",
+   "limit": {
+    "context": 262144,
+    "output": 65536
+   },
+   "capabilities": {
+    "cache": false,
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "stream_usage": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "budget": {
+      "max": 81920
+     },
+     "default": {
+      "type": "toggle",
+      "value": true
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.059887,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 128000
+         }
+        },
+        "price": 0.239546
+       }
+      ]
+     },
+     "output": {
+      "price": 0.479092,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 128000
+         }
+        },
+        "price": 1.916369
+       }
+      ]
+     }
+    },
+    "web_search": {
+     "price": 0.573411
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/x-matroska",
+     "video/quicktime",
+     "video/x-flv",
+     "video/x-ms-wmv"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/alibaba/chat"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/alibaba/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://dashscope.aliyuncs.com/apps/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/alibaba/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-02-23",
+   "recommended_api": "chat-completions"
+  },
   "qwen3.5-397b-a17b": {
    "id": "qwen3.5-397b-a17b",
    "name": "Qwen3.5 397B-A17B",
    "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
    "type": "chat",
    "family": "qwen",
+   "status": "deprecated",
    "release_date": "2026-02-16",
    "limit": {
     "context": 262144,
@@ -6903,6 +6273,7 @@
    "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
    "type": "chat",
    "family": "qwen-plus",
+   "status": "deprecated",
    "release_date": "2026-02-16",
    "limit": {
     "context": 1000000,
@@ -7078,6 +6449,241 @@
    "last_updated": "2026-09-22",
    "recommended_api": "chat-completions"
   },
+  "qwen3.6-27b": {
+   "id": "qwen3.6-27b",
+   "name": "Qwen3.6 27B",
+   "description": "Qwen vision-language model for visual reasoning, documents, and agent tasks",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.6-27b",
+   "release_date": "2026-04-22",
+   "limit": {
+    "context": 262144,
+    "output": 65536
+   },
+   "capabilities": {
+    "cache": false,
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "stream_usage": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "budget": {},
+     "default": {
+      "type": "toggle",
+      "value": true
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.449149
+     },
+     "output": {
+      "price": 2.694894
+     }
+    },
+    "web_search": {
+     "price": 0.573411
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/x-matroska",
+     "video/quicktime",
+     "video/x-flv",
+     "video/x-ms-wmv"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/alibaba/chat"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://dashscope.aliyuncs.com/apps/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/alibaba/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-04-22",
+   "recommended_api": "chat-completions"
+  },
+  "qwen3.6-35b-a3b": {
+   "id": "qwen3.6-35b-a3b",
+   "name": "Qwen3.6 35B-A3B",
+   "description": "Open multimodal Qwen MoE for local agents that need vision, audio, and code",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.6-35b-a3b",
+   "release_date": "2026-04-17",
+   "limit": {
+    "context": 262144,
+    "output": 65536
+   },
+   "capabilities": {
+    "cache": false,
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "stream_usage": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "budget": {
+      "max": 131072
+     },
+     "default": {
+      "type": "toggle",
+      "value": true
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.269489
+     },
+     "output": {
+      "price": 1.616936
+     }
+    },
+    "web_search": {
+     "price": 0.573411
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/x-matroska",
+     "video/quicktime",
+     "video/x-flv",
+     "video/x-ms-wmv"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/alibaba/chat"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/alibaba/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://dashscope.aliyuncs.com/apps/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/alibaba/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-04-17",
+   "recommended_api": "chat-completions"
+  },
   "qwen3.6-flash": {
    "id": "qwen3.6-flash",
    "name": "Qwen3.6 Flash",
@@ -7247,80 +6853,6 @@
    },
    "open_weights": false,
    "last_updated": "2026-04-27",
-   "recommended_api": "chat-completions"
-  },
-  "qwen3.6-max-preview": {
-   "id": "qwen3.6-max-preview",
-   "name": "Qwen3.6 Max Preview",
-   "description": "Flagship Qwen model for complex reasoning, coding, and agentic workflows",
-   "type": "chat",
-   "family": "qwen-max",
-   "status": "deprecated",
-   "release_date": "2026-04-20",
-   "limit": {
-    "context": 245800,
-    "output": 65536
-   },
-   "capabilities": {
-    "temperature": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "budget": {
-      "max": 131072
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1.32,
-      "cache": {
-       "read": 0.132
-      }
-     },
-     "output": {
-      "price": 7.9
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/alibaba/chat"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none"
-       ],
-       "updates": []
-      }
-     },
-     "compatibility": {
-      "max_tokens_field": "max_tokens"
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-04-21",
    "recommended_api": "chat-completions"
   },
   "qwen3.6-plus": {
@@ -8125,7 +7657,8 @@
    "canonical_id": "alibaba/qwen3.8-2.4t-a95b",
    "release_date": "2026-08-12",
    "limit": {
-    "context": 262144,
+    "context": 1000000,
+    "input": 991808,
     "output": 131072
    },
    "capabilities": {
@@ -8266,8 +7799,9 @@
    "canonical_id": "alibaba/qwen3.8-27b",
    "release_date": "2026-08-14",
    "limit": {
-    "context": 262144,
-    "output": 32768
+    "context": 1000000,
+    "input": 991808,
+    "output": 131072
    },
    "capabilities": {
     "cache": {
@@ -9034,42 +8568,103 @@
    "last_updated": "2026-09-17",
    "recommended_api": "chat-completions"
   },
-  "qwq-plus": {
-   "id": "qwq-plus",
-   "name": "QwQ Plus",
-   "description": "Qwen reasoning model for deliberate problem solving, math, and coding",
+  "qwen4-max": {
+   "id": "qwen4-max",
+   "name": "Qwen4 Max",
+   "description": "Flagship multimodal model for coding, office productivity, frontend design, and complex agentic tasks",
    "type": "chat",
-   "family": "qwq",
-   "status": "deprecated",
-   "release_date": "2025-03-05",
+   "family": "qwen-max",
+   "canonical_id": "alibaba/qwen4-max",
+   "release_date": "2026-11-16",
    "limit": {
-    "context": 131072,
-    "output": 8192
+    "context": 1000000,
+    "output": 262144
    },
    "capabilities": {
+    "cache": {
+     "implicit": {
+      "min_tokens": 1024
+     },
+     "explicit": {
+      "ttl": [
+       "5m",
+       "1h"
+      ],
+      "min_tokens": 1024,
+      "max_breakpoints": 4,
+      "targets": [
+       "system",
+       "messages"
+      ]
+     }
+    },
     "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "stream_usage": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
      "supported": true
     },
     "reasoning": {
-     "supported": true
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "high",
+      "xhigh"
+     ],
+     "budget": {
+      "min": 1,
+      "max": 262144
+     },
+     "default": {
+      "type": "effort",
+      "value": "high"
+     }
     }
    },
    "cost": {
     "text": {
      "input": {
-      "price": 0.23
+      "price": 1.497163,
+      "cache": {
+       "read": 0.074858,
+       "explicit": {
+        "read": 0.074858,
+        "write": {
+         "5m": 1.871454,
+         "1h": 2.994326
+        }
+       }
+      }
      },
      "output": {
-      "price": 0.574
+      "price": 4.491489
      }
+    },
+    "web_search": {
+     "price": 0.573411
     }
    },
    "modalities": {
     "input": [
-     "text"
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/x-matroska",
+     "video/quicktime",
+     "video/x-flv",
+     "video/x-ms-wmv",
+     "application/pdf"
     ],
     "output": [
      "text"
@@ -9086,19 +8681,54 @@
       "tools": {
        "choice": [
         "auto",
-        "none"
+        "none",
+        "tool"
        ],
        "updates": []
       }
      },
      "compatibility": {
-      "max_tokens_field": "max_tokens"
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "responses": {
+     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/alibaba/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://dashscope.aliyuncs.com/apps/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/alibaba/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
      }
     }
    },
    "open_weights": false,
-   "knowledge": "2024-04",
-   "last_updated": "2025-03-05",
+   "last_updated": "2026-11-16",
    "recommended_api": "chat-completions"
   },
   "siliconflow/deepseek-r1-0528": {

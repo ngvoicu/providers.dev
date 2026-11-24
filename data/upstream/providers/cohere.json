@@ -1492,8 +1492,173 @@
    "last_updated": "2026-06-09",
    "recommended_api": "chat-completions"
   },
+  "north-mini-code-1.0": {
+   "id": "north-mini-code-1.0",
+   "name": "North Mini Code",
+   "description": "Cohere coding model for practical software engineering and agentic edits",
+   "type": "chat",
+   "family": "north-mini",
+   "canonical_id": "cohere/north-mini-code-1-0",
+   "release_date": "2026-06-09",
+   "limit": {
+    "context": 256000,
+    "output": 64000
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "high"
+     ],
+     "default": {
+      "type": "effort",
+      "value": "high"
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.cohere.ai/compatibility/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/cohere/chat"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "strict": true,
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "reasoning_field": "reasoning_content"
+     }
+    },
+    "cohere-chat": {
+     "base_url": "https://api.cohere.com/v2",
+     "sdk": {
+      "aisdk": "@ai-sdk/cohere",
+      "opencodeai": "@opencode/ai/providers/cohere"
+     },
+     "capabilities": {
+      "system_updates": true,
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "strict": true,
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-09-23",
+   "last_updated": "2026-06-09",
+   "recommended_api": "chat-completions"
+  },
   "north-small-translate-09-2026": {
    "id": "north-small-translate-09-2026",
+   "name": "North Small Translate",
+   "description": "Open-weight translation model for more than 50 languages and locale variants",
+   "type": "chat",
+   "family": "north-small",
+   "canonical_id": "cohere/north-small-translate-1-0",
+   "release_date": "2026-09-09",
+   "limit": {
+    "context": 32768,
+    "output": 16000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0
+     },
+     "output": {
+      "price": 0
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "cohere-chat": {
+     "base_url": "https://api.cohere.com/v2",
+     "sdk": {
+      "aisdk": "@ai-sdk/cohere",
+      "opencodeai": "@opencode/ai/providers/cohere"
+     },
+     "capabilities": {
+      "system_updates": true
+     }
+    },
+    "chat-completions": {
+     "base_url": "https://api.cohere.ai/compatibility/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/cohere/chat"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-09-09",
+   "recommended_api": "cohere-chat"
+  },
+  "north-small-translate-1.0": {
+   "id": "north-small-translate-1.0",
    "name": "North Small Translate",
    "description": "Open-weight translation model for more than 50 languages and locale variants",
    "type": "chat",
@@ -1785,6 +1950,110 @@
    },
    "open_weights": false,
    "last_updated": "2025-12-11",
+   "recommended_api": "rerank"
+  },
+  "rerank-v5.0-fast": {
+   "id": "rerank-v5.0-fast",
+   "name": "Rerank 5 Fast",
+   "description": "Low-latency multilingual reranker for high-volume search and agent loops",
+   "type": "reranking",
+   "family": "cohere-rerank-fast",
+   "canonical_id": "cohere/rerank-v5.0-fast",
+   "release_date": "2026-10-21",
+   "limit": {
+    "context": 32768,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.02
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "reranking"
+    ]
+   },
+   "api": {
+    "rerank": {
+     "base_url": "https://api.cohere.com/v2",
+     "sdk": {
+      "aisdk": "@ai-sdk/cohere"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-10-21",
+   "recommended_api": "rerank"
+  },
+  "rerank-v5.0-pro": {
+   "id": "rerank-v5.0-pro",
+   "name": "Rerank 5 Pro",
+   "description": "Highest-quality multilingual reranker for reasoning-heavy queries and long documents",
+   "type": "reranking",
+   "family": "cohere-rerank-pro",
+   "canonical_id": "cohere/rerank-v5.0-pro",
+   "release_date": "2026-10-21",
+   "limit": {
+    "context": 32768,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.05
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "reranking"
+    ]
+   },
+   "api": {
+    "rerank": {
+     "base_url": "https://api.cohere.com/v2",
+     "sdk": {
+      "aisdk": "@ai-sdk/cohere"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-10-21",
    "recommended_api": "rerank"
   },
   "tiny-aya-earth": {
