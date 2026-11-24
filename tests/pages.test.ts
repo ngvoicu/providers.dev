@@ -295,7 +295,10 @@ describe("API response boundary", () => {
       const raw = readFileSync(join(ROOT, "src", "pages", "reference-content", "docs", `${name}.astro`), "utf8");
       expect(raw, name).not.toMatch(/[\w,.;:)]\n\s*<(a|code|em|strong|span)\b/);
     }
-    for (const file of [["components", "provimux", "SupportBody.astro"], ["layouts", "Provimux.astro"], ["pages", "provimux", "index.astro"], ["pages", "provimux", "support", "index.astro"], ["pages", "provimux", "not-found", "index.astro"]]) {
+    for (const file of [
+      ["components", "provimux", "SupportBody.astro"], ["layouts", "Provimux.astro"], ["pages", "provimux", "index.astro"], ["pages", "provimux", "support", "index.astro"], ["pages", "provimux", "not-found", "index.astro"],
+      ["layouts", "PiCacheKeeper.astro"], ["pages", "pi-cache-keeper", "index.astro"], ["pages", "pi-cache-keeper", "not-found", "index.astro"],
+    ]) {
       expect(readFileSync(join(ROOT, "src", ...file), "utf8"), file.join("/")).not.toMatch(/[\w,.;:)]\n\s*<(a|code|em|strong|span)\b/);
     }
     // The worked examples are entries of data/authored, as written there.
@@ -322,7 +325,7 @@ describe("API response boundary", () => {
     expect(methodology).toContain("providers.dev takes no payment for listing, correcting or measuring an entry. A provider may supply documentation, or access for a measurement; the result is published whatever it shows.");
     expect(methodology.match(/<a href="\/docs\/contributing\/">contributing<\/a>/g)).toHaveLength(2);
     const layout = readFileSync(join(ROOT, "src", "layouts", "Base.astro"), "utf8");
-    expect(layout).toMatch(/<li><a href="\/docs\/licensing\/">Licensing and attribution<\/a><\/li>\s*<li><a href="\/docs\/contributing\/">Contributing<\/a><\/li>\s*<li><a href="https:\/\/provimux\.providers\.dev\/">Provimux<\/a><\/li>\s*<li><a href="https:\/\/provimux\.providers\.dev\/support\/">Provimux support<\/a><\/li>\s*<li><a href="mailto:office@providers\.dev">Contact<\/a><\/li>/);
+    expect(layout).toMatch(/<li><a href="\/docs\/licensing\/">Licensing and attribution<\/a><\/li>\s*<li><a href="\/docs\/contributing\/">Contributing<\/a><\/li>\s*<li><a href="https:\/\/provimux\.providers\.dev\/">Provimux<\/a><\/li>\s*<li><a href="https:\/\/provimux\.providers\.dev\/support\/">Provimux support<\/a><\/li>\s*<li><a href="https:\/\/pi-cache-keeper\.providers\.dev\/">pi-cache-keeper<\/a><\/li>\s*<li><a href="mailto:office@providers\.dev">Contact<\/a><\/li>/);
     expect(layout).not.toContain('href="/support/"');
     expect(methodology).toContain('A provider can write to <a href="mailto:office@providers.dev">office@providers.dev</a>.');
     const evidence = await (await page("/evidence/")).text();

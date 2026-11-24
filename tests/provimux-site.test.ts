@@ -130,10 +130,10 @@ describe("providers.dev sends what moved to provimux.providers.dev with a 301, b
     expect(movedToProvimux(new URL("https://providers.dev/provimux//evil.example/x"))).toBe("https://provimux.providers.dev//evil.example/x");
   });
 
-  it("has the subdomain as a custom domain of the Worker, beside the apex and www", () => {
+  it("has the subdomain as a custom domain of the Worker, beside the apex, www and pi-cache-keeper's", () => {
     const config = readFileSync(join(ROOT, "wrangler.jsonc"), "utf8");
     const patterns = [...config.matchAll(/\{ "pattern": "([^"]+)", "custom_domain": true \}/g)].map((match) => match[1]);
-    expect(patterns).toEqual(["providers.dev", "www.providers.dev", "provimux.providers.dev"]);
+    expect(patterns).toEqual(["providers.dev", "www.providers.dev", "provimux.providers.dev", "pi-cache-keeper.providers.dev"]);
   });
 });
 

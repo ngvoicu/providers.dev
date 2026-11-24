@@ -888,15 +888,16 @@ compiles one shared shell with CSS and scripts, plus authored methodology, licen
 enumerate entries, providers or models. `/docs/api/` renders the actual `/api/v1/openapi.json` response, including
 its guide, parameters, schemas and examples. Authored text is also public through `/api/v1/docs/{document}`.
 
-The site has one address, `https://providers.dev`. `wrangler.jsonc` attaches three custom domains to the Worker,
-`providers.dev`, `www.providers.dev` and `provimux.providers.dev` (Provimux's own site, below), and turns off the
-`workers.dev` address and the preview URLs:
+The site has one address, `https://providers.dev`. `wrangler.jsonc` attaches four custom domains to the Worker,
+`providers.dev`, `www.providers.dev`, and two products' own sites, `provimux.providers.dev` and
+`pi-cache-keeper.providers.dev` (below), and turns off the `workers.dev` address and the preview URLs:
 
 ```jsonc
 "routes": [
   { "pattern": "providers.dev", "custom_domain": true },
   { "pattern": "www.providers.dev", "custom_domain": true },
-  { "pattern": "provimux.providers.dev", "custom_domain": true }
+  { "pattern": "provimux.providers.dev", "custom_domain": true },
+  { "pattern": "pi-cache-keeper.providers.dev", "custom_domain": true }
 ],
 "workers_dev": false,
 "preview_urls": false,
@@ -913,12 +914,21 @@ redirected. HSTS is not set.
 `src/pages/provimux/` into `dist/provimux/` with their own layout (`src/layouts/Provimux.astro`) and files
 (`public/provimux/`: the console screenshots, icons, `robots.txt`, `sitemap.xml`). They read no dataset. On that host
 the Worker serves `dist/provimux/` as the root and nothing else: no API, no providers.dev page; any other address gets
-the site's own page with status 404, and plain http at the edge goes to https (`src/core/provimux-site.ts`). On
+the site's own page with status 404, and plain http at the edge goes to https (`src/core/provimux-site.ts`, with the
+rules every product site shares in `src/core/product-site.ts`). On
 providers.dev, `/support/` and `/docs/support/` get a 301 to `https://provimux.providers.dev/support/`, and anything
 under `/provimux/` a 301 to the same path on the subdomain, so the build is never a page of providers.dev. The support
 text is one component (`src/components/provimux/SupportBody.astro`), also published as `/api/v1/docs/support`. To
 preview the subdomain locally: `npx wrangler dev --port <port> --local-upstream provimux.providers.dev` (a second
 preview at the same time needs its own `--persist-to` folder).
+
+**pi-cache-keeper's site, `https://pi-cache-keeper.providers.dev`.** One static page, `/`, built the same way from
+`src/pages/pi-cache-keeper/` into `dist/pi-cache-keeper/`, with its own layout (`src/layouts/PiCacheKeeper.astro`),
+stylesheet (`src/styles/pi-cache-keeper.css`) and files (`public/pi-cache-keeper/`: icons, `og.png`, `robots.txt`,
+`sitemap.xml`). Its text is taken from pi-cache-keeper's README; its terminal pictures are that README's sample sessions,
+drawn as text. On that host the Worker serves `dist/pi-cache-keeper/` as the root and nothing else, by the same rules
+as Provimux's site (`src/core/pi-cache-keeper-site.ts`); on providers.dev anything under `/pi-cache-keeper/` gets a 301
+to the same path on the subdomain. Preview: `npx wrangler dev --port <port> --local-upstream pi-cache-keeper.providers.dev`.
 
 A deploy takes its credentials from the environment, never from a file: `CLOUDFLARE_API_TOKEN` (an API token that
 can edit Workers scripts and their routes and custom domains on the zone) and `CLOUDFLARE_ACCOUNT_ID`. By hand:

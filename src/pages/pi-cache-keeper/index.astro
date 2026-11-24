@@ -1,0 +1,501 @@
+---
+// pi-cache-keeper.providers.dev/ (served at the subdomain's root; see src/core/pi-cache-keeper-site.ts). Every
+// statement here is taken from pi-cache-keeper's README. The terminal pictures are its figures' sample sessions
+// (media/figures.html there), drawn as text: no real session.
+import PiCacheKeeper from "../../layouts/PiCacheKeeper.astro";
+
+const github = "https://github.com/ngvoicu/pi-cache-keeper";
+const readme = `${github}#readme`;
+const npm = "https://www.npmjs.com/package/pi-cache-keeper";
+const original = "https://github.com/nicobailon/pi-cached-compaction";
+const install = "pi install npm:pi-cache-keeper";
+
+/** What it does, in two groups. HTML. */
+const does: { title: string; items: { name: string; text: string }[] }[] = [
+  {
+    title: "Compaction",
+    items: [
+      { name: "From the warm cache", text: "The summary request repeats your conversation as it is and reads about 99% of it from the cache, and the summary sees all the tool output." },
+      { name: "When the context is full", text: "At 90% of the model's window by default, or at a token cap you set, while a summary still fits." },
+      { name: "Just before the cache expires", text: "When you step away, so your next message doesn't pay to write the whole session again." },
+      { name: "With another model when the cache can't be used", text: "A cheaper model, or one on a login with spare quota, writes the summary, and the session goes on with its own model. Off until you pick one." },
+    ],
+  },
+  {
+    title: "The cache",
+    items: [
+      { name: "Kept warm through a break", text: "For up to as long as you choose, and it stops once refreshing has cost as much as one cache miss. Off until you set it." },
+      { name: "In the footer", text: "How long the cache stays warm, the cache lifetimes and the one in use, what the last request asked for, the price, and what went wrong, fitted to the terminal's width." },
+      { name: "Model data from providers.dev", text: "One safe value per quantity (input window, output limit, cache lifetimes and prices), measured values first, for what Pi doesn't know about a model." },
+      { name: "Settings per session", text: "Each session can set its own compaction and keep-warm values over the defaults, with <code>/cache-keeper-settings</code>." },
+    ],
+  },
+];
+
+/** Pi's compaction beside pi-cache-keeper's, as the README's table has it. HTML. */
+const compare: { topic: string; pi: string; pck: string }[] = [
+  { topic: "What it sends", pi: "The older messages as text, under its own system prompt.", pck: "Your conversation as it is, plus one instruction." },
+  { topic: "Prompt cache", pi: "Not used.", pck: "About 99% read from it at normal compaction sizes." },
+  { topic: "Tool output the summary sees", pi: "The first 2,000 characters of each result.", pck: "All of it, read from the cache." },
+  { topic: "Cost", pi: "Full price, for the older messages only.", pck: "0.1× for the whole session: less once there's a lot to summarize, more on small sessions." },
+  { topic: "After a long break", pi: "Your next message rewrites the whole expired cache.", pck: "It compacts just before the cache expires, so there's much less to rewrite." },
+  { topic: "Cache lifetime", pi: "Pi's default (5 minutes on Anthropic).", pck: "1 hour in interactive sessions, which Anthropic bills at 2× per write instead of 1.25×." },
+  { topic: "What you see", pi: "The summary.", pck: "The summary, a card comparing the cost with Pi's compaction, and a cache countdown in the footer." },
+];
+
+/** The footer's last line in some of its states, from the README's figure. Each part: [class, text]. */
+type Part = [string, string];
+const dot: Part = ["t-dim", " · "];
+const values = (price: Part[] = [["", "api $3/$15"], ["t-dim", " per M"]]): Part[] => [["", "long 1h"], ["t-dim", " (in use)"], dot, ["t-mut", "short 5m"], dot, ["t-dim", "sent 1h"], dot, ...price];
+const states: { caption: string; line: Part[] }[] = [
+  { caption: "Warm: a message now reads the conversation from the cache", line: [["", "cache warm · 59m left"], dot, ...values()] },
+  { caption: "The last 30 seconds, in the warning color", line: [["t-warn", "cache warm · 0:25 left"], dot, ...values()] },
+  { caption: "Expired", line: [["t-mut", "cache cold · next message full price"], dot, ...values()] },
+  { caption: "A subscription login", line: [["", "cache warm · 59m left"], dot, ...values([["", "sub, counted at $3/$15"], ["t-dim", " per M"]])] },
+  { caption: "Keep-warm on (2 h): the extension keeps the cache warm until 16:40 and has spent $0.36 of one cache miss", line: [["", "cache warm · 41m left"], dot, ["t-mut", "keep-warm 2h until 16:40, $0.36 spent of $2.07"], dot, ...values()] },
+  { caption: "Through a proxy: an API key answered for a login's values", line: [["", "cache warm · 59m left"], dot, ["t-warn", "⚠ answered by an API key"], dot, ...values()] },
+  { caption: "providers.dev could not be reached: Pi's own values", line: [["", "cache warm · 58m left"], dot, ["t-warn", "⚠ providers.dev: no data, fetch failed"], dot, ...values()] },
+];
+const html = (parts: Part[]) => parts.map(([cls, text]) => (cls ? `<span class="${cls}">${text}</span>` : text)).join("");
+
+const commands: { name: string; text: string }[] = [
+  { name: "/cache-keeper", text: "Shows the cache right now, whether the next compaction would read it, the settings in effect, the model data in use, and this session's log." },
+  { name: "/cache-keeper-settings", text: "Opens the settings menu on this session's settings, with the defaults for all sessions one step away." },
+  { name: "/cache-keeper-warm", text: "Starts keeping the cache warm again for the models that two refreshes in a row without a hit left to Pi's own warming." },
+  { name: "/cache-keeper-stop", text: "Stops keeping idle caches warm in every Pi window that uses the same settings, until the next message you send each window." },
+  { name: "/cache-keeper-refresh", text: "Fetches the model data from providers.dev now and puts it into Pi's <code>models.json</code>." },
+  { name: "/compact", text: "Pi's own command; it goes through the cached path too." },
+];
+
+const settings: { name: string; value: string; text: string }[] = [
+  { name: "compactAtPercent", value: "90", text: "After a turn, compact once the context fills this share of the model's window; <code>0</code> turns it off." },
+  { name: "compactAtTokens", value: "0", text: "Also compact once the context holds this many tokens, on any model, whichever comes first; <code>0</code> turns it off." },
+  { name: "fallbackCompactionModel", value: '""', text: 'This model (<code>"provider/modelId"</code>) writes the summary when the cache can\'t be used; <code>""</code> turns it off.' },
+  { name: "compactBeforeExpiry", value: "true", text: "Compact 20 s before the cache expires, when idle." },
+  { name: "minContextTokens", value: "140000", text: "The smallest context compacted before the cache expires." },
+  { name: "keepWarmMinutes", value: "0", text: "Keep the cache warm up to this many minutes after Pi goes idle (up to 1440); it stops once refreshing has cost as much as one cache miss; <code>0</code> turns it off." },
+  { name: "cacheRetention", value: '"long"', text: 'Ask for the longer cache in interactive sessions (2× writes on Anthropic and Kimi); <code>"short"</code> keeps Pi\'s default. The same for every session.' },
+  { name: "modelData", value: "true", text: "Read each model's input window, cache lifetimes and prices from providers.dev and put them into Pi's <code>models.json</code>; <code>false</code> takes them out again. The same for every session." },
+];
+
+/** Where it works, from the README's table of providers. */
+const providers: { name: string; cached: string; countdown: string }[] = [
+  { name: "Anthropic API", cached: "Yes", countdown: "Yes, 1 hour" },
+  { name: "Claude via pi-claude-bridge", cached: "Yes, on a copy of the Claude Code conversation", countdown: "Yes, 1 hour" },
+  { name: "Claude on opencode-go", cached: "Yes", countdown: "Yes, 1 hour" },
+  { name: "GPT-5.6+ on <code>openai</code>", cached: "Yes, not tested live yet", countdown: "Yes, 30 minutes" },
+  { name: "GPT-5.6+ on opencode-go", cached: "Yes", countdown: "After you set a flag in <code>models.json</code>" },
+  { name: "Kimi K3 on <code>moonshotai</code> and <code>moonshotai-cn</code>", cached: "Yes, not tested live yet", countdown: "Yes, 5 minutes or 1 hour" },
+  { name: "Other Responses and Chat Completions APIs", cached: "Yes", countdown: "With a lifetime from providers.dev, or one you declare" },
+  { name: "<code>openai-codex</code> (ChatGPT sign-in)", cached: "Yes, not tested live yet", countdown: "With the lifetime providers.dev has for the model" },
+  { name: "Google and others", cached: "No, Pi's compaction runs", countdown: "No" },
+];
+---
+
+<PiCacheKeeper
+  title="pi-cache-keeper · Make the prompt cache pay off"
+  description="A Pi extension that makes the prompt cache pay off: compaction read from the warm cache, compacting when the context is full and before the cache expires, keeping the cache warm through a break, and model data from providers.dev."
+  path="/"
+>
+  <section class="pck-hero">
+    <div class="pck-page">
+      <p class="eyebrow pck-eyebrow"><span>An extension for <a href="https://pi.dev">Pi</a> · open source (MIT)</span></p>
+      <h1>Make the prompt cache pay off.</h1>
+      <p class="pck-lead">
+        pi-cache-keeper compacts a Pi session by reading the prompt cache the session already built. On big sessions the summary costs a fraction of Pi's compaction, and it is
+        written from the full tool output instead of 2,000-character excerpts.
+      </p>
+      <p class="pck-sub">
+        It compacts when the context gets full and just before the cache expires, it can keep the cache warm through a break, and it fills in what Pi doesn't know about a model
+        (how much input it takes, how long its cache lasts, what it costs) from providers.dev.
+      </p>
+      <div class="pck-cta">
+        <div class="pck-command" role="group" aria-label="Install in Pi">
+          <code><span aria-hidden="true" class="pck-prompt">$</span> {install}</code>
+          <button type="button" class="copy" data-copy={install} aria-label="Copy the install command">Copy</button>
+        </div>
+        <a class="button primary" href="#install">Install</a>
+        <a class="button" href="#how">How it works</a>
+      </div>
+      <p class="hint pck-cta-note">Then run <code>/reload</code> in Pi. It needs Pi 1.6.0 or newer.</p>
+
+      <figure class="pck-shot">
+        <div class="pck-term pck-term-hero" role="img" aria-label="Pi after a compaction with pi-cache-keeper. The card reads: cached compaction (ctrl+o for details). 15:05:52 compact when full: cached, 99% of 904k from cache, 5k out, 41.6s, summary 9840 chars. vs Pi's compaction: 75% less, $0.59 instead of ~$2.4 (it sends ~451k tokens, none from cache). 15:06:34 saved, 903k tokens summarized. Below the editor, Pi's footer, whose last line is pi-cache-keeper's: cache warm · 59m left · long 1h (in use) · short 5m · sent 1h · sub, counted at $4/$20 per M.">
+          <div class="pck-term-bar" aria-hidden="true"><span></span><span></span><span></span><em>pi</em></div>
+          <div class="pck-term-body" aria-hidden="true">
+            <p class="t-line"><span class="t-acc">cached compaction</span>  <span class="t-dim">(ctrl+o for details)</span></p>
+            <p class="t-line">15:05:52 compact when full: cached, 99% of 904k from cache, 5k out, 41.6s, summary 9840 chars</p>
+            <p class="t-line t-indent t-ok">vs Pi's compaction: 75% less, $0.59 instead of ~$2.4 (it sends ~451k tokens, none from cache)</p>
+            <p class="t-line">15:06:34   saved, 903k tokens summarized</p>
+            <div class="t-editor"><span class="t-acc">›</span> <span class="t-cursor">_</span></div>
+            <p class="t-line t-mut">~/project (main)</p>
+            <p class="t-line t-mut t-split"><span>↑900 ↓1.2k R411k W2.1k CH99.3% $0.260 (sub) 41.2%/1.0M (auto)</span><span>claude-opus-5-5 • high</span></p>
+            <p class="t-line t-status">cache warm · 59m left<span class="t-dim"> · </span>long 1h<span class="t-dim"> (in use) · </span><span class="t-mut">short 5m</span><span class="t-dim"> · sent 1h · </span>sub, counted at $4/$20<span class="t-dim"> per M</span></p>
+          </div>
+        </div>
+        <figcaption>
+          <strong>After a compaction:</strong> the card under the summary compares its cost with Pi's compaction, and the last line of Pi's footer counts down how long the cache
+          stays warm. A sample session.
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section id="what" class="pck-section" aria-labelledby="what-title">
+    <div class="pck-page">
+      <header class="pck-head">
+        <h2 id="what-title">What it does</h2>
+        <p>
+          Compacting from the cache, compacting when full, compacting before expiry and model data from providers.dev are on by default. Keeping the cache warm and the
+          fallback compaction model are off until you set them.
+        </p>
+      </header>
+      <div class="pck-does">
+        {does.map((group) => (
+          <div class="pck-does-group">
+            <h3 class="pck-group-title">{group.title}</h3>
+            <ul class="pck-does-list">
+              {group.items.map((item) => (
+                <li>
+                  <strong>{item.name}</strong>
+                  <span set:html={item.text} />
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section id="how" class="pck-section" aria-labelledby="how-title">
+    <div class="pck-page">
+      <header class="pck-head">
+        <h2 id="how-title">How it works</h2>
+        <p>
+          Pi's compaction swaps the system prompt, drops the tools, and flattens the messages into text. None of that matches what the provider has cached, so every token of
+          the summary request is billed at full price. It also cuts every tool result down to its first 2,000 characters: the summarizer sees the start of a long file or test
+          run, and misses the failures listed at the end.
+        </p>
+        <p>
+          pi-cache-keeper keeps the system prompt, the tools and the messages as they are, and appends one instruction, as the next turn of the same conversation. The
+          provider reads nearly all of it from the cache, at about a tenth of the input price, and the model writing the summary sees the whole conversation. The result looks
+          like Pi's: its checkpoint format, its recent messages kept as they are, and the read and modified file lists carried forward.
+        </p>
+      </header>
+
+      <div class="pck-diagrams">
+        <figure class="pck-diagram" aria-labelledby="sends-title">
+          <p id="sends-title" class="pck-diagram-title">What each compaction sends</p>
+          <div class="pck-send">
+            <p class="pck-send-label">Pi's compaction</p>
+            <div class="pck-segs">
+              <span class="pck-seg is-full">summarizer prompt</span>
+              <span class="pck-seg is-full is-grow">older messages as text, tool output cut</span>
+            </div>
+            <p class="pck-send-result"><strong class="is-full">nothing</strong> from the cache</p>
+          </div>
+          <div class="pck-send">
+            <p class="pck-send-label">pi-cache-keeper</p>
+            <div class="pck-segs">
+              <span class="pck-seg-group is-grow">
+                <span class="pck-segs-inner">
+                  <span class="pck-seg is-cached">tools</span>
+                  <span class="pck-seg is-cached">system prompt</span>
+                  <span class="pck-seg is-cached is-grow">msg 1 … msg N</span>
+                </span>
+                <span class="pck-brace">the same bytes as your last turn</span>
+              </span>
+              <span class="pck-seg-group">
+                <span class="pck-segs-inner"><span class="pck-seg is-full">summarize this</span></span>
+                <span class="pck-brace">new</span>
+              </span>
+            </div>
+            <p class="pck-send-result"><strong class="is-cached">~99%</strong> from the cache</p>
+          </div>
+          <p class="pck-legend"><span class="pck-key is-cached"></span>Read from the cache, at about a tenth of the input price <span class="pck-key is-full"></span>Full price</p>
+        </figure>
+
+        <figure class="pck-diagram" aria-labelledby="sees-title">
+          <p id="sees-title" class="pck-diagram-title">One 40 KB test run, as the summarizer sees it</p>
+          <div class="pck-sees">
+            <p class="pck-send-label">Pi's compaction</p>
+            <div class="pck-bar is-cut" role="img" aria-label="The first 2,000 characters of 40 KB: one twentieth of the bar"><span style="width: 5%"></span></div>
+            <p class="pck-sees-result">the first 2,000 characters</p>
+            <p class="pck-sees-note">the failures are down here ↑</p>
+          </div>
+          <div class="pck-sees">
+            <p class="pck-send-label">pi-cache-keeper</p>
+            <div class="pck-bar is-all" role="img" aria-label="All 40 KB: the whole bar"><span style="width: 100%"></span></div>
+            <p class="pck-sees-result is-cached">all of it, from the cache</p>
+          </div>
+        </figure>
+      </div>
+
+      <div class="pck-compare" role="table" aria-label="Pi's compaction beside pi-cache-keeper's">
+        <div class="pck-compare-head" role="row">
+          <span role="columnheader"><span class="sr-only">Topic</span></span>
+          <span role="columnheader">Pi's compaction</span>
+          <span role="columnheader" class="pck-col-pck">pi-cache-keeper</span>
+        </div>
+        {compare.map((row) => (
+          <div class="pck-row" role="row">
+            <h3 role="rowheader">{row.topic}</h3>
+            <p role="cell" class="pck-pi"><span class="pck-label">Pi's compaction</span><span set:html={row.pi} /></p>
+            <p role="cell" class="pck-pck"><span class="pck-label">pi-cache-keeper</span><span set:html={row.pck} /></p>
+          </div>
+        ))}
+      </div>
+
+      <div class="pck-notes">
+        <p>
+          <strong>It checks before it sends.</strong> Before sending, the extension checks that the request repeats your last one byte for byte up to the new part,
+          on the exact request Pi would send. When it can't prove that, Pi's own compaction runs as usual, or the fallback compaction model where you picked one.
+        </p>
+        <p>
+          <strong>On small sessions, Pi's is often cheaper.</strong> Pi's compaction sends only the older part, so on small sessions, and on sessions that mostly read big files,
+          it has little to send. Once the older part is most of the session, which is usually the case when auto-compaction fires, reading everything at 0.1× costs less. The
+          card shows both numbers every time.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section id="footer" class="pck-section" aria-labelledby="footer-title">
+    <div class="pck-page">
+      <header class="pck-head">
+        <h2 id="footer-title">The footer</h2>
+        <p>
+          The extension adds one line to Pi's footer: the cache countdown, then what went wrong, then the values in use for the current model. Sending a message restarts the
+          countdown. While the cache is warm, a message reads the conversation from the cache at a fraction of the price; after it goes cold, the next message pays full price
+          to write the conversation again.
+        </p>
+      </header>
+
+      <figure class="pck-anatomy" aria-label="One footer line in its three parts">
+        <div class="pck-anatomy-line">
+          <span class="pck-part"><code>cache warm · 59m left</code><span class="pck-part-label">The countdown</span></span>
+          <span class="pck-part-sep" aria-hidden="true">·</span>
+          <span class="pck-part is-warn"><code>⚠ answered by an API key</code><span class="pck-part-label">What went wrong</span></span>
+          <span class="pck-part-sep" aria-hidden="true">·</span>
+          <span class="pck-part is-values"><code>long 1h (in use) · short 5m · sent 1h · api $3/$15 per M</code><span class="pck-part-label">The values in use</span></span>
+        </div>
+      </figure>
+
+      <div class="pck-footer-grid">
+        <figure class="pck-term pck-states" aria-labelledby="states-title">
+          <div class="pck-term-bar"><span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span><em id="states-title">pi · the footer's last line</em></div>
+          <ol class="pck-term-body">
+            {states.map((state) => (
+              <li>
+                <p class="t-caption">{state.caption}</p>
+                <p class="t-line t-nowrap" set:html={html(state.line)} />
+              </li>
+            ))}
+          </ol>
+        </figure>
+        <div class="pck-footer-side">
+          <dl class="pck-parts">
+            <div><dt><code>long 1h (in use)</code></dt><dd>The model's cache tier in use and its lifetime.</dd></div>
+            <div><dt><code>short 5m</code></dt><dd>The other tier's lifetime, or <code>unknown</code>.</dd></div>
+            <div><dt><code>sent 1h</code></dt><dd>What the last request's cache markers asked for.</dd></div>
+            <div><dt><code>api $3/$15 per M</code></dt><dd>How the model is reached (<code>api</code>, <code>sub</code>, or <code>sub or api</code> through a proxy) and the price in use, input and output per million tokens.</dd></div>
+            <div><dt><code>⚠ …</code></dt><dd>What went wrong, right after the countdown, in the warning color. <code>/cache-keeper</code> has the full detail.</dd></div>
+          </dl>
+          <div class="pck-narrow">
+            <p class="pck-narrow-title">In a narrow terminal</p>
+            <p>The line is fitted to the width: the wording goes first, then the least important parts. The countdown always stays.</p>
+            <p class="pck-cols"><span class="pck-cols-n">60 columns</span><code>warm 59m · long 1h · short 5m · sent 1h · api $3/$15</code></p>
+            <p class="pck-cols"><span class="pck-cols-n">40 columns</span><code>warm 59m · long 1h · api $3/$15</code></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="settings" class="pck-section" aria-labelledby="settings-title">
+    <div class="pck-page">
+      <header class="pck-head">
+        <h2 id="settings-title">Settings and commands</h2>
+        <p>
+          <code>/cache-keeper-settings</code> changes them in a menu. The defaults, for every session, are the <code>cacheKeeper</code> key in <code>~/.pi/agent/settings.json</code>.
+          A session's own values win in that session and are saved in the session itself, so they hold when you resume it.
+        </p>
+      </header>
+
+      <div class="pck-split">
+        <div>
+          <h3 class="pck-sub-title">Commands</h3>
+          <dl class="pck-commands">
+            {commands.map((command) => (
+              <div>
+                <dt><code>{command.name}</code></dt>
+                <dd set:html={command.text} />
+              </div>
+            ))}
+          </dl>
+        </div>
+        <figure class="pck-term" role="img" aria-label="The output of /cache-keeper for a sample session: the cache has 59 minutes left; the next compaction takes the cached path; compact when full at 90%, 900k of 1000k; no fallback compaction model; keep warm up to 4 h, set by this session; compact before expiry from 140k tokens; the model data from providers.dev; this session's settings; and this session's log: a compaction read 99% of 904k from the cache, and a refresh kept the cache warm after 57 idle minutes for $0.21 of the $2.36 one cache miss costs.">
+          <div class="pck-term-bar" aria-hidden="true"><span></span><span></span><span></span><em>pi · /cache-keeper</em></div>
+          <div class="pck-term-body pck-term-small" aria-hidden="true">
+            <p class="t-line">pi-cache-keeper · anthropic/claude-opus-5-5</p>
+            <p class="t-line">cache: 59m left (lifetime 60 min, declared by the model)</p>
+            <p class="t-line">next compaction: cached path; last request 4 s ago with 185 messages, 1 since. The request prefix is checked when it runs.</p>
+            <p class="t-line">when full: at 90%: 900k of 1000k on anthropic/claude-opus-5-5, leaving 96k for the summary</p>
+            <p class="t-line">fallback compaction model: off: when the cache can't be read, Pi's compaction writes the summary on this session's model</p>
+            <p class="t-line">keep warm (this session): up to 4 h after Pi goes idle; stops once refreshing has cost as much as one cache miss; so far $0 spent, a miss costs $2.36</p>
+            <p class="t-line">before expiry: on, from 140k tokens of context · retention long</p>
+            <p class="t-line">model data: claude-subscription/claude-opus-5-5: window 1,000,000, short cache 1 h, long cache 1 h (https://providers.dev, checked 180 min ago; /cache-keeper-refresh fetches it again)</p>
+            <p class="t-line">settings: this session's own: keepWarmMinutes 4 h (default 2 h); every other follows the defaults · /cache-keeper-settings</p>
+            <p class="t-line">log: ~/.pi/agent/cache-keeper.jsonl</p>
+            <p class="t-line t-gap">This session:</p>
+            <p class="t-line">15:05:52 compact when full: cached, 99% of 904k from cache, 5k out, 41.6s, summary 9840 chars</p>
+            <p class="t-line t-indent">vs Pi's compaction: 75% less, $0.59 instead of ~$2.4 (it sends ~451k tokens, none from cache)</p>
+            <p class="t-line">15:06:34   saved, 903k tokens summarized</p>
+            <p class="t-line">16:36:52 kept the cache warm, idle 57 min: 99% of 411k from cache, 1 out, $0.21; $0.21 of $2.36 (one cache miss) spent</p>
+          </div>
+          <figcaption class="pck-term-caption">A sample session.</figcaption>
+        </figure>
+      </div>
+
+      <h3 class="pck-sub-title pck-sub-title-gap">Settings</h3>
+      <div class="pck-table-wrap">
+        <table class="pck-table">
+          <thead>
+            <tr><th scope="col">Setting</th><th scope="col">Default</th><th scope="col">What it does</th></tr>
+          </thead>
+          <tbody>
+            {settings.map((setting) => (
+              <tr>
+                <th scope="row"><code>{setting.name}</code></th>
+                <td data-label="Default"><code>{setting.value}</code></td>
+                <td set:html={setting.text} />
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div class="pck-settings-foot">
+        <div class="pck-code">
+          <pre><code>{`{
+  "cacheKeeper": {
+    "compactBeforeExpiry": false
+  }
+}`}</code></pre>
+        </div>
+        <p>
+          A session can set its own <code>compactAtPercent</code>, <code>compactAtTokens</code>, <code>fallbackCompactionModel</code>, <code>compactBeforeExpiry</code>, <code>minContextTokens</code> and <code>keepWarmMinutes</code>; every other setting follows the defaults. <a href={`${github}#settings`}>Every setting in full</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section id="model-data" class="pck-section" aria-labelledby="data-title">
+    <div class="pck-page pck-split pck-split-data">
+      <div class="pck-split-text">
+        <p class="pck-kicker">From <a href="https://providers.dev">providers.dev</a></p>
+        <h2 id="data-title">Model data</h2>
+        <p>
+          Pi's model catalog doesn't say how long most providers keep a prompt cache, and for some models its input window is smaller than what the provider accepts. Without a
+          lifetime there is no countdown, no compacting before expiry and no warming; with a window that is too small, Pi compacts long before it has to.
+        </p>
+        <p>
+          providers.dev publishes both, with prices, for each model at each provider and access method (API key or subscription login), from the providers' documentation and
+          from evaluations. The extension puts them into the <code>modelOverrides</code> of <code>~/.pi/agent/models.json</code>, the place Pi has for it, so Pi's own warming
+          and compaction use the same numbers as the countdown.
+        </p>
+      </div>
+      <ul class="pck-facts">
+        <li><strong>What is written.</strong> providers.dev's input window replaces Pi's (one known only from an evaluation can raise Pi's, never lower it). Cache lifetimes only for a tier Pi has no lifetime for; prices and the output limit only where Pi has none.</li>
+        <li><strong>Your own values stay.</strong> Values you set in <code>models.json</code> yourself are never touched.</li>
+        <li><strong>What is sent.</strong> The names of the providers Pi has credentials for, as query parameters to a public read-only API. No key, no account, nothing about your sessions or prompts.</li>
+        <li><strong>When.</strong> At the start of an interactive session, when the saved data is a day old. Nothing is fetched on its own in print or JSON mode or with <code>PI_OFFLINE</code> set.</li>
+        <li><strong>Off.</strong> <code>"modelData": false</code> takes the values it wrote out of <code>models.json</code>, which brings Pi's own back.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="install" class="pck-section" aria-labelledby="install-title">
+    <div class="pck-page">
+      <header class="pck-head">
+        <h2 id="install-title">Install</h2>
+      </header>
+      <div class="pck-install">
+        <div class="pck-install-main">
+          <div class="pck-code">
+            <pre><code>{install}</code></pre>
+            <button type="button" class="copy" data-copy={install} aria-label="Copy the install command">Copy</button>
+          </div>
+          <p>
+            Then run <code>/reload</code>: Pi loads extensions only at startup or on <code>/reload</code>. Compacting from the cache, compacting when full, compacting before
+            expiry and model data from providers.dev are on by default; keeping the cache warm is off until you set <code>keepWarmMinutes</code>. Update it
+            with <code>pi update --extensions</code>.
+          </p>
+          <p class="pck-links">
+            <a class="button" href={npm}>pi-cache-keeper on npm</a>
+            <a class="button" href={github}>Source on GitHub</a>
+            <a class="button" href={`${github}/blob/main/CHANGELOG.md`}>Changelog</a>
+          </p>
+        </div>
+        <section class="pck-card" aria-labelledby="needs-title">
+          <h3 id="needs-title">Requirements</h3>
+          <ul>
+            <li><strong>Pi 1.6.0 or newer.</strong></li>
+            <li>No runtime dependencies and no install scripts.</li>
+            <li>Published to npm by GitHub Actions, with provenance.</li>
+          </ul>
+        </section>
+      </div>
+
+      <h3 class="pck-sub-title pck-sub-title-gap" id="providers">Providers</h3>
+      <div class="pck-table-wrap">
+        <table class="pck-table pck-providers">
+          <thead>
+            <tr><th scope="col">Provider</th><th scope="col">Cached compaction</th><th scope="col">Countdown and compacting before expiry</th></tr>
+          </thead>
+          <tbody>
+            {providers.map((row) => (
+              <tr>
+                <th scope="row" set:html={row.name} />
+                <td data-label="Cached compaction" set:html={row.cached} />
+                <td data-label="Countdown and compacting before expiry" set:html={row.countdown} />
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="hint pck-providers-note"><a href={`${github}#providers`}>Each provider in detail</a>, with the flag opencode-go's GPT models need.</p>
+    </div>
+  </section>
+
+  <section id="provimux" class="pck-section" aria-labelledby="provimux-title">
+    <div class="pck-page">
+      <div class="pck-band">
+        <div>
+          <h2 id="provimux-title">Works well with Provimux and pi-provimux</h2>
+          <p>
+            Through a proxy, one Pi provider serves models of many labs, and a model can come from a subscription login or an API key, whose caches can last differently: a
+            Claude login keeps a cache for an hour, a Claude API key for 5 minutes by default. pi-cache-keeper knows no proxy. It asks over Pi's event bus,
+            and <a href="https://www.npmjs.com/package/pi-provimux">pi-provimux</a> answers for Provimux and CLIProxyAPI with where each model comes from.
+          </p>
+        </div>
+        <p class="pck-links">
+          <a class="button primary" href="https://provimux.providers.dev/">Provimux</a>
+          <a class="button" href="https://www.npmjs.com/package/pi-provimux">pi-provimux on npm</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section id="credit" class="pck-section pck-credit" aria-labelledby="credit-title">
+    <div class="pck-page">
+      <h2 id="credit-title">Based on pi-cached-compaction</h2>
+      <p>
+        pi-cache-keeper is based on <a href={original}>pi-cached-compaction</a> by <a href="https://github.com/nicobailon">Nico Bailon</a>, released under the MIT licence,
+        starting from its 0.2.0 release. Compaction from the warm cache, the compaction card, the cache countdown, compacting before the cache expires and the longer cache are
+        his work, and his commits are kept in the repository's history. This is a separate project; it is not maintained by Nico Bailon.
+      </p>
+      <p><a href={readme}>Read the full README on GitHub</a></p>
+    </div>
+  </section>
+</PiCacheKeeper>
