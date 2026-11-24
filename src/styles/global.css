@@ -817,37 +817,79 @@
     margin-left: 0.45rem;
   }
 
-  /* A provider's model list: one line for where the list is from (its mark, its date, what it is), then a row per
-     model. A model without an entry is set a step quieter than one that links to its entry. */
-  .listing-from {
+  /* A provider's models: its entries, then, folded under them behind one line, the models its lists name that have no
+     entry. Those rows are a step quieter than an entry's: no link, softer figures, and the cells no list can fill say so
+     in grey. The fold is a details element in the table's own row, so it needs no script and keeps the columns. */
+  table.models > tbody:not(:last-child) > tr:last-child > * {
+    border-bottom: 1px solid var(--line);
+  }
+  tbody.more-models:not(:has(details.more-models[open])) > tr.listed-only {
+    display: none;
+  }
+  tbody.more-models:not(:has(details.more-models[open])) > tr.fold > td {
+    border-bottom: 0;
+  }
+  table.models tr.fold > td {
+    background: var(--bg-subtle);
+  }
+  details.more-models > summary {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
-    gap: 0.35rem 0.75rem;
-    margin-top: 0.7rem;
-    font-size: 0.88rem;
-    line-height: 1.5;
+    align-items: baseline;
+    gap: 0.1rem 0.5rem;
+    list-style: none;
+    font-size: 0.86rem;
+  }
+  details.more-models > summary::-webkit-details-marker {
+    display: none;
+  }
+  /* A chevron drawn with two borders: it points right while the rows are folded and down once they are open */
+  details.more-models > summary::before {
+    content: "";
+    align-self: center;
+    width: 0.42rem;
+    height: 0.42rem;
+    margin: 0 0.3rem 0 0.1rem;
+    border-right: 1.5px solid var(--link);
+    border-bottom: 1.5px solid var(--link);
+    transform: rotate(-45deg);
+    transition: transform 0.15s ease;
+  }
+  details.more-models[open] > summary::before {
+    transform: translateY(-0.12rem) rotate(45deg);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    details.more-models > summary::before {
+      transition: none;
+    }
+  }
+  details.more-models > summary .count {
+    color: var(--link);
+    font-weight: 560;
+  }
+  details.more-models > summary:hover .count {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  details.more-models > summary .said {
+    color: var(--muted);
+  }
+  table.models tr.listed-only > * {
     color: var(--fg-soft);
   }
-  table.listing tbody th .listed-name {
-    color: var(--fg-soft);
+  table.models tr.listed-only .listed-name {
     font-weight: 500;
   }
-  table.listing tbody th .hint {
-    margin-top: 0.2rem;
+  /* A model no list names is printed by its id alone, at the size of a name */
+  table.models tr.listed-only .id.alone code {
+    font-size: 0.84rem;
+    color: var(--fg-soft);
   }
-  table.listing .levels {
-    display: inline-flex;
-    flex-wrap: wrap;
-    gap: 0.25rem;
-    max-width: 16rem;
+  table.models tr.listed-only > th > .hint {
+    margin-top: 0.15rem;
   }
-  .listing-empty {
-    margin-top: 0.8rem;
-    padding: 1.4rem 1rem;
-    border: 1px dashed var(--line-strong);
-    border-radius: 12px;
-    font-size: 0.9rem;
+  table.models tbody > tr > th > .id + .hint {
+    margin-top: 0.15rem;
   }
 
   /* pi's section of an entry's page: whose data it is in one line of short facts, then how pi calls the model */
@@ -2040,6 +2082,14 @@
     }
     table.entries.stack-tablet > tbody > tr > .source-col {
       flex: 2 1 12rem;
+    }
+    /* A model with no entry has no price: the card leaves the dash out (the line over the rows says so) */
+    table.models.stack-tablet > tbody > tr.listed-only > .no-price {
+      display: none;
+    }
+    /* and its two words of cache lifetime share a line with its sources */
+    table.models.stack-tablet > tbody > tr.listed-only > .life-col {
+      flex: 1 1 7rem;
     }
     table.entries.stack-tablet > tbody > tr > .strip-col {
       flex-basis: 100%;

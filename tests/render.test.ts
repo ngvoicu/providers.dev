@@ -4,7 +4,7 @@ import { buildIndex, type Summary } from "../src/core/entries.ts";
 import type { Json, JsonObject } from "../src/core/merge.ts";
 import { emptyInputWindow, inputWindow, type InputWindow } from "../src/core/limits.ts";
 import { entryHtml, evaluationStrip, piRechecked, rowHtml, tableHead } from "../src/core/render.ts";
-import { listingHtml, modelHtml } from "../src/core/detail-view.ts";
+import { modelHtml, modelsTableHtml, providerHtml } from "../src/core/detail-view.ts";
 import type { ProviderSummary } from "../src/core/entries.ts";
 import type { Listing, ListingLists, ListingModel, ListingReasoning, ListingSource, ListingSources } from "../src/core/listings.ts";
 import { canonicalModels } from "../src/core/resources.ts";
@@ -1090,11 +1090,15 @@ describe("pi's catalog on an entry's page and in a row", () => {
   });
 });
 
-// The section "Model list" of a provider's page (Provimux's model-lists.md, sections 4.5 and 10, D4): the listing as
-// /api/v1/listings/{provider} gives it, printed and not worked out.
-describe("the model list of a provider", () => {
+// A provider's models (since API 1.6.0): one table, its entries first, then, folded under them, the models its lists
+// name that have no entry, as /api/v1/providers/{provider} and /api/v1/listings/{provider} give them, printed and not
+// worked out.
+describe("the models of a provider", () => {
   const today = { date: new Date("2026-11-22T00:00:00Z"), stale_after_days: 30 };
-  const provider = { id: "devin", name: "Devin" } as ProviderSummary;
+  const provider = (access: "api" | "subscription" = "subscription"): ProviderSummary => ({
+    id: "devin", name: "Devin", origin: "added", doc: null, env: [], entry_count: 1, evidence_entry_count: 1,
+    providers_dev: { access, access_basis: "Signed in with a plan.", access_source: null, note: null, evidence: [] },
+  }) as unknown as ProviderSummary;
   const sources = (source: ListingSource | null): ListingSources => ({
     name: source, owner: source, released: source, context_window: source, max_input: null, max_output: source, input_modalities: source, output_modalities: source,
     reasoning: { supported: source, levels: source, budget_min: null, budget_max: null, can_disable: null, dynamic: null, disable_with: null },
@@ -1116,87 +1120,107 @@ describe("the model list of a provider", () => {
       evidence: [{ kind: "listed", url: "https://github.com/ngvoicu/groundtruth/blob/main/listed.json", date: "2026-11-22", note: null }], model_count: models.length, models, ...more,
     };
   };
+  const entry = (model: string, name: string): Summary => summaryOf({ ref: `devin/${model}`, provider: "devin", model, name });
+  const table = (entries: Summary[], value: Listing | null, access: "api" | "subscription" = "subscription", day = today): string => modelsTableHtml(provider(access), entries, value, "2026-11-21", day);
   const rowOf = (html: string, id: string): string => html.split("<tr").find((part) => part.includes(`<code>${id}</code>`)) ?? "";
 
-  it("links a model with an entry to it, and says a model without one is listed, not evaluated, with no link", () => {
-    const html = listingHtml(provider, listing([model({ id: "swe-2", name: "SWE-2", entry: { provider: "devin", model: "swe-2" } }), model({})]), today);
-    const withEntry = rowOf(html, "swe-2");
-    expect(withEntry).toContain('<a href="/entries/devin/swe-2">SWE-2</a>');
-    expect(withEntry).toContain('<a href="/entries/devin/swe-2" title="The catalog entry devin/swe-2: its values, sources and any evaluations.">Entry page</a>');
-    expect(withEntry).not.toContain("Listed, not evaluated");
+  it("prints one table: the entries first, then the models a list names without an entry, folded behind one line that counts them", () => {
+    const html = table([entry("swe-2", "SWE-2")], listing([model({ id: "swe-2", name: "SWE-2", entry: { provider: "devin", model: "swe-2" } }), model({})]));
+    expect(count(html, "<table")).toBe(1);
+    expect(html).toContain('<h2 id="models" class="!m-0">Models</h2>');
+    expect(html).not.toContain("Model list</h2>");
+    expect(html).toContain('<a href="/api/v1/providers/devin"><code>GET /api/v1/providers/devin</code></a> · <a href="/api/v1/listings/devin"><code>GET /api/v1/listings/devin</code></a>');
+    // The entry is printed once, as an entry, before the fold; the model without one comes after it, quieter, with no link.
+    expect(count(html, "<code>swe-2</code>")).toBe(1);
+    expect(html.indexOf("<code>swe-2</code>")).toBeLessThan(html.indexOf('<tbody class="more-models"'));
+    expect(html).toContain('<tbody class="more-models" id="model-list"><tr class="fold"><td colspan="8"><details class="more-models"><summary><span class="count">1 more model</span> <span class="said">known from model lists only: no entry, so no price or cache data</span></summary></details></td></tr><tr class="listed-only">');
     const without = rowOf(html, "gemini-4-neon");
     expect(without).toContain('<span class="listed-name">Gemini 4 Neon</span>');
-    expect(without).toContain(">Listed, not evaluated</span>");
     expect(without).not.toContain("<a ");
+    expect(without).toContain(">Not evaluated</span>");
+    expect(without).toContain('data-label="Price in / out"><span class="muted" title="providers.dev has no entry for this model at this provider, so no price.">–</span>');
   });
 
-  it("says where the list is from: its mark, its date, the client that read it and the source", () => {
-    const html = listingHtml(provider, listing([model({})]), today);
-    expect(html).toContain('<h2 id="model-list" class="!m-0">Model list</h2>');
-    expect(html).toContain('<span class="badge listed">listed</span><span class="muted date" title="The day the vendor&#39;s list was read.">2026-11-22</span>');
-    expect(html).toContain("1 model on the vendor's own list, read through Provimux, a proxy built on CLIProxyAPI. <a href=\"https://github.com/ngvoicu/groundtruth/blob/main/listed.json\">Source</a>");
-    expect(html).toContain('<a href="/api/v1/listings/devin"><code>GET /api/v1/listings/devin</code></a>');
-    const imported = listingHtml(provider, listing([model({ listed_by: ["models.dev"], sources: sources("models.dev") })], { basis: "models.dev", client: null, client_label: null, evidence: [] }), today);
-    expect(imported).toContain('<span class="origin upstream">models.dev</span><span class="muted date" title="Imported from models.dev on this date.">2026-11-22</span>');
-    expect(imported).toContain("1 model listed by models.dev for this provider.");
-    expect(imported).not.toContain("Source</a>");
+  it("opens the fold and does not say more where the provider has no entries; with nothing at all, says so", () => {
+    const html = table([], listing([model({}), model({ id: "other" })]));
+    expect(html).toContain('<details class="more-models" open><summary><span class="count">2 models</span>');
+    expect(html).not.toContain("<tbody></tbody>");
+    // Every model of the list has its entry: no fold.
+    expect(table([entry("swe-2", "SWE-2")], listing([model({ id: "swe-2", entry: { provider: "devin", model: "swe-2" } })]))).not.toContain("more-models");
+    const none = table([], null);
+    expect(none).toContain("No models are listed for this provider.");
+    expect(none).not.toContain("<table");
+    expect(none).not.toContain("/api/v1/listings");
   });
 
-  it("marks a list read by the discovery stale by the threshold it is given, and an imported list never", () => {
-    const old = listingHtml(provider, listing([model({})], { listed_at: "2026-10-01" }), today);
-    expect(old).toContain('<span class="stale" title="The day the vendor&#39;s list was read. More than 30 days ago.">2026-10-01 · stale</span>');
-    expect(listingHtml(provider, listing([model({})], { listed_at: "2026-10-01" }), { ...today, stale_after_days: 90 })).not.toContain("· stale");
-    expect(listingHtml(provider, listing([model({})], { basis: "models.dev", listed_at: "2026-10-01", client: null, client_label: null, evidence: [] }), today)).not.toContain("· stale");
-  });
-
-  it("prints each value as the listing has it, its source in the hover text, and Unknown where no source states it", () => {
-    const html = listingHtml(provider, listing([model({ sources: { ...sources("listed"), max_output: "models.dev" } }), model({ id: "bare", name: null, released: null, context_window: null, max_output: null, input_modalities: null, reasoning: null, sources: sources(null) })]), today);
+  it("prints what the lists state of a model without an entry, its source in the hover text, and Unknown where none states it", () => {
+    const html = table([], listing([model({ sources: { ...sources("listed"), max_output: "models.dev" } }), model({ id: "bare", name: null, released: null, context_window: null, max_output: null, sources: sources(null) }), model({ id: "same-as-id", name: "same-as-id" })]));
     const full = rowOf(html, "gemini-4-neon");
     expect(full).toContain('<span title="1,048,576 tokens. From the vendor&#39;s own list.">1.05M</span>');
     expect(full).toContain('<span title="65,536 tokens. From models.dev.">65.54K</span>');
-    expect(full).toContain('<span class="chip">low</span><span class="chip">medium</span><span class="chip">high</span>');
-    expect(full).toContain(">text, image</span>");
-    expect(full).toContain(">2026-11-01</span>");
-    // A model with no name is printed by its id, once.
-    const bare = html.split("<tr").find((part) => part.includes('<span class="listed-name">bare</span>')) ?? "";
-    expect(count(bare, "bare")).toBe(1);
-    expect(count(bare, ">Unknown</span>")).toBe(5);
+    expect(full).toContain('<span class="muted date" title="Release date. From the vendor&#39;s own list.">2026-11-01</span>');
+    // A model no source names is printed by its id, once, at the size of a name.
+    for (const id of ["bare", "same-as-id"]) {
+      const bare = rowOf(html, id);
+      expect(bare).toContain(`<th scope="row"><div class="id alone"><code>${id}</code>`);
+      expect(bare).not.toContain("listed-name");
+      expect(count(bare, `<code>${id}</code>`)).toBe(1);
+    }
+    expect(count(rowOf(html, "bare"), ">Unknown</span>")).toBe(3);
   });
 
-  it("tells reasoning levels, reasons with no levels stated, does not reason, no levels and unknown apart", () => {
-    const cell = (value: ListingReasoning | null): string => {
-      const html = listingHtml(provider, listing([model({ reasoning: value })]), today);
-      return html.split('data-label="Reasoning">')[1]!.split("</td>")[0]!;
-    };
-    expect(cell(reasoning({ supported: true, levels: ["low", "max"] }))).toBe('<span class="levels" title="The levels a request can ask for. From the vendor&#39;s own list."><span class="chip">low</span><span class="chip">max</span></span>');
-    expect(cell(reasoning({ supported: true }))).toContain(">Yes</span>");
-    expect(cell(reasoning({ supported: false }))).toContain(">No</span>");
-    expect(cell(reasoning({ levels: [] }))).toContain(">None</span>");
-    expect(cell(reasoning({}))).toContain(">Unknown</span>");
-    expect(cell(null)).toContain(">Unknown</span>");
+  it("marks each list that names a model with the list's date: subscription where the vendor's list was read through a login, vendor list otherwise", () => {
+    const lists: ListingLists = { listed: { listed_at: "2026-11-22", model_count: 1 }, "providers.dev": null, "models.dev": { listed_at: "2026-11-21", model_count: 1 }, "pi.dev": { listed_at: "2026-11-20", model_count: 1 } };
+    const all = listing([model({ listed_by: ["listed", "models.dev", "pi.dev"] })], { lists });
+    expect(rowOf(table([], all), "gemini-4-neon")).toContain('<span class="sources"><span class="badge listed" title="On the vendor&#39;s own model list, read on a subscription login through Provimux, a proxy built on CLIProxyAPI.">subscription</span><span class="muted date" title="The day the vendor&#39;s list was read.">2026-11-22</span><span class="origin upstream" title="On models.dev&#39;s list of this provider.">models.dev</span><span class="muted date" title="Imported from models.dev on this date.">2026-11-21</span><span class="origin pi" title="On pi&#39;s catalog of this provider.">pi.dev</span><span class="muted date" title="Fetched from pi&#39;s catalog on this date.">2026-11-20</span></span>');
+    expect(rowOf(table([], all, "api"), "gemini-4-neon")).toContain('title="On the vendor&#39;s own model list, read through Provimux, a proxy built on CLIProxyAPI.">vendor list</span>');
+    // Only the lists that name it.
+    const pi = rowOf(table([], listing([model({ listed_by: ["pi.dev"] })], { lists })), "gemini-4-neon");
+    expect(pi).toContain(">pi.dev</span>");
+    expect(pi).not.toContain("models.dev</span>");
+    expect(pi).not.toContain("subscription</span>");
+  });
+
+  it("marks a list read by the discovery or stated by providers.dev stale by the threshold it is given, and an import never", () => {
+    const old = listing([model({})], { listed_at: "2026-10-01" });
+    expect(table([], old)).toContain('<span class="stale" title="The day the vendor&#39;s list was read. More than 30 days ago.">2026-10-01 · stale</span>');
+    expect(table([], old, "subscription", { ...today, stale_after_days: 90 })).not.toContain("· stale");
+    expect(table([], listing([model({ listed_by: ["models.dev"] })], { basis: "models.dev", listed_at: "2026-10-01" }))).not.toContain("· stale");
+  });
+
+  it("adds to an entry's row the plan names and the vendor's own list where it names the entry, and nothing where it does not", () => {
+    const lists: ListingLists = { listed: { listed_at: "2026-11-22", model_count: 1 }, "providers.dev": null, "models.dev": { listed_at: "2026-11-21", model_count: 1 }, "pi.dev": null };
+    const html = table([entry("swe-2", "SWE-2"), entry("swe-1", "SWE-1")], listing([
+      model({ id: "swe-2", entry: { provider: "devin", model: "swe-2" }, plans: ["pro"] }),
+      model({ id: "swe-1", entry: { provider: "devin", model: "swe-1" }, listed_by: ["models.dev"] }),
+    ], { lists }));
+    const listed = rowOf(html, "swe-2");
+    expect(listed).toContain('<div class="hint" title="Plan names the vendor&#39;s list attaches to the model, as it writes them.">Plans: pro</div></th>');
+    expect(listed).toContain('<td class="nowrap source-col" data-label="Source"><span class="sources"><span class="badge listed" title="On the vendor&#39;s own model list, read on a subscription login through Provimux, a proxy built on CLIProxyAPI.">subscription</span><span class="muted date" title="The day the vendor&#39;s list was read.">2026-11-22</span><span class="origin upstream"');
+    const imported = rowOf(html, "swe-1");
+    expect(imported).not.toContain("badge listed");
+    expect(imported).not.toContain("Plans:");
+    expect(html).not.toContain("more-models");
   });
 
   it("shows the plan names the vendor's list attaches, as it writes them, and a model hidden in its picker", () => {
-    const html = listingHtml(provider, listing([model({ plans: ["plus", "pro"], hidden: true }), model({ id: "other", hidden: false })]), today);
+    const html = table([], listing([model({ plans: ["plus", "pro"], hidden: true }), model({ id: "other", hidden: false })]));
     expect(rowOf(html, "gemini-4-neon")).toContain(">Plans: plus, pro</div>");
     expect(rowOf(html, "gemini-4-neon")).toContain(">Hidden in the vendor's picker</div>");
     expect(rowOf(html, "other")).not.toContain("Plans:");
     expect(rowOf(html, "other")).not.toContain("Hidden");
   });
 
-  it("counts the models of the list it names, and says how many more other sources' lists add (1.6.0)", () => {
-    const lists: ListingLists = { listed: { listed_at: "2026-11-22", model_count: 1 }, "providers.dev": null, "models.dev": { listed_at: "2026-11-21", model_count: 2 }, "pi.dev": null };
-    const html = listingHtml(provider, listing([model({ id: "a" }), model({ id: "b", listed_by: ["models.dev"] }), model({ id: "c", listed_by: ["models.dev"] })], { lists }), today);
-    expect(html).toContain("1 model on the vendor's own list, read through Provimux, a proxy built on CLIProxyAPI. 2 more models from other sources' lists.");
-    // One list: nothing more is said.
-    expect(listingHtml(provider, listing([model({})]), today)).not.toContain("from other sources");
+  it("gives each list in the page's facts, with its date and, in the hover text, how many models it names; and says when there is none", () => {
+    const lists: ListingLists = { listed: { listed_at: "2026-11-22", model_count: 6 }, "providers.dev": null, "models.dev": { listed_at: "2026-11-21", model_count: 2 }, "pi.dev": null };
+    const html = providerHtml(provider(), [], listing([model({})], { lists }), "2026-11-21", today);
+    expect(html).toContain('<dt class="muted">Model lists</dt><dd><span class="sources side"><span class="badge listed" title="The vendor&#39;s own model list, read on a subscription login through Provimux, a proxy built on CLIProxyAPI: 6 models.">subscription</span><span class="muted date" title="The day the vendor&#39;s list was read.">2026-11-22</span><span class="origin upstream" title="models.dev&#39;s list of this provider: 2 models.">models.dev</span><span class="muted date" title="Imported from models.dev on this date.">2026-11-21</span></span><div class="hint mt-1"><a href="/docs/methodology/#listings">How the lists are joined</a> · <a href="https://github.com/ngvoicu/groundtruth/blob/main/listed.json">Source</a></div></dd>');
+    const none = providerHtml(provider(), [], null, "2026-11-21", today);
+    expect(none).toContain("<dt class=\"muted\">Model lists</dt><dd><span class=\"muted\">None yet: no source gives a list of this provider's models.</span></dd>");
   });
 
-  it("says plainly when no source gives a list, with no table and no link to an answer that is not there", () => {
-    const html = listingHtml(provider, null, today);
-    expect(html).toContain("No model list for this provider yet: no source gives one.");
-    expect(html).toContain('<a href="/docs/methodology/#listings">Where a model list comes from</a>');
-    expect(html).not.toContain("<table");
-    expect(html).not.toContain("/api/v1/listings");
+  it("puts in the fold, linked to its entry, a model of the list whose entry the page has no row for", () => {
+    const html = table([], listing([model({ id: "swe-3", name: "SWE-3", entry: { provider: "devin", model: "swe-3" } })]));
+    expect(rowOf(html, "swe-3")).toContain('<a href="/entries/devin/swe-3">SWE-3</a>');
   });
 });

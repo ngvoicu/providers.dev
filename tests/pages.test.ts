@@ -80,7 +80,7 @@ describe("API response boundary", () => {
     }
   });
 
-  it("prints a provider's model list from /api/v1/listings/{provider}, as the API answers it", async () => {
+  it("prints a provider's models from /api/v1/providers/{provider} and /api/v1/listings/{provider}, as the API answers them, in one table", async () => {
     const calls: string[] = [];
     const listing = {
       provider: "provider-02", basis: "listed", listed_at: "2026-11-13", client: "provimux", client_label: "API response only", model_count: 2,
@@ -102,16 +102,19 @@ describe("API response boundary", () => {
       return api(path);
     })).text();
     expect(calls).toContain("/api/v1/listings/provider-02");
-    expect(html).toContain('<dt class="muted">Model list</dt><dd><a href="#model-list">2 models</a><span class="muted"> · from the vendor&#39;s own list and models.dev</span></dd>');
-    expect(html).toContain("1 model on the vendor's own list, read through API response only. 1 more model from other sources' lists.");
-    expect(html).toContain('<a href="/entries/provider-02/lab/model-4">Model four</a>');
+    // Each list in the facts with its date; one table of models, the entry with a row of its own, the listed model folded under it.
+    expect(html).toContain('<dt class="muted">Model lists</dt><dd><span class="sources side"><span class="badge listed" title="The vendor&#39;s own model list, read through API response only: 1 model.">vendor list</span><span class="muted date" title="The day the vendor&#39;s list was read.">2026-11-13</span><span class="origin upstream" title="models.dev&#39;s list of this provider: 1 model.">models.dev</span><span class="muted date" title="Imported from models.dev on this date.">2026-11-12</span></span>');
+    expect(html.split("<table").length - 1).toBe(1);
+    expect(html).not.toContain("Model list</h2>");
+    expect(html).toContain('<code>lab/model-4</code>');
+    expect(html).toContain('<span class="count">1 more model</span>');
     expect(html).toContain('<span class="listed-name">Not an entry</span>');
-    expect(html).toContain(">Listed, not evaluated</span>");
+    expect(html).toContain(">Not evaluated</span>");
     expect(html).toContain(">Plans: pro</div>");
     expect(html).toContain('<span title="2,000,000 tokens. From the vendor&#39;s own list.">2M</span>');
-    // As published: the fixture's provider has models.dev's list of it.
+    // As published: the fixture's provider has models.dev's list of it, whose every model has its entry.
     const published = await (await page("/providers/provider-02/")).text();
-    expect(published).toContain("listed by models.dev for this provider.");
+    expect(published).toContain('<span class="origin upstream" title="models.dev&#39;s list of this provider: ');
     expect(published).toContain('<a href="/api/v1/listings/provider-02"><code>GET /api/v1/listings/provider-02</code></a>');
   });
 
@@ -120,8 +123,8 @@ describe("API response boundary", () => {
     const response = await page("/providers/added-login/");
     expect(response.status).toBe(200);
     const html = await response.text();
-    expect(html).toContain('<dt class="muted">Model list</dt><dd><span class="muted">No list yet</span></dd>');
-    expect(html).toContain("No model list for this provider yet: no source gives one.");
+    expect(html).toContain("<dt class=\"muted\">Model lists</dt><dd><span class=\"muted\">None yet: no source gives a list of this provider's models.</span></dd>");
+    expect(html).not.toContain("more-models");
     expect(html).not.toContain("/api/v1/listings/added-login");
     // A listing the API cannot serve is not "no list": the page is unavailable, as for any other answer it lacks.
     const failed = await page("/providers/provider-02/", async (path) => path.startsWith("/api/v1/listings/") ? new Response(null, { status: 503 }) : api(path));
@@ -301,7 +304,7 @@ describe("API response boundary", () => {
     const methodology = readFileSync(join(ROOT, "src", "pages", "reference-content", "docs", "methodology.astro"), "utf8").replace(/\s+/g, " ");
     expect(methodology).toContain('{ id: "listings", label: "Model lists" }');
     expect(methodology).toContain('<h2 id="listings">Model lists</h2>');
-    for (const words of ["the models the lists providers.dev has name for that provider and access method, evaluated or not", "It joins the lists of four sources, each model once", "so the joined list too can miss a model", "A model providers.dev leaves out of the provider with evidence is not on it, whichever list names it", "No list is taken as the whole", "published in its <code>listed.json</code>", "one without says <em>Listed, not evaluated</em>", "nothing of it is written into an entry's limits or into a safe value", "never prices, allowances or quotas"]) {
+    for (const words of ["the models the lists providers.dev has name for that provider and access method, evaluated or not", "A listing joins the lists of four sources, each model once", "so the joined list too can miss a model", "A model providers.dev leaves out of the provider with evidence is not on it, whichever list names it", "No list is taken as the whole", "published in its <code>listed.json</code>", "one table of its models", "folded behind one line, are the models a model list names that have no entry", "<em>subscription</em> where it was read through a subscription login", "nothing of it is written into an entry's limits or into a safe value", "never prices, allowances or quotas"]) {
       expect(methodology, words).toContain(words);
     }
     expect(methodology).toContain("Plans are not tracked: a plan's name appears only where a vendor's own model list attaches it to a model");
@@ -621,7 +624,10 @@ it("keeps a provider whose every entry a catalog rule leaves out, with no entrie
   expect(providers.data).toEqual([expect.objectContaining({ id: "old-router", entry_count: 0 })]);
   const page = await get("/providers/old-router/");
   expect(page.status).toBe(200);
-  expect(await page.text()).toContain("No entries are listed for this provider.");
+  // Its entries are left out; the models models.dev lists for it are still the provider's models, with no entry.
+  const html = await page.text();
+  expect(html).toContain('<details class="more-models" open><summary><span class="count">2 models</span>');
+  expect(html).toContain('<span class="listed-name">Oldfam 1.5</span>');
   const catalog = await get("/?provider=old-router");
   expect(catalog.status).toBe(200);
   expect(await catalog.text()).toMatch(/<div id="empty" class="empty">/);

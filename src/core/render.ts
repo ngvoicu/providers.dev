@@ -44,7 +44,7 @@ const NONE = '<span class="muted">None</span>';
 const IN_PLAN = '<span class="muted" title="No price per token: the entry is paid for through a plan or subscription, which providers.dev does not list.">In plan</span>';
 const ACCESS_LABEL = { api: "API key", subscription: "Subscription", unknown: "Unclassified" } as const;
 
-function copyButton(value: string, label: string): string {
+export function copyButton(value: string, label: string): string {
   return `<button type="button" class="copy" data-copy="${e(value)}" aria-label="Copy ${e(label)}" title="Copy ${e(label)}">Copy</button>`;
 }
 
@@ -103,8 +103,9 @@ function piMark(pi: PiSummary): string {
  * given: in a row and on the entry's own page. Only the entry's page (`entry`) has the date say that the last import
  * failed; in a row the date is plain like the models.dev one, and its title says the rest.
  */
-function sourcesHtml(entry: Pick<Summary, "origin" | "verified" | "overridden_fields" | "pi">, options: { today: Today; imported?: string; pi?: MetaPi; entry?: boolean }, inline = false): string {
-  const parts: string[] = [];
+function sourcesHtml(entry: Pick<Summary, "origin" | "verified" | "overridden_fields" | "pi">, options: { today: Today; imported?: string; pi?: MetaPi; entry?: boolean }, inline = false, first = ""): string {
+  // `first`: pairs a provider's page puts before the entry's own sources (the vendor's list that names the entry).
+  const parts: string[] = first ? [first] : [];
   if (entry.origin !== "added") {
     const date = options.imported ? `<span class="muted date" title="Imported from models.dev on this date.">${e(options.imported)}</span>` : "<span></span>";
     parts.push(`<span class="origin upstream" title="${e(ORIGIN_TITLE.upstream)}">${ORIGIN_LABEL.upstream}</span>${date}`);
@@ -227,10 +228,17 @@ export interface RowOptions {
   /** Leave the provider column out (on a provider's own page). */
   hideProvider?: boolean;
   providerNames?: Record<string, string>;
+  /**
+   * What a provider's page adds to a row from the provider's listing, by entry ref: `note`, lines under the model's id
+   * (the plan names a vendor's list attaches); `source`, a source and its date before the entry's own (a vendor's list
+   * that names the model). Both are HTML made from fields of the listing.
+   */
+  listed?: Record<string, RowListed>;
 }
+export interface RowListed { note: string; source: string }
 
 /** The column names of the entry table. Where the table is stacked, each cell repeats its column's name. */
-const COLUMN = { provider: "Provider", input_window: "Context window", max_output: "Max output", price: "Price in / out", released: "Released", lifetime: "Cache lifetime", source: "Source" } as const;
+export const COLUMN = { provider: "Provider", input_window: "Context window", max_output: "Max output", price: "Price in / out", released: "Released", lifetime: "Cache lifetime", source: "Source" } as const;
 const WARNED = ` A warning sign marks a value whose sources do not all agree: it opens each source's value.`;
 
 export function tableHead(options: { hideProvider?: boolean; sortable?: boolean; sort?: string; order?: string }): string {
@@ -259,15 +267,16 @@ export function rowHtml(entry: Summary, options: RowOptions): string {
   const provider = options.providerNames?.[entry.provider] ?? entry.provider;
   const access = entry.access === "api" ? "" : ` <span class="badge ${entry.access}" title="Access: ${ACCESS_LABEL[entry.access]}">${ACCESS_LABEL[entry.access]}</span>`;
   const status = entry.status ? ` <span class="badge">${e(entry.status)}</span>` : "";
+  const listed = options.listed?.[entry.ref];
   return `<tr>
-<th scope="row"><a href="${e(href)}">${e(entry.name)}</a>${status}<div class="id"><code>${e(entry.model)}</code>${copyButton(entry.ref, "entry id")}</div></th>
+<th scope="row"><a href="${e(href)}">${e(entry.name)}</a>${status}<div class="id"><code>${e(entry.model)}</code>${copyButton(entry.ref, "entry id")}</div>${listed?.note ?? ""}</th>
 ${options.hideProvider ? "" : `<td class="provider-col" data-label="${COLUMN.provider}"><a class="plain" href="/providers/${e(entry.provider)}/">${e(provider)}</a>${access}</td>`}
 <td class="num window-col" data-label="${COLUMN.input_window}">${listValue(entry, "input_window", `${href}#limits`, options.today)}</td>
 <td class="num" data-label="${COLUMN.max_output}">${listValue(entry, "max_output", `${href}#limits`, options.today)}</td>
 <td class="num mid-only" data-label="${COLUMN.price}">${priceCell(entry, wholePriceWarning(entry.safe.price, warnId(entry.ref, "price"), options.today))}</td>
 <td class="wide-only" data-label="${COLUMN.released}">${entry.release_date ? `<span class="muted date">${e(entry.release_date)}</span>` : UNKNOWN}</td>
 <td class="life-col" data-label="${COLUMN.lifetime}">${lifetimeCell(entry, href, options.today)}</td>
-<td class="nowrap source-col" data-label="${COLUMN.source}">${sourcesHtml(entry, options)}</td>
+<td class="nowrap source-col" data-label="${COLUMN.source}">${sourcesHtml(entry, options, false, listed?.source)}</td>
 </tr>`;
 }
 
