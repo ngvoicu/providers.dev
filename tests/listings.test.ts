@@ -396,13 +396,43 @@ describe("openai-codex once the discovery lists it (1.6.0)", () => {
 });
 
 describe("the authored Codex listing (finding 5)", () => {
+  // The authored file is checked against fixtures, never against data/upstream: the daily sync rewrites that snapshot,
+  // and models.dev's list for openai-codex grew from two models to eleven on 2026-11-23.
+  const text = readFileSync(join(ROOT, "data", "authored", "listings", "openai-codex.yaml"), "utf8");
+  const file = AuthoredListing.parse(parse(text));
+  const six = ["gpt-6.1-sol", "gpt-6.1-terra", "gpt-6-astra", "gpt-6-luna", "gpt-6.2-astra", "gpt-6.2-sol"];
+  // models.dev's openai-codex on 2026-11-22, the date of the file's listed evidence.
+  const modelsDev = ["gpt-6.1-sol", "gpt-6.1-terra"];
+  const authored = [file];
+  const upstream = (id: string) => entry(id, { canonical_id: `openai/${id}` });
+  const added = (id: string) => entry(id, { canonical_id: `openai/${id}` }, { origin: "added", inherited: { from: `openai/${id}`, fields: ["name"] }, measured: 921500 });
+
   it("lists the six models of the catalog's openai-codex: models.dev's two and the four providers.dev measured, each with evidence", () => {
-    const file = AuthoredListing.parse(parse(readFileSync(join(ROOT, "data", "authored", "listings", "openai-codex.yaml"), "utf8")));
-    expect(file.list!.models).toEqual(["gpt-6.1-sol", "gpt-6.1-terra", "gpt-6-astra", "gpt-6-luna", "gpt-6.2-astra", "gpt-6.2-sol"]);
-    expect(file.list!.evidence.map((item) => item.kind)).toEqual(["listed", "measured", "measured", "measured", "measured"]);
-    const upstream = Object.keys((JSON.parse(readFileSync(join(ROOT, "data", "upstream", "providers", "openai-codex.json"), "utf8")) as { models: object }).models).sort();
-    expect(upstream).toEqual(["gpt-6.1-sol", "gpt-6.1-terra"]);
-    expect(readFileSync(join(ROOT, "data", "authored", "listings", "openai-codex.yaml"), "utf8")).toContain("union of every source's list");
+    expect(file.list!.models).toEqual(six);
+    const [listed, ...measured] = file.list!.evidence;
+    expect(listed).toMatchObject({ kind: "listed", url: "https://models.dev/experimental/v2.0/api.json?include=openai-codex" });
+    // The listed evidence names exactly the models models.dev listed then, and nothing else of the six.
+    const named = (note: string | null | undefined) => note!.match(/gpt-[\w.-]*\w/g);
+    expect(named(listed!.note)).toEqual(modelsDev);
+    // Every other model has one measurement of its own, through the Codex login.
+    expect(measured.map((item) => item.kind)).toEqual(["measured", "measured", "measured", "measured"]);
+    expect(measured.map((item) => named(item.note))).toEqual(six.filter((id) => !modelsDev.includes(id)).map((id) => [id]));
+    expect(text).toContain("union of every source's list");
+  });
+
+  it("published with models.dev's two: the six, models.dev's two listed by both", () => {
+    const { listings, issues } = build({ catalog: catalogOf({ "openai-codex": [...modelsDev.map(upstream), ...six.filter((id) => !modelsDev.includes(id)).map(added)] }), authored });
+    expect(issues).toEqual([]);
+    expect(listings[0]).toMatchObject({ basis: "providers.dev", model_count: 6, lists: { "providers.dev": { model_count: 6 }, "models.dev": { model_count: 2 } } });
+    expect(listings[0]!.models!.map((model) => [model.id, model.listed_by])).toEqual(six.map((id) => [id, modelsDev.includes(id) ? ["providers.dev", "models.dev"] : ["providers.dev"]]));
+  });
+
+  it("published once models.dev lists more (eleven, as on 2026-11-23): the six stay first, the rest after them (1.6.0 union)", () => {
+    const more = ["gpt-5.6-luna", "gpt-5.6-sol", "gpt-5.6-terra", "gpt-6-sol", "gpt-image-2"];
+    const { listings, issues } = build({ catalog: catalogOf({ "openai-codex": [...six, ...more].map(upstream) }), authored });
+    expect(issues).toEqual([]);
+    expect(listings[0]).toMatchObject({ basis: "providers.dev", model_count: 11, lists: { "providers.dev": { model_count: 6 }, "models.dev": { model_count: 11 } } });
+    expect(listings[0]!.models!.map((model) => [model.id, model.listed_by])).toEqual([...six.map((id) => [id, ["providers.dev", "models.dev"]]), ...more.map((id) => [id, ["models.dev"]])]);
   });
 });
 
