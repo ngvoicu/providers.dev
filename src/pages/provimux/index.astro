@@ -1,7 +1,8 @@
 ---
 // provimux.providers.dev/ (served at the subdomain's root; see src/core/provimux-site.ts). Every statement here is
 // taken from Provimux's README (.github/README.md), pi-provimux's README or the provimux-ui release notes; the pools
-// section also from the console's own words (provimux-ui's Models page) and the routing it describes.
+// section also from the console's own words (provimux-ui's Models page) and the routing it describes; Savings from the
+// README and the console's Savings page; pi-cache-keeper from its README and its site (src/pages/pi-cache-keeper).
 import Provimux from "../../layouts/Provimux.astro";
 
 const github = "https://github.com/ngvoicu/provimux";
@@ -69,19 +70,62 @@ const groups: { title: string; promise: string; rows: Row[] }[] = [
 /** The console screenshots: made with example data (accounts at example.com, made-up keys). */
 const shot = (page: string, alt: string) => ({ page, alt });
 const accounts = shot("accounts", "The console's Accounts page. Chips read 10 accounts, 7 working, 1 signed out, 1 cooling down, 1 off. A Claude card lists a subscription, alex@example.com, Working, priority 10, and an API key at api.anthropic.com, Working, priority 0. A ChatGPT · OpenAI card lists a subscription that is signed out, with a Sign in again button; a second subscription, team@example.com, Working, 1 model cooling down; and an API key at api.openai.com. A Gemini API key is off.");
-const models = shot("models", "The console's Models page. Chips read 14 names, 3 of yours, 7 served by more than one account, 3 cooling down. Under Your names: opus with 4 accounts (a Claude subscription, cooling down, 46 min left (quota), priority 10; a Devin subscription, priority 5; a Claude API key at api.anthropic.com and an OpenRouter API key at openrouter.ai, both priority 0), then deepseek and qwen-coder, each served by an OpenRouter API key. Under Used in the last 30 days: gpt-6.1-terra with 3 accounts, one of them a subscription cooling down, 18 min left (quota); claude-sonnet-5-5 with 2 accounts.");
+const models = shot("models", "The console's Models page. Chips read 13 names, 2 of yours, 7 served by more than one account, 3 cooling down. Under Your names: opus with 4 accounts (a Claude subscription, cooling down, 46 min left (quota), priority 10; a Devin subscription, priority 5; a Claude API key at api.anthropic.com and an OpenRouter API key at openrouter.ai, both priority 0), then qwen-coder, served by an OpenRouter API key. Under Used in the last 30 days: claude-opus-5-5 with 2 accounts and 1508 requests, its subscription cooling down; gpt-6.1-terra with 3 accounts and 767 requests, one of them a subscription cooling down, 18 min left (quota); claude-sonnet-5-5 with 2 accounts.");
 
-/** The pool in the Models picture, alone: a wide crop beside the text, and the console's own phone layout on a phone. */
-const pool = {
-  alt: "A name on the console's Models page: opus, Your name, 4 accounts, 1840 requests in 30 days. 1: a Claude subscription, alex@example.com, sends claude-opus-5-5, cooling down, 46 min left (quota), priority 10. 2: a Devin subscription, alex@example.com, sends devin/claude-opus-5-5, priority 5. 3, shared: a Claude API key at api.anthropic.com sends claude-opus-5-5, priority 0, and an OpenRouter API key at openrouter.ai sends anthropic/claude-opus-5.5, priority 0.",
+/**
+ * A part of a console page, cropped: a wide crop from `from` pixels of the window up, and the console's own phone
+ * layout below that. One picture per theme. Request counts in the pictures are by upstream model, as the gateway
+ * records them, so a name of your own shows its accounts and no count.
+ */
+interface Crop { name: string; alt: string; from: number; wide: { width: number; height: number }; narrow: { width: number; height: number } }
+const pool: Crop = {
+  name: "pool",
+  alt: "A name on the console's Models page: opus, Your name, 4 accounts. 1: a Claude subscription, alex@example.com, sends claude-opus-5-5, cooling down, 46 min left (quota), priority 10. 2: a Devin subscription, alex@example.com, sends devin/claude-opus-5-5, priority 5. 3, shared: a Claude API key at api.anthropic.com sends claude-opus-5-5, priority 0, and an OpenRouter API key at openrouter.ai sends anthropic/claude-opus-5.5, priority 0.",
+  from: 640,
   wide: { width: 744, height: 318 },
   narrow: { width: 424, height: 458 },
 };
-const poolPicture = (scheme: "light" | "dark") =>
+const savings: Crop = {
+  name: "savings",
+  alt: "The console's Savings page for Nov 1 to Nov 25, 2026, in days of the server's zone, priced with OpenRouter's public list at base rates (long-context tiers not applied). Worth of prompt caching, an estimate: $972.71, of which $83.57 on API keys, money that would have been paid, and $889.14 on subscriptions, which saves quota, not dollars. Copy the line: Prompt caching through Provimux was worth $972 this month at base API list prices.",
+  from: 900,
+  wide: { width: 1162, height: 733 },
+  narrow: { width: 424, height: 620 },
+};
+const cropPicture = (crop: Crop, scheme: "light" | "dark") =>
   `<picture class="shot-${scheme}">` +
-  `<source media="(min-width: 640px)" srcset="/media/console-pool-wide-${scheme}.webp 1x, /media/console-pool-wide-${scheme}-2x.webp 2x" width="${pool.wide.width}" height="${pool.wide.height}">` +
-  `<img src="/media/console-pool-narrow-${scheme}.webp" srcset="/media/console-pool-narrow-${scheme}-2x.webp 2x" width="${pool.narrow.width}" height="${pool.narrow.height}" alt="${pool.alt}" decoding="async" loading="lazy">` +
+  `<source media="(min-width: ${crop.from}px)" srcset="/media/console-${crop.name}-wide-${scheme}.webp 1x, /media/console-${crop.name}-wide-${scheme}-2x.webp 2x" width="${crop.wide.width}" height="${crop.wide.height}">` +
+  `<img src="/media/console-${crop.name}-narrow-${scheme}.webp" srcset="/media/console-${crop.name}-narrow-${scheme}-2x.webp 2x" width="${crop.narrow.width}" height="${crop.narrow.height}" alt="${crop.alt}" decoding="async" loading="lazy">` +
   `</picture>`;
+const cropPictures = (crop: Crop) => cropPicture(crop, "light") + cropPicture(crop, "dark");
+
+/**
+ * pi's /model list with pi-provimux 105.0.7. Each line as pi 1.6.0's selector draws it (model-selector.js: the cursor
+ * "→ ", the current model's "✓ ", the id, the name in brackets, the provider): the name is the model's display name in
+ * Provimux's model list, " · ", and where it comes from, as pi-provimux's sourceLabel (extensions/sources.ts) says it
+ * for these accounts: the ones at the highest priority, joined by "or", then "fallback" and the others, highest first.
+ * The pool's display name is the one its rows set (README: set display-name on each alias row of a shared name).
+ */
+const piRows: { id: string; name: string; source: string; current?: boolean }[] = [
+  { id: "opus", name: "Claude Opus 5.5", source: "Anthropic sub, fallback Devin sub, Anthropic api, OpenRouter api", current: true },
+  { id: "claude-opus-5-5", name: "Claude Opus 5.5", source: "Anthropic sub, fallback api" },
+  { id: "claude-sonnet-5-5", name: "Claude Sonnet 5.5", source: "Anthropic sub or api" },
+  { id: "gpt-6.1-terra", name: "GPT 6.1 Terra", source: "OpenAI sub, fallback api" },
+  { id: "devin/kimi-k3", name: "Kimi K3 (Devin)", source: "Devin sub" },
+  { id: "anthropic/claude-opus-5.5", name: "anthropic/claude-opus-5.5", source: "OpenRouter api" },
+];
+/** A source in its colour: a subscription green, an API key amber; the words between them dim. */
+const sourceHtml = (source: string) =>
+  source
+    .split(/(, fallback |, | or )/)
+    .map((part, i) => (i % 2 === 1 ? `<span class="pmx-t-dim">${part}</span>` : `<span class="${part.endsWith("sub") ? "pmx-t-sub" : "pmx-t-api"}">${part}</span>`))
+    .join("");
+const piList = `<span class="pmx-t-row pmx-t-dim">/model</span>` + piRows
+  .map((row) => {
+    const lead = row.current ? `<span class="pmx-t-sel">→ ✓ ${row.id}</span>` : `    ${row.id}`;
+    return `<span class="pmx-t-row">${lead} <span class="pmx-t-dim">(${row.name} · </span>${sourceHtml(row.source)}<span class="pmx-t-dim">)</span> <span class="pmx-t-dim">[provimux]</span></span>`;
+  })
+  .join("");
 ---
 
 <Provimux
@@ -197,8 +241,8 @@ const poolPicture = (scheme: "light" | "dark") =>
       </div>
       <div class="pmx-pool-shots">
         <figure class="pmx-shot pmx-pool-shot">
-          <div class="pmx-frame pmx-frame-card">
-            <Fragment set:html={poolPicture("light") + poolPicture("dark")} />
+          <div class="pmx-frame pmx-frame-crop">
+            <Fragment set:html={cropPictures(pool)} />
           </div>
           <figcaption>
             <strong>opus</strong> on the Models page, its accounts in the order Provimux tries them. The Claude subscription is cooling down after its quota ran
@@ -231,7 +275,7 @@ const poolPicture = (scheme: "light" | "dark") =>
         <li><strong>Models.</strong> Every model name your tools can send, and what serves it, in the order Provimux tries: subscription or API key, the account, the model sent, its priority, a recorded cooldown and the age of each login's own list.</li>
         <li><strong>Accounts.</strong> Every subscription and API key on one page, one card per service, each with its state in one word (Working, Signed out, Cooling down), its priority, and the fix where one is needed.</li>
         <li><strong>Your names.</strong> Short names, and <a href="#pools">pools</a>: one name served by several accounts. Saved in one action.</li>
-        <li><strong>Savings.</strong> Daily usage totals kept across restarts and estimated at public list prices: what prompt caching was worth, and what the paid keys cost.</li>
+        <li><strong>Savings.</strong> Daily usage totals kept across restarts and estimated at public list prices: what prompt caching was worth, and what the paid keys cost. <a href="#savings">More below</a>.</li>
       </ul>
       <figure class="pmx-shot pmx-shot-wide">
         <div class="pmx-frame">
@@ -239,6 +283,51 @@ const poolPicture = (scheme: "light" | "dark") =>
         </div>
         <figcaption>The <strong>Models</strong> page: each name with the accounts behind it, in the order Provimux tries them. On a plain CLIProxyAPI the console runs too, and Provimux's own pages hide themselves. Example data.</figcaption>
       </figure>
+    </div>
+  </section>
+
+  <section id="savings" class="pmx-section" aria-labelledby="savings-title">
+    <div class="pmx-page">
+      <header class="pmx-head">
+        <p class="pmx-kicker">Savings</p>
+        <h2 id="savings-title">What prompt caching was worth, and what the paid keys cost.</h2>
+        <p>
+          Provimux adds up every request into daily totals, kept across restarts, and values them at public list prices. The console's Savings page shows what
+          prompt caching was worth, how many requests subscriptions and API keys served, what the subscription requests would have cost on an API key, and what
+          the API keys cost.
+        </p>
+      </header>
+      <figure class="pmx-shot pmx-shot-wide pmx-savings-shot">
+        <div class="pmx-frame pmx-frame-crop">
+          <Fragment set:html={cropPictures(savings)} />
+        </div>
+        <figcaption>
+          The <strong>Savings</strong> page for this month: the worth of prompt caching, its part on API keys and its part on subscriptions, the requests each kind
+          served, and what the API keys cost as OpenRouter reported it. Example data.
+        </figcaption>
+      </figure>
+      <ul class="pmx-list pmx-savings-list">
+        <li>
+          <strong>Estimates, said to be estimates.</strong> Valued at the base list prices of the day each request was recorded: OpenRouter's public list, and
+          Provimux's own table for models it lacks; long-context tiers are not applied. The worth of caching is net of what writing the cache cost, so it can
+          be negative.
+        </li>
+        <li>
+          <strong>Money on a key, quota on a subscription.</strong> On an API key, caching saves money. On a subscription it saves quota, and its value at list
+          price is shown apart. Provimux does not know what a subscription costs, so it never says what one saved.
+        </li>
+        <li>
+          <strong>A charge the provider reported,</strong> where one reports it (OpenRouter), beside the estimate.
+        </li>
+        <li>
+          <strong>By day, model, provider and host, and client key.</strong> A client key shows no more than its last 4 characters. One button copies a line to
+          share: <em>Prompt caching through Provimux was worth $972 this month at base API list prices.</em>
+        </li>
+        <li>
+          <strong>One request out.</strong> To have prices, Provimux downloads OpenRouter's public model list, at most every 3 hours and only while it records
+          requests. No key and nothing about your installation is sent.
+        </li>
+      </ul>
     </div>
   </section>
 
@@ -311,8 +400,8 @@ brew services start provimux</code></pre>
           serves appears in <code>/model</code>, with its context window, reasoning levels and, when models.dev knows it, its price.
         </p>
         <ul class="pmx-list">
-          <li><strong>Where each model comes from, in its name:</strong> <code>Claude Opus 5.5 · Anthropic sub, fallback api</code>. <code>sub</code> is a subscription login, <code>api</code> an API key.</li>
-          <li><strong>Which route answered, in the footer,</strong> after each answer: <code>answered: Anthropic sub</code>. This needs Provimux 8.1.1-pmx.1 or newer.</li>
+          <li><strong>Where each model comes from, in its name:</strong> <code>Claude Opus 5.5 · Anthropic sub, fallback api</code>. <code>sub</code> is a subscription login, <code>api</code> an API key. Accounts of the same priority are joined by <code>or</code>, and the others follow <code>fallback</code>, highest priority first.</li>
+          <li><strong>Which route answered, in the footer,</strong> after each answer: <code>answered: Devin sub</code>. This needs Provimux 8.1.1-pmx.1 or newer.</li>
           <li><strong>Claude models in Claude's own format</strong> (<code>/v1/messages</code>) where it is safe: with pi's long cache retention, that brings Anthropic's 1-hour prompt cache.</li>
         </ul>
         <div class="pmx-code">
@@ -331,13 +420,61 @@ brew services start provimux</code></pre>
       </div>
       <figure class="pmx-term" aria-label="Example: pi's model list and footer with pi-provimux">
         <div class="pmx-term-bar" aria-hidden="true"><span></span><span></span><span></span><em>pi</em></div>
-        <pre><code><span class="pmx-t-dim">/model</span>
-<span class="pmx-t-sel">→ claude-opus-5-5</span> <span class="pmx-t-dim">(Claude Opus 5.5 · </span><span class="pmx-t-sub">Anthropic sub</span><span class="pmx-t-dim">, fallback </span><span class="pmx-t-api">api</span><span class="pmx-t-dim">)</span> <span class="pmx-t-dim">[provimux]</span>
-  gpt-6.1-terra <span class="pmx-t-dim">(GPT 6.1 Terra · </span><span class="pmx-t-sub">OpenAI sub</span><span class="pmx-t-dim">, fallback </span><span class="pmx-t-api">api</span><span class="pmx-t-dim">)</span> <span class="pmx-t-dim">[provimux]</span>
-  anthropic/claude-opus-5.5 <span class="pmx-t-dim">(anthropic/claude-opus-5.5 · </span><span class="pmx-t-api">OpenRouter api</span><span class="pmx-t-dim">)</span> <span class="pmx-t-dim">[provimux]</span></code></pre>
-        <p class="pmx-term-foot"><span class="pmx-t-dim">footer</span> answered: <span class="pmx-t-sub">Anthropic sub</span></p>
+        <pre class="pmx-term-rows"><code set:html={piList} /></pre>
+        <p class="pmx-term-foot"><span class="pmx-t-dim">footer</span> answered: <span class="pmx-t-sub">Devin sub</span></p>
         <figcaption class="sr-only">An example, not a real account.</figcaption>
       </figure>
+    </div>
+  </section>
+
+  <section id="cache-keeper" class="pmx-section" aria-labelledby="cache-keeper-title">
+    <div class="pmx-page">
+      <header class="pmx-head">
+        <p class="pmx-kicker">Also for pi</p>
+        <h2 id="cache-keeper-title">pi-cache-keeper</h2>
+        <p>
+          A pi extension that makes the prompt cache pay off. It compacts a session by reading the cache the session already built, compacts when the context
+          gets full and just before the cache expires, can keep the cache warm through a break, and fills in what pi doesn't know about a model from
+          providers.dev.
+        </p>
+      </header>
+      <ol class="pmx-fit" aria-label="How providers.dev, Provimux and pi-cache-keeper fit together">
+        <li>
+          <span class="pmx-fit-who"><a href="https://providers.dev">providers.dev</a></span>
+          <strong>Measures.</strong>
+          <span>Each model's input window, cache lifetimes and prices, at each provider and for each way in (API key or subscription login), measured values first.</span>
+        </li>
+        <li>
+          <span class="pmx-fit-who">Provimux</span>
+          <strong>Carries every account behind one key.</strong>
+          <span>And, through pi-provimux, tells pi which accounts serve each model and which one answered.</span>
+        </li>
+        <li>
+          <span class="pmx-fit-who">pi-cache-keeper</span>
+          <strong>Acts on it in pi.</strong>
+          <span>It looks each model up as the account that serves it, so the countdown, keeping warm and compacting follow that account's cache; when another account answers, the footer says so and follows it.</span>
+        </li>
+      </ol>
+      <ul class="pmx-list pmx-keeper-list">
+        <li><strong>Compacts from the warm cache:</strong> the summary reads about 99% of the conversation from the cache, and it sees all the tool output.</li>
+        <li><strong>Compacts when the context is full,</strong> and just before the cache expires when you step away, so your next message doesn't pay to write the whole session again.</li>
+        <li><strong>Keeps the cache warm through a break,</strong> for up to as long as you choose, and stops once refreshing has cost as much as one cache miss. Off until you set it.</li>
+        <li><strong>Model data from providers.dev:</strong> one safe value per quantity (input window, output limit, cache lifetimes and prices), measured values first.</li>
+        <li><strong>In the footer:</strong> how long the cache stays warm, the cache lifetimes and the one in use, the price, and what went wrong, such as <code>⚠ answered by an API key</code>.</li>
+      </ul>
+      <div class="pmx-keeper-install">
+        <div class="pmx-code">
+          <pre><code>pi install npm:pi-cache-keeper</code></pre>
+          <button type="button" class="copy" data-copy="pi install npm:pi-cache-keeper" aria-label="Copy the pi-cache-keeper install command">Copy</button>
+        </div>
+        <p class="pmx-links">
+          <a class="button primary" href="https://pi-cache-keeper.providers.dev/">pi-cache-keeper.providers.dev</a>
+          <a class="button" href="https://www.npmjs.com/package/pi-cache-keeper">pi-cache-keeper on npm</a>
+        </p>
+      </div>
+      <p class="hint pmx-keeper-note">
+        Then run <code>/reload</code> in pi; it needs pi 1.6.0 or newer. Based on Nico Bailon's <a href="https://github.com/nicobailon/pi-cached-compaction">pi-cached-compaction</a> (MIT).
+      </p>
     </div>
   </section>
 

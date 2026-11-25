@@ -159,8 +159,8 @@ describe("Provimux's pages", () => {
 
   it("shows the console with example data, in both themes and two sizes", () => {
     const media = readdirSync(join(ROOT, "public", "provimux", "media")).sort();
-    expect(media).toEqual(["accounts", "models", "pool-narrow", "pool-wide"].flatMap((page) => ["dark", "light"].flatMap((scheme) => [`console-${page}-${scheme}-2x.webp`, `console-${page}-${scheme}.webp`])).sort());
-    expect(home.match(/Example data\./g)).toHaveLength(3);
+    expect(media).toEqual(["accounts", "models", "pool-narrow", "pool-wide", "savings-narrow", "savings-wide"].flatMap((page) => ["dark", "light"].flatMap((scheme) => [`console-${page}-${scheme}-2x.webp`, `console-${page}-${scheme}.webp`])).sort());
+    expect(home.match(/Example data\./g)).toHaveLength(4);
     expect(home).toContain("alex@example.com");
   });
 

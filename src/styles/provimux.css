@@ -447,7 +447,7 @@
   .pmx-pool-answer {
     max-width: 746px;
   }
-  .pmx-frame-card picture {
+  .pmx-frame-crop picture {
     display: block;
   }
   @media (max-width: 639px) {
@@ -456,11 +456,11 @@
     }
   }
   @media (max-width: 700px) {
-    .pmx-frame.pmx-frame-card {
+    .pmx-frame.pmx-frame-crop {
       max-height: none;
       mask-image: none;
     }
-    .pmx-frame.pmx-frame-card img {
+    .pmx-frame.pmx-frame-crop img {
       width: 100%;
       max-width: 100%;
       margin-left: 0;
@@ -489,6 +489,101 @@
     .pmx-pool-note {
       margin-top: 1.25rem;
     }
+  }
+
+  /* Savings: the page's top as it is from 900px (1162px wide), its headline card in the console's phone layout below */
+  .pmx-savings-shot {
+    max-width: 1164px;
+  }
+  @media (max-width: 899px) {
+    .pmx-savings-shot {
+      max-width: 426px;
+    }
+  }
+  .pmx-savings-list,
+  .pmx-keeper-list {
+    margin-top: 1.5rem;
+  }
+  @media (min-width: 900px) {
+    .pmx-savings-list,
+    .pmx-keeper-list {
+      grid-template-columns: 1fr 1fr;
+      column-gap: 2.5rem;
+    }
+  }
+
+  /* pi-cache-keeper: how the three fit, in order, as three steps joined by an arrow */
+  .pmx-fit {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    counter-reset: none;
+  }
+  .pmx-fit li {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 0.3rem;
+    padding: 1rem 1.15rem;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--bg-subtle);
+    font-size: 0.9rem;
+    color: var(--fg-soft);
+  }
+  .pmx-fit li:last-child {
+    border-color: var(--brand-line);
+    background: linear-gradient(135deg, var(--brand-bg), var(--bg-subtle) 80%);
+  }
+  .pmx-fit-who {
+    font-size: 0.74rem;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--brand);
+  }
+  .pmx-fit-who a {
+    color: inherit;
+  }
+  .pmx-fit strong {
+    font-size: 1rem;
+    color: var(--fg);
+  }
+  @media (min-width: 900px) {
+    .pmx-fit {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.75rem;
+    }
+    /* The arrow between two steps, in the gap */
+    .pmx-fit li + li::before {
+      content: "→";
+      position: absolute;
+      left: -1.35rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1rem;
+      color: var(--muted);
+    }
+  }
+  .pmx-keeper-list code {
+    white-space: nowrap;
+  }
+  .pmx-keeper-install {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1rem;
+    margin-top: 1.5rem;
+  }
+  .pmx-keeper-install .pmx-code {
+    flex: 0 1 26rem;
+    min-width: 0;
+  }
+  .pmx-keeper-install .pmx-code pre {
+    margin: 0;
+  }
+  .pmx-keeper-note {
+    margin-top: 0.75rem;
   }
 
   /* Install */
@@ -619,6 +714,15 @@
     background: #111116;
     font-family: var(--font-mono);
     font-size: 0.78rem;
+  }
+  /* A line wider than the terminal wraps, as a terminal wraps it, under its own text rather than under the cursor */
+  .pmx-term-rows {
+    white-space: pre-wrap;
+  }
+  .pmx-t-row {
+    display: block;
+    padding-left: 4ch;
+    text-indent: -4ch;
   }
   .pmx-t-dim {
     color: #8b8b94;
