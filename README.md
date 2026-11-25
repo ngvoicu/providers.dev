@@ -372,6 +372,15 @@ whatever list names it (this folder's, models.dev's, pi's or the vendor's own); 
 No value is copied from router-for-me's model files: each comes from the vendor's list or documentation, models.dev,
 pi or a measurement, and says which.
 
+**Release dates.** An entry's `release_date` is models.dev's, or, for an entry providers.dev added, the one it inherits
+from the entry it names; a listed model's `released` is the first of: a rule here, the entry's date, models.dev's
+record. The vendor's list gives none (its release dates are never read). A date is the lab's release date of the
+model, never the day a reseller or login started offering it, and it needs the lab's own source (announcement, release
+notes, changelog, model card or documentation) quoted in the evidence. A model with an entry gets it by an override
+(`set: { release_date: "2026-11-24" }` in `data/authored/overrides/<provider>.yaml`); a model with no entry by a rule
+here (`set: { released: "2026-11-24" }`). Where the lab's sources disagree, or only press gives a date, no date is
+stated; the file says why in a comment.
+
 ## Syncing
 
 - **By hand:** `npm run sync` (add `-- --force` to download again even if nothing changed), then `npm run build`.
