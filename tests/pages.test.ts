@@ -417,6 +417,18 @@ describe("API response boundary", () => {
     expect((await page("/?lifetime_basis=none")).status).toBe(400);
   });
 
+  it("the home page's lead names no count, and its facts line carries the counts from /api/v1/meta and the facets", async () => {
+    const { data: meta } = (await (await api("/api/v1/meta")).json()) as { data: Meta };
+    expect(meta.pi.snapshot).toBeNull();
+    const facets = one(FacetsSchema).parse(await (await api("/api/v1/facets")).json()).data;
+    const html = await (await page("/")).text();
+    const lead = html.match(/<p class="lead">([\s\S]*?)<\/p>/)![1]!;
+    expect(lead).toBe('Context window, maximum output, price and prompt caching for every model, at every provider and for each way in. Built on <a href="https://models.dev">models.dev</a>, with our own <a href="/?origin=modified,added">corrections and measurements</a> on top. Each quantity has one value; <a href="/docs/methodology/#safe-values">a warning</a> marks where its sources disagree.');
+    const facts = html.match(/<p class="facts-line muted">([\s\S]*?)<\/p>/)![1]!;
+    const n = (value: number) => value.toLocaleString("en-US");
+    expect(facts).toBe(`<span>${n(meta.counts.entries)} entries</span><span><a href="/?origin=modified,added">${n(facets.evidence_entries)} corrected or evaluated</a></span><span>${n(meta.counts.providers)} providers, <a href="/?access=subscription">${n(facets.subscription_providers)} by subscription</a></span><span><a href="/models/">${n(meta.counts.models)} models</a></span><span><a href="/evidence/#cache">${n(meta.counts.cache_evaluations)} cache evaluations</a></span><span>Updated ${meta.generated_at.slice(0, 10)}</span>`);
+  });
+
   it("keeps the basis filter in the catalog's form, with one value and with both", async () => {
     const form = (html: string): string => html.match(/<form id="filters"[\s\S]*?<\/form>/)?.[0] ?? "";
     const one = form(await (await page("/?lifetime_basis=measured&sort=cache_long&order=desc&limit=100")).text());
@@ -823,6 +835,13 @@ describe("pi's catalog on the pages", () => {
     const html = await piPage("/");
     const attribute = html.match(/<table class="entries stack-tablet" id="entries"[^>]* data-pi="([^"]*)"/)![1]!;
     expect(JSON.parse(attribute.replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&"))).toEqual(pi);
+  });
+
+  it("the home page's lead names pi's model catalog, with a link to the methodology, where a pi snapshot exists", async () => {
+    const html = await piPage("/");
+    const lead = html.match(/<p class="lead">([\s\S]*?)<\/p>/)![1]!;
+    expect(lead).toContain('Built on <a href="https://models.dev">models.dev</a> and <a href="/docs/methodology/#pi">pi\'s model catalog</a>, with our own <a href="/?origin=modified,added">corrections and measurements</a> on top.');
+    expect(lead).not.toMatch(/\d/);
   });
 
   it("the home page says nothing about differences in anything about pi: not in a row, not in a column's title", async () => {
