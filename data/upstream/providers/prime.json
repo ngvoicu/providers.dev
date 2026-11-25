@@ -204,7 +204,10 @@
    "modalities": {
     "input": [
      "text",
-     "image"
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
     ],
     "output": [
      "text"
@@ -1829,10 +1832,34 @@
    },
    "modalities": {
     "input": [
-     "audio",
-     "image",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
      "text",
-     "video"
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp"
     ],
     "output": [
      "text"
@@ -1901,10 +1928,34 @@
    },
    "modalities": {
     "input": [
-     "audio",
-     "image",
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/heic",
+     "image/heif",
      "text",
-     "video"
+     "video/mp4",
+     "video/mpeg",
+     "video/mov",
+     "video/avi",
+     "video/x-flv",
+     "video/mpg",
+     "video/webm",
+     "video/wmv",
+     "video/3gpp"
     ],
     "output": [
      "text"
@@ -4456,6 +4507,80 @@
    "last_updated": "2026-09-29",
    "recommended_api": "chat-completions"
   },
+  "openai/gpt-6.1-sol-pro": {
+   "id": "openai/gpt-6.1-sol-pro",
+   "name": "GPT-6.1 Sol Pro",
+   "description": "Near-Astra performance for complex coding, computer use, and professional work at a lower cost.",
+   "type": "chat",
+   "family": "gpt-sol",
+   "canonical_id": "openai/gpt-6.1-sol",
+   "release_date": "2026-09-29",
+   "limit": {
+    "context": 1050000,
+    "output": 128000
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2
+     },
+     "output": {
+      "price": 10
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.pinference.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-04-30",
+   "last_updated": "2026-09-29",
+   "recommended_api": "chat-completions"
+  },
   "openai/gpt-6.2-astra": {
    "id": "openai/gpt-6.2-astra",
    "name": "GPT-6.2 Astra",
@@ -4501,7 +4626,10 @@
    },
    "modalities": {
     "input": [
-     "image",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
      "text"
     ],
     "output": [
@@ -4572,7 +4700,10 @@
    },
    "modalities": {
     "input": [
-     "image",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
      "text"
     ],
     "output": [
@@ -4876,6 +5007,75 @@
    },
    "open_weights": true,
    "last_updated": "2026-08-14",
+   "recommended_api": "chat-completions"
+  },
+  "ricursiveai/ripple-65b-preview": {
+   "id": "ricursiveai/ripple-65b-preview",
+   "name": "Ripple 65B Preview",
+   "description": "Dense 65B open-weight model pretrained from scratch on 12T tokens and post-trained for agentic coding",
+   "type": "chat",
+   "canonical_id": "ricursiveai/ripple-65b-preview",
+   "release_date": "2026-11-04",
+   "limit": {
+    "context": 1048576,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "medium"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1,
+      "cache": {
+       "read": 0.025,
+       "write": 0.1
+      }
+     },
+     "output": {
+      "price": 0.3
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.pinference.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-11-04",
    "recommended_api": "chat-completions"
   },
   "thinkingmachines/inkling-2-small": {

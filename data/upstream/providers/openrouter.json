@@ -1404,14 +1404,19 @@
   "amazon/titan-embed-image-v1": {
    "id": "amazon/titan-embed-image-v1",
    "name": "Titan Multimodal Embeddings G1",
-   "description": "Multimodal embedding model",
+   "description": "Amazon embedding model that maps text, images or both into one vector space for multimodal search",
    "type": "embedding",
-   "release_date": "2026-10-26",
+   "family": "titan-embed",
+   "canonical_id": "amazon/titan-embed-image-v1",
+   "release_date": "2023-11-29",
    "limit": {
     "context": 128,
-    "output": 0
+    "output": 1024
    },
    "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -1437,9 +1442,7 @@
     "input": [
      "text",
      "image/png",
-     "image/jpeg",
-     "image/webp",
-     "image/gif"
+     "image/jpeg"
     ],
     "output": [
      "embedding"
@@ -1455,20 +1458,25 @@
     }
    },
    "open_weights": false,
-   "last_updated": "2026-10-26",
+   "last_updated": "2023-11-29",
    "recommended_api": "embeddings"
   },
   "amazon/titan-embed-text-v1": {
    "id": "amazon/titan-embed-text-v1",
    "name": "Titan Embeddings G1 - Text",
-   "description": "Text embedding model",
+   "description": "Amazon's first-generation text embedding model for search, personalization and clustering",
    "type": "embedding",
-   "release_date": "2026-10-26",
+   "family": "titan-embed",
+   "canonical_id": "amazon/titan-embed-text-v1",
+   "release_date": "2023-09-28",
    "limit": {
     "context": 8192,
-    "output": 0
+    "output": 1536
    },
    "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -1503,20 +1511,25 @@
     }
    },
    "open_weights": false,
-   "last_updated": "2026-10-26",
+   "last_updated": "2023-09-28",
    "recommended_api": "embeddings"
   },
   "amazon/titan-embed-text-v2": {
    "id": "amazon/titan-embed-text-v2",
    "name": "Titan Text Embeddings V2",
-   "description": "Text embedding model",
+   "description": "Amazon's second-generation text embedding model with selectable output dimensions",
    "type": "embedding",
-   "release_date": "2026-10-26",
+   "family": "titan-embed",
+   "canonical_id": "amazon/titan-embed-text-v2",
+   "release_date": "2024-04-30",
    "limit": {
     "context": 8192,
-    "output": 0
+    "output": 1024
    },
    "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -1551,7 +1564,7 @@
     }
    },
    "open_weights": false,
-   "last_updated": "2026-10-26",
+   "last_updated": "2024-04-30",
    "recommended_api": "embeddings"
   },
   "anthracite-org/magnum-v4-72b": {
@@ -8985,7 +8998,7 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.0456,
+      "price": 0.047,
       "cache": {
        "read": 0.035
       }
@@ -9446,13 +9459,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.0507,
+      "price": 0.14,
       "cache": {
-       "read": 0.001014
+       "read": 0.0042
       }
      },
      "output": {
-      "price": 0.2028
+      "price": 0.42
      }
     }
    },
@@ -9564,13 +9577,281 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.03,
+      "price": 0.15,
       "cache": {
-       "read": 0.001
-      }
+       "read": 0.003
+      },
+      "overrides": [
+       {
+        "when": {
+         "utc_days": {
+          "in": [
+           "sat",
+           "sun"
+          ]
+         }
+        },
+        "price": 0.15,
+        "cache": {
+         "read": 0.003
+        }
+       },
+       {
+        "when": {
+         "utc_hours": {
+          "lt": "01:00"
+         },
+         "utc_days": {
+          "in": [
+           "mon",
+           "tue",
+           "wed",
+           "thu",
+           "fri"
+          ]
+         }
+        },
+        "price": 0.15,
+        "cache": {
+         "read": 0.003
+        }
+       },
+       {
+        "when": {
+         "utc_days": {
+          "in": [
+           "mon",
+           "tue",
+           "wed",
+           "thu",
+           "fri"
+          ]
+         },
+         "all": [
+          {
+           "utc_hours": {
+            "gte": "01:00"
+           }
+          },
+          {
+           "utc_hours": {
+            "lt": "04:00"
+           }
+          }
+         ]
+        },
+        "price": 0.3,
+        "cache": {
+         "read": 0.006
+        }
+       },
+       {
+        "when": {
+         "utc_days": {
+          "in": [
+           "mon",
+           "tue",
+           "wed",
+           "thu",
+           "fri"
+          ]
+         },
+         "all": [
+          {
+           "utc_hours": {
+            "gte": "04:00"
+           }
+          },
+          {
+           "utc_hours": {
+            "lt": "06:00"
+           }
+          }
+         ]
+        },
+        "price": 0.15,
+        "cache": {
+         "read": 0.003
+        }
+       },
+       {
+        "when": {
+         "utc_days": {
+          "in": [
+           "mon",
+           "tue",
+           "wed",
+           "thu",
+           "fri"
+          ]
+         },
+         "all": [
+          {
+           "utc_hours": {
+            "gte": "06:00"
+           }
+          },
+          {
+           "utc_hours": {
+            "lt": "10:00"
+           }
+          }
+         ]
+        },
+        "price": 0.3,
+        "cache": {
+         "read": 0.006
+        }
+       },
+       {
+        "when": {
+         "utc_hours": {
+          "gte": "10:00"
+         },
+         "utc_days": {
+          "in": [
+           "mon",
+           "tue",
+           "wed",
+           "thu",
+           "fri"
+          ]
+         }
+        },
+        "price": 0.15,
+        "cache": {
+         "read": 0.003
+        }
+       }
+      ]
      },
      "output": {
-      "price": 0.2
+      "price": 0.6,
+      "overrides": [
+       {
+        "when": {
+         "utc_days": {
+          "in": [
+           "sat",
+           "sun"
+          ]
+         }
+        },
+        "price": 0.6
+       },
+       {
+        "when": {
+         "utc_hours": {
+          "lt": "01:00"
+         },
+         "utc_days": {
+          "in": [
+           "mon",
+           "tue",
+           "wed",
+           "thu",
+           "fri"
+          ]
+         }
+        },
+        "price": 0.6
+       },
+       {
+        "when": {
+         "utc_days": {
+          "in": [
+           "mon",
+           "tue",
+           "wed",
+           "thu",
+           "fri"
+          ]
+         },
+         "all": [
+          {
+           "utc_hours": {
+            "gte": "01:00"
+           }
+          },
+          {
+           "utc_hours": {
+            "lt": "04:00"
+           }
+          }
+         ]
+        },
+        "price": 1.2
+       },
+       {
+        "when": {
+         "utc_days": {
+          "in": [
+           "mon",
+           "tue",
+           "wed",
+           "thu",
+           "fri"
+          ]
+         },
+         "all": [
+          {
+           "utc_hours": {
+            "gte": "04:00"
+           }
+          },
+          {
+           "utc_hours": {
+            "lt": "06:00"
+           }
+          }
+         ]
+        },
+        "price": 0.6
+       },
+       {
+        "when": {
+         "utc_days": {
+          "in": [
+           "mon",
+           "tue",
+           "wed",
+           "thu",
+           "fri"
+          ]
+         },
+         "all": [
+          {
+           "utc_hours": {
+            "gte": "06:00"
+           }
+          },
+          {
+           "utc_hours": {
+            "lt": "10:00"
+           }
+          }
+         ]
+        },
+        "price": 1.2
+       },
+       {
+        "when": {
+         "utc_hours": {
+          "gte": "10:00"
+         },
+         "utc_days": {
+          "in": [
+           "mon",
+           "tue",
+           "wed",
+           "thu",
+           "fri"
+          ]
+         }
+        },
+        "price": 0.6
+       }
+      ]
      }
     }
    },
@@ -22282,8 +22563,8 @@
    "canonical_id": "minimax/MiniMax-M2.5",
    "release_date": "2026-02-12",
    "limit": {
-    "context": 198000,
-    "output": 32768
+    "context": 65536,
+    "output": 65536
    },
    "capabilities": {
     "temperature": true,
@@ -22302,13 +22583,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.27,
+      "price": 0.3,
       "cache": {
-       "read": 0.03
+       "read": 0.06
       }
      },
      "output": {
-      "price": 0.95
+      "price": 1.2
      }
     }
    },
@@ -22613,7 +22894,7 @@
    "release_date": "2026-10-19",
    "limit": {
     "context": 1048576,
-    "output": 512000
+    "output": 131072
    },
    "capabilities": {
     "temperature": true,
@@ -22639,13 +22920,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.1,
+      "price": 0.075,
       "cache": {
-       "read": 0.025
+       "read": 0.0075
       }
      },
      "output": {
-      "price": 0.4
+      "price": 0.3
      }
     }
    },
@@ -43849,13 +44130,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.05,
+      "price": 0.1,
       "cache": {
-       "read": 0.025
+       "read": 0.035
       }
      },
      "output": {
-      "price": 0.7
+      "price": 0.89
      }
     }
    },
@@ -44765,7 +45046,7 @@
    "release_date": "2026-08-14",
    "limit": {
     "context": 1024000,
-    "output": 32768
+    "output": 131072
    },
    "capabilities": {
     "temperature": true,
@@ -44790,13 +45071,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.06,
+      "price": 0.035,
       "cache": {
-       "read": 0.059
+       "read": 0.0175
       }
      },
      "output": {
-      "price": 1.96
+      "price": 1.5
      }
     }
    },
@@ -51730,6 +52011,119 @@
    "last_updated": "2026-10-08",
    "recommended_api": "systemone"
   },
+  "upstage/solar-mini-4-5": {
+   "id": "upstage/solar-mini-4-5",
+   "name": "Solar Mini 4.5 (Preview)",
+   "description": "Efficient model for low-latency assistance, extraction, and routine automation",
+   "type": "chat",
+   "family": "solar-mini",
+   "release_date": "2026-11-24",
+   "limit": {
+    "context": 524288,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.01,
+      "cache": {
+       "read": 0.001
+      }
+     },
+     "output": {
+      "price": 0.04
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@openrouter/ai-sdk-provider",
+      "opencodeai": "@opencode/ai/providers/openrouter"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-24",
+   "recommended_api": "chat-completions"
+  },
   "upstage/solar-mini4": {
    "id": "upstage/solar-mini4",
    "name": "Solar Mini 4",
@@ -51846,6 +52240,119 @@
    "open_weights": false,
    "knowledge": "2026-02",
    "last_updated": "2026-09-22",
+   "recommended_api": "chat-completions"
+  },
+  "upstage/solar-pro-4-contributor": {
+   "id": "upstage/solar-pro-4-contributor",
+   "name": "Solar Pro 4 Contributor",
+   "description": "Flagship model for demanding analysis, coding, and production agent workflows",
+   "type": "chat",
+   "family": "solar-pro",
+   "release_date": "2026-11-24",
+   "limit": {
+    "context": 524288,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "minimal",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.09,
+      "cache": {
+       "read": 0.018
+      }
+     },
+     "output": {
+      "price": 0.36
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@openrouter/ai-sdk-provider",
+      "opencodeai": "@opencode/ai/providers/openrouter"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-24",
    "recommended_api": "chat-completions"
   },
   "upstage/solar-pro4": {
@@ -53321,134 +53828,6 @@
    "last_updated": "2026-03-16",
    "recommended_api": "speech"
   },
-  "xiaomi/mimo-v2.5": {
-   "id": "xiaomi/mimo-v2.5",
-   "name": "MiMo-V2.5",
-   "description": "Open MiMo model for multimodal coding agents and long-context automation",
-   "type": "chat",
-   "family": "mimo",
-   "canonical_id": "xiaomi/mimo-v2.5",
-   "status": "deprecated",
-   "release_date": "2026-04-22",
-   "limit": {
-    "context": 1000000,
-    "output": 65536
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.4,
-      "cache": {
-       "read": 0.08
-      }
-     },
-     "output": {
-      "price": 2
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "image/bmp",
-     "audio/mpeg",
-     "audio/wav",
-     "audio/flac",
-     "audio/mp4",
-     "audio/ogg",
-     "video/mp4",
-     "video/quicktime",
-     "video/x-msvideo",
-     "video/x-ms-wmv"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@openrouter/ai-sdk-provider",
-      "opencodeai": "@opencode/ai/providers/openrouter"
-     },
-     "capabilities": {
-      "system_updates": true,
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     },
-     "compatibility": {
-      "reasoning_field": "reasoning_details"
-     }
-    },
-    "responses": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    },
-    "messages": {
-     "base_url": "https://openrouter.ai/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/anthropic",
-      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "none",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    }
-   },
-   "open_weights": true,
-   "knowledge": "2024-12",
-   "last_updated": "2026-04-22",
-   "recommended_api": "chat-completions"
-  },
   "xiaomi/mimo-v2.6-flash": {
    "id": "xiaomi/mimo-v2.6-flash",
    "name": "MiMo-V2.6-Flash",
@@ -53570,6 +53949,114 @@
    },
    "open_weights": true,
    "last_updated": "2026-09-22",
+   "recommended_api": "chat-completions"
+  },
+  "xiaomi/mimo-v2.6-flash-mopd": {
+   "id": "xiaomi/mimo-v2.6-flash-mopd",
+   "name": "MiMo-V2.6-Flash-MOPD",
+   "description": "MiMo flash model for fast multimodal assistance and agent workflows",
+   "type": "chat",
+   "family": "mimo",
+   "release_date": "2026-11-23",
+   "limit": {
+    "context": 1048576,
+    "output": 32768
+   },
+   "capabilities": {
+    "temperature": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.15,
+      "cache": {
+       "read": 0.02
+      }
+     },
+     "output": {
+      "price": 0.42
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image",
+     "video",
+     "audio"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@openrouter/ai-sdk-provider",
+      "opencodeai": "@opencode/ai/providers/openrouter"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-11-23",
    "recommended_api": "chat-completions"
   },
   "xiaomi/mimo-v2.6-pro": {
@@ -55190,13 +55677,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.15,
+      "price": 0.12,
       "cache": {
-       "read": 0.03
+       "read": 0.02
       }
      },
      "output": {
-      "price": 0.5
+      "price": 0.38
      }
     }
    },
@@ -56296,7 +56783,7 @@
    "release_date": "2026-09-14",
    "limit": {
     "context": 1048576,
-    "output": 393216
+    "output": 943718
    },
    "capabilities": {
     "temperature": true,
@@ -56319,13 +56806,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.03,
+      "price": 0.036,
       "cache": {
-       "read": 0.001
+       "read": 0.01
       }
      },
      "output": {
-      "price": 0.2
+      "price": 0.5
      }
     }
    },
@@ -56521,7 +57008,7 @@
    "release_date": "2026-08-01",
    "limit": {
     "context": 1048576,
-    "output": 131072
+    "output": 943718
    },
    "capabilities": {
     "temperature": true,
@@ -56544,13 +57031,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.04532,
+      "price": 0.047,
       "cache": {
-       "read": 0.001442
+       "read": 0.035
       }
      },
      "output": {
-      "price": 0.13596
+      "price": 0.3
      }
     }
    },

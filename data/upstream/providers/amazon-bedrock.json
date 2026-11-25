@@ -9,6 +9,73 @@
   "AWS_BEARER_TOKEN_BEDROCK"
  ],
  "models": {
+  "amazon.nova-2-5-sonic": {
+   "id": "amazon.nova-2-5-sonic",
+   "name": "Nova 2.5 Sonic",
+   "description": "Amazon speech-to-speech model for real-time voice agents, with better tool calling and lower latency than Nova 2 Sonic",
+   "type": "realtime",
+   "canonical_id": "amazon/nova-2-5-sonic",
+   "release_date": "2026-10-05",
+   "limit": {
+    "context": 256000,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.33
+     },
+     "output": {
+      "price": 2.75
+     }
+    },
+    "audio": {
+     "input": {
+      "price": 3
+     },
+     "output": {
+      "price": 12
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "audio/lpcm"
+    ],
+    "output": [
+     "text",
+     "audio/lpcm"
+    ]
+   },
+   "api": {
+    "invoke-model-with-bidirectional-stream": {
+     "base_url": "https://bedrock-runtime.${AWS_REGION}.amazonaws.com",
+     "sdk": {},
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-10-05",
+   "recommended_api": "invoke-model-with-bidirectional-stream"
+  },
   "amazon.nova-2-lite-v1:0": {
    "id": "amazon.nova-2-lite-v1:0",
    "name": "Nova 2 Lite",
@@ -138,6 +205,161 @@
    "knowledge": "2025-10",
    "last_updated": "2025-12-01",
    "recommended_api": "converse"
+  },
+  "amazon.nova-2-multimodal-embeddings-v1:0": {
+   "id": "amazon.nova-2-multimodal-embeddings-v1:0",
+   "name": "Nova Multimodal Embeddings",
+   "description": "Amazon embedding model that maps text, documents, images, video and audio into one vector space",
+   "type": "embedding",
+   "canonical_id": "amazon/nova-2-multimodal-embeddings",
+   "release_date": "2025-10-28",
+   "limit": {
+    "context": 8192,
+    "output": 3072
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.135
+     }
+    },
+    "image": {
+     "input": {
+      "unit": "image",
+      "price": 0.00006
+     }
+    },
+    "audio": {
+     "input": {
+      "unit": "second",
+      "price": 0.00014
+     }
+    },
+    "video": {
+     "input": {
+      "unit": "second",
+      "price": 0.0007
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/gif",
+     "audio/mpeg",
+     "audio/wav",
+     "audio/ogg",
+     "video/mp4",
+     "video/quicktime",
+     "video/x-matroska",
+     "video/webm",
+     "video/x-flv",
+     "video/mpeg",
+     "video/x-ms-wmv",
+     "video/3gpp"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "api": {
+    "invoke-model": {
+     "base_url": "https://bedrock-runtime.${AWS_REGION}.amazonaws.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/amazon-bedrock"
+     }
+    },
+    "start-async-invoke": {
+     "base_url": "https://bedrock-runtime.${AWS_REGION}.amazonaws.com",
+     "sdk": {}
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-10-28",
+   "recommended_api": "invoke-model"
+  },
+  "amazon.nova-2-sonic-v1:0": {
+   "id": "amazon.nova-2-sonic-v1:0",
+   "name": "Nova 2 Sonic",
+   "description": "Amazon speech-to-speech model for real-time voice conversations with tool calling",
+   "type": "realtime",
+   "canonical_id": "amazon/nova-2-sonic",
+   "release_date": "2025-12-02",
+   "limit": {
+    "context": 1000000,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.33
+     },
+     "output": {
+      "price": 2.75
+     }
+    },
+    "audio": {
+     "input": {
+      "price": 3
+     },
+     "output": {
+      "price": 12
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "audio/lpcm"
+    ],
+    "output": [
+     "text",
+     "audio/lpcm"
+    ]
+   },
+   "api": {
+    "invoke-model-with-bidirectional-stream": {
+     "base_url": "https://bedrock-runtime.${AWS_REGION}.amazonaws.com",
+     "sdk": {},
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-12-02",
+   "recommended_api": "invoke-model-with-bidirectional-stream"
   },
   "amazon.nova-lite-v1:0": {
    "id": "amazon.nova-lite-v1:0",
@@ -424,6 +646,170 @@
    "knowledge": "2024-10",
    "last_updated": "2024-12-03",
    "recommended_api": "converse"
+  },
+  "amazon.titan-embed-image-v1": {
+   "id": "amazon.titan-embed-image-v1",
+   "name": "Titan Multimodal Embeddings G1",
+   "description": "Amazon embedding model that maps text, images or both into one vector space for multimodal search",
+   "type": "embedding",
+   "family": "titan-embed",
+   "canonical_id": "amazon/titan-embed-image-v1",
+   "release_date": "2023-11-29",
+   "limit": {
+    "context": 256,
+    "output": 1024
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.8
+     }
+    },
+    "image": {
+     "input": {
+      "unit": "image",
+      "price": 0.00006
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "api": {
+    "invoke-model": {
+     "base_url": "https://bedrock-runtime.${AWS_REGION}.amazonaws.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/amazon-bedrock"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2023-11-29",
+   "recommended_api": "invoke-model"
+  },
+  "amazon.titan-embed-text-v1": {
+   "id": "amazon.titan-embed-text-v1",
+   "name": "Titan Embeddings G1 - Text",
+   "description": "Amazon's first-generation text embedding model for search, personalization and clustering",
+   "type": "embedding",
+   "family": "titan-embed",
+   "canonical_id": "amazon/titan-embed-text-v1",
+   "release_date": "2023-09-28",
+   "limit": {
+    "context": 8192,
+    "output": 1536
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "api": {
+    "invoke-model": {
+     "base_url": "https://bedrock-runtime.${AWS_REGION}.amazonaws.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/amazon-bedrock"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2023-09-28",
+   "recommended_api": "invoke-model"
+  },
+  "amazon.titan-embed-text-v2:0": {
+   "id": "amazon.titan-embed-text-v2:0",
+   "name": "Titan Text Embeddings V2",
+   "description": "Amazon's second-generation text embedding model with selectable output dimensions",
+   "type": "embedding",
+   "family": "titan-embed",
+   "canonical_id": "amazon/titan-embed-text-v2",
+   "release_date": "2024-04-30",
+   "limit": {
+    "context": 8192,
+    "output": 1024
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.02
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "api": {
+    "invoke-model": {
+     "base_url": "https://bedrock-runtime.${AWS_REGION}.amazonaws.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/amazon-bedrock"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2024-04-30",
+   "recommended_api": "invoke-model"
   },
   "anthropic.claude-fable-5": {
    "id": "anthropic.claude-fable-5",
@@ -3897,6 +4283,182 @@
    "last_updated": "2024-12-03",
    "recommended_api": "converse"
   },
+  "cohere.embed-english-v3": {
+   "id": "cohere.embed-english-v3",
+   "name": "Embed English 3",
+   "description": "English embedding model for search, classification, and clustering",
+   "type": "embedding",
+   "family": "cohere-embed",
+   "canonical_id": "cohere/embed-english-v3.0",
+   "release_date": "2023-11-02",
+   "limit": {
+    "context": 512,
+    "output": 1024
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1
+     }
+    },
+    "image": {
+     "input": {
+      "unit": "image",
+      "price": 0.0001
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "api": {
+    "invoke-model": {
+     "base_url": "https://bedrock-runtime.${AWS_REGION}.amazonaws.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/amazon-bedrock"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2023-11-02",
+   "recommended_api": "invoke-model"
+  },
+  "cohere.embed-multilingual-v3": {
+   "id": "cohere.embed-multilingual-v3",
+   "name": "Embed Multilingual 3",
+   "description": "Multilingual embedding model covering over 100 languages",
+   "type": "embedding",
+   "family": "cohere-embed",
+   "canonical_id": "cohere/embed-multilingual-v3.0",
+   "release_date": "2023-11-02",
+   "limit": {
+    "context": 512,
+    "output": 1024
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1
+     }
+    },
+    "image": {
+     "input": {
+      "unit": "image",
+      "price": 0.0001
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "api": {
+    "invoke-model": {
+     "base_url": "https://bedrock-runtime.${AWS_REGION}.amazonaws.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/amazon-bedrock"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2023-11-02",
+   "recommended_api": "invoke-model"
+  },
+  "cohere.embed-v4:0": {
+   "id": "cohere.embed-v4:0",
+   "name": "Embed 4",
+   "description": "Multimodal embedding model for text, images, and mixed text-and-image documents",
+   "type": "embedding",
+   "family": "cohere-embed",
+   "canonical_id": "cohere/embed-v4.0",
+   "release_date": "2025-04-15",
+   "limit": {
+    "context": 128000,
+    "output": 1536
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.12
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp",
+     "image/gif"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "api": {
+    "invoke-model": {
+     "base_url": "https://bedrock-runtime.${AWS_REGION}.amazonaws.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/amazon-bedrock"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-04-15",
+   "recommended_api": "invoke-model"
+  },
   "deepseek.r1-v1:0": {
    "id": "deepseek.r1-v1:0",
    "name": "DeepSeek-R1",
@@ -6047,6 +6609,62 @@
    "last_updated": "2026-09-28",
    "recommended_api": "converse"
   },
+  "eu.cohere.embed-v4:0": {
+   "id": "eu.cohere.embed-v4:0",
+   "name": "Embed 4",
+   "description": "Multimodal embedding model for text, images, and mixed text-and-image documents",
+   "type": "embedding",
+   "family": "cohere-embed",
+   "canonical_id": "cohere/embed-v4.0",
+   "release_date": "2025-04-15",
+   "limit": {
+    "context": 128000,
+    "output": 1536
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.12
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp",
+     "image/gif"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "api": {
+    "invoke-model": {
+     "base_url": "https://bedrock-runtime.${AWS_REGION}.amazonaws.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/amazon-bedrock"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-04-15",
+   "recommended_api": "invoke-model"
+  },
   "eu.mistral.pixtral-large-2502-v1:0": {
    "id": "eu.mistral.pixtral-large-2502-v1:0",
    "name": "Pixtral Large (25.02) (EU)",
@@ -6112,6 +6730,58 @@
    "open_weights": false,
    "last_updated": "2025-04-08",
    "recommended_api": "converse"
+  },
+  "eu.twelvelabs.marengo-embed-3-0-v1:0": {
+   "id": "eu.twelvelabs.marengo-embed-3-0-v1:0",
+   "name": "Marengo 3.0",
+   "description": "TwelveLabs video understanding embedding model for any-to-any search across video, audio, images and text",
+   "type": "embedding",
+   "canonical_id": "twelvelabs/marengo3.0",
+   "release_date": "2025-12-01",
+   "limit": {
+    "context": 500,
+    "output": 512
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "image": {
+     "input": {
+      "unit": "image",
+      "price": 0.0001
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "api": {
+    "invoke-model": {
+     "base_url": "https://bedrock-runtime.${AWS_REGION}.amazonaws.com",
+     "sdk": {}
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-12-01",
+   "recommended_api": "invoke-model"
   },
   "global.amazon.nova-2-lite-v1:0": {
    "id": "global.amazon.nova-2-lite-v1:0",
@@ -11824,6 +12494,69 @@
    "last_updated": "2026-06-30",
    "recommended_api": "converse"
   },
+  "luma.ray-v2:0": {
+   "id": "luma.ray-v2:0",
+   "name": "Ray2",
+   "description": "Luma AI video generation model for realistic clips with natural, coherent motion from text or image keyframes",
+   "type": "video",
+   "family": "ray",
+   "canonical_id": "luma/ray-2",
+   "release_date": "2025-01-15",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "video": {
+     "output": {
+      "unit": "second",
+      "price": 1.5,
+      "overrides": [
+       {
+        "when": {
+         "resolution": {
+          "equals": "540p"
+         }
+        },
+        "price": 0.75
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png"
+    ],
+    "output": [
+     "video/mp4"
+    ]
+   },
+   "api": {
+    "start-async-invoke": {
+     "base_url": "https://bedrock-runtime.${AWS_REGION}.amazonaws.com",
+     "sdk": {}
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-01-15",
+   "recommended_api": "start-async-invoke"
+  },
   "meta.llama3-1-70b-instruct-v1:0": {
    "id": "meta.llama3-1-70b-instruct-v1:0",
    "name": "Llama 3.1 70B Instruct",
@@ -17107,6 +17840,78 @@
    "last_updated": "2025-11-25",
    "recommended_api": "converse"
   },
+  "twelvelabs.marengo-embed-3-0-v1:0": {
+   "id": "twelvelabs.marengo-embed-3-0-v1:0",
+   "name": "Marengo 3.0",
+   "description": "TwelveLabs video understanding embedding model for any-to-any search across video, audio, images and text",
+   "type": "embedding",
+   "canonical_id": "twelvelabs/marengo3.0",
+   "release_date": "2025-12-01",
+   "limit": {
+    "context": 500,
+    "output": 512
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "image": {
+     "input": {
+      "unit": "image",
+      "price": 0.0001
+     }
+    },
+    "audio": {
+     "input": {
+      "unit": "second",
+      "price": 0.00014
+     }
+    },
+    "video": {
+     "input": {
+      "unit": "second",
+      "price": 0.0007
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "audio/wav",
+     "audio/mpeg",
+     "audio/flac",
+     "video"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "api": {
+    "invoke-model": {
+     "base_url": "https://bedrock-runtime.${AWS_REGION}.amazonaws.com",
+     "sdk": {}
+    },
+    "start-async-invoke": {
+     "base_url": "https://bedrock-runtime.${AWS_REGION}.amazonaws.com",
+     "sdk": {}
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-12-01",
+   "recommended_api": "invoke-model"
+  },
   "us-gov.openai.gpt-oss-120b-1:0": {
    "id": "us-gov.openai.gpt-oss-120b-1:0",
    "name": "gpt-oss-120b (GovCloud)",
@@ -19540,6 +20345,62 @@
    "last_updated": "2026-09-28",
    "recommended_api": "converse"
   },
+  "us.cohere.embed-v4:0": {
+   "id": "us.cohere.embed-v4:0",
+   "name": "Embed 4",
+   "description": "Multimodal embedding model for text, images, and mixed text-and-image documents",
+   "type": "embedding",
+   "family": "cohere-embed",
+   "canonical_id": "cohere/embed-v4.0",
+   "release_date": "2025-04-15",
+   "limit": {
+    "context": 128000,
+    "output": 1536
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.12
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp",
+     "image/gif"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "api": {
+    "invoke-model": {
+     "base_url": "https://bedrock-runtime.${AWS_REGION}.amazonaws.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/amazon-bedrock"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-04-15",
+   "recommended_api": "invoke-model"
+  },
   "us.deepseek.r1-v1:0": {
    "id": "us.deepseek.r1-v1:0",
    "name": "DeepSeek-R1 (US)",
@@ -21418,6 +22279,58 @@
    "knowledge": "2026-06-01",
    "last_updated": "2026-11-17",
    "recommended_api": "converse"
+  },
+  "us.twelvelabs.marengo-embed-3-0-v1:0": {
+   "id": "us.twelvelabs.marengo-embed-3-0-v1:0",
+   "name": "Marengo 3.0",
+   "description": "TwelveLabs video understanding embedding model for any-to-any search across video, audio, images and text",
+   "type": "embedding",
+   "canonical_id": "twelvelabs/marengo3.0",
+   "release_date": "2025-12-01",
+   "limit": {
+    "context": 500,
+    "output": 512
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "image": {
+     "input": {
+      "unit": "image",
+      "price": 0.0001
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png"
+    ],
+    "output": [
+     "embedding"
+    ]
+   },
+   "api": {
+    "invoke-model": {
+     "base_url": "https://bedrock-runtime.${AWS_REGION}.amazonaws.com",
+     "sdk": {}
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-12-01",
+   "recommended_api": "invoke-model"
   },
   "us.writer.palmyra-x4-v1:0": {
    "id": "us.writer.palmyra-x4-v1:0",

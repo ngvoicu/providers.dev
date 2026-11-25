@@ -342,6 +342,107 @@
    "last_updated": "2024-01-30",
    "recommended_api": "embeddings"
   },
+  "ByteDance/Seed-1.8": {
+   "id": "ByteDance/Seed-1.8",
+   "name": "Seed 1.8",
+   "description": "ByteDance Seed model for multimodal reasoning, long-context analysis, and agent workflows",
+   "type": "chat",
+   "family": "seed",
+   "canonical_id": "bytedance-seed/seed-1-8",
+   "release_date": "2025-12-28",
+   "limit": {
+    "context": 256000,
+    "output": 64000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "prompt_cache_key": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.25,
+      "cache": {
+       "read": 0.05
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 128000
+         }
+        },
+        "price": 0.5,
+        "cache": {
+         "read": 0.1
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 2,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 128000
+         }
+        },
+        "price": 4
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.deepinfra.com/v1/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/deepinfra",
+      "opencodeai": "@opencode/ai/providers/deepinfra"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2025-12-28",
+   "recommended_api": "chat-completions"
+  },
   "ByteDance/Seed-2.0-code": {
    "id": "ByteDance/Seed-2.0-code",
    "name": "Seed 2.0 Code",
@@ -4583,6 +4684,223 @@
    "last_updated": "2026-04-02",
    "recommended_api": "chat-completions"
   },
+  "ibm-granite/granite-4.2-8b": {
+   "id": "ibm-granite/granite-4.2-8b",
+   "name": "Granite 4.2 8B",
+   "description": "Reasoning model for deliberate analysis, multi-step problem solving, and tool use",
+   "type": "chat",
+   "family": "granite",
+   "canonical_id": "ibm/granite-4.2-8b",
+   "release_date": "2026-08-25",
+   "limit": {
+    "context": 131072,
+    "output": 117964
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "prompt_cache_key": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.06,
+      "cache": {
+       "read": 0.015
+      }
+     },
+     "output": {
+      "price": 0.25
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.deepinfra.com/v1/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/deepinfra",
+      "opencodeai": "@opencode/ai/providers/deepinfra"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-25",
+   "recommended_api": "chat-completions"
+  },
+  "inclusionAI/Ling-3.0-flash": {
+   "id": "inclusionAI/Ling-3.0-flash",
+   "name": "Ling 3.0 Flash",
+   "description": "Hybrid-linear MoE reasoning model with 124B total and 5.1B active parameters for efficient agents",
+   "type": "chat",
+   "family": "ling-flash",
+   "canonical_id": "inclusionai/ling-3.0-flash",
+   "release_date": "2026-07-23",
+   "limit": {
+    "context": 131072,
+    "output": 32768
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "prompt_cache_key": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.06,
+      "cache": {
+       "read": 0.012
+      }
+     },
+     "output": {
+      "price": 0.18
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.deepinfra.com/v1/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/deepinfra",
+      "opencodeai": "@opencode/ai/providers/deepinfra"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-07-23",
+   "recommended_api": "chat-completions"
+  },
+  "inclusionAI/Ling-3.0-flash-VL": {
+   "id": "inclusionAI/Ling-3.0-flash-VL",
+   "name": "Ling 3.0 Flash VL",
+   "description": "Native multimodal hybrid MoE model for image and video understanding, reasoning, and visual agents",
+   "type": "chat",
+   "family": "ling-flash",
+   "canonical_id": "inclusionai/ling-3.0-flash-vl",
+   "release_date": "2026-09-10",
+   "limit": {
+    "context": 131072,
+    "output": 32768
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "prompt_cache_key": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.06,
+      "cache": {
+       "read": 0.012
+      }
+     },
+     "output": {
+      "price": 0.18
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp",
+     "video"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.deepinfra.com/v1/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/deepinfra",
+      "opencodeai": "@opencode/ai/providers/deepinfra"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-09-10",
+   "recommended_api": "chat-completions"
+  },
   "intfloat/e5-base-v2": {
    "id": "intfloat/e5-base-v2",
    "name": "E5 Base v2",
@@ -5126,6 +5444,85 @@
    "last_updated": "2024-07-23",
    "recommended_api": "chat-completions"
   },
+  "meta-models/Muse-Glimmer-30B": {
+   "id": "meta-models/Muse-Glimmer-30B",
+   "name": "Muse Glimmer 30B",
+   "description": "Muse Glimmer is a 30-billion-parameter open-weight multimodal model from Meta Superintelligence Labs, distilled from Muse Spark for always-on local agents, tool use, coding, and image understanding.",
+   "type": "chat",
+   "family": "muse-glimmer",
+   "canonical_id": "meta/muse-glimmer-30b",
+   "release_date": "2026-08-10",
+   "limit": {
+    "context": 131072,
+    "output": 131072
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "prompt_cache_key": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.3,
+      "cache": {
+       "read": 0.04
+      }
+     },
+     "output": {
+      "price": 1.2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.deepinfra.com/v1/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/deepinfra",
+      "opencodeai": "@opencode/ai/providers/deepinfra"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2026-01-04",
+   "last_updated": "2026-08-10",
+   "recommended_api": "chat-completions"
+  },
   "mistralai/Mistral-Nemo-Instruct-2407": {
    "id": "mistralai/Mistral-Nemo-Instruct-2407",
    "name": "Mistral Nemo",
@@ -5661,6 +6058,281 @@
    },
    "open_weights": true,
    "last_updated": "2026-10-23",
+   "recommended_api": "chat-completions"
+  },
+  "nvidia/NVIDIA-Nemotron-3-Super-120B-A12B": {
+   "id": "nvidia/NVIDIA-Nemotron-3-Super-120B-A12B",
+   "name": "Nemotron 3 Super 120B A12B",
+   "description": "Nemotron middle tier for collaborative agents and high-volume reasoning workloads",
+   "type": "chat",
+   "family": "nemotron-super",
+   "canonical_id": "nvidia/nemotron-3-super-120b-a12b",
+   "release_date": "2026-03-11",
+   "limit": {
+    "context": 262144,
+    "output": 262144
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "service_tier": [
+     "flex",
+     "priority"
+    ],
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.075
+     },
+     "output": {
+      "price": 0.4
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": 1.5
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": 0.8
+     }
+    ]
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.deepinfra.com/v1/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/deepinfra",
+      "opencodeai": "@opencode/ai/providers/deepinfra"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-06",
+   "last_updated": "2026-03-11",
+   "recommended_api": "chat-completions"
+  },
+  "nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B": {
+   "id": "nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B",
+   "name": "Nemotron 3 Ultra 550B A55B",
+   "description": "Largest Nemotron 3 model for maximum open-weight reasoning and agent accuracy",
+   "type": "chat",
+   "family": "nemotron-ultra",
+   "canonical_id": "nvidia/nemotron-3-ultra-550b-a55b",
+   "release_date": "2026-06-04",
+   "limit": {
+    "context": 262144,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true,
+     "explicit": {
+      "ttl": [
+       "5m",
+       "1h"
+      ],
+      "min_tokens": 8192
+     }
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "prompt_cache_key": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "service_tier": [
+     "flex",
+     "priority"
+    ],
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "medium",
+      "high"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.5,
+      "cache": {
+       "read": 0.1,
+       "explicit": {
+        "write": {
+         "5m": 0.625,
+         "1h": 1
+        }
+       }
+      }
+     },
+     "output": {
+      "price": 2.2
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": 1.5
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": 0.8
+     }
+    ]
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.deepinfra.com/v1/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/deepinfra",
+      "opencodeai": "@opencode/ai/providers/deepinfra"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-09",
+   "last_updated": "2026-06-04",
+   "recommended_api": "chat-completions"
+  },
+  "nvidia/NVIDIA-Nemotron-3.5-Lightning": {
+   "id": "nvidia/NVIDIA-Nemotron-3.5-Lightning",
+   "name": "Nemotron 3.5 Lightning 30B A3B",
+   "description": "Fast NVIDIA Nemotron MoE for reliable agentic tasks across enterprise workloads",
+   "type": "chat",
+   "family": "nemotron-lightning",
+   "canonical_id": "nvidia/nemotron-3.5-lightning",
+   "release_date": "2026-08-11",
+   "limit": {
+    "context": 262144,
+    "output": 262144
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "prompt_cache_key": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "default": {
+      "type": "toggle",
+      "value": false
+     }
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.06,
+      "cache": {
+       "read": 0.03
+      }
+     },
+     "output": {
+      "price": 0.16
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.deepinfra.com/v1/openai",
+     "sdk": {
+      "aisdk": "@ai-sdk/deepinfra",
+      "opencodeai": "@opencode/ai/providers/deepinfra"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2025-09",
+   "last_updated": "2026-08-11",
    "recommended_api": "chat-completions"
   },
   "nvidia/Nemotron-3-Embed-1B-BF16": {

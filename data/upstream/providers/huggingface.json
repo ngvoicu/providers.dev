@@ -266,7 +266,7 @@
    "canonical_id": "gryphe/mythomax-l2-13b",
    "release_date": "2023-08-10",
    "limit": {
-    "context": 4096,
+    "context": 8192,
     "output": 3200
    },
    "capabilities": {
@@ -506,10 +506,7 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.3,
-      "cache": {
-       "read": 0.03
-      }
+      "price": 0.3
      },
      "output": {
       "price": 1.2
@@ -567,7 +564,7 @@
    "canonical_id": "minimax/MiniMax-M2.7",
    "release_date": "2026-03-18",
    "limit": {
-    "context": 204800,
+    "context": 196608,
     "output": 131072
    },
    "capabilities": {
@@ -587,13 +584,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.3,
-      "cache": {
-       "read": 0.06
-      }
+      "price": 0.6
      },
      "output": {
-      "price": 1.2
+      "price": 1.8
      }
     }
    },
@@ -648,8 +642,8 @@
    "canonical_id": "minimax/MiniMax-M3",
    "release_date": "2026-06-01",
    "limit": {
-    "context": 262144,
-    "output": 262144
+    "context": 1048576,
+    "output": 512000
    },
    "capabilities": {
     "temperature": true,
@@ -729,7 +723,7 @@
    "canonical_id": "minimax/MiniMax-M3.1-Flash",
    "release_date": "2026-10-19",
    "limit": {
-    "context": 1000000,
+    "context": 1048576,
     "output": 512000
    },
    "capabilities": {
@@ -755,10 +749,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.15
+      "price": 0.075
      },
      "output": {
-      "price": 0.6
+      "price": 0.3
      }
     }
    },
@@ -886,6 +880,74 @@
    "last_updated": "2024-08-18",
    "recommended_api": "chat-completions"
   },
+  "NousResearch/Hermes-4-405B": {
+   "id": "NousResearch/Hermes-4-405B",
+   "name": "Hermes 4 405B",
+   "description": "Reasoning model for deliberate analysis, multi-step problem solving, and tool use",
+   "type": "chat",
+   "family": "hermes",
+   "canonical_id": "nousresearch/hermes-4-405b",
+   "release_date": "2025-08-26",
+   "limit": {
+    "context": 131072,
+    "output": 117964
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1
+     },
+     "output": {
+      "price": 3
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-08-31",
+   "last_updated": "2025-08-26",
+   "recommended_api": "chat-completions"
+  },
   "Qwen/Qwen2.5-Coder-32B-Instruct": {
    "id": "Qwen/Qwen2.5-Coder-32B-Instruct",
    "name": "Qwen2.5-Coder-32B-Instruct",
@@ -972,7 +1034,7 @@
    "canonical_id": "alibaba/qwen3-235b-a22b-instruct-2507",
    "release_date": "2025-07-21",
    "limit": {
-    "context": 131072,
+    "context": 262144,
     "output": 16384
    },
    "capabilities": {
@@ -992,10 +1054,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.14
+      "price": 0.09
      },
      "output": {
-      "price": 0.8
+      "price": 0.55
      }
     }
    },
@@ -1049,7 +1111,7 @@
    "canonical_id": "alibaba/qwen3-235b-a22b-thinking-2507",
    "release_date": "2025-07-25",
    "limit": {
-    "context": 262144,
+    "context": 128000,
     "output": 81920
    },
    "capabilities": {
@@ -1068,10 +1130,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.3
+      "price": 0.45
      },
      "output": {
-      "price": 3
+      "price": 3.5
      }
     }
    },
@@ -1223,7 +1285,7 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.09
+      "price": 0.1
      },
      "output": {
       "price": 0.3
@@ -1461,10 +1523,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.07
+      "price": 0.15
      },
      "output": {
-      "price": 0.26
+      "price": 0.6
      }
     }
    },
@@ -1519,7 +1581,7 @@
    "canonical_id": "alibaba/qwen3-coder-480b-a35b-instruct",
    "release_date": "2025-07-22",
    "limit": {
-    "context": 256000,
+    "context": 262144,
     "output": 65536
    },
    "capabilities": {
@@ -1538,10 +1600,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.35
+      "price": 0.3
      },
      "output": {
-      "price": 1.5
+      "price": 1
      }
     }
    },
@@ -1615,10 +1677,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.2
+      "price": 0.12
      },
      "output": {
-      "price": 1.5
+      "price": 0.8
      }
     }
    },
@@ -1862,10 +1924,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.25
+      "price": 0.09
      },
      "output": {
-      "price": 1
+      "price": 1.1
      }
     }
    },
@@ -1920,7 +1982,7 @@
    "canonical_id": "alibaba/qwen3-vl-235b-a22b-instruct",
    "release_date": "2025-09-23",
    "limit": {
-    "context": 131072,
+    "context": 262144,
     "output": 32768
    },
    "capabilities": {
@@ -1940,10 +2002,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.3
+      "price": 0.2
      },
      "output": {
-      "price": 1.5
+      "price": 0.88
      }
     }
    },
@@ -2004,7 +2066,7 @@
    "canonical_id": "alibaba/qwen3-vl-30b-a3b-instruct",
    "release_date": "2025-10-04",
    "limit": {
-    "context": 131072,
+    "context": 262144,
     "output": 32768
    },
    "capabilities": {
@@ -2024,10 +2086,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.2
+      "price": 0.15
      },
      "output": {
-      "price": 0.7
+      "price": 0.6
      }
     }
    },
@@ -2190,10 +2252,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.3
+      "price": 0.26
      },
      "output": {
-      "price": 2.4
+      "price": 2.6
      }
     }
    },
@@ -2273,10 +2335,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.25
+      "price": 0.14
      },
      "output": {
-      "price": 2
+      "price": 1
      }
     }
    },
@@ -2361,10 +2423,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.6
+      "price": 0.45
      },
      "output": {
-      "price": 3.6
+      "price": 3
      }
     }
    },
@@ -2446,10 +2508,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.17
+      "price": 0.1
      },
      "output": {
-      "price": 0.25
+      "price": 0.15
      }
     }
    },
@@ -2529,10 +2591,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.47
+      "price": 0.32
      },
      "output": {
-      "price": 3.19
+      "price": 3.2
      }
     }
    },
@@ -2612,10 +2674,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.15
+      "price": 0.1
      },
      "output": {
-      "price": 0.95
+      "price": 0.9
      }
     }
    },
@@ -2757,7 +2819,7 @@
    "canonical_id": "alibaba/qwen3.8-27b",
    "release_date": "2026-08-14",
    "limit": {
-    "context": 262144,
+    "context": 1000000,
     "output": 32768
    },
    "capabilities": {
@@ -2782,10 +2844,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.4
+      "price": 0.04
      },
      "output": {
-      "price": 3
+      "price": 1.35
      }
     }
    },
@@ -2834,6 +2896,93 @@
    },
    "open_weights": true,
    "last_updated": "2026-08-14",
+   "recommended_api": "chat-completions"
+  },
+  "Qwen/Qwen3.8-Flash-Next": {
+   "id": "Qwen/Qwen3.8-Flash-Next",
+   "name": "Qwen3.8 Flash Next",
+   "description": "Open-weight experimental preview of the Qwen4 architecture: hybrid-attention MoE (125B total, 6B active) with vision encoder for coding, agent tasks, and image and video understanding",
+   "type": "chat",
+   "family": "qwen-flash",
+   "canonical_id": "alibaba/qwen3.8-flash-next",
+   "release_date": "2026-08-27",
+   "limit": {
+    "context": 262144,
+    "output": 131072
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.15
+     },
+     "output": {
+      "price": 0.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "responses": {
+     "base_url": "https://router.huggingface.co/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-27",
    "recommended_api": "chat-completions"
   },
   "Qwen/Qwen3.8-Flash-Next-FP8": {
@@ -3604,8 +3753,8 @@
    "canonical_id": "deepseek/deepseek-v3-0324",
    "release_date": "2025-03-24",
    "limit": {
-    "context": 163840,
-    "output": 163840
+    "context": 131072,
+    "output": 131072
    },
    "capabilities": {
     "temperature": true,
@@ -3624,10 +3773,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.27
+      "price": 1
      },
      "output": {
-      "price": 1.12
+      "price": 2.625
      }
     }
    },
@@ -3681,7 +3830,7 @@
    "canonical_id": "deepseek/deepseek-v3.1",
    "release_date": "2025-08-21",
    "limit": {
-    "context": 131072,
+    "context": 163840,
     "output": 8192
    },
    "capabilities": {
@@ -3701,10 +3850,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.27
+      "price": 0.25
      },
      "output": {
-      "price": 1
+      "price": 0.95
      }
     }
    },
@@ -3777,10 +3926,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.28
+      "price": 0.26
      },
      "output": {
-      "price": 0.4
+      "price": 0.38
      }
     }
    },
@@ -3855,10 +4004,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.14
+      "price": 0.07
      },
      "output": {
-      "price": 0.28
+      "price": 0.14
      }
     }
    },
@@ -3937,10 +4086,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.14
+      "price": 0.07
      },
      "output": {
-      "price": 0.28
+      "price": 0.14
      }
     }
    },
@@ -4021,10 +4170,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.44
+      "price": 0.2156
      },
      "output": {
-      "price": 1.32
+      "price": 0.6468
      }
     }
    },
@@ -4105,13 +4254,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.435,
-      "cache": {
-       "read": 0.003625
-      }
+      "price": 0.888188
      },
      "output": {
-      "price": 0.87
+      "price": 1.5082
      }
     }
    },
@@ -4167,7 +4313,7 @@
    "canonical_id": "deepseek/deepseek-v4-pro-0813",
    "release_date": "2026-08-13",
    "limit": {
-    "context": 1000000,
+    "context": 1048576,
     "output": 384000
    },
    "capabilities": {
@@ -4192,10 +4338,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 1.32
+      "price": 1.3
      },
      "output": {
-      "price": 3.96
+      "price": 2.6
      }
     }
    },
@@ -4276,10 +4422,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.3
+      "price": 0.14
      },
      "output": {
-      "price": 1.2
+      "price": 0.42
      }
     }
    },
@@ -4363,10 +4509,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.3
+      "price": 0.05
      },
      "output": {
-      "price": 1.2
+      "price": 0.3
      }
     }
    },
@@ -4829,10 +4975,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.13
+      "price": 0.07
      },
      "output": {
-      "price": 0.4
+      "price": 0.24
      }
     }
    },
@@ -4911,10 +5057,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.14
+      "price": 0.34
      },
      "output": {
-      "price": 0.4
+      "price": 0.1
      }
     }
    },
@@ -5002,7 +5148,7 @@
       "price": 0.06
      },
      "output": {
-      "price": 0.25
+      "price": 0.15
      }
     }
    },
@@ -5056,7 +5202,7 @@
    "canonical_id": "inclusionai/ling-3.0-flash",
    "release_date": "2026-07-23",
    "limit": {
-    "context": 262144,
+    "context": 131072,
     "output": 32768
    },
    "capabilities": {
@@ -5211,7 +5357,7 @@
    "canonical_id": "inclusionai/ling-3.0-flash-vl",
    "release_date": "2026-09-10",
    "limit": {
-    "context": 262144,
+    "context": 131072,
     "output": 32768
    },
    "capabilities": {
@@ -5232,10 +5378,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.075
+      "price": 0.06
      },
      "output": {
-      "price": 0.22
+      "price": 0.18
      }
     }
    },
@@ -5576,10 +5722,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.06
+      "price": 0.02
      },
      "output": {
-      "price": 0.06
+      "price": 0.04
      }
     }
    },
@@ -5711,8 +5857,8 @@
    "canonical_id": "meta/llama-3.2-3b-instruct",
    "release_date": "2024-09-25",
    "limit": {
-    "context": 80000,
-    "output": 80000
+    "context": 131072,
+    "output": 131072
    },
    "capabilities": {
     "temperature": true,
@@ -5731,10 +5877,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.0509
+      "price": 0.05
      },
      "output": {
-      "price": 0.335
+      "price": 0.33
      }
     }
    },
@@ -5809,10 +5955,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.59
+      "price": 0.1
      },
      "output": {
-      "price": 0.79
+      "price": 0.32
      }
     }
    },
@@ -6608,10 +6754,7 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.6,
-      "cache": {
-       "read": 0.1
-      }
+      "price": 0.6
      },
      "output": {
       "price": 3
@@ -6705,13 +6848,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.95,
-      "cache": {
-       "read": 0.16
-      }
+      "price": 0.57
      },
      "output": {
-      "price": 4
+      "price": 2.4
      }
     }
    },
@@ -6794,10 +6934,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.95
+      "price": 0.6
      },
      "output": {
-      "price": 4
+      "price": 3
      }
     }
    },
@@ -6859,8 +6999,8 @@
    "canonical_id": "moonshotai/kimi-k3",
    "release_date": "2026-07-16",
    "limit": {
-    "context": 1000000,
-    "output": 1000000
+    "context": 1048576,
+    "output": 1048576
    },
    "capabilities": {
     "temperature": false,
@@ -6884,10 +7024,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 3
+      "price": 0.276
      },
      "output": {
-      "price": 15
+      "price": 9.6
      }
     }
    },
@@ -6973,10 +7113,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 2
+      "price": 1.24
      },
      "output": {
-      "price": 10
+      "price": 6.2
      }
     }
    },
@@ -7282,7 +7422,7 @@
    "canonical_id": "nvidia/nemotron-3.5-lightning",
    "release_date": "2026-08-11",
    "limit": {
-    "context": 262144,
+    "context": 1048576,
     "output": 262144
    },
    "capabilities": {
@@ -7303,10 +7443,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.05
+      "price": 0.06
      },
      "output": {
-      "price": 0.2
+      "price": 0.16
      }
     }
    },
@@ -7382,10 +7522,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.2
+      "price": 0.1
      },
      "output": {
-      "price": 0.5
+      "price": 0.4
      }
     }
    },
@@ -7546,10 +7686,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.25
+      "price": 0.03
      },
      "output": {
-      "price": 0.69
+      "price": 0.15
      }
     }
    },
@@ -7629,10 +7769,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.1
+      "price": 0.018
      },
      "output": {
-      "price": 0.5
+      "price": 0.09
      }
     }
    },
@@ -7796,10 +7936,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.4
+      "price": 0.25
      },
      "output": {
-      "price": 1.2
+      "price": 1
      }
     }
    },
@@ -8128,10 +8268,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.834
+      "price": 0.7089
      },
      "output": {
-      "price": 2.501
+      "price": 2.12585
      }
     }
    },
@@ -8275,7 +8415,7 @@
    "canonical_id": "tencent/hy4-preview",
    "release_date": "2026-08-28",
    "limit": {
-    "context": 1000000,
+    "context": 1048576,
     "input": 983040,
     "output": 65536
    },
@@ -8442,7 +8582,7 @@
    "canonical_id": "thinkingmachines/inkling-2-mini",
    "release_date": "2026-11-20",
    "limit": {
-    "context": 262144,
+    "context": 1048576,
     "output": 65536
    },
    "capabilities": {
@@ -8470,10 +8610,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.12
+      "price": 0.075
      },
      "output": {
-      "price": 0.5
+      "price": 0.3
      }
     }
    },
@@ -8557,10 +8697,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.3
+      "price": 0.15
      },
      "output": {
-      "price": 1
+      "price": 0.5
      }
     }
    },
@@ -8635,7 +8775,7 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.5
+      "price": 0.45
      },
      "output": {
       "price": 1.2
@@ -8996,7 +9136,7 @@
    "canonical_id": "zhipuai/glm-4.6",
    "release_date": "2025-09-30",
    "limit": {
-    "context": 204800,
+    "context": 202752,
     "output": 131072
    },
    "capabilities": {
@@ -9015,10 +9155,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.55
+      "price": 0.43
      },
      "output": {
-      "price": 2.2
+      "price": 1.75
      }
     }
    },
@@ -9230,7 +9370,7 @@
    "canonical_id": "zhipuai/glm-4.7",
    "release_date": "2025-12-22",
    "limit": {
-    "context": 204800,
+    "context": 202752,
     "output": 131072
    },
    "capabilities": {
@@ -9249,13 +9389,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.6,
-      "cache": {
-       "read": 0.11
-      }
+      "price": 0.4
      },
      "output": {
-      "price": 2.2
+      "price": 1.75
      }
     }
    },
@@ -9311,7 +9448,7 @@
    "canonical_id": "zhipuai/glm-4.7-flash",
    "release_date": "2026-01-19",
    "limit": {
-    "context": 202752,
+    "context": 131072,
     "output": 128000
    },
    "capabilities": {
@@ -9330,7 +9467,7 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.06
+      "price": 0.0605
      },
      "output": {
       "price": 0.4
@@ -9408,10 +9545,7 @@
    "cost": {
     "text": {
      "input": {
-      "price": 1,
-      "cache": {
-       "read": 0.2
-      }
+      "price": 1
      },
      "output": {
       "price": 3.2
@@ -9569,10 +9703,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.62
+      "price": 0.5625
      },
      "output": {
-      "price": 2.42
+      "price": 1.8
      }
     }
    },
@@ -9651,10 +9785,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 1.4
+      "price": 0.0699
      },
      "output": {
-      "price": 4.4
+      "price": 1.4
      }
     }
    },
@@ -9733,10 +9867,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.15
+      "price": 0.0356
      },
      "output": {
-      "price": 0.5
+      "price": 0.0815
      }
     }
    },
