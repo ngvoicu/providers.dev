@@ -4,7 +4,7 @@ import { buildIndex, type Summary } from "../src/core/entries.ts";
 import type { Json, JsonObject } from "../src/core/merge.ts";
 import { emptyInputWindow, inputWindow, type InputWindow } from "../src/core/limits.ts";
 import { entryHtml, evaluationStrip, piRechecked, rowHtml, tableHead } from "../src/core/render.ts";
-import { modelHtml, modelsTableHtml, providerHtml } from "../src/core/detail-view.ts";
+import { DOCUMENTS_FOLD_TITLE, modelHtml, modelsTableHtml, providerHtml } from "../src/core/detail-view.ts";
 import type { ProviderSummary } from "../src/core/entries.ts";
 import type { Listing, ListingLists, ListingModel, ListingReasoning, ListingSource, ListingSources } from "../src/core/listings.ts";
 import { canonicalModels } from "../src/core/resources.ts";
@@ -1271,6 +1271,18 @@ describe("the models of a provider", () => {
     expect(codex).toContain(' · 3 evaluations, 2026-11-17 to 2026-11-18: <a href="https://github.com/ngvoicu/groundtruth/blob/main/results/r1.json" title="Run 1.">1</a> <a ');
     expect(codex).toContain('>a document at example.com, 2026-11-20</a>');
     expect(line([])).toBe("How the lists are joined</a>");
+    // Documents are folded behind one item with their count, after the lists and evaluations; open, the same groups.
+    expect(codex).toContain('<details class="evidence-fold"><summary title="');
+    expect(codex).toContain('>1 document</summary> <a href="https://www.example.com/models">a document at example.com, 2026-11-20</a></details>');
+    const doc = (host: string, at: number) => ({ kind: "documented" as const, url: `https://${host}/m${at}`, date: "2026-11-25", note: `"Released ${at}."` });
+    const many = line([groundtruth, inherited, ...[1, 2, 3].map((at) => doc("platform.claude.com", at)), doc("cognition.com", 1), doc("cognition.com", 1)]);
+    expect(many).toBe(
+      'How the lists are joined</a> · Sources: <a href="https://github.com/ngvoicu/groundtruth/blob/main/listed.json">the vendor&#39;s list as read, 2026-11-25</a> · ' +
+        '<a href="https://models.dev/experimental/v2.0/api.json?include=openai-codex" title="models.dev&#39;s records of the models an added entry inherits name, owner and released from: kimi-k3 from moonshotai/kimi-k3.">models.dev&#39;s records, 2026-11-25</a> · ' +
+        `<details class="evidence-fold"><summary title="${DOCUMENTS_FOLD_TITLE.replaceAll("'", "&#39;")}">4 documents</summary> ` +
+        '3 documents at platform.claude.com, 2026-11-25: <a href="https://platform.claude.com/m1" title="&quot;Released 1.&quot;">1</a> <a href="https://platform.claude.com/m2" title="&quot;Released 2.&quot;">2</a> <a href="https://platform.claude.com/m3" title="&quot;Released 3.&quot;">3</a> · ' +
+        '<a href="https://cognition.com/m1" title="&quot;Released 1.&quot;">a document at cognition.com, 2026-11-25</a></details>',
+    );
   });
 
   it("puts in the fold, linked to its entry, a model of the list whose entry the page has no row for", () => {

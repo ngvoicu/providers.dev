@@ -65,9 +65,14 @@ function evidenceWhat(item: ListingEvidence): [string, string] {
   return item.kind === "documented" ? [`a document${at}`, `documents${at}`] : [`a list${at}`, `lists${at}`];
 }
 
+/** What the folded documents of a listing's line are, in its hover text. */
+export const DOCUMENTS_FOLD_TITLE = "The documents providers.dev's statements about the listed models cite, grouped by site. Each link's hover text quotes the document.";
+
 /**
  * The evidence of a listing, each piece once (by address), named by what it is, with its date; its note in the hover
- * text. Pieces that are the same thing (several evaluations) are one group, numbered.
+ * text. Pieces that are the same thing (several evaluations) are one group, numbered. The documents (evidence of
+ * providers.dev's statements of the models' fields) are folded behind one item with their count, so that a page with
+ * many of them keeps a short line; it opens to the same groups.
  */
 function evidenceLine(evidence: ListingEvidence[]): string {
   const seen = new Set<string>();
@@ -80,12 +85,19 @@ function evidenceLine(evidence: ListingEvidence[]): string {
   }
   if (seen.size === 0) return "";
   const link = (item: ListingEvidence, text: string): string => `<a href="${e(item.url)}"${item.note ? ` title="${e(item.note)}"` : ""}>${text}</a>`;
-  const parts = [...groups].map(([one, { many, items }]) => {
+  const part = ([one, { many, items }]: [string, { many: string; items: ListingEvidence[] }]): string => {
     if (items.length === 1) return link(items[0]!, `${e(one)}, ${e(items[0]!.date)}`);
     const dates = [...new Set(items.map((item) => item.date))].sort();
     const span = dates.length === 1 ? dates[0]! : `${dates[0]!} to ${dates[dates.length - 1]!}`;
     return `${exact(items.length)} ${e(many)}, ${e(span)}: ${items.map((item, at) => link(item, String(at + 1))).join(" ")}`;
-  });
+  };
+  const isDocuments = ([, { items }]: [string, { items: ListingEvidence[] }]): boolean => items[0]!.kind === "documented" && evidenceWhat(items[0]!)[0] !== "models.dev's records";
+  const parts = [...groups].filter((group) => !isDocuments(group)).map(part);
+  const documents = [...groups].filter(isDocuments);
+  const count = documents.reduce((sum, [, { items }]) => sum + items.length, 0);
+  if (count > 0) {
+    parts.push(`<details class="evidence-fold"><summary title="${e(DOCUMENTS_FOLD_TITLE)}">${plural(count, "document")}</summary> ${documents.map(part).join(" · ")}</details>`);
+  }
   return ` · ${seen.size === 1 ? "Source" : "Sources"}: ${parts.join(" · ")}`;
 }
 

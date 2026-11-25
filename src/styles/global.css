@@ -834,6 +834,26 @@
     margin-left: 0.45rem;
   }
 
+  /* The documents of a provider's model lists, folded behind one item of the Sources line: closed, the item reads
+     "30 documents"; open, the grouped links follow it in the same line. No script. */
+  details.evidence-fold {
+    display: inline;
+  }
+  details.evidence-fold > summary {
+    display: inline;
+    text-decoration: underline dotted;
+    text-underline-offset: 2px;
+  }
+  details.evidence-fold > summary::-webkit-details-marker {
+    display: none;
+  }
+  details.evidence-fold > summary::after {
+    content: " ▸";
+  }
+  details.evidence-fold[open] > summary::after {
+    content: " ▾";
+  }
+
   /* A provider's models: its entries, then, folded under them behind one line, the models its lists name that have no
      entry. Those rows are a step quieter than an entry's: no link, softer figures, and the cells no list can fill say so
      in grey. The fold is a details element in the table's own row, so it needs no script and keeps the columns. */
