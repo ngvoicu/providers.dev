@@ -2,9 +2,10 @@
 import { etagMatches, refFromPath, representationTag } from "./api.ts";
 import { catalogHtml, modelsHtml, providersHtml, type Envelope, type One } from "./catalog-view.ts";
 import { evidenceHtml, modelHtml, providerHtml } from "./detail-view.ts";
+import { listIndexing } from "./crawl.ts";
 import { documentHtml, fillMetaSlots, openapiHtml, type OpenApiDocument } from "./docs-view.ts";
 import type { ProviderSummary, Summary } from "./entries.ts";
-import { entryHref, escapeHtml as e, type Today } from "./format.ts";
+import { entryHref, escapeHtml as e, modelHref, providerHref, type Today } from "./format.ts";
 import type { Listing } from "./listings.ts";
 import type { JsonObject } from "./merge.ts";
 import { fillShell, PAGE_SHELL } from "./page-shell.ts";
@@ -20,7 +21,14 @@ export interface PageDeps {
   site: string;
   now(): Date;
 }
-interface View { title: string; description: string; html: string; canonical?: string }
+/**
+ * A page: its title, description and body, its canonical address (path and query, built from the ids the API returns,
+ * never from the address as it was asked), and whether it is a page to index (false: a filtered, sorted or searched
+ * view, `noindex, follow`).
+ */
+interface View { title: string; description: string; html: string; canonical: string; index?: boolean }
+/** A temporary failure: crawlers and clients are asked to come back after this many seconds. */
+export const RETRY_AFTER_S = 300;
 class ApiError extends Error {
   status: number;
   constructor(status: number) { super(`API response ${status}`); this.status = status; }
@@ -94,10 +102,13 @@ export async function handlePage(request: Request, deps: PageDeps): Promise<Resp
       const parsed = parseQuery(params, true);
       if (!parsed.ok) throw new ApiError(400);
       const [result, facets] = await Promise.all([read<Envelope<Summary>>(`/api/v1/entries?${serializeQuery(parsed.query)}`).then(within), one<Facets>("/api/v1/facets")]);
-      view = { title: "AI model catalog", description: "Context, output, pricing and prompt caching by model, provider and access method.", html: catalogHtml(result, parsed.query, facets, meta, kept(own), today) };
+      const listing = listIndexing(own);
+      view = { title: "AI model catalog", description: "Context, output, pricing and prompt caching by model, provider and access method.", html: catalogHtml(result, parsed.query, facets, meta, kept(own), today), canonical: `/${listing.search}`, index: listing.index };
     } else if (path === "/providers") {
-      const own = kept(pageParams(url.searchParams, PROVIDER_PARAMS));
-      view = { title: "Providers", description: "Providers and access methods in the catalog.", html: providersHtml(within(await read<Envelope<ProviderSummary>>(`/api/v1/providers${own.search}`)), own) };
+      const params = pageParams(url.searchParams, PROVIDER_PARAMS);
+      const own = kept(params);
+      const listing = listIndexing(params);
+      view = { title: "Providers", description: "Providers and access methods in the catalog.", html: providersHtml(within(await read<Envelope<ProviderSummary>>(`/api/v1/providers${own.search}`)), own), canonical: `/providers/${listing.search}`, index: listing.index };
     } else if (path.startsWith("/providers/")) {
       // The provider's model list, where a source has one: the API answers 404 for a provider it has no listing for.
       const [{ provider, entries }, listing] = await Promise.all([
@@ -107,14 +118,16 @@ export async function handlePage(request: Request, deps: PageDeps): Promise<Resp
           throw error;
         }),
       ]);
-      view = { title: provider.name, description: `${provider.name}: ${provider.entry_count} model entries.`, html: providerHtml(provider, entries, listing, imported, today, meta.pi) };
+      view = { title: provider.name, description: `${provider.name}: ${provider.entry_count} model entries.`, html: providerHtml(provider, entries, listing, imported, today, meta.pi), canonical: providerHref(provider.id) };
     } else if (path === "/models") {
-      const own = kept(pageParams(url.searchParams, MODEL_PARAMS));
-      view = { title: "Models", description: "Canonical models and the providers that serve them.", html: modelsHtml(within(await read<Envelope<CanonicalModel>>(`/api/v1/models${own.search}`)), own) };
+      const params = pageParams(url.searchParams, MODEL_PARAMS);
+      const own = kept(params);
+      const listing = listIndexing(params);
+      view = { title: "Models", description: "Canonical models and the providers that serve them.", html: modelsHtml(within(await read<Envelope<CanonicalModel>>(`/api/v1/models${own.search}`)), own), canonical: `/models/${listing.search}`, index: listing.index };
     } else if (path.startsWith("/models/")) {
       if (!refFromPath(path.slice("/models/".length))) throw new ApiError(404);
       const [model, facets] = await Promise.all([one<CanonicalModelDetail>(`/api/v1${path}`), one<Facets>("/api/v1/facets")]);
-      view = { title: model.name, description: `${model.name}: ${model.entry_count} entries across providers and access methods.`, html: modelHtml(model, Object.fromEntries(facets.providers.map((provider) => [provider.id, provider.name])), imported, today, meta.pi) };
+      view = { title: model.name, description: `${model.name}: ${model.entry_count} entries across providers and access methods.`, html: modelHtml(model, Object.fromEntries(facets.providers.map((provider) => [provider.id, provider.name])), imported, today, meta.pi), canonical: modelHref(model.id) };
     } else if (path.startsWith("/entries/")) {
       if (!refFromPath(path.slice("/entries/".length))) throw new ApiError(404);
       const { provider, summary, entry } = await one<{ provider: ProviderSummary; summary: Summary; entry: JsonObject }>(`/api/v1${path}`);
@@ -130,24 +143,37 @@ export async function handlePage(request: Request, deps: PageDeps): Promise<Resp
         read<Envelope<CacheEvaluationRecord>>(`/api/v1/evaluations/cache?offset=${offset("cache_offset")}`).then(within),
         read<Envelope<LimitEvaluationRecord>>(`/api/v1/evaluations/limits?offset=${offset("limits_offset")}`).then(within),
       ]);
-      view = { title: "Evidence", description: "Corrections and evaluations with sources and dates.", html: evidenceHtml(meta, corrections, added, cache, measured, kept(own), today) };
+      // Its three sections page apart, so a later page of one repeats the first page of the others: only /evidence/ is indexed.
+      const listing = listIndexing(own, EVIDENCE_PARAMS.map(({ name }) => name), false);
+      view = { title: "Evidence", description: "Corrections and evaluations with sources and dates.", html: evidenceHtml(meta, corrections, added, cache, measured, kept(own), today), canonical: `/evidence/${listing.search}`, index: listing.index };
     } else if (path === "/docs/api") {
-      view = { title: "API", description: "The providers.dev API: endpoints, parameters, response schemas and examples.", html: openapiHtml(await read<OpenApiDocument>("/api/v1/openapi.json")) };
+      view = { title: "API", description: "The providers.dev API: endpoints, parameters, response schemas and examples.", html: openapiHtml(await read<OpenApiDocument>("/api/v1/openapi.json")), canonical: "/docs/api/" };
     } else if (path.startsWith("/docs/") && (DOCUMENTS as readonly string[]).includes(path.slice("/docs/".length)) && path !== "/docs/support") {
       // The support document is in the API; its page is on provimux.providers.dev (the Worker sends /support/ there).
-      const document = await one<Documentation>(`/api/v1/docs/${path.split("/").at(-1)}`);
-      view = { title: document.title, description: document.description, html: documentHtml(fillMetaSlots(document, meta)) };
+      const name = path.split("/").at(-1)!;
+      const document = await one<Documentation>(`/api/v1/docs/${name}`);
+      view = { title: document.title, description: document.description, html: documentHtml(fillMetaSlots(document, meta)), canonical: `/docs/${name}/` };
     } else throw new ApiError(404);
   } catch (error) {
     status = error instanceof ApiError && (error.status === 400 || error.status === 404) ? error.status : 503;
     const title = status === 404 ? "Nothing at this address" : status === 400 ? "Invalid filters" : "The catalog is temporarily unavailable";
-    view = { title, description: title, html: `<h1>${title}</h1><p class="lead mt-3">${status === 400 ? 'Use the <a href="/docs/api/">documented API parameters</a> for this view.' : status === 404 ? "This page, provider or model may no longer be listed." : "The API could not load a complete published snapshot. Try again shortly."}</p><p class="mt-6"><a class="button" href="/">Search the catalog</a></p>` };
+    view = { title, description: title, canonical: "", html: `<h1>${title}</h1><p class="lead mt-3">${status === 400 ? 'Use the <a href="/docs/api/">documented API parameters</a> for this view.' : status === 404 ? "This page, provider or model may no longer be listed." : "The API could not load a complete published snapshot. Try again shortly."}</p><p class="mt-6"><a class="button" href="/">Search the catalog</a></p>` };
+  }
+  // One address per page: the same path with or without its final slash is sent to the canonical one, query and all.
+  const canonicalPath = view.canonical.split("?")[0]!;
+  if (status === 200 && url.pathname !== canonicalPath && url.pathname.replace(/\/+$/, "") === canonicalPath.replace(/\/+$/, "")) {
+    const location = new URL(canonicalPath, url.origin);
+    location.search = url.search;
+    return new Response(null, { status: 301, headers: { Location: location.toString() } });
   }
   const shell = await deps.shell();
-  if (!shell) return new Response("Page template unavailable", { status: 503, headers: { "Cache-Control": "no-store" } });
+  if (!shell) return new Response("Page template unavailable", { status: 503, headers: { "Cache-Control": "no-store", "Retry-After": String(RETRY_AFTER_S) } });
+  // An error page has no canonical and is not indexed; a view of a list is followed but not indexed.
+  const robots = status !== 200 ? "noindex" : view.index === false ? "noindex, follow" : null;
+  const head = `${status === 200 ? `<link rel="canonical" href="${e(new URL(view.canonical, deps.site).toString())}">` : ""}${robots ? `<meta name="robots" content="${robots}">` : ""}`;
   const nav = [["/", "Catalog"], ["/providers/", "Providers"], ["/models/", "Models"], ["/evidence/", "Evidence"], ["/docs/api/", "API"], ["/docs/methodology/", "Methodology"]];
   const html = fillShell(await shell.text(), {
-    title: e(view.title), description: e(view.description), canonical: e(new URL(view.canonical ?? url.pathname, deps.site).toString()), html: view.html,
+    title: e(view.title), description: e(view.description), head, html: view.html,
     nav: nav.map(([href, label]) => `<a href="${href}"${href === "/" ? path === "/" || path.startsWith("/entr") ? ' aria-current="page"' : "" : `${path}/`.startsWith(href!) || ((path === "/docs/licensing" || path === "/docs/contributing") && label === "Methodology") ? ' aria-current="page"' : ""}>${label}</a>`).join(""),
     dataset: meta ? `<li>Version <code>${e(meta.dataset_version)}</code></li><li>Published ${e(meta.generated_at.slice(0, 10))} ${e(meta.generated_at.slice(11, 16))} UTC</li><li>models.dev imported ${e(meta.upstream.fetched_at.slice(0, 10))}${meta.upstream.commit ? ` (<a href="https://github.com/anomalyco/models.dev/commit/${e(meta.upstream.commit)}"><code>${e(meta.upstream.commit.slice(0, 7))}</code></a>)` : ""}</li>${meta.sync.last_attempt_ok === false ? '<li class="stale">The last import failed. This is the last good snapshot.</li>' : ""}${meta.pi.snapshot ? `<li>Pi's catalog fetched ${e(meta.pi.snapshot.fetched_at.slice(0, 10))}${piRechecked(meta.pi) ? `, last checked ${e(meta.pi.snapshot.checked_at.slice(0, 10))}` : ""}</li>` : ""}${meta.pi.sync.last_attempt_ok === false ? `<li class="stale">${meta.pi.snapshot ? "The last import of Pi's catalog failed. Its data is the last good snapshot." : "The last import of Pi's catalog failed. This dataset has no Pi data."}</li>` : ""}` : '<li>Metadata unavailable</li>',
   });
@@ -155,6 +181,7 @@ export async function handlePage(request: Request, deps: PageDeps): Promise<Resp
   const headers = new Headers({ "Content-Type": "text/html; charset=utf-8", "X-Content-Type-Options": "nosniff", ETag: etag, "Cache-Control": status === 200 ? "public, max-age=300, stale-while-revalidate=3600" : "no-store" });
   // An error page is never a page to index.
   if (status !== 200) headers.set("X-Robots-Tag", "noindex");
+  if (status === 503) headers.set("Retry-After", String(RETRY_AFTER_S));
   if (meta) { headers.set("X-Dataset-Version", meta.dataset_version); headers.set("X-Dataset-Generated-At", meta.generated_at); }
   if (status === 200 && etagMatches(request, etag)) return new Response(null, { status: 304, headers });
   return new Response(request.method === "HEAD" ? null : html, { status, headers });

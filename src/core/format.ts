@@ -126,6 +126,11 @@ export function entryHref(ref: string): string {
   return `/entries/${ref.split("/").map(encodeURIComponent).join("/")}`;
 }
 
+/** The page of a provider: /providers/{id}/. */
+export function providerHref(id: string): string {
+  return `/providers/${encodeURIComponent(id)}/`;
+}
+
 export function modelHref(canonicalId: string): string {
   return `/models/${canonicalId.split("/").map(encodeURIComponent).join("/")}/`;
 }

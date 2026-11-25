@@ -1,13 +1,13 @@
 // Static assets contain templates and versioned data. Pages consume the public API response contract.
 import { apiHeaders, handleApi } from "../src/core/api.ts";
-import { handlePage, isPage, PAGE_SHELL } from "../src/core/pages.ts";
+import { SITE, SITEMAP_PATH } from "../src/core/crawl.ts";
+import { handlePage, isPage, PAGE_SHELL, RETRY_AFTER_S } from "../src/core/pages.ts";
 import { movedToPiCacheKeeper, PI_CACHE_KEEPER } from "../src/core/pi-cache-keeper-site.ts";
 import { siteRoute, type ProductSite } from "../src/core/product-site.ts";
 import { movedToProvimux, PROVIMUX } from "../src/core/provimux-site.ts";
 import { readSnapshot, type AssetBinding } from "../src/core/snapshot.ts";
 
 interface Env { ASSETS: AssetBinding }
-const SITE = "https://providers.dev";
 const SITE_HOST = new URL(SITE).hostname;
 const WWW_HOST = `www.${SITE_HOST}`;
 
@@ -73,12 +73,20 @@ export default {
     const api = url.pathname.startsWith("/api/v1/") || url.pathname === "/api.json" || url.pathname === "/data/catalog.json";
     const data = url.pathname.startsWith("/data/");
     const page = isPage(url.pathname);
+    // The sitemaps, written with each publication (src/core/crawl.ts), are read from it.
+    const sitemap = SITEMAP_PATH.test(url.pathname);
     // Implementation assets are internal. CSS, scripts, icons and other public files remain static.
     if (url.pathname.startsWith("/site-shell") || url.pathname.startsWith("/reference-content") || url.pathname.startsWith("/snapshots/") || url.pathname === "/current.json") return new Response("Not found", { status: 404 });
-    if (!api && !data && !page && /\.[a-z0-9]+$/i.test(url.pathname)) return env.ASSETS.fetch(request);
+    if (!api && !data && !page && !sitemap && /\.[a-z0-9]+$/i.test(url.pathname)) return env.ASSETS.fetch(request);
     try {
       const snapshot = await readSnapshot(env.ASSETS, url.origin);
       if (api) return handleApi(request, snapshot);
+      if (sitemap) {
+        if (request.method !== "GET" && request.method !== "HEAD") return new Response(null, { status: 405, headers: { Allow: "GET, HEAD" } });
+        const asset = await snapshot.asset(`/data/sitemaps${url.pathname}`);
+        if (!asset) return new Response("Not found", { status: 404, headers: { "Cache-Control": "no-store" } });
+        return new Response(request.method === "HEAD" ? null : asset.body, { headers: { "Content-Type": "application/xml; charset=utf-8", "Cache-Control": "public, max-age=3600", "X-Dataset-Version": snapshot.meta.dataset_version } });
+      }
       if (data) {
         if (request.method !== "GET" && request.method !== "HEAD") return new Response(null, { status: 405, headers: { Allow: "GET, HEAD" } });
         const asset = await snapshot.asset(url.pathname);
@@ -90,7 +98,8 @@ export default {
         shell: () => snapshot.asset(PAGE_SHELL), site: SITE, now: () => new Date(),
       });
     } catch {
-      const headers = { "Cache-Control": "no-store", "Content-Type": api ? "application/json" : "text/plain; charset=utf-8", "Access-Control-Allow-Origin": "*" };
+      // A temporary failure: 503 with Retry-After, never cached.
+      const headers = { "Cache-Control": "no-store", "Retry-After": String(RETRY_AFTER_S), "Content-Type": api ? "application/json" : "text/plain; charset=utf-8", "Access-Control-Allow-Origin": "*" };
       return new Response(request.method === "HEAD" ? null : api ? JSON.stringify({ error: { code: "snapshot_incomplete", message: "The published snapshot is unavailable. Try again shortly." } }) : "The published snapshot is unavailable. Try again shortly.", { status: 503, headers });
     }
   },

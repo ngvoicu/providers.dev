@@ -1008,7 +1008,7 @@ describe("the contract", () => {
 });
 
 describe("entry pages", () => {
-  const shell = `<html><head><title>${MARK.title} · providers.dev</title><meta name="description" content="${MARK.description}"><link rel="canonical" href="${MARK.canonical}"></head><body><div id="entry">${MARK.html}</div></body></html>`;
+  const shell = `<html><head><title>${MARK.title} · providers.dev</title><meta name="description" content="${MARK.description}">${MARK.head}</head><body><div id="entry">${MARK.html}</div></body></html>`;
   const page = (path: string, init?: RequestInit, pageShell = shell, index = deps.index): Promise<Response> =>
     handlePage(new Request(`https://providers.dev${path}`, init), {
       api: (path) => handleApi(new Request(`https://providers.dev${path}`), { ...deps, index }),

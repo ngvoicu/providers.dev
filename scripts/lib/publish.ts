@@ -6,6 +6,7 @@ import { gzipSync } from "node:zlib";
 import { parse as parseYaml } from "yaml";
 import { z, type ZodType } from "zod";
 import { CACHE_AGES_S } from "../../src/core/cache.ts";
+import { sitemapFiles } from "../../src/core/crawl.ts";
 import { buildIndex, SHARD_SIZE, type Index } from "../../src/core/entries.ts";
 import { listCorrections, listEvaluations } from "../../src/core/resources.ts";
 import { resolve } from "../../src/core/resolve.ts";
@@ -405,6 +406,9 @@ function writeSnapshot(dir: string, catalog: Catalog, index: Index, meta: Meta, 
 
   const license = readFileSync(join(rootDir, "LICENSES", "models.dev-MIT.txt"), "utf8");
   writeFileSync(join(site, "data", "LICENSE-models.dev.txt"), license);
+  // The sitemaps, from the same index as the pages; the Worker serves them at the root (/sitemap.xml and the files it names).
+  mkdirSync(join(site, "data", "sitemaps"), { recursive: true });
+  for (const [name, text] of sitemapFiles(index)) writeFileSync(join(site, "data", "sitemaps", name), text);
   writeFileSync(join(site, "data", "LICENSE-pi.txt"), readFileSync(join(rootDir, "LICENSES", "pi-MIT.txt"), "utf8"));
   const piSnapshot = meta.pi.snapshot;
   writeFileSync(

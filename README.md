@@ -550,7 +550,7 @@ The API is strict about its query: a parameter it does not know, or a value it c
 (`invalid_parameters`), naming the parameter. The site's pages are not: links reach them with `utm_source`, `fbclid`,
 `ref` and the like, so a page leaves out of its query every parameter it does not know and every filter whose value the
 API would refuse, and shows the page as if they were not there (`pageParams` in `src/core/pages.ts`); its canonical
-address has no query. A page past the last page of a list (`?offset=999999`) is the not-found page, with status 404.
+address leaves them out. A page past the last page of a list (`?offset=999999`) is the not-found page, with status 404.
 
 Four resources, with the same names on the website: **providers**, **entries** (a model at a provider and access
 method), **models** (canonical: a model as its lab names it) and **evaluations**. Every collection answers
@@ -944,6 +944,28 @@ for `www.providers.dev`, over http or https, and a plain http request for `provi
 requests from Cloudflare's edge, told apart by the `X-Forwarded-Proto` header the edge sets: `wrangler dev` with these
 routes hands the local Worker `http://providers.dev/…` too, but no such header, so a local preview is never
 redirected. HSTS is not set.
+
+**What crawlers are told** (`src/core/crawl.ts`, `handlePage`):
+
+- One address per page. A provider, a model, a list, the evidence page and a document end in `/`; an entry does not
+  (`/entries/{provider}/{model}`). The other form of the final slash gets a 301 to it, with the query. The canonical
+  link of a page is built from the ids the API returns (`providerHref`, `modelHref`, `entryHref`), never from the
+  address as it was asked, so `/providers/%61nthropic/` states `/providers/anthropic/`.
+- The catalog, `/providers/` and `/models/`, and their pages at the default size (`?offset=50`, `?offset=100`, …), are
+  indexed, each page canonical to itself; page one has one address (no `offset=0`). A search, a filter, a sort,
+  another page size, or an offset between two pages is a view: `<meta name="robots" content="noindex, follow">`, and a
+  canonical that keeps every parameter choosing its rows, in name order. Of the evidence page, whose three sections
+  page apart, only `/evidence/` is indexed.
+- An error page (404, 400, 503) has no canonical and `noindex`, in the page and in `X-Robots-Tag`. A 503 says
+  `Retry-After: 300`, also from the Worker when no publication can be read.
+- Sitemaps: `/sitemap.xml` is an index of `/sitemap-pages.xml`, `/sitemap-providers.xml`, `/sitemap-models.xml` and
+  `/sitemap-entries-{n}.xml` (5,000 addresses each), all at the root (a sitemap lists only addresses under its own
+  folder). `npm run data` writes them into the publication (`data/sitemaps/`, from the same index as the pages) and the
+  Worker serves them from it, so they change with the data and never list a page the publication lacks. They have no
+  `lastmod`: the data has no date at which a page last changed (an entry's `last_updated` is models.dev's, and a
+  provider's page changes when an entry comes or goes). Each address is the page's canonical one; `tests/crawl.test.ts`
+  asks every address of the fixture's sitemaps for its canonical, and the counts of the build's sitemaps against its
+  meta. The product sites keep their own static `sitemap.xml`.
 
 **Provimux's site, `https://provimux.providers.dev`.** Two static pages, `/` and `/support/`, built by Astro from
 `src/pages/provimux/` into `dist/provimux/` with their own layout (`src/layouts/Provimux.astro`) and files

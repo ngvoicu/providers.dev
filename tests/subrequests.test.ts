@@ -69,7 +69,8 @@ function routes(root: string): string[] {
     "/", "/?sort=price_in&limit=200", "/providers/", `/providers/${provider}/`, `/providers/${listed}/`, "/models/", `/models/${model}/`,
     `/entries/${entry.ref}/`, "/evidence/", "/docs/api/", "/docs/methodology/", "/docs/licensing/", "/docs/contributing/", "/support/",
   ];
-  return [...api, ...pages, "/data/meta.json", `/data/listings/${listed}.json`, "/favicon.svg", "/nothing"];
+  const sitemaps = ["/sitemap.xml", "/sitemap-entries-1.xml"];
+  return [...api, ...pages, ...sitemaps, "/data/meta.json", `/data/listings/${listed}.json`, "/favicon.svg", "/nothing"];
 }
 
 /** The routes that read more than BUDGET, with what they read: none is the answer. */
@@ -122,6 +123,13 @@ describe("subrequests: no request reads ASSETS more than 45 times", () => {
     expect(statuses["/api/v1/listings?view=full"]).toBe(200);
     expect(statuses[`/api/v1/listings?view=full&limit=${FULL_LISTING_LIMIT}`]).toBe(200);
     expect(statuses["/api/v1/listings/nobody"]).toBe(404);
+    expect(statuses["/sitemap.xml"]).toBe(200);
+  });
+
+  it("reads the pointer, the meta and the one file for a sitemap, and no index", async () => {
+    const { status, reads } = await ask(root, "/sitemap-entries-1.xml");
+    expect(status).toBe(200);
+    expect(reads.length).toBe(3);
   });
 
   it("reads exactly the pointer, the meta, the list and one file per listing for a page in full, and no index", async () => {

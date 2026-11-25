@@ -10,7 +10,7 @@ import { handlePage, pageParams, type PageDeps } from "../src/core/pages.ts";
 import { PARAMS, PROVIDER_PARAMS } from "../src/core/query.ts";
 import { depsFrom, fetchReturning, fixtureUpstream, ROOT, tempDataDir, writeAuthored } from "./helpers.ts";
 
-const shell = `<html><head><title>${MARK.title} · providers.dev</title><meta name="description" content="${MARK.description}"><link rel="canonical" href="${MARK.canonical}"></head><body><nav>${MARK.nav}</nav><main>${MARK.html}</main><footer>${MARK.dataset}</footer></body></html>`;
+const shell = `<html><head><title>${MARK.title} · providers.dev</title><meta name="description" content="${MARK.description}">${MARK.head}</head><body><nav>${MARK.nav}</nav><main>${MARK.html}</main><footer>${MARK.dataset}</footer></body></html>`;
 const now = () => new Date("2026-11-14T12:00:00Z");
 let deps: LoadedDeps;
 
