@@ -735,6 +735,23 @@
     line-height: 1.35;
     white-space: nowrap;
   }
+  /* On a provider's page: a limit an entry does not state, taken from the provider's model list, with that list's mark
+     under it, as in the Source column. */
+  .listed-figure {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.1rem;
+    line-height: 1.35;
+    white-space: nowrap;
+  }
+  .listed-figure > :first-child {
+    color: var(--fg-soft);
+  }
+  .listed-figure > .badge,
+  .listed-figure > .origin {
+    font-family: var(--font-sans);
+  }
   .price-from {
     color: var(--muted);
     font-family: var(--font-sans, inherit);
@@ -1991,6 +2008,9 @@
     }
     table.stack-tablet > tbody > tr > td.num {
       text-align: left;
+    }
+    table.stack-tablet > tbody > tr > td.num .listed-figure {
+      align-items: flex-start;
     }
     table.stack-tablet > tbody > tr > [data-label]::before {
       content: attr(data-label);

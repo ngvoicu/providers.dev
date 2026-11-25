@@ -231,11 +231,23 @@ export interface RowOptions {
   /**
    * What a provider's page adds to a row from the provider's listing, by entry ref: `note`, lines under the model's id
    * (the plan names a vendor's list attaches); `source`, a source and its date before the entry's own (a vendor's list
-   * that names the model). Both are HTML made from fields of the listing.
+   * that names the model); `fill`, the listing's context window and max output of the model, each with the mark of the
+   * list it is from, or null where the listing has none. All are HTML made from fields of the listing.
    */
   listed?: Record<string, RowListed>;
 }
-export interface RowListed { note: string; source: string }
+export interface RowListed { note: string; source: string; fill: { input_window: string | null; max_output: string | null } }
+
+/**
+ * A limit in a row: the entry's own safe value; where it has none, what the provider's listing states of the model,
+ * with the list's mark (a provider's page only). The entry's own value always comes first. A measured input window is
+ * never displaced: where the entry has one, its safe value is that, and the listing states no window for it (API 1.6.1).
+ */
+function limitCell(entry: Summary, quantity: "input_window" | "max_output", href: string, today: Today, listed: RowListed | undefined): string {
+  const fill = listed?.fill[quantity] ?? null;
+  if (entry.safe[quantity].value === null && fill !== null) return `<span class="safe-cell listed-fill">${fill}</span>`;
+  return listValue(entry, quantity, href, today);
+}
 
 /** The column names of the entry table. Where the table is stacked, each cell repeats its column's name. */
 export const COLUMN = { provider: "Provider", input_window: "Context window", max_output: "Max output", price: "Price in / out", released: "Released", lifetime: "Cache lifetime", source: "Source" } as const;
@@ -271,8 +283,8 @@ export function rowHtml(entry: Summary, options: RowOptions): string {
   return `<tr>
 <th scope="row"><a href="${e(href)}">${e(entry.name)}</a>${status}<div class="id"><code>${e(entry.model)}</code>${copyButton(entry.ref, "entry id")}</div>${listed?.note ?? ""}</th>
 ${options.hideProvider ? "" : `<td class="provider-col" data-label="${COLUMN.provider}"><a class="plain" href="/providers/${e(entry.provider)}/">${e(provider)}</a>${access}</td>`}
-<td class="num window-col" data-label="${COLUMN.input_window}">${listValue(entry, "input_window", `${href}#limits`, options.today)}</td>
-<td class="num" data-label="${COLUMN.max_output}">${listValue(entry, "max_output", `${href}#limits`, options.today)}</td>
+<td class="num window-col" data-label="${COLUMN.input_window}">${limitCell(entry, "input_window", `${href}#limits`, options.today, listed)}</td>
+<td class="num" data-label="${COLUMN.max_output}">${limitCell(entry, "max_output", `${href}#limits`, options.today, listed)}</td>
 <td class="num mid-only" data-label="${COLUMN.price}">${priceCell(entry, wholePriceWarning(entry.safe.price, warnId(entry.ref, "price"), options.today))}</td>
 <td class="wide-only" data-label="${COLUMN.released}">${entry.release_date ? `<span class="muted date">${e(entry.release_date)}</span>` : UNKNOWN}</td>
 <td class="life-col" data-label="${COLUMN.lifetime}">${lifetimeCell(entry, href, options.today)}</td>

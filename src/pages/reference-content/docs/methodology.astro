@@ -268,7 +268,10 @@ const words = (text: string): string => escapeHtml(text).replace(/`([^`]+)`/g, "
       list names it. The API names, per model, the lists that have it, and the page marks them in the model's sources, each with its list's date. An entry carries the mark of the
       vendor's own list where that list names it: <em>subscription</em> where it was read through a subscription login. Each value of a model without an entry (context window,
       output limit, release date) is from the first of the same sources that states it, and its hover text names that source. A list is not a set of entries: nothing of it is
-      written into an entry's limits or into a safe value. The date of a list is the day it was read, or the day of the import; a list read by the discovery or stated by
+      written into an entry's limits or into a safe value. Where an entry states no context window or no output limit of its own, its row on the provider's page shows
+      the listing's figure for the model instead of Unknown, with the mark of the list it is from (<em>vendor list</em>), and its hover text says it is the list's figure,
+      not an evaluation's. The entry's own value always comes first, and where the entry has a measured input window the vendor's window is not shown at all; the API and the
+      entry's own page keep the entry's values only. The date of a list is the day it was read, or the day of the import; a list read by the discovery or stated by
       providers.dev is marked stale like other providers.dev evidence. Where the vendor's own list attaches plan names to a model, they are shown as it writes them; never prices,
       allowances or quotas.
     </p>
@@ -311,7 +314,7 @@ const words = (text: string): string => escapeHtml(text).replace(/`([^`]+)`/g, "
 
     <h2 id="sync">Daily import</h2>
     <p>
-      Each day a scheduled job, at 04:17 and 06:47 UTC, fetches models.dev once per run, with a conditional request; a run that finds nothing new changes nothing. The import is validated before it replaces anything: it must be valid JSON in the expected structure, ids
+      Four times a day a scheduled job, at 04:17, 10:43, 16:29 and 22:51 UTC, fetches models.dev once per run, with a conditional request; a run that finds nothing new changes nothing. The import is validated before it replaces anything: it must be valid JSON in the expected structure, ids
       must match their keys, and it must not be empty or have lost a large share of its entries since the previous import. If validation fails or models.dev is unavailable, the previous
       snapshot stays in place and keeps being served; the footer and <code>/api/v1/meta</code> report the failed import. Visitors and API requests never trigger a fetch.
     </p>

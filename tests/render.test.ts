@@ -1192,7 +1192,7 @@ describe("the models of a provider", () => {
     const lists: ListingLists = { listed: { listed_at: "2026-11-22", model_count: 1 }, "providers.dev": null, "models.dev": { listed_at: "2026-11-21", model_count: 1 }, "pi.dev": null };
     const html = table([entry("swe-2", "SWE-2"), entry("swe-1", "SWE-1")], listing([
       model({ id: "swe-2", entry: { provider: "devin", model: "swe-2" }, plans: ["pro"] }),
-      model({ id: "swe-1", entry: { provider: "devin", model: "swe-1" }, listed_by: ["models.dev"] }),
+      model({ id: "swe-1", entry: { provider: "devin", model: "swe-1" }, listed_by: ["models.dev"], sources: sources("models.dev") }),
     ], { lists }));
     const listed = rowOf(html, "swe-2");
     expect(listed).toContain('<div class="hint" title="Plan names the vendor&#39;s list attaches to the model, as it writes them.">Plans: pro</div></th>');
@@ -1214,12 +1214,63 @@ describe("the models of a provider", () => {
   it("gives each list in the page's facts, with its date and, in the hover text, how many models it names; and says when there is none", () => {
     const lists: ListingLists = { listed: { listed_at: "2026-11-22", model_count: 6 }, "providers.dev": null, "models.dev": { listed_at: "2026-11-21", model_count: 2 }, "pi.dev": null };
     const html = providerHtml(provider(), [], listing([model({})], { lists }), "2026-11-21", today);
-    expect(html).toContain('<dt class="muted">Model lists</dt><dd><span class="sources side"><span class="badge listed" title="The vendor&#39;s own model list, read on a subscription login through Provimux, a proxy built on CLIProxyAPI: 6 models.">subscription</span><span class="muted date" title="The day the vendor&#39;s list was read.">2026-11-22</span><span class="origin upstream" title="models.dev&#39;s list of this provider: 2 models.">models.dev</span><span class="muted date" title="Imported from models.dev on this date.">2026-11-21</span></span><div class="hint mt-1">The vendor\'s list, 2026-11-22. Read from one account&#39;s model list on that date; other plans may offer more or fewer models.</div><div class="hint mt-1"><a href="/docs/methodology/#listings">How the lists are joined</a> · <a href="https://github.com/ngvoicu/groundtruth/blob/main/listed.json">Source</a></div></dd>');
+    expect(html).toContain('<dt class="muted">Model lists</dt><dd><span class="sources side"><span class="badge listed" title="The vendor&#39;s own model list, read on a subscription login through Provimux, a proxy built on CLIProxyAPI: 6 models.">subscription</span><span class="muted date" title="The day the vendor&#39;s list was read.">2026-11-22</span><span class="origin upstream" title="models.dev&#39;s list of this provider: 2 models.">models.dev</span><span class="muted date" title="Imported from models.dev on this date.">2026-11-21</span></span><div class="hint mt-1">The vendor\'s list, 2026-11-22. Read from one account&#39;s model list on that date; other plans may offer more or fewer models.</div><div class="hint mt-1"><a href="/docs/methodology/#listings">How the lists are joined</a> · Source: <a href="https://github.com/ngvoicu/groundtruth/blob/main/listed.json">the vendor&#39;s list as read, 2026-11-22</a></div></dd>');
     expect(html.split("Read from one account&#39;s model list on that date").length).toBe(2);
     const imported = providerHtml(provider(), [], listing([model({ listed_by: ["models.dev"] })], { lists: { listed: null, "providers.dev": null, "models.dev": { listed_at: "2026-11-21", model_count: 1 }, "pi.dev": null } }), "2026-11-21", today);
     expect(imported).not.toContain("one account");
     const none = providerHtml(provider(), [], null, "2026-11-21", today);
     expect(none).toContain("<dt class=\"muted\">Model lists</dt><dd><span class=\"muted\">None yet: no source gives a list of this provider's models.</span></dd>");
+  });
+
+  it("shows in an entry's row the listing's context window and max output where the entry has none, with the list's mark", () => {
+    const measured: SafeValue = { ...emptySafeValues().input_window, value: 999000, at_least: true, scope: "input", source: "measured", agreement: "single" };
+    const own: SafeValue = { ...emptySafeValues().max_output, value: 64000, source: "models.dev", agreement: "single" };
+    const neon = { ...entry("gemini-4-neon", "Gemini 4 Neon") };
+    const opus = { ...entry("claude-opus-5-5", "Claude Opus 5.5"), safe: { ...emptySafeValues(), input_window: measured, max_output: own } };
+    const html = table([neon, opus], listing([
+      model({ entry: { provider: "devin", model: "gemini-4-neon" }, context_window: 1048576, max_output: 1000000 }),
+      // A model whose entry has a measured window: the listing states no window for it (API 1.6.1), only its output.
+      model({ id: "claude-opus-5-5", entry: { provider: "devin", model: "claude-opus-5-5" }, context_window: null, max_output: 128000, sources: { ...sources("listed"), context_window: null } }),
+    ]));
+    const filled = rowOf(html, "gemini-4-neon");
+    expect(filled).toContain('<td class="num window-col" data-label="Context window"><span class="safe-cell listed-fill"><span class="listed-figure" title="1,048,576 tokens, as stated in the vendor&#39;s own model list, read on a subscription login through Provimux, a proxy built on CLIProxyAPI on 2026-11-22. The entry states no value of its own and providers.dev has not measured it."><span>1.05M</span><span class="badge listed">vendor list</span></span></span></td>');
+    expect(filled).toContain('<td class="num" data-label="Max output"><span class="safe-cell listed-fill"><span class="listed-figure" title="1,000,000 tokens, as stated in');
+    expect(filled).toContain("<span>1M</span>");
+    // The entry's own values come first: the measured window stays, and so does a stated max output.
+    const kept = rowOf(html, "claude-opus-5-5");
+    expect(kept).toContain("≥ 999K");
+    expect(kept).not.toContain("listed-figure");
+    expect(kept).not.toContain("128K");
+    // A listing that states nothing leaves Unknown; no listing at all changes nothing.
+    const bare = rowOf(table([neon], listing([model({ entry: { provider: "devin", model: "gemini-4-neon" }, context_window: null, max_output: null, sources: sources(null) })])), "gemini-4-neon");
+    expect(count(bare, ">Unknown</span>")).toBeGreaterThanOrEqual(2);
+    expect(bare).not.toContain("listed-figure");
+    expect(rowOf(table([neon], null), "gemini-4-neon")).not.toContain("listed-figure");
+    // Another list's figure carries that list's mark.
+    const pi = rowOf(table([neon], listing([model({ entry: { provider: "devin", model: "gemini-4-neon" }, sources: { ...sources("pi.dev") } })])), "gemini-4-neon");
+    expect(pi).toContain('<span class="origin pi">pi.dev</span>');
+    // The catalog's rows, which have no listing, are as before.
+    expect(rowHtml(neon, { today })).not.toContain("listed-figure");
+  });
+
+  it("names each source of the model lists once, by what it is", () => {
+    const groundtruth = { kind: "listed" as const, url: "https://github.com/ngvoicu/groundtruth/blob/main/listed.json", date: "2026-11-25", note: null };
+    const inherited = { kind: "listed" as const, url: "https://models.dev/experimental/v2.0/api.json?include=openai-codex", date: "2026-11-25", note: "models.dev's records of the models an added entry inherits name, owner and released from: kimi-k3 from moonshotai/kimi-k3." };
+    const line = (evidence: Listing["evidence"]): string => {
+      const html = providerHtml(provider(), [], listing([model({})], { evidence }), "2026-11-21", today);
+      const start = html.indexOf("How the lists are joined");
+      return html.slice(start, html.indexOf("</div></dd>", start));
+    };
+    const devin = line([groundtruth, inherited]);
+    expect(devin).toBe('How the lists are joined</a> · Sources: <a href="https://github.com/ngvoicu/groundtruth/blob/main/listed.json">the vendor&#39;s list as read, 2026-11-25</a> · <a href="https://models.dev/experimental/v2.0/api.json?include=openai-codex" title="models.dev&#39;s records of the models an added entry inherits name, owner and released from: kimi-k3 from moonshotai/kimi-k3.">models.dev&#39;s records, 2026-11-25</a>');
+    expect(devin).not.toContain("listed, 2026");
+    // The same address twice is one link; several evaluations are one group, numbered.
+    const runs = [1, 2, 3].map((at) => ({ kind: "measured" as const, url: `https://github.com/ngvoicu/groundtruth/blob/main/results/r${at}.json`, date: at === 3 ? "2026-11-18" : "2026-11-17", note: `Run ${at}.` }));
+    const codex = line([groundtruth, groundtruth, ...runs, { kind: "documented", url: "https://www.example.com/models", date: "2026-11-20", note: null }]);
+    expect(count(codex, "listed.json")).toBe(1);
+    expect(codex).toContain(' · 3 evaluations, 2026-11-17 to 2026-11-18: <a href="https://github.com/ngvoicu/groundtruth/blob/main/results/r1.json" title="Run 1.">1</a> <a ');
+    expect(codex).toContain('>a document at example.com, 2026-11-20</a>');
+    expect(line([])).toBe("How the lists are joined</a>");
   });
 
   it("puts in the fold, linked to its entry, a model of the list whose entry the page has no row for", () => {

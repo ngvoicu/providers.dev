@@ -107,7 +107,10 @@ The baseline is imported from models.dev; our additions, corrections and measure
   records beside the safe value. The safe value is a published number made by a published rule, not a verdict a page
   writes. Vendors' own model lists are not values of an entry; they stay in evaluation notes. A vendor's list is
   published as the provider's listing (`/api/v1/listings`), and is never written into an entry's `limit` or into a
-  safe value.
+  safe value. One page rule only: on a provider's page, an entry's row whose safe input window or max output is null
+  shows the listing's `context_window` or `max_output` of the model instead, with the list's mark (`limitCell` in
+  `src/core/render.ts`). Where the entry has a measured window the listing states none (1.6.1), so nothing displaces
+  it; the API, the catalog and the entry's page are unchanged.
 - pi's values stand last. They are never written into a field of the entry (`limit`, `cost` or any other), and a safe
   value is pi's only where no other source states one: laid on by `layPi` after the fence, from the statements the
   fence reads with `piStatements`. No value a measurement, providers.dev or models.dev states differs with or without
@@ -178,7 +181,7 @@ Before finishing a change: `npm run build && npm run check`, and look at the aff
 
 The site is live at `https://providers.dev`. The repository has two remotes: `upstream` (GitHub
 `ngvoicu/providers.dev`) and `origin` (the owner's Forgejo server). GitHub is where work and the daily snapshot land:
-the `Publish` workflow runs on GitHub only and commits the snapshot there (04:17 and 06:47 UTC; the second is a fallback). The Forgejo server follows
+the `Publish` workflow runs on GitHub only and commits the snapshot there (04:17, 10:43, 16:29 and 22:51 UTC; a scheduled run that finds nothing new neither commits nor deploys). The Forgejo server follows
 GitHub by itself: its workflow `Follow GitHub` (`.forgejo/workflows/follow-github.yml`) brings its `main` to
 GitHub's every hour: a fast-forward when it can be one; otherwise it first keeps the server's `main` as
 `refs/nas-backup/main-<UTC time>`, then sets it to GitHub's, in one atomic push. It never merges and only reads

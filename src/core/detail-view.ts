@@ -3,7 +3,7 @@ import { apiLink, pageLinks, type Envelope } from "./catalog-view.ts";
 import type { ProviderSummary, Summary } from "./entries.ts";
 import { compactTokens, compactTokensDown, entryHref, escapeHtml as e, exact, isStale, plural, type Today } from "./format.ts";
 import type { WindowBound } from "./limits.ts";
-import { LISTING_SOURCES, type Listing, type ListingModel, type ListingSource } from "./listings.ts";
+import { LISTED_PAGE, LISTING_SOURCES, type Listing, type ListingEvidence, type ListingModel, type ListingSource } from "./listings.ts";
 import { COLUMN, copyButton, evaluationStrip, rowHtml, stripHead, tableHead, type RowListed } from "./render.ts";
 import type { CacheEvaluationRecord, CanonicalModelDetail, Correction, LimitEvaluationRecord } from "./resources.ts";
 import type { Meta, MetaPi } from "./schema.ts";
@@ -55,6 +55,40 @@ function listPair(source: ListingSource, listing: Listing, access: Access, today
  */
 export const LISTED_ONE_ACCOUNT = "Read from one account's model list on that date; other plans may offer more or fewer models.";
 
+/** What a piece of a listing's evidence is, in words, one and several: the discovery file, models.dev, an evaluation, a document. */
+function evidenceWhat(item: ListingEvidence): [string, string] {
+  if (item.url === LISTED_PAGE) return ["the vendor's list as read", "the vendor's list as read"];
+  const host = URL.canParse(item.url) ? new URL(item.url).hostname.replace(/^www\./, "") : "";
+  if (host === "models.dev") return ["models.dev's records", "models.dev's records"];
+  if (item.kind === "measured") return ["an evaluation", "evaluations"];
+  const at = host ? ` at ${host}` : "";
+  return item.kind === "documented" ? [`a document${at}`, `documents${at}`] : [`a list${at}`, `lists${at}`];
+}
+
+/**
+ * The evidence of a listing, each piece once (by address), named by what it is, with its date; its note in the hover
+ * text. Pieces that are the same thing (several evaluations) are one group, numbered.
+ */
+function evidenceLine(evidence: ListingEvidence[]): string {
+  const seen = new Set<string>();
+  const groups = new Map<string, { many: string; items: ListingEvidence[] }>();
+  for (const item of evidence) {
+    if (seen.has(item.url)) continue;
+    seen.add(item.url);
+    const [one, many] = evidenceWhat(item);
+    (groups.get(one) ?? groups.set(one, { many, items: [] }).get(one)!).items.push(item);
+  }
+  if (seen.size === 0) return "";
+  const link = (item: ListingEvidence, text: string): string => `<a href="${e(item.url)}"${item.note ? ` title="${e(item.note)}"` : ""}>${text}</a>`;
+  const parts = [...groups].map(([one, { many, items }]) => {
+    if (items.length === 1) return link(items[0]!, `${e(one)}, ${e(items[0]!.date)}`);
+    const dates = [...new Set(items.map((item) => item.date))].sort();
+    const span = dates.length === 1 ? dates[0]! : `${dates[0]!} to ${dates[dates.length - 1]!}`;
+    return `${exact(items.length)} ${e(many)}, ${e(span)}: ${items.map((item, at) => link(item, String(at + 1))).join(" ")}`;
+  });
+  return ` · ${seen.size === 1 ? "Source" : "Sources"}: ${parts.join(" · ")}`;
+}
+
 /** The facts row of the provider's page: each list with its date, how many models it names in the hover text. */
 function listsFact(listing: Listing | null, access: Access, today: Today): string {
   if (!listing) return '<span class="muted">None yet: no source gives a list of this provider\'s models.</span>';
@@ -62,9 +96,7 @@ function listsFact(listing: Listing | null, access: Access, today: Today): strin
     const list = listing.lists[source];
     return list ? [listPair(source, listing, access, today, `${listName(source, listing, access)}: ${plural(list.model_count, "model")}.`)] : [];
   });
-  const evidence = listing.evidence.length === 1
-    ? ` · <a href="${e(listing.evidence[0]!.url)}">Source</a>`
-    : listing.evidence.length > 1 ? ` · Sources: ${listing.evidence.map((item) => `<a href="${e(item.url)}">${e(item.kind)}, ${e(item.date)}</a>`).join(" · ")}` : "";
+  const evidence = evidenceLine(listing.evidence);
   const listedAt = listing.lists.listed?.listed_at ?? null;
   const oneAccount = listing.lists.listed ? `<div class="hint mt-1">The vendor's list${listedAt ? `, ${e(listedAt)}` : ""}. ${e(LISTED_ONE_ACCOUNT)}</div>` : "";
   return `<span class="sources side">${pairs.join("")}</span>${oneAccount}<div class="hint mt-1"><a href="/docs/methodology/#listings">How the lists are joined</a>${evidence}</div>`;
@@ -83,13 +115,34 @@ function listedNotes(model: ListingModel): string {
   ].join("");
 }
 
-/** What the page adds to an entry's row from the listing: its plan names, and the vendor's own list where it names the entry. */
+/**
+ * A limit of the listing in an entry's row, where the entry states none: the figure, then the mark of the list it is
+ * from, as in the Source column. Its hover text says that it is the list's figure and not an evaluation's.
+ */
+function listedLimit(value: number | null, source: ListingSource | null, listing: Listing, access: Access): string | null {
+  if (value === null || source === null) return null;
+  const name = listName(source, listing, access).replace(/^(The|A) /, (word) => word.toLowerCase());
+  const date = listing.lists[source]?.listed_at ?? null;
+  const said = `${exact(value)} tokens, as stated in ${name}${date ? ` on ${date}` : ""}. The entry states no value of its own and providers.dev has not measured it.`;
+  const mark = source === "listed" ? `<span class="badge listed">vendor list</span>` : `<span class="${LIST_MARK_CLASS[source]}">${source}</span>`;
+  return `<span class="listed-figure" title="${e(said)}"><span>${compactTokens(value)}</span>${mark}</span>`;
+}
+
+/**
+ * What the page adds to an entry's row from the listing: its plan names, the vendor's own list where it names the
+ * entry, and the listing's context window and max output, which the row shows only where the entry has none of its own.
+ */
 function entryListed(listing: Listing | null, access: Access, today: Today): Record<string, RowListed> {
   const listed: Record<string, RowListed> = {};
-  for (const model of listing?.models ?? []) {
+  if (!listing) return listed;
+  for (const model of listing.models ?? []) {
     if (!model.entry) continue;
-    const source = model.listed_by.includes("listed") ? listPair("listed", listing!, access, today, onList("listed", listing!, access)) : "";
-    listed[`${model.entry.provider}/${model.entry.model}`] = { note: listedNotes(model), source };
+    const source = model.listed_by.includes("listed") ? listPair("listed", listing, access, today, onList("listed", listing, access)) : "";
+    const fill = {
+      input_window: listedLimit(model.context_window, model.sources.context_window, listing, access),
+      max_output: listedLimit(model.max_output, model.sources.max_output, listing, access),
+    };
+    listed[`${model.entry.provider}/${model.entry.model}`] = { note: listedNotes(model), source, fill };
   }
   return listed;
 }
