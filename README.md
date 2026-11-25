@@ -335,7 +335,10 @@ lists for the provider, each once: a login reads only what its own subscription 
 whole. Each model names the lists that have it (`listed_by`), and the listing gives each source's list with its date
 and size (`lists`); `basis` is the highest-ranked source with a list. A model an override leaves out with evidence is
 in no listing of its provider, whichever list names it. Each field of a model is from the first source
-that states it, and the model names that source per field. Nothing of a listing is written into an entry.
+that states it, and the model names that source per field. One exception: where the model's entry has a measured
+input window, neither the vendor's list nor pi gives its `context_window` or `max_input` (pi gives no `max_output`
+either), so that no stated figure stands against the measurement; those fields are then the entry's (since API 1.6.1).
+Nothing of a listing is written into an entry.
 
 `data/authored/listings/<provider>.yaml` holds what providers.dev states, each statement with a reason and evidence:
 
@@ -641,6 +644,11 @@ added `listed_by` to `ListingModel` (the sources whose list names the model, in 
 `basis` stays: the highest-ranked source that has a list, with its date in `listed_at`; it no longer means that the
 list is whole. A model no source names takes its id as its name from the first list that has it. The fields of a model
 are chosen as before.
+1.6.1 changed no structure: it corrected which source gives a model's window. Where the model's entry has a
+measured input window, the vendor's own list gives the listing no `context_window` and no `max_input`, as pi gives
+none: both are then where the entry takes them (providers.dev, models.dev), or `null`. A measurement counts before a
+stated value, and in 1.6.0 the vendor's figure stood against it (`devin/swe-2`: 262,000 listed, an input of 300,499
+read in full). The vendor's other fields of the model are taken as before.
 That promise holds for everything providers.dev makes itself: summaries, `providers_dev` records, evaluations,
 corrections, evidence, paths and parameters. The fields imported from models.dev (`limit`, `cost`, `capabilities`,
 `modalities` and the like) follow the models.dev v2 schema, which models.dev calls experimental. When models.dev

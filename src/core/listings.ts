@@ -6,7 +6,8 @@
 // or statement, data/authored/listings/), `models.dev` (the imported entries of the provider), `pi.dev` (pi's models
 // of the provider). The models of a listing are every model any of them lists for the provider (since 1.6.0; before,
 // the first source's list was taken whole), and each model names the sources that list it (`listed_by`); each field of
-// a model is from the first source that states it, and the model names that source per field.
+// a model is from the first source that states it, and the model names that source per field; where the model's entry
+// has a measured input window, neither the vendor's list nor pi gives its window or max_input (since 1.6.1).
 //
 // Nothing here is written into an entry: a listing is a resource of its own, and no value of it reaches an entry's
 // `limit` or a safe value.
@@ -549,23 +550,26 @@ export function buildListings(input: ListingsInput): { listings: Listing[]; issu
     const piModels = new Map((pi?.models ?? []).map((model) => [model.id, model]));
     const models = unique.map((id) => {
       const statements: [ListingSource, Statement][] = [];
+      const entry = Object.hasOwn(provider.models, id) ? provider.models[id]! : undefined;
+      const own = entry ? ext(entry) : undefined;
+      // A measurement counts before a stated value: where the model's entry has a measured input window, neither the
+      // vendor's list nor pi gives the listing a window. Its context_window and max_input are then where the entry
+      // takes them (providers.dev, models.dev), or unknown.
+      const measured = (own?.limits?.input_window?.measured_tokens ?? null) !== null;
       const found = discovered.get(id);
-      if (found) statements.push(["listed", takeListed(found)]);
+      if (found) statements.push(["listed", listedStatement(found, measured)]);
       rules.forEach((rule, index) => {
         if (rule.models !== "all" && !rule.models.includes(id)) return;
         applied.add(index);
         statements.push(["providers.dev", statementOf(rule.set)]);
       });
-      const entry = Object.hasOwn(provider.models, id) ? provider.models[id]! : undefined;
       if (entry) {
         const { providersDev, modelsDev } = entryStatements(entry);
         statements.push(["providers.dev", providersDev], ["models.dev", modelsDev]);
       } else if (left.has(id)) statements.push(["models.dev", entryStatement(left.get(id)!)]);
-      const own = entry ? ext(entry) : undefined;
       if (own?.origin === "added" && own.inherited && Object.keys(entryStatements(entry!).modelsDev).length > 0) inheritedFrom.push(`${id} from ${own.inherited.from}`);
       // pi gives no limit to a model whose entry has a measured window: pi's figure would stand beside, and against,
       // what providers.dev measured.
-      const measured = (own?.limits?.input_window?.measured_tokens ?? null) !== null;
       const fromPi = piModels.get(id);
       if (fromPi) statements.push(["pi.dev", piStatement(fromPi, measured)]);
       const canonical = entry && typeof entry.canonical_id === "string" ? entry.canonical_id : null;
@@ -582,6 +586,19 @@ export function buildListings(input: ListingsInput): { listings: Listing[]; issu
     listings.push({ provider: providerId, basis, listed_at: lists[basis]!.listed_at, lists, client: client?.id ?? null, client_label: client?.label ?? null, evidence, model_count: models.length, models });
   }
   return { listings, issues };
+}
+
+/**
+ * What the vendor's list states of a model (takeListed), without its window and max_input where the model's entry has
+ * a measured input window: the measurement counts first, and the vendor's figure would stand against it in the row.
+ */
+function listedStatement(model: ListedModel, noWindow: boolean): Statement {
+  const out = takeListed(model);
+  if (noWindow) {
+    delete out.context_window;
+    delete out.max_input;
+  }
+  return out;
 }
 
 /** What pi states of a model: its name, window, output limit, input kinds and whether it reasons. A 0 is no statement. */

@@ -514,7 +514,7 @@ describe("HTTP behaviour", () => {
 
   it("describes the cache lifetime record: its components and a guide section", async () => {
     const document = await json<{ info: { version: string; contact: unknown; license: unknown }; "x-guide": { id: string; title: string; paragraphs: string[] }[]; components: { schemas: Record<string, { properties?: Record<string, unknown> }> } }>("/api/v1/openapi.json");
-    expect(document.info.version).toBe("1.6.0");
+    expect(document.info.version).toBe("1.6.1");
     expect(document.info.contact).toEqual({ name: "providers.dev", email: "office@providers.dev", url: "https://providers.dev/docs/contributing/" });
     expect(document.info.license).toEqual({ name: "MIT", url: "https://providers.dev/docs/licensing/" });
     const schemas = document.components.schemas;
@@ -577,9 +577,9 @@ describe("pi's catalog in the API (design/pi-source.md, section d)", () => {
     expect(meta.sync.last_error ?? "").not.toMatch(/pi/);
   });
 
-  it("is version 1.6.0, with the six pi components, the keys on the entry, the summary and /meta, and a guide section after Input window", async () => {
+  it("is version 1.6.1, with the six pi components, the keys on the entry, the summary and /meta, and a guide section after Input window", async () => {
     const document = await json<{ info: { version: string; description: string }; "x-guide": { id: string; title: string; paragraphs: string[] }[]; components: { schemas: Record<string, { properties?: Record<string, unknown>; required?: string[] }> } }>("/api/v1/openapi.json");
-    expect(document.info.version).toBe("1.6.0");
+    expect(document.info.version).toBe("1.6.1");
     expect(document.info.description).toContain("A second catalog, pi's (MIT), is imported beside it: what it states for an entry is under providers_dev.pi.");
     const schemas = document.components.schemas;
     for (const name of ["PiBlock", "PiCost", "PiCostTier", "PiDifference", "PiSummary", "PiValue"]) expect(schemas[name], name).toBeDefined();
@@ -635,7 +635,7 @@ describe("pi's catalog in the API (design/pi-source.md, section d)", () => {
 describe("the input window in the OpenAPI document", () => {
   it("has the two components, the key on the entry and the summary, input_read on an evaluation, and a guide section after Unknown values", async () => {
     const document = await json<{ info: { version: string }; "x-guide": { id: string; title: string; paragraphs: string[] }[]; components: { schemas: Record<string, { properties?: Record<string, unknown>; required?: string[] }> } }>("/api/v1/openapi.json");
-    expect(document.info.version).toBe("1.6.0");
+    expect(document.info.version).toBe("1.6.1");
     const schemas = document.components.schemas;
     expect(Object.keys(schemas.InputWindow!.properties!)).toEqual([
       "tokens", "basis", "bound", "scope", "source", "date", "documented_tokens", "documented_field", "documented_source", "documented_date", "documented_status",

@@ -10,7 +10,7 @@ import { sync } from "../scripts/lib/sync.ts";
 import { ListingSchema } from "../src/core/contract.ts";
 import { buildListings, kinds, LISTED_PAGE, type ListingModel, type ListingsInput } from "../src/core/listings.ts";
 import { matchPi, piLists, type PiCatalog, type PiModel } from "../src/core/pi.ts";
-import { AuthoredListing, PiAliases, type Catalog, type PublishedModel } from "../src/core/schema.ts";
+import { AuthoredListing, PiAliases, type Catalog, type ListedModel, type PublishedModel } from "../src/core/schema.ts";
 import { fetchReturning, fixtureUpstream, ROOT, tempDataDir, writeAuthored } from "./helpers.ts";
 
 const evidence = [{ kind: "documented" as const, url: "https://example.com/models", date: "2026-11-20" }];
@@ -338,6 +338,8 @@ describe("the review's findings 2 and 6: the Codex login", () => {
   });
 
   it("a lower source's max_input above the chosen window is dropped: 922,000 of models.dev against 400,000 listed (finding 2)", () => {
+    // An entry with no measured window: the vendor's window stands (one with a measured window takes none from it).
+    const catalog = catalogOf({ "openai-codex": [entry("gpt-6.1-sol", { canonical_id: "openai/gpt-6.1-sol", limit: { context: 1050000, input: 922000, output: 128000 } })] });
     const listed = { providers: { "openai-codex": { date: "2026-11-21", client: "provimux", models: [{ id: "gpt-6.1-sol", context_window: 400000 }] } } };
     const model = build({ catalog, listed }).listings[0]!.models![0]!;
     expect(model).toMatchObject({ context_window: 400000, max_input: null, max_output: 128000, sources: { context_window: "listed", max_input: null, max_output: "models.dev" } });
@@ -361,6 +363,66 @@ describe("the review's findings 2 and 6: the Codex login", () => {
     // A field an added entry does not inherit stays providers.dev's.
     const measuredOnly = build({ catalog: catalogOf({ s: [entry("own", { name: "Own", limit: { context: 900000 } }, { origin: "added", inherited: { from: "x/own", fields: ["release_date"] } })] }), listed: { providers: { s: { date: "2026-11-22", client: "provimux", models: [{ id: "own" }] } } } }).listings[0]!.models![0]!;
     expect(measuredOnly.sources).toMatchObject({ name: "providers.dev", context_window: "providers.dev" });
+  });
+});
+
+describe("a measured input window outranks the vendor's list (1.6.1)", () => {
+  // As the discovery file of 2026-11-25 has them. Devin's entries are added, with a measured window and no limit of
+  // their own; Codex's have models.dev's 1,050,000 and 922,000 and, but for gpt-6-sol, a measured window.
+  const devin = [
+    entry("swe-2", {}, { origin: "added", measured: 300499 }),
+    entry("gpt-6-1-sol", { canonical_id: "openai/gpt-6.1-sol" }, { origin: "added", inherited: { from: "openai/gpt-6.1-sol", fields: ["name"] }, measured: 921500 }),
+    entry("grok-4-7", {}, { origin: "added" }),
+  ];
+  const codexLimit = { limit: { context: 1050000, input: 922000, output: 128000 } };
+  const codex = [entry("gpt-6-astra", codexLimit, { measured: 921500 }), entry("gpt-6.1-terra", codexLimit, { measured: 920870 }), entry("gpt-6-sol", codexLimit)];
+  const catalog = catalogOf({ devin, "openai-codex": codex });
+  const day = { date: "2026-11-25", client: "provimux" };
+  const listed = (codexRows: ListedModel[]) => ({
+    providers: {
+      devin: { ...day, models: [{ id: "swe-2", context_window: 262000, max_output: 128000 }, { id: "gpt-6-1-sol", context_window: 1000000, max_input: 990000, max_output: 128000 }, { id: "grok-4-7", context_window: 500000, max_output: 100000 }, { id: "swe-2-1", context_window: 262144, max_output: 65536 }] as ListedModel[] },
+      "openai-codex": { ...day, models: codexRows },
+    },
+  });
+  const first = listed(["gpt-6-astra", "gpt-6.1-terra", "gpt-6-sol"].map((id) => ({ id, context_window: 872000 })));
+  const listingOf = (input: ReturnType<typeof listed>, provider: string) => build({ catalog, listed: input }).listings.find((listing) => listing.provider === provider)!;
+
+  it("devin/swe-2: no 262,000 from the vendor beside a measured input of 300,499; the rest of the vendor's row stays", () => {
+    const model = modelOf(listingOf(first, "devin").models, "swe-2");
+    expect(model).toMatchObject({ context_window: null, max_input: null, max_output: 128000, listed_by: ["listed"], sources: { context_window: null, max_input: null, max_output: "listed" } });
+  });
+
+  it("devin's GPT models: neither the vendor's window nor its max_input where 921,500 was measured", () => {
+    const model = modelOf(listingOf(first, "devin").models, "gpt-6-1-sol");
+    expect(model).toMatchObject({ context_window: null, max_input: null, max_output: 128000, sources: { context_window: null, max_input: null, max_output: "listed" } });
+  });
+
+  it("a model with no measured window, or with no entry, still takes the vendor's window", () => {
+    const listing = listingOf(first, "devin");
+    expect(modelOf(listing.models, "grok-4-7")).toMatchObject({ context_window: 500000, sources: { context_window: "listed" } });
+    expect(modelOf(listing.models, "swe-2-1")).toMatchObject({ entry: null, context_window: 262144, sources: { context_window: "listed" } });
+  });
+
+  it("openai-codex: a measured model keeps models.dev's 1,050,000 and 922,000, whatever window the vendor's list states", () => {
+    for (const input of [first, listed(["gpt-6-astra", "gpt-6.1-terra", "gpt-6-sol"].map((id) => ({ id })))]) {
+      const listing = listingOf(input, "openai-codex");
+      for (const id of ["gpt-6-astra", "gpt-6.1-terra"]) {
+        expect(modelOf(listing.models, id), id).toMatchObject({ context_window: 1050000, max_input: 922000, sources: { context_window: "models.dev", max_input: "models.dev" } });
+        expect(modelOf(listing.models, id).listed_by[0]).toBe("listed");
+      }
+    }
+  });
+
+  it("openai-codex/gpt-6-sol, not measured: the vendor's 872,000 stands and models.dev's 922,000 above it is dropped; with no window listed, models.dev's stand", () => {
+    expect(modelOf(listingOf(first, "openai-codex").models, "gpt-6-sol")).toMatchObject({ context_window: 872000, max_input: null, sources: { context_window: "listed", max_input: null } });
+    const withoutWindow = listingOf(listed([{ id: "gpt-6-sol" }]), "openai-codex");
+    expect(modelOf(withoutWindow.models, "gpt-6-sol")).toMatchObject({ context_window: 1050000, max_input: 922000, sources: { context_window: "models.dev", max_input: "models.dev" } });
+  });
+
+  it("a window providers.dev publishes for a measured entry (claude-subscription) is providers.dev's, not the vendor's", () => {
+    const own = catalogOf({ "claude-subscription": [entry("claude-opus-5-5", { limit: { context: 1000000 } }, { origin: "added", measured: 1000000 })] });
+    const model = build({ catalog: own, listed: { providers: { "claude-subscription": { ...day, models: [{ id: "claude-opus-5-5", context_window: 1000000, max_output: 128000 }] } } } }).listings[0]!.models![0]!;
+    expect(model).toMatchObject({ context_window: 1000000, max_output: 128000, sources: { context_window: "providers.dev", max_output: "listed" } });
   });
 });
 
