@@ -16,15 +16,15 @@ The baseline is imported daily from [models.dev](https://models.dev) (MIT). On t
 For five quantities (the input window, the maximum output, the short and the long cache lifetime, and the price) the
 API publishes one **safe value** (`providers_dev.safe`) and what every source states beside it. The order of the
 sources: what providers.dev measured (the most direct measurement that exists), providers.dev's own corrections and
-entries, models.dev, pi's catalog; the first that states a value gives it, and where two sources contradict each
+entries, models.dev, Pi's catalog; the first that states a value gives it, and where two sources contradict each
 other the website shows a warning. A measurement never changes `limit`, `cost` or `capabilities`: those stay as
 imported and corrected.
 
-Beside it, a second catalog is imported with the same daily run: the model catalog of the coding agent pi
-([pi.dev/models](https://pi.dev/models), MIT, from `https://pi.dev/api/models`). What pi states for an entry (how pi
+Beside it, a second catalog is imported with the same daily run: the model catalog of the coding agent Pi
+([pi.dev/models](https://pi.dev/models), MIT, from `https://pi.dev/api/models`). What Pi states for an entry (how Pi
 calls the model, its limits and prices, and where they differ from the published values) is published on that entry
-under `providers_dev.pi`, and never merged into its fields: models.dev stays the reference. pi is also the last
-source of the safe values: its figure is the safe value only where no other source states one. A model only pi lists
+under `providers_dev.pi`, and never merged into its fields: models.dev stays the reference. Pi is also the last
+source of the safe values: its figure is the safe value only where no other source states one. A model only Pi lists
 is not an entry.
 
 It publishes metadata only. There is no chat and no inference proxy. List prices per token are shown as models.dev
@@ -43,7 +43,7 @@ Needs Node 24 or newer.
 
 ```
 npm install
-npm run sync      # import models.dev, pi's catalog and the measurements into data/ (needs the network)
+npm run sync      # import models.dev, Pi's catalog and the measurements into data/ (needs the network)
 npm run build     # resolve the dataset and build the site into dist/
 npm run preview   # http://localhost:8787 : the site and the API, as on Cloudflare
 ```
@@ -60,7 +60,7 @@ If there is no snapshot, the build stops and says so; it never falls back to sam
 ```
 data/upstream/    the last good import of models.dev      written only by `npm run sync`
 data/sources/     observed.json and listed.json (groundtruth) written only by `npm run sync`
-data/pi/          the last good import of pi's catalog    written only by `npm run sync`
+data/pi/          the last good import of Pi's catalog    written only by `npm run sync`
 data/authored/    our providers, overrides, rules, listings  written by people
         │
         ▼  npm run data   (src/core/resolve.ts: deterministic, no network)
@@ -293,38 +293,38 @@ the published threshold, and that is the only thing a page works out.
 then the first matching id pattern, then the default. Only providers named there, and the ones we add, count as
 reviewed; the site marks the rest "by default" or "by name".
 
-### Pair pi's spelling with the catalog's
+### Pair Pi's spelling with the catalog's
 
-A pi model reaches the entry with its own provider id and model id. Where pi spells a provider or a model otherwise,
+A Pi model reaches the entry with its own provider id and model id. Where Pi spells a provider or a model otherwise,
 `data/authored/pi-aliases.yaml` pairs the two, and says nothing else:
 
 ```yaml
 providers:
-  fireworks:                       # pi's provider id
+  fireworks:                       # Pi's provider id
     same_as: fireworks-ai          # the provider of the catalog it is
     reason: Both catalogs give the same base URL for the provider.
     evidence:
       - { kind: listed, url: https://pi.dev/api/models, date: "2026-11-20", note: '...' }
-  openrouter:                      # a pi provider id the catalog has itself: no same_as, only models
+  openrouter:                      # a Pi provider id the catalog has itself: no same_as, only models
     checked: "2026-11-21"          # the day the model lines were checked against the report
     models:
-      "vendor/model-v2": { same_as: "vendor/model-2" }   # pi's model id: the entry's model id
+      "vendor/model-v2": { same_as: "vendor/model-2" }   # Pi's model id: the entry's model id
 ```
 
 A provider line with `same_as` needs a `reason` and `evidence`, and is written only where the two ids name the same
 service: the same base URL in both catalogs, or the provider's own documentation or models.dev's own record showing
-pi's address. Equal model ids alone are not enough. A model line is written only where the two ids name the same model
+Pi's address. Equal model ids alone are not enough. A model line is written only where the two ids name the same model
 at the same provider, the same deployment and price class; a `:batch` or `-batch` id is not the id without it. Equal
-ids always win over a line, and where two pi models reach one entry, the one with the entry's own ids keeps it.
+ids always win over a line, and where two Pi models reach one entry, the one with the entry's own ids keeps it.
 Nothing is matched by similarity. The file is checked like every authored file: a key it does not know, or a
 `same_as` without its evidence, fails `npm run data`.
 
 Matching is done before the catalog rules and the overrides leave entries out. `npm run data` writes
-`data/published/pi-report.json` (beside the published data, never served): each pi model is matched, left out (its
+`data/published/pi-report.json` (beside the published data, never served): each Pi model is matched, left out (its
 entry is left out, by which rule) or unmatched (with the reason, and `alike` and `same_host` as hints for this file).
-A line that no longer fits is reported in `/api/v1/meta`: `pi-alias-orphan` (it names a provider, entry or pi model
-that is gone), `pi-provider-collides` (the catalog now has the pi provider id itself), `pi-alias-conflict`,
-`pi-alias-redundant` (the entry now has the pi model's own id). None of them fails the build.
+A line that no longer fits is reported in `/api/v1/meta`: `pi-alias-orphan` (it names a provider, entry or Pi model
+that is gone), `pi-provider-collides` (the catalog now has the Pi provider id itself), `pi-alias-conflict`,
+`pi-alias-redundant` (the entry now has the Pi model's own id). None of them fails the build.
 
 ### State what a provider's model list holds
 
@@ -339,7 +339,7 @@ whole. Each model names the lists that have it (`listed_by`), and the listing gi
 and size (`lists`); `basis` is the highest-ranked source with a list. A model an override leaves out with evidence is
 in no listing of its provider, whichever list names it. Each field of a model is from the first source
 that states it, and the model names that source per field. One exception: where the model's entry has a measured
-input window, neither the vendor's list nor pi gives its `context_window` or `max_input` (pi gives no `max_output`
+input window, neither the vendor's list nor Pi gives its `context_window` or `max_input` (Pi gives no `max_output`
 either), so that no stated figure stands against the measurement; those fields are then the entry's (since API 1.6.1).
 Nothing of a listing is written into an entry.
 
@@ -367,10 +367,10 @@ rules:                    # optional: fields of models, by id or for every model
 A statement without evidence, or a key the file does not know, fails `npm run data`. A rule for a model the listing
 does not name raises `listing-rule-orphan`, and a file for a provider the catalog lacks `listing-provider-unknown`.
 A model an override in `data/authored/overrides/` leaves out with evidence is left out of its provider's listing
-whatever list names it (this folder's, models.dev's, pi's or the vendor's own); where the vendor's own list names it,
+whatever list names it (this folder's, models.dev's, Pi's or the vendor's own); where the vendor's own list names it,
 `listing-excluded-listed` asks for the override to be checked again.
 No value is copied from router-for-me's model files: each comes from the vendor's list or documentation, models.dev,
-pi or a measurement, and says which.
+Pi or a measurement, and says which.
 
 **Release dates.** An entry's `release_date` is models.dev's, or, for an entry providers.dev added, the one it inherits
 from the entry it names; a listed model's `released` is the first of: a rule here, the entry's date, models.dev's
@@ -384,7 +384,7 @@ stated; the file says why in a comment.
 ## Syncing
 
 - **By hand:** `npm run sync` (add `-- --force` to download again even if nothing changed), then `npm run build`.
-  `npm run sync -- --only=pi` imports pi's catalog alone and leaves models.dev and the measurements as they are.
+  `npm run sync -- --only=pi` imports Pi's catalog alone and leaves models.dev and the measurements as they are.
 - **Scheduled:** `.github/workflows/publish.yml` ("Publish", on) runs four times a day, at 04:17, 10:43, 16:29 and
   22:51 UTC, on every push to `main`, and from the Actions tab, on GitHub only. GitHub can delay a scheduled run by
   many hours or drop it (some days in November 2026 had none, and those that ran started 8 to 12 hours late), so four
@@ -408,7 +408,7 @@ stated; the file says why in a comment.
 
 `npm run sync` imports four sources, one after the other, each on its own: models.dev into `data/upstream/`, the
 measurements file into `data/sources/`, groundtruth's discovery file into `data/sources/`, and
-[pi's model catalog](https://pi.dev/api/models) (MIT) into `data/pi/`. models.dev is the reference; pi's catalog is a
+[pi's model catalog](https://pi.dev/api/models) (MIT) into `data/pi/`. models.dev is the reference; Pi's catalog is a
 second, extra source beside it. A failure of one source never touches another source's snapshot.
 
 The discovery file (`LISTED_URL` in `scripts/lib/sync.ts`) is groundtruth's `listed.json`, at the root of its
@@ -420,7 +420,7 @@ its id and the kept values; every other field is left out, so the committed copy
 digest and the ETag are the fetched file's, and an ETag is sent. A missing file (404) is "no discovery yet": nothing changes, a copy
 held before included, and `data/sync-status.json` records `listed: { status: "absent" }`. A file that is not JSON,
 does not fit the structure, or answers another error keeps the last good copy: the part is recorded as `failed` with
-the reason, the `Publish` run warns, and the build lists a `listed-sync-failed` warning in `/api/v1/meta`. Like pi's
+the reason, the `Publish` run warns, and the build lists a `listed-sync-failed` warning in `/api/v1/meta`. Like Pi's
 part, it never changes `last_attempt_ok`.
 
 What the file may hold, for whoever writes it (groundtruth's G1): per provider id of the catalog, `date`, `client`
@@ -455,7 +455,7 @@ If any check fails or models.dev is down, `data/upstream/` is left exactly as it
 error, and the next build publishes the last good snapshot with a note that the last sync failed. A lock file
 (`data/.sync.lock`) stops two syncs on one machine from running at once.
 
-pi's catalog (`PI_URL` in `src/core/schema.ts`; pi's part of the sync is `scripts/lib/pi-sync.ts`) is checked the
+Pi's catalog (`PI_URL` in `src/core/schema.ts`; Pi's part of the sync is `scripts/lib/pi-sync.ts`) is checked the
 same way: JSON in the expected structure (`PiFeed` in `src/core/pi.ts`), every provider key a valid provider id,
 every model's `id` its key and its `provider` its provider key, no model id the build cannot hold (`__proto__`), at
 least 10 providers and 300 models, and no more than 40% of either lost since the last import. The request and the
@@ -463,66 +463,66 @@ whole body must be done within 60 seconds, and the body is read from its stream 
 16 MB (the feed is about 1 MB), without reading the rest. It sends the stored ETag too, and an equal body counts as
 unchanged. The new snapshot is swapped in as the very last step of the import, so a feed that fails a check never
 replaces it. `data/pi/` holds `meta.json` (the
-address, the times, the ETag, `Last-Modified` and pi's catalog revision as sent, the digest of the body and the
+address, the times, the ETag, `Last-Modified` and Pi's catalog revision as sent, the digest of the body and the
 counts) and one file per provider key, its models sorted by id, each model exactly as the feed gives it.
 
 The two kinds of failure are told apart:
 
-- **Only the pi import fails** (pi down, not JSON, another structure, a key and an id that disagree, too small, 40%
-  lost, too slow, too large, or any fault in pi's own code): `data/pi/` is left as it was, `meta.json` included, or,
-  where pi's code failed after it had stored a good snapshot, as a healthy run leaves it; it is always a snapshot the
+- **Only the Pi import fails** (Pi down, not JSON, another structure, a key and an id that disagree, too small, 40%
+  lost, too slow, too large, or any fault in Pi's own code): `data/pi/` is left as it was, `meta.json` included, or,
+  where Pi's code failed after it had stored a good snapshot, as a healthy run leaves it; it is always a snapshot the
   build can use. models.dev and the measurements are imported as usual; the command prints why and exits 0. `data/sync-status.json` records it under its own `pi` key
   (`status: "failed"` and the error) and keeps `last_attempt_ok: true` with no `last_error`. The `Publish` run stays
-  green, with a warning on the run, and builds and deploys with the last good pi snapshot.
-- **models.dev or the measurements fail**: as described above, whatever pi did. `data/upstream/` stays as it was,
-  `last_attempt_ok` is `false`, the command exits with an error and the `Publish` run is marked failed. A good pi
+  green, with a warning on the run, and builds and deploys with the last good Pi snapshot.
+- **models.dev or the measurements fail**: as described above, whatever Pi did. `data/upstream/` stays as it was,
+  `last_attempt_ok` is `false`, the command exits with an error and the `Publish` run is marked failed. A good Pi
   import in the same run is still kept.
 
 `last_attempt_at`, `last_attempt_ok` and `last_error` in `data/sync-status.json` speak of models.dev and the
 measurements only; the `pi` key has its own time, status and error. The file is written twice in a run: once before
-the pi part, with the five fields of models.dev and the measurements and a `pi` record that says
-`The pi part did not finish.`, and once after it, with the pi part's outcome. So models.dev's result never waits on
-pi, and a run that dies inside the pi part leaves a record of an attempt that did not finish, never the previous
+the Pi part, with the five fields of models.dev and the measurements and a `pi` record that says
+`The pi part did not finish.`, and once after it, with the Pi part's outcome. So models.dev's result never waits on
+Pi, and a run that dies inside the Pi part leaves a record of an attempt that did not finish, never the previous
 attempt's success. `--only=pi` keeps the five fields as they were (a file that does not parse counts as having none),
-writes the `pi` key, exits with an error if the pi import failed, and exists so that a pi snapshot can be taken
+writes the `pi` key, exits with an error if the Pi import failed, and exists so that a Pi snapshot can be taken
 without moving `data/upstream/`.
 
-pi's part runs behind a fence (`scripts/lib/pi-fence.ts`, design section k): in the sync and in the build, pi's
+Pi's part runs behind a fence (`scripts/lib/pi-fence.ts`, design section k): in the sync and in the build, Pi's
 code is called in one guarded place each, and what it returns is taken only as plain data that fits the contract.
-The dataset is complete without pi before any of pi's code runs; then what pi states of the safe values is read from
+The dataset is complete without Pi before any of Pi's code runs; then what Pi states of the safe values is read from
 the checked blocks by the reference's own code (`piStatements`), through the same guard, and laid over the entries
-(`layPi`). No value that a measurement, providers.dev or models.dev states is different with or without pi's data:
-`npm run compare:published -- <without> <with>` checks it, taking pi's items off with `withoutPi`.
-Nothing on pi's side can stop the models.dev import, the build or the deploy, within three limits: a pi part that
-is well-formed, agrees with itself and is wrong is published as pi's part (it shows in `pi.counts` of
-`/api/v1/meta` and in the line the build prints, and where it gives no entry a pi block at all, the build says so
+(`layPi`). No value that a measurement, providers.dev or models.dev states is different with or without Pi's data:
+`npm run compare:published -- <without> <with>` checks it, taking Pi's items off with `withoutPi`.
+Nothing on Pi's side can stop the models.dev import, the build or the deploy, within three limits: a Pi part that
+is well-formed, agrees with itself and is wrong is published as Pi's part (it shows in `pi.counts` of
+`/api/v1/meta` and in the line the build prints, and where it gives no entry a Pi block at all, the build says so
 with a warning), and can then publish a wrong number as a safe value where no other source states one, marked
-`pi.dev` in the API, or a wrong warning wherever pi is listed; a computation that never ends is bounded only by the import's
-deadline and size cap; and a broken commit of pi's code is caught by the push that brings it, whose run fails. Two
-warnings say when pi's side went wrong:
+`pi.dev` in the API, or a wrong warning wherever Pi is listed; a computation that never ends is bounded only by the import's
+deadline and size cap; and a broken commit of Pi's code is caught by the push that brings it, whose run fails. Two
+warnings say when Pi's side went wrong:
 
-- **The pi import failed** (the `Import` step's output `pi=failed`): the run stays green with the warning
-  "The pi import failed", and the site is built with the last good pi snapshot.
-- **pi data missing from the build** (the build step's output `pi=turned_away` or `pi=published_without_blocks`):
-  - `turned_away`: the stored pi snapshot cannot be used, what pi's code gave does not fit the contract or does not
+- **The Pi import failed** (the `Import` step's output `pi=failed`): the run stays green with the warning
+  "The pi import failed", and the site is built with the last good Pi snapshot.
+- **Pi data missing from the build** (the build step's output `pi=turned_away` or `pi=published_without_blocks`):
+  - `turned_away`: the stored Pi snapshot cannot be used, what Pi's code gave does not fit the contract or does not
     agree with itself, or the `pi` record of `data/sync-status.json` does not fit. The dataset is built and deployed
     without that part, and `/api/v1/meta` lists the reason under `issues` (`pi-snapshot-unreadable`, one per part
     left out).
-  - `published_without_blocks`: pi's data is usable and fits, and no entry has a pi block. When a usable pi
+  - `published_without_blocks`: Pi's data is usable and fits, and no entry has a Pi block. When a usable Pi
     snapshot gives no block at all, the build says so: `/api/v1/meta` lists a `pi-no-blocks` warning with the
     snapshot's number of models and how many were left out and unmatched, and the build prints it. The data is
-    published as pi's code gave it: nothing is turned away or repaired.
+    published as Pi's code gave it: nothing is turned away or repaired.
 
-  Either way the run carries the warning "pi data missing from the build", and the safe values only pi states are
+  Either way the run carries the warning "pi data missing from the build", and the safe values only Pi states are
   published as unknown. Without a folder `data/pi/` at all, the
-  dataset simply has no pi data, with no warning about the data; a record of the last pi import in
+  dataset simply has no Pi data, with no warning about the data; a record of the last Pi import in
   `data/sync-status.json` that cannot be used still gives its own warning, folder or not.
 
 On GitHub the import step writes its outcome per source (`upstream`, `measurements`, `pi`) and `pi_revision7`, the
-first seven characters of the stored pi snapshot's revision, to the step's outputs; the build step writes `pi`
+first seven characters of the stored Pi snapshot's revision, to the step's outputs; the build step writes `pi`
 (`published`, `published_without_blocks`, `none` or `turned_away`). The warning steps read them, and a snapshot
 commit names what changed (`sync: models.dev <commit>`, `sync: pi <revision>`, both, or `sync: measurements`)
-without reading any file of pi's.
+without reading any file of Pi's.
 
 The import is not made tolerant of a change in models.dev's structure: that is the owner's decision. When models.dev
 changes the type of a field the site reads, the import fails on purpose: the site goes on serving the last good
@@ -563,7 +563,7 @@ method), **models** (canonical: a model as its lab names it) and **evaluations**
 | `GET /api/v1/listings` | listings: every model a provider offers, evaluated or not; `?view=full` adds the models, at most 40 listings a page (since 1.5.1), `?provider=` and `?basis=` filter (since 1.5.0) |
 | `GET /api/v1/listings/{provider}` | one listing with its models (since 1.5.0) |
 | `GET /api/v1/catalog` | the complete merged catalog, `{ meta, data }` with `data` keyed by provider id |
-| `GET /api/v1/meta` | dataset version, counts, freshness, the stale threshold (`stale_after_days`), upstream commit, sync status, pi's catalog (`pi`), the listings and the discovery file (`listings`), open issues |
+| `GET /api/v1/meta` | dataset version, counts, freshness, the stale threshold (`stale_after_days`), upstream commit, sync status, Pi's catalog (`pi`), the listings and the discovery file (`listings`), open issues |
 | `GET /api/v1/openapi.json` | the OpenAPI 3.1 document |
 | `GET /api.json` | the merged catalog keyed by provider id, in the models.dev v2 structure, no envelope |
 
@@ -613,12 +613,12 @@ and belongs in `/api/v2`. Once the record has grown beyond 1.0.0, the version (`
 `src/core/openapi.ts`) must be above it: a release that adds something takes a minor step. The version restarted at
 1.0.0 with the first public release; the numbers before it were never public. 1.1.0 (2026-11-17) added the input window
 range of a model: `input_window_min`, `input_window_max`, `input_window_unknown_count` and `input_window_reference`,
-and the component `ModelInputWindowEnd`. 1.2.0 added pi's catalog: `providers_dev.pi` on every entry (the
-block, or `null` where pi does not list it), `pi` on every entry summary, `pi` in `/api/v1/meta` with the keys `pi` and
+and the component `ModelInputWindowEnd`. 1.2.0 added Pi's catalog: `providers_dev.pi` on every entry (the
+block, or `null` where Pi does not list it), `pi` on every entry summary, `pi` in `/api/v1/meta` with the keys `pi` and
 `pi_notice` of its `license`, and the components `PiBlock`, `PiCost`, `PiCostTier`, `PiDifference` and `PiSummary`.
-1.3.0 added `values` to the pi block, and the component `PiValue`: for each of the nine values pi's catalog can
-state of an entry (its two limits, four prices, tiers and two cache lifetimes), pi's value and its standing beside
-the entry's own (`agrees`, `differs`, `only`, `not_compared`, `silent`). A value only pi states is there and in no
+1.3.0 added `values` to the Pi block, and the component `PiValue`: for each of the nine values Pi's catalog can
+state of an entry (its two limits, four prices, tiers and two cache lifetimes), Pi's value and its standing beside
+the entry's own (`agrees`, `differs`, `only`, `not_compared`, `silent`). A value only Pi states is there and in no
 field of the entry. With it, `differences` lists no price and no tiers on a subscription entry
 (`design/pi-merged.md`).
 1.4.0 added `safe` to every entry (`providers_dev.safe`) and every summary: for the input window, the maximum
@@ -645,7 +645,7 @@ without an API entry to refer to (`github-copilot/mai-code-1.1-flash`, `mai-code
 1.5.0 added the listings: the paths `/api/v1/listings` (with `provider`, `basis`, `view`, `limit` and `offset`) and
 `/api/v1/listings/{provider}`, `listings` in `/api/v1/meta`, the error code `listing_not_found`, and the components
 `Listing`, `ListingModel`, `ListingReasoning`, `ListingSources` and `ListingReasoningSources`: every model a provider
-and access method offers, evaluated or not, from the vendor's own list, providers.dev, models.dev or pi, each field
+and access method offers, evaluated or not, from the vendor's own list, providers.dev, models.dev or Pi, each field
 with its source.
 1.5.1 changed no structure: it fixed a range that never worked. A page of `/api/v1/listings?view=full` holds at most
 40 listings, and 40 when `limit` is not given; a larger `limit` returns 400 (`invalid_parameters`), as a limit above
@@ -654,14 +654,14 @@ full failed with 500 on Cloudflare (each listing in full is a file, each file a 
 [Worker subrequests](#worker-subrequests)). `view=summary` keeps 1 to 200, default 50. The OpenAPI schema of `limit`
 is shared by both views and stays as recorded (maximum 200, default 50); its description gives the range in full.
 1.6.0 made a listing the union of its sources: its `models` are every model the vendor's own list, an authored list,
-models.dev and pi list for the provider, each once, where until 1.5.1 they were the list of `basis` taken whole. It
+models.dev and Pi list for the provider, each once, where until 1.5.1 they were the list of `basis` taken whole. It
 added `listed_by` to `ListingModel` (the sources whose list names the model, in the fixed order), `lists` to `Listing`
 (per source its list's `listed_at` and `model_count`, or `null`) and the components `ListingList` and `ListingLists`.
 `basis` stays: the highest-ranked source that has a list, with its date in `listed_at`; it no longer means that the
 list is whole. A model no source names takes its id as its name from the first list that has it. The fields of a model
 are chosen as before.
 1.6.1 changed no structure: it corrected which source gives a model's window. Where the model's entry has a
-measured input window, the vendor's own list gives the listing no `context_window` and no `max_input`, as pi gives
+measured input window, the vendor's own list gives the listing no `context_window` and no `max_input`, as Pi gives
 none: both are then where the entry takes them (providers.dev, models.dev), or `null`. A measurement counts before a
 stated value, and in 1.6.0 the vendor's figure stood against it (`devin/swe-2`: 262,000 listed, an input of 300,499
 read in full). The vendor's other fields of the model are taken as before.
@@ -730,7 +730,7 @@ a measured item naming its client, its kind, its evaluation and its raw result).
 gives it: the most direct measurement (on an API-key entry, requests sent straight to the provider; on a login, the
 vendor's own client, else direct, else a proxy), then providers.dev, then models.dev, then pi.dev. Where the first is
 a window and a later source states a cap on the input not above it, the cap is the value. A price is taken whole from
-one source. `differing` lists the quantities whose sources contradict each other: the website's warnings. pi's
+one source. `differing` lists the quantities whose sources contradict each other: the website's warnings. Pi's
 statements are laid on after the fence (`layPi`), and change a value only where no other source states one.
 `safeValues`, `layPi` and `mirror` in `src/core/safe.ts` work it out once; the records above carry the same values,
 copied by `mirror`. `/api/v1/entries` sorts by the safe input window (`sort=input_window`), filters by it
@@ -1008,10 +1008,10 @@ For what does not fit an issue: [office@providers.dev](mailto:office@providers.d
 - The imported baseline: models.dev, MIT, Copyright (c) 2025 models.dev. The full text is in
   [`LICENSES/models.dev-MIT.txt`](./LICENSES/models.dev-MIT.txt) and ships with the dataset as
   `/data/LICENSE-models.dev.txt` and `/data/NOTICE.txt`.
-- pi's model catalog: pi (https://github.com/earendil-works/pi), MIT, Copyright (c) 2025 Mario Zechner. The full text
+- Pi's model catalog: Pi (https://github.com/earendil-works/pi), MIT, Copyright (c) 2025 Mario Zechner. The full text
   is in [`LICENSES/pi-MIT.txt`](./LICENSES/pi-MIT.txt) and ships with the dataset as `/data/LICENSE-pi.txt`; `/data/NOTICE.txt`
-  names it. Every `providers_dev.pi` block is pi's.
+  names it. Every `providers_dev.pi` block is Pi's.
 - In the data, everything else under `providers_dev`, every entry with `providers_dev.origin: "added"` and every field
   listed in a `providers_dev.provenance` array is ours; the rest is models.dev's.
 
-providers.dev is not affiliated with or endorsed by models.dev, pi or any provider it lists.
+providers.dev is not affiliated with or endorsed by models.dev, Pi or any provider it lists.

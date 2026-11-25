@@ -168,7 +168,7 @@ describe("Provimux's pages", () => {
     for (const words of [
       "brew install ngvoicu/tap/provimux", "brew services start provimux", "ghcr.io/ngvoicu/provimux",
       "pi install npm:pi-provimux", "https://www.npmjs.com/package/pi-provimux", "https://github.com/ngvoicu/pi-provimux",
-      "It needs pi 1.6.0 or newer.", "This needs Provimux 8.1.1-pmx.1 or newer.",
+      "It needs Pi 1.6.0 or newer.", "This needs Provimux 8.1.1-pmx.1 or newer.",
       "https://github.com/ngvoicu/provimux", "https://providers.dev", 'href="/support/"',
     ]) expect(text, words).toContain(words);
   });

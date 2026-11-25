@@ -208,14 +208,14 @@ describe("API response boundary", () => {
       "the client's own system prompt and tool definitions included", "it is what the route accepts, the client's own prompt and tools included, not what is left after them",
       "<strong>Measured</strong>", "<strong>providers.dev</strong>", "<strong>models.dev</strong>", "<strong>pi.dev</strong>",
       "only requests sent straight to the provider count", "the vendor's own client counts first", "<em>Not counted</em>",
-      "A price is taken whole from one source, never mixed", "pi's 0 states nothing", "the cap is the value",
+      "A price is taken whole from one source, never mixed", "Pi's 0 states nothing", "the cap is the value",
       "at or below 99 %", "at or above 101 %", "A source that states nothing does not disagree", "prices agree only when exactly equal",
       "<code>agreement: \"differ\"</code>", "<code>disagree</code>", "<code>safe.input_window.window_tokens</code>", "rounded down, never up",
       "One account per route.", "goes stale as all providers.dev evidence does", "A refused size is the probe's count, not the provider's.",
       "A window a route names is its total.", "become the value of an entry only where no other source states one",
     ]) expect(source, words).toContain(words);
     // The rules the safe values replaced, and pi's standings, are gone; pi does give a safe value.
-    for (const gone of ["pi's data enters no safe value", "<em>Documentation contradicted</em>", "the lowest decides", "<strong>pi agrees</strong>", "in two figures only", "<code>limit.context</code> and nothing else"]) expect(source, gone).not.toContain(gone);
+    for (const gone of ["Pi's data enters no safe value", "<em>Documentation contradicted</em>", "the lowest decides", "<strong>Pi agrees</strong>", "in two figures only", "<code>limit.context</code> and nothing else"]) expect(source, gone).not.toContain(gone);
     expect(source).not.toContain("limit-value");
   });
 
@@ -707,7 +707,7 @@ describe("pi's catalog on the pages", () => {
     // Each flag pi states, once, with pi's name and value; the provider's in words.
     for (const [name, value] of Object.entries(block.compat as JsonObject)) expect(section.split(`<code>${name}: ${escapeHtml(JSON.stringify(value))}</code>`).length - 1, name).toBe(1);
     expect(section).toContain("The <code>store</code> request field<div class=\"hint\"><code>supportsStore: false</code></div></dt><dd>Not accepted</dd>");
-    for (const [level, value] of Object.entries(block.thinking_level_map as JsonObject)) expect(section).toContain(`<dt>${level}</dt><dd>${value === null ? '<span class="muted" title="pi marks this level as not supported.">not supported</span>' : `<code>${value}</code>`}</dd>`);
+    for (const [level, value] of Object.entries(block.thinking_level_map as JsonObject)) expect(section).toContain(`<dt>${level}</dt><dd>${value === null ? '<span class="muted" title="Pi marks this level as not supported.">not supported</span>' : `<code>${value}</code>`}</dd>`);
     // Whose data it is, and as of when: fetched from pi, last checked unchanged, its values in the rows, pi's list.
     expect(section).toContain("Fetched <span class=\"date\" title=\"2026-11-20 14:19 UTC\">2026-11-20</span> from <a href=\"https://pi.dev/api/models\"");
     expect(section).toContain("Last checked <span class=\"date\" title=\"2026-11-21 04:17 UTC\">2026-11-21</span>, unchanged");
@@ -720,7 +720,7 @@ describe("pi's catalog on the pages", () => {
     expect(section).not.toMatch(/id="pi-prices"|Limits and prices|>Cache lifetimes<|No difference/);
     // No difference: the mark in the heading says no more than pi.dev, and no value warns.
     expect(html).not.toContain("warn-sign");
-    expect(head).toContain('<span class="origin pi" title="pi&#39;s model catalog (pi.dev) also lists this entry. Imported, not verified by providers.dev. It is the last source of each value.">pi.dev</span>');
+    expect(head).toContain('<span class="origin pi" title="Pi&#39;s model catalog (pi.dev) also lists this entry. Imported, not verified by providers.dev. It is the last source of each value.">pi.dev</span>');
     expect(head).toMatch(/>pi\.dev<\/span><span class="muted date" title="[^"]*">2026-11-20<\/span>/);
     expect(head).not.toContain("differ<");
   });
@@ -773,7 +773,7 @@ describe("pi's catalog on the pages", () => {
       const html = await (await page(`/entries/${ref}`)).text();
       expect(html, ref).not.toMatch(/class="pi-(?:note|only|line|tiers-line)"|pi-tiers-table|class="origin pi"|<span class="warn-src">pi\.dev<\/span>/);
       const { section } = parts(html);
-      expect(section.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim(), ref).toMatch(/^How pi calls the model (?:This dataset is built without pi's catalog|pi's model catalog does not list this entry)/);
+      expect(section.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim(), ref).toMatch(/^How Pi calls the model (?:This dataset is built without Pi's catalog|Pi's model catalog does not list this entry)/);
     }
   });
 
@@ -781,7 +781,7 @@ describe("pi's catalog on the pages", () => {
     const { section, head } = parts(await piPage("/entries/provider-02/model-9"));
     expect(section).toContain("<code>provider-02/Model-Nine</code>");
     expect(section).toContain("<strong>Model Nine</strong>");
-    expect(section).toContain("Paired by providers.dev: pi spells the provider or model id otherwise than this entry.");
+    expect(section).toContain("Paired by providers.dev: Pi spells the provider or model id otherwise than this entry.");
     expect(head).toContain("as provider-02/Model-Nine");
   });
 
@@ -790,7 +790,7 @@ describe("pi's catalog on the pages", () => {
     expect((entry.providers_dev as JsonObject).pi).toBeNull();
     const html = await piPage("/entries/provider-20/lab/model-4");
     const { section, head } = parts(html);
-    expect(section).toContain("pi's model catalog does not list this entry.");
+    expect(section).toContain("Pi's model catalog does not list this entry.");
     expect(section).toContain("Fetched <span class=\"date\"");
     expect(section).not.toContain("<table");
     expect(head).not.toContain("pi.dev");
@@ -805,11 +805,11 @@ describe("pi's catalog on the pages", () => {
     for (const path of ["/?q=model-4&limit=200", "/providers/provider-02/", "/models/lab/model-4/"]) {
       const html = await piPage(path);
       const listed = rowOf(html, "provider-02/lab/model-4");
-      expect(listed, path).toContain('<span class="origin pi" title="pi&#39;s model catalog (pi.dev) also lists this entry.');
+      expect(listed, path).toContain('<span class="origin pi" title="Pi&#39;s model catalog (pi.dev) also lists this entry.');
       // Three sources, each a mark and its date, pi's last.
       const sources = listed.split('<td class="nowrap source-col" data-label="Source">')[1]!.split("</td>")[0]!;
       expect(sources.replace(/<[^>]+>/g, " ").trim().split(/\s+/), path).toEqual(["models.dev", expect.stringMatching(/^\d{4}-\d\d-\d\d$/), "providers.dev", "2026-11-01", "pi.dev", fetched]);
-      expect(sources, path).toMatch(new RegExp(`>pi\\.dev</span><span class="muted date" title="Fetched from pi&#39;s catalog ${fetched} \\d\\d:\\d\\d UTC\\. Last checked ${checked} \\d\\d:\\d\\d UTC: unchanged since the fetch\\.">${fetched}</span></span>$`));
+      expect(sources, path).toMatch(new RegExp(`>pi\\.dev</span><span class="muted date" title="Fetched from Pi&#39;s catalog ${fetched} \\d\\d:\\d\\d UTC\\. Last checked ${checked} \\d\\d:\\d\\d UTC: unchanged since the fetch\\.">${fetched}</span></span>$`));
       expect(listed).not.toMatch(/\d differs?|otherwise/i);
       expect(listed).not.toContain("pi-differ");
       // The pi.dev mark and what follows it show fetched_at, not checked_at. Only that part is searched: the models.dev
@@ -822,7 +822,7 @@ describe("pi's catalog on the pages", () => {
       if (!path.startsWith("/providers/")) {
         const unlisted = rowOf(html, "provider-20/lab/model-4");
         expect(unlisted, path).not.toContain("pi.dev");
-        expect(unlisted, path).not.toContain("pi&#39;s catalog");
+        expect(unlisted, path).not.toContain("Pi&#39;s catalog");
         // One source, one date: the models.dev import's.
         const own = unlisted.split('<td class="nowrap source-col" data-label="Source">')[1]!.split("</td>")[0]!;
         expect(own, path).toMatch(/^<span class="sources"><span class="origin upstream"[^>]*>models\.dev<\/span><span class="muted date" title="Imported from models\.dev on this date\.">\d{4}-\d\d-\d\d<\/span><\/span>$/);
@@ -840,7 +840,7 @@ describe("pi's catalog on the pages", () => {
   it("the home page's lead names pi's model catalog, with a link to the methodology, where a pi snapshot exists", async () => {
     const html = await piPage("/");
     const lead = html.match(/<p class="lead">([\s\S]*?)<\/p>/)![1]!;
-    expect(lead).toContain('Built on <a href="https://models.dev">models.dev</a> and <a href="/docs/methodology/#pi">pi\'s model catalog</a>, with our own <a href="/?origin=modified,added">corrections and measurements</a> on top.');
+    expect(lead).toContain('Built on <a href="https://models.dev">models.dev</a> and <a href="/docs/methodology/#pi">Pi\'s model catalog</a>, with our own <a href="/?origin=modified,added">corrections and measurements</a> on top.');
     expect(lead).not.toMatch(/\d/);
   });
 
@@ -848,10 +848,10 @@ describe("pi's catalog on the pages", () => {
     for (const path of ["/", "/?q=model-4&limit=200"]) {
       const html = await piPage(path);
       // Every text and every attribute value of the page, and of them those that speak of pi.
-      const aboutPi = html.split(/[<>"]/).filter((piece) => /\bpi\b|pi\.dev|pi&#39;s/i.test(piece));
+      const aboutPi = html.split(/[<>"]/).filter((piece) => /\bpi\b|pi\.dev|Pi&#39;s/i.test(piece));
       expect(aboutPi.length, path).toBeGreaterThan(2);
       expect(aboutPi.filter((piece) => /differ/i.test(piece)), path).toEqual([]);
-      expect(html, path).toContain("and the import of pi&#39;s catalog, where pi lists the entry.");
+      expect(html, path).toContain("and the import of Pi&#39;s catalog, where Pi lists the entry.");
     }
   });
 
@@ -873,25 +873,25 @@ describe("pi's catalog on the pages", () => {
     };
     const footer = async (read: (path: string) => Promise<Response>) => (await (await handlePage(new Request("https://providers.dev/providers/"), { api: read, shell: async () => new Response(shell), site: "https://providers.dev", now })).text()).split("<footer>")[1]!;
     const fetchedOnly = await footer(withMeta((pi) => ({ ...pi, snapshot: { ...pi.snapshot!, checked_at: pi.snapshot!.fetched_at } })));
-    expect(fetchedOnly).toContain("<li>pi's catalog fetched 2026-11-20</li>");
+    expect(fetchedOnly).toContain("<li>Pi's catalog fetched 2026-11-20</li>");
     expect(fetchedOnly).not.toContain("last checked");
     const failedFirst = await footer(withMeta((pi) => ({ ...pi, snapshot: null, sync: { last_attempt_at: "2026-11-21T04:17:00.000Z", last_attempt_ok: false, last_error: "pi.dev answered HTTP 503" }, counts: { entries_with_block: 0, left_out_models: 0, unmatched_models: 0 } })));
-    expect(failedFirst).toContain('<li class="stale">The last import of pi\'s catalog failed. This dataset has no pi data.</li>');
+    expect(failedFirst).toContain('<li class="stale">The last import of Pi\'s catalog failed. This dataset has no Pi data.</li>');
     expect(failedFirst).not.toContain("Its data is the last good snapshot");
     const failedLater = await footer(withMeta((pi) => ({ ...pi, sync: { last_attempt_at: "2026-11-21T04:17:00.000Z", last_attempt_ok: false, last_error: "pi.dev answered HTTP 503" } })));
-    expect(failedLater).toContain("The last import of pi's catalog failed. Its data is the last good snapshot.");
+    expect(failedLater).toContain("The last import of Pi's catalog failed. Its data is the last good snapshot.");
     // The second review: by time, not by spelling. The same instant, and an earlier one, spelled to sort later as text.
     for (const [fetched, checked] of [["2026-11-21T05:00:00.000Z", "2026-11-21T05:00:00Z"], ["2026-11-21T05:00:00.418Z", "2026-11-21T05:00:00Z"]]) {
       const html = await footer(withMeta((pi) => ({ ...pi, snapshot: { ...pi.snapshot!, fetched_at: fetched!, checked_at: checked! } })));
-      expect(html).toContain("<li>pi's catalog fetched 2026-11-21</li>");
+      expect(html).toContain("<li>Pi's catalog fetched 2026-11-21</li>");
     }
     const later = await footer(withMeta((pi) => ({ ...pi, snapshot: { ...pi.snapshot!, fetched_at: "2026-11-21T05:00:00.000Z", checked_at: "2026-11-22T05:00:00Z" } })));
-    expect(later).toContain("<li>pi's catalog fetched 2026-11-21, last checked 2026-11-22</li>");
+    expect(later).toContain("<li>Pi's catalog fetched 2026-11-21, last checked 2026-11-22</li>");
   });
 
   it("dates pi's catalog in the footer of every page, and says when its last import failed", async () => {
     const html = await piPage("/providers/");
-    expect(html).toContain("<li>pi's catalog fetched 2026-11-20, last checked 2026-11-21</li>");
-    expect(html).not.toContain("The last import of pi's catalog failed");
+    expect(html).toContain("<li>Pi's catalog fetched 2026-11-20, last checked 2026-11-21</li>");
+    expect(html).not.toContain("The last import of Pi's catalog failed");
   });
 });

@@ -11,7 +11,7 @@ const words = (text: string): string => escapeHtml(text).replace(/`([^`]+)`/g, "
 <Doc
   title="Methodology"
   description="Where each value on providers.dev comes from: one value per quantity from four sources in a fixed order, a warning where they disagree, how the models.dev baseline is merged with corrections and evaluations, and what unknown means."
-  lead="The catalog is the latest verified import of models.dev, plus added providers, documented corrections and independent evaluations, with pi's model catalog as the last source. Each quantity is shown as one value, chosen by one rule; where the sources disagree, a warning shows what each one states. This page explains how."
+  lead="The catalog is the latest verified import of models.dev, plus added providers, documented corrections and independent evaluations, with Pi's model catalog as the last source. Each quantity is shown as one value, chosen by one rule; where the sources disagree, a warning shows what each one states. This page explains how."
   toc={[
     { id: "kinds", label: "Sources" },
     { id: "safe-values", label: "One value per quantity" },
@@ -23,7 +23,7 @@ const words = (text: string): string => escapeHtml(text).replace(/`([^`]+)`/g, "
     { id: "listings", label: "Model lists" },
     { id: "merge", label: "Merge rules" },
     { id: "sync", label: "Daily import" },
-    { id: "pi", label: "pi's catalog" },
+    { id: "pi", label: "Pi's catalog" },
     { id: "caching", label: "Documented caching" },
     { id: "evaluations", label: "Cache evaluations" },
     { id: "lifetimes", label: "Cache lifetimes" },
@@ -37,7 +37,7 @@ const words = (text: string): string => escapeHtml(text).replace(/`([^`]+)`/g, "
       <li><strong>Measured.</strong> Observed by providers.dev by sending requests. A measurement names the access method, the client the requests went through, the date and the raw result.</li>
       <li><span class="origin added">providers.dev</span> <strong>Stated by providers.dev.</strong> A correction of an imported entry, or a value of an entry providers.dev adds, each resting on the provider's own page, named with the date it was read.</li>
       <li><span class="origin upstream">models.dev</span> <strong>Imported.</strong> Copied from models.dev and not independently checked. Its date is the date of the import.</li>
-      <li><span class="origin pi">pi.dev</span> <strong>pi's catalog.</strong> What the model catalog of the coding agent pi states for an entry, imported and not independently checked (see <a href="#pi">pi's catalog</a>). Its date is the date of the import of pi's catalog.</li>
+      <li><span class="origin pi">pi.dev</span> <strong>Pi's catalog.</strong> What the model catalog of the coding agent Pi states for an entry, imported and not independently checked (see <a href="#pi">Pi's catalog</a>). Its date is the date of the import of Pi's catalog.</li>
       <li><strong>API price.</strong> The list price of the API entry of the same model, shown on a subscription entry and marked "API price". It is the only value an entry takes from another one (see <a href="#prices">Prices</a>).</li>
     </ul>
     <p>
@@ -62,11 +62,11 @@ const words = (text: string): string => escapeHtml(text).replace(/`([^`]+)`/g, "
       <li><strong>Measured</strong>: the most direct measurement of the entry (below).</li>
       <li><strong>providers.dev</strong>: a correction with its evidence, or the value of an entry providers.dev adds.</li>
       <li><strong>models.dev</strong>: the entry as imported.</li>
-      <li><strong>pi.dev</strong>: pi's catalog, where it lists the entry.</li>
+      <li><strong>pi.dev</strong>: Pi's catalog, where it lists the entry.</li>
     </ol>
     <p>
       Where no source states one, the value is <em>Unknown</em>. A price is taken whole from one source, never mixed: a part one source lacks, a cache-read price say, is not
-      filled in from another. providers.dev does not measure prices, so a price is providers.dev's, models.dev's or pi's.
+      filled in from another. providers.dev does not measure prices, so a price is providers.dev's, models.dev's or Pi's.
     </p>
     <h3>Which measurement counts</h3>
     <ul>
@@ -94,7 +94,7 @@ const words = (text: string): string => escapeHtml(text).replace(/`([^`]+)`/g, "
     <ul>
       <li>A source that states nothing has no say: a field that is missing or <code>null</code>, and a limit of 0, which means none stated.</li>
       <li>A cache lifetime of 0 (the entry does not cache) and a listed price of 0 are statements. A lifetime of 0 is shown as <em>None</em>, whatever its source.</li>
-      <li>pi writes 0 both for a price it does not charge and for one it has not recorded, so pi's 0 states nothing. pi states no price for a subscription entry.</li>
+      <li>Pi writes 0 both for a price it does not charge and for one it has not recorded, so Pi's 0 states nothing. Pi states no price for a subscription entry.</li>
       <li>
         providers.dev can publish a value as unknown on purpose, where the imported one does not hold for an access method. That is its statement: the value is{" "}
         <em>Unknown</em>, no later source fills it, and the warning shows what the others state.
@@ -212,7 +212,7 @@ const words = (text: string): string => escapeHtml(text).replace(/`([^`]+)`/g, "
     <ul>
       <li>
         Prices are list prices in US dollars. The price of an entry is one source's, whole: providers.dev's where it corrects one, else models.dev's (<code>cost</code>), else
-        pi's (see <a href="#safe-values">One value per quantity</a>). Every price is printed with every digit the source states.
+        Pi's (see <a href="#safe-values">One value per quantity</a>). Every price is printed with every digit the source states.
       </li>
       <li>
         Text is priced per million tokens. Audio, images, video and web search are charges of their own, each in the unit the source gives: per million tokens or characters, per second
@@ -263,7 +263,7 @@ const words = (text: string): string => escapeHtml(text).replace(/`([^`]+)`/g, "
       state of them, and no price or cache data. The lists are published as <a href="/api/v1/listings"><code>/api/v1/listings</code></a>. A listing joins the lists of four
       sources, each model once: the vendor's own list as one signed-in account received it (another plan's list may differ), read through a login by the daily discovery of <a href="https://github.com/ngvoicu/groundtruth">groundtruth</a> and published
       in its <code>listed.json</code>, with the client that read it named beside the list; a list providers.dev states, with evidence; the models models.dev lists for the provider;
-      and the models pi's catalog lists for it. No list is taken as the whole: a login reads only the models its own subscription offers, and a plan tier or a subscription
+      and the models Pi's catalog lists for it. No list is taken as the whole: a login reads only the models its own subscription offers, and a plan tier or a subscription
       providers.dev does not hold can offer more, so the joined list too can miss a model. A model providers.dev leaves out of the provider with evidence is not on it, whichever
       list names it. The API names, per model, the lists that have it, and the page marks them in the model's sources, each with its list's date. An entry carries the mark of the
       vendor's own list where that list names it: <em>subscription</em> where it was read through a subscription login. Each value of a model without an entry (context window,
@@ -283,7 +283,7 @@ const words = (text: string): string => escapeHtml(text).replace(/`([^`]+)`/g, "
       <li><strong>Additions</strong>: providers and entries that models.dev does not have.</li>
       <li><strong>Corrections</strong>: single fields set on upstream entries. They take precedence.</li>
     </ol>
-    <p>pi's catalog is a fourth input that sets no field of an entry and stands last: what it states is published under <code>providers_dev.pi</code>, and its limits, prices and lifetimes are the last source of the safe values (see <a href="#pi">pi's catalog</a>).</p>
+    <p>Pi's catalog is a fourth input that sets no field of an entry and stands last: what it states is published under <code>providers_dev.pi</code>, and its limits, prices and lifetimes are the last source of the safe values (see <a href="#pi">Pi's catalog</a>).</p>
     <p>A correction is a patch applied field by field:</p>
   </div>
   <div class="scroll max-w-[62rem]">
@@ -319,67 +319,67 @@ const words = (text: string): string => escapeHtml(text).replace(/`([^`]+)`/g, "
       snapshot stays in place and keeps being served; the footer and <code>/api/v1/meta</code> report the failed import. Visitors and API requests never trigger a fetch.
     </p>
     <p>
-      The same run fetches pi's model catalog from <a href="https://pi.dev/api/models"><code>pi.dev/api/models</code></a>, automatically and on its own: it is checked in the same way, and a
+      The same run fetches Pi's model catalog from <a href="https://pi.dev/api/models"><code>pi.dev/api/models</code></a>, automatically and on its own: it is checked in the same way, and a
       failure of either source leaves the other's import and its own last good snapshot as they were.
     </p>
-    <p>The current import, source commit and counts are published at <a href="/api/v1/meta"><code>/api/v1/meta</code></a>, pi's under <code>pi</code>.</p>
+    <p>The current import, source commit and counts are published at <a href="/api/v1/meta"><code>/api/v1/meta</code></a>, Pi's under <code>pi</code>.</p>
 
-    <h2 id="pi">pi's catalog</h2>
+    <h2 id="pi">Pi's catalog</h2>
     <p>
-      pi is a coding agent (<a href="https://github.com/earendil-works/pi">github.com/earendil-works/pi</a>, MIT License). Its model catalog, <a href="https://pi.dev/models">pi.dev/models</a>,
-      says how pi calls each model it supports and at what price and limits it reckons. providers.dev imports it beside models.dev and is not affiliated with pi. A model that only pi
+      Pi is a coding agent (<a href="https://github.com/earendil-works/pi">github.com/earendil-works/pi</a>, MIT License). Its model catalog, <a href="https://pi.dev/models">pi.dev/models</a>,
+      says how Pi calls each model it supports and at what price and limits it reckons. providers.dev imports it beside models.dev and is not affiliated with Pi. A model that only Pi
       lists is not an entry.
     </p>
     <p>
-      pi is the last of the four sources of a value (see <a href="#safe-values">One value per quantity</a>). Its context window, maximum output, prices and cache lifetimes
-      become the value of an entry only where no other source states one; there they are shown unmarked, like any other value, and the API names pi as the source. Where pi
-      states a value otherwise than another source, the value's warning shows pi's figure beside the others'. pi's figures are never written into <code>limit</code>,{" "}
-      <code>cost</code> or <code>capabilities</code>, and no value another source states changes with or without pi's data.
+      Pi is the last of the four sources of a value (see <a href="#safe-values">One value per quantity</a>). Its context window, maximum output, prices and cache lifetimes
+      become the value of an entry only where no other source states one; there they are shown unmarked, like any other value, and the API names Pi as the source. Where Pi
+      states a value otherwise than another source, the value's warning shows Pi's figure beside the others'. Pi's figures are never written into <code>limit</code>,{" "}
+      <code>cost</code> or <code>capabilities</code>, and no value another source states changes with or without Pi's data.
     </p>
     <p>
-      A context window of pi's can be the window pi's own client works with rather than what the route accepts, and pi's price for a subscription entry is a list price too: pi
-      states no price there. Where pi stands beside each field of the entry is published as well, in the entry's pi block (<code>providers_dev.pi.values</code>); the pages do not
+      A context window of Pi's can be the window Pi's own client works with rather than what the route accepts, and Pi's price for a subscription entry is a list price too: Pi
+      states no price there. Where Pi stands beside each field of the entry is published as well, in the entry's Pi block (<code>providers_dev.pi.values</code>); the pages do not
       print it.
     </p>
-    <h3>How pi calls the model</h3>
+    <h3>How Pi calls the model</h3>
     <ul>
       <li>
-        The section <em>How pi calls the model</em> of an entry's page holds what only pi returns, as pi states it: pi's name for the model, the request format in words and in pi's word,
-        the address, what pi sends, whether pi treats the model as one that reasons, the thinking levels with the value pi sends for each (not the provider's list of effort values), pi's
-        flags in three groups, and the request limits. None of it becomes a value of providers.dev's: pi's catalog names no source, and a flag speaks of one request format at pi's address.
+        The section <em>How Pi calls the model</em> of an entry's page holds what only Pi returns, as Pi states it: Pi's name for the model, the request format in words and in Pi's word,
+        the address, what Pi sends, whether Pi treats the model as one that reasons, the thinking levels with the value Pi sends for each (not the provider's list of effort values), Pi's
+        flags in three groups, and the request limits. None of it becomes a value of providers.dev's: Pi's catalog names no source, and a flag speaks of one request format at Pi's address.
       </li>
       <li>
-        What pi does not state is <em>Not stated</em>, never "no": a flag pi does not name follows pi's own default, which is not published. A flag of the first group that is <code>true</code>
-        or <code>false</code> is said as Accepted or Not accepted (Required or Not required for the one that names a requirement), with pi's name and value beside the
-        words. A flag the table below does not name is printed as pi states it, under <em>Other flags</em>.
+        What Pi does not state is <em>Not stated</em>, never "no": a flag Pi does not name follows Pi's own default, which is not published. A flag of the first group that is <code>true</code>
+        or <code>false</code> is said as Accepted or Not accepted (Required or Not required for the one that names a requirement), with Pi's name and value beside the
+        words. A flag the table below does not name is printed as Pi states it, under <em>Other flags</em>.
       </li>
       <li>
-        Where pi spells a provider or model id otherwise, providers.dev pairs the two by hand, and only where they are certainly the same; nothing is matched by similarity. The page
-        then shows pi's own spelling.
+        Where Pi spells a provider or model id otherwise, providers.dev pairs the two by hand, and only where they are certainly the same; nothing is matched by similarity. The page
+        then shows Pi's own spelling.
       </li>
       <li>
-        The page dates pi's data twice: when providers.dev fetched it, which moves only when pi's catalog changed, and when it was last checked and found unchanged. pi's values are
+        The page dates Pi's data twice: when providers.dev fetched it, which moves only when Pi's catalog changed, and when it was last checked and found unchanged. Pi's values are
         imported, so they are never marked stale. When the last import failed, the page and the footer say so, and the last good catalog stays published.
       </li>
     </ul>
-    <p>The page's words for pi's request formats and flags:</p>
+    <p>The page's words for Pi's request formats and flags:</p>
   </div>
   <div class="scroll max-w-[62rem]">
     <table class="facts">
       <thead><tr><th scope="col">Request format (<code>api</code>)</th><th scope="col">On the page</th></tr></thead>
       <tbody>
         {Object.entries(PI_FORMAT_WORDS).map(([api, words]) => <tr><th scope="row"><code>{api}</code></th><td>{words}</td></tr>)}
-        <tr><th scope="row">Any other</th><td>pi's word alone</td></tr>
+        <tr><th scope="row">Any other</th><td>Pi's word alone</td></tr>
       </tbody>
     </table>
   </div>
   <div class="scroll max-w-[62rem] mt-4">
     <table class="facts">
-      <thead><tr><th scope="col">pi's flag (<code>compat</code>)</th><th scope="col">Group</th><th scope="col">On the page</th></tr></thead>
+      <thead><tr><th scope="col">Pi's flag (<code>compat</code>)</th><th scope="col">Group</th><th scope="col">On the page</th></tr></thead>
       <tbody>
         {Object.entries(PI_ACCEPTS_FLAGS).map(([name, flag]) => <tr><th scope="row"><code>{name}</code></th><td class="whitespace-nowrap">{PI_FLAG_GROUPS.accepts.title}</td><td set:html={words(flag.label) + (flag.says === "accepted" ? ": Accepted or Not accepted" : flag.says === "required" ? ": Required or Not required" : ": the value as stated")} /></tr>)}
-        {PI_OWN_FLAGS.map((name) => <tr><th scope="row"><code>{name}</code></th><td class="whitespace-nowrap">{PI_FLAG_GROUPS.own.title}</td><td>As pi states it: pi's own switch, not a statement about the provider</td></tr>)}
-        <tr><th scope="row">Any other</th><td class="whitespace-nowrap">{PI_FLAG_GROUPS.other.title}</td><td>As pi states it</td></tr>
+        {PI_OWN_FLAGS.map((name) => <tr><th scope="row"><code>{name}</code></th><td class="whitespace-nowrap">{PI_FLAG_GROUPS.own.title}</td><td>As Pi states it: Pi's own switch, not a statement about the provider</td></tr>)}
+        <tr><th scope="row">Any other</th><td class="whitespace-nowrap">{PI_FLAG_GROUPS.other.title}</td><td>As Pi states it</td></tr>
       </tbody>
     </table>
   </div>
@@ -451,7 +451,7 @@ const words = (text: string): string => escapeHtml(text).replace(/`([^`]+)`/g, "
     <h2 id="lifetimes">Cache lifetimes</h2>
     <p>
       Every entry has a cache lifetime for each retention profile, short and long: how long a cached prompt can be relied on. It is a safe value like the others (see{" "}
-      <a href="#safe-values">One value per quantity</a>), from what was measured, what providers.dev and models.dev document, and what pi states, in that order.
+      <a href="#safe-values">One value per quantity</a>), from what was measured, what providers.dev and models.dev document, and what Pi states, in that order.
     </p>
     <ul>
       <li>
@@ -486,7 +486,7 @@ const words = (text: string): string => escapeHtml(text).replace(/`([^`]+)`/g, "
       number; a page compares a published date with today's date using it, and that is the only thing a page works out. A reader of the API applies it to its own date.
     </p>
     <p>
-      Imported values, models.dev's and pi's, are never marked stale: their date is the date of the import, given next to the source. A value without a warning shows no
+      Imported values, models.dev's and Pi's, are never marked stale: their date is the date of the import, given next to the source. A value without a warning shows no
       date; the date of each source's statement is in the warning and in the API.
     </p>
     <p>Licences and attribution are on the <a href="/docs/licensing/">licensing</a> page. How to propose a correction or a measurement is on the <a href="/docs/contributing/">contributing</a> page.</p>

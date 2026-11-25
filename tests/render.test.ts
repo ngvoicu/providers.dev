@@ -123,7 +123,7 @@ describe("the entry page", () => {
 
   it("has the same sections, tables and rows whatever is known about the entry", () => {
     const bare = skeleton(pages.bare);
-    expect(bare.filter((item) => item.startsWith("h"))).toEqual(["h2 Limits", "h3 Limit evaluations tokens", "h2 Price", "h3 Conditional rates", "h3 Request controls", "h2 Prompt caching", "h3 Cache evaluations", "h3 Cache modes", "h3 Retention", "h2 How pi calls the model", "h2 Provenance", "h2 Data"]);
+    expect(bare.filter((item) => item.startsWith("h"))).toEqual(["h2 Limits", "h3 Limit evaluations tokens", "h2 Price", "h3 Conditional rates", "h3 Request controls", "h2 Prompt caching", "h3 Cache evaluations", "h3 Cache modes", "h3 Retention", "h2 How Pi calls the model", "h2 Provenance", "h2 Data"]);
     // One row per quantity, its safe value: one window, "Context window", and no row of documented or measured figures.
     expect(bare.filter((item) => item.startsWith("row"))).toEqual([
       "row Context window", "row Maximum output",
@@ -795,7 +795,7 @@ describe("pi's catalog on an entry's page and in a row", () => {
   // pi's statements laid over the safe values after the fence, dated by the fetch of pi's catalog, as the build does.
   const catalog = layPiOver(resolveWithPi(input, { catalog: pi }).catalog, "2026-11-12");
   const index = buildIndex(catalog, "fixture", "2026-11-14T00:00:00Z", "2026-11-14T00:00:00Z");
-  /** The same data built without pi's catalog. */
+  /** The same data built without Pi's catalog. */
   const without = buildIndex(resolveWithPi(input).catalog, "fixture", "2026-11-14T00:00:00Z", "2026-11-14T00:00:00Z");
   const modelOf = (ref: string): JsonObject => catalog[ref.split("/")[0]!]!.models[ref.split("/").slice(1).join("/")]!;
   // The build writes each summary's pi from the checked block (scripts/lib/pi-fence.ts).
@@ -911,30 +911,30 @@ describe("pi's catalog on an entry's page and in a row", () => {
     }
   });
 
-  it("pi's section holds only what pi alone returns: no table of limits and prices, no cache lifetimes; the request format in words and in pi's word; each stated flag once, in its group", () => {
+  it("pi's section holds only what pi alone returns: no table of limits and prices, no cache lifetimes; the request format in words and in Pi's word; each stated flag once, in its group", () => {
     for (const model of LISTED) {
       const own = section(page(model));
       expect(own, model).not.toMatch(/id="pi-prices"|Limits and prices|>Cache lifetimes<|No difference/);
-      expect(own, model).toContain('<h2 id="pi">How pi calls the model</h2>'.slice(0, 0));
+      expect(own, model).toContain('<h2 id="pi">How Pi calls the model</h2>'.slice(0, 0));
       const block = blockOf(model);
       for (const name of Object.keys(block.compat ?? {})) expect(own.split(`<code>${name}`).length - 1, `${model} ${name}`).toBe(1);
     }
-    expect(page("agree")).toContain('<h2 id="pi">How pi calls the model</h2>');
+    expect(page("agree")).toContain('<h2 id="pi">How Pi calls the model</h2>');
     // The format in plain words and pi's word under them; a format with no words, pi's word alone.
     expect(section(page("agree"))).toContain("Anthropic Messages<div class=\"id\"><code>anthropic-messages</code></div>");
-    expect(text(section(page("pricey")))).toMatch(/in words and in pi's word an-api-without-words Address/);
+    expect(text(section(page("pricey")))).toMatch(/in words and in Pi's word an-api-without-words Address/);
     // The three groups: the provider's, in words with pi's name and value; pi's own; any other name, as stated.
     const group = (html: string, title: string): string => `${title} ${text(html.split(`<th scope="row">${title}`)[1]!.split("</tr>")[0]!).trim()}`;
     const agree = section(page("agree"));
-    expect(group(agree, "What the provider accepts")).toBe("What the provider accepts compat : what the provider or the model accepts in this request format, as pi states it. A flag not named follows pi's own default: it is not false Strict tool schemas supportsStrictTools: true Accepted reasoning_content on earlier assistant messages in a request requiresReasoningContentOnAssistantMessages: true Required The request field for the output limit maxTokensField: \"max_tokens\" max_tokens");
-    expect(group(agree, "What pi does")).toBe("What pi does pi's own switches, as pi states them: how pi builds its requests. Not a statement about the provider sendSessionAffinityHeaders true");
-    expect(group(agree, "Other flags")).toBe("Other flags Flags this page has no words for yet, as pi states them supportsSomethingNew 3");
+    expect(group(agree, "What the provider accepts")).toBe("What the provider accepts compat : what the provider or the model accepts in this request format, as Pi states it. A flag not named follows Pi's own default: it is not false Strict tool schemas supportsStrictTools: true Accepted reasoning_content on earlier assistant messages in a request requiresReasoningContentOnAssistantMessages: true Required The request field for the output limit maxTokensField: \"max_tokens\" max_tokens");
+    expect(group(agree, "What Pi does")).toBe("What Pi does Pi's own switches, as Pi states them: how Pi builds its requests. Not a statement about the provider sendSessionAffinityHeaders true");
+    expect(group(agree, "Other flags")).toBe("Other flags Flags this page has no words for yet, as Pi states them supportsSomethingNew 3");
     // A group pi states nothing of says so; it is not false.
     const bare = section(page("bare"));
-    for (const title of ["What the provider accepts", "What pi does", "Other flags"]) expect(group(bare, title)).toMatch(/None stated$/);
+    for (const title of ["What the provider accepts", "What Pi does", "Other flags"]) expect(group(bare, title)).toMatch(/None stated$/);
     const full = section(page("full"));
     expect(group(full, "What the provider accepts")).toContain("The store request field supportsStore: false Not accepted");
-    expect(group(full, "What pi does")).toContain('chatTemplateArgs {"enable_thinking":{"$var":"thinking.enabled"}}');
+    expect(group(full, "What Pi does")).toContain('chatTemplateArgs {"enable_thinking":{"$var":"thinking.enabled"}}');
   });
 
   it("a flag absent from compat is not shown as false, and nothing pi does not state is shown as no", () => {
@@ -951,21 +951,21 @@ describe("pi's catalog on an entry's page and in a row", () => {
     const full = section(page("full"));
     expect(values(page("full")).match(/\bfalse\b/g)).toEqual(["false"]);
     expect(full).toContain("<code>supportsStore: false</code>");
-    expect(full).toContain("<dt>minimal</dt><dd><span class=\"muted\" title=\"pi marks this level as not supported.\">not supported</span></dd>");
+    expect(full).toContain("<dt>minimal</dt><dd><span class=\"muted\" title=\"Pi marks this level as not supported.\">not supported</span></dd>");
   });
 
   it("has the same tables and rows on every entry pi lists, and one line on an entry it does not", () => {
     const skeleton = (html: string): string[] => [...section(html).matchAll(/<h3[^>]*>(.*?)<\/h3>|<th scope="(?:col|row)"[^>]*>(.*?)(?:<div|<\/th>)/gs)].map((match) => (match[1] ?? match[2]!).replace(/<[^>]+>/g, "").trim());
     for (const model of LISTED) expect(skeleton(page(model)), model).toEqual(skeleton(page("full")));
-    expect(skeleton(page("full"))).toEqual(["In pi's catalog", "As pi states it", "Model", "Request format", "Address", "Input", "Reasoning", "Thinking levels", "What the provider accepts", "What pi does", "Other flags", "Request limits"]);
+    expect(skeleton(page("full"))).toEqual(["In Pi's catalog", "As Pi states it", "Model", "Request format", "Address", "Input", "Reasoning", "Thinking levels", "What the provider accepts", "What Pi does", "Other flags", "Request limits"]);
     const unlisted = section(page("unlisted"));
-    expect(text(unlisted).trim()).toBe("How pi calls the model pi's model catalog does not list this entry. Fetched 2026-11-12 from pi.dev/api/models Last checked 2026-11-14 , unchanged");
+    expect(text(unlisted).trim()).toBe("How Pi calls the model Pi's model catalog does not list this entry. Fetched 2026-11-12 from pi.dev/api/models Last checked 2026-11-14 , unchanged");
   });
 
   it("says when pi's catalog was fetched and last checked, and that the last import failed when /meta says so", () => {
     const fine = page("full");
     expect(text(section(fine))).toContain("Fetched 2026-11-12 from pi.dev/api/models Last checked 2026-11-14 , unchanged");
-    expect(fine).toMatch(/>pi\.dev<\/span><span class="muted date" title="Fetched from pi&#39;s catalog 2026-11-12 14:19 UTC\. Last checked 2026-11-14 04:17 UTC: unchanged since the fetch\.">2026-11-12<\/span>/);
+    expect(fine).toMatch(/>pi\.dev<\/span><span class="muted date" title="Fetched from Pi&#39;s catalog 2026-11-12 14:19 UTC\. Last checked 2026-11-14 04:17 UTC: unchanged since the fetch\.">2026-11-12<\/span>/);
     expect(fine).toContain("It is the last source of each value.");
     expect(fine).not.toContain("failed");
     const failed = page("full", meta({ last_attempt_at: "2026-11-15T04:17:00.000Z", last_attempt_ok: false, last_error: "pi.dev answered HTTP 503" }));
@@ -1007,9 +1007,9 @@ describe("pi's catalog on an entry's page and in a row", () => {
     // A first import that failed: no snapshot, so nothing is the last good one.
     const failedFirst: MetaPi = { source: "https://pi.dev/api/models", snapshot: null, sync: { last_attempt_at: "2026-11-15T04:17:00.000Z", last_attempt_ok: false, last_error: "pi.dev answered HTTP 503" }, counts: { entries_with_block: 0, left_out_models: 0, unmatched_models: 0 } };
     const unlisted = page("unlisted", failedFirst);
-    expect(text(section(unlisted))).toContain("This dataset is built without pi's catalog ( pi.dev/api/models ). The last import, 2026-11-15, failed");
+    expect(text(section(unlisted))).toContain("This dataset is built without Pi's catalog ( pi.dev/api/models ). The last import, 2026-11-15, failed");
     expect(unlisted).not.toMatch(/last good/);
-    expect(unlisted).toContain("This dataset has no pi data. The last import, 2026-11-15 04:17 UTC, failed.");
+    expect(unlisted).toContain("This dataset has no Pi data. The last import, 2026-11-15 04:17 UTC, failed.");
   });
 
   it("7, second review: a check is later by time, not by spelling", () => {
@@ -1041,7 +1041,7 @@ describe("pi's catalog on an entry's page and in a row", () => {
 
   it("a row with a block has the pi.dev badge and nothing about differences; a row without one has none", () => {
     const listed = row({ ref: "lab/full", provider: "lab", model: "full", pi: { ref: "lab/full", api: "openai-completions", match: "id", difference_count: 2 } });
-    expect(listed).toContain('<span class="origin pi" title="pi&#39;s model catalog (pi.dev) also lists this entry. Imported, not verified by providers.dev. It is the last source of each value.">pi.dev</span>');
+    expect(listed).toContain('<span class="origin pi" title="Pi&#39;s model catalog (pi.dev) also lists this entry. Imported, not verified by providers.dev. It is the last source of each value.">pi.dev</span>');
     expect(listed).not.toContain("<a class=\"origin");
     expect(listed).not.toMatch(/differ|otherwise|agree/i);
     const paired = row({ ref: "lab/full", provider: "lab", model: "full", pi: { ref: "lab-pi/Full", api: "openai-completions", match: "alias", difference_count: 0 } });
@@ -1055,7 +1055,7 @@ describe("pi's catalog on an entry's page and in a row", () => {
     /** The source cell of a row, and what a reader sees in it. */
     const cell = (more: Partial<Summary>, pi?: MetaPi): string => rowHtml(summaryOf(more), { today, imported: "2026-11-13", pi }).split('data-label="Source">')[1]!.split("</td>")[0]!;
     const seen = (html: string): string[] => html.replace(/<[^>]+>/g, " ").trim().split(/\s+/);
-    const said = "Fetched from pi&#39;s catalog 2026-11-12 14:19 UTC. Last checked 2026-11-14 04:17 UTC: unchanged since the fetch.";
+    const said = "Fetched from Pi&#39;s catalog 2026-11-12 14:19 UTC. Last checked 2026-11-14 04:17 UTC: unchanged since the fetch.";
 
     // models.dev and pi: the date of pi's data is fetched_at (2026-11-12), not the last check (2026-11-14).
     const two = cell(listed, meta());
@@ -1072,14 +1072,14 @@ describe("pi's catalog on an entry's page and in a row", () => {
     // No pi block: no mark and no date of pi's, with or without pi's data.
     for (const pi of [meta(), undefined]) {
       expect(seen(cell({ ref: "lab/full", provider: "lab", model: "full" }, pi))).toEqual(["models.dev", "2026-11-13"]);
-      expect(cell({ ref: "lab/full", provider: "lab", model: "full" }, pi)).not.toContain("pi&#39;s catalog");
+      expect(cell({ ref: "lab/full", provider: "lab", model: "full" }, pi)).not.toContain("Pi&#39;s catalog");
     }
     // No pi data in the answer: the mark, no date; nothing is made up.
     expect(seen(cell(listed))).toEqual(["models.dev", "2026-11-13", "pi.dev"]);
     expect(seen(cell(listed, { ...meta(), snapshot: null }))).toEqual(["models.dev", "2026-11-13", "pi.dev"]);
     // No check after the fetch: the title says the fetch only.
     const once = { ...meta(), snapshot: { ...meta().snapshot!, checked_at: meta().snapshot!.fetched_at } };
-    expect(cell(listed, once)).toContain('title="Fetched from pi&#39;s catalog 2026-11-12 14:19 UTC.">2026-11-12</span>');
+    expect(cell(listed, once)).toContain('title="Fetched from Pi&#39;s catalog 2026-11-12 14:19 UTC.">2026-11-12</span>');
     // The last import failed: in a row the date stays as plain as the models.dev one, and its title says so; the
     // entry's page says it in words beside the date.
     const failed = meta({ last_attempt_at: "2026-11-15T04:17:00.000Z", last_attempt_ok: false, last_error: "pi.dev answered HTTP 503" });
@@ -1172,7 +1172,7 @@ describe("the models of a provider", () => {
   it("marks each list that names a model with the list's date: subscription where the vendor's list was read through a login, vendor list otherwise", () => {
     const lists: ListingLists = { listed: { listed_at: "2026-11-22", model_count: 1 }, "providers.dev": null, "models.dev": { listed_at: "2026-11-21", model_count: 1 }, "pi.dev": { listed_at: "2026-11-20", model_count: 1 } };
     const all = listing([model({ listed_by: ["listed", "models.dev", "pi.dev"] })], { lists });
-    expect(rowOf(table([], all), "gemini-4-neon")).toContain('<span class="sources"><span class="badge listed" title="On the vendor&#39;s own model list, read on a subscription login through Provimux, a proxy built on CLIProxyAPI.">subscription</span><span class="muted date" title="The day the vendor&#39;s list was read.">2026-11-22</span><span class="origin upstream" title="On models.dev&#39;s list of this provider.">models.dev</span><span class="muted date" title="Imported from models.dev on this date.">2026-11-21</span><span class="origin pi" title="On pi&#39;s catalog of this provider.">pi.dev</span><span class="muted date" title="Fetched from pi&#39;s catalog on this date.">2026-11-20</span></span>');
+    expect(rowOf(table([], all), "gemini-4-neon")).toContain('<span class="sources"><span class="badge listed" title="On the vendor&#39;s own model list, read on a subscription login through Provimux, a proxy built on CLIProxyAPI.">subscription</span><span class="muted date" title="The day the vendor&#39;s list was read.">2026-11-22</span><span class="origin upstream" title="On models.dev&#39;s list of this provider.">models.dev</span><span class="muted date" title="Imported from models.dev on this date.">2026-11-21</span><span class="origin pi" title="On Pi&#39;s catalog of this provider.">pi.dev</span><span class="muted date" title="Fetched from Pi&#39;s catalog on this date.">2026-11-20</span></span>');
     expect(rowOf(table([], all, "api"), "gemini-4-neon")).toContain('title="On the vendor&#39;s own model list, read through Provimux, a proxy built on CLIProxyAPI.">vendor list</span>');
     // Only the lists that name it.
     const pi = rowOf(table([], listing([model({ listed_by: ["pi.dev"] })], { lists })), "gemini-4-neon");

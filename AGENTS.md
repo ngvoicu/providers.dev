@@ -111,13 +111,13 @@ The baseline is imported from models.dev; our additions, corrections and measure
   shows the listing's `context_window` or `max_output` of the model instead, with the list's mark (`limitCell` in
   `src/core/render.ts`). Where the entry has a measured window the listing states none (1.6.1), so nothing displaces
   it; the API, the catalog and the entry's page are unchanged.
-- pi's values stand last. They are never written into a field of the entry (`limit`, `cost` or any other), and a safe
-  value is pi's only where no other source states one: laid on by `layPi` after the fence, from the statements the
+- Pi's values stand last. They are never written into a field of the entry (`limit`, `cost` or any other), and a safe
+  value is Pi's only where no other source states one: laid on by `layPi` after the fence, from the statements the
   fence reads with `piStatements`. No value a measurement, providers.dev or models.dev states differs with or without
-  pi's data (`npm run compare:published`). The listings are the one other place: pi is the fourth source of a listing
+  Pi's data (`npm run compare:published`). The listings are the one other place: Pi is the fourth source of a listing
   (`/api/v1/listings`), after the vendor's list, providers.dev and models.dev, and a field it gives is marked `pi.dev`
   in the model's `sources`. A listing's models are the union of the four sources' lists (since API 1.6.0); `listed_by`
-  names the lists that have a model, and no list is taken as the whole. A listing is not an entry. Where pi stands beside each value
+  names the lists that have a model, and no list is taken as the whole. A listing is not an entry. Where Pi stands beside each value
   is worked out once, in `piValues` (`src/core/pi.ts`), into `providers_dev.pi.values`, from the same reading as
   `differences`; a page prints the `standing` and compares nothing (`design/pi-merged.md`).
 - The safe value, like every figure the site shows, is worked out once, when the data is built, and published in the
@@ -147,7 +147,7 @@ The baseline is imported from models.dev; our additions, corrections and measure
   says a condition in words with `src/core/conditions.ts`.
 - Measured limits use numeric columns, not generated sentences. Free-text evaluation notes belong in raw evidence.
 - Each source carries its own date: the import date next to `models.dev`, the newest evidence next to
-  `providers.dev`, and next to `pi.dev` the import of pi's catalog (`pi.snapshot.fetched_at` of `/api/v1/meta`, which
+  `providers.dev`, and next to `pi.dev` the import of Pi's catalog (`pi.snapshot.fetched_at` of `/api/v1/meta`, which
   like the models.dev date moves only when the data changed).
 - A measurement names the client it went through: the provider directly, Provimux (our distribution of CLIProxyAPI), or a vendor's own CLI. Every
   client has a kind (`direct`, `own-client`, `proxy`), from the measurements file or

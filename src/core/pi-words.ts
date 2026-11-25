@@ -35,7 +35,7 @@ export const PI_ACCEPTS_FLAGS: Readonly<Record<string, PiFlagWords>> = {
   maxTokensField: { label: "The request field for the output limit", says: "value" },
   supportsTemperature: { label: "The `temperature` request field", says: "accepted" },
   supportsUsageInStreaming: { label: "Token usage in a streamed response", says: "accepted" },
-  thinkingFormat: { label: "How thinking is asked for, by pi's name for the convention", says: "value" },
+  thinkingFormat: { label: "How thinking is asked for, by Pi's name for the convention", says: "value" },
   requiresReasoningContentOnAssistantMessages: { label: "`reasoning_content` on earlier assistant messages in a request", says: "required" },
   supportsLongCacheRetention: { label: "A request for the long cache lifetime", says: "accepted" },
   supportsExplicitPromptCacheMode: { label: "The `prompt_cache_options` request field", says: "accepted" },
@@ -56,9 +56,9 @@ export const PI_OWN_FLAGS: readonly string[] = ["sendSessionAffinityHeaders", "s
 
 /** The three groups, in the page's order. Group C is every name the other two do not have, printed as stated. */
 export const PI_FLAG_GROUPS = {
-  accepts: { title: "What the provider accepts", said: "`compat`: what the provider or the model accepts in this request format, as pi states it. A flag not named follows pi's own default: it is not false" },
-  own: { title: "What pi does", said: "pi's own switches, as pi states them: how pi builds its requests. Not a statement about the provider" },
-  other: { title: "Other flags", said: "Flags this page has no words for yet, as pi states them" },
+  accepts: { title: "What the provider accepts", said: "`compat`: what the provider or the model accepts in this request format, as Pi states it. A flag not named follows Pi's own default: it is not false" },
+  own: { title: "What Pi does", said: "Pi's own switches, as Pi states them: how Pi builds its requests. Not a statement about the provider" },
+  other: { title: "Other flags", said: "Flags this page has no words for yet, as Pi states them" },
 } as const;
 export type PiFlagGroup = keyof typeof PI_FLAG_GROUPS;
 

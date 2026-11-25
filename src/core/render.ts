@@ -80,10 +80,10 @@ const UTC = (stamp: string): string => `${stamp.slice(0, 10)} ${stamp.slice(11, 
 function piDatesSaid(meta: MetaPi | undefined): string {
   const snapshot = meta?.snapshot;
   const lastFailed = meta?.sync.last_attempt_ok === false ? ` The last import${meta.sync.last_attempt_at ? `, ${UTC(meta.sync.last_attempt_at)},` : ""} failed` : "";
-  if (!snapshot) return `This dataset has no pi data.${lastFailed ? `${lastFailed}.` : ""}`;
+  if (!snapshot) return `This dataset has no Pi data.${lastFailed ? `${lastFailed}.` : ""}`;
   const failed = lastFailed ? `${lastFailed}: this is the last good one.` : "";
   const checked = piRechecked(meta) ? ` Last checked ${UTC(snapshot.checked_at)}: unchanged since the fetch.` : "";
-  return `Fetched from pi's catalog ${UTC(snapshot.fetched_at)}.${checked}${failed}`;
+  return `Fetched from Pi's catalog ${UTC(snapshot.fetched_at)}.${checked}${failed}`;
 }
 
 /**
@@ -93,7 +93,7 @@ function piDatesSaid(meta: MetaPi | undefined): string {
  */
 function piMark(pi: PiSummary): string {
   const named = pi.match === "alias" ? `, as ${pi.ref}` : "";
-  return `<span class="origin pi" title="${e(`pi's model catalog (pi.dev) also lists this entry${named}. Imported, not verified by providers.dev. It is the last source of each value.`)}">pi.dev</span>`;
+  return `<span class="origin pi" title="${e(`Pi's model catalog (pi.dev) also lists this entry${named}. Imported, not verified by providers.dev. It is the last source of each value.`)}">pi.dev</span>`;
 }
 
 /**
@@ -270,7 +270,7 @@ ${column("max_output", COLUMN.max_output, `The most tokens one response can hold
 ${column("price_in", COLUMN.price, `List price in US dollars per million tokens, input then output, before any conditional rate (pricing). Conditional rates marks an entry whose price changes with context size, service tier, region, date or the time of day: open the entry for those. A subscription is not paid per token: it shows the API list price of the same model, marked API price, or In plan where the catalog has no API entry of that model.${WARNED}`, "num mid-only")}
 ${column("release_date", COLUMN.released, "When the model was released, as models.dev records it. It is the model's date: the same at every provider.", "wide-only")}
 ${column(null, COLUMN.lifetime, `How long a cached prompt can be relied on (safe.cache_short, safe.cache_long): short, what a request gets without asking for a lifetime; long, what it gets when it asks for a longer one. None: no time at all.${WARNED}`, "life-col")}
-${column("verified", COLUMN.source, "Where the entry comes from, with a date per source: the import from models.dev, the newest providers.dev evidence, and the import of pi's catalog, where pi lists the entry.")}
+${column("verified", COLUMN.source, "Where the entry comes from, with a date per source: the import from models.dev, the newest providers.dev evidence, and the import of Pi's catalog, where Pi lists the entry.")}
 </tr>`;
 }
 
@@ -633,7 +633,7 @@ function cacheDocumented(documented: CacheDocumentation, source: string): string
 // page shows them only in a value's warning, or as the value where pi alone states one. What pi does not state says
 // so, never "no": a flag absent from `compat` is not false.
 
-const NOT_STATED = '<span class="unknown" title="pi\'s catalog does not state it.">Not stated</span>';
+const NOT_STATED = '<span class="unknown" title="Pi\'s catalog does not state it.">Not stated</span>';
 
 /** A map pi states, a name and a value per line, values as written in pi's catalog. */
 function piPairs(pairs: [string, string][], className: string): string {
@@ -651,7 +651,7 @@ const rawFlag = (value: Json): string => (typeof value === "string" ? value : JS
 function piFlags(compat: PiBlock["compat"]): Record<PiFlagGroup, string> {
   const flags = Object.entries(compat ?? {});
   const none = (group: PiFlagGroup): string =>
-    `<span class="unknown" title="pi's catalog states no ${group === "other" ? "other flag" : "flag of this group"} for this model. A flag not stated follows pi's own default: it is not false.">None stated</span>`;
+    `<span class="unknown" title="Pi's catalog states no ${group === "other" ? "other flag" : "flag of this group"} for this model. A flag not stated follows Pi's own default: it is not false.">None stated</span>`;
   const of = (group: PiFlagGroup) => flags.filter(([name]) => piFlagGroup(name) === group);
   const accepts = of("accepts").map(([name, value]): [string, string] => {
     const words = PI_ACCEPTS_FLAGS[name]!;
@@ -677,30 +677,30 @@ function piCallTable(block: PiBlock): string {
   const row = (label: string, hint: string, value: string): string => `<tr><th scope="row">${label}<div class="hint">${hint}</div></th><td>${value}</td></tr>`;
   const levels = block.thinking_level_map === null
     ? NOT_STATED
-    : piPairs(Object.entries(block.thinking_level_map).map(([level, value]) => [e(level), value === null ? '<span class="muted" title="pi marks this level as not supported.">not supported</span>' : `<code>${e(value)}</code>`]), "levels");
+    : piPairs(Object.entries(block.thinking_level_map).map(([level, value]) => [e(level), value === null ? '<span class="muted" title="Pi marks this level as not supported.">not supported</span>' : `<code>${e(value)}</code>`]), "levels");
   const flags = piFlags(block.compat);
   const limits = block.input_limits;
   const limit = (value: number | null, unit: string): string => (value === null ? NOT_STATED : `${exact(value)} <span class="muted">${unit}</span>`);
   const requestLimits = limits.max_request_bytes === null && limits.max_images_per_request === null && limits.max_images_per_message === null
-    ? '<span class="unknown" title="pi\'s catalog states no request limits for this model.">None stated</span>'
+    ? '<span class="unknown" title="Pi\'s catalog states no request limits for this model.">None stated</span>'
     : piPairs([["Request size", limit(limits.max_request_bytes, "bytes")], ["Images per request", limit(limits.max_images_per_request, "")], ["Images per message", limit(limits.max_images_per_message, "")]], "limits");
   const named = block.match === "alias"
-    ? "Paired by providers.dev: pi spells the provider or model id otherwise than this entry."
+    ? "Paired by providers.dev: Pi spells the provider or model id otherwise than this entry."
     : "The same provider and model id as this entry.";
   const words = PI_FORMAT_WORDS[block.api];
   const format = words ? `${e(words)}<div class="id"><code>${e(block.api)}</code></div>` : `<code>${e(block.api)}</code>`;
   const group = (key: PiFlagGroup): string => row(e(PI_FLAG_GROUPS[key].title), piWord(PI_FLAG_GROUPS[key].said), flags[key]);
-  return `<div class="scroll"><table class="facts pairs pi-call stack-phone"><thead><tr><th scope="col">In pi's catalog</th><th scope="col">As pi states it</th></tr></thead><tbody>
-${row("Model", named, `<strong>${e(block.name)}</strong><div class="id"><code>${e(block.ref)}</code>${copyButton(block.ref, "pi's id")}</div>`)}
-${row("Request format", "<code>api</code>: the API pi speaks to this model, in words and in pi's word", format)}
-${row("Address", "<code>base_url</code>: where pi sends requests, placeholders as written", block.base_url === null ? NOT_STATED : `<code class="break">${e(block.base_url)}</code> ${copyButton(block.base_url, "address")}`)}
-${row("Input", "What pi sends to the model, in pi's words", block.input.length ? block.input.map((kind) => `<span class="chip">${e(kind)}</span>`).join(" ") : NOT_STATED)}
-${row("Reasoning", "Whether pi treats the model as one that reasons", block.reasoning ? "Yes" : "No")}
-${row("Thinking levels", "The value pi sends for each level it names. A level not named follows pi's own default. Not the provider's list of effort values", levels)}
+  return `<div class="scroll"><table class="facts pairs pi-call stack-phone"><thead><tr><th scope="col">In Pi's catalog</th><th scope="col">As Pi states it</th></tr></thead><tbody>
+${row("Model", named, `<strong>${e(block.name)}</strong><div class="id"><code>${e(block.ref)}</code>${copyButton(block.ref, "Pi's id")}</div>`)}
+${row("Request format", "<code>api</code>: the API Pi speaks to this model, in words and in Pi's word", format)}
+${row("Address", "<code>base_url</code>: where Pi sends requests, placeholders as written", block.base_url === null ? NOT_STATED : `<code class="break">${e(block.base_url)}</code> ${copyButton(block.base_url, "address")}`)}
+${row("Input", "What Pi sends to the model, in Pi's words", block.input.length ? block.input.map((kind) => `<span class="chip">${e(kind)}</span>`).join(" ") : NOT_STATED)}
+${row("Reasoning", "Whether Pi treats the model as one that reasons", block.reasoning ? "Yes" : "No")}
+${row("Thinking levels", "The value Pi sends for each level it names. A level not named follows Pi's own default. Not the provider's list of effort values", levels)}
 ${group("accepts")}
 ${group("own")}
 ${group("other")}
-${row("Request limits", "The provider's limits on one request, as pi states them", requestLimits)}
+${row("Request limits", "The provider's limits on one request, as Pi states them", requestLimits)}
 </tbody></table></div>`;
 }
 
@@ -712,17 +712,17 @@ function piSection(block: PiBlock | null, meta: MetaPi | undefined): string {
   const dates = piDates(meta);
   const source = `<a href="${e(meta?.source ?? "https://pi.dev/api/models")}" rel="noopener">${e(shortUrl(meta?.source ?? "https://pi.dev/api/models"))}</a>`;
   const fetched = dates.fetched ? `<span>Fetched <span class="date" title="${e(UTC(meta!.snapshot!.fetched_at))}">${e(dates.fetched)}</span> from ${source}</span>` : `<span>From ${source}</span>`;
-  const checked = dates.checked ? `<span title="pi's feed was checked again on this date and had not changed since the fetch.">Last checked <span class="date" title="${e(UTC(meta!.snapshot!.checked_at))}">${e(dates.checked)}</span>, unchanged</span>` : "";
+  const checked = dates.checked ? `<span title="Pi's feed was checked again on this date and had not changed since the fetch.">Last checked <span class="date" title="${e(UTC(meta!.snapshot!.checked_at))}">${e(dates.checked)}</span>, unchanged</span>` : "";
   // "The last good one" only where there is one: after a first import that failed, the dataset has no pi data.
   const failed = dates.failed ? `<span class="stale" title="${e(piDatesSaid(meta))}">The last import${dates.failed_at ? `, ${e(dates.failed_at)},` : ""} failed${meta?.snapshot ? ": this is the last good one" : ""}</span>` : "";
   if (block === null) {
-    if (meta && meta.snapshot === null) return `<p class="muted">This dataset is built without pi's catalog (${source}).${failed ? ` ${failed}` : ""}</p>`;
-    return `<p class="muted">pi's model catalog does not list this entry.</p><p class="pi-facts muted">${fetched}${checked}${failed}</p>`;
+    if (meta && meta.snapshot === null) return `<p class="muted">This dataset is built without Pi's catalog (${source}).${failed ? ` ${failed}` : ""}</p>`;
+    return `<p class="muted">Pi's model catalog does not list this entry.</p><p class="pi-facts muted">${fetched}${checked}${failed}</p>`;
   }
   const list = `https://pi.dev/models?provider=${encodeURIComponent(block.provider)}`;
-  return `<p class="pi-facts"><span class="origin pi" title="pi's model catalog, a second source imported beside models.dev.">pi.dev</span>${fetched}${checked}${failed}<span>Not verified by providers.dev</span><span>Its limits, prices and cache lifetimes: the last source of each value above</span><span><a href="${e(list)}" rel="noopener">pi's list for <code>${e(block.provider)}</code></a></span></p>
+  return `<p class="pi-facts"><span class="origin pi" title="Pi's model catalog, a second source imported beside models.dev.">pi.dev</span>${fetched}${checked}${failed}<span>Not verified by providers.dev</span><span>Its limits, prices and cache lifetimes: the last source of each value above</span><span><a href="${e(list)}" rel="noopener">Pi's list for <code>${e(block.provider)}</code></a></span></p>
 ${piCallTable(block)}
-<p class="hint"><a href="/docs/methodology/#pi">How pi's catalog is used</a></p>`;
+<p class="hint"><a href="/docs/methodology/#pi">How Pi's catalog is used</a></p>`;
 }
 
 function tile(label: string, value: string, foot: string, small = false): string {
@@ -842,7 +842,7 @@ export function entryHtml(view: EntryView): string {
 </section>
 
 <section aria-labelledby="pi">
-  <h2 id="pi">How pi calls the model</h2>
+  <h2 id="pi">How Pi calls the model</h2>
   ${piSection(extension.pi, view.pi)}
 </section>
 

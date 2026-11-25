@@ -19,7 +19,7 @@ function listName(source: ListingSource, listing: Listing, access: Access): stri
     const client = listing.client_label ?? listing.client ?? "a client";
     return access === "subscription" ? `The vendor's own model list, read on a subscription login through ${client}` : `The vendor's own model list, read through ${client}`;
   }
-  return { "providers.dev": "A list providers.dev states, with evidence", "models.dev": "models.dev's list of this provider", "pi.dev": "pi's catalog of this provider" }[source];
+  return { "providers.dev": "A list providers.dev states, with evidence", "models.dev": "models.dev's list of this provider", "pi.dev": "Pi's catalog of this provider" }[source];
 }
 /** A model's mark of a list, in its hover text: "On the vendor's own model list, read through …". */
 const onList = (source: ListingSource, listing: Listing, access: Access): string => `On ${listName(source, listing, access).replace(/^(The|A) /, (word) => word.toLowerCase())}.`;
@@ -28,7 +28,7 @@ const LIST_DATE_WORD: Record<ListingSource, string> = {
   listed: "The day the vendor's list was read.",
   "providers.dev": "Date of the newest providers.dev evidence for this list.",
   "models.dev": "Imported from models.dev on this date.",
-  "pi.dev": "Fetched from pi's catalog on this date.",
+  "pi.dev": "Fetched from Pi's catalog on this date.",
 };
 const LIST_MARK_CLASS: Record<Exclude<ListingSource, "listed">, string> = { "providers.dev": "origin added", "models.dev": "origin upstream", "pi.dev": "origin pi" };
 
@@ -115,7 +115,7 @@ function listsFact(listing: Listing | null, access: Access, today: Today): strin
 }
 
 const LISTING_UNKNOWN = '<span class="unknown" title="No source states it. Unknown is not zero and not unlimited.">Unknown</span>';
-const from = (source: ListingSource | null): string => (source ? ` From ${source === "listed" ? "the vendor's own list" : source === "pi.dev" ? "pi's catalog" : source}.` : "");
+const from = (source: ListingSource | null): string => (source ? ` From ${source === "listed" ? "the vendor's own list" : source === "pi.dev" ? "Pi's catalog" : source}.` : "");
 const listingTokens = (value: number | null, source: ListingSource | null): string =>
   value === null ? LISTING_UNKNOWN : `<span title="${e(`${exact(value)} tokens.${from(source)}`)}">${compactTokens(value)}</span>`;
 
