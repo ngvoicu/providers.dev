@@ -4691,6 +4691,180 @@
     }
    }
   },
+  "gpt-6-astra-healthcare": {
+   "id": "gpt-6-astra-healthcare",
+   "name": "GPT-6 Astra Healthcare",
+   "description": "GPT-6 Astra paired with a harness tailored to clinical questions; its web search uses a dedicated index of medical sources.",
+   "type": "chat",
+   "family": "gpt-astra",
+   "canonical_id": "openai/gpt-6-astra-healthcare",
+   "release_date": "2026-11-24",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": {
+      "min_tokens": 1024
+     },
+     "explicit": {
+      "ttl": [
+       "30m",
+       "12h"
+      ],
+      "min_tokens": 1024,
+      "max_breakpoints": 4
+     }
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "prompt_cache_key": true,
+    "store": true,
+    "system_updates": true,
+    "effort_updates": true,
+    "service_tier": [
+     "priority"
+    ],
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 10,
+      "cache": {
+       "read": 1
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 20,
+        "cache": {
+         "read": 2
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 50,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 75
+       }
+      ]
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     },
+     {
+      "when": {
+       "not": {
+        "region": {
+         "equals": "global"
+        }
+       }
+      },
+      "factor": {
+       "text": 1.1
+      }
+     }
+    ],
+    "web_search": {
+     "price": 10
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.openai.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "freeform": [
+        "text",
+        "lark",
+        "regex"
+       ],
+       "strict": true,
+       "updates": [
+        "add",
+        "remove",
+        "replace"
+       ],
+       "search": true
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-04-30",
+   "last_updated": "2026-11-24",
+   "recommended_api": "responses",
+   "experimental": {
+    "modes": {
+     "fast": {
+      "service_tier": "priority",
+      "body": {
+       "service_tier": "priority"
+      }
+     }
+    }
+   }
+  },
   "gpt-6-cyber": {
    "id": "gpt-6-cyber",
    "name": "GPT-6 Cyber",
@@ -5555,6 +5729,180 @@
     }
    }
   },
+  "gpt-6.1-sol-healthcare": {
+   "id": "gpt-6.1-sol-healthcare",
+   "name": "GPT-6.1 Sol Healthcare",
+   "description": "GPT-6.1 Sol paired with a harness tailored to clinical questions; its web search uses a dedicated index of medical sources.",
+   "type": "chat",
+   "family": "gpt-sol",
+   "canonical_id": "openai/gpt-6.1-sol-healthcare",
+   "release_date": "2026-11-24",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": {
+      "min_tokens": 1024
+     },
+     "explicit": {
+      "ttl": [
+       "30m",
+       "12h"
+      ],
+      "min_tokens": 1024,
+      "max_breakpoints": 4
+     }
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "prompt_cache_key": true,
+    "store": true,
+    "system_updates": true,
+    "effort_updates": true,
+    "service_tier": [
+     "priority"
+    ],
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.1
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 4,
+        "cache": {
+         "read": 0.2
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 10,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 15
+       }
+      ]
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     },
+     {
+      "when": {
+       "not": {
+        "region": {
+         "equals": "global"
+        }
+       }
+      },
+      "factor": {
+       "text": 1.1
+      }
+     }
+    ],
+    "web_search": {
+     "price": 10
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.openai.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "freeform": [
+        "text",
+        "lark",
+        "regex"
+       ],
+       "strict": true,
+       "updates": [
+        "add",
+        "remove",
+        "replace"
+       ],
+       "search": true
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-04-30",
+   "last_updated": "2026-11-24",
+   "recommended_api": "responses",
+   "experimental": {
+    "modes": {
+     "fast": {
+      "service_tier": "priority",
+      "body": {
+       "service_tier": "priority"
+      }
+     }
+    }
+   }
+  },
   "gpt-6.1-terra": {
    "id": "gpt-6.1-terra",
    "name": "GPT-6.1 Terra",
@@ -6031,6 +6379,188 @@
     }
    }
   },
+  "gpt-6.2-astra-healthcare": {
+   "id": "gpt-6.2-astra-healthcare",
+   "name": "GPT-6.2 Astra Healthcare",
+   "description": "GPT-6.2 Astra paired with a harness tailored to clinical questions; its web search uses a dedicated index of medical sources.",
+   "type": "chat",
+   "family": "gpt-astra",
+   "canonical_id": "openai/gpt-6.2-astra-healthcare",
+   "release_date": "2026-11-24",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": {
+      "min_tokens": 1024
+     },
+     "explicit": {
+      "ttl": [
+       "30m",
+       "12h"
+      ],
+      "min_tokens": 1024,
+      "max_breakpoints": 4
+     }
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "prompt_cache_key": true,
+    "store": true,
+    "system_updates": true,
+    "effort_updates": true,
+    "service_tier": [
+     "priority"
+    ],
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 8,
+      "cache": {
+       "read": 0.4,
+       "write": {
+        "30m": 10,
+        "12h": 20
+       }
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 16,
+        "cache": {
+         "read": 0.8,
+         "write": {
+          "30m": 20,
+          "12h": 40
+         }
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 40,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 60
+       }
+      ]
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     },
+     {
+      "when": {
+       "not": {
+        "region": {
+         "equals": "global"
+        }
+       }
+      },
+      "factor": {
+       "text": 1.1
+      }
+     }
+    ],
+    "web_search": {
+     "price": 10
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.openai.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "freeform": [
+        "text",
+        "lark",
+        "regex"
+       ],
+       "strict": true,
+       "updates": [
+        "add",
+        "remove",
+        "replace"
+       ],
+       "search": true
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-05-18",
+   "last_updated": "2026-11-24",
+   "recommended_api": "responses",
+   "experimental": {
+    "modes": {
+     "fast": {
+      "service_tier": "priority",
+      "body": {
+       "service_tier": "priority"
+      }
+     }
+    }
+   }
+  },
   "gpt-6.2-sol": {
    "id": "gpt-6.2-sol",
    "name": "GPT-6.2 Sol",
@@ -6271,6 +6801,188 @@
      "ultrafast": {
       "body": {
        "service_tier": "ultrafast"
+      }
+     }
+    }
+   }
+  },
+  "gpt-6.2-sol-healthcare": {
+   "id": "gpt-6.2-sol-healthcare",
+   "name": "GPT-6.2 Sol Healthcare",
+   "description": "GPT-6.2 Sol paired with a harness tailored to clinical questions; its web search uses a dedicated index of medical sources.",
+   "type": "chat",
+   "family": "gpt-sol",
+   "canonical_id": "openai/gpt-6.2-sol-healthcare",
+   "release_date": "2026-11-24",
+   "limit": {
+    "context": 1050000,
+    "input": 922000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": {
+      "min_tokens": 1024
+     },
+     "explicit": {
+      "ttl": [
+       "30m",
+       "12h"
+      ],
+      "min_tokens": 1024,
+      "max_breakpoints": 4
+     }
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "prompt_cache_key": true,
+    "store": true,
+    "system_updates": true,
+    "effort_updates": true,
+    "service_tier": [
+     "priority"
+    ],
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2,
+      "cache": {
+       "read": 0.1,
+       "write": {
+        "30m": 2.5,
+        "12h": 5
+       }
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 4,
+        "cache": {
+         "read": 0.2,
+         "write": {
+          "30m": 5,
+          "12h": 10
+         }
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 10,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 15
+       }
+      ]
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": {
+       "text": 2
+      }
+     },
+     {
+      "when": {
+       "not": {
+        "region": {
+         "equals": "global"
+        }
+       }
+      },
+      "factor": {
+       "text": 1.1
+      }
+     }
+    ],
+    "web_search": {
+     "price": 10
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "responses": {
+     "base_url": "https://api.openai.com/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "freeform": [
+        "text",
+        "lark",
+        "regex"
+       ],
+       "strict": true,
+       "updates": [
+        "add",
+        "remove",
+        "replace"
+       ],
+       "search": true
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-06-01",
+   "last_updated": "2026-11-24",
+   "recommended_api": "responses",
+   "experimental": {
+    "modes": {
+     "fast": {
+      "service_tier": "priority",
+      "body": {
+       "service_tier": "priority"
       }
      }
     }
