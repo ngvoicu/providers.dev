@@ -23,7 +23,7 @@ export const PolicyEvidenceSchema = z.strictObject({
  * own record: pi's, where no other source states one (providers_dev.safe.price.source pi.dev).
  */
 export const PricingEvidenceSchema = PolicyEvidenceSchema.extend({
-  kind: z.enum(["documented", "measured", "listed"]).describe("documented = the provider says so. measured = providers.dev ran it. listed = a catalog lists it: pi's catalog, on a price that is pi's (since 1.4.0)."),
+  kind: z.enum(["documented", "measured", "listed"]).describe("documented = the provider says so. measured = providers.dev ran it. listed = a catalog lists it: Pi's catalog, on a price that is Pi's (since 1.4.0)."),
 });
 export const CoverageSchema = z.enum(["unknown", "partial", "complete", "not_applicable"])
   .describe("unknown = no usable record; partial = known fields without a completeness claim; complete = explicitly confirmed for the stated scope; not_applicable = no per-use billing on this access. Empty lists alone never prove absence.");
