@@ -51,6 +51,160 @@
    "last_updated": "2025-07-15",
    "recommended_api": "videos"
   },
+  "cogview-4-250304": {
+   "id": "cogview-4-250304",
+   "name": "CogView-4",
+   "description": "Open text-to-image model with bilingual Chinese and English prompts, in-image Chinese text rendering and any resolution from 512 to 2048 px",
+   "type": "image",
+   "family": "cogview",
+   "canonical_id": "zhipuai/cogview-4",
+   "release_date": "2025-03-04",
+   "limit": {
+    "context": 1024,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "image": {
+     "output": {
+      "unit": "image",
+      "price": 0.01
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "image"
+    ]
+   },
+   "api": {
+    "images": {
+     "base_url": "https://api.z.ai/api/paas/v4",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/zai/images"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-03-04",
+   "recommended_api": "images"
+  },
+  "glm-4-32b-0414-128k": {
+   "id": "glm-4-32b-0414-128k",
+   "name": "GLM-4-32B-0414-128K",
+   "description": "32B GLM-4 foundation model tuned for instruction following, code generation, function calling and search-based Q&A",
+   "type": "chat",
+   "family": "glm",
+   "canonical_id": "zhipuai/glm-4-32b-0414-128k",
+   "release_date": "2025-04-14",
+   "limit": {
+    "context": 128000,
+    "output": 16384
+   },
+   "capabilities": {
+    "cache": false,
+    "temperature": true,
+    "top_k": false,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1
+     },
+     "output": {
+      "price": 0.1
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.z.ai/api/paas/v4",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/zai/chat"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": []
+      }
+     },
+     "compatibility": {
+      "max_tokens_field": "max_tokens"
+     }
+    },
+    "messages": {
+     "base_url": "https://api.z.ai/api/anthropic/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/messages"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://api.z.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/zai-coding-plan/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none"
+       ],
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-04-14",
+   "recommended_api": "chat-completions"
+  },
   "glm-4.5": {
    "id": "glm-4.5",
    "name": "GLM-4.5",

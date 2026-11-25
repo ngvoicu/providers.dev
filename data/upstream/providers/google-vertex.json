@@ -778,6 +778,7 @@
    "type": "chat",
    "family": "claude-opus",
    "canonical_id": "anthropic/claude-opus-4-5-20251101",
+   "status": "deprecated",
    "release_date": "2025-11-24",
    "limit": {
     "context": 200000,
@@ -1724,7 +1725,7 @@
     }
    },
    "open_weights": false,
-   "knowledge": "2025-07-31",
+   "knowledge": "2025-01-31",
    "last_updated": "2025-09-29",
    "recommended_api": "messages"
   },
@@ -2564,7 +2565,8 @@
    "type": "image",
    "family": "nano-banana",
    "canonical_id": "google/gemini-2.5-flash-image",
-   "release_date": "2025-08-26",
+   "status": "deprecated",
+   "release_date": "2025-10-02",
    "limit": {
     "context": 65536,
     "output": 32768
@@ -2631,8 +2633,8 @@
     }
    },
    "open_weights": false,
-   "knowledge": "2024-06",
-   "last_updated": "2025-08-26",
+   "knowledge": "2025-06",
+   "last_updated": "2025-10-02",
    "recommended_api": "images"
   },
   "gemini-2.5-flash-lite": {
@@ -2643,7 +2645,7 @@
    "family": "gemini-flash-lite",
    "canonical_id": "google/gemini-2.5-flash-lite",
    "status": "deprecated",
-   "release_date": "2025-06-17",
+   "release_date": "2025-07-22",
    "limit": {
     "context": 1048576,
     "output": 65536
@@ -2793,7 +2795,7 @@
    },
    "open_weights": false,
    "knowledge": "2025-01",
-   "last_updated": "2025-06-17",
+   "last_updated": "2025-07-22",
    "recommended_api": "generate-content"
   },
   "gemini-2.5-flash-tts": {
@@ -4666,6 +4668,205 @@
    "last_updated": "2026-07-21",
    "recommended_api": "interactions"
   },
+  "gemini-3.5-live-translate-preview": {
+   "id": "gemini-3.5-live-translate-preview",
+   "name": "Gemini 3.5 Live Translate Preview",
+   "description": "Low-latency audio-to-audio model for real-time speech translation across 70+ languages",
+   "type": "realtime",
+   "family": "gemini-live-translate",
+   "canonical_id": "google/gemini-3.5-live-translate-preview",
+   "status": "beta",
+   "release_date": "2026-06-09",
+   "limit": {
+    "context": 131072,
+    "output": 65536
+   },
+   "capabilities": {
+    "cache": false,
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "audio": {
+     "input": {
+      "price": 3.5
+     },
+     "output": {
+      "price": 21
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "audio/pcm"
+    ],
+    "output": [
+     "audio/pcm",
+     "text"
+    ]
+   },
+   "api": {
+    "bidi-generate-content": {
+     "base_url": "wss://aiplatform.googleapis.com/ws/google.cloud.aiplatform.v1.LlmBidiService",
+     "path": "/BidiGenerateContent",
+     "sdk": {
+      "aisdk": "@ai-sdk/google-vertex"
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2025-01",
+   "last_updated": "2026-06-09",
+   "recommended_api": "bidi-generate-content"
+  },
+  "gemini-3.5-transcribe": {
+   "id": "gemini-3.5-transcribe",
+   "name": "Gemini 3.5 Transcribe",
+   "description": "Speech-to-text model with language detection, speaker diarization, word timestamps, and custom vocabulary",
+   "type": "transcription",
+   "family": "gemini-transcribe",
+   "canonical_id": "google/gemini-3.5-transcribe",
+   "release_date": "2026-08-26",
+   "limit": {
+    "context": 98304,
+    "output": 32768
+   },
+   "capabilities": {
+    "cache": false,
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2
+     },
+     "output": {
+      "price": 12
+     }
+    },
+    "audio": {
+     "input": {
+      "price": 2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "audio/wav",
+     "audio/mp3",
+     "audio/aiff",
+     "audio/aac",
+     "audio/ogg",
+     "audio/flac",
+     "audio/mpeg",
+     "audio/m4a",
+     "audio/l16",
+     "audio/opus",
+     "audio/alaw",
+     "audio/mulaw",
+     "audio/webm"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "transcriptions": {
+     "base_url": "https://${GOOGLE_VERTEX_ENDPOINT}/v1beta1/projects/${GOOGLE_VERTEX_PROJECT}/locations/${GOOGLE_VERTEX_LOCATION}/publishers/google",
+     "sdk": {
+      "aisdk": "@ai-sdk/google-vertex",
+      "opencodeai": "@opencode/ai/protocols/google-transcription"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-08-26",
+   "recommended_api": "transcriptions"
+  },
+  "gemini-3.5-transcribe-live": {
+   "id": "gemini-3.5-transcribe-live",
+   "name": "Gemini 3.5 Transcribe Live",
+   "description": "Speech transcription model for accurate audio-to-text and captioning workflows",
+   "type": "transcription",
+   "family": "gemini-transcribe",
+   "canonical_id": "google/gemini-3.5-transcribe-live",
+   "release_date": "2026-08-26",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "cache": false,
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 3.5
+     },
+     "output": {
+      "price": 21
+     }
+    },
+    "audio": {
+     "input": {
+      "price": 3.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "audio/pcm"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "bidi-generate-content": {
+     "base_url": "wss://${GOOGLE_VERTEX_ENDPOINT}/ws/google.cloud.aiplatform.v1.LlmBidiService",
+     "path": "/BidiGenerateContent",
+     "sdk": {
+      "aisdk": "@ai-sdk/google-vertex"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-08-26",
+   "recommended_api": "bidi-generate-content"
+  },
   "gemini-3.6-flash": {
    "id": "gemini-3.6-flash",
    "name": "Gemini 3.6 Flash",
@@ -4935,6 +5136,7 @@
    "type": "chat",
    "family": "gemini-flash",
    "canonical_id": "google/gemini-3.7-flash",
+   "status": "deprecated",
    "release_date": "2026-08-13",
    "limit": {
     "context": 1048576,
@@ -6408,7 +6610,7 @@
    "type": "embedding",
    "family": "gemini-embedding",
    "canonical_id": "google/gemini-embedding-001",
-   "release_date": "2025-05-20",
+   "release_date": "2025-07-14",
    "limit": {
     "context": 2048,
     "output": 1
@@ -6455,7 +6657,7 @@
    },
    "open_weights": false,
    "knowledge": "2025-05",
-   "last_updated": "2025-05-20",
+   "last_updated": "2025-07-14",
    "recommended_api": "predict"
   },
   "gemini-embedding-2": {
@@ -7832,6 +8034,7 @@
    "type": "embedding",
    "family": "google-text-embedding",
    "canonical_id": "google/text-embedding-005",
+   "status": "deprecated",
    "release_date": "2024-11-18",
    "limit": {
     "context": 2048,
@@ -7889,6 +8092,7 @@
    "type": "embedding",
    "family": "google-text-embedding",
    "canonical_id": "google/text-multilingual-embedding-002",
+   "status": "deprecated",
    "release_date": "2024-05-14",
    "limit": {
     "context": 2048,

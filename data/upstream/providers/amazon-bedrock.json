@@ -1473,6 +1473,7 @@
    "type": "chat",
    "family": "claude-opus",
    "canonical_id": "anthropic/claude-opus-4-5-20251101",
+   "status": "deprecated",
    "release_date": "2025-11-24",
    "limit": {
     "context": 200000,
@@ -2278,7 +2279,7 @@
     }
    },
    "open_weights": false,
-   "knowledge": "2025-07-31",
+   "knowledge": "2025-01-31",
    "last_updated": "2025-09-29",
    "recommended_api": "converse"
   },
@@ -2922,101 +2923,6 @@
    "open_weights": false,
    "knowledge": "2024-10",
    "last_updated": "2024-12-03",
-   "recommended_api": "converse"
-  },
-  "apac.anthropic.claude-sonnet-4-20250514-v1:0": {
-   "id": "apac.anthropic.claude-sonnet-4-20250514-v1:0",
-   "name": "Claude Sonnet 4 (APAC)",
-   "description": "Balanced Claude model for coding, analysis, agent workflows, and cost control",
-   "type": "chat",
-   "family": "claude-sonnet",
-   "canonical_id": "anthropic/claude-sonnet-4-20250514",
-   "status": "deprecated",
-   "release_date": "2025-05-22",
-   "limit": {
-    "context": 200000,
-    "output": 64000
-   },
-   "capabilities": {
-    "cache": {
-     "explicit": {
-      "ttl": [
-       "5m"
-      ],
-      "min_tokens": 1024,
-      "max_breakpoints": 4,
-      "targets": [
-       "tools",
-       "system",
-       "messages"
-      ]
-     }
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "budget": {
-      "min": 1024
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 3,
-      "cache": {
-       "read": 0.3,
-       "write": 3.75
-      }
-     },
-     "output": {
-      "price": 15
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "converse": {
-     "base_url": "https://bedrock-runtime.${AWS_REGION}.amazonaws.com",
-     "sdk": {
-      "aisdk": "@ai-sdk/amazon-bedrock",
-      "opencodeai": "@opencode/ai/providers/amazon-bedrock"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-03-31",
-   "last_updated": "2025-05-22",
    "recommended_api": "converse"
   },
   "au.anthropic.claude-haiku-4-5-20251001-v1:0": {
@@ -3866,7 +3772,7 @@
     }
    },
    "open_weights": false,
-   "knowledge": "2025-07-31",
+   "knowledge": "2025-01-31",
    "last_updated": "2025-09-29",
    "recommended_api": "converse"
   },
@@ -4281,6 +4187,238 @@
    "open_weights": false,
    "knowledge": "2024-10",
    "last_updated": "2024-12-03",
+   "recommended_api": "converse"
+  },
+  "ca.anthropic.claude-haiku-5-5": {
+   "id": "ca.anthropic.claude-haiku-5-5",
+   "name": "Claude Haiku 5.5 (Canada)",
+   "description": "Fast Claude model for responsive assistance, classification, and lightweight agents",
+   "type": "chat",
+   "family": "claude-haiku",
+   "canonical_id": "anthropic/claude-haiku-5-5",
+   "release_date": "2026-10-07",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "explicit": {
+      "ttl": [
+       "5m",
+       "1h"
+      ],
+      "min_tokens": 512,
+      "max_breakpoints": 4,
+      "targets": [
+       "tools",
+       "system",
+       "messages"
+      ]
+     }
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": true,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.11,
+      "cache": {
+       "read": 0.011,
+       "write": {
+        "5m": 0.1375,
+        "1h": 0.22
+       }
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 100000
+         }
+        },
+        "price": 0.55,
+        "cache": {
+         "read": 0.055,
+         "write": {
+          "5m": 0.6875,
+          "1h": 1.1
+         }
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 0.55,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 100000
+         }
+        },
+        "price": 2.75
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "converse": {
+     "base_url": "https://bedrock-runtime.${AWS_REGION}.amazonaws.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/amazon-bedrock",
+      "opencodeai": "@opencode/ai/providers/amazon-bedrock"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "required",
+        "tool"
+       ],
+       "strict": true,
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-06",
+   "last_updated": "2026-10-07",
+   "recommended_api": "converse"
+  },
+  "ca.anthropic.claude-sonnet-5-5": {
+   "id": "ca.anthropic.claude-sonnet-5-5",
+   "name": "Claude Sonnet 5.5 (Canada)",
+   "description": "Fast Claude model for everyday coding, agents, and knowledge work",
+   "type": "chat",
+   "family": "claude-sonnet",
+   "canonical_id": "anthropic/claude-sonnet-5-5",
+   "release_date": "2026-09-28",
+   "limit": {
+    "context": 1000000,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "explicit": {
+      "ttl": [
+       "5m",
+       "1h"
+      ],
+      "min_tokens": 512,
+      "max_breakpoints": 4,
+      "targets": [
+       "tools",
+       "system",
+       "messages"
+      ]
+     }
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": true,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 2.2,
+      "cache": {
+       "read": 0.11,
+       "write": {
+        "5m": 2.75,
+        "1h": 4.4
+       }
+      }
+     },
+     "output": {
+      "price": 11
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "application/pdf"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "converse": {
+     "base_url": "https://bedrock-runtime.${AWS_REGION}.amazonaws.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/amazon-bedrock",
+      "opencodeai": "@opencode/ai/providers/amazon-bedrock"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto"
+       ],
+       "strict": true,
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-06",
+   "last_updated": "2026-09-28",
    "recommended_api": "converse"
   },
   "cohere.embed-english-v3": {
@@ -5144,109 +5282,6 @@
    "last_updated": "2024-12-03",
    "recommended_api": "converse"
   },
-  "eu.anthropic.claude-fable-5": {
-   "id": "eu.anthropic.claude-fable-5",
-   "name": "Claude Fable 5 (EU)",
-   "description": "Claude model for creative writing, analysis, and controlled agent workflows",
-   "type": "chat",
-   "family": "claude-fable",
-   "canonical_id": "anthropic/claude-fable-5",
-   "release_date": "2026-06-09",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "explicit": {
-      "ttl": [
-       "5m",
-       "1h"
-      ],
-      "min_tokens": 512,
-      "max_breakpoints": 4,
-      "targets": [
-       "tools",
-       "system",
-       "messages"
-      ]
-     }
-    },
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": true,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 11,
-      "cache": {
-       "read": 1.1,
-       "write": {
-        "5m": 13.75,
-        "1h": 22
-       }
-      }
-     },
-     "output": {
-      "price": 55
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "converse": {
-     "base_url": "https://bedrock-runtime.${AWS_REGION}.amazonaws.com",
-     "sdk": {
-      "aisdk": "@ai-sdk/amazon-bedrock",
-      "opencodeai": "@opencode/ai/providers/amazon-bedrock"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "required",
-        "tool"
-       ],
-       "strict": true,
-       "updates": []
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-01-31",
-   "last_updated": "2026-06-09",
-   "recommended_api": "converse"
-  },
   "eu.anthropic.claude-haiku-4-5-20251001-v1:0": {
    "id": "eu.anthropic.claude-haiku-4-5-20251001-v1:0",
    "name": "Claude Haiku 4.5 (EU)",
@@ -5485,6 +5520,7 @@
    "type": "chat",
    "family": "claude-opus",
    "canonical_id": "anthropic/claude-opus-4-5-20251101",
+   "status": "deprecated",
    "release_date": "2025-11-24",
    "limit": {
     "context": 200000,
@@ -6102,101 +6138,6 @@
    "last_updated": "2026-09-22",
    "recommended_api": "converse"
   },
-  "eu.anthropic.claude-sonnet-4-20250514-v1:0": {
-   "id": "eu.anthropic.claude-sonnet-4-20250514-v1:0",
-   "name": "Claude Sonnet 4 (EU)",
-   "description": "Balanced Claude model for coding, analysis, agent workflows, and cost control",
-   "type": "chat",
-   "family": "claude-sonnet",
-   "canonical_id": "anthropic/claude-sonnet-4-20250514",
-   "status": "deprecated",
-   "release_date": "2025-05-22",
-   "limit": {
-    "context": 200000,
-    "output": 64000
-   },
-   "capabilities": {
-    "cache": {
-     "explicit": {
-      "ttl": [
-       "5m"
-      ],
-      "min_tokens": 1024,
-      "max_breakpoints": 4,
-      "targets": [
-       "tools",
-       "system",
-       "messages"
-      ]
-     }
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "budget": {
-      "min": 1024
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 3,
-      "cache": {
-       "read": 0.3,
-       "write": 3.75
-      }
-     },
-     "output": {
-      "price": 15
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "converse": {
-     "base_url": "https://bedrock-runtime.${AWS_REGION}.amazonaws.com",
-     "sdk": {
-      "aisdk": "@ai-sdk/amazon-bedrock",
-      "opencodeai": "@opencode/ai/providers/amazon-bedrock"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-03-31",
-   "last_updated": "2025-05-22",
-   "recommended_api": "converse"
-  },
   "eu.anthropic.claude-sonnet-4-5-20250929-v1:0": {
    "id": "eu.anthropic.claude-sonnet-4-5-20250929-v1:0",
    "name": "Claude Sonnet 4.5 (EU)",
@@ -6294,7 +6235,7 @@
     }
    },
    "open_weights": false,
-   "knowledge": "2025-07-31",
+   "knowledge": "2025-01-31",
    "last_updated": "2025-09-29",
    "recommended_api": "converse"
   },
@@ -7456,6 +7397,7 @@
    "type": "chat",
    "family": "claude-opus",
    "canonical_id": "anthropic/claude-opus-4-5-20251101",
+   "status": "deprecated",
    "release_date": "2025-11-24",
    "limit": {
     "context": 200000,
@@ -8073,101 +8015,6 @@
    "last_updated": "2026-09-22",
    "recommended_api": "converse"
   },
-  "global.anthropic.claude-sonnet-4-20250514-v1:0": {
-   "id": "global.anthropic.claude-sonnet-4-20250514-v1:0",
-   "name": "Claude Sonnet 4 (Global)",
-   "description": "Balanced Claude model for coding, analysis, agent workflows, and cost control",
-   "type": "chat",
-   "family": "claude-sonnet",
-   "canonical_id": "anthropic/claude-sonnet-4-20250514",
-   "status": "deprecated",
-   "release_date": "2025-05-22",
-   "limit": {
-    "context": 200000,
-    "output": 64000
-   },
-   "capabilities": {
-    "cache": {
-     "explicit": {
-      "ttl": [
-       "5m"
-      ],
-      "min_tokens": 1024,
-      "max_breakpoints": 4,
-      "targets": [
-       "tools",
-       "system",
-       "messages"
-      ]
-     }
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "budget": {
-      "min": 1024
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 3,
-      "cache": {
-       "read": 0.3,
-       "write": 3.75
-      }
-     },
-     "output": {
-      "price": 15
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "converse": {
-     "base_url": "https://bedrock-runtime.${AWS_REGION}.amazonaws.com",
-     "sdk": {
-      "aisdk": "@ai-sdk/amazon-bedrock",
-      "opencodeai": "@opencode/ai/providers/amazon-bedrock"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-03-31",
-   "last_updated": "2025-05-22",
-   "recommended_api": "converse"
-  },
   "global.anthropic.claude-sonnet-4-5-20250929-v1:0": {
    "id": "global.anthropic.claude-sonnet-4-5-20250929-v1:0",
    "name": "Claude Sonnet 4.5 (Global)",
@@ -8265,7 +8112,7 @@
     }
    },
    "open_weights": false,
-   "knowledge": "2025-07-31",
+   "knowledge": "2025-01-31",
    "last_updated": "2025-09-29",
    "recommended_api": "converse"
   },
@@ -10135,8 +9982,7 @@
     "input": [
      "text",
      "image/jpeg",
-     "image/png",
-     "application/pdf"
+     "image/png"
     ],
     "output": [
      "text"
@@ -11183,6 +11029,210 @@
    "last_updated": "2026-06-30",
    "recommended_api": "converse"
   },
+  "in.moonshotai.kimi-k3": {
+   "id": "in.moonshotai.kimi-k3",
+   "name": "Kimi K3 (India)",
+   "description": "Multimodal Kimi model with 1M context and always-on thinking for long-horizon agent work",
+   "type": "chat",
+   "family": "kimi",
+   "canonical_id": "moonshotai/kimi-k3",
+   "release_date": "2026-07-16",
+   "limit": {
+    "context": 1048576,
+    "output": 128000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "service_tier": [
+     "flex",
+     "priority"
+    ],
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 3.3,
+      "cache": {
+       "read": 0.33,
+       "write": {
+        "30m": 4.125
+       }
+      }
+     },
+     "output": {
+      "price": 16.5
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": 1.75
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": 0.5
+     }
+    ]
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "converse": {
+     "base_url": "https://bedrock-runtime.${AWS_REGION}.amazonaws.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/amazon-bedrock",
+      "opencodeai": "@opencode/ai/providers/amazon-bedrock"
+     },
+     "capabilities": {
+      "tools": {
+       "strict": true,
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-07-16",
+   "recommended_api": "converse"
+  },
+  "in.moonshotai.kimi-k3.1": {
+   "id": "in.moonshotai.kimi-k3.1",
+   "name": "Kimi K3.1 Pro Highspeed (India)",
+   "description": "Multimodal Kimi model with a 1M-token context window and always-on reasoning, for coding, 3D creation and financial research",
+   "type": "chat",
+   "family": "kimi-pro",
+   "canonical_id": "moonshotai/kimi-k3.1-pro",
+   "release_date": "2026-10-23",
+   "limit": {
+    "context": 1048576,
+    "output": 1048576
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": true
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "service_tier": [
+     "flex",
+     "priority"
+    ],
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "none",
+      "low",
+      "medium",
+      "high",
+      "xhigh",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 4.4,
+      "cache": {
+       "read": 0.22,
+       "write": {
+        "30m": 5.5
+       }
+      }
+     },
+     "output": {
+      "price": 22
+     }
+    },
+    "multipliers": [
+     {
+      "when": {
+       "service_tier": {
+        "equals": "priority"
+       }
+      },
+      "factor": 1.75
+     },
+     {
+      "when": {
+       "service_tier": {
+        "equals": "flex"
+       }
+      },
+      "factor": 0.5
+     }
+    ]
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "converse": {
+     "base_url": "https://bedrock-runtime.${AWS_REGION}.amazonaws.com",
+     "sdk": {
+      "aisdk": "@ai-sdk/amazon-bedrock",
+      "opencodeai": "@opencode/ai/providers/amazon-bedrock"
+     },
+     "capabilities": {
+      "tools": {
+       "strict": true,
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-10-23",
+   "recommended_api": "converse"
+  },
   "in.openai.gpt-5.6-luna": {
    "id": "in.openai.gpt-5.6-luna",
    "name": "GPT-5.6 Luna (India)",
@@ -11978,110 +12028,6 @@
    "last_updated": "2026-05-28",
    "recommended_api": "converse"
   },
-  "jp.anthropic.claude-opus-5": {
-   "id": "jp.anthropic.claude-opus-5",
-   "name": "Claude Opus 5 (JP)",
-   "description": "Strongest Claude Opus model for coding, agents, and professional work",
-   "type": "chat",
-   "family": "claude-opus",
-   "canonical_id": "anthropic/claude-opus-5",
-   "release_date": "2026-07-24",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "explicit": {
-      "ttl": [
-       "5m",
-       "1h"
-      ],
-      "min_tokens": 512,
-      "max_breakpoints": 4,
-      "targets": [
-       "tools",
-       "system",
-       "messages"
-      ]
-     }
-    },
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": true,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 5.5,
-      "cache": {
-       "read": 0.55,
-       "write": {
-        "5m": 6.875,
-        "1h": 11
-       }
-      }
-     },
-     "output": {
-      "price": 27.5
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "converse": {
-     "base_url": "https://bedrock-runtime.${AWS_REGION}.amazonaws.com",
-     "sdk": {
-      "aisdk": "@ai-sdk/amazon-bedrock",
-      "opencodeai": "@opencode/ai/providers/amazon-bedrock"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "required",
-        "tool"
-       ],
-       "strict": true,
-       "updates": []
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-05",
-   "last_updated": "2026-07-24",
-   "recommended_api": "converse"
-  },
   "jp.anthropic.claude-opus-5-5": {
    "id": "jp.anthropic.claude-opus-5-5",
    "name": "Claude Opus 5.5 (JP)",
@@ -12280,7 +12226,7 @@
     }
    },
    "open_weights": false,
-   "knowledge": "2025-07-31",
+   "knowledge": "2025-01-31",
    "last_updated": "2025-09-29",
    "recommended_api": "converse"
   },
@@ -12388,110 +12334,6 @@
    "open_weights": false,
    "knowledge": "2025-08-31",
    "last_updated": "2026-03-13",
-   "recommended_api": "converse"
-  },
-  "jp.anthropic.claude-sonnet-5": {
-   "id": "jp.anthropic.claude-sonnet-5",
-   "name": "Claude Sonnet 5 (JP)",
-   "description": "Everyday Claude agent model for coding, planning, browsing, and general work",
-   "type": "chat",
-   "family": "claude-sonnet",
-   "canonical_id": "anthropic/claude-sonnet-5",
-   "release_date": "2026-06-30",
-   "limit": {
-    "context": 1000000,
-    "output": 128000
-   },
-   "capabilities": {
-    "cache": {
-     "explicit": {
-      "ttl": [
-       "5m",
-       "1h"
-      ],
-      "min_tokens": 1024,
-      "max_breakpoints": 4,
-      "targets": [
-       "tools",
-       "system",
-       "messages"
-      ]
-     }
-    },
-    "temperature": false,
-    "top_k": false,
-    "top_p": false,
-    "structured_output": true,
-    "system_updates": true,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "effort": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-     ]
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2.2,
-      "cache": {
-       "read": 0.22,
-       "write": {
-        "5m": 2.75,
-        "1h": 4.4
-       }
-      }
-     },
-     "output": {
-      "price": 11
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "converse": {
-     "base_url": "https://bedrock-runtime.${AWS_REGION}.amazonaws.com",
-     "sdk": {
-      "aisdk": "@ai-sdk/amazon-bedrock",
-      "opencodeai": "@opencode/ai/providers/amazon-bedrock"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "required",
-        "tool"
-       ],
-       "strict": true,
-       "updates": []
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2026-01-31",
-   "last_updated": "2026-06-30",
    "recommended_api": "converse"
   },
   "luma.ray-v2:0": {
@@ -14765,7 +14607,7 @@
    "canonical_id": "openai/gpt-5.4",
    "release_date": "2026-03-05",
    "limit": {
-    "context": 1000000,
+    "context": 1050000,
     "output": 128000
    },
    "capabilities": {
@@ -14800,10 +14642,33 @@
       "price": 2.75,
       "cache": {
        "read": 0.275
-      }
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 5.5,
+        "cache": {
+         "read": 0.55
+        }
+       }
+      ]
      },
      "output": {
-      "price": 16.5
+      "price": 16.5,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 24.75
+       }
+      ]
      }
     }
    },
@@ -14871,7 +14736,7 @@
    "canonical_id": "openai/gpt-5.5",
    "release_date": "2026-04-23",
    "limit": {
-    "context": 1000000,
+    "context": 1050000,
     "output": 128000
    },
    "capabilities": {
@@ -14906,10 +14771,33 @@
       "price": 5.5,
       "cache": {
        "read": 0.55
-      }
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 11,
+        "cache": {
+         "read": 1.1
+        }
+       }
+      ]
      },
      "output": {
-      "price": 33
+      "price": 33,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gt": 272000
+         }
+        },
+        "price": 49.5
+       }
+      ]
      }
     }
    },
@@ -18366,99 +18254,6 @@
    "last_updated": "2024-12-03",
    "recommended_api": "converse"
   },
-  "us.amazon.nova-premier-v1:0": {
-   "id": "us.amazon.nova-premier-v1:0",
-   "name": "Nova Premier (US)",
-   "description": "Multimodal model for complex analysis, long-context understanding, tool use, and model distillation",
-   "type": "chat",
-   "family": "nova-premier",
-   "canonical_id": "amazon/nova-premier",
-   "status": "deprecated",
-   "release_date": "2025-04-30",
-   "limit": {
-    "context": 1000000,
-    "output": 10000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2.5,
-      "cache": {
-       "read": 0.625,
-       "write": 2.5
-      }
-     },
-     "output": {
-      "price": 12.5
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "video/mp4",
-     "video/quicktime",
-     "video/x-matroska",
-     "video/webm",
-     "video/x-flv",
-     "video/mpeg",
-     "video/x-ms-wmv",
-     "video/3gpp",
-     "application/pdf",
-     "text/csv",
-     "text/plain",
-     "text/html",
-     "text/markdown"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "converse": {
-     "base_url": "https://bedrock-runtime.${AWS_REGION}.amazonaws.com",
-     "sdk": {
-      "aisdk": "@ai-sdk/amazon-bedrock",
-      "opencodeai": "@opencode/ai/providers/amazon-bedrock"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2024-10",
-   "last_updated": "2025-04-30",
-   "recommended_api": "converse"
-  },
   "us.amazon.nova-pro-v1:0": {
    "id": "us.amazon.nova-pro-v1:0",
    "name": "Nova Pro (US)",
@@ -19221,6 +19016,7 @@
    "type": "chat",
    "family": "claude-opus",
    "canonical_id": "anthropic/claude-opus-4-5-20251101",
+   "status": "deprecated",
    "release_date": "2025-11-24",
    "limit": {
     "context": 200000,
@@ -19838,101 +19634,6 @@
    "last_updated": "2026-09-22",
    "recommended_api": "converse"
   },
-  "us.anthropic.claude-sonnet-4-20250514-v1:0": {
-   "id": "us.anthropic.claude-sonnet-4-20250514-v1:0",
-   "name": "Claude Sonnet 4 (US)",
-   "description": "Balanced Claude model for coding, analysis, agent workflows, and cost control",
-   "type": "chat",
-   "family": "claude-sonnet",
-   "canonical_id": "anthropic/claude-sonnet-4-20250514",
-   "status": "deprecated",
-   "release_date": "2025-05-22",
-   "limit": {
-    "context": 200000,
-    "output": 64000
-   },
-   "capabilities": {
-    "cache": {
-     "explicit": {
-      "ttl": [
-       "5m"
-      ],
-      "min_tokens": 1024,
-      "max_breakpoints": 4,
-      "targets": [
-       "tools",
-       "system",
-       "messages"
-      ]
-     }
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true,
-     "toggle": true,
-     "budget": {
-      "min": 1024
-     }
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 3,
-      "cache": {
-       "read": 0.3,
-       "write": 3.75
-      }
-     },
-     "output": {
-      "price": 15
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/jpeg",
-     "image/png",
-     "image/gif",
-     "image/webp",
-     "application/pdf"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "converse": {
-     "base_url": "https://bedrock-runtime.${AWS_REGION}.amazonaws.com",
-     "sdk": {
-      "aisdk": "@ai-sdk/amazon-bedrock",
-      "opencodeai": "@opencode/ai/providers/amazon-bedrock"
-     },
-     "capabilities": {
-      "tools": {
-       "choice": [
-        "auto",
-        "required",
-        "tool"
-       ],
-       "updates": []
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "knowledge": "2025-03-31",
-   "last_updated": "2025-05-22",
-   "recommended_api": "converse"
-  },
   "us.anthropic.claude-sonnet-4-5-20250929-v1:0": {
    "id": "us.anthropic.claude-sonnet-4-5-20250929-v1:0",
    "name": "Claude Sonnet 4.5 (US)",
@@ -20030,7 +19731,7 @@
     }
    },
    "open_weights": false,
-   "knowledge": "2025-07-31",
+   "knowledge": "2025-01-31",
    "last_updated": "2025-09-29",
    "recommended_api": "converse"
   },
@@ -22588,8 +22289,7 @@
     "input": [
      "text",
      "image/jpeg",
-     "image/png",
-     "application/pdf"
+     "image/png"
     ],
     "output": [
      "text"
