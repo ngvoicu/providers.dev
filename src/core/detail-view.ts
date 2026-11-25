@@ -49,6 +49,12 @@ function listPair(source: ListingSource, listing: Listing, access: Access, today
   return `${mark}${dated}`;
 }
 
+/**
+ * What the vendor's own list is, said once on the provider's page beside its date: the models one account was offered
+ * on that day, not the vendor's whole catalogue. It names no plan and no account.
+ */
+export const LISTED_ONE_ACCOUNT = "Read from one account's model list on that date; other plans may offer more or fewer models.";
+
 /** The facts row of the provider's page: each list with its date, how many models it names in the hover text. */
 function listsFact(listing: Listing | null, access: Access, today: Today): string {
   if (!listing) return '<span class="muted">None yet: no source gives a list of this provider\'s models.</span>';
@@ -59,7 +65,9 @@ function listsFact(listing: Listing | null, access: Access, today: Today): strin
   const evidence = listing.evidence.length === 1
     ? ` · <a href="${e(listing.evidence[0]!.url)}">Source</a>`
     : listing.evidence.length > 1 ? ` · Sources: ${listing.evidence.map((item) => `<a href="${e(item.url)}">${e(item.kind)}, ${e(item.date)}</a>`).join(" · ")}` : "";
-  return `<span class="sources side">${pairs.join("")}</span><div class="hint mt-1"><a href="/docs/methodology/#listings">How the lists are joined</a>${evidence}</div>`;
+  const listedAt = listing.lists.listed?.listed_at ?? null;
+  const oneAccount = listing.lists.listed ? `<div class="hint mt-1">The vendor's list${listedAt ? `, ${e(listedAt)}` : ""}. ${e(LISTED_ONE_ACCOUNT)}</div>` : "";
+  return `<span class="sources side">${pairs.join("")}</span>${oneAccount}<div class="hint mt-1"><a href="/docs/methodology/#listings">How the lists are joined</a>${evidence}</div>`;
 }
 
 const LISTING_UNKNOWN = '<span class="unknown" title="No source states it. Unknown is not zero and not unlimited.">Unknown</span>';

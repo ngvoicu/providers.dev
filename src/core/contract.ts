@@ -579,7 +579,7 @@ export const ListingSourcesSchema = z
     plans: fieldSource,
     hidden: fieldSource,
   })
-  .describe("Per field of a listed model, the source that gave it: listed (the vendor's own list, through groundtruth's discovery), providers.dev (an authored statement with evidence), models.dev, pi.dev. Null = no source states it. Other values may be added.") satisfies z.ZodType<ListingSources>;
+  .describe("Per field of a listed model, the source that gave it: listed (the vendor's own list as one signed-in account received it, through groundtruth's discovery; another plan's list may differ), providers.dev (an authored statement with evidence), models.dev, pi.dev. Null = no source states it. Other values may be added.") satisfies z.ZodType<ListingSources>;
 
 export const ListingModelSchema = z
   .strictObject({
@@ -600,7 +600,7 @@ export const ListingModelSchema = z
     variants: z.array(z.string()).describe("The vendor's own ids where it has one id per reasoning level (Devin), from an authored statement. Empty where id itself is what a request names. Never taken from the vendor's list."),
     plans: z.array(z.string()).describe("Plan names the vendor's own list attaches to the model, from a fixed list of single words (free, go, plus, pro, team, business, enterprise, edu, education, max), in lower case; any other name is left out. Empty = none. No prices, allowances or quotas."),
     hidden: z.boolean().nullable().describe("The vendor's list marks the model as not shown in pickers. Null = not stated."),
-    listed_by: z.array(listingSource).min(1).describe("The sources whose list of the provider names this model, in the fixed order listed, providers.dev, models.dev, pi.dev. listed: the vendor's own list, read through a client by groundtruth's discovery (on a subscription login, the model is offered on that subscription). The others are public or authored lists. Never empty. The date of each list is in the listing's lists. Since 1.6.0. Other values may be added."),
+    listed_by: z.array(listingSource).min(1).describe("The sources whose list of the provider names this model, in the fixed order listed, providers.dev, models.dev, pi.dev. listed: the vendor's own list as one signed-in account received it, read through a client by groundtruth's discovery (on a subscription login, the model is offered on that account's plan; another plan's list may differ). The others are public or authored lists. Never empty. The date of each list is in the listing's lists. Since 1.6.0. Other values may be added."),
     sources: ListingSourcesSchema,
   })
   .describe("One model of a listing: what the sources state of it on this access method. A listed model need not be an entry.") satisfies z.ZodType<ListingModel>;
@@ -619,7 +619,7 @@ export const ListingListsSchema = z
 export const ListingSchema = z
   .strictObject({
     provider: z.string().describe("The provider id, as in /api/v1/providers/{provider}."),
-    basis: listingSource.describe("The highest-ranked source that has a list for the provider, of four in a fixed order: listed (the vendor's own list, read by groundtruth's discovery), providers.dev (an authored list), models.dev (the imported entries of the provider), pi.dev (pi's models of the provider). Since 1.6.0 the listing's models are those of every source with a list (lists), not of basis alone: a model basis does not name can be in models, and listed_by says which lists name each. Until 1.5.1 the models were taken whole from basis. Other values may be added."),
+    basis: listingSource.describe("The highest-ranked source that has a list for the provider, of four in a fixed order: listed (the vendor's own list as one signed-in account received it, read by groundtruth's discovery; another plan's list may differ), providers.dev (an authored list), models.dev (the imported entries of the provider), pi.dev (pi's models of the provider). Since 1.6.0 the listing's models are those of every source with a list (lists), not of basis alone: a model basis does not name can be in models, and listed_by says which lists name each. Until 1.5.1 the models were taken whole from basis. Other values may be added."),
     listed_at: date.nullable().describe("The day basis was read: the discovery's date for listed, the import's date for models.dev and pi.dev, the newest evidence date for providers.dev. Null = not known. The date of every source is in lists."),
     lists: ListingListsSchema,
     client: z.string().nullable().describe("For listed: the public id of the client that read the vendor's list, as in data/authored/measurement-labels.yaml. Null otherwise."),
@@ -628,7 +628,7 @@ export const ListingSchema = z
     model_count: z.int().min(0).describe("How many models the listing has: every model any source lists, each once."),
     models: z.array(ListingModelSchema).nullable().describe("Every model any source lists for the provider, each once: the models of basis first, in its order, then each next source's models not named before, in its order (since 1.6.0). Null in /api/v1/listings without view=full, so that the answer has the same keys in both views."),
   })
-  .describe("The model list of one provider and access method: every model the vendor's own list (read on a date through a named client), an authored list, models.dev and pi name for it, each with the sources that list it, completed by sourced statements. Not an evaluation: a listed model need not be an entry, and nothing of a listing is written into an entry. Since 1.5.0.") satisfies z.ZodType<Listing>;
+  .describe("The model list of one provider and access method: every model the vendor's own list (as one signed-in account received it, read on a date through a named client; another plan's list may differ), an authored list, models.dev and pi name for it, each with the sources that list it, completed by sourced statements. Not an evaluation: a listed model need not be an entry, and nothing of a listing is written into an entry. Since 1.5.0.") satisfies z.ZodType<Listing>;
 
 // ---- full objects. The part that comes from models.dev is theirs and grows with it, so unknown fields are allowed there.
 export const EntrySchema = z

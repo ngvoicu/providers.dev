@@ -103,6 +103,8 @@ describe("API response boundary", () => {
     expect(calls).toContain("/api/v1/listings/provider-02");
     // Each list in the facts with its date; one table of models, the entry with a row of its own, the listed model folded under it.
     expect(html).toContain('<dt class="muted">Model lists</dt><dd><span class="sources side"><span class="badge listed" title="The vendor&#39;s own model list, read through API response only: 1 model.">vendor list</span><span class="muted date" title="The day the vendor&#39;s list was read.">2026-11-13</span><span class="origin upstream" title="models.dev&#39;s list of this provider: 1 model.">models.dev</span><span class="muted date" title="Imported from models.dev on this date.">2026-11-12</span></span>');
+    expect(html.split("Read from one account&#39;s model list on that date; other plans may offer more or fewer models.").length - 1).toBe(1);
+    expect(html).toContain("<div class=\"hint mt-1\">The vendor's list, 2026-11-13. Read from one account&#39;s model list");
     expect(html.split("<table").length - 1).toBe(1);
     expect(html).not.toContain("Model list</h2>");
     expect(html).toContain('<code>lab/model-4</code>');
@@ -375,7 +377,7 @@ describe("API response boundary", () => {
 
   it("shows the version and the Stability section of the OpenAPI document on /docs/api/", async () => {
     const html = await (await page("/docs/api/")).text();
-    expect(html).toContain("Version 1.6.1 ·");
+    expect(html).toContain("Version 1.6.2 ·");
     expect(html).toContain('<h2 id="stability">Stability</h2>');
     expect(html).toContain("/api/v1 only grows.");
   });

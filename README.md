@@ -32,7 +32,9 @@ records them; a subscription entry shows the API list price of the same model, m
 plans, their prices and their quotas are not listed; the one exception is the plan names a vendor's own model list
 attaches to a model, which a listing (`/api/v1/listings`) carries as they are.
 A vendor's own model list is published as the provider's listing, never written into an entry's `limit` or into a
-safe value.
+safe value. It is the list as one signed-in account received it: another plan's list may differ, so it is that
+account's view, not the vendor's whole catalogue. A provider page says so beside the list's date: "Read from one
+account's model list on that date; other plans may offer more or fewer models."
 It is not affiliated with models.dev or pi.
 
 ## Run it
@@ -328,7 +330,8 @@ that is gone), `pi-provider-collides` (the catalog now has the pi provider id it
 
 A listing (`/api/v1/listings`, since API 1.5.0) is the model list of one provider and access method: every model it
 offers, evaluated or not. It is built in `src/core/listings.ts` from four sources, in this order: `listed` (the
-vendor's own list, from groundtruth's discovery file `listed.json`), `providers.dev` (this folder), `models.dev` (the
+vendor's own list as one signed-in account received it, from groundtruth's discovery file `listed.json`; another
+plan's list may differ), `providers.dev` (this folder), `models.dev` (the
 provider's imported models, those a catalog rule leaves out of the catalog included: a rule says what providers.dev
 lists as entries, not what a provider offers) and `pi.dev`. Since API 1.6.0 its models are every model any of the four
 lists for the provider, each once: a login reads only what its own subscription offers, so no list is taken as the
@@ -649,6 +652,8 @@ measured input window, the vendor's own list gives the listing no `context_windo
 none: both are then where the entry takes them (providers.dev, models.dev), or `null`. A measurement counts before a
 stated value, and in 1.6.0 the vendor's figure stood against it (`devin/swe-2`: 262,000 listed, an input of 300,499
 read in full). The vendor's other fields of the model are taken as before.
+1.6.2 changed no structure: it corrected the text. Where the descriptions and the guide said "the vendor's own list",
+they now say it is the list as one signed-in account received it, and that another plan's list may differ.
 That promise holds for everything providers.dev makes itself: summaries, `providers_dev` records, evaluations,
 corrections, evidence, paths and parameters. The fields imported from models.dev (`limit`, `cost`, `capabilities`,
 `modalities` and the like) follow the models.dev v2 schema, which models.dev calls experimental. When models.dev
