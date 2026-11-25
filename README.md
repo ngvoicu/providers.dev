@@ -966,6 +966,12 @@ redirected. HSTS is not set.
   provider's page changes when an entry comes or goes). Each address is the page's canonical one; `tests/crawl.test.ts`
   asks every address of the fixture's sitemaps for its canonical, and the counts of the build's sitemaps against its
   meta. The product sites keep their own static `sitemap.xml`.
+- `robots.txt` on each host (`public/robots.txt`, `public/provimux/robots.txt`, `public/pi-cache-keeper/robots.txt`):
+  one group for every user agent, `Allow: /`, no `Disallow`, the content signals `search=yes, ai-input=yes,
+  ai-train=yes` (search, AI input and AI training are all allowed), and the host's `Sitemap:`. Views of the catalog
+  are kept out of the index by their robots meta, not by robots.txt, which would also keep crawlers from the API's
+  searches and from the pages of a list. `tests/crawl.test.ts` holds each file to that and follows its `Sitemap:` line
+  on the build.
 
 **Provimux's site, `https://provimux.providers.dev`.** Two static pages, `/` and `/support/`, built by Astro from
 `src/pages/provimux/` into `dist/provimux/` with their own layout (`src/layouts/Provimux.astro`) and files

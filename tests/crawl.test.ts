@@ -247,3 +247,34 @@ describe("sitemaps", () => {
     if (xmllint) for (const name of readdirSync(join(data, "sitemaps"))) execFileSync("xmllint", ["--noout", join(data, "sitemaps", name)]);
   });
 });
+
+describe("robots.txt", () => {
+  const hosts = [["providers.dev", "public/robots.txt"], ["provimux.providers.dev", "public/provimux/robots.txt"], ["pi-cache-keeper.providers.dev", "public/pi-cache-keeper/robots.txt"]] as const;
+
+  it("allows every crawler everything, says the owner's content signals and names the host's sitemap, on every host", () => {
+    for (const [host, file] of hosts) {
+      const rules = readFileSync(join(ROOT, file), "utf8").split("\n").map((line) => line.replace(/#.*/, "").trim()).filter(Boolean);
+      // One group for every user agent, none for a crawler apart, and no Disallow: nothing is kept from any crawler.
+      expect([host, rules]).toEqual([host, ["User-agent: *", "Content-Signal: search=yes, ai-input=yes, ai-train=yes", "Allow: /", `Sitemap: https://${host}/sitemap.xml`]]);
+    }
+  });
+
+  // The build: each host's robots.txt is served on that host, and the sitemap it names answers there.
+  const built = join(ROOT, "dist");
+  it.skipIf(!existsSync(join(built, "current.json")))("is served on each host from the build, and the sitemap it names answers", async () => {
+    const assets: AssetBinding = { async fetch(request) {
+      const path = new URL(typeof request === "string" ? request : request.url).pathname;
+      const file = join(built, path.endsWith("/") ? `${path}index.html` : path);
+      return existsSync(file) ? new Response(readFileSync(file)) : new Response(null, { status: 404 });
+    } };
+    for (const [host, file] of hosts) {
+      const robots = await worker.fetch(new Request(`https://${host}/robots.txt`), { ASSETS: assets });
+      const text = await robots.text();
+      expect([host, robots.status, text]).toEqual([host, 200, readFileSync(join(ROOT, file), "utf8")]);
+      const sitemap = /^Sitemap: (\S+)$/m.exec(text)![1]!;
+      const answer = await worker.fetch(new Request(sitemap), { ASSETS: assets });
+      expect([sitemap, answer.status]).toEqual([sitemap, 200]);
+      expect(await answer.text()).toMatch(/^<\?xml version="1\.0" encoding="UTF-8"\?>\n<(urlset|sitemapindex) xmlns="http:\/\/www\.sitemaps\.org\/schemas\/sitemap\/0\.9">/);
+    }
+  });
+});
