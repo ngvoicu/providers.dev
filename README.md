@@ -376,13 +376,17 @@ pi or a measurement, and says which.
 
 - **By hand:** `npm run sync` (add `-- --force` to download again even if nothing changed), then `npm run build`.
   `npm run sync -- --only=pi` imports pi's catalog alone and leaves models.dev and the measurements as they are.
-- **Scheduled:** `.github/workflows/publish.yml` ("Publish", on) runs daily at 04:17 and 06:47 UTC, on every push to
-  `main`, and from the Actions tab, on GitHub only. The second time is a fallback: GitHub can delay or drop a
-  scheduled run, and neither scheduled run had fired by 2026-11-18. A run whose import finds nothing new commits
-  nothing. It imports, builds, tests, commits the snapshot if the data changed, and
-  deploys to `https://providers.dev`. A push to `main` builds, tests and deploys what is in the repository, without an
-  import. Only one run is active at a time. The daily snapshot is committed on GitHub, so a clone pulls from GitHub
-  before any work.
+- **Scheduled:** `.github/workflows/publish.yml` ("Publish", on) runs four times a day, at 04:17, 10:43, 16:29 and
+  22:51 UTC, on every push to `main`, and from the Actions tab, on GitHub only. GitHub can delay a scheduled run by
+  many hours or drop it (some days in November 2026 had none, and those that ran started 8 to 12 hours late), so four
+  slots at uneven minutes make a lost slot cost hours, not a day. It imports, builds, tests, commits the snapshot if
+  the data changed, and deploys to `https://providers.dev`. A push to `main` builds, tests and deploys what is in the
+  repository, without an import. A run whose import finds nothing new commits nothing, and a scheduled one does not
+  deploy either when the live Worker version was built from the same commit (each deploy names it in its message,
+  `commit <sha>`) and `/api/v1/meta` reports no failed import (`scripts/lib/deploy-gate.ts`; its log says why). Only
+  one run is active at a time; each checks out `main` as it is when it starts, and a snapshot that meets a newer commit
+  is put on top of it before the push. The snapshot is committed on GitHub, so a clone pulls from GitHub before any
+  work.
 - **The copy on the owner's Forgejo server:** it follows GitHub by itself. `.forgejo/workflows/follow-github.yml`
   ("Follow GitHub") runs there every hour, at minute 03 (UTC), and by hand. It fetches `main` from GitHub and
   brings the server's `main` to it: a fast-forward when it can be one; when GitHub's `main` is not a descendant of the

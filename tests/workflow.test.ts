@@ -7,7 +7,7 @@ import { parse } from "yaml";
 import { describe, expect, it } from "vitest";
 import { ROOT, tempDataDir } from "./helpers.ts";
 
-type Step = { name?: string; id?: string; if?: string; run?: string; env?: Record<string, string> };
+type Step = { name?: string; id?: string; if?: string; run?: string; uses?: string; with?: Record<string, string>; env?: Record<string, string> };
 const workflow = parse(readFileSync(join(ROOT, ".github", "workflows", "publish.yml"), "utf8")) as { jobs: { publish: { steps: Step[] } } };
 const steps = workflow.jobs.publish.steps;
 const keepStep = steps.find((step) => step.name === "Keep the new snapshot")!;
@@ -130,5 +130,70 @@ describe("the warning about pi data missing from the build", () => {
     expect(steps[build + 1]).toMatchObject({ name: "Warn about pi data missing from the build", if: "steps.build.outputs.pi == 'turned_away' || steps.build.outputs.pi == 'published_without_blocks'" });
     // Fixed text: nothing that came from pi is printed as a workflow command.
     expect(steps[build + 1]!.run).toBe(`echo "::warning title=pi data missing from the build::The dataset is built and deployed without pi's data, with pi's data but no pi block on any entry, or without the record of the last pi import. /api/v1/meta lists which and why, under issues (pi-snapshot-unreadable, pi-no-blocks). The models.dev part is as usual; the safe values only pi states are published as unknown."`);
+  });
+});
+
+describe("a run that finds nothing new", () => {
+  const withOutput = (dir: string) => {
+    const output = join(dir, "..", "github-output");
+    writeFileSync(output, "");
+    const env: Record<string, string | undefined> = { ...process.env, GIT_CONFIG_GLOBAL: "/dev/null", GIT_CONFIG_NOSYSTEM: "1", PI_REVISION7: "", GITHUB_OUTPUT: output };
+    return { output, run: () => spawnSync("bash", ["-e", "-c", keep], { cwd: dir, encoding: "utf8", env }) };
+  };
+
+  it("commits nothing and says so in its outputs; a run that commits gives the commit it built", () => {
+    const dir = checkout(false);
+    const { output, run } = withOutput(dir);
+    write(dir, "data/sync-status.json", '{"last_attempt_at":"later"}\n');
+    expect(run().status).toBe(0);
+    expect(readFileSync(output, "utf8")).toBe("committed=false\n");
+    expect(git(dir, "log", "-1", "--format=%s").trim()).toBe("start");
+    write(dir, "data/upstream/providers/a.json", '{"changed":true}\n');
+    expect(run().status).toBe(0);
+    expect(readFileSync(output, "utf8")).toContain(`built=${git(dir, "rev-parse", "HEAD").trim()}\ncommitted=true\n`);
+  });
+
+  it("puts its snapshot on top of a commit that reached main after the checkout, and pushes", () => {
+    const dir = checkout(false);
+    // Another clone pushes a commit to main meanwhile.
+    const other = join(dir, "..", "other");
+    execFileSync("git", ["clone", "-q", join(dir, "..", "remote.git"), other]);
+    git(other, "config", "user.name", "test");
+    git(other, "config", "user.email", "test");
+    git(other, "config", "commit.gpgsign", "false");
+    write(other, "README.md", "code\n");
+    git(other, "add", "-A");
+    git(other, "commit", "-q", "-m", "code");
+    git(other, "push", "-q", "origin", "main");
+    write(dir, "data/upstream/providers/a.json", '{"changed":true}\n');
+    const result = withOutput(dir).run();
+    expect(result.status, result.stderr).toBe(0);
+    expect(git(dir, "log", "-3", "--format=%s").trim().split("\n")).toEqual(["sync: models.dev e06a33e", "code", "start"]);
+    expect(git(dir, "rev-parse", "HEAD")).toBe(git(dir, "rev-parse", "origin/main"));
+  });
+});
+
+describe("the schedule", () => {
+  const on = parse(readFileSync(join(ROOT, ".github", "workflows", "publish.yml"), "utf8")).on as { schedule: { cron: string }[] };
+  it("has four slots a day at uneven minutes, about six hours apart", () => {
+    const slots = on.schedule.map(({ cron }) => {
+      const [minute, hour, ...rest] = cron.split(" ");
+      expect(rest).toEqual(["*", "*", "*"]);
+      return Number(hour) * 60 + Number(minute);
+    }).sort((a, b) => a - b);
+    expect(slots).toHaveLength(4);
+    for (const slot of slots) expect([0, 15, 30, 45]).not.toContain(slot % 60);
+    const gaps = slots.map((slot, at) => ((slots[(at + 1) % 4]! - slot + 1440) % 1440));
+    for (const gap of gaps) expect(gap).toBeGreaterThanOrEqual(5 * 60);
+  });
+
+  it("checks out main as it is when the run starts, and deploys only as the gate says, naming the commit it built", () => {
+    expect(steps[0]).toMatchObject({ uses: "actions/checkout@v4", with: { ref: "${{ github.ref }}" } });
+    const deploy = steps.find((step) => step.name === "Deploy to Cloudflare")!;
+    expect(deploy.if).toBe("steps.gate.outputs.deploy == 'true'");
+    expect(deploy.run).toContain('npx wrangler deploy --message "commit $BUILT"');
+    const gate = steps.findIndex((step) => step.name === "Decide whether to deploy");
+    expect(steps[gate + 1]).toBe(deploy);
+    expect(steps[gate]!.run).toBe("node scripts/deploy-gate.ts");
   });
 });

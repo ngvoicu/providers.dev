@@ -1,9 +1,15 @@
 name: Publish
 
-# Daily, at 04:17 and 06:47 UTC: import models.dev once per run, rebuild, deploy. Also on every push to main and by
-# hand. The second time is a fallback: GitHub can delay or drop a scheduled run, and none fired at 04:17 on 2026-11-17
-# or 2026-11-18. Two runs a day are safe: a snapshot is committed only when the data changed, and one run is active
-# at a time.
+# Four times a day, at 04:17, 10:43, 16:29 and 22:51 UTC: import the sources once per run, rebuild, deploy. Also on
+# every push to main and by hand. GitHub can delay a scheduled run by many hours or drop it (none ran on some days in
+# November 2026, and those that ran started 8 to 12 hours late), so four slots at uneven minutes make a lost slot cost
+# hours, not a day.
+# A run that finds nothing new is harmless: it commits nothing (a snapshot is committed only when the data changed,
+# not for a new "checked at" time), and a scheduled one does not deploy either when the live site was built from the
+# same commit and reports no failed import (scripts/lib/deploy-gate.ts); a push or a run by hand always deploys.
+# One run is active at a time, and each checks out main as it is when the run starts, not as it was when the run was
+# queued, so a run that waited behind another starts from that run's snapshot. A snapshot that meets a newer commit
+# on main is put on top of it before the push.
 # A failed import never unpublishes anything: the build then uses the last good snapshot in the repository,
 # and the site says that the last sync failed.
 # Runs on GitHub only. A mirror that reads .github/workflows/ skips the job, so only one place commits a snapshot
@@ -12,7 +18,9 @@ name: Publish
 on:
   schedule:
     - cron: "17 4 * * *"
-    - cron: "47 6 * * *"
+    - cron: "43 10 * * *"
+    - cron: "29 16 * * *"
+    - cron: "51 22 * * *"
   workflow_dispatch:
     inputs:
       force:
@@ -22,7 +30,9 @@ on:
   push:
     branches: [main]
 
-# One run at a time, so two syncs can never race. A second run waits for the first.
+# One run at a time, so two syncs can never race. A second run waits for the first. GitHub keeps one waiting run: a
+# third replaces it (it shows as cancelled). Nothing is lost by that: the run that stays checks out main's newest commit
+# and, if the live site was not built from it, deploys it.
 concurrency:
   group: publish
   cancel-in-progress: false
@@ -37,6 +47,10 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          # main as it is now: a run queued behind another starts from that run's snapshot, not from the commit it was
+          # queued on.
+          ref: ${{ github.ref }}
       - uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -69,6 +83,7 @@ jobs:
         run: npm run check
 
       - name: Keep the new snapshot
+        id: keep
         if: steps.sync.outcome == 'success'
         env:
           PI_REVISION7: ${{ steps.sync.outputs.pi_revision7 }}
@@ -93,19 +108,49 @@ jobs:
             # data/pi/ exists once a pi import has succeeded; a repository that never held one has nothing to add.
             if [ -d data/pi ]; then git add data/pi; fi
             git commit -m "$message"
-            git push
+            # The commit whose tree was built and tested, for the deploy's record.
+            echo "built=$(git rev-parse HEAD)" >> "${GITHUB_OUTPUT:-/dev/null}"
+            echo "committed=true" >> "${GITHUB_OUTPUT:-/dev/null}"
+            if ! git push; then
+              # A commit reached main after the checkout. The snapshot touches only data/, so it goes on top of it.
+              git pull --rebase origin main
+              git push
+            fi
+          else
+            echo "Nothing new: no commit."
+            echo "committed=false" >> "${GITHUB_OUTPUT:-/dev/null}"
           fi
 
-      - name: Deploy to Cloudflare
+      # Every run deploys but a scheduled one that found nothing new while the live site is this commit with no failed
+      # import (scripts/lib/deploy-gate.ts). It says why in its log.
+      - name: Decide whether to deploy
+        id: gate
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          EVENT: ${{ github.event_name }}
+          SYNC_OUTCOME: ${{ steps.sync.outcome }}
+          PART_UPSTREAM: ${{ steps.sync.outputs.upstream }}
+          PART_MEASUREMENTS: ${{ steps.sync.outputs.measurements }}
+          PART_PI: ${{ steps.sync.outputs.pi }}
+          PART_LISTED: ${{ steps.sync.outputs.listed }}
+          COMMITTED: ${{ steps.keep.outputs.committed }}
+          BUILT: ${{ steps.keep.outputs.built }}
+        run: node scripts/deploy-gate.ts
+
+      - name: Deploy to Cloudflare
+        if: steps.gate.outputs.deploy == 'true'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          BUILT: ${{ steps.gate.outputs.built }}
         run: |
           missing=""
           if [ -z "$CLOUDFLARE_API_TOKEN" ]; then missing="CLOUDFLARE_API_TOKEN"; fi
           if [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then missing="${missing:+$missing and }CLOUDFLARE_ACCOUNT_ID"; fi
           if [ -n "$missing" ]; then echo "Secret not set: $missing. Built and tested, not deployed."; exit 0; fi
-          npx wrangler deploy
+          # The version's message names the commit it was built from: the next scheduled run reads it back.
+          npx wrangler deploy --message "commit $BUILT"
 
       - name: Report a failed import
         if: steps.sync.outcome == 'failure'
