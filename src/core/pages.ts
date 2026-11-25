@@ -8,7 +8,7 @@ import { entryHref, escapeHtml as e, type Today } from "./format.ts";
 import type { Listing } from "./listings.ts";
 import type { JsonObject } from "./merge.ts";
 import { fillShell, PAGE_SHELL } from "./page-shell.ts";
-import { parseQuery, serializeQuery, SITE_DEFAULT } from "./query.ts";
+import { MODEL_PARAMS, PARAMS, parseParams, parseQuery, PROVIDER_PARAMS, serializeQuery, SITE_DEFAULT, type ParamDoc } from "./query.ts";
 import { entryHtml, piRechecked } from "./render.ts";
 import { DOCUMENTS, type CanonicalModel, type CanonicalModelDetail, type Correction, type CacheEvaluationRecord, type Documentation, type Facets, type LimitEvaluationRecord } from "./resources.ts";
 import type { Meta } from "./schema.ts";
@@ -24,6 +24,26 @@ interface View { title: string; description: string; html: string; canonical?: s
 class ApiError extends Error {
   status: number;
   constructor(status: number) { super(`API response ${status}`); this.status = status; }
+}
+
+/** The page offsets of the evidence page, one per paged section. */
+const EVIDENCE_PARAMS: ParamDoc[] = (["corrections_offset", "cache_offset", "limits_offset"] as const).map((name) => ({ name, kind: "integer", description: "Items to skip." }));
+
+/**
+ * The pages' own lenient step in front of the API's validator, which stays strict. A page is often reached by a link
+ * that carries more than its filters (utm_source=chatgpt.com, fbclid, ref, …) or a filter a person mistyped: the page
+ * keeps of the query only the parameters `docs` describes whose value the API accepts (the first, where a name is
+ * repeated) and leaves out everything else, as if it were not in the address. The browser's explorer does the same
+ * (src/client/explorer.ts, readUrl).
+ */
+export function pageParams(search: URLSearchParams, docs: readonly ParamDoc[]): URLSearchParams {
+  const known = new Set(docs.map((doc) => doc.name as string));
+  const kept = new URLSearchParams();
+  for (const [name, value] of search) {
+    if (!known.has(name) || kept.has(name) || value.trim() === "") continue;
+    if (parseParams(new URLSearchParams([[name, value]]), docs, true).ok) kept.set(name, value);
+  }
+  return kept;
 }
 
 export function isPage(path: string): boolean {
@@ -51,6 +71,13 @@ export async function handlePage(request: Request, deps: PageDeps): Promise<Resp
     }
     return items;
   };
+  /** The page's address with only the parameters it uses: what its own links and forms carry on. */
+  const kept = (params: URLSearchParams): URL => new URL(`${url.pathname}${params.toString() ? `?${params}` : ""}`, url.origin);
+  /** A page past the last one of a list is not a page of it: the not-found page. */
+  const within = <T>(result: Envelope<T>): Envelope<T> => {
+    if (result.offset > 0 && result.data.length === 0) throw new ApiError(404);
+    return result;
+  };
   const now = new Date(`${deps.now().toISOString().slice(0, 10)}T00:00:00Z`);
   let status = 200;
   let meta: Meta | undefined;
@@ -61,14 +88,16 @@ export async function handlePage(request: Request, deps: PageDeps): Promise<Resp
     // Staleness is the published threshold applied to today: the one thing a page works out.
     const today: Today = { date: now, stale_after_days: meta.stale_after_days };
     if (path === "/") {
-      const params = new URLSearchParams(url.search);
+      const own = pageParams(url.searchParams, PARAMS);
+      const params = new URLSearchParams(own);
       if (!params.has("sort")) for (const [name, value] of new URLSearchParams(SITE_DEFAULT)) if (!params.has(name)) params.set(name, value);
       const parsed = parseQuery(params, true);
       if (!parsed.ok) throw new ApiError(400);
-      const [result, facets] = await Promise.all([read<Envelope<Summary>>(`/api/v1/entries?${serializeQuery(parsed.query)}`), one<Facets>("/api/v1/facets")]);
-      view = { title: "AI model catalog", description: "Context, output, pricing and prompt caching by model, provider and access method.", html: catalogHtml(result, parsed.query, facets, meta, url, today) };
+      const [result, facets] = await Promise.all([read<Envelope<Summary>>(`/api/v1/entries?${serializeQuery(parsed.query)}`).then(within), one<Facets>("/api/v1/facets")]);
+      view = { title: "AI model catalog", description: "Context, output, pricing and prompt caching by model, provider and access method.", html: catalogHtml(result, parsed.query, facets, meta, kept(own), today) };
     } else if (path === "/providers") {
-      view = { title: "Providers", description: "Providers and access methods in the catalog.", html: providersHtml(await read<Envelope<ProviderSummary>>(`/api/v1/providers${url.search}`), url) };
+      const own = kept(pageParams(url.searchParams, PROVIDER_PARAMS));
+      view = { title: "Providers", description: "Providers and access methods in the catalog.", html: providersHtml(within(await read<Envelope<ProviderSummary>>(`/api/v1/providers${own.search}`)), own) };
     } else if (path.startsWith("/providers/")) {
       // The provider's model list, where a source has one: the API answers 404 for a provider it has no listing for.
       const [{ provider, entries }, listing] = await Promise.all([
@@ -80,7 +109,8 @@ export async function handlePage(request: Request, deps: PageDeps): Promise<Resp
       ]);
       view = { title: provider.name, description: `${provider.name}: ${provider.entry_count} model entries.`, html: providerHtml(provider, entries, listing, imported, today, meta.pi) };
     } else if (path === "/models") {
-      view = { title: "Models", description: "Canonical models and the providers that serve them.", html: modelsHtml(await read<Envelope<CanonicalModel>>(`/api/v1/models${url.search}`), url) };
+      const own = kept(pageParams(url.searchParams, MODEL_PARAMS));
+      view = { title: "Models", description: "Canonical models and the providers that serve them.", html: modelsHtml(within(await read<Envelope<CanonicalModel>>(`/api/v1/models${own.search}`)), own) };
     } else if (path.startsWith("/models/")) {
       if (!refFromPath(path.slice("/models/".length))) throw new ApiError(404);
       const [model, facets] = await Promise.all([one<CanonicalModelDetail>(`/api/v1${path}`), one<Facets>("/api/v1/facets")]);
@@ -92,13 +122,15 @@ export async function handlePage(request: Request, deps: PageDeps): Promise<Resp
       const facts = [window.value === null ? "" : `context window ${window.at_least ? "at least " : ""}${window.value.toLocaleString("en-US")} tokens`, summary.max_output === null ? "" : `maximum output ${summary.max_output.toLocaleString("en-US")} tokens`].filter(Boolean);
       view = { title: `${summary.name} at ${provider.name}`, description: `${summary.name} at ${provider.name} (${summary.ref})${facts.length ? `: ${facts.join(", ")}` : ""}. Limits, prices and prompt caching.`, canonical: entryHref(summary.ref), html: entryHtml({ summary, provider, model: entry, imported, today, cache_ages_s: meta.cache_ages_s, pi: meta.pi }) };
     } else if (path === "/evidence") {
+      const own = pageParams(url.searchParams, EVIDENCE_PARAMS);
+      const offset = (name: string): string => own.get(name) ?? "0";
       const [corrections, added, cache, measured] = await Promise.all([
-        read<Envelope<Correction>>(`/api/v1/corrections?offset=${encodeURIComponent(url.searchParams.get("corrections_offset") ?? "0")}`),
+        read<Envelope<Correction>>(`/api/v1/corrections?offset=${offset("corrections_offset")}`).then(within),
         all<ProviderSummary>("/api/v1/providers?origin=added"),
-        read<Envelope<CacheEvaluationRecord>>(`/api/v1/evaluations/cache?offset=${encodeURIComponent(url.searchParams.get("cache_offset") ?? "0")}`),
-        read<Envelope<LimitEvaluationRecord>>(`/api/v1/evaluations/limits?offset=${encodeURIComponent(url.searchParams.get("limits_offset") ?? "0")}`),
+        read<Envelope<CacheEvaluationRecord>>(`/api/v1/evaluations/cache?offset=${offset("cache_offset")}`).then(within),
+        read<Envelope<LimitEvaluationRecord>>(`/api/v1/evaluations/limits?offset=${offset("limits_offset")}`).then(within),
       ]);
-      view = { title: "Evidence", description: "Corrections and evaluations with sources and dates.", html: evidenceHtml(meta, corrections, added, cache, measured, url, today) };
+      view = { title: "Evidence", description: "Corrections and evaluations with sources and dates.", html: evidenceHtml(meta, corrections, added, cache, measured, kept(own), today) };
     } else if (path === "/docs/api") {
       view = { title: "API", description: "The providers.dev API: endpoints, parameters, response schemas and examples.", html: openapiHtml(await read<OpenApiDocument>("/api/v1/openapi.json")) };
     } else if (path.startsWith("/docs/") && (DOCUMENTS as readonly string[]).includes(path.slice("/docs/".length)) && path !== "/docs/support") {
@@ -109,7 +141,7 @@ export async function handlePage(request: Request, deps: PageDeps): Promise<Resp
   } catch (error) {
     status = error instanceof ApiError && (error.status === 400 || error.status === 404) ? error.status : 503;
     const title = status === 404 ? "Nothing at this address" : status === 400 ? "Invalid filters" : "The catalog is temporarily unavailable";
-    view = { title, description: title, html: `<h1>${title}</h1><p class="lead mt-3">${status === 400 ? 'Use the <a href="/docs/api/">documented API parameters</a> for this view.' : status === 404 ? "This provider or model may no longer be listed." : "The API could not load a complete published snapshot. Try again shortly."}</p><p class="mt-6"><a class="button" href="/">Search the catalog</a></p>` };
+    view = { title, description: title, html: `<h1>${title}</h1><p class="lead mt-3">${status === 400 ? 'Use the <a href="/docs/api/">documented API parameters</a> for this view.' : status === 404 ? "This page, provider or model may no longer be listed." : "The API could not load a complete published snapshot. Try again shortly."}</p><p class="mt-6"><a class="button" href="/">Search the catalog</a></p>` };
   }
   const shell = await deps.shell();
   if (!shell) return new Response("Page template unavailable", { status: 503, headers: { "Cache-Control": "no-store" } });
@@ -121,6 +153,8 @@ export async function handlePage(request: Request, deps: PageDeps): Promise<Resp
   });
   const etag = await representationTag(html);
   const headers = new Headers({ "Content-Type": "text/html; charset=utf-8", "X-Content-Type-Options": "nosniff", ETag: etag, "Cache-Control": status === 200 ? "public, max-age=300, stale-while-revalidate=3600" : "no-store" });
+  // An error page is never a page to index.
+  if (status !== 200) headers.set("X-Robots-Tag", "noindex");
   if (meta) { headers.set("X-Dataset-Version", meta.dataset_version); headers.set("X-Dataset-Generated-At", meta.generated_at); }
   if (status === 200 && etagMatches(request, etag)) return new Response(null, { status: 304, headers });
   return new Response(request.method === "HEAD" ? null : html, { status, headers });

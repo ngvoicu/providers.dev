@@ -546,6 +546,12 @@ the provider altogether, the import drops it, its entries leave the site, and `/
 Read-only, no key, CORS open. Full reference with every filter: `/docs/api/` on the site, and
 `/api/v1/openapi.json`.
 
+The API is strict about its query: a parameter it does not know, or a value it cannot read, is a 400
+(`invalid_parameters`), naming the parameter. The site's pages are not: links reach them with `utm_source`, `fbclid`,
+`ref` and the like, so a page leaves out of its query every parameter it does not know and every filter whose value the
+API would refuse, and shows the page as if they were not there (`pageParams` in `src/core/pages.ts`); its canonical
+address has no query. A page past the last page of a list (`?offset=999999`) is the not-found page, with status 404.
+
 Four resources, with the same names on the website: **providers**, **entries** (a model at a provider and access
 method), **models** (canonical: a model as its lab names it) and **evaluations**. Every collection answers
 `{ meta, total, limit, offset, next_offset, data }`; every single object `{ meta, data }`.

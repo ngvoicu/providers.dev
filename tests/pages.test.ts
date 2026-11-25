@@ -372,7 +372,8 @@ describe("API response boundary", () => {
     for (const entry of result.data) expect(html).toContain(entry.ref);
     expect(html).toContain("Page 2 of 10");
     expect(html).toContain('href="/?provider=provider-02&amp;limit=2&amp;offset=4&amp;sort=model"');
-    expect((await page("/?min_context=nope")).status).toBe(400);
+    // A known filter with a value the API refuses is left out on the page (the API still refuses it).
+    expect((await page("/?min_context=nope")).status).toBe(200);
   });
 
   it("shows the version and the Stability section of the OpenAPI document on /docs/api/", async () => {
@@ -414,7 +415,7 @@ describe("API response boundary", () => {
     expect([...html.matchAll(/data-copy="([^"]+)" aria-label="Copy entry id"/g)].map((match) => match[1])).toEqual(answer.data.map((item) => item.ref));
     // No header is marked as sorted: the table has no cache lifetime sort control.
     expect(html).not.toContain("aria-sort");
-    expect((await page("/?lifetime_basis=none")).status).toBe(400);
+    expect((await page("/?lifetime_basis=none")).status).toBe(200);
   });
 
   it("the home page's lead names no count, and its facts line carries the counts from /api/v1/meta and the facets", async () => {
@@ -441,7 +442,7 @@ describe("API response boundary", () => {
 
   it("has every declared filter of the entry list in the catalog's form, as a control or carried, once", async () => {
     // A query that sets every parameter, so that a carried one is written.
-    const all = "q=model&provider=provider-02&family=f&canonical_id=lab/model-1&type=chat&access=api&origin=upstream&cache=yes&cache_mode=implicit&lifetime_basis=measured&min_context=1&min_output=1&min_input_window=1&max_age_months=600&evaluated=false&disagree=false&sort=cache_short&order=desc&limit=10&offset=10";
+    const all = "q=model&provider=provider-02&family=f&canonical_id=lab/model-1&type=chat&access=api&origin=upstream&cache=yes&cache_mode=implicit&lifetime_basis=measured&min_context=1&min_output=1&min_input_window=1&max_age_months=600&evaluated=false&disagree=false&sort=cache_short&order=desc&limit=10&offset=0"; // offset 0: a later page of a list this query leaves empty is not a page
     expect(PARAMS.map(({ name }) => name).filter((name) => !all.includes(`${name}=`))).toEqual([]);
     const html = (await (await page(`/?${all}`)).text()).match(/<form id="filters"[\s\S]*?<\/form>/)?.[0] ?? "";
     const names = [...html.matchAll(/<(?:input|select)\b[^>]*\bname="([^"]+)"/g)].map((match) => match[1]);
