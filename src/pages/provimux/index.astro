@@ -1,6 +1,7 @@
 ---
 // provimux.providers.dev/ (served at the subdomain's root; see src/core/provimux-site.ts). Every statement here is
-// taken from Provimux's README (.github/README.md), pi-provimux's README or the provimux-ui release notes.
+// taken from Provimux's README (.github/README.md), pi-provimux's README or the provimux-ui release notes; the pools
+// section also from the console's own words (provimux-ui's Models page) and the routing it describes.
 import Provimux from "../../layouts/Provimux.astro";
 
 const github = "https://github.com/ngvoicu/provimux";
@@ -68,7 +69,19 @@ const groups: { title: string; promise: string; rows: Row[] }[] = [
 /** The console screenshots: made with example data (accounts at example.com, made-up keys). */
 const shot = (page: string, alt: string) => ({ page, alt });
 const accounts = shot("accounts", "The console's Accounts page. Chips read 10 accounts, 7 working, 1 signed out, 1 cooling down, 1 off. A Claude card lists a subscription, alex@example.com, Working, priority 10, and an API key at api.anthropic.com, Working, priority 0. A ChatGPT · OpenAI card lists a subscription that is signed out, with a Sign in again button; a second subscription, team@example.com, Working, 1 model cooling down; and an API key at api.openai.com. A Gemini API key is off.");
-const models = shot("models", "The console's Models page. Under Your names: deepseek and qwen-coder, each served by an OpenRouter API key. Under Used in the last 30 days: claude-opus-5-5 with 2 routes, first a Claude subscription, alex@example.com, priority 10, then a Claude API key at api.anthropic.com, priority 0; gpt-6.1-terra with 3 routes, one of them a subscription cooling down, 19 min left (quota); claude-sonnet-5-5 with 2 routes.");
+const models = shot("models", "The console's Models page. Chips read 14 names, 3 of yours, 7 served by more than one account, 3 cooling down. Under Your names: opus with 4 accounts (a Claude subscription, cooling down, 46 min left (quota), priority 10; a Devin subscription, priority 5; a Claude API key at api.anthropic.com and an OpenRouter API key at openrouter.ai, both priority 0), then deepseek and qwen-coder, each served by an OpenRouter API key. Under Used in the last 30 days: gpt-6.1-terra with 3 accounts, one of them a subscription cooling down, 18 min left (quota); claude-sonnet-5-5 with 2 accounts.");
+
+/** The pool in the Models picture, alone: a wide crop beside the text, and the console's own phone layout on a phone. */
+const pool = {
+  alt: "A name on the console's Models page: opus, Your name, 4 accounts, 1840 requests in 30 days. 1: a Claude subscription, alex@example.com, sends claude-opus-5-5, cooling down, 46 min left (quota), priority 10. 2: a Devin subscription, alex@example.com, sends devin/claude-opus-5-5, priority 5. 3, shared: a Claude API key at api.anthropic.com sends claude-opus-5-5, priority 0, and an OpenRouter API key at openrouter.ai sends anthropic/claude-opus-5.5, priority 0.",
+  wide: { width: 744, height: 318 },
+  narrow: { width: 424, height: 458 },
+};
+const poolPicture = (scheme: "light" | "dark") =>
+  `<picture class="shot-${scheme}">` +
+  `<source media="(min-width: 640px)" srcset="/media/console-pool-wide-${scheme}.webp 1x, /media/console-pool-wide-${scheme}-2x.webp 2x" width="${pool.wide.width}" height="${pool.wide.height}">` +
+  `<img src="/media/console-pool-narrow-${scheme}.webp" srcset="/media/console-pool-narrow-${scheme}-2x.webp 2x" width="${pool.narrow.width}" height="${pool.narrow.height}" alt="${pool.alt}" decoding="async" loading="lazy">` +
+  `</picture>`;
 ---
 
 <Provimux
@@ -150,6 +163,61 @@ const models = shot("models", "The console's Models page. Under Your names: deep
     </div>
   </section>
 
+  <section id="pools" class="pmx-section" aria-labelledby="pools-title">
+    <div class="pmx-page pmx-pool">
+      <div class="pmx-pool-text">
+        <header class="pmx-pool-head">
+          <p class="pmx-kicker">Pools</p>
+          <h2 id="pools-title">One name, every account that can serve it.</h2>
+          <p>
+            Give a name of your own, such as <code>opus</code>, and put models from any of your accounts under it: a Claude subscription, an Anthropic API key,
+            Devin, OpenRouter. Your tools ask for that one name. Provimux sends each request to one of the accounts behind it, in your order, and tells your tool
+            which one answered.
+          </p>
+        </header>
+        <ul class="pmx-list pmx-pool-points">
+          <li>
+            <strong>Made on the console's Models page:</strong> New name, a model from each account, save.
+            Until then <code>claude-opus-5-5</code>, <code>devin/claude-opus-5-5</code> and <code>anthropic/claude-opus-5.5</code> are three names, and a request
+            for one never reaches the accounts behind the others.
+          </li>
+          <li>
+            <strong>Tried in your order.</strong> The highest priority first, and accounts of the same priority share the requests. An account cooling down
+            after a refused request or a spent quota is skipped until its cooldown ends. Priorities are yours, one per account for all its models; nothing is
+            chosen by price or speed.
+          </li>
+          <li>
+            <strong>The answer names its account</strong> in its headers, also after a retry on another account, and <span class="whitespace-nowrap">pi-provimux</span> shows it in pi's footer.
+          </li>
+        </ul>
+        <p class="hint pmx-pool-note">
+          The routing is CLIProxyAPI's: one name on several accounts, tried by priority. Provimux adds the page that makes a pool in one save, and the headers
+          that name the account. In the console, pools are among <em>Your names</em>, which also holds short names for a single model.
+        </p>
+      </div>
+      <div class="pmx-pool-shots">
+        <figure class="pmx-shot pmx-pool-shot">
+          <div class="pmx-frame pmx-frame-card">
+            <Fragment set:html={poolPicture("light") + poolPicture("dark")} />
+          </div>
+          <figcaption>
+            <strong>opus</strong> on the Models page, its accounts in the order Provimux tries them. The Claude subscription is cooling down after its quota ran
+            out, so the next request goes to Devin; the two API keys share third place. Example data.
+          </figcaption>
+        </figure>
+        <figure class="pmx-term pmx-pool-answer" aria-label="Example: the answer to a request for opus names the account that gave it">
+          <div class="pmx-term-bar" aria-hidden="true"><span></span><span></span><span></span><em>a request for opus</em></div>
+          <pre><code><span class="pmx-t-dim">→ POST /v1/chat/completions</span>  <span class="pmx-t-dim">model:</span> <span class="pmx-t-sel">opus</span>
+<span class="pmx-t-dim">← 200 OK</span>
+  X-CPA-AUTH-KIND: <span class="pmx-t-sub">oauth</span>
+  X-CPA-AUTH-PROVIDER: <span class="pmx-t-sub">devin</span></code></pre>
+          <p class="pmx-term-foot"><span class="pmx-t-dim">pi footer</span> answered: <span class="pmx-t-sub">Devin sub</span></p>
+          <figcaption class="sr-only">An example, not a real account.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
   <section id="console" class="pmx-section" aria-labelledby="console-title">
     <div class="pmx-page">
       <header class="pmx-head">
@@ -162,14 +230,14 @@ const models = shot("models", "The console's Models page. Under Your names: deep
       <ul class="pmx-list pmx-console-list">
         <li><strong>Models.</strong> Every model name your tools can send, and what serves it, in the order Provimux tries: subscription or API key, the account, the model sent, its priority, a recorded cooldown and the age of each login's own list.</li>
         <li><strong>Accounts.</strong> Every subscription and API key on one page, one card per service, each with its state in one word (Working, Signed out, Cooling down), its priority, and the fix where one is needed.</li>
-        <li><strong>Your own names.</strong> Short names, and one name served by several models, saved in one action.</li>
+        <li><strong>Your names.</strong> Short names, and <a href="#pools">pools</a>: one name served by several accounts. Saved in one action.</li>
         <li><strong>Savings.</strong> Daily usage totals kept across restarts and estimated at public list prices: what prompt caching was worth, and what the paid keys cost.</li>
       </ul>
       <figure class="pmx-shot pmx-shot-wide">
         <div class="pmx-frame">
           <Fragment set:html={["light", "dark"].map((scheme) => `<img class="shot-${scheme}" src="/media/console-${models.page}-${scheme}.webp" srcset="/media/console-${models.page}-${scheme}.webp 1440w, /media/console-${models.page}-${scheme}-2x.webp 2880w" sizes="(min-width: 1260px) 1180px, 100vw" width="1440" height="1100" alt="${models.alt}" decoding="async" loading="lazy">`).join("")} />
         </div>
-        <figcaption>The <strong>Models</strong> page: each name with its routes, in the order Provimux tries them. On a plain CLIProxyAPI the console runs too, and Provimux's own pages hide themselves. Example data.</figcaption>
+        <figcaption>The <strong>Models</strong> page: each name with the accounts behind it, in the order Provimux tries them. On a plain CLIProxyAPI the console runs too, and Provimux's own pages hide themselves. Example data.</figcaption>
       </figure>
     </div>
   </section>

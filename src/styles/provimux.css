@@ -403,6 +403,94 @@
     }
   }
 
+  /* Pools: the text beside one name's card from the console, and the answer that names its account. Stacked, the
+     picture comes right after the lead; side by side from 1100px, the text on the left. */
+  .pmx-pool {
+    display: grid;
+    gap: 1.5rem;
+  }
+  .pmx-pool-text,
+  .pmx-pool-shots {
+    display: contents;
+  }
+  .pmx-pool-head {
+    order: 1;
+  }
+  .pmx-pool-shot {
+    order: 2;
+  }
+  .pmx-pool-points {
+    order: 3;
+    margin-top: 0;
+  }
+  .pmx-pool-points,
+  .pmx-pool-note {
+    max-width: 48rem;
+  }
+  .pmx-pool-answer {
+    order: 4;
+  }
+  .pmx-pool-note {
+    order: 5;
+  }
+  .pmx-pool-head > p {
+    margin-top: 0.75rem;
+    max-width: 44rem;
+    color: var(--fg-soft);
+  }
+  /* A model's name is read whole: it never breaks at its hyphens */
+  .pmx-pool-text code {
+    white-space: nowrap;
+  }
+  /* The card is shown at its own size or smaller: 744px wide beside the text, the console's phone layout (424px) on a phone */
+  .pmx-pool-shot,
+  .pmx-pool-answer {
+    max-width: 746px;
+  }
+  .pmx-frame-card picture {
+    display: block;
+  }
+  @media (max-width: 639px) {
+    .pmx-pool-shot {
+      max-width: 426px;
+    }
+  }
+  @media (max-width: 700px) {
+    .pmx-frame.pmx-frame-card {
+      max-height: none;
+      mask-image: none;
+    }
+    .pmx-frame.pmx-frame-card img {
+      width: 100%;
+      max-width: 100%;
+      margin-left: 0;
+    }
+  }
+  @media (min-width: 1100px) {
+    .pmx-pool {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.55fr);
+      column-gap: 3rem;
+      align-items: start;
+    }
+    .pmx-pool-text,
+    .pmx-pool-shots {
+      display: grid;
+      align-content: start;
+    }
+    /* The picture stays in view while the text beside it is read */
+    .pmx-pool-shots {
+      gap: 1rem;
+      position: sticky;
+      top: 5rem;
+    }
+    .pmx-pool-points {
+      margin-top: 1.4rem;
+    }
+    .pmx-pool-note {
+      margin-top: 1.25rem;
+    }
+  }
+
   /* Install */
   .pmx-install {
     display: grid;
