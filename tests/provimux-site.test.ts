@@ -159,8 +159,8 @@ describe("Provimux's pages", () => {
 
   it("shows the console with example data, in both themes and two sizes", () => {
     const media = readdirSync(join(ROOT, "public", "provimux", "media")).sort();
-    expect(media).toEqual(["accounts", "models", "pool-narrow", "pool-wide", "savings-narrow", "savings-wide"].flatMap((page) => ["dark", "light"].flatMap((scheme) => [`console-${page}-${scheme}-2x.webp`, `console-${page}-${scheme}.webp`])).sort());
-    expect(home.match(/Example data\./g)).toHaveLength(4);
+    expect(media).toEqual(["accounts", "models", "names-narrow", "names-wide", "pool-narrow", "pool-wide", "savings-narrow", "savings-wide"].flatMap((page) => ["dark", "light"].flatMap((scheme) => [`console-${page}-${scheme}-2x.webp`, `console-${page}-${scheme}.webp`])).sort());
+    expect(home.match(/Example data\./g)).toHaveLength(5);
     expect(home).toContain("alex@example.com");
   });
 
@@ -176,7 +176,7 @@ describe("Provimux's pages", () => {
   it("keeps to Provimux's public wording: CLIProxyAPI in full, no promises about logins, no other e-mail, no local paths", () => {
     // "CPA" only inside a header name such as X-CPA-AUTH-KIND.
     expect(text.replace(/X-CPA-[A-Z-]+/g, "")).not.toMatch(/\bCPA\b/);
-    for (const words of ["compliant", "ToS-safe", "won't get you banned", "cheapest", "save 83", "works with Claude Code", "local endpoint", "partner of", "referral", "affiliate link", "/Users/"]) {
+    for (const words of ["compliant", "ToS-safe", "won't get you banned", "cheapest", "save 83", "works with Claude Code", "local endpoint", "partner of", "referral", "affiliate link", "/Users/", "security boundary", "access control"]) {
       expect(text.toLowerCase(), words).not.toContain(words.toLowerCase());
     }
     // office@providers.dev, and the screenshots' made-up accounts at example.com.

@@ -1,8 +1,9 @@
 ---
 // provimux.providers.dev/ (served at the subdomain's root; see src/core/provimux-site.ts). Every statement here is
 // taken from Provimux's README (.github/README.md), pi-provimux's README or the provimux-ui release notes; the pools
-// section also from the console's own words (provimux-ui's Models page) and the routing it describes; Savings from the
-// README and the console's Savings page; pi-cache-keeper from its README and its site (src/pages/pi-cache-keeper).
+// section also from the console's own words (provimux-ui's Models page) and the routing it describes; "Your names"
+// (#only-your-names) from the README's "Serve only my names" and the Models page's switch; Savings from the README and
+// the console's Savings page; pi-cache-keeper from its README and its site (src/pages/pi-cache-keeper).
 import Provimux from "../../layouts/Provimux.astro";
 
 const github = "https://github.com/ngvoicu/provimux";
@@ -91,6 +92,14 @@ const savings: Crop = {
   from: 900,
   wide: { width: 1162, height: 733 },
   narrow: { width: 424, height: 620 },
+};
+/** "Serve only my names" switched but not on yet (provimux-ui v1.29.2-pmx.6, gateway v8.1.3-pmx.2's names and usage). */
+const names: Crop = {
+  name: "names",
+  alt: "The Serve only my names card on the console's Models page, switched but not on yet. 10 names will stop being served. 2 of them were used in the last 30 days. Stay served, 3: claude-opus-5-5, with a button to stop keeping it, opus and qwen-coder. Used in the last 30 days, 2, with a Keep all 2 button: gpt-6.1-terra, 767 requests in 30 days, served by a Codex subscription ×2 and a Codex API key, paid per token, and claude-sonnet-5-5, 348 requests in 30 days, served by a Claude subscription and a Claude API key, paid per token, each with Keep. Not used in 30 days, 8, folded. At the bottom: 2 names your tools used are not kept: a tool that asks for one will get an error. Buttons: Cancel, and Turn on: 2 used names will be refused.",
+  from: 900,
+  wide: { width: 1154, height: 574 },
+  narrow: { width: 424, height: 818 },
 };
 const cropPicture = (crop: Crop, scheme: "light" | "dark") =>
   `<picture class="shot-${scheme}">` +
@@ -259,6 +268,35 @@ const piList = `<span class="pmx-t-row pmx-t-dim">/model</span>` + piRows
           <figcaption class="sr-only">An example, not a real account.</figcaption>
         </figure>
       </div>
+    </div>
+  </section>
+
+  <section id="only-your-names" class="pmx-section" aria-labelledby="names-title">
+    <div class="pmx-page pmx-names">
+      <header class="pmx-head">
+        <p class="pmx-kicker">Your names</p>
+        <h2 id="names-title">Serve only the names you chose.</h2>
+        <p>
+          Between them, your logins and API keys can offer hundreds of model names, and your tools' model lists show every one. One switch, off by default,
+          makes Provimux list and serve only the names you set: your <a href="#pools">pools</a> and short names, and the models you keep under their own name,
+          such as <code>claude-opus-5-5</code>. Any other name is refused with a message that says why, and a model a provider adds tomorrow stays out until
+          you name it.
+        </p>
+      </header>
+      <figure class="pmx-shot pmx-shot-wide pmx-names-shot">
+        <div class="pmx-frame pmx-frame-crop">
+          <Fragment set:html={cropPictures(names)} />
+        </div>
+        <figcaption>
+          The switch on the console's <strong>Models</strong> page, before it goes on. The pool <code>opus</code>, the short name <code>qwen-coder</code> and the
+          kept <code>claude-opus-5-5</code> stay served; of the 10 names that would stop, your tools used 2 in the last 30 days, each with Keep. Example data.
+        </figcaption>
+      </figure>
+      <p class="hint pmx-names-note">
+        In <code>config.yaml</code> it is <code>models.only-my-names</code>, applied without a restart. A pool still reaches every account behind it. Turning
+        the switch off serves every name again, and the names you kept stay kept for next time. Realtime and live connections choose a Codex login without
+        naming a model, so they are served whatever the switch says; <a href={`${github}#serve-only-my-names`}>the README</a> lists the other cases.
+      </p>
     </div>
   </section>
 
