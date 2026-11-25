@@ -149,11 +149,11 @@ export function piOfBuild(input: PiOfBuildInput): PiOfBuild {
       // The fence's own count of the blocks of the part it has taken: a part with none is published whole, and said.
       if (data.blocks.length === 0) {
         const { snapshot, counts } = data;
-        issues.push({ level: "warning", code: "pi-no-blocks", target: "data/pi", message: `pi's snapshot has ${snapshot.models} models and no entry has a pi block (left out: ${counts.left_out_models}, unmatched: ${counts.unmatched_models}). pi's data is published as pi's code gave it.` });
+        issues.push({ level: "warning", code: "pi-no-blocks", target: "data/pi", message: `Pi's snapshot has ${snapshot.models} models and no entry has a Pi block (left out: ${counts.left_out_models}, unmatched: ${counts.unmatched_models}). Pi's data is published as Pi's code gave it.` });
       }
     } else {
       turnedAway = true;
-      issues.push({ level: "warning", code: "pi-snapshot-unreadable", target: "data/pi", message: `pi's data is left out of this dataset (${why}). No entry has a pi block.` });
+      issues.push({ level: "warning", code: "pi-snapshot-unreadable", target: "data/pi", message: `Pi's data is left out of this dataset (${why}). No entry has a Pi block.` });
     }
   }
 
@@ -168,7 +168,7 @@ export function piOfBuild(input: PiOfBuildInput): PiOfBuild {
   if (record.ok) sync = record.value;
   else {
     turnedAway = true;
-    issues.push({ level: "warning", code: "pi-snapshot-unreadable", target: "data/sync-status.json", message: `The record of the last pi import is left out of this dataset (${record.why}). It is published as no attempt recorded.` });
+    issues.push({ level: "warning", code: "pi-snapshot-unreadable", target: "data/sync-status.json", message: `The record of the last Pi import is left out of this dataset (${record.why}). It is published as no attempt recorded.` });
   }
 
   const state: PiOfBuild["state"] = turnedAway ? "turned_away" : !data ? "none" : data.blocks.length === 0 ? "published_without_blocks" : "published";

@@ -107,7 +107,7 @@ function loadYaml<T>(path: string, schema: ZodType<T>, errors: string[]): T | un
 const compact = (value: unknown): string => JSON.stringify(value);
 
 /** pi's project, licence and the copyright line of its LICENSE file (LICENSES/pi-MIT.txt). */
-const PI_LICENSE = "pi (https://github.com/earendil-works/pi), MIT License, Copyright (c) 2025 Mario Zechner";
+const PI_LICENSE = "Pi (https://github.com/earendil-works/pi), MIT License, Copyright (c) 2025 Mario Zechner";
 
 export function publish(input: PublishOptions): PublishReport {
   const options = { now: () => new Date(), ...input };
@@ -205,7 +205,7 @@ export function publish(input: PublishOptions): PublishReport {
       return true as const;
     }, z.literal(true));
     if (!written.ok) {
-      issues.push({ level: "warning", code: "pi-snapshot-unreadable", target: "data/published/pi-report.json", message: `pi's report could not be written (${written.why}). The dataset is published with pi's data as usual; only data/published/pi-report.json is missing.` });
+      issues.push({ level: "warning", code: "pi-snapshot-unreadable", target: "data/published/pi-report.json", message: `Pi's report could not be written (${written.why}). The dataset is published with Pi's data as usual; only data/published/pi-report.json is missing.` });
     }
   }
   const generatedAt = options.now().toISOString();
@@ -314,7 +314,7 @@ export function publish(input: PublishOptions): PublishReport {
       upstream: "models.dev, MIT License, Copyright (c) 2025 models.dev",
       notice: "Baseline imported from https://models.dev. providers.dev is not affiliated with or endorsed by models.dev.",
       pi: PI_LICENSE,
-      pi_notice: "The pi block of an entry (providers_dev.pi) is imported from https://pi.dev/api/models. providers.dev is not affiliated with or endorsed by pi.",
+      pi_notice: "The Pi block of an entry (providers_dev.pi) is imported from https://pi.dev/api/models. providers.dev is not affiliated with or endorsed by Pi.",
     },
     pi: pi.meta,
     listings: {
@@ -422,12 +422,12 @@ function writeSnapshot(dir: string, catalog: Catalog, index: Index, meta: Meta, 
       "and is not part of models.dev.",
       "providers.dev is not affiliated with or endorsed by models.dev.",
       "",
-      "The pi block of an entry (providers_dev.pi) is imported from the model catalog of pi",
+      "The Pi block of an entry (providers_dev.pi) is imported from the model catalog of Pi",
       "(https://pi.dev/api/models, https://github.com/earendil-works/pi), MIT License, Copyright (c) 2025 Mario Zechner.",
       piSnapshot
         ? `Imported ${piSnapshot.fetched_at}${piSnapshot.revision ? ` at catalog revision ${piSnapshot.revision}` : ""}. The full license is in LICENSE-pi.txt.`
-        : "This dataset holds no pi data. The full license is in LICENSE-pi.txt.",
-      "providers.dev is not affiliated with or endorsed by pi.",
+        : "This dataset holds no Pi data. The full license is in LICENSE-pi.txt.",
+      "providers.dev is not affiliated with or endorsed by Pi.",
       "",
     ].join("\n"),
   );

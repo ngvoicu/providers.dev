@@ -405,6 +405,6 @@ export function pricingOfPi(price: PriceStatement, access: string): Pricing {
     rules,
     rule_order: "listed",
     unparsed: [],
-    evidence: [{ kind: "listed", url: PI_CATALOG_URL, date: price.date, note: "pi's catalog lists this price for the entry; no other source states one." }],
+    evidence: [{ kind: "listed", url: PI_CATALOG_URL, date: price.date, note: "Pi's catalog lists this price for the entry; no other source states one." }],
   });
 }

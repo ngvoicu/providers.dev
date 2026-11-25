@@ -667,6 +667,9 @@ stated value, and in 1.6.0 the vendor's figure stood against it (`devin/swe-2`: 
 read in full). The vendor's other fields of the model are taken as before.
 1.6.2 changed no structure: it corrected the text. Where the descriptions and the guide said "the vendor's own list",
 they now say it is the list as one signed-in account received it, and that another plan's list may differ.
+1.6.3 changed no structure: it corrected the text. The descriptions, the guide, the licence line and notice of
+`/api/v1/meta`, the issue messages and the evidence note of a price only Pi lists write the coding agent's name as
+"Pi"; field names, enum values, source ids such as `pi.dev` and the guide's anchor `pi` stay as they were.
 That promise holds for everything providers.dev makes itself: summaries, `providers_dev` records, evaluations,
 corrections, evidence, paths and parameters. The fields imported from models.dev (`limit`, `cost`, `capabilities`,
 `modalities` and the like) follow the models.dev v2 schema, which models.dev calls experimental. When models.dev

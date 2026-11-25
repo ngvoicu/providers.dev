@@ -454,12 +454,12 @@ export function matchPi(pi: PiCatalog, aliases: PiAliases | undefined, before: C
   for (const [piProvider, line] of Object.entries(lines)) {
     const piModels = own(pi, piProvider);
     if (!piModels) {
-      issues.push({ level: "warning", code: "pi-alias-orphan", target: where(piProvider), message: `data/authored/pi-aliases.yaml has a line for the pi provider ${piProvider}, which pi's catalog no longer has. Delete the line.` });
+      issues.push({ level: "warning", code: "pi-alias-orphan", target: where(piProvider), message: `data/authored/pi-aliases.yaml has a line for the Pi provider ${piProvider}, which Pi's catalog no longer has. Delete the line.` });
       continue;
     }
     for (const piModel of Object.keys(line.models)) {
       if (own(piModels, piModel)) continue;
-      issues.push({ level: "warning", code: "pi-alias-orphan", target: where(piProvider, piModel), message: `data/authored/pi-aliases.yaml has a line for the pi model ${piProvider}/${piModel}, which pi's catalog no longer has. Delete the line.` });
+      issues.push({ level: "warning", code: "pi-alias-orphan", target: where(piProvider, piModel), message: `data/authored/pi-aliases.yaml has a line for the Pi model ${piProvider}/${piModel}, which Pi's catalog no longer has. Delete the line.` });
     }
   }
 
@@ -489,7 +489,7 @@ export function matchPi(pi: PiCatalog, aliases: PiAliases | undefined, before: C
       target = piProvider;
       state = "shared";
       if (line?.same_as !== undefined) {
-        issues.push({ level: "warning", code: "pi-provider-collides", target: where(piProvider), message: `data/authored/pi-aliases.yaml pairs the pi provider ${piProvider} with ${line.same_as}, but the catalog has a provider ${piProvider} itself. The catalog's own provider is used and the same_as is ignored.` });
+        issues.push({ level: "warning", code: "pi-provider-collides", target: where(piProvider), message: `data/authored/pi-aliases.yaml pairs the Pi provider ${piProvider} with ${line.same_as}, but the catalog has a provider ${piProvider} itself. The catalog's own provider is used and the same_as is ignored.` });
       }
     } else if (line?.same_as !== undefined) {
       if (entriesOf.has(line.same_as)) {
@@ -497,12 +497,12 @@ export function matchPi(pi: PiCatalog, aliases: PiAliases | undefined, before: C
         state = "paired";
       } else {
         orphaned = true;
-        issues.push({ level: "warning", code: "pi-alias-orphan", target: where(piProvider), message: `data/authored/pi-aliases.yaml pairs the pi provider ${piProvider} with ${line.same_as}, which the catalog does not have. Its models belong to no entry.` });
+        issues.push({ level: "warning", code: "pi-alias-orphan", target: where(piProvider), message: `data/authored/pi-aliases.yaml pairs the Pi provider ${piProvider} with ${line.same_as}, which the catalog does not have. Its models belong to no entry.` });
       }
     } else if (line && Object.keys(line.models).length > 0) {
       for (const piModel of Object.keys(line.models)) {
         if (!own(models, piModel)) continue;
-        issues.push({ level: "warning", code: "pi-alias-orphan", target: where(piProvider, piModel), message: `data/authored/pi-aliases.yaml pairs the pi model ${piProvider}/${piModel}, but the catalog has no provider ${piProvider} and the file pairs it with none.` });
+        issues.push({ level: "warning", code: "pi-alias-orphan", target: where(piProvider, piModel), message: `data/authored/pi-aliases.yaml pairs the Pi model ${piProvider}/${piModel}, but the catalog has no provider ${piProvider} and the file pairs it with none.` });
       }
     }
     const piHosts = new Set(Object.values(models).map((model) => hostOf(model.baseUrl)).filter((host): host is string => host !== null));
@@ -521,7 +521,7 @@ export function matchPi(pi: PiCatalog, aliases: PiAliases | undefined, before: C
       }
       if (entries.has(piModel)) {
         if (modelLine) {
-          issues.push({ level: "notice", code: "pi-alias-redundant", target: where(piProvider, piModel), message: `The model line for ${piProvider}/${piModel} in data/authored/pi-aliases.yaml is no longer needed: ${target} now has an entry with the pi model's own id. Delete the line.` });
+          issues.push({ level: "notice", code: "pi-alias-redundant", target: where(piProvider, piModel), message: `The model line for ${piProvider}/${piModel} in data/authored/pi-aliases.yaml is no longer needed: ${target} now has an entry with the Pi model's own id. Delete the line.` });
         }
         candidates.push({ piProvider, piModel, model, provider: target, entry: piModel, match: state === "shared" ? "id" : "alias" });
         continue;
@@ -530,7 +530,7 @@ export function matchPi(pi: PiCatalog, aliases: PiAliases | undefined, before: C
         if (entries.has(modelLine.same_as)) {
           candidates.push({ piProvider, piModel, model, provider: target, entry: modelLine.same_as, match: "alias" });
         } else {
-          issues.push({ level: "warning", code: "pi-alias-orphan", target: where(piProvider, piModel), message: `data/authored/pi-aliases.yaml pairs the pi model ${piProvider}/${piModel} with ${target}/${modelLine.same_as}, which the catalog does not have.` });
+          issues.push({ level: "warning", code: "pi-alias-orphan", target: where(piProvider, piModel), message: `data/authored/pi-aliases.yaml pairs the Pi model ${piProvider}/${piModel} with ${target}/${modelLine.same_as}, which the catalog does not have.` });
           unmatched.push({ pi_provider: piProvider, pi_model: piModel, name: model.name, why: "alias-orphan", alike: alike(piModel) });
         }
         continue;
@@ -552,7 +552,7 @@ export function matchPi(pi: PiCatalog, aliases: PiAliases | undefined, before: C
     assignments.push(winner);
     for (const loser of group) {
       if (loser === winner) continue;
-      issues.push({ level: "warning", code: "pi-alias-conflict", target: where(loser.piProvider, loser.piModel), message: `The pi models ${winner.piProvider}/${winner.piModel} and ${loser.piProvider}/${loser.piModel} both reach the entry ${ref}. ${winner.piProvider}/${winner.piModel} keeps it; ${loser.piProvider}/${loser.piModel} belongs to no entry.` });
+      issues.push({ level: "warning", code: "pi-alias-conflict", target: where(loser.piProvider, loser.piModel), message: `The Pi models ${winner.piProvider}/${winner.piModel} and ${loser.piProvider}/${loser.piModel} both reach the entry ${ref}. ${winner.piProvider}/${winner.piModel} keeps it; ${loser.piProvider}/${loser.piModel} belongs to no entry.` });
       unmatched.push({ pi_provider: loser.piProvider, pi_model: loser.piModel, name: loser.model.name, why: "alias-conflict", alike: [] });
     }
   }

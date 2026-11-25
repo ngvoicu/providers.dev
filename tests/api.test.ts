@@ -514,7 +514,7 @@ describe("HTTP behaviour", () => {
 
   it("describes the cache lifetime record: its components and a guide section", async () => {
     const document = await json<{ info: { version: string; contact: unknown; license: unknown }; "x-guide": { id: string; title: string; paragraphs: string[] }[]; components: { schemas: Record<string, { properties?: Record<string, unknown> }> } }>("/api/v1/openapi.json");
-    expect(document.info.version).toBe("1.6.2");
+    expect(document.info.version).toBe("1.6.3");
     expect(document.info.contact).toEqual({ name: "providers.dev", email: "office@providers.dev", url: "https://providers.dev/docs/contributing/" });
     expect(document.info.license).toEqual({ name: "MIT", url: "https://providers.dev/docs/licensing/" });
     const schemas = document.components.schemas;
@@ -570,17 +570,17 @@ describe("pi's catalog in the API (design/pi-source.md, section d)", () => {
       sync: { last_attempt_at: expect.any(String), last_attempt_ok: false, last_error: expect.stringMatching(/^the pi feed/) },
       counts: { entries_with_block: 0, left_out_models: 0, unmatched_models: 0 },
     });
-    expect(meta.license.pi).toBe("pi (https://github.com/earendil-works/pi), MIT License, Copyright (c) 2025 Mario Zechner");
-    expect(meta.license.pi_notice).toBe("The pi block of an entry (providers_dev.pi) is imported from https://pi.dev/api/models. providers.dev is not affiliated with or endorsed by pi.");
+    expect(meta.license.pi).toBe("Pi (https://github.com/earendil-works/pi), MIT License, Copyright (c) 2025 Mario Zechner");
+    expect(meta.license.pi_notice).toBe("The Pi block of an entry (providers_dev.pi) is imported from https://pi.dev/api/models. providers.dev is not affiliated with or endorsed by Pi.");
     expect(meta.license.data).toBe("MIT");
     // A failed pi attempt does not touch the top-level sync, which speaks of models.dev and the measurements.
     expect(meta.sync.last_error ?? "").not.toMatch(/pi/);
   });
 
-  it("is version 1.6.2, with the six pi components, the keys on the entry, the summary and /meta, and a guide section after Input window", async () => {
+  it("is version 1.6.3, with the six pi components, the keys on the entry, the summary and /meta, and a guide section after Input window", async () => {
     const document = await json<{ info: { version: string; description: string }; "x-guide": { id: string; title: string; paragraphs: string[] }[]; components: { schemas: Record<string, { properties?: Record<string, unknown>; required?: string[] }> } }>("/api/v1/openapi.json");
-    expect(document.info.version).toBe("1.6.2");
-    expect(document.info.description).toContain("A second catalog, pi's (MIT), is imported beside it: what it states for an entry is under providers_dev.pi.");
+    expect(document.info.version).toBe("1.6.3");
+    expect(document.info.description).toContain("A second catalog, Pi's (MIT), is imported beside it: what it states for an entry is under providers_dev.pi.");
     const schemas = document.components.schemas;
     for (const name of ["PiBlock", "PiCost", "PiCostTier", "PiDifference", "PiSummary", "PiValue"]) expect(schemas[name], name).toBeDefined();
     expect(Object.keys(schemas.PiValue!.properties!)).toEqual(["field", "entry_field", "unit", "standing", "pi", "pi_tiers"]);
@@ -593,10 +593,10 @@ describe("pi's catalog in the API (design/pi-source.md, section d)", () => {
     const ids = document["x-guide"].map((item) => item.id);
     expect(ids.indexOf("pi")).toBe(ids.indexOf("input-window") + 1);
     const section = document["x-guide"].find((item) => item.id === "pi")!;
-    expect(section.title).toBe("pi's catalog");
+    expect(section.title).toBe("Pi's catalog");
     expect(section.paragraphs).toHaveLength(6);
     const text = section.paragraphs.join(" ");
-    for (const words of ["Since 1.2.0", "models.dev stays the reference", "not an entry", "match", "alias", "not false", "0 stands for no charge and for no price recorded alike", "Prices are compared exactly, with no tolerance", "cost.tiers", "/meta.pi", "unmatched_models", "Since 1.3.0", "subscription", "agrees, differs, only, not_compared or silent", "in no field of the entry", "providers_dev.safe", "Since 1.4.0 pi is also the last source of the safe values"]) expect(text).toContain(words);
+    for (const words of ["Since 1.2.0", "models.dev stays the reference", "not an entry", "match", "alias", "not false", "0 stands for no charge and for no price recorded alike", "Prices are compared exactly, with no tolerance", "cost.tiers", "/meta.pi", "unmatched_models", "Since 1.3.0", "subscription", "agrees, differs, only, not_compared or silent", "in no field of the entry", "providers_dev.safe", "Since 1.4.0 Pi is also the last source of the safe values"]) expect(text).toContain(words);
   });
 
   it("gives every pi block of /entries/{provider}/{model} values with nine items (1.3.0)", async () => {
@@ -635,7 +635,7 @@ describe("pi's catalog in the API (design/pi-source.md, section d)", () => {
 describe("the input window in the OpenAPI document", () => {
   it("has the two components, the key on the entry and the summary, input_read on an evaluation, and a guide section after Unknown values", async () => {
     const document = await json<{ info: { version: string }; "x-guide": { id: string; title: string; paragraphs: string[] }[]; components: { schemas: Record<string, { properties?: Record<string, unknown>; required?: string[] }> } }>("/api/v1/openapi.json");
-    expect(document.info.version).toBe("1.6.2");
+    expect(document.info.version).toBe("1.6.3");
     const schemas = document.components.schemas;
     expect(Object.keys(schemas.InputWindow!.properties!)).toEqual([
       "tokens", "basis", "bound", "scope", "source", "date", "documented_tokens", "documented_field", "documented_source", "documented_date", "documented_status",

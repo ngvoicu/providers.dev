@@ -222,13 +222,13 @@ const agreement = z
 
 export const SourceValueSchema = z
   .strictObject({
-    source: valueSource.describe("measured = providers.dev's own evaluations of the entry, the most direct that exist. providers.dev = a correction of the imported entry, or a value of an entry providers.dev adds, with evidence. models.dev = the entry as imported. pi.dev = pi's catalog."),
+    source: valueSource.describe("measured = providers.dev's own evaluations of the entry, the most direct that exist. providers.dev = a correction of the imported entry, or a value of an entry providers.dev adds, with evidence. models.dev = the entry as imported. pi.dev = Pi's catalog."),
     value: z.number().min(0).nullable().describe("The number the source states: tokens or seconds. 0 is a value for a lifetime (no cache to rely on). Null exactly where withheld."),
     withheld: z.boolean().describe("True on providers.dev where it publishes the value as unknown on purpose, against a value models.dev states. False on every other item."),
     at_least: z.boolean().describe("A measured lower bound: the real value is this or more. False on every other item."),
     below: z.number().min(0).nullable().describe("Measured: the smallest value seen to fail, an input refused or the youngest age with a cache miss. Null = none seen, and on every other source."),
     scope: statedScope.describe("Input window only: input = a cap on the input alone; window = a window input and output share. Null on every other quantity."),
-    date: date.nullable().describe("measured: the day of the evaluation it names. providers.dev: the newest evidence of the corrections that touch the fields read, or of the entry it adds. models.dev: the import date. pi.dev: the day of pi's snapshot. Null = no date."),
+    date: date.nullable().describe("measured: the day of the evaluation it names. providers.dev: the newest evidence of the corrections that touch the fields read, or of the entry it adds. models.dev: the import date. pi.dev: the day of Pi's snapshot. Null = no date."),
     evidence_url: z.url().nullable().describe("providers.dev: the evidence that gives its date. measured: the raw result of the evaluation it names. Null on the two catalogs."),
     client: z.string().nullable().describe("Measured: the public id of the client the evaluation went through. Null on every other source."),
     client_label: z.string().nullable().describe("Measured: its public label. Null on every other source."),
@@ -338,67 +338,67 @@ export const PiCostTierSchema = z
 
 export const PiCostSchema = z
   .strictObject({
-    input: z.number().min(0).describe("US dollars per million input tokens, as pi's catalog states it."),
+    input: z.number().min(0).describe("US dollars per million input tokens, as Pi's catalog states it."),
     output: z.number().min(0),
     cache_read: z.number().min(0),
     cache_write: z.number().min(0).describe("The price of a cache write of the short lifetime."),
-    tiers: z.array(PiCostTierSchema).describe("Tiers by size of request, ascending. Empty = pi states none."),
+    tiers: z.array(PiCostTierSchema).describe("Tiers by size of request, ascending. Empty = Pi states none."),
   })
-  .describe("pi's prices. In pi's catalog a price is always a number: 0 stands for no charge and for no price recorded alike, so a 0 here is not a statement that the provider charges nothing.") satisfies z.ZodType<PiCost>;
+  .describe("Pi's prices. In Pi's catalog a price is always a number: 0 stands for no charge and for no price recorded alike, so a 0 here is not a statement that the provider charges nothing.") satisfies z.ZodType<PiCost>;
 
 export const PiDifferenceSchema = z
   .strictObject({
-    field: z.enum(["context_window", "max_tokens", "cost.input", "cost.output", "cost.cache_read", "cost.cache_write", "cost.tiers"]).describe("The field of the pi block that differs."),
+    field: z.enum(["context_window", "max_tokens", "cost.input", "cost.output", "cost.cache_read", "cost.cache_write", "cost.tiers"]).describe("The field of the Pi block that differs."),
     entry_field: z.string().describe("The field of the entry it was compared with: limit.context, limit.output, cost.text.input.price, cost.text.output.price, cost.text.input.cache.read, cost.text.input.cache.write, or cost.text for the tiers."),
     unit: z.enum(["tokens", "usd_per_million_tokens"]),
-    pi: z.number().nullable().describe("pi's value. Null for cost.tiers."),
+    pi: z.number().nullable().describe("Pi's value. Null for cost.tiers."),
     published: z.number().nullable().describe("The entry's value, as published. Null for cost.tiers."),
-    pi_tiers: z.array(PiCostTierSchema).nullable().describe("For cost.tiers: pi's tiers. Null otherwise."),
+    pi_tiers: z.array(PiCostTierSchema).nullable().describe("For cost.tiers: Pi's tiers. Null otherwise."),
     published_tiers: z.array(PiCostTierSchema).nullable().describe("For cost.tiers: the entry's tiers by size of request, read from its cost. Null otherwise."),
   })
-  .describe("One value that pi's catalog states otherwise than the entry publishes it. No price and no tiers are listed on a subscription entry.") satisfies z.ZodType<PiDifference>;
+  .describe("One value that Pi's catalog states otherwise than the entry publishes it. No price and no tiers are listed on a subscription entry.") satisfies z.ZodType<PiDifference>;
 
 export const PiValueSchema = z
   .strictObject({
     // The list of PI_VALUE_FIELDS in src/core/pi.ts, spelled out: the contract imports only types from pi's modules.
-    field: z.enum(["context_window", "max_tokens", "cost.input", "cost.output", "cost.cache_read", "cost.cache_write", "cost.tiers", "prompt_cache.short", "prompt_cache.long"]).describe("The value of pi's catalog the item speaks of."),
+    field: z.enum(["context_window", "max_tokens", "cost.input", "cost.output", "cost.cache_read", "cost.cache_write", "cost.tiers", "prompt_cache.short", "prompt_cache.long"]).describe("The value of Pi's catalog the item speaks of."),
     entry_field: z.string().describe("The field of the entry it stands beside: limit.context, limit.output, cost.text.input.price, cost.text.output.price, cost.text.input.cache.read, cost.text.input.cache.write, cost.text for the tiers, providers_dev.cache.lifetime.short.documented_s, providers_dev.cache.lifetime.long.documented_s."),
     unit: z.enum(["tokens", "usd_per_million_tokens", "seconds"]),
-    standing: z.enum(["agrees", "differs", "only", "not_compared", "silent"]).describe("agrees = pi and the entry state the same value. differs = they state different values: the entry's is published in its own field, pi's is here. only = pi states a value and the entry states none: pi's value is here and in no field of the entry. not_compared = pi states a value that is not compared with the entry's: a price on a subscription entry, a price in another unit, a cache-write price the entry keys by lifetime, tiers that cannot be read as tiers, or a field providers.dev publishes as unknown. silent = pi states no value: a limit or a price of 0 in pi's catalog is no statement."),
-    pi: z.number().min(0).nullable().describe("pi's value, where pi states one. Null with silent, and for cost.tiers."),
-    pi_tiers: z.array(PiCostTierSchema).nullable().describe("For cost.tiers, where the standing is not silent: pi's tiers, ascending; an empty list = pi states none. Null otherwise."),
+    standing: z.enum(["agrees", "differs", "only", "not_compared", "silent"]).describe("agrees = Pi and the entry state the same value. differs = they state different values: the entry's is published in its own field, Pi's is here. only = Pi states a value and the entry states none: Pi's value is here and in no field of the entry. not_compared = Pi states a value that is not compared with the entry's: a price on a subscription entry, a price in another unit, a cache-write price the entry keys by lifetime, tiers that cannot be read as tiers, or a field providers.dev publishes as unknown. silent = Pi states no value: a limit or a price of 0 in Pi's catalog is no statement."),
+    pi: z.number().min(0).nullable().describe("Pi's value, where Pi states one. Null with silent, and for cost.tiers."),
+    pi_tiers: z.array(PiCostTierSchema).nullable().describe("For cost.tiers, where the standing is not silent: Pi's tiers, ascending; an empty list = Pi states none. Null otherwise."),
   })
-  .describe("Where pi's catalog stands beside one value of the entry. providers.dev's own value comes first, then models.dev's, then pi's: pi's value never replaces the entry's.") satisfies z.ZodType<PiValue>;
+  .describe("Where Pi's catalog stands beside one value of the entry. providers.dev's own value comes first, then models.dev's, then Pi's: Pi's value never replaces the entry's.") satisfies z.ZodType<PiValue>;
 
 export const PiBlockSchema = z
   .strictObject({
-    ref: z.string().describe("provider/model in pi's catalog: pi's provider id, then pi's model id. They can be spelled otherwise than the entry's."),
-    provider: z.string().describe("pi's provider id."),
-    model: z.string().describe("pi's model id."),
-    match: z.enum(["id", "alias"]).describe("How the entry and pi's model belong together. id = pi's provider id and model id are the entry's. alias = providers.dev paired the provider id, the model id or both by hand, because pi spells them otherwise."),
+    ref: z.string().describe("provider/model in Pi's catalog: Pi's provider id, then Pi's model id. They can be spelled otherwise than the entry's."),
+    provider: z.string().describe("Pi's provider id."),
+    model: z.string().describe("Pi's model id."),
+    match: z.enum(["id", "alias"]).describe("How the entry and Pi's model belong together. id = Pi's provider id and model id are the entry's. alias = providers.dev paired the provider id, the model id or both by hand, because Pi spells them otherwise."),
     name: z.string(),
-    type: z.string().describe("As pi states it, for example chat."),
-    api: z.string().describe("The request format pi uses for the model, in pi's words: openai-completions, openai-responses, azure-openai-responses, openai-codex-responses, anthropic-messages, bedrock-converse-stream, google-generative-ai, google-vertex, mistral-conversations, pi-messages. Other values may be added."),
-    base_url: z.string().nullable().describe("The address pi sends requests to, as stated, placeholders such as {CLOUDFLARE_ACCOUNT_ID} included. Null = pi states none."),
-    reasoning: z.boolean().describe("Whether pi treats the model as one that reasons."),
-    input: z.array(z.string()).describe("The kinds of input pi sends: text, image."),
+    type: z.string().describe("As Pi states it, for example chat."),
+    api: z.string().describe("The request format Pi uses for the model, in Pi's words: openai-completions, openai-responses, azure-openai-responses, openai-codex-responses, anthropic-messages, bedrock-converse-stream, google-generative-ai, google-vertex, mistral-conversations, pi-messages. Other values may be added."),
+    base_url: z.string().nullable().describe("The address Pi sends requests to, as stated, placeholders such as {CLOUDFLARE_ACCOUNT_ID} included. Null = Pi states none."),
+    reasoning: z.boolean().describe("Whether Pi treats the model as one that reasons."),
+    input: z.array(z.string()).describe("The kinds of input Pi sends: text, image."),
     context_window: z.int().min(0).describe("Tokens."),
-    max_tokens: z.int().min(0).describe("Tokens: the most pi asks for in one response."),
+    max_tokens: z.int().min(0).describe("Tokens: the most Pi asks for in one response."),
     cost: PiCostSchema,
-    thinking_level_map: z.record(z.string(), z.string().nullable()).nullable().describe("pi's thinking levels (off, minimal, low, medium, high, xhigh, max) and the value pi sends for each. A level whose value is null is one pi marks as not supported. A level that is not named follows pi's own default for the request format, which is not published here. Null = pi states no map."),
-    compat: z.record(z.string(), json).nullable().describe("pi's compatibility flags for the model, names and values exactly as pi's catalog states them (supportsLongCacheRetention, cacheControlFormat, forceAdaptiveThinking, thinkingFormat, supportsStrictTools and others; the set grows with pi). Only what the catalog states: a flag that is not here follows pi's own default for the request format, which lives in pi's code and is not published. Null = pi states none."),
-    prompt_cache: z.strictObject({ short_s: z.int().min(0).nullable(), long_s: z.int().min(0).nullable() }).nullable().describe("The cache lifetimes pi reckons with, in seconds, for its short and its long retention. Null = pi states none, which pi reads as: the provider's cache behaviour is not known. Not part of providers_dev.cache."),
+    thinking_level_map: z.record(z.string(), z.string().nullable()).nullable().describe("Pi's thinking levels (off, minimal, low, medium, high, xhigh, max) and the value Pi sends for each. A level whose value is null is one Pi marks as not supported. A level that is not named follows Pi's own default for the request format, which is not published here. Null = Pi states no map."),
+    compat: z.record(z.string(), json).nullable().describe("Pi's compatibility flags for the model, names and values exactly as Pi's catalog states them (supportsLongCacheRetention, cacheControlFormat, forceAdaptiveThinking, thinkingFormat, supportsStrictTools and others; the set grows with Pi). Only what the catalog states: a flag that is not here follows Pi's own default for the request format, which lives in Pi's code and is not published. Null = Pi states none."),
+    prompt_cache: z.strictObject({ short_s: z.int().min(0).nullable(), long_s: z.int().min(0).nullable() }).nullable().describe("The cache lifetimes Pi reckons with, in seconds, for its short and its long retention. Null = Pi states none, which Pi reads as: the provider's cache behaviour is not known. Not part of providers_dev.cache."),
     input_limits: z
       .strictObject({
         max_request_bytes: z.int().min(0).nullable(),
         max_images_per_request: z.int().min(0).nullable(),
         max_images_per_message: z.int().min(0).nullable(),
       })
-      .describe("The provider's limits on a request as pi states them. Each is null where pi states none."),
-    differences: z.array(PiDifferenceSchema).describe("Where pi's price, context window or output limit is not the entry's published value, in a fixed order: context_window, max_tokens, cost.input, cost.output, cost.cache_read, cost.cache_write, cost.tiers. Empty = they agree wherever both state a value."),
-    values: z.array(PiValueSchema).length(9).describe("One item for each value pi's catalog can state of an entry, in a fixed order: context_window, max_tokens, cost.input, cost.output, cost.cache_read, cost.cache_write, cost.tiers, prompt_cache.short, prompt_cache.long. Since 1.3.0."),
+      .describe("The provider's limits on a request as Pi states them. Each is null where Pi states none."),
+    differences: z.array(PiDifferenceSchema).describe("Where Pi's price, context window or output limit is not the entry's published value, in a fixed order: context_window, max_tokens, cost.input, cost.output, cost.cache_read, cost.cache_write, cost.tiers. Empty = they agree wherever both state a value."),
+    values: z.array(PiValueSchema).length(9).describe("One item for each value Pi's catalog can state of an entry, in a fixed order: context_window, max_tokens, cost.input, cost.output, cost.cache_read, cost.cache_write, cost.tiers, prompt_cache.short, prompt_cache.long. Since 1.3.0."),
   })
-  .describe("What pi's model catalog (https://pi.dev/api/models) states for this entry. Imported, not checked by providers.dev, and never merged into the entry's own fields: models.dev stays the reference.") satisfies z.ZodType<PiBlock>;
+  .describe("What Pi's model catalog (https://pi.dev/api/models) states for this entry. Imported, not checked by providers.dev, and never merged into the entry's own fields: models.dev stays the reference.") satisfies z.ZodType<PiBlock>;
 
 export const PiSummarySchema = z
   .strictObject({
@@ -407,7 +407,7 @@ export const PiSummarySchema = z
     match: z.enum(["id", "alias"]).describe("providers_dev.pi.match of the full entry."),
     difference_count: z.int().min(0).describe("How many items providers_dev.pi.differences of the full entry has."),
   })
-  .describe("The pi block of an entry in short.") satisfies z.ZodType<PiSummary>;
+  .describe("The Pi block of an entry in short.") satisfies z.ZodType<PiSummary>;
 
 // ---- the providers_dev record of an entry and of a provider
 export const EntryExtensionSchema = z
@@ -430,7 +430,7 @@ export const EntryExtensionSchema = z
     safe: SafeValuesSchema,
     evidence: z.array(EvidenceSchema).describe("Sources for an added entry and for authored declarations. Empty = none."),
     verified: date.nullable().describe("The newest date of providers.dev evidence or evaluations for this entry. Null = it has none."),
-    pi: PiBlockSchema.nullable().describe("What pi's catalog states for this entry. Null = pi does not list it."),
+    pi: PiBlockSchema.nullable().describe("What Pi's catalog states for this entry. Null = Pi does not list it."),
   })
   .describe("Everything providers.dev adds to an entry. The same keys on every entry.") satisfies z.ZodType<ModelExtension>;
 
@@ -483,7 +483,7 @@ export const EntrySummarySchema = z
     overridden_fields: z.array(z.string()).describe("The imported fields providers.dev corrected."),
     verified: date.nullable().describe("The newest date of providers.dev evidence. Null = the entry has none."),
     shard: z.int().min(0).describe("Which file under /data/entries/<provider>/ holds the full entry."),
-    pi: PiSummarySchema.nullable().describe("The pi block of the entry in short: providers_dev.pi of the full entry. Null = pi's catalog does not list the entry. Since 1.2.0."),
+    pi: PiSummarySchema.nullable().describe("The Pi block of the entry in short: providers_dev.pi of the full entry. Null = Pi's catalog does not list the entry. Since 1.2.0."),
   })
   .describe("One provider-model entry in short: what the lists return and what the tables of the website show. Every summary has every field; a value no source gives is null.") satisfies z.ZodType<Summary>;
 
@@ -619,7 +619,7 @@ export const ListingListsSchema = z
 export const ListingSchema = z
   .strictObject({
     provider: z.string().describe("The provider id, as in /api/v1/providers/{provider}."),
-    basis: listingSource.describe("The highest-ranked source that has a list for the provider, of four in a fixed order: listed (the vendor's own list as one signed-in account received it, read by groundtruth's discovery; another plan's list may differ), providers.dev (an authored list), models.dev (the imported entries of the provider), pi.dev (pi's models of the provider). Since 1.6.0 the listing's models are those of every source with a list (lists), not of basis alone: a model basis does not name can be in models, and listed_by says which lists name each. Until 1.5.1 the models were taken whole from basis. Other values may be added."),
+    basis: listingSource.describe("The highest-ranked source that has a list for the provider, of four in a fixed order: listed (the vendor's own list as one signed-in account received it, read by groundtruth's discovery; another plan's list may differ), providers.dev (an authored list), models.dev (the imported entries of the provider), pi.dev (Pi's models of the provider). Since 1.6.0 the listing's models are those of every source with a list (lists), not of basis alone: a model basis does not name can be in models, and listed_by says which lists name each. Until 1.5.1 the models were taken whole from basis. Other values may be added."),
     listed_at: date.nullable().describe("The day basis was read: the discovery's date for listed, the import's date for models.dev and pi.dev, the newest evidence date for providers.dev. Null = not known. The date of every source is in lists."),
     lists: ListingListsSchema,
     client: z.string().nullable().describe("For listed: the public id of the client that read the vendor's list, as in data/authored/measurement-labels.yaml. Null otherwise."),
@@ -628,7 +628,7 @@ export const ListingSchema = z
     model_count: z.int().min(0).describe("How many models the listing has: every model any source lists, each once."),
     models: z.array(ListingModelSchema).nullable().describe("Every model any source lists for the provider, each once: the models of basis first, in its order, then each next source's models not named before, in its order (since 1.6.0). Null in /api/v1/listings without view=full, so that the answer has the same keys in both views."),
   })
-  .describe("The model list of one provider and access method: every model the vendor's own list (as one signed-in account received it, read on a date through a named client; another plan's list may differ), an authored list, models.dev and pi name for it, each with the sources that list it, completed by sourced statements. Not an evaluation: a listed model need not be an entry, and nothing of a listing is written into an entry. Since 1.5.0.") satisfies z.ZodType<Listing>;
+  .describe("The model list of one provider and access method: every model the vendor's own list (as one signed-in account received it, read on a date through a named client; another plan's list may differ), an authored list, models.dev and Pi name for it, each with the sources that list it, completed by sourced statements. Not an evaluation: a listed model need not be an entry, and nothing of a listing is written into an entry. Since 1.5.0.") satisfies z.ZodType<Listing>;
 
 // ---- full objects. The part that comes from models.dev is theirs and grows with it, so unknown fields are allowed there.
 export const EntrySchema = z
@@ -718,37 +718,37 @@ export const MetaSchema = z
       data: z.string(),
       upstream: z.string(),
       notice: z.string(),
-      pi: z.string().describe("pi's catalog: its project, licence and copyright line. Since 1.2.0."),
-      pi_notice: z.string().describe("Where the pi block of an entry comes from, and that providers.dev is not affiliated with pi. Since 1.2.0."),
+      pi: z.string().describe("Pi's catalog: its project, licence and copyright line. Since 1.2.0."),
+      pi_notice: z.string().describe("Where the Pi block of an entry comes from, and that providers.dev is not affiliated with Pi. Since 1.2.0."),
     }),
     pi: z
       .strictObject({
-        source: z.string().describe("The address pi's catalog is imported from."),
+        source: z.string().describe("The address Pi's catalog is imported from."),
         snapshot: z
           .strictObject({
-            fetched_at: z.string().describe("When the pi data of this dataset was imported."),
-            checked_at: z.string().describe("When pi last confirmed that it had not changed."),
+            fetched_at: z.string().describe("When the Pi data of this dataset was imported."),
+            checked_at: z.string().describe("When Pi last confirmed that it had not changed."),
             etag: z.string().nullable(),
-            last_modified: z.string().nullable().describe("The Last-Modified of pi's answer, as sent."),
-            revision: z.string().nullable().describe("pi's own revision of its catalog, as sent."),
+            last_modified: z.string().nullable().describe("The Last-Modified of Pi's answer, as sent."),
+            revision: z.string().nullable().describe("Pi's own revision of its catalog, as sent."),
             sha256: z.string(),
-            providers: z.int().describe("Provider ids in pi's catalog."),
-            models: z.int().describe("Models in pi's catalog."),
+            providers: z.int().describe("Provider ids in Pi's catalog."),
+            models: z.int().describe("Models in Pi's catalog."),
           })
           .nullable()
-          .describe("The pi import this dataset is built on. Null = it is built without pi data: no entry has a pi block."),
+          .describe("The Pi import this dataset is built on. Null = it is built without Pi data: no entry has a Pi block."),
         sync: z
           .strictObject({ last_attempt_at: z.string().nullable(), last_attempt_ok: z.boolean().nullable(), last_error: z.string().nullable() })
-          .describe("The last attempt to import pi's catalog. All null = no attempt is recorded. A failed attempt leaves the snapshot above as it was. `sync` beside `upstream` speaks of models.dev and the evaluations only."),
+          .describe("The last attempt to import Pi's catalog. All null = no attempt is recorded. A failed attempt leaves the snapshot above as it was. `sync` beside `upstream` speaks of models.dev and the evaluations only."),
         counts: z
           .strictObject({
-            entries_with_block: z.int().describe("Entries with a pi block."),
-            left_out_models: z.int().describe("pi models whose entry providers.dev leaves out (exclusions)."),
-            unmatched_models: z.int().describe("pi models that belong to no entry. Nothing of them is published."),
+            entries_with_block: z.int().describe("Entries with a Pi block."),
+            left_out_models: z.int().describe("Pi models whose entry providers.dev leaves out (exclusions)."),
+            unmatched_models: z.int().describe("Pi models that belong to no entry. Nothing of them is published."),
           })
           .describe("The three add up to snapshot.models."),
       })
-      .describe("pi's model catalog, the second imported source: where it came from, whether the last import worked, and how much of it is in this dataset. Since 1.2.0."),
+      .describe("Pi's model catalog, the second imported source: where it came from, whether the last import worked, and how much of it is in this dataset. Since 1.2.0."),
     listings: z
       .strictObject({
         count: z.int().min(0).describe("Listings in this dataset."),

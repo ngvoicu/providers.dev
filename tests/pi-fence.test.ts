@@ -426,7 +426,7 @@ describe("1. the table of faults of the build, generated from what the fence cal
       const expected = metaOf(without);
       expected.issues = [...expected.issues, ...warnings.slice(0, 1)];
       const sameMeta = JSON.stringify(meta) === JSON.stringify(expected);
-      const why = warnings[0]?.message.match(/^pi's data is left out of this dataset \((.*)\)\. No entry has a pi block\.$/s)?.[1] ?? null;
+      const why = warnings[0]?.message.match(/^Pi's data is left out of this dataset \((.*)\)\. No entry has a Pi block\.$/s)?.[1] ?? null;
       const oneLine = why !== null && !/[\r\n]/.test(why) && [...why].length <= 300;
       const otherFiles = differing(files, without).filter((path) => path !== "site/data/meta.json");
       results.push({ row: `${fault.name}: ${fault.label}`, fired, ok: report.ok, pi: report.pi, problems, compared, files: [...otherFiles, ...(sameMeta && warnings.length === 1 && warnings[0]!.target === "data/pi" && oneLine ? [] : ["site/data/meta.json"])], why });
@@ -499,7 +499,7 @@ describe("1. the table of faults of the build, generated from what the fence cal
     const meta = metaOf(files);
     const warning = meta.issues.at(-1)!;
     expect(warning).toMatchObject({ level: "warning", code: "pi-snapshot-unreadable", target: "data/pi" });
-    expect(warning.message).toMatch(/^pi's data is left out of this dataset \([^\r\n]{1,300}\)\. No entry has a pi block\.$/);
+    expect(warning.message).toMatch(/^Pi's data is left out of this dataset \([^\r\n]{1,300}\)\. No entry has a Pi block\.$/);
     const expected = metaOf(without);
     expected.issues = [...expected.issues, warning];
     expect(meta).toEqual(expected);
@@ -606,7 +606,7 @@ describe("1. the table of faults of the build, generated from what the fence cal
         level: "warning",
         code: "pi-snapshot-unreadable",
         target: "data/published/pi-report.json",
-        message: "pi's report could not be written (EIO: i/o error, write). The dataset is published with pi's data as usual; only data/published/pi-report.json is missing.",
+        message: "Pi's report could not be written (EIO: i/o error, write). The dataset is published with Pi's data as usual; only data/published/pi-report.json is missing.",
       });
       expected.issues = [...expected.issues, warning];
       expect(meta).toEqual(expected);
@@ -660,7 +660,7 @@ describe("1. the table of faults of the build, generated from what the fence cal
       const expected = metaOf(recordHealthy);
       const warning = meta.issues.at(-1)!;
       expect(warning).toMatchObject({ level: "warning", code: "pi-snapshot-unreadable", target: "data/sync-status.json" });
-      expect(warning.message).toMatch(/^The record of the last pi import is left out of this dataset \([^\r\n]{1,300}\)\. It is published as no attempt recorded\.$/);
+      expect(warning.message).toMatch(/^The record of the last Pi import is left out of this dataset \([^\r\n]{1,300}\)\. It is published as no attempt recorded\.$/);
       expected.pi.sync = { last_attempt_at: null, last_attempt_ok: null, last_error: null };
       expected.issues = [...expected.issues, warning];
       expect(meta).toEqual(expected);
@@ -837,7 +837,7 @@ describe("6. a part that fits and has no block is published whole, with the fenc
     const models = meta.pi.snapshot!.models;
     expect(meta.issues).toEqual([
       ...healthyMeta.issues,
-      { level: "warning", code: "pi-no-blocks", target: "data/pi", message: `pi's snapshot has ${models} models and no entry has a pi block (left out: ${left_out_models}, unmatched: ${unmatched_models + entries_with_block}). pi's data is published as pi's code gave it.` },
+      { level: "warning", code: "pi-no-blocks", target: "data/pi", message: `Pi's snapshot has ${models} models and no entry has a Pi block (left out: ${left_out_models}, unmatched: ${unmatched_models + entries_with_block}). Pi's data is published as Pi's code gave it.` },
     ]);
     expect(report.issues.filter(noBlock)).toHaveLength(1);
     expect(report.issues.filter((issue) => issue.code === "pi-snapshot-unreadable")).toEqual([]);
@@ -882,7 +882,7 @@ describe("6. a part that fits and has no block is published whole, with the fenc
     const report = build(variant({}, undefined));
     expect(report).toMatchObject({ ok: true, pi: "published_without_blocks" });
     expect(report.issues.filter(noBlock)).toEqual([
-      { level: "warning", code: "pi-no-blocks", target: "data/pi", message: "pi's snapshot has 0 models and no entry has a pi block (left out: 0, unmatched: 0). pi's data is published as pi's code gave it." },
+      { level: "warning", code: "pi-no-blocks", target: "data/pi", message: "Pi's snapshot has 0 models and no entry has a Pi block (left out: 0, unmatched: 0). Pi's data is published as Pi's code gave it." },
     ]);
   });
 });

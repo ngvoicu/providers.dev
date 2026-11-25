@@ -377,7 +377,7 @@ describe("API response boundary", () => {
 
   it("shows the version and the Stability section of the OpenAPI document on /docs/api/", async () => {
     const html = await (await page("/docs/api/")).text();
-    expect(html).toContain("Version 1.6.2 ·");
+    expect(html).toContain("Version 1.6.3 ·");
     expect(html).toContain('<h2 id="stability">Stability</h2>');
     expect(html).toContain("/api/v1 only grows.");
   });
