@@ -1,6 +1,7 @@
 // Static assets contain templates and versioned data. Pages consume the public API response contract.
 import { API_CATALOG_TYPE, apiCatalog, CONTENT_SIGNAL, linkHeader, llmsTxt, MARKDOWN_TYPE, markdownHref, prefersMarkdown } from "../src/core/agents.ts";
 import { apiHeaders, handleApi } from "../src/core/api.ts";
+import { PUBLICATION_CACHE, withAssetCache } from "../src/core/cache-control.ts";
 import { SITE, SITEMAP_PATH } from "../src/core/crawl.ts";
 import type { Summary } from "../src/core/entries.ts";
 import { handlePage, isPage, PAGE_SHELL, RETRY_AFTER_S } from "../src/core/pages.ts";
@@ -74,7 +75,8 @@ async function productSite(request: Request, env: Env, site: ProductSite): Promi
     if (of !== undefined && site.pages.includes(of)) headers.set("Link", linkHeader(site.site, [{ href: of, rel: "canonical" }]));
     if (markdown || url.pathname.endsWith(".md")) headers.set("Content-Type", MARKDOWN_TYPE);
     else if (url.pathname.endsWith(".txt")) headers.set("Content-Type", "text/plain; charset=utf-8");
-    return new Response(response.body, { status: response.status, headers });
+    // Astro's hashed stylesheets and fonts, shared with providers.dev, are kept a year; the site's own files are not.
+    return withAssetCache(url.pathname, new Response(response.body, { status: response.status, headers }));
   }
   // An address the site does not have, or a file it lacks: the site's own page for it, with status 404.
   const missing = route.status === 404 && response.ok ? response : await env.ASSETS.fetch(new Request(new URL(site.notFound, url.origin)));
@@ -124,7 +126,7 @@ export default {
     const agents = url.pathname === "/llms.txt" || url.pathname === "/.well-known/api-catalog";
     // Implementation assets are internal. CSS, scripts, icons and other public files remain static.
     if (url.pathname.startsWith("/site-shell") || url.pathname.startsWith("/reference-content") || url.pathname.startsWith("/snapshots/") || url.pathname === "/current.json") return new Response("Not found", { status: 404 });
-    if (!api && !data && !page && !sitemap && !agents && /\.[a-z0-9]+$/i.test(url.pathname)) return env.ASSETS.fetch(request);
+    if (!api && !data && !page && !sitemap && !agents && /\.[a-z0-9]+$/i.test(url.pathname)) return withAssetCache(url.pathname, await env.ASSETS.fetch(request));
     if (url.pathname === "/.well-known/api-catalog") {
       if (request.method !== "GET" && request.method !== "HEAD") return new Response(null, { status: 405, headers: { Allow: "GET, HEAD" } });
       return new Response(request.method === "HEAD" ? null : apiCatalog(SITE), { headers: { "Content-Type": API_CATALOG_TYPE, "Cache-Control": "public, max-age=3600", "Access-Control-Allow-Origin": "*", Link: linkHeader(SITE, [{ href: "/.well-known/api-catalog", rel: "api-catalog" }]) } });
@@ -135,13 +137,13 @@ export default {
       if (url.pathname === "/llms.txt") {
         if (request.method !== "GET" && request.method !== "HEAD") return new Response(null, { status: 405, headers: { Allow: "GET, HEAD" } });
         const text = await llms((path) => handleApi(new Request(new URL(path, url.origin)), snapshot));
-        return new Response(request.method === "HEAD" ? null : text, { headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "public, max-age=3600", "Content-Signal": CONTENT_SIGNAL, "X-Dataset-Version": snapshot.meta.dataset_version } });
+        return new Response(request.method === "HEAD" ? null : text, { headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": PUBLICATION_CACHE, "Content-Signal": CONTENT_SIGNAL, "X-Dataset-Version": snapshot.meta.dataset_version } });
       }
       if (sitemap) {
         if (request.method !== "GET" && request.method !== "HEAD") return new Response(null, { status: 405, headers: { Allow: "GET, HEAD" } });
         const asset = await snapshot.asset(`/data/sitemaps${url.pathname}`);
         if (!asset) return new Response("Not found", { status: 404, headers: { "Cache-Control": "no-store" } });
-        return new Response(request.method === "HEAD" ? null : asset.body, { headers: { "Content-Type": "application/xml; charset=utf-8", "Cache-Control": "public, max-age=3600", "X-Dataset-Version": snapshot.meta.dataset_version } });
+        return new Response(request.method === "HEAD" ? null : asset.body, { headers: { "Content-Type": "application/xml; charset=utf-8", "Cache-Control": PUBLICATION_CACHE, "X-Dataset-Version": snapshot.meta.dataset_version } });
       }
       if (data) {
         if (request.method !== "GET" && request.method !== "HEAD") return new Response(null, { status: 405, headers: { Allow: "GET, HEAD" } });

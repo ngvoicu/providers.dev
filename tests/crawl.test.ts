@@ -9,6 +9,7 @@ import { publish } from "../scripts/lib/publish.ts";
 import { stageSnapshot } from "../scripts/lib/stage.ts";
 import { sync } from "../scripts/lib/sync.ts";
 import { handleApi, type LoadedDeps } from "../src/core/api.ts";
+import { PUBLICATION_CACHE } from "../src/core/cache-control.ts";
 import { FIXED_PAGES, listIndexing, SITEMAP_ENTRIES, SITEMAP_PATH, sitemapFiles } from "../src/core/crawl.ts";
 import type { Index } from "../src/core/entries.ts";
 import { MARK } from "../src/core/page-shell.ts";
@@ -226,7 +227,7 @@ describe("sitemaps", () => {
     const get = (url: string, method = "GET") => worker.fetch(new Request(url, { method }), { ASSETS: assets });
     for (const name of readdirSync(join(dataDir, "published", "site", "data", "sitemaps"))) {
       const response = await get(`https://providers.dev/${name}`);
-      expect([name, response.status, response.headers.get("Content-Type"), response.headers.get("Cache-Control")]).toEqual([name, 200, "application/xml; charset=utf-8", "public, max-age=3600"]);
+      expect([name, response.status, response.headers.get("Content-Type"), response.headers.get("Cache-Control")]).toEqual([name, 200, "application/xml; charset=utf-8", PUBLICATION_CACHE]);
       expect(await response.text()).toBe(readFileSync(join(dataDir, "published", "site", "data", "sitemaps", name), "utf8"));
       const headOnly = await get(`https://providers.dev/${name}`, "HEAD");
       expect([headOnly.status, await headOnly.text()]).toEqual([200, ""]);

@@ -1073,6 +1073,14 @@ npm run deploy        # publish the prepared assets when ready
 To rebuild templates without resolving the dataset, use `npm run build:site`. A full `npm run build` still does
 both. Data refreshes update the API, page content, filter options and footer together. Existing client/HTTP caches
 can retain responses for the advertised cache period (300 seconds, with stale revalidation up to 3600 seconds).
+The sitemaps and `/llms.txt`, made from the publication too, have the same period; errors are `no-store`.
+Astro's files under `/_astro/`, whose names carry a hash of their content, are sent with
+`Cache-Control: public, max-age=31536000, immutable` on all three hosts, by the Worker itself (`withAssetCache` in
+`src/core/cache-control.ts`): `_headers` does not reach an answer the Worker makes, staging rewrites it, and the
+Worker must keep answering first so that `www` and plain http are still redirected. Only a 200 or 304 of a hashed
+name gets it; a missing file, any other file and each host's icons and pictures keep the asset layer's revalidation.
+The Worker keeps no answer of its own, and Cloudflare caches none of its answers on these custom domains, so the
+request after a deploy or an import reads the new publication (`tests/cache-control.test.ts`).
 A browser filter response from a new publication triggers a page reload so its counts and footer stay consistent.
 No model/provider HTML files are generated or maintained individually.
 

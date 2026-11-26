@@ -1,5 +1,6 @@
 // Every page is a view of public API responses. This module has no catalog/index/file-data access.
 import { etagMatches, refFromPath, representationTag } from "./api.ts";
+import { PUBLICATION_CACHE } from "./cache-control.ts";
 import { catalogHtml, modelsHtml, providersHtml, type Envelope, type One } from "./catalog-view.ts";
 import { evidenceHtml, modelHtml, providerHtml } from "./detail-view.ts";
 import { API_LINKS, CONTENT_SIGNAL, entryMarkdownQuery, linkHeader, MARKDOWN_QUERY, MARKDOWN_QUERY_VALUE, MARKDOWN_TYPE, markdownBase, markdownHref, prefersMarkdown } from "./agents.ts";
@@ -245,7 +246,7 @@ export async function handlePage(request: Request, deps: PageDeps): Promise<Resp
   });
   const body = markdown ? pageMarkdown(html, view, status, meta, absolute) : html;
   const etag = await representationTag(body);
-  const headers = new Headers({ "Content-Type": markdown ? MARKDOWN_TYPE : "text/html; charset=utf-8", "X-Content-Type-Options": "nosniff", ETag: etag, "Cache-Control": status === 200 ? "public, max-age=300, stale-while-revalidate=3600" : "no-store", "Content-Signal": CONTENT_SIGNAL });
+  const headers = new Headers({ "Content-Type": markdown ? MARKDOWN_TYPE : "text/html; charset=utf-8", "X-Content-Type-Options": "nosniff", ETag: etag, "Cache-Control": status === 200 ? PUBLICATION_CACHE : "no-store", "Content-Signal": CONTENT_SIGNAL });
   if (negotiated) headers.set("Vary", "Accept");
   // An error page is never a page to index; nor is the markdown of a view that is not.
   if (status !== 200) headers.set("X-Robots-Tag", "noindex");
