@@ -156,6 +156,9 @@ The baseline is imported from models.dev; our additions, corrections and measure
   coding agent used on top of Provimux is not named ("A coding agent, through Provimux"). The public names
   are in `data/authored/measurement-labels.yaml`; a new client id must be added there (the build warns and publishes
   it as "other"). Runs marked `lacks` are not published: they say something about a proxy build, not a provider.
+- A page's markdown version is the page itself, written as markdown (`src/core/markdown.ts`): never a second
+  renderer of the data. A change to a page changes its markdown with it; `tests/agents.test.ts` compares the two over
+  the whole build.
 - Commit messages carry no links to agent sessions (no `Claude-Session:` line). `scripts/commit-msg` removes one;
   install it once per clone with `ln -sf ../../scripts/commit-msg .git/hooks/commit-msg`.
 

@@ -70,7 +70,9 @@ function routes(root: string): string[] {
     `/entries/${entry.ref}/`, "/evidence/", "/docs/api/", "/docs/methodology/", "/docs/licensing/", "/docs/contributing/", "/support/",
   ];
   const sitemaps = ["/sitemap.xml", "/sitemap-entries-1.xml"];
-  return [...api, ...pages, ...sitemaps, "/data/meta.json", `/data/listings/${listed}.json`, "/favicon.svg", "/nothing"];
+  // The markdown versions (each reads what its page reads) and what agents read first.
+  const agents = ["/index.html.md", `/providers/${provider}/index.html.md`, `/models/${model}/index.html.md`, `/entries/${entry.ref}.md`, "/evidence/index.html.md", "/docs/api/index.html.md", "/llms.txt", "/.well-known/api-catalog"];
+  return [...api, ...pages, ...sitemaps, ...agents, "/data/meta.json", `/data/listings/${listed}.json`, "/favicon.svg", "/nothing"];
 }
 
 /** The routes that read more than BUDGET, with what they read: none is the answer. */

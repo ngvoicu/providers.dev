@@ -989,6 +989,42 @@ redirected. HSTS is not set.
   page changed. The product sites carry a `WebSite`, a `SoftwareApplication` (free, MIT, no offer) and its
   `SoftwareSourceCode`, crediting the project each is built on. Error pages have none.
 
+**What agents are given** (`src/core/agents.ts`, `src/core/markdown.ts`, `src/core/product-agents.ts`):
+
+- Every page has a markdown version: `index.html.md` after an address that ends in `/` (`/index.html.md`,
+  `/providers/anthropic/index.html.md`, `/models/openai/gpt-6.1-terra/index.html.md`, `/evidence/index.html.md`,
+  `/docs/methodology/index.html.md`), `.md` after an entry's address (`/entries/anthropic/claude-opus-5-5.md`). A
+  list's query carries over (`/providers/index.html.md?offset=50`). The page's own address also answers in markdown
+  to an `Accept` header that names `text/markdown` with a quality above 0 and not below that of `text/html` (in
+  either order; `*/*` alone, no header, or `text/markdown;q=0` get HTML), with `Vary: Accept`. An address that is a
+  page of its own stays that page: an entry whose id ends in `.md` keeps its address, and the entry whose `.md`
+  address that would be names its markdown at `?format=markdown` (which every page answers). No `index.md` aliases
+  and no `llms-full.txt`.
+- The markdown is the page: `handlePage` makes the HTML page for the request, then writes its `<main>` and its footer
+  as markdown, after a few lines of front matter (title, description, `canonical`, `dataset_version`,
+  `dataset_generated_at`). Every word, figure and label is the page's, in its order: "at least", Measured,
+  documented, "API list price of", In plan, Unknown, the warnings and each source's value in them, the evaluations
+  and their dates. What it leaves out is not text of the page: forms, buttons, drawings marked `aria-hidden`, what
+  the page hides, and the raw JSON a page folds away that the API serves whole ("Show the full entry as published",
+  and the schemas of the API guide); the markdown links the API. Links are the page's, written in full; a provider's
+  markdown links an entry only where the page does, where the entry exists. `tests/agents.test.ts` reads each page and
+  its markdown apart (`tests/page-text.ts`, which shares no code with the converter) and compares them character by
+  character outside tables and cell by cell inside, on every entry, provider and model of the build in `dist/`.
+- A markdown answer is `text/markdown; charset=utf-8`, with `Link: <its page>; rel="canonical"` (search engines show
+  the page, not its copy; the markdown stays open to every crawler and agent), the page's `Cache-Control`, its own
+  `ETag`, and `X-Robots-Tag: noindex` only where the page is not indexed either. Every page answer carries
+  `Content-Signal: search=yes, ai-input=yes, ai-train=yes`; an HTML page names its markdown version and `/llms.txt`
+  in its head (`rel="alternate" type="text/markdown"`, `rel="describedby"`) and in its `Link` header. The home page and
+  the API guide also name the OpenAPI document (`service-desc`), the guide (`service-doc`) and the API catalogue.
+- `/llms.txt` on providers.dev is written for each request from the publication: what the site is, the dataset's
+  version and counts, the API's documents, an entry and a model of the publication as examples (so every link
+  answers), the docs and lists in markdown, and the products' own files. `/.well-known/api-catalog` (RFC 9727,
+  `application/linkset+json`) names `/api/v1/entries` as the API, with the OpenAPI document as `application/json`
+  and the guide; `/api/v1/` itself answers 404 and is named nowhere. No answer of `/api/v1` changed.
+- The product sites: `scripts/finalize-site.ts` writes `index.html.md` beside each built page (from the page as built,
+  so it cannot fall behind it) and the site's `llms.txt`. A picture's words keep no e-mail address of a sample screen
+  (`pictureWords`). The Worker serves them with their types, the same headers and the same negotiation.
+
 **Provimux's site, `https://provimux.providers.dev`.** Two static pages, `/` and `/support/`, built by Astro from
 `src/pages/provimux/` into `dist/provimux/` with their own layout (`src/layouts/Provimux.astro`) and files
 (`public/provimux/`: the console screenshots, icons, `robots.txt`, `sitemap.xml`). They read no dataset. On that host
