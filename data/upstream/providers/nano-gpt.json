@@ -10520,13 +10520,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.04532,
+      "price": 0.05,
       "cache": {
-       "read": 0.001442
+       "read": 0.013
       }
      },
      "output": {
-      "price": 0.13596
+      "price": 0.16
      }
     }
    },
@@ -10593,13 +10593,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.04532,
+      "price": 0.05,
       "cache": {
-       "read": 0.001442
+       "read": 0.013
       }
      },
      "output": {
-      "price": 0.13596
+      "price": 0.16
      }
     }
    },
@@ -19003,7 +19003,7 @@
     "temperature": true,
     "top_k": true,
     "top_p": true,
-    "structured_output": false,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -19069,7 +19069,7 @@
     "temperature": true,
     "top_k": true,
     "top_p": true,
-    "structured_output": false,
+    "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
     "tools": {
@@ -38098,138 +38098,6 @@
    "last_updated": "2026-07-15",
    "recommended_api": "chat-completions"
   },
-  "unbiased/pareto-26.10": {
-   "id": "unbiased/pareto-26.10",
-   "name": "Pareto 26.10",
-   "description": "Blended multimodal model that selects frontier and open models for each request and blends their outputs into one answer",
-   "type": "chat",
-   "family": "pareto",
-   "canonical_id": "unbiased/pareto-26.10",
-   "release_date": "2026-10-15",
-   "limit": {
-    "context": 1048576,
-    "input": 1048576,
-    "output": 131072
-   },
-   "capabilities": {
-    "temperature": true,
-    "top_k": false,
-    "top_p": true,
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 0.8,
-      "cache": {
-       "read": 0.03
-      }
-     },
-     "output": {
-      "price": 3.2
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://nano-gpt.com/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": []
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-10-15",
-   "recommended_api": "chat-completions"
-  },
-  "unbiased/pareto-26.9": {
-   "id": "unbiased/pareto-26.9",
-   "name": "Pareto 26.9",
-   "description": "Pareto 26.9 is an experimental multimodal composite model from Unbiased AI for research, coding, agentic workflows, and general-purpose tasks. It runs several frontier and open models for each request and returns a single selected or synthesized answer. This experimental release supports text and image input, tool calling, a 262K-token context window, and up to 131K output tokens. Its underlying model mix and behavior may change as it is evaluated. Request content may be retained for abuse prevention and security monitoring for up to 30 days, and is not used for model training without explicit consent.",
-   "type": "chat",
-   "family": "pareto",
-   "release_date": "2026-09-18",
-   "limit": {
-    "context": 262144,
-    "input": 262144,
-    "output": 131072
-   },
-   "capabilities": {
-    "structured_output": false,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": false
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 2.5,
-      "cache": {
-       "read": 0.25
-      }
-     },
-     "output": {
-      "price": 7.5
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "chat-completions": {
-     "base_url": "https://nano-gpt.com/api/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai-compatible",
-      "opencodeai": "@opencode/ai/providers/openai-compatible"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": []
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-09-18",
-   "recommended_api": "chat-completions"
-  },
   "universal-summarizer": {
    "id": "universal-summarizer",
    "name": "Universal Summarizer",
@@ -40407,6 +40275,74 @@
    },
    "open_weights": true,
    "last_updated": "2026-11-07",
+   "recommended_api": "chat-completions"
+  },
+  "yetalabs/kimi-k3.1-pro-abliterated": {
+   "id": "yetalabs/kimi-k3.1-pro-abliterated",
+   "name": "Kimi K3.1 Pro Abliterated (YetaLabs)",
+   "description": "YetaLabs' abliterated (refusal-removed) version of Moonshot AI's Kimi K3.1 Pro. It always reasons, with low, high or max effort, and supports tool calling, structured output and up to 10 images per request. It may describe itself as an OpenAI model when asked. Its behavior and response quality may differ from Kimi K3.1 Pro.",
+   "type": "chat",
+   "family": "kimi-pro",
+   "release_date": "2026-11-25",
+   "limit": {
+    "context": 980000,
+    "input": 980000,
+    "output": 262144
+   },
+   "capabilities": {
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "high",
+      "max"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 1.4,
+      "cache": {
+       "read": 0.14
+      }
+     },
+     "output": {
+      "price": 2.8
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://nano-gpt.com/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-11-25",
    "recommended_api": "chat-completions"
   },
   "z-ai/GLM-4.5-Air": {
