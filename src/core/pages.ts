@@ -3,6 +3,8 @@ import { etagMatches, refFromPath, representationTag } from "./api.ts";
 import { catalogHtml, modelsHtml, providersHtml, type Envelope, type One } from "./catalog-view.ts";
 import { evidenceHtml, modelHtml, providerHtml } from "./detail-view.ts";
 import { listIndexing } from "./crawl.ts";
+import { apiDocsMeta, catalogMeta, documentMeta, entryMeta, errorMeta, evidenceMeta, modelMeta, modelsMeta, providerMeta, providersMeta } from "./page-meta.ts";
+import { catalogPage, documentGraph, homeGraph, jsonLdScript, webApi, type JsonLd } from "./structured-data.ts";
 import { documentHtml, fillMetaSlots, openapiHtml, type OpenApiDocument } from "./docs-view.ts";
 import type { ProviderSummary, Summary } from "./entries.ts";
 import { entryHref, escapeHtml as e, modelHref, providerHref, type Today } from "./format.ts";
@@ -23,10 +25,10 @@ export interface PageDeps {
 }
 /**
  * A page: its title, description and body, its canonical address (path and query, built from the ids the API returns,
- * never from the address as it was asked), and whether it is a page to index (false: a filtered, sorted or searched
- * view, `noindex, follow`).
+ * never from the address as it was asked), whether it is a page to index (false: a filtered, sorted or searched
+ * view, `noindex, follow`), and its structured data. `title` is the full title (src/core/page-meta.ts).
  */
-interface View { title: string; description: string; html: string; canonical: string; index?: boolean }
+interface View { title: string; description: string; html: string; canonical: string; index?: boolean; ld?: JsonLd[] }
 /** A temporary failure: crawlers and clients are asked to come back after this many seconds. */
 export const RETRY_AFTER_S = 300;
 class ApiError extends Error {
@@ -61,6 +63,8 @@ export function isPage(path: string): boolean {
 export async function handlePage(request: Request, deps: PageDeps): Promise<Response> {
   if (request.method !== "GET" && request.method !== "HEAD") return new Response(null, { status: 405, headers: { Allow: "GET, HEAD" } });
   const url = new URL(request.url);
+  /** An address of the site in full, as a canonical link and structured data name it. */
+  const absolute = (address: string): string => new URL(address, deps.site).toString();
   const path = url.pathname.replace(/\/+$/, "") || "/";
   if (path === "/entry" && url.searchParams.get("ref")?.includes("/")) return Response.redirect(new URL(entryHref(url.searchParams.get("ref")!), url.origin).toString(), 301);
   const read = async <T>(api: string): Promise<T> => {
@@ -103,12 +107,17 @@ export async function handlePage(request: Request, deps: PageDeps): Promise<Resp
       if (!parsed.ok) throw new ApiError(400);
       const [result, facets] = await Promise.all([read<Envelope<Summary>>(`/api/v1/entries?${serializeQuery(parsed.query)}`).then(within), one<Facets>("/api/v1/facets")]);
       const listing = listIndexing(own);
-      view = { title: "AI model catalog", description: "Context, output, pricing and prompt caching by model, provider and access method.", html: catalogHtml(result, parsed.query, facets, meta, kept(own), today), canonical: `/${listing.search}`, index: listing.index };
+      const about = catalogMeta(meta, result, listing.index);
+      const canonical = `/${listing.search}`;
+      view = { ...about, html: catalogHtml(result, parsed.query, facets, meta, kept(own), today), canonical, index: listing.index, ld: canonical === "/" ? homeGraph(meta, about) : catalogPage(absolute(canonical), about, { type: "CollectionPage" }) };
     } else if (path === "/providers") {
       const params = pageParams(url.searchParams, PROVIDER_PARAMS);
       const own = kept(params);
       const listing = listIndexing(params);
-      view = { title: "Providers", description: "Providers and access methods in the catalog.", html: providersHtml(within(await read<Envelope<ProviderSummary>>(`/api/v1/providers${own.search}`)), own), canonical: `/providers/${listing.search}`, index: listing.index };
+      const result = within(await read<Envelope<ProviderSummary>>(`/api/v1/providers${own.search}`));
+      const about = providersMeta(result, listing.index);
+      const canonical = `/providers/${listing.search}`;
+      view = { ...about, html: providersHtml(result, own), canonical, index: listing.index, ld: catalogPage(absolute(canonical), about, { type: "CollectionPage" }) };
     } else if (path.startsWith("/providers/")) {
       // The provider's model list, where a source has one: the API answers 404 for a provider it has no listing for.
       const [{ provider, entries }, listing] = await Promise.all([
@@ -118,22 +127,29 @@ export async function handlePage(request: Request, deps: PageDeps): Promise<Resp
           throw error;
         }),
       ]);
-      view = { title: provider.name, description: `${provider.name}: ${provider.entry_count} model entries.`, html: providerHtml(provider, entries, listing, imported, today, meta.pi), canonical: providerHref(provider.id) };
+      const about = providerMeta(provider);
+      const canonical = providerHref(provider.id);
+      view = { ...about, html: providerHtml(provider, entries, listing, imported, today, meta.pi), canonical, ld: catalogPage(absolute(canonical), about, { crumbs: [["Providers", absolute("/providers/")], [provider.name, absolute(canonical)]] }) };
     } else if (path === "/models") {
       const params = pageParams(url.searchParams, MODEL_PARAMS);
       const own = kept(params);
       const listing = listIndexing(params);
-      view = { title: "Models", description: "Canonical models and the providers that serve them.", html: modelsHtml(within(await read<Envelope<CanonicalModel>>(`/api/v1/models${own.search}`)), own), canonical: `/models/${listing.search}`, index: listing.index };
+      const result = within(await read<Envelope<CanonicalModel>>(`/api/v1/models${own.search}`));
+      const about = modelsMeta(result, listing.index);
+      const canonical = `/models/${listing.search}`;
+      view = { ...about, html: modelsHtml(result, own), canonical, index: listing.index, ld: catalogPage(absolute(canonical), about, { type: "CollectionPage" }) };
     } else if (path.startsWith("/models/")) {
       if (!refFromPath(path.slice("/models/".length))) throw new ApiError(404);
       const [model, facets] = await Promise.all([one<CanonicalModelDetail>(`/api/v1${path}`), one<Facets>("/api/v1/facets")]);
-      view = { title: model.name, description: `${model.name}: ${model.entry_count} entries across providers and access methods.`, html: modelHtml(model, Object.fromEntries(facets.providers.map((provider) => [provider.id, provider.name])), imported, today, meta.pi), canonical: modelHref(model.id) };
+      const about = modelMeta(model);
+      const canonical = modelHref(model.id);
+      view = { ...about, html: modelHtml(model, Object.fromEntries(facets.providers.map((provider) => [provider.id, provider.name])), imported, today, meta.pi), canonical, ld: catalogPage(absolute(canonical), about, { crumbs: [["Models", absolute("/models/")], [model.name, absolute(canonical)]] }) };
     } else if (path.startsWith("/entries/")) {
       if (!refFromPath(path.slice("/entries/".length))) throw new ApiError(404);
       const { provider, summary, entry } = await one<{ provider: ProviderSummary; summary: Summary; entry: JsonObject }>(`/api/v1${path}`);
-      const window = summary.safe.input_window;
-      const facts = [window.value === null ? "" : `context window ${window.at_least ? "at least " : ""}${window.value.toLocaleString("en-US")} tokens`, summary.max_output === null ? "" : `maximum output ${summary.max_output.toLocaleString("en-US")} tokens`].filter(Boolean);
-      view = { title: `${summary.name} at ${provider.name}`, description: `${summary.name} at ${provider.name} (${summary.ref})${facts.length ? `: ${facts.join(", ")}` : ""}. Limits, prices and prompt caching.`, canonical: entryHref(summary.ref), html: entryHtml({ summary, provider, model: entry, imported, today, cache_ages_s: meta.cache_ages_s, pi: meta.pi }) };
+      const about = entryMeta(summary, provider.name);
+      const canonical = entryHref(summary.ref);
+      view = { ...about, canonical, html: entryHtml({ summary, provider, model: entry, imported, today, cache_ages_s: meta.cache_ages_s, pi: meta.pi }), ld: catalogPage(absolute(canonical), about, { crumbs: [["Providers", absolute("/providers/")], [provider.name, absolute(providerHref(provider.id))], [summary.name, absolute(canonical)]] }) };
     } else if (path === "/evidence") {
       const own = pageParams(url.searchParams, EVIDENCE_PARAMS);
       const offset = (name: string): string => own.get(name) ?? "0";
@@ -145,19 +161,25 @@ export async function handlePage(request: Request, deps: PageDeps): Promise<Resp
       ]);
       // Its three sections page apart, so a later page of one repeats the first page of the others: only /evidence/ is indexed.
       const listing = listIndexing(own, EVIDENCE_PARAMS.map(({ name }) => name), false);
-      view = { title: "Evidence", description: "Corrections and evaluations with sources and dates.", html: evidenceHtml(meta, corrections, added, cache, measured, kept(own), today), canonical: `/evidence/${listing.search}`, index: listing.index };
+      const about = evidenceMeta(meta, listing.index);
+      const canonical = `/evidence/${listing.search}`;
+      view = { ...about, html: evidenceHtml(meta, corrections, added, cache, measured, kept(own), today), canonical, index: listing.index, ld: catalogPage(absolute(canonical), about) };
     } else if (path === "/docs/api") {
-      view = { title: "API", description: "The providers.dev API: endpoints, parameters, response schemas and examples.", html: openapiHtml(await read<OpenApiDocument>("/api/v1/openapi.json")), canonical: "/docs/api/" };
+      const openapi = await read<OpenApiDocument>("/api/v1/openapi.json");
+      const about = apiDocsMeta(openapi.info);
+      view = { ...about, html: openapiHtml(openapi), canonical: "/docs/api/", ld: documentGraph(absolute("/docs/api/"), about, "API", true, webApi(openapi.info)) };
     } else if (path.startsWith("/docs/") && (DOCUMENTS as readonly string[]).includes(path.slice("/docs/".length)) && path !== "/docs/support") {
       // The support document is in the API; its page is on provimux.providers.dev (the Worker sends /support/ there).
       const name = path.split("/").at(-1)!;
       const document = await one<Documentation>(`/api/v1/docs/${name}`);
-      view = { title: document.title, description: document.description, html: documentHtml(fillMetaSlots(document, meta)), canonical: `/docs/${name}/` };
+      const about = documentMeta(name, document);
+      // Licensing is a notice, not an article.
+      view = { ...about, html: documentHtml(fillMetaSlots(document, meta)), canonical: `/docs/${name}/`, ld: documentGraph(absolute(`/docs/${name}/`), about, document.title, name !== "licensing") };
     } else throw new ApiError(404);
   } catch (error) {
     status = error instanceof ApiError && (error.status === 400 || error.status === 404) ? error.status : 503;
     const title = status === 404 ? "Nothing at this address" : status === 400 ? "Invalid filters" : "The catalog is temporarily unavailable";
-    view = { title, description: title, canonical: "", html: `<h1>${title}</h1><p class="lead mt-3">${status === 400 ? 'Use the <a href="/docs/api/">documented API parameters</a> for this view.' : status === 404 ? "This page, provider or model may no longer be listed." : "The API could not load a complete published snapshot. Try again shortly."}</p><p class="mt-6"><a class="button" href="/">Search the catalog</a></p>` };
+    view = { ...errorMeta(title), canonical: "", html: `<h1>${title}</h1><p class="lead mt-3">${status === 400 ? 'Use the <a href="/docs/api/">documented API parameters</a> for this view.' : status === 404 ? "This page, provider or model may no longer be listed." : "The API could not load a complete published snapshot. Try again shortly."}</p><p class="mt-6"><a class="button" href="/">Search the catalog</a></p>` };
   }
   // One address per page: the same path with or without its final slash is sent to the canonical one, query and all.
   const canonicalPath = view.canonical.split("?")[0]!;
@@ -170,7 +192,9 @@ export async function handlePage(request: Request, deps: PageDeps): Promise<Resp
   if (!shell) return new Response("Page template unavailable", { status: 503, headers: { "Cache-Control": "no-store", "Retry-After": String(RETRY_AFTER_S) } });
   // An error page has no canonical and is not indexed; a view of a list is followed but not indexed.
   const robots = status !== 200 ? "noindex" : view.index === false ? "noindex, follow" : null;
-  const head = `${status === 200 ? `<link rel="canonical" href="${e(new URL(view.canonical, deps.site).toString())}">` : ""}${robots ? `<meta name="robots" content="${robots}">` : ""}`;
+  // The page's own head: its canonical address (also og:url), the robots meta where it is not to be indexed, its structured data.
+  const canonical = status === 200 ? e(absolute(view.canonical)) : null;
+  const head = `${canonical ? `<link rel="canonical" href="${canonical}"><meta property="og:url" content="${canonical}">` : ""}${robots ? `<meta name="robots" content="${robots}">` : ""}${status === 200 && view.ld ? jsonLdScript(view.ld) : ""}`;
   const nav = [["/", "Catalog"], ["/providers/", "Providers"], ["/models/", "Models"], ["/evidence/", "Evidence"], ["/docs/api/", "API"], ["/docs/methodology/", "Methodology"]];
   const html = fillShell(await shell.text(), {
     title: e(view.title), description: e(view.description), head, html: view.html,

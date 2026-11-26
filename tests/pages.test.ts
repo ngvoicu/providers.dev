@@ -21,7 +21,7 @@ import type { JsonObject } from "../src/core/merge.ts";
 import type { Meta } from "../src/core/schema.ts";
 import { depsFrom, fetchReturning, fixturePi, fixtureUpstream, ROOT, tempDataDir, writeAuthored, writePiSnapshot } from "./helpers.ts";
 
-const shell = `<html><head><title>${MARK.title} · providers.dev</title><meta name="description" content="${MARK.description}">${MARK.head}</head><body><nav>${MARK.nav}</nav><main>${MARK.html}</main><footer>${MARK.dataset}</footer></body></html>`;
+const shell = `<html><head><title>${MARK.title}</title><meta name="description" content="${MARK.description}">${MARK.head}</head><body><nav>${MARK.nav}</nav><main>${MARK.html}</main><footer>${MARK.dataset}</footer></body></html>`;
 const now = () => new Date("2026-11-14T12:00:00Z");
 let deps: LoadedDeps;
 let dataDir: string;

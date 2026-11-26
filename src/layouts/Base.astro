@@ -4,11 +4,11 @@ import Mark from "../components/Mark.astro";
 import { MARK } from "../core/page-shell.ts";
 
 interface Props {
+  /** The full title, " · providers.dev" included: the page shell's marker, filled by src/core/pages.ts (src/core/page-meta.ts). */
   title: string;
   description?: string;
 }
 const { title, description = "A reference for AI models as each provider and access method actually exposes them: context, output and prompt-cache behaviour, with sources." } = Astro.props;
-const full = title === "providers.dev" ? "providers.dev · AI models as each provider exposes them" : `${title} · providers.dev`;
 ---
 
 <!doctype html>
@@ -16,16 +16,20 @@ const full = title === "providers.dev" ? "providers.dev · AI models as each pro
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{full}</title>
+    <title>{title}</title>
     <meta name="description" content={description} />
-    <meta property="og:title" content={full} />
+    <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="providers.dev" />
     <Fragment set:html={MARK.head} />
     <meta property="og:image" content={new URL("/og.png", Astro.site)} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="providers.dev: AI models as each provider actually exposes them. Context window, maximum output and prompt cache, for every provider and access method." />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />

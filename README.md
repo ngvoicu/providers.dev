@@ -972,6 +972,22 @@ redirected. HSTS is not set.
   are kept out of the index by their robots meta, not by robots.txt, which would also keep crawlers from the API's
   searches and from the pages of a list. `tests/crawl.test.ts` holds each file to that and follows its `Sitemap:` line
   on the build.
+- Titles and descriptions (`src/core/page-meta.ts`) are made from the API answer the page prints, and say no more than
+  the page: "at least" where a value is a lower bound, "unknown" where no source states one (never 0), the API list
+  price of another entry where a subscription shows one, "not all sources agree" where the page warns. An entry's
+  title is its name, the model id in brackets unless the id is the name in lower case with hyphens, and the provider;
+  `tests/seo-meta.test.ts` checks that no two entries, providers, models or documents of the build share a title or a
+  description. The module owns the whole title, " · providers.dev" included: `<title>`, `og:title`, `twitter:title`
+  and the page's name in its structured data are one string.
+- Structured data (`src/core/structured-data.ts`): JSON-LD in the page's head, from the same answer. The home page
+  holds the publisher (`Organization`, `https://providers.dev/#organization`), the site (`WebSite`) and the catalog
+  (`Dataset`, with its two JSON downloads and the version of the publication); a list is a `CollectionPage`; a
+  provider, a model and an entry are a `WebPage` with the `BreadcrumbList` of the trail shown above its h1; the
+  methodology, contributing and API pages are a `TechArticle` (the API's names `WebAPI`, by its guide and its OpenAPI
+  document, never `/api/v1/`, which answers 404); licensing is a `WebPage`. No rating, review, offer, search action,
+  date or person: a price on an entry is a provider's list price, not an offer, and the data has no date at which a
+  page changed. The product sites carry a `WebSite`, a `SoftwareApplication` (free, MIT, no offer) and its
+  `SoftwareSourceCode`, crediting the project each is built on. Error pages have none.
 
 **Provimux's site, `https://provimux.providers.dev`.** Two static pages, `/` and `/support/`, built by Astro from
 `src/pages/provimux/` into `dist/provimux/` with their own layout (`src/layouts/Provimux.astro`) and files

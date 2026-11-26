@@ -152,9 +152,10 @@ describe("Provimux's pages", () => {
     expect(layout).toContain("const canonical = path === null ? null : new URL(path, PROVIMUX_SITE).toString();");
     expect(layout).toContain('<link rel="canonical" href={canonical} />');
     expect(layout).toContain('<meta name="robots" content="noindex" />');
-    expect(home).toContain('title="Provimux · One key for every AI account"');
-    expect(home).toContain('path="/"');
-    expect(support).toContain('title="Support · Provimux" description={SUPPORT.description} path="/support/"');
+    expect(home).toContain('const title = "Provimux · One key for every AI account";');
+    expect(home).toContain('<Provimux title={title} description={description} path="/" jsonLd={jsonLd}>');
+    expect(support).toContain('const title = "Support · Provimux";');
+    expect(support).toContain('<Provimux title={title} description={SUPPORT.description} path="/support/" jsonLd={jsonLd}>');
   });
 
   it("shows the console with example data, in both themes and two sizes", () => {

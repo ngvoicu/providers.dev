@@ -3,12 +3,28 @@
 // statement here is taken from pi-cache-keeper's README. The terminal pictures are its figures' sample sessions
 // (media/figures.html there), drawn as text: no real session.
 import PiCacheKeeper from "../../layouts/PiCacheKeeper.astro";
+import { PI_CACHE_KEEPER_SITE } from "../../core/pi-cache-keeper-site.ts";
+import { productGraph } from "../../core/structured-data.ts";
 
 const github = "https://github.com/ngvoicu/pi-cache-keeper";
 const readme = `${github}#readme`;
 const npm = "https://www.npmjs.com/package/pi-cache-keeper";
 const original = "https://github.com/nicobailon/pi-cached-compaction";
 const install = "pi install npm:pi-cache-keeper";
+const title = "pi-cache-keeper · Make the prompt cache pay off";
+const description =
+  "A Pi extension that makes the prompt cache pay off: compaction read from the warm cache, compacting when the context is full and before the cache expires, keeping the cache warm through a break, and model data from providers.dev.";
+// The structured data says what the page says: a free MIT extension for Pi 1.6.0 or newer, based on Nico Bailon's
+// pi-cached-compaction (credited as #credit credits it), published to npm. No offer, rating or review.
+const jsonLd = productGraph({
+  site: PI_CACHE_KEEPER_SITE,
+  name: "pi-cache-keeper",
+  title,
+  description,
+  repository: github,
+  basedOn: { name: "pi-cached-compaction", repository: original, author: { "@type": "Person", name: "Nico Bailon", url: "https://github.com/nicobailon" } },
+  more: { applicationSubCategory: "Pi extension", softwareRequirements: "Pi 1.6.0 or newer", downloadUrl: npm },
+});
 
 /** What it does, in two groups. HTML. */
 const does: { title: string; items: { name: string; text: string }[] }[] = [
@@ -92,11 +108,7 @@ const providers: { name: string; cached: string; countdown: string }[] = [
 ];
 ---
 
-<PiCacheKeeper
-  title="pi-cache-keeper · Make the prompt cache pay off"
-  description="A Pi extension that makes the prompt cache pay off: compaction read from the warm cache, compacting when the context is full and before the cache expires, keeping the cache warm through a break, and model data from providers.dev."
-  path="/"
->
+<PiCacheKeeper title={title} description={description} path="/" jsonLd={jsonLd}>
   <section class="pck-hero">
     <div class="pck-page">
       <p class="eyebrow pck-eyebrow"><span>An extension for <a href="https://pi.dev">Pi</a> · open source (MIT)</span></p>

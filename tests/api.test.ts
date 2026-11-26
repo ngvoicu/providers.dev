@@ -1008,7 +1008,7 @@ describe("the contract", () => {
 });
 
 describe("entry pages", () => {
-  const shell = `<html><head><title>${MARK.title} · providers.dev</title><meta name="description" content="${MARK.description}">${MARK.head}</head><body><div id="entry">${MARK.html}</div></body></html>`;
+  const shell = `<html><head><title>${MARK.title}</title><meta name="description" content="${MARK.description}">${MARK.head}</head><body><div id="entry">${MARK.html}</div></body></html>`;
   const page = (path: string, init?: RequestInit, pageShell = shell, index = deps.index): Promise<Response> =>
     handlePage(new Request(`https://providers.dev${path}`, init), {
       api: (path) => handleApi(new Request(`https://providers.dev${path}`), { ...deps, index }),
@@ -1032,7 +1032,7 @@ describe("entry pages", () => {
     expect(response.status).toBe(200);
     expect(response.headers.get("Content-Type")).toContain("text/html");
     const html = await response.text();
-    expect(html).toContain("<title>Model 4 at Provider 2 · providers.dev</title>");
+    expect(html).toContain("<title>Model 4 (lab/model-4) at Provider 2 · providers.dev</title>");
     expect(html).toContain('<link rel="canonical" href="https://providers.dev/entries/provider-02/lab/model-4">');
     expect(html).toContain("context window 500,000 tokens");
     expect(html).toContain("<h1>Model 4</h1>");

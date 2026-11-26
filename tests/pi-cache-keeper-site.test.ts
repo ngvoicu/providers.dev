@@ -138,8 +138,8 @@ describe("pi-cache-keeper's page", () => {
     expect(layout).toContain('<link rel="canonical" href={canonical} />');
     expect(layout).toContain('<meta name="robots" content="noindex" />');
     expect(layout).toContain("<meta property=\"og:image\" content={`${PI_CACHE_KEEPER_SITE}/og.png`} />");
-    expect(home).toContain('title="pi-cache-keeper · Make the prompt cache pay off"');
-    expect(home).toContain('path="/"');
+    expect(home).toContain('const title = "pi-cache-keeper · Make the prompt cache pay off";');
+    expect(home).toContain('<PiCacheKeeper title={title} description={description} path="/" jsonLd={jsonLd}>');
     expect(missing).toContain("path={null}");
     expect(readdirSync(join(ROOT, "public", "pi-cache-keeper")).sort()).toEqual(["apple-touch-icon.png", "favicon.ico", "favicon.svg", "og.png", "robots.txt", "sitemap.xml"]);
   });

@@ -18,7 +18,7 @@ import type { Meta } from "../src/core/schema.ts";
 import worker from "../worker/index.ts";
 import { depsFrom, fetchReturning, fixtureUpstream, ROOT, tempDataDir, writeAuthored } from "./helpers.ts";
 
-const shell = `<html><head><title>${MARK.title} · providers.dev</title>${MARK.head}</head><body><nav>${MARK.nav}</nav><main>${MARK.html}</main><footer>${MARK.dataset}</footer></body></html>`;
+const shell = `<html><head><title>${MARK.title}</title>${MARK.head}</head><body><nav>${MARK.nav}</nav><main>${MARK.html}</main><footer>${MARK.dataset}</footer></body></html>`;
 const now = () => new Date("2026-11-14T12:00:00Z");
 let deps: LoadedDeps;
 let dataDir: string;

@@ -5,11 +5,27 @@
 // (#only-your-names) from the README's "Serve only my names" and the Models page's switch; Savings from the README and
 // the console's Savings page; pi-cache-keeper from its README and its site (src/pages/pi-cache-keeper).
 import Provimux from "../../layouts/Provimux.astro";
+import { PROVIMUX_SITE } from "../../core/provimux-site.ts";
+import { productGraph } from "../../core/structured-data.ts";
 
 const github = "https://github.com/ngvoicu/provimux";
 const readme = `${github}#readme`;
 const cliproxyapi = "https://github.com/router-for-me/CLIProxyAPI";
 const install = "brew install ngvoicu/tap/provimux";
+const title = "Provimux · One key for every AI account";
+const description =
+  "A self-hosted AI gateway: one OpenAI-, Claude- and Gemini-compatible endpoint for your API keys and accounts, with the prompt cache kept in use and the account behind every answer shown.";
+// The structured data says what the page says: free and MIT, built on CLIProxyAPI (credited as #built-on credits it),
+// the platforms of "Other ways to install", the latest release. No offer, rating or review.
+const jsonLd = productGraph({
+  site: PROVIMUX_SITE,
+  name: "Provimux",
+  title,
+  description,
+  repository: github,
+  basedOn: { name: "CLIProxyAPI", repository: cliproxyapi, author: { "@type": "Organization", name: "Router-For.ME", url: "https://github.com/router-for-me" } },
+  more: { operatingSystem: "macOS, Linux, Windows, FreeBSD", downloadUrl: `${github}/releases/latest` },
+});
 
 /** One row of what Provimux adds: what CLIProxyAPI does, and what Provimux does instead. HTML. */
 interface Row { topic: string; cpa: string; pmx: string }
@@ -137,11 +153,7 @@ const piList = `<span class="pmx-t-row pmx-t-dim">/model</span>` + piRows
   .join("");
 ---
 
-<Provimux
-  title="Provimux · One key for every AI account"
-  description="A self-hosted AI gateway: one OpenAI-, Claude- and Gemini-compatible endpoint for your API keys and accounts, with the prompt cache kept in use and the account behind every answer shown."
-  path="/"
->
+<Provimux title={title} description={description} path="/" jsonLd={jsonLd}>
   <section class="pmx-hero">
     <div class="pmx-page">
       <p class="eyebrow pmx-eyebrow">Open source (MIT) · built on <a href={cliproxyapi}>CLIProxyAPI</a></p>

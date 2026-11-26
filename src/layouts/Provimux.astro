@@ -4,14 +4,17 @@
 import "../styles/global.css";
 import "../styles/provimux.css";
 import { PROVIMUX_SITE } from "../core/provimux-site.ts";
+import { jsonLdScript, type JsonLd } from "../core/structured-data.ts";
 
 interface Props {
   title: string;
   description: string;
   /** The page's path on the subdomain; null for a page that has no address of its own (not found). */
   path: string | null;
+  /** The page's structured data (src/core/structured-data.ts); none on a page with no address of its own. */
+  jsonLd?: JsonLd[];
 }
-const { title, description, path } = Astro.props;
+const { title, description, path, jsonLd } = Astro.props;
 const canonical = path === null ? null : new URL(path, PROVIMUX_SITE).toString();
 const github = "https://github.com/ngvoicu/provimux";
 const nav = [
@@ -40,7 +43,11 @@ const nav = [
     <meta property="og:image" content={`${PROVIMUX_SITE}/og.png`} />
     <meta property="og:image:width" content="1280" />
     <meta property="og:image:height" content="640" />
+    <meta property="og:image:alt" content="Provimux by providers.dev: One key for every AI account. Your subscriptions and API keys behind one endpoint, open to everyone you choose. Pools of models from every provider, with the prompt cache kept in use." />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    {canonical && jsonLd && <Fragment set:html={jsonLdScript(jsonLd)} />}
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
