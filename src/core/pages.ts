@@ -6,7 +6,7 @@ import { evidenceHtml, modelHtml, providerHtml } from "./detail-view.ts";
 import { API_LINKS, CONTENT_SIGNAL, entryMarkdownQuery, linkHeader, MARKDOWN_QUERY, MARKDOWN_QUERY_VALUE, MARKDOWN_TYPE, markdownBase, markdownHref, prefersMarkdown } from "./agents.ts";
 import { listIndexing } from "./crawl.ts";
 import { elementHtml, htmlToMarkdown } from "./markdown.ts";
-import { apiDocsMeta, catalogMeta, documentMeta, entryMeta, errorMeta, evidenceMeta, modelMeta, modelsMeta, providerMeta, providersMeta } from "./page-meta.ts";
+import { apiDocsMeta, catalogMeta, documentMeta, entryGroupPath, entryMeta, errorMeta, evidenceMeta, modelGroupPath, modelMeta, modelsMeta, providerLabels, providerMeta, providersMeta } from "./page-meta.ts";
 import { catalogPage, documentGraph, homeGraph, jsonLdScript, webApi, type JsonLd } from "./structured-data.ts";
 import { documentHtml, fillMetaSlots, openapiHtml, type OpenApiDocument } from "./docs-view.ts";
 import type { ProviderSummary, Summary } from "./entries.ts";
@@ -141,14 +141,16 @@ export async function handlePage(request: Request, deps: PageDeps): Promise<Resp
         view = { ...about, html: providersHtml(result, own), canonical, index: listing.index, ld: catalogPage(absolute(canonical), about, { type: "CollectionPage" }) };
       } else if (path.startsWith("/providers/")) {
         // The provider's model list, where a source has one: the API answers 404 for a provider it has no listing for.
-        const [{ provider, entries }, listing] = await Promise.all([
+        const [{ provider, entries }, listing, facets] = await Promise.all([
           one<{ provider: ProviderSummary; entries: Summary[] }>(`/api/v1${path}`),
           one<Listing>(`/api/v1/listings/${path.slice("/providers/".length)}`).catch((error: unknown) => {
             if (error instanceof ApiError && error.status === 404) return null;
             throw error;
           }),
+          one<Facets>("/api/v1/facets"),
         ]);
-        const about = providerMeta(provider);
+        // Its title names it by its label among all providers (page-meta.ts, UNIQUE).
+        const about = providerMeta(provider, providerLabels(facets.providers));
         const canonical = providerHref(provider.id);
         view = { ...about, html: providerHtml(provider, entries, listing, imported, today, meta.pi), canonical, ld: catalogPage(absolute(canonical), about, { crumbs: [["Providers", absolute("/providers/")], [provider.name, absolute(canonical)]] }) };
       } else if (path === "/models") {
@@ -162,13 +164,17 @@ export async function handlePage(request: Request, deps: PageDeps): Promise<Resp
       } else if (path.startsWith("/models/")) {
         if (!refFromPath(path.slice("/models/".length))) throw new ApiError(404);
         const [model, facets] = await Promise.all([one<CanonicalModelDetail>(`/api/v1${path}`), one<Facets>("/api/v1/facets")]);
-        const about = modelMeta(model);
+        // Its title and description among those of the models whose name begins with the same word (page-meta.ts, UNIQUE).
+        const about = modelMeta(model, await all<CanonicalModel>(modelGroupPath(model)));
         const canonical = modelHref(model.id);
         view = { ...about, html: modelHtml(model, Object.fromEntries(facets.providers.map((provider) => [provider.id, provider.name])), imported, today, meta.pi), canonical, ld: catalogPage(absolute(canonical), about, { crumbs: [["Models", absolute("/models/")], [model.name, absolute(canonical)]] }) };
       } else if (path.startsWith("/entries/")) {
         if (!refFromPath(path.slice("/entries/".length))) throw new ApiError(404);
         const { provider, summary, entry } = await one<{ provider: ProviderSummary; summary: Summary; entry: JsonObject }>(`/api/v1${path}`);
-        const about = entryMeta(summary, provider.name);
+        // Its title and description among those of the entries of its provider whose name begins with the same word,
+        // with the labels of all providers (page-meta.ts, UNIQUE).
+        const [group, facets] = await Promise.all([all<Summary>(entryGroupPath(summary)), one<Facets>("/api/v1/facets")]);
+        const about = entryMeta(summary, group, providerLabels(facets.providers));
         const canonical = entryHref(summary.ref);
         // Where `{address}.md` is the page of another entry (an id ending in .md), the markdown is at the format query.
         const twin = (await deps.api(`/api/v1${canonical}.md`)).ok;

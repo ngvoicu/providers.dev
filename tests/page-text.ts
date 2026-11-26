@@ -132,7 +132,8 @@ export function markdownText(markdown: string): PageText {
   const plain = (text: string): string => bare(text
     .replace(/<br>/g, " ")
     .replace(/!\[/g, "[")
-    .replace(/\]\((?:<[^>]*>|[^)\s]*)\)/g, "]")
+    // A link's target, not a "](" of the text, whose bracket is escaped (an odd number of backslashes before it).
+    .replace(/(?<!\\)((?:\\\\)*)\]\((?:<[^>]*>|[^)\s]*)\)/g, "$1]")
     .replace(/\\([\\`*_[\]<>#|+\-.)])/g, "$1"));
   const out: PageText = { text: "", tables: [] };
   let rows: string[][] | null = null;

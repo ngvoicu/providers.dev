@@ -340,7 +340,9 @@ describe("the build in dist/", () => {
       ...models.map(modelHref),
       ...index.entries.map((summary) => entryHref(summary.ref)),
     ];
-    expect(paths.length).toBeGreaterThan(5000);
+    // The build's own pages, all of them: as many as it has entries, providers and models, whatever an import brought.
+    expect(index.entries.length).toBeGreaterThan(0);
+    expect(paths.length).toBe(11 + index.providers.length + models.length + index.entries.length);
     const found: string[] = [];
     for (const path of paths) {
       const problem = await compare(ask, path);

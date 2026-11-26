@@ -979,8 +979,14 @@ redirected. HSTS is not set.
   hyphens, underscores, colons and slashes; a dot counts), and the provider, which comes before the id where the title
   would pass 70 characters; a model's title leaves out its id on the same terms, also where the id is the name after
   the lab's id. The two cache lifetimes are said as the tiles show them ("prompt cache lifetime unknown" where both
-  are unknown, "5 min (short), long lifetime unknown" where one is). `tests/seo-meta.test.ts` checks that no two entries, providers, models or documents of the build share a title or a
-  description. The module owns the whole title, " · providers.dev" included: `<title>`, `og:title`, `twitter:title`
+  are unknown, "5 min (short), long lifetime unknown" where one is). No two pages share a title or a description,
+  whatever an import brings, and no rule for them can stop a build: a page writes its own among those of its group,
+  which it reads from the API (an entry: the entries of its provider whose name begins with the same word; a model: the
+  models whose name does), and where the short form would give two of them one text, those take the id in brackets
+  (then a number after it). A provider is named by its id where its name would make two pages one (two providers of
+  one name). The reasoning is at UNIQUE in `page-meta.ts`; `tests/seo-meta.test.ts` checks it on the whole build and on
+  a build with ids that differ only in case or a separator, providers of one name and names holding " at ". The
+  module owns the whole title, " · providers.dev" included: `<title>`, `og:title`, `twitter:title`
   and the page's name in its structured data are one string.
 - Structured data (`src/core/structured-data.ts`): JSON-LD in the page's head, from the same answer. The home page
   holds the publisher (`Organization`, `https://providers.dev/#organization`), the site (`WebSite`) and the catalog

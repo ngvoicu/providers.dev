@@ -10,11 +10,12 @@ import { sync } from "../scripts/lib/sync.ts";
 import { handleApi, modelsFor, type LoadedDeps } from "../src/core/api.ts";
 import type { Index, Summary } from "../src/core/entries.ts";
 import { MARK } from "../src/core/page-shell.ts";
-import { cacheWords, documentMeta, entryMeta, entryTitle, HOME_TITLE, modelMeta, providerMeta, type PageMeta } from "../src/core/page-meta.ts";
+import { cacheWords, documentMeta, entryMeta, HOME_TITLE, modelMeta, plain, providerLabels, providerMeta, UNNAMED, type PageMeta } from "../src/core/page-meta.ts";
 import type { SafeValue } from "../src/core/safe.ts";
 import { handlePage, type PageDeps } from "../src/core/pages.ts";
 import type { Meta } from "../src/core/schema.ts";
 import { depsFrom, fetchReturning, fixtureUpstream, ROOT, tempDataDir, writeAuthored } from "./helpers.ts";
+import type { UpstreamCatalog } from "../src/core/schema.ts";
 
 // The shell's head as Base.astro writes it: the title, description and social tags from the markers, then the page's head.
 const shell = `<html><head><title>${MARK.title}</title><meta name="description" content="${MARK.description}"><meta property="og:title" content="${MARK.title}"><meta property="og:description" content="${MARK.description}"><meta name="twitter:title" content="${MARK.title}">${MARK.head}</head><body><nav>${MARK.nav}</nav><main>${MARK.html}</main><footer>${MARK.dataset}</footer></body></html>`;
@@ -30,9 +31,9 @@ beforeAll(async () => {
   deps = depsFrom(join(dataDir, "published"));
 });
 
-const api = (path: string) => handleApi(new Request(`${SITE}${path}`), deps);
-const pageDeps = (): PageDeps => ({ api, shell: async () => new Response(shell), site: SITE, now });
-const page = (path: string) => handlePage(new Request(`${SITE}${path}`), pageDeps());
+const api = (path: string, from: LoadedDeps = deps) => handleApi(new Request(`${SITE}${path}`), from);
+const pageDeps = (from: LoadedDeps = deps): PageDeps => ({ api: (path) => api(path, from), shell: async () => new Response(shell), site: SITE, now });
+const page = (path: string, from: LoadedDeps = deps) => handlePage(new Request(`${SITE}${path}`), pageDeps(from));
 
 const unescape = (text: string): string => text.replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
 type Node = Record<string, unknown>;
@@ -59,8 +60,8 @@ function readHtml(status: number, html: string): Read {
     }),
   };
 }
-async function read(path: string): Promise<Read> {
-  const response = await page(path);
+async function read(path: string, from: LoadedDeps = deps): Promise<Read> {
+  const response = await page(path, from);
   return readHtml(response.status, await response.text());
 }
 
@@ -93,11 +94,61 @@ function pageNode(result: Read): Node {
 }
 
 /** Each page type of the fixture, with what its structured data must hold. */
-async function pagePaths(): Promise<{ providers: string[]; models: string[]; entries: Summary[] }> {
-  const providers = (await (await api("/api/v1/providers?limit=200")).json() as { data: { id: string }[] }).data.map((item) => item.id);
-  const models = (await (await api("/api/v1/models?limit=200")).json() as { data: { id: string }[] }).data.map((item) => item.id);
-  return { providers, models, entries: deps.index.entries };
+async function pagePaths(from: LoadedDeps = deps): Promise<{ providers: string[]; models: string[]; entries: Summary[] }> {
+  const providers = (await (await api("/api/v1/providers?limit=200", from)).json() as { data: { id: string }[] }).data.map((item) => item.id);
+  const models = (await (await api("/api/v1/models?limit=200", from)).json() as { data: { id: string }[] }).data.map((item) => item.id);
+  return { providers, models, entries: from.index.entries };
 }
+
+/** Every provider, model and entry page of a publication through handlePage: each with its own title and description. */
+async function everyPageOwnsItsTitle(from: LoadedDeps): Promise<Map<string, string>> {
+  const { providers, models, entries } = await pagePaths(from);
+  const paths = [
+    ...providers.map((id) => `/providers/${encodeURIComponent(id)}/`),
+    ...models.map((id) => `/models/${id.split("/").map(encodeURIComponent).join("/")}/`),
+    ...entries.map((summary) => `/entries/${summary.ref.split("/").map(encodeURIComponent).join("/")}`),
+  ];
+  const titles = new Map<string, string>();
+  const descriptions = new Map<string, string>();
+  const byPath = new Map<string, string>();
+  for (const path of paths) {
+    const result = await read(path, from);
+    expect([path, result.status]).toEqual([path, 200]);
+    expect(pageNode(result).name, path).toBe(result.title);
+    expect(titles.get(result.title), `${path} has the title of ${titles.get(result.title)}`).toBeUndefined();
+    expect(descriptions.get(result.description), `${path} has the description of ${descriptions.get(result.description)}`).toBeUndefined();
+    titles.set(result.title, path);
+    descriptions.set(result.description, path);
+    byPath.set(path, result.title);
+  }
+  return byPath;
+}
+
+/** The titles and descriptions of every entry, provider and model of an index, as their pages make them. */
+function metasOf(index: Index): [string, PageMeta][] {
+  const labels = providerLabels(index.providers);
+  const byProvider = new Map<string, Summary[]>();
+  for (const summary of index.entries) byProvider.set(summary.provider, [...(byProvider.get(summary.provider) ?? []), summary]);
+  const models = modelsFor(index);
+  return [
+    ...index.entries.map((summary): [string, PageMeta] => {
+      const meta = entryMeta(summary, byProvider.get(summary.provider)!, labels);
+      checkEntry(summary, meta, labels.get(summary.provider)!);
+      return [summary.ref, meta];
+    }),
+    ...index.providers.map((provider): [string, PageMeta] => [provider.id, providerMeta(provider, labels)]),
+    ...models.map((model): [string, PageMeta] => [model.id, modelMeta(model, models)]),
+  ];
+}
+
+/** An entry of the fixture with other names and ids, for the title rules. */
+function variant(over: Partial<Summary>): Summary {
+  const base = deps.index.entries[1]!;
+  const model = over.model ?? base.model;
+  return { ...base, ...over, model, ref: `${over.provider ?? base.provider}/${model}` };
+}
+const titleOf = (summary: Summary, group: Summary[] = [summary], providers: { id: string; name: string }[] = [{ id: summary.provider, name: "P" }]): string =>
+  entryMeta(summary, group, providerLabels(providers)).title;
 
 describe("titles and descriptions", () => {
   it("gives every page of the fixture its own title and description, the same in the title, og:title and structured data", async () => {
@@ -148,17 +199,76 @@ describe("titles and descriptions", () => {
   });
 
   it("leaves out an id that is the name written another way, and puts the provider before a long id", () => {
-    expect(entryTitle({ name: "Kimi K2.6", model: "moonshotai/Kimi-K2.6", canonical_id: "moonshotai/kimi-k2.6" }, "P")).toBe("Kimi K2.6 at P · providers.dev");
-    expect(entryTitle({ name: "GLM-5.2", model: "fireworks/glm-5.2", canonical_id: "zhipuai/glm-5.2" }, "P")).toBe("GLM-5.2 (fireworks/glm-5.2) at P · providers.dev");
-    expect(entryTitle({ name: "MiniMax-M2.5", model: "MiniMax-M2.5", canonical_id: null }, "P")).toBe("MiniMax-M2.5 at P · providers.dev");
-    expect(entryTitle({ name: "DeepSeek: DeepSeek V4", model: "deepseek/deepseek-v4", canonical_id: null }, "P")).toBe("DeepSeek: DeepSeek V4 at P · providers.dev");
-    expect(entryTitle({ name: "Gemini 3.8 Flash", model: "gemini-3-8-flash", canonical_id: "google/gemini-3.8-flash" }, "P")).toBe("Gemini 3.8 Flash (gemini-3-8-flash) at P · providers.dev");
-    expect(entryTitle({ name: "Nemotron 3 Super", model: "nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-BF16", canonical_id: "nvidia/nemotron-3-super" }, "Thinking Machines"))
-      .toBe("Nemotron 3 Super at Thinking Machines (nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-BF16) · providers.dev");
+    expect(titleOf(variant({ name: "Kimi K2.6", model: "moonshotai/Kimi-K2.6", canonical_id: "moonshotai/kimi-k2.6" }))).toBe("Kimi K2.6 at P · providers.dev");
+    expect(titleOf(variant({ name: "GLM-5.2", model: "fireworks/glm-5.2", canonical_id: "zhipuai/glm-5.2" }))).toBe("GLM-5.2 (fireworks/glm-5.2) at P · providers.dev");
+    expect(titleOf(variant({ name: "MiniMax-M2.5", model: "MiniMax-M2.5", canonical_id: null }))).toBe("MiniMax-M2.5 at P · providers.dev");
+    expect(titleOf(variant({ name: "DeepSeek: DeepSeek V4", model: "deepseek/deepseek-v4", canonical_id: null }))).toBe("DeepSeek: DeepSeek V4 at P · providers.dev");
+    expect(titleOf(variant({ name: "Gemini 3.8 Flash", model: "gemini-3-8-flash", canonical_id: "google/gemini-3.8-flash" }))).toBe("Gemini 3.8 Flash (gemini-3-8-flash) at P · providers.dev");
+    const long = variant({ name: "Nemotron 3 Super", model: "nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-BF16", canonical_id: "nvidia/nemotron-3-super" });
+    expect(titleOf(long, [long], [{ id: long.provider, name: "Thinking Machines" }])).toBe("Nemotron 3 Super at Thinking Machines (nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-BF16) · providers.dev");
+    // Not where another provider's name is this provider's followed by that id in brackets.
+    expect(titleOf(long, [long], [{ id: long.provider, name: "Thinking Machines" }, { id: "tm-x", name: "Thinking Machines (nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-BF16)" }]))
+      .toBe("Nemotron 3 Super (nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-BF16) at Thinking Machines · providers.dev");
+  });
+
+  it("keeps the id where leaving it out would give two entries of a provider one title: ids that differ in case, or in a separator", () => {
+    const lower = variant({ name: "Twin Model", model: "twin-model", canonical_id: null });
+    const upper = variant({ name: "Twin Model", model: "Twin-Model", canonical_id: null });
+    const under = variant({ name: "Twin Model", model: "twin_model", canonical_id: null });
+    const other = variant({ name: "Twin Engine", model: "twin-engine", canonical_id: null });
+    const group = [lower, upper, under, other];
+    expect(group.map((summary) => titleOf(summary, group))).toEqual([
+      "Twin Model (twin-model) at P · providers.dev",
+      "Twin Model (Twin-Model) at P · providers.dev",
+      "Twin Model (twin_model) at P · providers.dev",
+      "Twin Engine at P · providers.dev",
+    ]);
+    // Alone, the id is left out again.
+    expect(titleOf(lower)).toBe("Twin Model at P · providers.dev");
+    // A name that holds another entry's name and id: the second takes a number after its id.
+    const named = variant({ name: "Twin Model (twin-model)", model: "twin-model-2", canonical_id: null });
+    expect(new Set([lower, upper, named].map((summary, _, all) => titleOf(summary, all))).size).toBe(3);
+  });
+
+  it("names a provider by its id where its name would make two pages one", () => {
+    const labels = providerLabels([
+      { id: "a", name: "Same" }, { id: "b", name: "Same" }, { id: "c", name: "C" }, { id: "d", name: "C (c/x)" }, { id: "e", name: "Look at Me" }, { id: "f", name: "  " }, { id: "g", name: "MiniMax" }, { id: "h", name: "MiniMax (minimax.io)" },
+    ]);
+    expect(Object.fromEntries(labels)).toEqual({ a: "a", b: "b", c: "C", d: "d", e: "Look\u00A0at Me", f: "f", g: "MiniMax", h: "MiniMax (minimax.io)" });
+    // A name holding " at " keeps the first " at " of a title the one before the provider; an empty name is shown by its id.
+    expect(titleOf(variant({ name: "Look at", model: "look", canonical_id: null }))).toBe("Look\u00A0at (look) at P · providers.dev");
+    expect(titleOf(variant({ name: " ", model: "blank-name", canonical_id: null }))).toBe("blank-name (blank-name) at P · providers.dev");
+    expect(titleOf(variant({ name: "", model: " ", canonical_id: null }))).toBe(`${UNNAMED} () at P · providers.dev`);
+  });
+
+  it("builds and gives every page its own title and description where the data holds such entries and providers", async () => {
+    const dataDir = tempDataDir();
+    const upstream: UpstreamCatalog = fixtureUpstream();
+    const twin = (id: string, name: string) => ({ ...upstream["provider-00"]!.models["model-1"]!, id, name, canonical_id: undefined });
+    for (const [id, name] of [["twin-model", "Twin Model"], ["Twin-Model", "Twin Model"], ["twin_model", "Twin Model"], ["twin model at", "Twin Model (twin-model)"], ["look-at", "Look at"], ["blank", " "]]) upstream["provider-00"]!.models[id!] = twin(id!, name!);
+    upstream["provider-01"]!.name = "Provider 0";
+    upstream["provider-02"]!.name = "Provider 0 (provider-00/twin-model), API key";
+    const synced = await sync({ dataDir, fetch: fetchReturning(JSON.stringify(upstream)) });
+    expect(synced.upstream, JSON.stringify(synced.upstream)).not.toMatchObject({ status: "failed" });
+    writeAuthored(dataDir);
+    expect(publish({ dataDir, rootDir: ROOT, now }).errors).toEqual([]);
+    const twins = depsFrom(join(dataDir, "published"));
+    const titles = await everyPageOwnsItsTitle(twins);
+    expect(["twin-model", "Twin-Model", "twin_model"].map((id) => titles.get(`/entries/provider-00/${id}`))).toEqual([
+      "Twin Model (twin-model) at provider-00 · providers.dev",
+      "Twin Model (Twin-Model) at provider-00 · providers.dev",
+      "Twin Model (twin_model) at provider-00 · providers.dev",
+    ]);
+    // The same, from the index as the build's test reads it.
+    for (const key of ["title", "description"] as const) {
+      const texts = metasOf(twins.index).map(([, meta]) => meta[key]);
+      expect(new Set(texts).size, key).toBe(texts.length);
+    }
   });
 
   it("keeps the qualifiers its page shows: at least, unknown, whose price, a warning; never measured", () => {
-    for (const summary of deps.index.entries) checkEntry(summary, entryMeta(summary, "Provider"));
+    const labels = providerLabels(deps.index.providers);
+    for (const summary of deps.index.entries) checkEntry(summary, entryMeta(summary, deps.index.entries, labels), labels.get(summary.provider)!);
   });
 
   // The publication `npm run build` made: every entry, provider and model of the real data.
@@ -166,22 +276,15 @@ describe("titles and descriptions", () => {
   it.skipIf(!existsSync(join(built, "current.json")))("has no two pages with one title or one description in the publication in dist/", () => {
     const id = (JSON.parse(readFileSync(join(built, "current.json"), "utf8")) as { id: string }).id;
     const index = JSON.parse(gunzipSync(readFileSync(join(built, "snapshots", id, "data", "index.json.gz"))).toString()) as Index;
-    const names = new Map(index.providers.map((provider) => [provider.id, provider.name]));
-    const pages: [string, PageMeta][] = [
-      ...index.entries.map((summary): [string, PageMeta] => {
-        const meta = entryMeta(summary, names.get(summary.provider)!);
-        checkEntry(summary, meta);
-        return [summary.ref, meta];
-      }),
-      ...index.providers.map((provider): [string, PageMeta] => [provider.id, providerMeta(provider)]),
-      ...modelsFor(index).map((model): [string, PageMeta] => [model.id, modelMeta(model)]),
-    ];
+    const pages = metasOf(index);
     // The documents' own descriptions, as the build wrote them.
     for (const name of ["methodology", "licensing", "contributing"]) {
       const document = JSON.parse(readFileSync(join(built, "reference-content", "docs", `${name}.json`), "utf8")) as { title: string; description: string };
       pages.push([`/docs/${name}/`, documentMeta(name, document)]);
     }
-    expect(pages.length).toBeGreaterThan(1000);
+    // Every entry, provider and model of the build, whatever an import brought, and the three documents.
+    expect(index.entries.length).toBeGreaterThan(0);
+    expect(pages.length).toBe(index.entries.length + index.providers.length + modelsFor(index).length + 3);
     for (const key of ["title", "description"] as const) {
       const seen = new Map<string, string>();
       const twice = pages.filter(([ref, meta]) => { const before = seen.get(meta[key]); seen.set(meta[key], ref); return before !== undefined; });
@@ -190,21 +293,30 @@ describe("titles and descriptions", () => {
   });
 });
 
-/** The description of an entry against its summary: what its tiles say, qualifiers included. */
-function checkEntry(summary: Summary, meta: PageMeta): void {
+/**
+ * The description of an entry against its summary: what its tiles say, qualifiers included. Only the words this module
+ * writes are read, never the data's own (a name, an id, a ref): a model named "Measured 7B" fails nothing.
+ */
+function checkEntry(summary: Summary, meta: PageMeta, label: string): void {
   const { input_window: window, max_output: output } = summary.safe;
-  const text = meta.description;
+  const name = plain(summary.name) || plain(summary.model) || UNNAMED;
+  const head = `${name} at ${label} (${summary.ref}), `;
+  expect(meta.description.startsWith(head), meta.description).toBe(true);
+  expect(meta.title.startsWith(name), meta.title).toBe(true);
+  // What follows the ref and the access ("API key: "), less the ref a reference price names.
+  const rest = meta.description.slice(head.length);
+  const facts = rest.slice(rest.indexOf(": ") + 2);
+  const words = summary.price_from ? facts.replace(`(API list price of ${summary.price_from})`, "(API list price of …)") : facts;
   const warned = (safe: typeof window): string => (safe.agreement === "differ" ? " (not all sources agree)" : "");
   const said = (safe: typeof window): string => `${safe.value === null ? "unknown" : `${safe.at_least ? "at least " : ""}${safe.value.toLocaleString("en-US")} tokens`}${warned(safe)},`;
-  expect(text).toContain(`context window ${said(window)}`);
-  expect(text).toContain(`maximum output ${said(output)}`);
-  if (summary.price_from && summary.price_in !== null && summary.price_out !== null) expect(text).toContain(`(API list price of ${summary.price_from})`);
-  if (summary.price_in === null && summary.price_out === null && summary.pricing.billing === "not_applicable") expect(text).toContain("price: in plan");
+  expect(facts.startsWith(`context window ${said(window)}`), facts).toBe(true);
+  expect(words).toContain(`maximum output ${said(output)}`);
+  if (summary.price_from && summary.price_in !== null && summary.price_out !== null) expect(facts).toContain(`(API list price of ${summary.price_from})`);
+  if (summary.price_in === null && summary.price_out === null && summary.pricing.billing === "not_applicable") expect(words).toContain("price: in plan");
   // An unknown price is never written as zero.
-  if (summary.price_in === null || summary.price_out === null) expect(text).not.toMatch(/price \$/);
-  expect(text).not.toMatch(/measured/i);
-  expect(text).not.toMatch(/unknown (short|long)\b/);
-  expect(meta.title).toContain(summary.name);
+  if (summary.price_in === null || summary.price_out === null) expect(words).not.toMatch(/price \$/);
+  expect(words).not.toMatch(/measured/i);
+  expect(words).not.toMatch(/unknown (short|long)\b/);
 }
 
 describe("structured data", () => {
