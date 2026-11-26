@@ -327,7 +327,7 @@ describe("API response boundary", () => {
     expect(methodology).toContain("providers.dev takes no payment for listing, correcting or measuring an entry. A provider may supply documentation, or access for a measurement; the result is published whatever it shows.");
     expect(methodology.match(/<a href="\/docs\/contributing\/">contributing<\/a>/g)).toHaveLength(2);
     const layout = readFileSync(join(ROOT, "src", "layouts", "Base.astro"), "utf8");
-    expect(layout).toMatch(/<li><a href="\/docs\/licensing\/">Licensing and attribution<\/a><\/li>\s*<li><a href="\/docs\/contributing\/">Contributing<\/a><\/li>\s*<li><a href="https:\/\/provimux\.providers\.dev\/">Provimux<\/a><\/li>\s*<li><a href="https:\/\/provimux\.providers\.dev\/support\/">Provimux support<\/a><\/li>\s*<li><a href="https:\/\/pi-cache-keeper\.providers\.dev\/">pi-cache-keeper<\/a><\/li>\s*<li><a href="mailto:office@providers\.dev">Contact<\/a><\/li>/);
+    expect(layout).toMatch(/<li><a href="\/docs\/licensing\/">Licensing and attribution<\/a><\/li>\s*<li><a href="\/docs\/contributing\/">Contributing<\/a><\/li>\s*<li><a href="https:\/\/provimux\.providers\.dev\/">Provimux<\/a><\/li>\s*<li><a href="https:\/\/provimux\.providers\.dev\/support\/">Provimux support<\/a><\/li>\s*<li><a href="https:\/\/pi-cache-keeper\.providers\.dev\/">pi-cache-keeper<\/a><\/li>\s*<li><a href="https:\/\/ngvoicu\.dev\/" rel="author">Gabriel Voicu<\/a><\/li>\s*<li><a href="mailto:office@providers\.dev">Contact<\/a><\/li>/);
     expect(layout).not.toContain('href="/support/"');
     expect(methodology).toContain('A provider can write to <a href="mailto:office@providers.dev">office@providers.dev</a>.');
     const evidence = await (await page("/evidence/")).text();

@@ -1,10 +1,12 @@
 // The structured data (JSON-LD, schema.org) of the three sites, built from the same answer as the page it is on. It
 // claims nothing a page does not show: no rating, no review, no offer (a price on an entry is a provider's list price,
 // not something providers.dev sells; the products are free), no date (the data has no date at which a page changed,
-// and a publication's time is a build's clock), no person. Every address in it answers: the API is named by its
-// documentation and its OpenAPI document, never /api/v1/ (404).
+// and a publication's time is a build's clock). Every address in it answers: the API is named by its documentation
+// and its OpenAPI document, never /api/v1/ (404).
 //
-// One identity for the publisher on all three hosts: https://providers.dev/#organization.
+// One identity for the publisher on all three hosts: https://providers.dev/#organization. One person, the owner, named
+// in every footer with a link to his site and given there the role the page shows (maintainer of the catalog and the
+// site, author of pi-cache-keeper, maintainer of Provimux, a distribution of another project); never a founder.
 import { SITE } from "./crawl.ts";
 import type { PageMeta } from "./page-meta.ts";
 import type { Meta } from "./schema.ts";
@@ -26,6 +28,9 @@ export const ORGANIZATION: JsonLd = {
   email: "office@providers.dev",
 };
 const publisher = { "@id": ORGANIZATION_ID };
+
+/** The owner, with the identity his own site gives him (https://ngvoicu.dev/#person); the footers link it. */
+export const OWNER: JsonLd = { "@type": "Person", "@id": "https://ngvoicu.dev/#person", name: "Gabriel Voicu", url: "https://ngvoicu.dev/" };
 
 /**
  * A <script type="application/ld+json"> of one graph. `<`, `>` and `&` are written as escapes, so that no value can end
@@ -62,7 +67,7 @@ export function homeGraph(meta: Meta, page: PageMeta): JsonLd[] {
   const pi = meta.pi.snapshot !== null;
   return [
     ORGANIZATION,
-    { "@type": "WebSite", "@id": WEBSITE_ID, name: "providers.dev", url, description: "AI models as each provider exposes them: context window, maximum output, price and prompt caching, per provider and access method.", inLanguage: "en", publisher },
+    { "@type": "WebSite", "@id": WEBSITE_ID, name: "providers.dev", url, description: "AI models as each provider exposes them: context window, maximum output, price and prompt caching, per provider and access method.", inLanguage: "en", publisher, maintainer: OWNER },
     {
       "@type": "Dataset",
       "@id": CATALOG_ID,
@@ -70,7 +75,8 @@ export function homeGraph(meta: Meta, page: PageMeta): JsonLd[] {
       description: `${page.description} Each quantity has one value; a warning marks where its sources disagree.`,
       url,
       version: meta.dataset_version,
-      creator: publisher,
+      creator: OWNER,
+      maintainer: OWNER,
       publisher,
       isBasedOn: ["https://models.dev", ...(pi ? ["https://pi.dev/models"] : [])],
       license: `${SITE}/docs/licensing/`,
@@ -124,6 +130,8 @@ export interface Product {
   repository: string;
   /** The project it is built on, credited as the page credits it. */
   basedOn: { name: string; repository: string; author: JsonLd };
+  /** The owner's role, as the page shows it: `author` of his own package, `maintainer` of a distribution. */
+  owner: "author" | "maintainer";
   more?: JsonLd;
 }
 
@@ -147,6 +155,7 @@ export function productGraph(product: Product): JsonLd[] {
       isAccessibleForFree: true,
       license: "https://opensource.org/licenses/MIT",
       publisher,
+      [product.owner]: OWNER,
       image: `${product.site}/og.png`,
       isBasedOn: { "@id": upstream["@id"] },
       ...product.more,

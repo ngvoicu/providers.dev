@@ -71,15 +71,29 @@ function walk(value: unknown, visit: (key: string, value: unknown) => void, key 
   else if (value && typeof value === "object") for (const [name, inner] of Object.entries(value)) { visit(name, inner); walk(inner, visit, name); }
 }
 
-/** Nothing the pages do not show: no rating, review, offer, search action, date or person (B6 is held). */
-function claimsNothingElse(graph: Node[], persons: readonly string[] = []): void {
+/** The owner, as every footer links him and as his own site identifies him. */
+const OWNER = { "@type": "Person", "@id": "https://ngvoicu.dev/#person", name: "Gabriel Voicu", url: "https://ngvoicu.dev/" };
+const OWNER_LINK = '<a href="https://ngvoicu.dev/" rel="author">Gabriel Voicu</a>';
+
+/**
+ * Nothing the pages do not show: no rating, review, offer, search action, date or founder. The persons are those the
+ * page credits, and the owner, whom every footer links, exactly as his site names him and in the roles given (by key).
+ */
+function claimsNothingElse(graph: Node[], persons: readonly string[] = [], roles: readonly string[] = []): void {
+  const owned: string[] = [];
+  const others: string[] = [];
   walk(graph, (key, value) => {
     expect(["aggregateRating", "review", "offers", "potentialAction", "datePublished", "dateModified", "dateCreated", "founder", "sameAs"], key).not.toContain(key);
     if (key === "@type") expect(["Offer", "AggregateRating", "Review", "SearchAction", "Product"]).not.toContain(value);
-    if (typeof value === "string") expect(value).not.toMatch(/ngvoicu\.dev|Gabriel/);
+    const node = value as Node | null;
+    if (node && typeof node === "object" && !Array.isArray(node) && node["@type"] === "Person") {
+      if (node["@id"] === OWNER["@id"]) { expect(node).toEqual(OWNER); owned.push(key); } else others.push(node.name as string);
+    }
   });
-  const people = graph.flatMap((node) => { const found: string[] = []; walk([node], (key, value) => { if (key === "@type" && value === "Person") found.push("Person"); }); return found; });
-  expect(people.length).toBe(persons.length);
+  // The owner's name and site appear nowhere but in that one object.
+  expect(JSON.stringify(graph).split(JSON.stringify(OWNER)).join("null")).not.toMatch(/ngvoicu\.dev|Gabriel/);
+  expect(owned.sort()).toEqual([...roles].sort());
+  expect(others.sort()).toEqual([...persons].sort());
 }
 
 function byType(graph: Node[], type: string): Node[] {
@@ -336,7 +350,10 @@ describe("structured data", () => {
       { "@type": "DataDownload", encodingFormat: "application/json", contentUrl: `${SITE}/api.json` },
       { "@type": "DataDownload", encodingFormat: "application/json", contentUrl: `${SITE}/api/v1/catalog` },
     ]);
-    claimsNothingElse(result.graph);
+    // The owner maintains the site and made and maintains the catalog; the publisher stays the organization, which has no founder.
+    expect(dataset).toMatchObject({ creator: OWNER, maintainer: OWNER, publisher: { "@id": `${SITE}/#organization` } });
+    expect(byType(result.graph, "WebSite")[0]).toMatchObject({ maintainer: OWNER, publisher: { "@id": `${SITE}/#organization` } });
+    claimsNothingElse(result.graph, [], ["creator", "maintainer", "maintainer"]);
     await answers(result.graph);
   });
 
@@ -409,10 +426,11 @@ describe("structured data", () => {
   const product = (path: string): Read => readHtml(200, readFileSync(join(built, path), "utf8"));
   it.skipIf(!existsSync(join(built, "provimux", "index.html")))("describes each product as free software built on the project it credits, with no offer, rating or review", () => {
     const cases = [
-      { path: "provimux/index.html", site: "https://provimux.providers.dev", name: "Provimux", repository: "https://github.com/ngvoicu/provimux", upstream: "CLIProxyAPI", persons: [] as string[] },
-      { path: "pi-cache-keeper/index.html", site: "https://pi-cache-keeper.providers.dev", name: "pi-cache-keeper", repository: "https://github.com/ngvoicu/pi-cache-keeper", upstream: "pi-cached-compaction", persons: ["Nico Bailon"] },
+      // Provimux is his distribution of another project: its maintainer, not its author.
+      { path: "provimux/index.html", site: "https://provimux.providers.dev", name: "Provimux", repository: "https://github.com/ngvoicu/provimux", upstream: "CLIProxyAPI", persons: [] as string[], role: "maintainer" },
+      { path: "pi-cache-keeper/index.html", site: "https://pi-cache-keeper.providers.dev", name: "pi-cache-keeper", repository: "https://github.com/ngvoicu/pi-cache-keeper", upstream: "pi-cached-compaction", persons: ["Nico Bailon"], role: "author" },
     ];
-    for (const { path, site, name, repository, upstream, persons } of cases) {
+    for (const { path, site, name, repository, upstream, persons, role } of cases) {
       const html = readFileSync(join(built, path), "utf8");
       const result = product(path);
       expect(result.canonical).toBe(`${site}/`);
@@ -429,8 +447,10 @@ describe("structured data", () => {
       if (application!.softwareRequirements) expect(html).toContain(application!.softwareRequirements as string);
       if (application!.operatingSystem) for (const system of (application!.operatingSystem as string).split(", ")) expect(html).toContain(system);
       expect(application!.softwareRequirements ?? "Pi 1.6.0 or newer").toBe("Pi 1.6.0 or newer");
-      claimsNothingElse(result.graph, persons);
+      expect(application![role]).toEqual(OWNER);
+      claimsNothingElse(result.graph, persons, [role]);
       for (const person of persons) expect(html).toContain(person);
+      expect(html).toContain(OWNER_LINK);
     }
     const support = product("provimux/support/index.html");
     expect(pageNode(support)).toMatchObject({ "@type": "WebPage", name: "Support · Provimux", isPartOf: { "@id": "https://provimux.providers.dev/#website" } });
@@ -440,6 +460,20 @@ describe("structured data", () => {
     ]);
     claimsNothingElse(support.graph);
     for (const path of ["provimux/not-found/index.html", "pi-cache-keeper/not-found/index.html"]) expect(product(path).scripts).toEqual([]);
+  });
+
+  // Every page of providers.dev is written into one shell, whose footer names the owner; each product page has its own.
+  it.skipIf(!existsSync(join(built, "site-shell", "index.html")))("links the owner's site from the footer of every page of the three sites, and from their markdown", () => {
+    const footer = (html: string): string => html.slice(html.indexOf("<footer"), html.indexOf("</footer>"));
+    for (const path of ["site-shell/index.html", "provimux/index.html", "provimux/support/index.html", "provimux/not-found/index.html", "pi-cache-keeper/index.html", "pi-cache-keeper/not-found/index.html"]) {
+      const html = readFileSync(join(built, path), "utf8");
+      expect(footer(html).split(OWNER_LINK).length - 1, path).toBe(1);
+      // The link is followed by the contact, as the plan places it.
+      expect(footer(html), path).toMatch(/Gabriel Voicu<\/a><\/li>\s*<li><a href="mailto:office@providers\.dev">Contact<\/a>/);
+    }
+    for (const path of ["provimux/index.html.md", "provimux/support/index.html.md", "pi-cache-keeper/index.html.md"]) {
+      expect(readFileSync(join(built, path), "utf8"), path).toContain("[Gabriel Voicu](https://ngvoicu.dev/)");
+    }
   });
 });
 
