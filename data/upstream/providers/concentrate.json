@@ -1819,6 +1819,11 @@
     "output": 8192
    },
    "capabilities": {
+    "cache": {
+     "implicit": {
+      "min_tokens": 64
+     }
+    },
     "temperature": true,
     "top_k": false,
     "top_p": true,
@@ -1835,7 +1840,10 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.3
+      "price": 0.3,
+      "cache": {
+       "read": 0.03
+      }
      },
      "output": {
       "price": 0.9
@@ -6410,6 +6418,104 @@
    "last_updated": "2026-09-22",
    "recommended_api": "responses"
   },
+  "gpt-6-luna-decisions": {
+   "id": "gpt-6-luna-decisions",
+   "name": "GPT-6 Luna Decisions",
+   "description": "OpenAI's most efficient model for focused, high-volume tasks",
+   "type": "decision",
+   "family": "gpt-luna",
+   "canonical_id": "openai/gpt-6-luna",
+   "release_date": "2026-09-22",
+   "limit": {
+    "context": 600000
+   },
+   "capabilities": {
+    "cache": {
+     "implicit": {
+      "min_tokens": 1024
+     }
+    },
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.1,
+      "cache": {
+       "read": 0.01,
+       "write": {
+        "30m": 0.125
+       }
+      },
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gte": 272000
+         }
+        },
+        "price": 0.2,
+        "cache": {
+         "read": 0.02,
+         "write": {
+          "30m": 0.25
+         }
+        }
+       }
+      ]
+     },
+     "output": {
+      "price": 0,
+      "overrides": [
+       {
+        "when": {
+         "context": {
+          "gte": 272000
+         }
+        },
+        "price": 0
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/png",
+     "image/jpeg",
+     "image/webp",
+     "image/gif"
+    ],
+    "output": [
+     "decision"
+    ]
+   },
+   "api": {
+    "systemone": {
+     "base_url": "https://api.concentrate.ai/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/typesafe-ai",
+      "opencodeai": "@opencode/ai/providers/typesafe-ai/decisions"
+     }
+    }
+   },
+   "open_weights": false,
+   "knowledge": "2026-05-18",
+   "last_updated": "2026-09-22",
+   "recommended_api": "systemone"
+  },
   "gpt-6-sol": {
    "id": "gpt-6-sol",
    "name": "GPT-6 Sol",
@@ -7822,100 +7928,6 @@
    "open_weights": false,
    "knowledge": "2026-05",
    "last_updated": "2026-09-21",
-   "recommended_api": "responses"
-  },
-  "grok-build-0.1": {
-   "id": "grok-build-0.1",
-   "name": "Grok Build 0.1",
-   "description": "Fast Grok coding model tuned for agentic engineering and iterative edits",
-   "type": "chat",
-   "family": "grok-build",
-   "canonical_id": "xai/grok-build-0.1",
-   "release_date": "2026-04-16",
-   "limit": {
-    "context": 256000,
-    "output": 64000
-   },
-   "capabilities": {
-    "cache": {
-     "implicit": true
-    },
-    "temperature": true,
-    "top_k": true,
-    "top_p": true,
-    "structured_output": true,
-    "system_updates": false,
-    "effort_updates": false,
-    "tools": {
-     "supported": true
-    },
-    "reasoning": {
-     "supported": true
-    }
-   },
-   "cost": {
-    "text": {
-     "input": {
-      "price": 1,
-      "cache": {
-       "read": 0.2
-      },
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gte": 200000
-         }
-        },
-        "price": 2,
-        "cache": {
-         "read": 0.4
-        }
-       }
-      ]
-     },
-     "output": {
-      "price": 2,
-      "overrides": [
-       {
-        "when": {
-         "context": {
-          "gte": 200000
-         }
-        },
-        "price": 4
-       }
-      ]
-     }
-    }
-   },
-   "modalities": {
-    "input": [
-     "text",
-     "image/png",
-     "image/jpeg",
-     "image/webp"
-    ],
-    "output": [
-     "text"
-    ]
-   },
-   "api": {
-    "responses": {
-     "base_url": "https://api.concentrate.ai/v1",
-     "sdk": {
-      "aisdk": "@ai-sdk/openai",
-      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
-     },
-     "capabilities": {
-      "tools": {
-       "updates": []
-      }
-     }
-    }
-   },
-   "open_weights": false,
-   "last_updated": "2026-04-16",
    "recommended_api": "responses"
   },
   "hy3": {
@@ -9917,6 +9929,9 @@
     "output": 32000
    },
    "capabilities": {
+    "cache": {
+     "implicit": true
+    },
     "temperature": true,
     "top_k": true,
     "top_p": true,
@@ -9933,14 +9948,14 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.1
+      "price": 0.1,
+      "cache": {
+       "read": 0.01
+      }
      },
      "output": {
       "price": 0.1
      }
-    },
-    "web_search": {
-     "price": 30
     }
    },
    "modalities": {
@@ -9986,6 +10001,9 @@
     "output": 32000
    },
    "capabilities": {
+    "cache": {
+     "implicit": true
+    },
     "temperature": true,
     "top_k": true,
     "top_p": true,
@@ -10002,14 +10020,14 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.15
+      "price": 0.15,
+      "cache": {
+       "read": 0.015
+      }
      },
      "output": {
       "price": 0.15
      }
-    },
-    "web_search": {
-     "price": 30
     }
    },
    "modalities": {
@@ -10070,7 +10088,12 @@
      "supported": true
     },
     "reasoning": {
-     "supported": true
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "high"
+     ]
     }
    },
    "cost": {
@@ -10084,9 +10107,6 @@
      "output": {
       "price": 2.1
      }
-    },
-    "web_search": {
-     "price": 30
     }
    },
    "modalities": {
@@ -10094,7 +10114,8 @@
      "text",
      "image/png",
      "image/jpeg",
-     "image/webp"
+     "image/webp",
+     "application/pdf"
     ],
     "output": [
      "text"
@@ -10152,9 +10173,6 @@
      "output": {
       "price": 2
      }
-    },
-    "web_search": {
-     "price": 30
     }
    },
    "modalities": {
@@ -10222,9 +10240,6 @@
      "output": {
       "price": 2
      }
-    },
-    "web_search": {
-     "price": 30
     }
    },
    "modalities": {
@@ -10356,9 +10371,6 @@
      "output": {
       "price": 0.3
      }
-    },
-    "web_search": {
-     "price": 30
     }
    },
    "modalities": {

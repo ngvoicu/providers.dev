@@ -9053,7 +9053,7 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.047,
+      "price": 0.0456,
       "cache": {
        "read": 0.035
       }
@@ -9284,13 +9284,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.888188,
+      "price": 0.75726,
       "cache": {
-       "read": 0.2
+       "read": 0.21
       }
      },
      "output": {
-      "price": 1.5082
+      "price": 1.5004
      }
     }
    },
@@ -9514,13 +9514,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.14,
+      "price": 0.0507,
       "cache": {
-       "read": 0.0042
+       "read": 0.001014
       }
      },
      "output": {
-      "price": 0.42
+      "price": 0.2028
      }
     }
    },
@@ -18257,13 +18257,16 @@
    "description": "Reasoning model for deliberate analysis, multi-step problem solving, and tool use",
    "type": "chat",
    "family": "ling-tiny",
-   "release_date": "2026-08-06",
+   "canonical_id": "inclusionai/ling-3.0-tiny",
+   "release_date": "2026-08-07",
    "limit": {
     "context": 262144,
     "output": 250000
    },
    "capabilities": {
     "temperature": true,
+    "top_k": true,
+    "top_p": true,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -18353,7 +18356,7 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2026-08-06",
+   "last_updated": "2026-08-07",
    "recommended_api": "chat-completions"
   },
   "inclusionai/ling-3.1-flash": {
@@ -18471,13 +18474,16 @@
    "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
    "type": "chat",
    "family": "ling-flash-free",
-   "release_date": "2026-11-13",
+   "canonical_id": "inclusionai/ling-3.2-flash",
+   "release_date": "2026-11-05",
    "limit": {
     "context": 1048576,
     "output": 262144
    },
    "capabilities": {
     "temperature": true,
+    "top_k": true,
+    "top_p": true,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -18564,8 +18570,117 @@
      }
     }
    },
+   "open_weights": false,
+   "last_updated": "2026-11-05",
+   "recommended_api": "chat-completions"
+  },
+  "inclusionai/lingsante-3.1-air-vl": {
+   "id": "inclusionai/lingsante-3.1-air-vl",
+   "name": "LingSante 3.1 Air VL",
+   "description": "Multimodal reasoning model for visual analysis, planning, and tool use",
+   "type": "chat",
+   "family": "lingsante",
+   "canonical_id": "inclusionai/lingsante-3.1-air-vl",
+   "release_date": "2026-11-19",
+   "limit": {
+    "context": 131072,
+    "output": 32768
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "toggle": true
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.06,
+      "cache": {
+       "read": 0.012
+      }
+     },
+     "output": {
+      "price": 0.18
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@openrouter/ai-sdk-provider",
+      "opencodeai": "@opencode/ai/providers/openrouter"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    }
+   },
    "open_weights": true,
-   "last_updated": "2026-11-13",
+   "last_updated": "2026-11-19",
    "recommended_api": "chat-completions"
   },
   "inference-net/schematron-v2-small": {
@@ -26252,6 +26367,215 @@
    "open_weights": true,
    "last_updated": "2026-11-03",
    "recommended_api": "transcriptions"
+  },
+  "moonshotai/kimi-k2": {
+   "id": "moonshotai/kimi-k2",
+   "name": "Kimi K2 0711",
+   "description": "Kimi model for long-context chat, coding, and agentic reasoning",
+   "type": "chat",
+   "family": "kimi",
+   "canonical_id": "moonshotai/kimi-k2",
+   "release_date": "2025-07-11",
+   "limit": {
+    "context": 131072,
+    "output": 98304
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.57
+     },
+     "output": {
+      "price": 2.3
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@openrouter/ai-sdk-provider",
+      "opencodeai": "@opencode/ai/providers/openrouter"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "knowledge": "2024-12-31",
+   "last_updated": "2025-07-11",
+   "recommended_api": "chat-completions"
+  },
+  "moonshotai/kimi-k2-0905": {
+   "id": "moonshotai/kimi-k2-0905",
+   "name": "Kimi K2 Instruct 0905",
+   "description": "Kimi model for long-context chat, coding, and agentic reasoning",
+   "type": "chat",
+   "family": "kimi",
+   "canonical_id": "moonshotai/kimi-k2-0905",
+   "release_date": "2025-09-05",
+   "limit": {
+    "context": 262144,
+    "output": 98304
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.6
+     },
+     "output": {
+      "price": 2.5
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@openrouter/ai-sdk-provider",
+      "opencodeai": "@opencode/ai/providers/openrouter"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "responses": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai",
+      "opencodeai": "@opencode/ai/providers/openai-compatible/responses"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    },
+    "messages": {
+     "base_url": "https://openrouter.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/anthropic",
+      "opencodeai": "@opencode/ai/providers/anthropic-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "choice": [
+        "auto",
+        "none",
+        "required",
+        "tool"
+       ],
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-09-05",
+   "recommended_api": "chat-completions"
   },
   "moonshotai/kimi-k2.5": {
    "id": "moonshotai/kimi-k2.5",
@@ -38950,7 +39274,7 @@
    "release_date": "2026-10-28",
    "limit": {
     "context": 1048576,
-    "output": 131072
+    "output": 943718
    },
    "capabilities": {
     "temperature": true,
@@ -39064,7 +39388,7 @@
    "release_date": "2026-10-28",
    "limit": {
     "context": 1048576,
-    "output": 131072
+    "output": 943718
    },
    "capabilities": {
     "temperature": true,
@@ -53771,14 +54095,17 @@
    "name": "MiMo-V2.6-Flash-MOPD",
    "description": "MiMo flash model for fast multimodal assistance and agent workflows",
    "type": "chat",
-   "family": "mimo",
-   "release_date": "2026-11-23",
+   "family": "mimo-flash",
+   "canonical_id": "xiaomi/mimo-v2.6-flash-mopd",
+   "release_date": "2026-09-27",
    "limit": {
     "context": 1048576,
     "output": 32768
    },
    "capabilities": {
     "temperature": true,
+    "top_k": true,
+    "top_p": true,
     "structured_output": true,
     "system_updates": false,
     "effort_updates": false,
@@ -53806,9 +54133,20 @@
    "modalities": {
     "input": [
      "text",
-     "image",
-     "video",
-     "audio"
+     "image/jpeg",
+     "image/png",
+     "image/gif",
+     "image/webp",
+     "image/bmp",
+     "audio/mpeg",
+     "audio/wav",
+     "audio/flac",
+     "audio/mp4",
+     "audio/ogg",
+     "video/mp4",
+     "video/quicktime",
+     "video/x-msvideo",
+     "video/x-ms-wmv"
     ],
     "output": [
      "text"
@@ -53871,7 +54209,7 @@
     }
    },
    "open_weights": true,
-   "last_updated": "2026-11-23",
+   "last_updated": "2026-09-27",
    "recommended_api": "chat-completions"
   },
   "xiaomi/mimo-v2.6-pro": {
@@ -54459,7 +54797,7 @@
    "canonical_id": "zhipuai/glm-4.6",
    "release_date": "2025-09-30",
    "limit": {
-    "context": 204800,
+    "context": 202752,
     "output": 131072
    },
    "capabilities": {
@@ -56823,7 +57161,7 @@
    "release_date": "2026-08-01",
    "limit": {
     "context": 1048576,
-    "output": 943718
+    "output": 131072
    },
    "capabilities": {
     "temperature": true,
@@ -56846,13 +57184,13 @@
    "cost": {
     "text": {
      "input": {
-      "price": 0.047,
+      "price": 0.04532,
       "cache": {
-       "read": 0.035
+       "read": 0.001442
       }
      },
      "output": {
-      "price": 0.3
+      "price": 0.13596
      }
     }
    },
