@@ -1032,7 +1032,9 @@ describe("entry pages", () => {
     expect(response.status).toBe(200);
     expect(response.headers.get("Content-Type")).toContain("text/html");
     const html = await response.text();
-    expect(html).toContain("<title>Model 4 (lab/model-4) at Provider 2 · providers.dev</title>");
+    // The id is the name after its lab's id, so the title leaves it out; the description keeps it in the entry's ref.
+    expect(html).toContain("<title>Model 4 at Provider 2 · providers.dev</title>");
+    expect(html).toContain("Model 4 at Provider 2 (provider-02/lab/model-4)");
     expect(html).toContain('<link rel="canonical" href="https://providers.dev/entries/provider-02/lab/model-4">');
     expect(html).toContain("context window 500,000 tokens");
     expect(html).toContain("<h1>Model 4</h1>");

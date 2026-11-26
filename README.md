@@ -975,8 +975,11 @@ redirected. HSTS is not set.
 - Titles and descriptions (`src/core/page-meta.ts`) are made from the API answer the page prints, and say no more than
   the page: "at least" where a value is a lower bound, "unknown" where no source states one (never 0), the API list
   price of another entry where a subscription shows one, "not all sources agree" where the page warns. An entry's
-  title is its name, the model id in brackets unless the id is the name in lower case with hyphens, and the provider;
-  `tests/seo-meta.test.ts` checks that no two entries, providers, models or documents of the build share a title or a
+  title is its name, the model id in brackets unless the id is the name written another way (case, and spaces,
+  hyphens, underscores, colons and slashes; a dot counts), and the provider, which comes before the id where the title
+  would pass 70 characters; a model's title leaves out its id on the same terms, also where the id is the name after
+  the lab's id. The two cache lifetimes are said as the tiles show them ("prompt cache lifetime unknown" where both
+  are unknown, "5 min (short), long lifetime unknown" where one is). `tests/seo-meta.test.ts` checks that no two entries, providers, models or documents of the build share a title or a
   description. The module owns the whole title, " · providers.dev" included: `<title>`, `og:title`, `twitter:title`
   and the page's name in its structured data are one string.
 - Structured data (`src/core/structured-data.ts`): JSON-LD in the page's head, from the same answer. The home page

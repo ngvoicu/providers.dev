@@ -10,7 +10,8 @@ import { sync } from "../scripts/lib/sync.ts";
 import { handleApi, modelsFor, type LoadedDeps } from "../src/core/api.ts";
 import type { Index, Summary } from "../src/core/entries.ts";
 import { MARK } from "../src/core/page-shell.ts";
-import { documentMeta, entryMeta, HOME_TITLE, modelMeta, providerMeta, type PageMeta } from "../src/core/page-meta.ts";
+import { cacheWords, documentMeta, entryMeta, entryTitle, HOME_TITLE, modelMeta, providerMeta, type PageMeta } from "../src/core/page-meta.ts";
+import type { SafeValue } from "../src/core/safe.ts";
 import { handlePage, type PageDeps } from "../src/core/pages.ts";
 import type { Meta } from "../src/core/schema.ts";
 import { depsFrom, fetchReturning, fixtureUpstream, ROOT, tempDataDir, writeAuthored } from "./helpers.ts";
@@ -132,6 +133,30 @@ describe("titles and descriptions", () => {
     expect(titles.size).toBe(paths.length);
   });
 
+  it("says the two cache lifetimes as a sentence, unknown as unknown and 0 as none", () => {
+    const life = (value: number | null, differ = false): SafeValue => ({ value, agreement: differ ? "differ" : "agree" }) as unknown as SafeValue;
+    expect(cacheWords(life(null), life(null))).toBe("prompt cache lifetime unknown");
+    expect(cacheWords(life(null, true), life(null, true))).toBe("prompt cache lifetime unknown (not all sources agree)");
+    expect(cacheWords(life(300), life(null))).toBe("prompt cache lifetime 5 min (short), long lifetime unknown");
+    expect(cacheWords(life(1500, true), life(null))).toBe("prompt cache lifetime 25 min (short, not all sources agree), long lifetime unknown");
+    expect(cacheWords(life(null), life(3600))).toBe("prompt cache lifetime 1 h (long), short lifetime unknown");
+    expect(cacheWords(life(0), life(null))).toBe("prompt cache lifetime none (short), long lifetime unknown");
+    expect(cacheWords(life(300), life(3600))).toBe("prompt cache lifetime 5 min (short) and 1 h (long)");
+    expect(cacheWords(life(0), life(14400))).toBe("prompt cache lifetime none (short) and 4 h (long)");
+    expect(cacheWords(life(3600), life(3600))).toBe("prompt cache lifetime 1 h, short and long");
+    expect(cacheWords(life(0), life(0))).toBe("prompt cache lifetime none, short and long");
+  });
+
+  it("leaves out an id that is the name written another way, and puts the provider before a long id", () => {
+    expect(entryTitle({ name: "Kimi K2.6", model: "moonshotai/Kimi-K2.6", canonical_id: "moonshotai/kimi-k2.6" }, "P")).toBe("Kimi K2.6 at P · providers.dev");
+    expect(entryTitle({ name: "GLM-5.2", model: "fireworks/glm-5.2", canonical_id: "zhipuai/glm-5.2" }, "P")).toBe("GLM-5.2 (fireworks/glm-5.2) at P · providers.dev");
+    expect(entryTitle({ name: "MiniMax-M2.5", model: "MiniMax-M2.5", canonical_id: null }, "P")).toBe("MiniMax-M2.5 at P · providers.dev");
+    expect(entryTitle({ name: "DeepSeek: DeepSeek V4", model: "deepseek/deepseek-v4", canonical_id: null }, "P")).toBe("DeepSeek: DeepSeek V4 at P · providers.dev");
+    expect(entryTitle({ name: "Gemini 3.8 Flash", model: "gemini-3-8-flash", canonical_id: "google/gemini-3.8-flash" }, "P")).toBe("Gemini 3.8 Flash (gemini-3-8-flash) at P · providers.dev");
+    expect(entryTitle({ name: "Nemotron 3 Super", model: "nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-BF16", canonical_id: "nvidia/nemotron-3-super" }, "Thinking Machines"))
+      .toBe("Nemotron 3 Super at Thinking Machines (nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-BF16) · providers.dev");
+  });
+
   it("keeps the qualifiers its page shows: at least, unknown, whose price, a warning; never measured", () => {
     for (const summary of deps.index.entries) checkEntry(summary, entryMeta(summary, "Provider"));
   });
@@ -178,6 +203,7 @@ function checkEntry(summary: Summary, meta: PageMeta): void {
   // An unknown price is never written as zero.
   if (summary.price_in === null || summary.price_out === null) expect(text).not.toMatch(/price \$/);
   expect(text).not.toMatch(/measured/i);
+  expect(text).not.toMatch(/unknown (short|long)\b/);
   expect(meta.title).toContain(summary.name);
 }
 

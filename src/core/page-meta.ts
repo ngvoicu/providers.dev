@@ -98,19 +98,52 @@ export function modelMeta(model: Pick<CanonicalModel, "id" | "name" | "entry_cou
     ? "maximum output unknown"
     : `maximum output ${model.max_output_min === model.max_output_max ? exact(model.max_output_min) : `${exact(model.max_output_min)} to ${exact(model.max_output_max)}`} tokens`;
   const count = `${entries(model.entry_count)}${model.subscription_entry_count > 0 ? ` (${exact(model.subscription_entry_count)} by subscription)` : ""}`;
+  // The id in brackets unless it is the name, with the lab's id before it ("zhipuai/glm-5.3" of "GLM-5.3"), or the name
+  // written another way (spelledAs): then it tells a reader nothing the name does not.
+  const slug = model.id.slice(model.id.indexOf("/") + 1);
+  const named = spelledAs(model.name, slug) || spelledAs(model.name, model.id) ? model.name : `${model.name} (${model.id})`;
   return {
-    title: full(`${model.name} (${model.id}) across providers`),
+    title: full(`${named} across providers`),
     description: `${model.name} (${model.id}) at ${count} across providers and access methods: ${window}, ${output}.`,
   };
 }
 
 /**
- * An entry's name in its title: the name, and the model id in brackets unless the id is the name written in lower case
- * with hyphens for spaces. Two entries of one provider with one name have different ids, and at most one of them is
- * that form, so the title tells them apart.
+ * Whether an id is a name written another way: the same once both are in lower case with each run of spaces, hyphens,
+ * underscores, colons and slashes as one hyphen ("Qwen3.5 27B" and "Qwen3.5-27B", "DeepSeek: DeepSeek V4" and
+ * "deepseek/deepseek-v4", "GLM-5.3 Fast" and "glm-5.3:fast"). A dot counts: "gemini-3-8-flash" is not "Gemini 3.8 Flash",
+ * and one provider has both ids.
  */
-export function entryName(summary: Pick<Summary, "name" | "model">): string {
-  return summary.model === summary.name.toLowerCase().replace(/\s+/g, "-") ? summary.name : `${summary.name} (${summary.model})`;
+const spelling = (text: string): string => text.toLowerCase().replace(/[\s_:/-]+/g, "-");
+const spelledAs = (name: string, id: string): boolean => spelling(name) === spelling(id);
+
+/** Over this length a title shows the provider before a long id, so that what a search result shows names both. */
+const LONG_TITLE = 70;
+
+/**
+ * Whether an entry's model id says no more than its name: the name written another way (spelledAs), alone or after the
+ * id of the lab of its canonical model ("moonshotai/Kimi-K2.6" of "Kimi K2.6", canonical model moonshotai/kimi-k2.6).
+ * The id stays in the description, in the entry's ref. A route through another namespace keeps its id: "zai/glm-5.2"
+ * and "fireworks/glm-5.2" at one provider are told apart by it.
+ */
+function idInName(summary: Pick<Summary, "name" | "model" | "canonical_id">): boolean {
+  if (spelledAs(summary.name, summary.model)) return true;
+  const cut = summary.model.lastIndexOf("/");
+  if (cut < 0 || summary.canonical_id === null) return false;
+  const lab = summary.canonical_id.slice(0, summary.canonical_id.indexOf("/"));
+  return summary.model.slice(0, cut).toLowerCase() === lab.toLowerCase() && spelledAs(summary.name, summary.model.slice(cut + 1));
+}
+
+/**
+ * An entry's title: its name, the model id in brackets unless it says no more than the name (idInName), and the
+ * provider. Where that passes LONG_TITLE characters, the provider comes before the id. Two entries of one provider
+ * with one name have different ids, and the data has no two of them whose ids both say no more than their name:
+ * tests/seo-meta.test.ts holds every title of the build unique.
+ */
+export function entryTitle(summary: Pick<Summary, "name" | "model" | "canonical_id">, providerName: string): string {
+  if (idInName(summary)) return full(`${summary.name} at ${providerName}`);
+  const title = full(`${summary.name} (${summary.model}) at ${providerName}`);
+  return title.length > LONG_TITLE ? full(`${summary.name} at ${providerName} (${summary.model})`) : title;
 }
 
 const disagree = (safe: Pick<SafeValue, "agreement">): string => (safe.agreement === "differ" ? " (not all sources agree)" : "");
@@ -121,8 +154,23 @@ function tokens(safe: SafeValue): string {
   return `${safe.at_least ? "at least " : ""}${exact(safe.value)} tokens${disagree(safe)}`;
 }
 
-/** A lifetime as the tile prints it: "5 min", "None" (a lifetime of 0), "unknown". */
-const lifetime = (safe: SafeValue): string => `${safe.value === null ? "unknown" : lifetimeWords(safe.value).replace(/^None$/, "none")}${disagree(safe)}`;
+/** A known lifetime as the tile prints it: "5 min", "none" (a lifetime of 0). */
+const lifetime = (seconds: number): string => lifetimeWords(seconds).replace(/^None$/, "none");
+
+/**
+ * The two cache lifetimes as the tiles "Cache lifetime, short" and "Cache lifetime, long" show them, in a sentence:
+ * "prompt cache lifetime unknown" where both are, "prompt cache lifetime 5 min (short), long lifetime unknown" where
+ * one is, "prompt cache lifetime 5 min (short) and 1 h (long)", "prompt cache lifetime 1 h, short and long". A warning
+ * stays with the lifetime its tile warns on.
+ */
+export function cacheWords(short: SafeValue, long: SafeValue): string {
+  const warned = (safe: SafeValue, kind: string): string => (safe.agreement === "differ" ? ` (${kind}, not all sources agree)` : ` (${kind})`);
+  if (short.value === null && long.value === null) return `prompt cache lifetime unknown${disagree(short) || disagree(long)}`;
+  if (short.value === null) return `prompt cache lifetime ${lifetime(long.value!)}${warned(long, "long")}, short lifetime unknown${disagree(short)}`;
+  if (long.value === null) return `prompt cache lifetime ${lifetime(short.value)}${warned(short, "short")}, long lifetime unknown${disagree(long)}`;
+  if (short.value === long.value) return `prompt cache lifetime ${lifetime(short.value)}, short and long${disagree(short) || disagree(long)}`;
+  return `prompt cache lifetime ${lifetime(short.value)}${warned(short, "short")} and ${lifetime(long.value)}${warned(long, "long")}`;
+}
 
 /**
  * The price as the entry's tile shows it, in words; "" where the tile shows a rate of another kind (per image, per
@@ -149,10 +197,10 @@ export function entryMeta(summary: Summary, providerName: string): PageMeta {
     `context window ${tokens(safe.input_window)}`,
     `maximum output ${tokens(safe.max_output)}`,
     ...(price ? [price] : []),
-    `prompt cache lifetime ${lifetime(safe.cache_short)} short, ${lifetime(safe.cache_long)} long`,
+    cacheWords(safe.cache_short, safe.cache_long),
   ];
   return {
-    title: full(`${entryName(summary)} at ${providerName}`),
+    title: entryTitle(summary, providerName),
     description: `${summary.name} at ${providerName} (${summary.ref}), ${ACCESS_WORDS[summary.access]}: ${facts.join(", ")}.`,
   };
 }
