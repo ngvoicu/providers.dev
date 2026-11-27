@@ -1,7 +1,8 @@
 ---
 // pi-cache-keeper.providers.dev/ (served at the subdomain's root; see src/core/pi-cache-keeper-site.ts). Every
-// statement here is taken from pi-cache-keeper's README. The terminal pictures are its figures' sample sessions
-// (media/figures.html there), drawn as text: no real session.
+// statement here is taken from pi-cache-keeper's README as released (0.10.8), the commands from its "Commands"
+// section. The terminal pictures are its figures' sample sessions (media/figures.html there) and, for /cache-keeper,
+// the sample output in that section, drawn as text: no real session.
 import PiCacheKeeper from "../../layouts/PiCacheKeeper.astro";
 import { PI_CACHE_KEEPER_SITE } from "../../core/pi-cache-keeper-site.ts";
 import { productGraph } from "../../core/structured-data.ts";
@@ -70,18 +71,18 @@ const states: { caption: string; line: Part[] }[] = [
   { caption: "Expired", line: [["t-mut", "cache cold · next message full price"], dot, ...values()] },
   { caption: "A subscription login", line: [["", "cache warm · 59m left"], dot, ...values([["", "sub, counted at $3/$15"], ["t-dim", " per M"]])] },
   { caption: "Keep-warm on (2 h): the extension keeps the cache warm until 16:40 and has spent $0.36 of one cache miss", line: [["", "cache warm · 41m left"], dot, ["t-mut", "keep-warm 2h until 16:40, $0.36 spent of $2.07"], dot, ...values()] },
-  { caption: "Through a proxy: an API key answered for a login's values", line: [["", "cache warm · 59m left"], dot, ["t-warn", "⚠ answered by an API key"], dot, ...values()] },
+  { caption: "Through a proxy: an Anthropic API key answered for a login's values; the values follow what answered", line: [["", "cache warm · 59m left"], dot, ["t-warn", "⚠ answered by anthropic (API key)"], dot, ...values()] },
   { caption: "providers.dev could not be reached: Pi's own values", line: [["", "cache warm · 58m left"], dot, ["t-warn", "⚠ providers.dev: no data, fetch failed"], dot, ...values()] },
 ];
 const html = (parts: Part[]) => parts.map(([cls, text]) => (cls ? `<span class="${cls}">${text}</span>` : text)).join("");
 
 const commands: { name: string; text: string }[] = [
-  { name: "/cache-keeper", text: "Shows the cache right now, whether the next compaction would read it, the settings in effect, the model data in use, and this session's log." },
+  { name: "/cache-keeper", text: "Shows how long the prompt cache has left where that is known, whether the next compaction can read the cache, the settings and model data in use, and this session's latest log entries. Through a proxy it also names what answered last and, where providers.dev has no entry for that, the entry it looked up. Use it to see whether the cache is still warm, or what a <code>⚠</code> in the footer means." },
   { name: "/cache-keeper-settings", text: "Opens the settings menu on this session's settings, with the defaults for all sessions one step away." },
-  { name: "/cache-keeper-warm", text: "Starts keeping the cache warm again for the models that two refreshes in a row without a hit left to Pi's own warming." },
-  { name: "/cache-keeper-stop", text: "Stops keeping idle caches warm in every Pi window that uses the same settings, until the next message you send each window." },
-  { name: "/cache-keeper-refresh", text: "Fetches the model data from providers.dev now and puts it into Pi's <code>models.json</code>." },
-  { name: "/compact", text: "Pi's own command; it goes through the cached path too." },
+  { name: "/cache-keeper-warm", text: "Lets the extension warm a model's cache again after two refreshes in a row did not hit the cache and it left the model to Pi's own warming, as the footer then says. It sends nothing itself and does not turn keep-warm on." },
+  { name: "/cache-keeper-stop", text: "Before a long break: stops idle cache warming, the extension's and Pi's own, in every open Pi window that shares your <code>~/.pi/agent</code> and has loaded this version, until you next send that window a message. A refresh already on its way can still cost, and a stop can't be taken back." },
+  { name: "/cache-keeper-refresh", text: "Fetches the prices, input windows and cache lifetimes of your models from providers.dev again, now, and puts them into Pi's <code>models.json</code>. Not pi-provimux's <code>/provimux-refresh</code>, which reloads your gateway's model list." },
+  { name: "/compact", text: "Pi's own command; it goes through the extension too and reads the warm cache where it can." },
 ];
 
 const settings: { name: string; value: string; text: string }[] = [
@@ -289,7 +290,7 @@ const providers: { name: string; cached: string; countdown: string }[] = [
         <div class="pck-anatomy-line">
           <span class="pck-part"><code>cache warm · 59m left</code><span class="pck-part-label">The countdown</span></span>
           <span class="pck-part-sep" aria-hidden="true">·</span>
-          <span class="pck-part is-warn"><code>⚠ answered by an API key</code><span class="pck-part-label">What went wrong</span></span>
+          <span class="pck-part is-warn"><code>⚠ answered by anthropic (API key)</code><span class="pck-part-label">What went wrong</span></span>
           <span class="pck-part-sep" aria-hidden="true">·</span>
           <span class="pck-part is-values"><code>long 1h (in use) · short 5m · sent 1h · api $3/$15 per M</code><span class="pck-part-label">The values in use</span></span>
         </div>
@@ -347,25 +348,24 @@ const providers: { name: string; cached: string; countdown: string }[] = [
               </div>
             ))}
           </dl>
+          <p class="hint pck-commands-more"><a href={`${github}#commands`}>Every command in full</a>, with an example of each.</p>
         </div>
-        <figure class="pck-term" role="img" aria-label="The output of /cache-keeper for a sample session: the cache has 59 minutes left; the next compaction takes the cached path; compact when full at 90%, 900k of 1000k; no fallback compaction model; keep warm up to 4 h, set by this session; compact before expiry from 140k tokens; the model data from providers.dev; this session's settings; and this session's log: a compaction read 99% of 904k from the cache, and a refresh kept the cache warm after 57 idle minutes for $0.21 of the $2.36 one cache miss costs.">
+        <figure class="pck-term" role="img" aria-label="The output of /cache-keeper for a sample session on Claude Sonnet 4.6, a few seconds after an answer: the cache has 4 minutes left of its 5; the next compaction can read the cache as far as can be told now; compacting when full is off, so Pi's own automatic compaction applies; no fallback compaction model; keep warm while you are away for up to 2 h, within one cache miss, $0 spent so far of the $0.41 a miss costs; compact before expiry from 140k tokens; cache retention short; model data from providers.dev off; the default settings; the log file; and this session's latest log entry: a refresh kept the cache warm after 4 idle minutes for $0.036 of the $0.41 one cache miss costs.">
           <div class="pck-term-bar" aria-hidden="true"><span></span><span></span><span></span><em>pi · /cache-keeper</em></div>
           <div class="pck-term-body pck-term-small" aria-hidden="true">
-            <p class="t-line">pi-cache-keeper · anthropic/claude-opus-5-5</p>
-            <p class="t-line">cache: 59m left (lifetime 60 min, declared by the model)</p>
-            <p class="t-line">next compaction: cached path; last request 4 s ago with 185 messages, 1 since. The request prefix is checked when it runs.</p>
-            <p class="t-line">when full: at 90%: 900k of 1000k on anthropic/claude-opus-5-5, leaving 96k for the summary</p>
-            <p class="t-line">fallback compaction model: off: when the cache can't be read, Pi's compaction writes the summary on this session's model</p>
-            <p class="t-line">keep warm (this session): up to 4 h after Pi goes idle; stops once refreshing has cost as much as one cache miss; so far $0 spent, a miss costs $2.36</p>
-            <p class="t-line">before expiry: on, from 140k tokens of context · retention long</p>
-            <p class="t-line">model data: claude-subscription/claude-opus-5-5: window 1,000,000, short cache 1 h, long cache 1 h (https://providers.dev, checked 180 min ago; /cache-keeper-refresh fetches it again)</p>
-            <p class="t-line">settings: this session's own: keepWarmMinutes 4 h (default 2 h); every other follows the defaults · /cache-keeper-settings</p>
-            <p class="t-line">log: ~/.pi/agent/cache-keeper.jsonl</p>
-            <p class="t-line t-gap">This session:</p>
-            <p class="t-line">15:05:52 compact when full: cached, 99% of 904k from cache, 5k out, 41.6s, summary 9840 chars</p>
-            <p class="t-line t-indent">vs Pi's compaction: 75% less, $0.59 instead of ~$2.4 (it sends ~451k tokens, none from cache)</p>
-            <p class="t-line">15:06:34   saved, 903k tokens summarized</p>
-            <p class="t-line">16:36:52 kept the cache warm, idle 57 min: 99% of 411k from cache, 1 out, $0.21; $0.21 of $2.36 (one cache miss) spent</p>
+            <p class="t-line">pi-cache-keeper · anthropic/claude-sonnet-4-6</p>
+            <p class="t-line">cache: 4m left (lifetime 5 min, declared by the model)</p>
+            <p class="t-line">next compaction: from the cache, as far as can be told now; last request 4 s ago with 4 messages, 1 since. When it runs, it checks that its request begins with the same prefix as your last request, so the cache can be read.</p>
+            <p class="t-line">compact when full: off: this extension doesn't compact as the context fills; Pi's own automatic compaction, where it is on in Pi's settings, starts at its threshold (by default when the window is nearly full), often with too little room left to summarize from the cache</p>
+            <p class="t-line">fallback compaction model (asked to write the summary when the cache can't be used): off: when the cache can't be read, Pi's own compaction writes the summary on this session's model</p>
+            <p class="t-line">keep warm while you are away: re-sends your last request with a one-token answer shortly before the cache expires, for up to 2 h after Pi goes idle; sends a refresh only while the total so far plus its expected cost stays within one cache miss (writing the context again, less the cached read), so the last one can take the total past it; so far $0 spent, a miss costs $0.41</p>
+            <p class="t-line">compact before expiry: on, from 140k tokens of context: in the last 20 s before the cache expires, while Pi is idle with no message queued and the cache can be read, it starts a compaction from the still-warm cache; when that succeeds, your next message writes a summary and the recent messages again, not the whole session</p>
+            <p class="t-line">cache retention: short: Pi asks for its default cache (5 min on Anthropic's API)</p>
+            <p class="t-line">model data from providers.dev: off</p>
+            <p class="t-line">settings: the defaults (this session has none of its own) · change them with /cache-keeper-settings</p>
+            <p class="t-line">log file: ~/.pi/agent/cache-keeper.jsonl</p>
+            <p class="t-line t-gap">This session (its latest 12 entries in the log, at most):</p>
+            <p class="t-line">05:51:15 kept the cache warm, idle 4 min: 99% of 120k from cache, 1 out, $0.036; $0.036 of $0.41 (one cache miss) spent</p>
           </div>
           <figcaption class="pck-term-caption">A sample session.</figcaption>
         </figure>
@@ -489,7 +489,9 @@ const providers: { name: string; cached: string; countdown: string }[] = [
           <p>
             Through a proxy, one Pi provider serves models of many labs, and a model can come from a subscription login or an API key, whose caches can last differently: a
             Claude login keeps a cache for an hour, a Claude API key for 5 minutes by default. pi-cache-keeper knows no proxy. It asks over Pi's event bus,
-            and <a href="https://www.npmjs.com/package/pi-provimux">pi-provimux</a> answers for Provimux and CLIProxyAPI with where each model comes from.
+            and <a href="https://www.npmjs.com/package/pi-provimux">pi-provimux</a> answers for Provimux and CLIProxyAPI with where each model comes from and, with
+            Provimux, what answered. When that is not what the values are for, the footer names it, such as <code>⚠ answered by devin (login)</code>, the countdown
+            and the values follow it, and where providers.dev has no entry for it, <code>/cache-keeper</code> says which entry it looked up.
           </p>
         </div>
         <p class="pck-links">

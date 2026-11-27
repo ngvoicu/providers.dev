@@ -1049,8 +1049,9 @@ preview at the same time needs its own `--persist-to` folder).
 **pi-cache-keeper's site, `https://pi-cache-keeper.providers.dev`.** One static page, `/`, built the same way from
 `src/pages/pi-cache-keeper/` into `dist/pi-cache-keeper/`, with its own layout (`src/layouts/PiCacheKeeper.astro`),
 stylesheet (`src/styles/pi-cache-keeper.css`) and files (`public/pi-cache-keeper/`: icons, `og.png`, `robots.txt`,
-`sitemap.xml`). Its text is taken from pi-cache-keeper's README; its terminal pictures are that README's sample sessions,
-drawn as text. On that host the Worker serves `dist/pi-cache-keeper/` as the root and nothing else, by the same rules
+`sitemap.xml`). Its text is taken from pi-cache-keeper's README as released, its commands from that README's "Commands"
+section; its terminal pictures are that README's sample sessions and the sample output of `/cache-keeper` there, drawn as
+text. Provimux's site says what pi-provimux's commands do from pi-provimux's README in the same way. On that host the Worker serves `dist/pi-cache-keeper/` as the root and nothing else, by the same rules
 as Provimux's site (`src/core/pi-cache-keeper-site.ts`); on providers.dev anything under `/pi-cache-keeper/` gets a 301
 to the same path on the subdomain. Preview: `npx wrangler dev --port <port> --local-upstream pi-cache-keeper.providers.dev`.
 

@@ -140,7 +140,7 @@ const cropPicture = (crop: Crop, scheme: "light" | "dark") =>
 const cropPictures = (crop: Crop) => cropPicture(crop, "light") + cropPicture(crop, "dark");
 
 /**
- * pi's /model list with pi-provimux 105.0.7. Each line as pi 1.6.0's selector draws it (model-selector.js: the cursor
+ * pi's /model list with pi-provimux 105.0.8 (sourceLabel unchanged since 105.0.7). Each line as pi 1.6.0's selector draws it (model-selector.js: the cursor
  * "→ ", the current model's "✓ ", the id, the name in brackets, the provider): the name is the model's display name in
  * Provimux's model list, " · ", and where it comes from, as pi-provimux's sourceLabel (extensions/sources.ts) says it
  * for these accounts: the ones at the highest priority, joined by "or", then "fallback" and the others, highest first.
@@ -469,6 +469,9 @@ brew services start provimux</code></pre>
           <li><strong>Where each model comes from, in its name:</strong> <code>Claude Opus 5.5 · Anthropic sub, fallback api</code>. <code>sub</code> is a subscription login, <code>api</code> an API key. Accounts of the same priority are joined by <code>or</code>, and the others follow <code>fallback</code>, highest priority first.</li>
           <li><strong>Which route answered, in the footer,</strong> after each answer: <code>answered: Devin sub</code>. This needs Provimux 8.1.1-pmx.1 or newer.</li>
           <li><strong>Claude models in Claude's own format</strong> (<code>/v1/messages</code>) where it is safe: with Pi's long cache retention, that brings Anthropic's 1-hour prompt cache.</li>
+          <li><strong>Pi waits while you change the server:</strong> <code>/pause</code> holds each new request Pi sends, in every Pi window with pi-provimux, until <code>/continue</code>, and the footer says <code>paused · /continue</code> meanwhile.</li>
+          <li><strong>Quicker answers when you want them:</strong> <code>/fast</code> and <code>/ultrafast</code> turn a faster service tier on or off for the models whose server entry lists one, and say what they turned on or off and which tier they ask for. A faster tier can cost more.</li>
+          <li><strong>A model added on the server, in Pi without a restart:</strong> <code>/provimux-refresh</code> reloads the model list, with the accounts behind each model where the server lists them. <a href="https://github.com/ngvoicu/pi-provimux#commands">Every command, explained</a></li>
         </ul>
         <div class="pmx-code">
           <pre><code>pi install npm:pi-provimux</code></pre>
@@ -526,7 +529,7 @@ brew services start provimux</code></pre>
         <li><strong>Compacts when the context is full,</strong> and just before the cache expires when you step away, so your next message doesn't pay to write the whole session again.</li>
         <li><strong>Keeps the cache warm through a break,</strong> for up to as long as you choose, and stops once refreshing has cost as much as one cache miss. Off until you set it.</li>
         <li><strong>Model data from providers.dev:</strong> one safe value per quantity (input window, output limit, cache lifetimes and prices), measured values first.</li>
-        <li><strong>In the footer:</strong> how long the cache stays warm, the cache lifetimes and the one in use, the price, and what went wrong, such as <code>⚠ answered by an API key</code>.</li>
+        <li><strong>In the footer:</strong> how long the cache stays warm, the cache lifetimes and the one in use, the price, and what went wrong, such as <code>⚠ answered by anthropic (API key)</code>.</li>
       </ul>
       <div class="pmx-keeper-install">
         <div class="pmx-code">

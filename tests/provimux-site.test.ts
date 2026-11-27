@@ -182,6 +182,16 @@ describe("Provimux's pages", () => {
     ]) expect(text, words).toContain(words);
   });
 
+  it("says what pi-provimux 105.0.8 and pi-cache-keeper 0.10.8 show: the pause in the footer, commands that say what they did, what answered by name", () => {
+    for (const words of [
+      "<code>/pause</code> holds each new request Pi sends, in every Pi window with pi-provimux, until <code>/continue</code>, and the footer says <code>paused · /continue</code> meanwhile.",
+      "<code>/fast</code> and <code>/ultrafast</code> turn a faster service tier on or off", "and say what they turned on or off and which tier they ask for.",
+      "<code>/provimux-refresh</code> reloads the model list", "https://github.com/ngvoicu/pi-provimux#commands",
+      "such as <code>⚠ answered by anthropic (API key)</code>",
+    ]) expect(text, words).toContain(words);
+    expect(text).not.toContain("answered by an API key");
+  });
+
   it("keeps to Provimux's public wording: CLIProxyAPI in full, no promises about logins, no other e-mail, no local paths", () => {
     // "CPA" only inside a header name such as X-CPA-AUTH-KIND.
     expect(text.replace(/X-CPA-[A-Z-]+/g, "")).not.toMatch(/\bCPA\b/);

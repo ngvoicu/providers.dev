@@ -162,6 +162,25 @@ describe("pi-cache-keeper's page", () => {
     expect(layout.replace(/\s+/g, " ")).toContain("It is based on <a href=\"https://github.com/nicobailon/pi-cached-compaction\" class=\"underline\">pi-cached-compaction</a> by Nico Bailon.");
   });
 
+  it("says what 0.10.8 says: what answered through a proxy, by name, and every command in plain words", () => {
+    for (const words of [
+      "⚠ answered by anthropic (API key)", "Through a proxy: an Anthropic API key answered for a login's values; the values follow what answered",
+      "⚠ answered by devin (login)", "where providers.dev has no entry for it, <code>/cache-keeper</code> says which entry it looked up.",
+      "Through a proxy it also names what answered last and, where providers.dev has no entry for that, the entry it looked up.",
+      "It sends nothing itself and does not turn keep-warm on.", "A refresh already on its way can still cost, and a stop can't be taken back.",
+      "Not pi-provimux's <code>/provimux-refresh</code>, which reloads your gateway's model list.", "#commands`}>Every command in full</a>",
+      // /cache-keeper's sample output is the README's, with 0.10.8's lines.
+      "next compaction: from the cache, as far as can be told now;", "compact when full: off:", "fallback compaction model (asked to write the summary when the cache can't be used): off:",
+      "keep warm while you are away: re-sends your last request", "compact before expiry: on, from 140k tokens of context:", "cache retention: short:",
+      "model data from providers.dev: off", "· change them with /cache-keeper-settings", "log file: ~/.pi/agent/cache-keeper.jsonl",
+      "This session (its latest 12 entries in the log, at most):",
+    ]) expect(text, words).toContain(words);
+    // 0.10.7's wording is gone.
+    for (const words of ["answered by an API key", "cached path", "The request prefix is checked when it runs.", "retention long</p>", "This session:</p>", "Starts keeping the cache warm again", "that uses the same settings"]) {
+      expect(text, words).not.toContain(words);
+    }
+  });
+
   it("shows sample sessions only, and keeps to the public wording: no other e-mail, no local paths, no promises", () => {
     expect(home.match(/A sample session\./g)).toHaveLength(2);
     for (const words of ["/Users/", "cheapest", "guaranteed", "always cheaper", "referral", "affiliate"]) expect(text.toLowerCase(), words).not.toContain(words.toLowerCase());
