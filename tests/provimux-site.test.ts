@@ -174,6 +174,14 @@ describe("Provimux's pages", () => {
     ]) expect(text, words).toContain(words);
   });
 
+  it("says what v8.1.7-pmx.3 added: the account marker on every answer, and a restart that lets answers finish", () => {
+    for (const words of [
+      "<code>X-Provimux-Account</code>", "<code>models.answered-by: false</code> turns it off", "Nothing is sent in Home mode.",
+      "<code>server.restart-drain-seconds</code> (0 to 30)", "for up to 25 seconds", "The Homebrew service allows 40 seconds to stop",
+      "<code>stop_grace_period: 40s</code>",
+    ]) expect(text, words).toContain(words);
+  });
+
   it("keeps to Provimux's public wording: CLIProxyAPI in full, no promises about logins, no other e-mail, no local paths", () => {
     // "CPA" only inside a header name such as X-CPA-AUTH-KIND.
     expect(text.replace(/X-CPA-[A-Z-]+/g, "")).not.toMatch(/\bCPA\b/);

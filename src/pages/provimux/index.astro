@@ -3,7 +3,10 @@
 // taken from Provimux's README (.github/README.md), pi-provimux's README or the provimux-ui release notes; the pools
 // section also from the console's own words (provimux-ui's Models page) and the routing it describes; "Your names"
 // (#only-your-names) from the README's "Serve only my names" and the Models page's switch; Savings from the README and
-// the console's Savings page; pi-cache-keeper from its README and its site (src/pages/pi-cache-keeper).
+// the console's Savings page; pi-cache-keeper from its README and its site (src/pages/pi-cache-keeper). The account
+// marker (X-Provimux-Account) and the restart wait from the README of v8.1.7-pmx.3 ("Which account answered",
+// "Restarts and upgrades") and that release's notes; CLIProxyAPI's side of the restart row from the same release's
+// commit (upstream waits only when shutdown-timeout is above 0, and its example config sets 0).
 import Provimux from "../../layouts/Provimux.astro";
 import { PROVIMUX_SITE } from "../../core/provimux-site.ts";
 import { productGraph } from "../../core/structured-data.ts";
@@ -59,7 +62,7 @@ const groups: { title: string; promise: string; rows: Row[] }[] = [
       {
         topic: "Which account answered",
         cpa: "A client behind the proxy sees one list of models and cannot tell which account it is using.",
-        pmx: "The model list names the accounts behind each model, highest priority first (<code>/v1/models?include=accounts</code>), and every response names the one that answered (<code>X-CPA-AUTH-KIND</code>, <code>X-CPA-AUTH-PROVIDER</code>, <code>X-CPA-AUTH-HOST</code>).",
+        pmx: "The model list names the accounts behind each model, highest priority first (<code>/v1/models?include=accounts</code>), and every response names the one that answered (<code>X-CPA-AUTH-KIND</code>, <code>X-CPA-AUTH-PROVIDER</code>, <code>X-CPA-AUTH-HOST</code>). Each response also carries a marker of its account (<code>X-Provimux-Account</code>), the same as that account's marker in the list, so even two accounts of the same kind are told apart; no e-mail, key or file name can be read from it. On by default; <code>models.answered-by: false</code> turns it off. Nothing is sent in Home mode.",
       },
       {
         topic: "Each login's own model list",
@@ -80,6 +83,17 @@ const groups: { title: string; promise: string; rows: Row[] }[] = [
         topic: "The console",
         cpa: "The CLI Proxy API Management Center.",
         pmx: "provimux-ui: the same console in the providers.dev look, with Provimux's own pages Accounts, Models and Savings. Provimux downloads it and installs it only when it matches the release's checksums.",
+      },
+    ],
+  },
+  {
+    title: "Restarts",
+    promise: "A restart lets the answers being written finish.",
+    rows: [
+      {
+        topic: "A stop or restart",
+        cpa: "With <code>shutdown-timeout: 0</code>, as in its example config, a stop or restart cuts every answer still being written.",
+        pmx: "The HTTP answers in flight finish, for up to 25 seconds, before Provimux exits; with nothing in flight it exits at once. Existing installs get it with nothing to edit. <code>server.restart-drain-seconds</code> (0 to 30) sets the wait, and 0 turns it off. Not waited for: a Responses WebSocket turn and an answer through the AI Studio relay. The Homebrew service allows 40 seconds to stop; Docker needs a longer stop time (<a href=\"#other-ways\">Other ways</a>).",
       },
     ],
   },
@@ -276,7 +290,8 @@ const piList = `<span class="pmx-t-row pmx-t-dim">/model</span>` + piRows
           <pre><code><span class="pmx-t-dim">→ POST /v1/chat/completions</span>  <span class="pmx-t-dim">model:</span> <span class="pmx-t-sel">opus</span>
 <span class="pmx-t-dim">← 200 OK</span>
   X-CPA-AUTH-KIND: <span class="pmx-t-sub">oauth</span>
-  X-CPA-AUTH-PROVIDER: <span class="pmx-t-sub">devin</span></code></pre>
+  X-CPA-AUTH-PROVIDER: <span class="pmx-t-sub">devin</span>
+  X-Provimux-Account: <span class="pmx-t-sub">a.k3v7qz2m5xw4hn6tb2rc</span></code></pre>
           <p class="pmx-term-foot"><span class="pmx-t-dim">Pi footer</span> answered: <span class="pmx-t-sub">Devin sub</span></p>
           <figcaption class="sr-only">An example, not a real account.</figcaption>
         </figure>
@@ -410,7 +425,7 @@ brew services start provimux</code></pre>
           <section class="pmx-card" aria-labelledby="other-ways">
             <h3 id="other-ways">Other ways</h3>
             <ul>
-              <li><strong>Docker:</strong> <code>ghcr.io/ngvoicu/provimux</code>, linux/amd64 and linux/arm64, with CLIProxyAPI's paths: a CLIProxyAPI <code>docker-compose.yml</code> works with only the image name changed.</li>
+              <li><strong>Docker:</strong> <code>ghcr.io/ngvoicu/provimux</code>, linux/amd64 and linux/arm64, with CLIProxyAPI's paths: a CLIProxyAPI <code>docker-compose.yml</code> works with only the image name changed. Give it 40 seconds to stop (<code>stop_grace_period: 40s</code> in Compose, or <code>docker stop -t 40</code>), so a restart lets answers finish.</li>
               <li><strong>Release archives</strong> for macOS, Windows, Linux and FreeBSD, each release with its <code>checksums.txt</code>.</li>
               <li><strong>From source,</strong> with Go.</li>
             </ul>
