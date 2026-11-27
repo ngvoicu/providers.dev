@@ -13,7 +13,7 @@
   "antigravity": "Google Antigravity login"
  },
  "clients": {
-  "pi+cliproxyapi": "the pi coding agent through Provimux (CLIProxyAPI 8.0.53 before 22 November 2026): real sessions, resumed once (harness/probe.py)",
+  "pi+cliproxyapi": "the Pi coding agent through Provimux (CLIProxyAPI 8.0.53 before 22 November 2026): real sessions, resumed once (harness/probe.py until 22 November 2026; harness/agent_gateway.py from 27 November 2026, which records the account that answered)",
   "cliproxyapi": "plain HTTP requests through Provimux (CLIProxyAPI 8.0.53 before 22 November 2026) (the TypeScript probe)",
   "direct": "plain HTTP requests straight to the vendor (the TypeScript probe)",
   "codex-cli": "OpenAI's Codex CLI (harness/probe.py)",
@@ -1068,6 +1068,67 @@
    "last_warm_s": 3600,
    "first_all_cold_s": 3900,
    "note": "one Claude login (login A of two, priority -15, as CS1 - CS8), pinned by a temporary alias (probe/claude-fable-5-2) that no other login or API key serves. Served by build ngvoicu-local-a64b6855 (from 16:18:13 local); login A rose, the other Claude login and both Claude API keys stayed at 0",
+   "latest": true
+  },
+  {
+   "id": "agent-gateway-2026-11-27/F1",
+   "route": "claude-subscription",
+   "client": "pi+cliproxyapi",
+   "model": "claude-fable-5-2",
+   "models_dev": null,
+   "base_model": "anthropic/claude-fable-5-2",
+   "options": {
+    "reasoning": "low"
+   },
+   "date": "2026-11-27",
+   "source": "results/agent-gateway-2026-11-27/F1.jsonl",
+   "control": {
+    "warm": 1,
+    "total": 1
+   },
+   "checks": [
+    {
+     "age": "4m",
+     "age_s": 240,
+     "warm": 3,
+     "total": 3
+    },
+    {
+     "age": "6m",
+     "age_s": 360,
+     "warm": 3,
+     "total": 3
+    },
+    {
+     "age": "30m",
+     "age_s": 1800,
+     "warm": 3,
+     "total": 3
+    },
+    {
+     "age": "55m",
+     "age_s": 3300,
+     "warm": 3,
+     "total": 3
+    },
+    {
+     "age": "65m",
+     "age_s": 3900,
+     "warm": 0,
+     "total": 3
+    }
+   ],
+   "late_excluded": 0,
+   "all_warm_through_s": 3300,
+   "last_warm_s": 3300,
+   "first_all_cold_s": 3900,
+   "written_ttl": "1h",
+   "answered_by": [
+    "claude-login-1"
+   ],
+   "not_counted": 0,
+   "note": "Ages planned around the documented lifetimes (5 minutes, 1 hour), not from 2.5 minutes; 2 hours not checked because every 65-minute check was cold. Every cache write was a 1-hour one (Provimux asks for it on Claude logins). Pi 1.6.0 with pi-provimux 105.0.7 over SSE, cache warming off, through Provimux 8.1.7-pmx.3; each sample its own session and block, resumed once; a check counts only when one login of the intended kind answered its priming and itself (answered_by holds the labels of the gateway's account markers).",
+   "first_ages": "4 and 6 minutes, then 30, 55 and 65: on both sides of the documented 5-minute and 1-hour lifetimes",
    "latest": true
   },
   {
@@ -3900,6 +3961,94 @@
    "latest": true
   },
   {
+   "id": "agent-gateway-2026-11-27/A1",
+   "route": "codex-subscription",
+   "client": "pi+cliproxyapi",
+   "model": "gpt-6.2-astra",
+   "models_dev": null,
+   "base_model": "openai/gpt-6.2-astra",
+   "options": {
+    "reasoning": "low"
+   },
+   "date": "2026-11-27",
+   "source": "results/agent-gateway-2026-11-27/A1.jsonl",
+   "control": {
+    "warm": 0,
+    "total": 1
+   },
+   "checks": [],
+   "late_excluded": 0,
+   "all_warm_through_s": null,
+   "last_warm_s": null,
+   "first_all_cold_s": null,
+   "answered_by": [
+    "codex-login-1"
+   ],
+   "not_counted": 0,
+   "note": "The first control, cold at 30 seconds; the run ended there (the tool then had no second control) and A2 is its continuation in fresh sessions. Pi 1.6.0 with pi-provimux 105.0.7 over SSE, cache warming off, through Provimux 8.1.7-pmx.3; each sample its own session and block, resumed once; a check counts only when one login of the intended kind answered its priming and itself (answered_by holds the labels of the gateway's account markers).",
+   "latest": false
+  },
+  {
+   "id": "agent-gateway-2026-11-27/A2",
+   "route": "codex-subscription",
+   "client": "pi+cliproxyapi",
+   "model": "gpt-6.2-astra",
+   "models_dev": null,
+   "base_model": "openai/gpt-6.2-astra",
+   "options": {
+    "reasoning": "low"
+   },
+   "date": "2026-11-27",
+   "source": "results/agent-gateway-2026-11-27/A2.jsonl",
+   "control": {
+    "warm": 1,
+    "total": 2
+   },
+   "checks": [
+    {
+     "age": "25m",
+     "age_s": 1500,
+     "warm": 3,
+     "total": 3
+    },
+    {
+     "age": "35m",
+     "age_s": 2100,
+     "warm": 1,
+     "total": 3
+    },
+    {
+     "age": "55m",
+     "age_s": 3300,
+     "warm": 3,
+     "total": 3
+    },
+    {
+     "age": "65m",
+     "age_s": 3900,
+     "warm": 1,
+     "total": 3
+    },
+    {
+     "age": "2h",
+     "age_s": 7200,
+     "warm": 2,
+     "total": 3
+    }
+   ],
+   "late_excluded": 0,
+   "all_warm_through_s": 1500,
+   "last_warm_s": 7200,
+   "first_all_cold_s": null,
+   "answered_by": [
+    "codex-login-1"
+   ],
+   "not_counted": 0,
+   "note": "Continues A1, whose control was cold: its control counts here, so the chain's control is 1 of 2. Ages 25, 35, 55 and 65 minutes and 2 hours, around the documented 30 minutes; not from 2.5 minutes. Warm at random from 35 minutes on. Pi 1.6.0 with pi-provimux 105.0.7 over SSE, cache warming off, through Provimux 8.1.7-pmx.3; each sample its own session and block, resumed once; a check counts only when one login of the intended kind answered its priming and itself (answered_by holds the labels of the gateway's account markers).",
+   "continues": "agent-gateway-2026-11-27/A1",
+   "latest": true
+  },
+  {
    "id": "logins-gpt-6-2-2026-11-17/GS1",
    "route": "codex-subscription",
    "client": "cliproxyapi",
@@ -4065,6 +4214,138 @@
    "last_warm_s": 5400,
    "first_all_cold_s": 4500,
    "note": "27 of 51 timed checks warm: 3 of 3 at 2.5 minutes, 0 of 3 at 75 minutes, 1 of 3 at 90 minutes, all three cold from 2 hours through 12 hours.",
+   "latest": true
+  },
+  {
+   "id": "agent-gateway-2026-11-27/S1",
+   "route": "codex-subscription",
+   "client": "pi+cliproxyapi",
+   "model": "gpt-6.2-sol",
+   "models_dev": null,
+   "base_model": "openai/gpt-6.2-sol",
+   "options": {
+    "reasoning": "low"
+   },
+   "date": "2026-11-27",
+   "source": "results/agent-gateway-2026-11-27/S1.jsonl",
+   "control": {
+    "warm": 1,
+    "total": 1
+   },
+   "checks": [
+    {
+     "age": "25m",
+     "age_s": 1500,
+     "warm": 0,
+     "total": 3
+    },
+    {
+     "age": "35m",
+     "age_s": 2100,
+     "warm": 0,
+     "total": 3
+    },
+    {
+     "age": "55m",
+     "age_s": 3300,
+     "warm": 0,
+     "total": 3
+    },
+    {
+     "age": "65m",
+     "age_s": 3900,
+     "warm": 0,
+     "total": 3
+    }
+   ],
+   "late_excluded": 0,
+   "all_warm_through_s": null,
+   "last_warm_s": null,
+   "first_all_cold_s": 1500,
+   "answered_by": [
+    "codex-login-1"
+   ],
+   "not_counted": 0,
+   "note": "Cold at every age from 25 minutes; the 2-hour samples were primed and not checked (every 65-minute check was cold). Pi 1.6.0 with pi-provimux 105.0.7 over SSE, cache warming off, through Provimux 8.1.7-pmx.3; each sample its own session and block, resumed once; a check counts only when one login of the intended kind answered its priming and itself (answered_by holds the labels of the gateway's account markers).",
+   "first_ages": "25, 35, 55 and 65 minutes: around the documented 30 minutes; the younger ages are in S2, which continues this run",
+   "latest": false
+  },
+  {
+   "id": "agent-gateway-2026-11-27/S2",
+   "route": "codex-subscription",
+   "client": "pi+cliproxyapi",
+   "model": "gpt-6.2-sol",
+   "models_dev": null,
+   "base_model": "openai/gpt-6.2-sol",
+   "options": {
+    "reasoning": "low"
+   },
+   "date": "2026-11-27",
+   "source": "results/agent-gateway-2026-11-27/S2.jsonl",
+   "control": {
+    "warm": 2,
+    "total": 2
+   },
+   "checks": [
+    {
+     "age": "2.5m",
+     "age_s": 150,
+     "warm": 2,
+     "total": 3
+    },
+    {
+     "age": "5m",
+     "age_s": 300,
+     "warm": 1,
+     "total": 3
+    },
+    {
+     "age": "10m",
+     "age_s": 600,
+     "warm": 0,
+     "total": 3
+    },
+    {
+     "age": "15m",
+     "age_s": 900,
+     "warm": 0,
+     "total": 3
+    },
+    {
+     "age": "25m",
+     "age_s": 1500,
+     "warm": 0,
+     "total": 3
+    },
+    {
+     "age": "35m",
+     "age_s": 2100,
+     "warm": 0,
+     "total": 3
+    },
+    {
+     "age": "55m",
+     "age_s": 3300,
+     "warm": 0,
+     "total": 3
+    },
+    {
+     "age": "65m",
+     "age_s": 3900,
+     "warm": 0,
+     "total": 3
+    }
+   ],
+   "late_excluded": 0,
+   "all_warm_through_s": null,
+   "last_warm_s": 300,
+   "first_all_cold_s": 600,
+   "answered_by": [
+    "codex-login-1"
+   ],
+   "not_counted": 0,
+   "note": "Continues S1 with 2.5, 5, 10 and 15 minutes, started after S1 was cold at 25 minutes. Not all warm even at 2.5 minutes. Pi 1.6.0 with pi-provimux 105.0.7 over SSE, cache warming off, through Provimux 8.1.7-pmx.3; each sample its own session and block, resumed once; a check counts only when one login of the intended kind answered its priming and itself (answered_by holds the labels of the gateway's account markers).",
+   "continues": "agent-gateway-2026-11-27/S1",
    "latest": true
   },
   {
@@ -18606,6 +18887,10 @@
   {
    "id": "own-clients-2026-11-24/smoke/S3b",
    "reason": "own-client night 2026-11-24, audited (own-clients-2026-11-24/AUDIT.md): smoke run of the Devin CLI (gpt-6-1-terra-low), asking whether Devin still reports no cached token for that model: every read was zero and both 30-second controls were cold (no-observable-cache), the expected answer; no lifetime (raw file: results/own-clients-2026-11-24/smoke/S3b.jsonl)"
+  },
+  {
+   "id": "agent-gateway-2026-11-27/H1",
+   "reason": "gemini-4-hydrogen-low on the Antigravity login through Provimux: the first request (Pi's baseline) was refused with HTTP 429 RESOURCE_EXHAUSTED (a quota), and the run stopped at once, by its rule; nothing was measured (raw file: results/agent-gateway-2026-11-27/H1.jsonl)"
   }
  ]
 }
