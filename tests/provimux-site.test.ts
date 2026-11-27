@@ -182,6 +182,27 @@ describe("Provimux's pages", () => {
     ]) expect(text, words).toContain(words);
   });
 
+  it("says what v8.1.7-pmx.4 and provimux-ui v1.29.2-pmx.7 added, each where it belongs, and never that a conversation moves back by itself", () => {
+    for (const words of [
+      // Restarts: conversations keep their account.
+      "A restart lets the answers being written finish, and conversations keep their account.",
+      "After a restart or an upgrade, a conversation goes back to the account it was on, so the provider reads its prompt cache instead of writing it again.",
+      "On whenever session affinity is on (<code>routing.session-affinity: true</code>)",
+      // Cache: the second try on an overloaded provider, and sending a conversation back.
+      "Provimux waits about a second and tries the same account once more; only if that fails too does the request move down the list.",
+      "<code>routing.retry.same-account-retry: false</code> turns it off.",
+      "A client can see which account its conversation is bound to and release it, so that its next message goes to the first free account.",
+      // The console's Restarts page, in the comparison and in the console's list.
+      "Provimux's own pages Accounts, Models, Savings and Restarts.",
+      "<li><strong>Restarts.</strong> What a stop, a restart or an upgrade does to the answers in flight and the conversations under way",
+    ]) expect(text, words).toContain(words);
+    for (const words of ["automatically", "moves it back", "moved back", "goes back to the first", "back by itself", "returns on its own"]) {
+      expect(text.toLowerCase(), words).not.toContain(words);
+    }
+    // The section's pictures stay the released console's, with example data: no screen of the Restarts page.
+    expect(home).not.toContain("console-restarts");
+  });
+
   it("says what pi-provimux 105.0.8 and pi-cache-keeper 0.10.8 show: the pause in the footer, commands that say what they did, what answered by name", () => {
     for (const words of [
       "<code>/pause</code> holds each new request Pi sends, in every Pi window with pi-provimux, until <code>/continue</code>, and the footer says <code>paused · /continue</code> meanwhile.",

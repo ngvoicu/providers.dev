@@ -6,7 +6,11 @@
 // the console's Savings page; pi-cache-keeper from its README and its site (src/pages/pi-cache-keeper). The account
 // marker (X-Provimux-Account) and the restart wait from the README of v8.1.7-pmx.3 ("Which account answered",
 // "Restarts and upgrades") and that release's notes; CLIProxyAPI's side of the restart row from the same release's
-// commit (upstream waits only when shutdown-timeout is above 0, and its example config sets 0).
+// commit (upstream waits only when shutdown-timeout is above 0, and its example config sets 0). Conversations kept
+// across a restart, the second try on an overloaded provider and sending a conversation back from the README of
+// v8.1.7-pmx.4 ("Conversations keep their account across a restart", "An overloaded provider does not cost you your
+// first account", "Send a conversation back to your first account") and that release's notes; the console's Restarts
+// page from provimux-ui v1.29.2-pmx.7's release notes.
 import Provimux from "../../layouts/Provimux.astro";
 import { PROVIMUX_SITE } from "../../core/provimux-site.ts";
 import { productGraph } from "../../core/structured-data.ts";
@@ -53,6 +57,16 @@ const groups: { title: string; promise: string; rows: Row[] }[] = [
         cpa: "A client that sends its whole conversation again has it merged with the previous turn: the model sees the conversation twice, and the request is billed at about twice the input.",
         pmx: "The conversation is answered as it was sent, not merged.",
       },
+      {
+        topic: "An overloaded provider",
+        cpa: "When Anthropic's or OpenAI's own API says it is overloaded, the request moves straight to the next account in your order, which can be a paid API key.",
+        pmx: "Provimux waits about a second and tries the same account once more; only if that fails too does the request move down the list. On by default; <code>routing.retry.same-account-retry: false</code> turns it off.",
+      },
+      {
+        topic: "A conversation on a fallback account",
+        cpa: "With session affinity, a conversation that moved to another account while its first one cooled down stays there after the first is free again: a shorter prompt cache, or a paid key where you wanted your subscription.",
+        pmx: "A client can see which account its conversation is bound to and release it, so that its next message goes to the first free account. These requests need client keys (<code>access.api-keys</code>).",
+      },
     ],
   },
   {
@@ -82,18 +96,23 @@ const groups: { title: string; promise: string; rows: Row[] }[] = [
       {
         topic: "The console",
         cpa: "The CLI Proxy API Management Center.",
-        pmx: "provimux-ui: the same console in the providers.dev look, with Provimux's own pages Accounts, Models and Savings. Provimux downloads it and installs it only when it matches the release's checksums.",
+        pmx: "provimux-ui: the same console in the providers.dev look, with Provimux's own pages Accounts, Models, Savings and Restarts. Provimux downloads it and installs it only when it matches the release's checksums.",
       },
     ],
   },
   {
     title: "Restarts",
-    promise: "A restart lets the answers being written finish.",
+    promise: "A restart lets the answers being written finish, and conversations keep their account.",
     rows: [
       {
         topic: "A stop or restart",
         cpa: "With <code>shutdown-timeout: 0</code>, as in its example config, a stop or restart cuts every answer still being written.",
         pmx: "The HTTP answers in flight finish, for up to 25 seconds, before Provimux exits; with nothing in flight it exits at once. Existing installs get it with nothing to edit. <code>server.restart-drain-seconds</code> (0 to 30) sets the wait, and 0 turns it off. Not waited for: a Responses WebSocket turn and an answer through the AI Studio relay. The Homebrew service allows 40 seconds to stop; Docker needs a longer stop time (<a href=\"#other-ways\">Other ways</a>).",
+      },
+      {
+        topic: "Conversations after a restart",
+        cpa: "Session affinity keeps its bindings in memory only: a restart sends about half the conversations behind a name with two accounts to the other account, whose cache is cold.",
+        pmx: "After a restart or an upgrade, a conversation goes back to the account it was on, so the provider reads its prompt cache instead of writing it again. On whenever session affinity is on (<code>routing.session-affinity: true</code>), for conversations that send their own session id, as Pi, Claude Code and the Codex CLI do.",
       },
     ],
   },
@@ -342,6 +361,7 @@ const piList = `<span class="pmx-t-row pmx-t-dim">/model</span>` + piRows
         <li><strong>Accounts.</strong> Every subscription and API key on one page, one card per service, each with its state in one word (Working, Signed out, Cooling down), its priority, and the fix where one is needed.</li>
         <li><strong>Your names.</strong> Short names, and <a href="#pools">pools</a>: one name served by several accounts. Saved in one action.</li>
         <li><strong>Savings.</strong> Daily usage totals kept across restarts and estimated at public list prices: what prompt caching was worth, and what the paid keys cost. <a href="#savings">More below</a>.</li>
+        <li><strong>Restarts.</strong> What a stop, a restart or an upgrade does to the answers in flight and the conversations under way; there you set how long a stop waits and whether conversations keep their account.</li>
       </ul>
       <figure class="pmx-shot pmx-shot-wide">
         <div class="pmx-frame">
