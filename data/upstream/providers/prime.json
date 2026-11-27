@@ -2058,7 +2058,7 @@
    "release_date": "2024-12-06",
    "limit": {
     "context": 131072,
-    "output": 115200
+    "output": 32768
    },
    "capabilities": {
     "temperature": true,
@@ -4930,6 +4930,88 @@
   "qwen/qwen3.8-27b": {
    "id": "qwen/qwen3.8-27b",
    "name": "Qwen3.8 27B",
+   "description": "Dense 27B vision-language model for coding, agent tasks, and image and video understanding",
+   "type": "chat",
+   "family": "qwen",
+   "canonical_id": "alibaba/qwen3.8-27b",
+   "release_date": "2026-08-14",
+   "limit": {
+    "context": 262144,
+    "output": 65536
+   },
+   "capabilities": {
+    "temperature": true,
+    "top_k": true,
+    "top_p": true,
+    "structured_output": true,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": true
+    },
+    "reasoning": {
+     "supported": true,
+     "effort": [
+      "low",
+      "medium",
+      "xhigh"
+     ]
+    }
+   },
+   "cost": {
+    "text": {
+     "input": {
+      "price": 0.24,
+      "cache": {
+       "read": 0.05
+      }
+     },
+     "output": {
+      "price": 2.2
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/bmp",
+     "image/jpeg",
+     "image/png",
+     "image/tiff",
+     "image/webp",
+     "image/heic",
+     "video/mp4",
+     "video/x-msvideo",
+     "video/x-matroska",
+     "video/quicktime",
+     "video/x-flv",
+     "video/x-ms-wmv"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "chat-completions": {
+     "base_url": "https://api.pinference.ai/api/v1",
+     "sdk": {
+      "aisdk": "@ai-sdk/openai-compatible",
+      "opencodeai": "@opencode/ai/providers/openai-compatible"
+     },
+     "capabilities": {
+      "tools": {
+       "updates": []
+      }
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2026-08-14",
+   "recommended_api": "chat-completions"
+  },
+  "qwen/qwen3.8-27b-fast": {
+   "id": "qwen/qwen3.8-27b-fast",
+   "name": "Qwen3.8 27B (fast)",
    "description": "Dense 27B vision-language model for coding, agent tasks, and image and video understanding",
    "type": "chat",
    "family": "qwen",
