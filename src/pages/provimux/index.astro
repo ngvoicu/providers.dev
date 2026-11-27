@@ -414,37 +414,35 @@ brew services start provimux</code></pre>
             The config is <code>$(brew --prefix)/etc/provimux.conf</code>, created on the first install and never overwritten. Then open the console at <code>http://127.0.0.1:8317/management.html</code> on the same machine (from another machine, use the server's address) and sign in with your management key, <code>management.secret-key</code> in the config.
           </p>
         </div>
-        <div class="pmx-cards">
-          <section class="pmx-card" aria-labelledby="other-ways">
-            <h3 id="other-ways">Other ways</h3>
-            <ul>
-              <li><strong>Docker:</strong> <code>ghcr.io/ngvoicu/provimux</code>, linux/amd64 and linux/arm64. Give it 40 seconds to stop (<code>stop_grace_period: 40s</code> in Compose, or <code>docker stop -t 40</code>), so a restart lets answers finish.</li>
-              <li><strong>Release archives</strong> for macOS, Windows, Linux and FreeBSD, each release with its <code>checksums.txt</code>.</li>
-              <li><strong>From source,</strong> with Go.</li>
-            </ul>
-            <p><a href={`${github}#install`}>Every way, step by step</a></p>
-          </section>
-          <section class="pmx-card" aria-labelledby="for-a-team">
-            <h3 id="for-a-team">For a team</h3>
-            <p>
-              Run it on a server the team can reach and point everyone's tools at <code>http://&lt;your-server&gt;:8317</code>. Each person gets their own client key
-              under <code>access.api-keys</code>; removing it shuts out only that person. Outside a network you trust, serve HTTPS.
-            </p>
-            <p><a href={`${github}#for-a-team`}>Setting it up for a team</a></p>
-          </section>
-          <section class="pmx-card" aria-labelledby="your-accounts">
-            <h3 id="your-accounts">Your accounts</h3>
-            <p>
-              Add API keys under <code>api-keys</code>: <code>claude</code>, <code>codex</code> (OpenAI), <code>gemini</code>, <code>vertex</code>, <code>xai</code>, <code>meta</code>, and <code>openai-compatibility</code> for OpenRouter and other OpenAI-compatible services. For a company, use API keys and cloud accounts
-              (for example Vertex), billed to the company under its own agreement with the provider.
-            </p>
-            <p class="hint">
-              Provimux also accepts subscription logins (<code>oauth</code>) for your own account. Whether a provider allows a third-party tool to use its subscription
-              login is that provider's decision: Anthropic's terms do not allow it, and OpenAI has not authorized it. Read your provider's terms before you add a login;
-              the account is yours and so is the risk. Provimux is not affiliated with or endorsed by Anthropic or OpenAI.
-            </p>
-          </section>
-        </div>
+        <section class="pmx-card" aria-labelledby="other-ways">
+          <h3 id="other-ways">Other ways</h3>
+          <ul>
+            <li><strong>Docker:</strong> <code>ghcr.io/ngvoicu/provimux</code>, linux/amd64 and linux/arm64. Give it 40 seconds to stop (<code>stop_grace_period: 40s</code> in Compose, or <code>docker stop -t 40</code>), so a restart lets answers finish.</li>
+            <li><strong>Release archives</strong> for macOS, Windows, Linux and FreeBSD, each release with its <code>checksums.txt</code>.</li>
+            <li><strong>From source,</strong> with Go.</li>
+          </ul>
+          <p class="pmx-card-more"><a href={`${github}#install`}>Every way, step by step</a></p>
+        </section>
+        <section class="pmx-card" aria-labelledby="your-accounts">
+          <h3 id="your-accounts">Your accounts</h3>
+          <p>
+            Add API keys under <code>api-keys</code>: <code>claude</code>, <code>codex</code> (OpenAI), <code>gemini</code>, <code>vertex</code>, <code>xai</code>, <code>meta</code>, and <code>openai-compatibility</code> for OpenRouter and other OpenAI-compatible services. For a company, use API keys and cloud accounts
+            (for example Vertex), billed to the company under its own agreement with the provider.
+          </p>
+          <p class="hint">
+            Provimux also accepts subscription logins (<code>oauth</code>) for your own account. Whether a provider allows a third-party tool to use its subscription
+            login is that provider's decision: Anthropic's terms do not allow it, and OpenAI has not authorized it. Read your provider's terms before you add a login;
+            the account is yours and so is the risk. Provimux is not affiliated with or endorsed by Anthropic or OpenAI.
+          </p>
+        </section>
+        <section class="pmx-card" aria-labelledby="for-a-team">
+          <h3 id="for-a-team">For a team</h3>
+          <p>
+            Run it on a server the team can reach and point everyone's tools at <code>http://&lt;your-server&gt;:8317</code>. Each person gets their own client key
+            under <code>access.api-keys</code>; removing it shuts out only that person. Outside a network you trust, serve HTTPS.
+          </p>
+          <p class="pmx-card-more"><a href={`${github}#for-a-team`}>Setting it up for a team</a></p>
+        </section>
       </div>
     </div>
   </section>

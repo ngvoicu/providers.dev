@@ -603,25 +603,27 @@
     margin-top: 0.75rem;
   }
 
-  /* Install */
+  /* Install: the Homebrew commands beside the other ways to install; under them what comes next, accounts and a team */
   .pmx-install {
     display: grid;
-    gap: 1.75rem;
+    gap: 0.75rem;
     margin-top: 1.25rem;
+  }
+  .pmx-install-main {
+    margin-bottom: 1rem;
   }
   @media (min-width: 1000px) {
     .pmx-install {
       grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
-      align-items: start;
+      gap: 1.25rem 1.75rem;
+    }
+    .pmx-install-main {
+      margin-bottom: 0;
     }
   }
   .pmx-install-main > p {
-    margin: 0.9rem 0;
+    margin: 0.9rem 0 0;
     color: var(--fg-soft);
-  }
-  .pmx-install-main h3 {
-    margin: 1.75rem 0 0;
-    font-size: 1rem;
   }
   .pmx-code {
     position: relative;
@@ -635,11 +637,9 @@
     top: 0.65rem;
     right: 0.65rem;
   }
-  .pmx-cards {
-    display: grid;
-    gap: 0.75rem;
-  }
   .pmx-card {
+    display: flex;
+    flex-direction: column;
     padding: 1rem 1.15rem;
     border: 1px solid var(--line);
     border-radius: 12px;
@@ -662,6 +662,11 @@
   .pmx-card p + p,
   .pmx-card ul + p {
     margin-top: 0.6rem;
+  }
+  /* A card's link stands at its foot, so two cards of one row end on the same line */
+  .pmx-card .pmx-card-more {
+    margin-top: auto;
+    padding-top: 0.6rem;
   }
 
   /* pi: text beside an example of pi's model list, in a terminal that is dark in both themes */
