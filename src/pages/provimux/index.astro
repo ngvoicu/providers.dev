@@ -189,7 +189,7 @@ const piList = `<span class="pmx-t-row pmx-t-dim">/model</span>` + piRows
         <a class="button primary" href="#install">Install</a>
         <a class="button" href="#adds">What it adds</a>
       </div>
-      <p class="hint pmx-cta-note">macOS and Linux with Homebrew; Docker, release archives and source too. An existing CLIProxyAPI setup works as it is.</p>
+      <p class="hint pmx-cta-note">macOS and Linux with Homebrew; Docker, release archives and source too.</p>
 
       <figure class="pmx-shot pmx-shot-hero">
         <div class="pmx-frame">
@@ -206,7 +206,7 @@ const piList = `<span class="pmx-t-row pmx-t-dim">/model</span>` + piRows
         <h2 id="adds-title">What Provimux adds to CLIProxyAPI</h2>
         <p>
           Each Provimux release is a <a href={cliproxyapi}>CLIProxyAPI</a> release with Provimux's changes on top. It reads the same <code>config.yaml</code>, auth folder
-          (<code>~/.cli-proxy-api</code>) and port (8317), so an existing CLIProxyAPI setup works as it is: stop CLIProxyAPI and start Provimux in its place.
+          (<code>~/.cli-proxy-api</code>) and port (8317).
         </p>
       </header>
 
@@ -413,19 +413,12 @@ brew services start provimux</code></pre>
           <p>
             The config is <code>$(brew --prefix)/etc/provimux.conf</code>, created on the first install and never overwritten. Then open the console at <code>http://127.0.0.1:8317/management.html</code> on the same machine (from another machine, use the server's address) and sign in with your management key, <code>management.secret-key</code> in the config.
           </p>
-          <h3>Coming from CLIProxyAPI with Homebrew</h3>
-          <p>Stop its service (both listen on port 8317) and point Provimux at its config:</p>
-          <div class="pmx-code">
-            <pre><code>brew services stop cliproxyapi
-ln -sf "$(brew --prefix)/etc/cliproxyapi.conf" "$(brew --prefix)/etc/provimux.conf"
-brew services start provimux</code></pre>
-          </div>
         </div>
         <div class="pmx-cards">
           <section class="pmx-card" aria-labelledby="other-ways">
             <h3 id="other-ways">Other ways</h3>
             <ul>
-              <li><strong>Docker:</strong> <code>ghcr.io/ngvoicu/provimux</code>, linux/amd64 and linux/arm64, with CLIProxyAPI's paths: a CLIProxyAPI <code>docker-compose.yml</code> works with only the image name changed. Give it 40 seconds to stop (<code>stop_grace_period: 40s</code> in Compose, or <code>docker stop -t 40</code>), so a restart lets answers finish.</li>
+              <li><strong>Docker:</strong> <code>ghcr.io/ngvoicu/provimux</code>, linux/amd64 and linux/arm64. Give it 40 seconds to stop (<code>stop_grace_period: 40s</code> in Compose, or <code>docker stop -t 40</code>), so a restart lets answers finish.</li>
               <li><strong>Release archives</strong> for macOS, Windows, Linux and FreeBSD, each release with its <code>checksums.txt</code>.</li>
               <li><strong>From source,</strong> with Go.</li>
             </ul>

@@ -192,6 +192,19 @@ describe("Provimux's pages", () => {
     expect(text).not.toContain("answered by an API key");
   });
 
+  it("does not help to move from CLIProxyAPI or run the two side by side, and keeps the comparison and the credit", () => {
+    for (const words of [
+      "An existing CLIProxyAPI setup works as it is", "works as it is", "in its place", "Coming from CLIProxyAPI", "brew services stop cliproxyapi",
+      "cliproxyapi.conf", "docker-compose.yml", "with only the image name changed", "with CLIProxyAPI's paths",
+    ]) expect(text, words).not.toContain(words);
+    for (const words of [
+      'Open source (MIT) · built on <a href={cliproxyapi}>CLIProxyAPI</a>', "What Provimux adds to CLIProxyAPI",
+      "It reads the same <code>config.yaml</code>, auth folder (<code>~/.cli-proxy-api</code>) and port (8317).",
+      'aria-label="What CLIProxyAPI does, and what Provimux does instead"', "Everything else is CLIProxyAPI's.", "Built on CLIProxyAPI",
+      "<code>ghcr.io/ngvoicu/provimux</code>, linux/amd64 and linux/arm64.",
+    ]) expect(text, words).toContain(words);
+  });
+
   it("keeps to Provimux's public wording: CLIProxyAPI in full, no promises about logins, no other e-mail, no local paths", () => {
     // "CPA" only inside a header name such as X-CPA-AUTH-KIND.
     expect(text.replace(/X-CPA-[A-Z-]+/g, "")).not.toMatch(/\bCPA\b/);
