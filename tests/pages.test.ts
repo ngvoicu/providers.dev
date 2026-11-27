@@ -256,7 +256,7 @@ describe("API response boundary", () => {
       "<strong>A first reply, not a fix.</strong>", "Monday to Friday, 09:00 to 17:00 Central European Time (CET, and CEST in summer).",
       "Provimux is maintained by one person, working with AI agents.", "the unused part of what you paid is refunded, prorated. The code stays MIT",
       "Customers on a paid plan hear about a security fix before it is announced in public.",
-      "Setup and upgrades.", "A review of your configuration.", "Moving from CLIProxyAPI.", "Debugging.", "Priority on bugs.",
+      "Setup and upgrades.", "A review of your configuration.", "Debugging.", "Priority on bugs.",
       "providers.dev does not sell, pool, share or resell access to any model or account. You bring your own API keys or cloud accounts",
       'const email = "office@providers.dev";', "mailto:${email}?subject=", "bank transfer or by card (a Stripe invoice)", "a VAT-registered business in Romania", "reverse charge",
       'Or sponsor on GitHub: the Team and Business plans are also on <a href="https://github.com/sponsors/ngvoicu">GitHub Sponsors</a> as the $149 and $499 monthly tiers.',
