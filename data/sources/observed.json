@@ -7863,6 +7863,65 @@
    "latest": true
   },
   {
+   "id": "devin-swe-2-1-2026-11-27/W1",
+   "route": "devin",
+   "client": "pi+cliproxyapi",
+   "model": "swe-2-1",
+   "models_dev": null,
+   "base_model": null,
+   "options": {
+    "reasoning": "low"
+   },
+   "date": "2026-11-27",
+   "source": "results/devin-swe-2-1-2026-11-27/W1.jsonl",
+   "control": {
+    "warm": 1,
+    "total": 1
+   },
+   "checks": [
+    {
+     "age": "2.5m",
+     "age_s": 150,
+     "warm": 1,
+     "total": 3
+    },
+    {
+     "age": "5m",
+     "age_s": 300,
+     "warm": 1,
+     "total": 3
+    },
+    {
+     "age": "10m",
+     "age_s": 600,
+     "warm": 0,
+     "total": 3
+    },
+    {
+     "age": "30m",
+     "age_s": 1800,
+     "warm": 0,
+     "total": 3
+    },
+    {
+     "age": "1h",
+     "age_s": 3600,
+     "warm": 0,
+     "total": 3
+    }
+   ],
+   "late_excluded": 0,
+   "all_warm_through_s": null,
+   "last_warm_s": 300,
+   "first_all_cold_s": 600,
+   "answered_by": [
+    "devin-login-1"
+   ],
+   "not_counted": 0,
+   "note": "Served by the gateway as devin/swe-2-1, on the Devin login only; Devin's answers name devin/swe-2-1. Warm at random at 2.5 and 5 minutes (1 of 3 each), cold at every age from 10 minutes; 2 hours not checked because no 60-minute check was warm. Sent while the login's weekly quota was used up (other Devin models were refused): SWE-2.1 was answered. Pi 1.6.0 with pi-provimux 105.0.7 over SSE, cache warming off, through Provimux 8.1.7-pmx.4; each sample its own session and block, resumed once; a check counts only when one login of the intended kind answered its priming and itself (answered_by holds the labels of the gateway's account markers).",
+   "latest": true
+  },
+  {
    "id": "logins-2026-11-17/LM1",
    "route": "meta-subscription",
    "client": "cliproxyapi",
@@ -18382,6 +18441,17 @@
    "note": "no edge found: no request was refused at any size tried, and Devin lists 262,000. Both code words (one before the filler, one after it) came back at 20,493, 200,497 and 300,499 tokens, so the model read those inputs to the end. Requests of up to 930,487 tokens were accepted on 2026-11-13 (results/limits-2026-11-13) with no check that they were read, and a both-ends request then got no answer at 250K and 300K within 5 minutes: those sizes are not in the row",
    "date": "2026-11-16",
    "source": "results/limits-2026-11-16/swe-2-recall.jsonl"
+  },
+  {
+   "route": "devin",
+   "client": "cliproxyapi",
+   "model": "swe-2-1",
+   "models_dev": null,
+   "input_accepted": 282338,
+   "input_read": 282338,
+   "note": "no edge found: Devin lists 262,144 and the one request sent above it (282,220 tokens) was accepted; a both-ends request of the same filler (one code word before it, one after it) came back with both words at 282,338 tokens, so the model read that input to the end. No larger request was sent: the walk of results/limits-2026-11-16/devin_walk.py stops at an accepted request above the listed window",
+   "date": "2026-11-27",
+   "source": "results/devin-swe-2-1-2026-11-27/swe-2-1-limits.jsonl"
   },
   {
    "route": "meta-subscription",
