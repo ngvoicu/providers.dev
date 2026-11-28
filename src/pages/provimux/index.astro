@@ -13,7 +13,9 @@
 // page from provimux-ui v1.29.2-pmx.7's release notes. The entry on each answer, the figures in the model list and the
 // conversation that goes back by itself from the README of v8.1.7-pmx.5 ("Which model entry answered", "Prices and
 // cache lifetimes for your tools", "A conversation that fell back goes back by itself", "Requests to providers") and
-// that release's notes; the Routing page's card from provimux-ui v1.29.2-pmx.8's release notes.
+// that release's notes; the Routing page's card from provimux-ui v1.29.2-pmx.8's release notes. /provimux-route, the
+// figures pi-provimux hands on and pi-cache-keeper's footer from the READMEs and notes of pi-provimux 105.0.9 and
+// pi-cache-keeper 0.10.9.
 import Provimux from "../../layouts/Provimux.astro";
 import { PROVIMUX_SITE } from "../../core/provimux-site.ts";
 import { productGraph } from "../../core/structured-data.ts";
@@ -68,7 +70,7 @@ const groups: { title: string; promise: string; rows: Row[] }[] = [
       {
         topic: "A conversation on a fallback account",
         cpa: "With session affinity, a conversation that moved to another account while its first one cooled down stays there after the first is free again: a shorter prompt cache, or a paid key where you wanted your subscription.",
-        pmx: "A conversation that fell back can go back by itself: set <code>routing.session-affinity-return.cold-after</code> (for example <code>\"6m\"</code>, 6 minutes), and once no message of the conversation has been routed to an account for that long, its next message goes to the highest-priority account it may use. Set it to the longest cache lifetime of the accounts your conversations can fall to, plus a margin: within that time it never moves a conversation, and it sends nothing to any provider. Off until set; the console's Routing page sets it and shows whether it is in effect. A client can also see which account its conversation is bound to and release it, so that its next message goes to the first free account. These requests need client keys (<code>access.api-keys</code>).",
+        pmx: "A conversation that fell back can go back by itself: set <code>routing.session-affinity-return.cold-after</code> (for example <code>\"6m\"</code>, 6 minutes), and once no message of the conversation has been routed to an account for that long, its next message goes to the highest-priority account it may use. Set it to the longest cache lifetime of the accounts your conversations can fall to, plus a margin: within that time it never moves a conversation, and it sends nothing to any provider. Off until set; the console's Routing page sets it and shows whether it is in effect. A client can also see which account its conversation is bound to and release it, so that its next message goes to the first free account; in Pi, pi-provimux's <code>/provimux-route</code> does this and says what the move may cost first. These requests need client keys (<code>access.api-keys</code>).",
       },
     ],
   },
@@ -172,7 +174,7 @@ const cropPicture = (crop: Crop, scheme: "light" | "dark") =>
 const cropPictures = (crop: Crop) => cropPicture(crop, "light") + cropPicture(crop, "dark");
 
 /**
- * pi's /model list with pi-provimux 105.0.8 (sourceLabel unchanged since 105.0.7). Each line as pi 1.6.0's selector draws it (model-selector.js: the cursor
+ * pi's /model list with pi-provimux 105.0.9 (sourceLabel unchanged since 105.0.7). Each line as pi 1.6.0's selector draws it (model-selector.js: the cursor
  * "→ ", the current model's "✓ ", the id, the name in brackets, the provider): the name is the model's display name in
  * Provimux's model list, " · ", and where it comes from, as pi-provimux's sourceLabel (extensions/sources.ts) says it
  * for these accounts: the ones at the highest priority, joined by "or", then "fallback" and the others, highest first.
@@ -493,10 +495,12 @@ brew services start provimux</code></pre>
         <ul class="pmx-list">
           <li><strong>Where each model comes from, in its name:</strong> <code>Claude Opus 5.5 · Anthropic sub, fallback api</code>. <code>sub</code> is a subscription login, <code>api</code> an API key. Accounts of the same priority are joined by <code>or</code>, and the others follow <code>fallback</code>, highest priority first.</li>
           <li><strong>Which route answered, in the footer,</strong> after each answer: <code>answered: Devin sub</code>. This needs Provimux 8.1.1-pmx.1 or newer.</li>
+          <li><strong>The price and cache lifetimes of what really answered, for pi-cache-keeper:</strong> after a fallback, its footer (0.10.9 or newer) shows them for the account that answered, instead of unknown. pi-provimux reads the providers.dev entry each answer names and the server's prices and cache lifetimes for it, and hands them on; an answer with no entry has none, never a guess. This needs Provimux <span class="whitespace-nowrap">8.1.7-pmx.5</span> or newer.</li>
+          <li><strong>Back to your first account:</strong> <code>/provimux-route</code> shows which of your accounts this conversation is on, whether that is a fallback, and whether a higher-priority account is free again; the check sends nothing to a model and costs nothing. <code>/provimux-route release</code> moves the conversation back: it first says what the move may cost (the next message may read the whole conversation once without cache) and asks. This needs Provimux <span class="whitespace-nowrap">8.1.7-pmx.4</span> or newer, with session affinity on.</li>
           <li><strong>Claude models in Claude's own format</strong> (<code>/v1/messages</code>) where it is safe: with Pi's long cache retention, that brings Anthropic's 1-hour prompt cache.</li>
           <li><strong>Pi waits while you change the server:</strong> <code>/pause</code> holds each new request Pi sends, in every Pi window with pi-provimux, until <code>/continue</code>, and the footer says <code>paused · /continue</code> meanwhile.</li>
           <li><strong>Quicker answers when you want them:</strong> <code>/fast</code> and <code>/ultrafast</code> turn a faster service tier on or off for the models whose server entry lists one, and say what they turned on or off and which tier they ask for. A faster tier can cost more.</li>
-          <li><strong>A model added on the server, in Pi without a restart:</strong> <code>/provimux-refresh</code> reloads the model list, with the accounts behind each model where the server lists them. <a href="https://github.com/ngvoicu/pi-provimux#commands">Every command, explained</a></li>
+          <li><strong>A model added on the server, in Pi without a restart:</strong> <code>/provimux-refresh</code> reloads the model list, with the accounts behind each model where the server lists them, and the prices and cache lifetimes the server gives for what they answered. <a href="https://github.com/ngvoicu/pi-provimux#commands">Every command, explained</a></li>
         </ul>
         <div class="pmx-code">
           <pre><code>pi install npm:pi-provimux</code></pre>
@@ -541,12 +545,12 @@ brew services start provimux</code></pre>
         <li>
           <span class="pmx-fit-who">Provimux</span>
           <strong>Carries every account behind one key.</strong>
-          <span>And, through pi-provimux, tells Pi which accounts serve each model and which one answered.</span>
+          <span>And, through pi-provimux, tells Pi which accounts serve each model, which one answered, and the price and cache lifetimes of what answered.</span>
         </li>
         <li>
           <span class="pmx-fit-who">pi-cache-keeper</span>
           <strong>Acts on it in pi.</strong>
-          <span>It looks each model up as the account that serves it, so the countdown, keeping warm and compacting follow that account's cache; when another account answers, the footer says so and follows it.</span>
+          <span>It looks each model up as the account that serves it, so the countdown, keeping warm and compacting follow that account's cache; when another account answers, the footer says so and follows it. Through Provimux, it then shows that account's cache lifetimes and price.</span>
         </li>
       </ol>
       <ul class="pmx-list pmx-keeper-list">

@@ -191,7 +191,7 @@ describe("Provimux's pages", () => {
       // Cache: the second try on an overloaded provider, and sending a conversation back.
       "Provimux waits about a second and tries the same account once more; only if that fails too does the request move down the list.",
       "<code>routing.retry.same-account-retry: false</code> turns it off.",
-      "A client can also see which account its conversation is bound to and release it, so that its next message goes to the first free account.",
+      "A client can also see which account its conversation is bound to and release it, so that its next message goes to the first free account;",
       // The console's Restarts page, in the comparison and in the console's list.
       "Provimux's own pages Accounts, Models, Savings and Restarts.",
       "<li><strong>Restarts.</strong> What a stop, a restart or an upgrade does to the answers in flight and the conversations under way",
@@ -220,6 +220,21 @@ describe("Provimux's pages", () => {
     const rows = home.slice(home.indexOf("const groups"), home.indexOf("/** The console screenshots")).toLowerCase();
     for (const words of ["countdown", "keep warm", "keeps warm", "warm", "expires"]) expect(rows, words).not.toContain(words);
     expect(home).not.toContain("v8.1.2-pmx.1");
+  });
+
+  it("says what pi-provimux 105.0.9 and pi-cache-keeper 0.10.9 add: /provimux-route, and the figures of what answered handed on and shown", () => {
+    for (const words of [
+      "in Pi, pi-provimux's <code>/provimux-route</code> does this and says what the move may cost first.",
+      "<code>/provimux-route</code> shows which of your accounts this conversation is on",
+      "<code>/provimux-route release</code> moves the conversation back: it first says what the move may cost",
+      "with session affinity on.</li>",
+      "<strong>The price and cache lifetimes of what really answered, for pi-cache-keeper:</strong>",
+      "an answer with no entry has none, never a guess.",
+      "and the prices and cache lifetimes the server gives for what they answered.",
+      "which one answered, and the price and cache lifetimes of what answered.",
+      "Through Provimux, it then shows that account's cache lifetimes and price.",
+      "pi's /model list with pi-provimux 105.0.9",
+    ]) expect(text, words).toContain(words);
   });
 
   it("says what pi-provimux 105.0.8 and pi-cache-keeper 0.10.8 show: the pause in the footer, commands that say what they did, what answered by name", () => {
