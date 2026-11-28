@@ -1,6 +1,6 @@
 ---
 // pi-cache-keeper.providers.dev/ (served at the subdomain's root; see src/core/pi-cache-keeper-site.ts). Every
-// statement here is taken from pi-cache-keeper's README as released (0.10.8), the commands from its "Commands"
+// statement here is taken from pi-cache-keeper's README as released (0.10.9), the commands from its "Commands"
 // section. The terminal pictures are its figures' sample sessions (media/figures.html there) and, for /cache-keeper,
 // the sample output in that section, drawn as text: no real session.
 import PiCacheKeeper from "../../layouts/PiCacheKeeper.astro";
@@ -71,13 +71,13 @@ const states: { caption: string; line: Part[] }[] = [
   { caption: "Expired", line: [["t-mut", "cache cold · next message full price"], dot, ...values()] },
   { caption: "A subscription login", line: [["", "cache warm · 59m left"], dot, ...values([["", "sub, counted at $3/$15"], ["t-dim", " per M"]])] },
   { caption: "Keep-warm on (2 h): the extension keeps the cache warm until 16:40 and has spent $0.36 of one cache miss", line: [["", "cache warm · 41m left"], dot, ["t-mut", "keep-warm 2h until 16:40, $0.36 spent of $2.07"], dot, ...values()] },
-  { caption: "Through a proxy: an Anthropic API key answered for a login's values; the values follow what answered", line: [["", "cache warm · 59m left"], dot, ["t-warn", "⚠ answered by anthropic (API key)"], dot, ...values()] },
+  { caption: "Through a proxy: an Anthropic API key answered for a login's values; the values follow what answered (through Provimux, that account's own price and lifetimes)", line: [["", "cache warm · 59m left"], dot, ["t-warn", "⚠ answered by anthropic (API key)"], dot, ...values()] },
   { caption: "providers.dev could not be reached: Pi's own values", line: [["", "cache warm · 58m left"], dot, ["t-warn", "⚠ providers.dev: no data, fetch failed"], dot, ...values()] },
 ];
 const html = (parts: Part[]) => parts.map(([cls, text]) => (cls ? `<span class="${cls}">${text}</span>` : text)).join("");
 
 const commands: { name: string; text: string }[] = [
-  { name: "/cache-keeper", text: "Shows how long the prompt cache has left where that is known, whether the next compaction can read the cache, the settings and model data in use, and this session's latest log entries. Through a proxy it also names what answered last and, where providers.dev has no entry for that, the entry it looked up. Use it to see whether the cache is still warm, or what a <code>⚠</code> in the footer means." },
+  { name: "/cache-keeper", text: "Shows how long the prompt cache has left where that is known, whether the next compaction can read the cache, the settings and model data in use, and this session's latest log entries. Through a proxy it also names what answered last and, where providers.dev has no entry for that, the entry it looked up; through Provimux, also that answer's cache lifetimes and price, and where they come from. Use it to see whether the cache is still warm, or what a <code>⚠</code> in the footer means." },
   { name: "/cache-keeper-settings", text: "Opens the settings menu on this session's settings, with the defaults for all sessions one step away." },
   { name: "/cache-keeper-warm", text: "Lets the extension warm a model's cache again after two refreshes in a row did not hit the cache and it left the model to Pi's own warming, as the footer then says. It sends nothing itself and does not turn keep-warm on." },
   { name: "/cache-keeper-stop", text: "Before a long break: stops idle cache warming, the extension's and Pi's own, in every open Pi window that shares your <code>~/.pi/agent</code> and has loaded this version, until you next send that window a message. A refresh already on its way can still cost, and a stop can't be taken back." },
@@ -492,6 +492,11 @@ const providers: { name: string; cached: string; countdown: string }[] = [
             and <a href="https://www.npmjs.com/package/pi-provimux">pi-provimux</a> answers for Provimux and CLIProxyAPI with where each model comes from and, with
             Provimux, what answered. When that is not what the values are for, the footer names it, such as <code>⚠ answered by devin (login)</code>, the countdown
             and the values follow it, and where providers.dev has no entry for it, <code>/cache-keeper</code> says which entry it looked up.
+          </p>
+          <p>
+            After a fallback, the footer and <code>/cache-keeper</code> show the cache lifetimes and price of the account that really answered, where they used to say
+            unknown. From Provimux 8.1.7-pmx.5 on, each answer names its providers.dev entry, and pi-provimux 105.0.9 hands on Provimux's price and cache lifetimes for it;
+            an entry without them shows none, never a guess. This is display only: the countdown, keep-warm and what is written into <code>models.json</code> stay as they were.
           </p>
         </div>
         <p class="pck-links">

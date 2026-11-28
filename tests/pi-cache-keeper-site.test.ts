@@ -166,7 +166,7 @@ describe("pi-cache-keeper's page", () => {
     for (const words of [
       "⚠ answered by anthropic (API key)", "Through a proxy: an Anthropic API key answered for a login's values; the values follow what answered",
       "⚠ answered by devin (login)", "where providers.dev has no entry for it, <code>/cache-keeper</code> says which entry it looked up.",
-      "Through a proxy it also names what answered last and, where providers.dev has no entry for that, the entry it looked up.",
+      "Through a proxy it also names what answered last and, where providers.dev has no entry for that, the entry it looked up;",
       "It sends nothing itself and does not turn keep-warm on.", "A refresh already on its way can still cost, and a stop can't be taken back.",
       "Not pi-provimux's <code>/provimux-refresh</code>, which reloads your gateway's model list.", "#commands`}>Every command in full</a>",
       // /cache-keeper's sample output is the README's, with 0.10.8's lines.
@@ -179,6 +179,18 @@ describe("pi-cache-keeper's page", () => {
     for (const words of ["answered by an API key", "cached path", "The request prefix is checked when it runs.", "retention long</p>", "This session:</p>", "Starts keeping the cache warm again", "that uses the same settings"]) {
       expect(text, words).not.toContain(words);
     }
+  });
+
+  it("says what 0.10.9 adds: through Provimux, the price and cache lifetimes of what answered, display only", () => {
+    for (const words of [
+      "README as released (0.10.9)",
+      "the values follow what answered (through Provimux, that account's own price and lifetimes)",
+      "through Provimux, also that answer's cache lifetimes and price, and where they come from.",
+      "After a fallback, the footer and <code>/cache-keeper</code> show the cache lifetimes and price of the account that really answered, where they used to say unknown.",
+      "From Provimux 8.1.7-pmx.5 on, each answer names its providers.dev entry, and pi-provimux 105.0.9 hands on Provimux's price and cache lifetimes for it;",
+      "This is display only: the countdown, keep-warm and what is written into <code>models.json</code> stay as they were.",
+    ]) expect(text, words).toContain(words);
+    expect(text).not.toContain("README as released (0.10.8)");
   });
 
   it("shows sample sessions only, and keeps to the public wording: no other e-mail, no local paths, no promises", () => {
