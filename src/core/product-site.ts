@@ -12,10 +12,20 @@ export interface ProductSite {
   readonly notFound: string;
   /** Its pages, by address. */
   readonly pages: readonly string[];
+  /**
+   * Pages whose addresses the build's data gives (a page per run of a benchmark), by the shape of the address. Left
+   * out for a site whose pages are all listed. An address of such a shape with no page in the build is a missing one.
+   */
+  readonly families?: readonly RegExp[];
 }
 
-export function productSite(site: string, assets: string, pages: readonly string[]): ProductSite {
-  return { site, host: new URL(site).hostname, assets, notFound: `${assets}/not-found/`, pages };
+export function productSite(site: string, assets: string, pages: readonly string[], families?: readonly RegExp[]): ProductSite {
+  return { site, host: new URL(site).hostname, assets, notFound: `${assets}/not-found/`, pages, ...(families ? { families } : {}) };
+}
+
+/** Whether a path is the address of a page of the site: one it lists, or one of a shape its data gives. */
+export function isSitePage(site: ProductSite, path: string): boolean {
+  return site.pages.includes(path) || (site.families?.some((family) => family.test(path)) ?? false);
 }
 
 /**
@@ -26,8 +36,8 @@ export function productSite(site: string, assets: string, pages: readonly string
 export type SiteRoute = { asset: string; status: 200 | 404 } | { redirect: string };
 
 export function siteRoute(site: ProductSite, path: string): SiteRoute {
-  if (site.pages.includes(path)) return { asset: `${site.assets}${path}`, status: 200 };
-  if (site.pages.includes(`${path}/`)) return { redirect: `${path}/` };
+  if (isSitePage(site, path)) return { asset: `${site.assets}${path}`, status: 200 };
+  if (isSitePage(site, `${path}/`)) return { redirect: `${path}/` };
   if (path.startsWith("/_astro/")) return { asset: path, status: 200 };
   // A file of the site: an image, an icon, robots.txt, the sitemap. Never a folder, never a page of the build itself.
   if (/^\/[\w.-]+(\/[\w.-]+)*\.[a-z0-9]+$/i.test(path) && !path.includes("..") && !/\.html$/i.test(path)) return { asset: `${site.assets}${path}`, status: 200 };

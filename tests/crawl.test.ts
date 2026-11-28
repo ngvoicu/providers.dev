@@ -250,7 +250,7 @@ describe("sitemaps", () => {
 });
 
 describe("robots.txt", () => {
-  const hosts = [["providers.dev", "public/robots.txt"], ["provimux.providers.dev", "public/provimux/robots.txt"], ["pi-cache-keeper.providers.dev", "public/pi-cache-keeper/robots.txt"]] as const;
+  const hosts = [["providers.dev", "public/robots.txt"], ["provimux.providers.dev", "public/provimux/robots.txt"], ["pi-cache-keeper.providers.dev", "public/pi-cache-keeper/robots.txt"], ["teamvssolo.providers.dev", "public/teamvssolo/robots.txt"]] as const;
 
   it("allows every crawler everything, says the owner's content signals and names the host's sitemap, on every host", () => {
     for (const [host, file] of hosts) {

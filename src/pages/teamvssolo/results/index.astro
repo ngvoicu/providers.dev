@@ -1,0 +1,104 @@
+---
+// teamvssolo.providers.dev/results/: every setup beside itself across the tests, in one table of numbers, and the way
+// to each test's board and to every run. While there are no results it says that the first round is being played.
+import TeamVsSolo from "../../../layouts/TeamVsSolo.astro";
+import { cases, clock, MODE_NAME, suitePath, testName, usd, type BoardRow } from "../../../core/teamvssolo.ts";
+import { teamVsSoloBoards } from "../../../core/teamvssolo-data.ts";
+import { TEAMVSSOLO_SITE } from "../../../core/teamvssolo-site.ts";
+import { productPage } from "../../../core/structured-data.ts";
+
+const all = teamVsSoloBoards();
+const title = "Results · Team vs Solo";
+const description = all.length === 0
+  ? "The results of Team vs Solo: cases passed, price at list prices and time, for one model alone and for a chief with workers. The first round is being played; its results appear when it is complete."
+  : "Every setup of Team vs Solo across its tests: cases passed, price at list prices and time, for one model alone and for a chief with workers.";
+const jsonLd = productPage(TEAMVSSOLO_SITE, "/results/", { title, description }, [["Team vs Solo", `${TEAMVSSOLO_SITE}/`], ["Results", `${TEAMVSSOLO_SITE}/results/`]]);
+
+// One row a setup and mode, in the order of the first test's board; a setup a later test adds follows.
+const keys: string[] = [];
+const rowOf = new Map<string, BoardRow>();
+for (const board of all) for (const row of [...board.solos, ...board.teams]) if (!rowOf.has(row.key)) { keys.push(row.key); rowOf.set(row.key, row); }
+const solo = keys.filter((key) => rowOf.get(key)!.mode === "solo");
+const team = keys.filter((key) => rowOf.get(key)!.mode !== "solo");
+const cell = (key: string, suite: string): BoardRow | null => { const board = all.find((item) => item.suite === suite)!; return [...board.solos, ...board.teams].find((row) => row.key === key) ?? null; };
+const columns = 1 + all.length * 3;
+---
+
+<TeamVsSolo title={title} description={description} path="/results/" jsonLd={jsonLd} section="results">
+  <div class="tvs-page tvs-first">
+    <p class="crumbs"><a href="/">Team vs Solo</a> / Results</p>
+    {all.length === 0 ? (
+      <>
+        <h1>Results</h1>
+        <p class="tvs-answer">The first round is being played. Its results appear here when it is complete.</p>
+        <p class="tvs-links tvs-more">
+          <a class="button" href="/method/">How it is measured, and its limits</a>
+          <a class="button" href="/tests/">The tests</a>
+        </p>
+      </>
+    ) : (
+      <>
+        <h1>Every setup, on every test</h1>
+        <p class="tvs-lead">One row for each setup. Read across a row to see whether a setup that does well on one test does well on the other.</p>
+        <p class="tvs-run-head tvs-links">
+          {all.map((board) => <a class="button" href={suitePath(board.suite)}>{testName(board.suite)}: board and every run</a>)}
+        </p>
+        <div class="tvs-block">
+          <div class="tvs-data tvs-scroll">
+            <table class="tvs-table tvs-plain">
+              <caption>Cases passed, price and time of each setup</caption>
+              <thead>
+                <tr>
+                  <th scope="col" rowspan="2">Setup</th>
+                  {all.map((board) => <th scope="colgroup" colspan="3"><a href={suitePath(board.suite)}>{testName(board.suite)}</a></th>)}
+                </tr>
+                <tr>
+                  {all.map((board) => (
+                    <>
+                      <th scope="col">Passed<small>{board.checks.map((check) => `${check.label}${check.total === null ? "" : ` of ${cases(check.total)}`}`).join(", ")}</small></th>
+                      <th scope="col" class="num">Price</th>
+                      <th scope="col" class="num">Time</th>
+                    </>
+                  ))}
+                </tr>
+              </thead>
+              {([["One model alone", solo], ["A chief with workers", team]] as const).filter(([, list]) => list.length > 0).map(([name, list]) => (
+                <tbody>
+                  <tr class="tvs-group"><th colspan={columns} scope="colgroup">{name}</th></tr>
+                  {list.map((key) => {
+                    const row = rowOf.get(key)!;
+                    return (
+                      <tr>
+                        <th scope="row">
+                          {row.chief.short}{row.worker && ` with ${row.worker.short}`}
+                          <small>{MODE_NAME[row.mode]}. {row.worker ? `Chief: ${row.chief.how}. Workers: ${row.worker.how}.` : `${row.chief.how.charAt(0).toUpperCase()}${row.chief.how.slice(1)}.`}</small>
+                        </th>
+                        {all.map((board) => {
+                          const own = cell(key, board.suite);
+                          if (!own) return <td colspan="3" class="muted">Not run</td>;
+                          if (own.ranked.length === 0) return <td colspan="3"><span class="tvs-state not">Not ranked</span></td>;
+                          return (
+                            <>
+                              <td>{own.passed.map((passed) => (passed === null ? "Not known" : cases(passed))).join(", ")}<small>{own.ranked.length === 1 ? "1 run" : `middle of ${own.ranked.length} runs`}{own.best ? ", the best solo" : ""}</small></td>
+                              <td class="num">{own.usd === null ? "Not known" : usd(own.usd)}</td>
+                              <td class="num">{own.seconds === null ? "Not known" : clock(own.seconds)}</td>
+                            </>
+                          );
+                        })}
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              ))}
+            </table>
+          </div>
+          <div class="tvs-block">
+            <p class="tvs-answer-note">
+              Where a setup has several ranked runs, the table shows the middle one. A run that is not ranked is never counted. Prices are list prices; <a href="/method/#price">how the price is counted</a>.
+            </p>
+          </div>
+        </div>
+      </>
+    )}
+  </div>
+</TeamVsSolo>

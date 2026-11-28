@@ -1,0 +1,37 @@
+---
+// teamvssolo.providers.dev/tests/: the benchmark's tests, a paragraph each. What a test asks for and how it is scored,
+// in the benchmark's own published words: never a request's text, a check, or a file of a test.
+import TeamVsSolo from "../../../layouts/TeamVsSolo.astro";
+import { suitePath, testName, TESTS } from "../../../core/teamvssolo.ts";
+import { teamVsSoloBoards } from "../../../core/teamvssolo-data.ts";
+import { TEAMVSSOLO_SITE } from "../../../core/teamvssolo-site.ts";
+import { productPage } from "../../../core/structured-data.ts";
+
+const all = teamVsSoloBoards();
+const title = "The tests · Team vs Solo";
+const description = "The tests of Team vs Solo, a paragraph each: what a model is asked to build and how hidden checks score it. Tally, Conduit, Valkey and Ferry.";
+const jsonLd = productPage(TEAMVSSOLO_SITE, "/tests/", { title, description }, [["Team vs Solo", `${TEAMVSSOLO_SITE}/`], ["Tests", `${TEAMVSSOLO_SITE}/tests/`]]);
+---
+
+<TeamVsSolo title={title} description={description} path="/tests/" jsonLd={jsonLd} section="tests">
+  <div class="tvs-page tvs-first">
+    <p class="crumbs"><a href="/">Team vs Solo</a> / Tests</p>
+    <h1>The tests</h1>
+    <p class="tvs-lead">Each test is one written request for a piece of software. The model gets the request and the starting files. Checks it never sees then score what it built.</p>
+    <p class="tvs-sub">providers.dev keeps its requests and scoring checks private. <a href="/method/#public">What is public and what is not</a></p>
+    <div class="tvs-tests">
+      {TESTS.map((test) => {
+        const own = all.filter((board) => board.suite === test.name);
+        const runs = own.reduce((sum, board) => sum + board.runs, 0);
+        return (
+          <section class="tvs-test" id={test.name}>
+            <h2>{testName(test.name)}</h2>
+            <p class="line">{test.line}</p>
+            <p>{test.text}</p>
+            {runs > 0 && <p class="state"><a href={suitePath(test.name)}>{runs} runs on {testName(test.name)}</a></p>}
+          </section>
+        );
+      })}
+    </div>
+  </div>
+</TeamVsSolo>

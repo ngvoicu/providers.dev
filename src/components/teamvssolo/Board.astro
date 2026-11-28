@@ -1,0 +1,99 @@
+---
+// A test's board: every setup in a row, solos first, each group best first; the cases passed in each check, the price
+// and the time, each on its own scale. The bar is the middle run of the setup's ranked runs, a dot under it is one run, and
+// the line in every row of a column is the best solo's value. A table, so that it reads the same as text.
+import { cases, clock, MODE_NAME, runPath, singles, testName, usd, whyNotRanked, type Board, type BoardRow, type RunRecord } from "../../core/teamvssolo.ts";
+
+interface Props { board: Board }
+const { board } = Astro.props;
+const { best } = board;
+const columns = board.checks.length + 3;
+const percent = (value: number | null, of: number | null): number | null => (value === null || of === null || of <= 0 ? null : Math.max(0, Math.min(100, (value / of) * 100)));
+
+interface Measure { label: string; text: string; fill: number | null; rings: number[]; line: number | null; title: string }
+function measures(row: BoardRow): Measure[] {
+  const several = row.ranked.length > 1;
+  const of = (pick: (run: RunRecord) => number | null, max: number | null): number[] => (several ? row.ranked.flatMap((run) => percent(pick(run), max) ?? []) : []);
+  const each = (pick: (run: RunRecord) => number | null, say: (value: number) => string): string => (several ? `Each run: ${row.ranked.flatMap((run) => { const value = pick(run); return value === null ? [] : [say(value)]; }).join(", ")}` : "");
+  return [
+    ...board.checks.map((check, i) => {
+      const pick = (run: RunRecord): number | null => run.quality.checks?.find((item) => item.name === check.name)?.passed ?? null;
+      return { label: check.label, text: row.passed[i] == null ? "Not known" : cases(row.passed[i]!), fill: percent(row.passed[i] ?? null, check.total), rings: of(pick, check.total), line: best ? percent(best.passed[i] ?? null, check.total) : null, title: each(pick, cases) };
+    }),
+    { label: "Price", text: row.usd === null ? "Not known" : usd(row.usd), fill: percent(row.usd, board.maxUsd), rings: of((run) => run.cost.usd_at_list, board.maxUsd), line: best ? percent(best.usd, board.maxUsd) : null, title: each((run) => run.cost.usd_at_list, usd) },
+    { label: "Time", text: row.seconds === null ? "Not known" : clock(row.seconds), fill: percent(row.seconds, board.maxSeconds), rings: of((run) => run.time.wall_seconds, board.maxSeconds), line: best ? percent(best.seconds, board.maxSeconds) : null, title: each((run) => run.time.wall_seconds, clock) },
+  ];
+}
+const groups: [string, BoardRow[], string][] = [["One model alone", board.solos, "is-solo"], ["A chief with workers", board.teams, "is-team"]];
+const rows = board.solos.length + board.teams.length;
+const one = singles(board);
+let index = 0;
+---
+
+<figure class="tvs-board">
+  <div class="tvs-data">
+    <table class="tvs-table">
+      <caption>{testName(board.suite)}: every setup, best first</caption>
+      <colgroup><col class="setup" />{Array.from({ length: columns - 1 }, () => <col />)}</colgroup>
+      <thead>
+        <tr>
+          <th scope="col">Setup</th>
+          {board.checks.map((check) => <th scope="col">{check.label}{check.total !== null && <small>passed, of {cases(check.total)}</small>}</th>)}
+          <th scope="col">Price<small>at list prices</small></th>
+          <th scope="col">Time<small>start to end</small></th>
+        </tr>
+      </thead>
+      {groups.filter(([, list]) => list.length > 0).map(([title, list, kind]) => (
+        <tbody>
+          <tr class="tvs-group"><th colspan={columns} scope="colgroup">{title}</th></tr>
+          {list.map((row) => {
+            const at = index++;
+            return (
+              <tr class:list={["tvs-row", kind, { "tvs-unranked": row.ranked.length === 0 }]} style={`--row:${at}`}>
+                <th scope="row">
+                  <span class="tvs-setup-name">
+                    {row.chief.short}{row.worker && <><span class="plus"> with </span>{row.worker.short}</>}{row.best && <>{" "}<span class="tvs-best">Best solo</span></>}
+                  </span>
+                  <span class="tvs-setup-note">
+                    <span class:list={["tvs-mode", row.mode]}>{MODE_NAME[row.mode]}</span>{" "}
+                    {row.worker ? `Chief: ${row.chief.how}. Workers: ${row.worker.how}.` : `${row.chief.how.charAt(0).toUpperCase()}${row.chief.how.slice(1)}.`}
+                    {" "}{row.runs.length === 1 ? "Run" : "Runs"}{" "}
+                    {row.runs.map((run, i) => <>{i > 0 && ", "}<a href={runPath(run.id)} class={run.ranked ? undefined : "is-unranked"} title={run.ranked ? undefined : `Not ranked. ${whyNotRanked(run)}`}>{run.repeat.n}{!run.ranked && <span class="sr-only"> (not ranked)</span>}</a></>)}.
+                  </span>
+                </th>
+                {row.ranked.length === 0 ? (
+                  <td class="tvs-why" colspan={columns - 1}><strong>Not ranked.</strong> {whyNotRanked(row.runs[0]!)} <a href={runPath(row.runs[0]!.id)}>See the run</a></td>
+                ) : (
+                  measures(row).map((measure) => (
+                    <td class="tvs-measure" data-label={measure.label} title={measure.title || undefined}>
+                      <span class="tvs-value">{measure.text}</span>
+                      <span class:list={["tvs-bar", { "has-runs": measure.rings.length > 0 }]} aria-hidden="true">
+                        {measure.fill !== null && <i style={`width:${measure.fill.toFixed(2)}%`}></i>}
+                        {measure.rings.map((ring) => <u style={`left:${ring.toFixed(2)}%`}></u>)}
+                        {measure.line !== null && <s style={`left:${measure.line.toFixed(2)}%`}></s>}
+                      </span>
+                    </td>
+                  ))
+                )}
+              </tr>
+            );
+          })}
+        </tbody>
+      ))}
+    </table>
+  </div>
+  <figcaption>
+    <p class="tvs-key" aria-hidden="true">
+      <span><i class="solo"></i>One model alone</span>
+      <span><i></i>A chief with workers</span>
+      <span><i class="ring"></i>One run</span>
+      <span><i class="line"></i>The best solo</span>
+    </p>
+    <p>
+      A bar is the middle run of a setup's ranked runs, and each dot under it is one run. The line in each column is the best solo.
+      {" "}{one} of {rows} rows rest on a single run.
+      {" "}Runs started {board.from === board.to ? `on ${board.from}` : `from ${board.from} to ${board.to}`} (UTC){board.priceDays.length > 0 && `, priced at list prices fetched on ${board.priceDays.join(" and ")}`}.
+      {" "}Rows are in order of cases passed, the first check first; then the lower price.
+    </p>
+  </figcaption>
+</figure>

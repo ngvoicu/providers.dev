@@ -1,0 +1,127 @@
+---
+// teamvssolo.providers.dev/method/: how the benchmark works and what its numbers cannot say, in plain words. Every
+// statement is one the benchmark's own notes make about a run, its score, its price and its time; nothing of a test's
+// request or checks is here.
+import TeamVsSolo from "../../../layouts/TeamVsSolo.astro";
+import ModeFigure from "../../../components/teamvssolo/ModeFigure.astro";
+import { teamVsSoloBoards } from "../../../core/teamvssolo-data.ts";
+import { TEAMVSSOLO_SITE } from "../../../core/teamvssolo-site.ts";
+import { ORGANIZATION_ID, productPage } from "../../../core/structured-data.ts";
+
+const title = "Method and limits · Team vs Solo";
+const description = "How Team vs Solo works: what a run is, the three modes, how score, price and time are counted, which runs count, what stays private, and the limits of its numbers.";
+const [publisher, page, crumbs] = productPage(TEAMVSSOLO_SITE, "/method/", { title, description }, [["Team vs Solo", `${TEAMVSSOLO_SITE}/`], ["Method", `${TEAMVSSOLO_SITE}/method/`]]);
+const jsonLd = [publisher!, { ...page!, "@type": "TechArticle", headline: "Method and limits", author: { "@id": ORGANIZATION_ID } }, crumbs!];
+// How the pages count is said once there are pages of results to count.
+const published = teamVsSoloBoards().length > 0;
+const toc = [
+  ["run", "A run"],
+  ["modes", "The three modes"],
+  ["score", "Score"],
+  ["price", "Price"],
+  ["time", "Time"],
+  ["ranked", "Which runs count"],
+  ["honest", "Keeping the checks out of reach"],
+  ...(published ? [["pages", "How these pages count"] as const] : []),
+  ["public", "Public and private"],
+  ["limits", "Limits"],
+];
+---
+
+<TeamVsSolo title={title} description={description} path="/method/" jsonLd={jsonLd} section="method">
+  <div class="tvs-page tvs-first">
+    <p class="crumbs"><a href="/">Team vs Solo</a> / Method</p>
+    <h1>Method and limits</h1>
+    <p class="tvs-lead">Team vs Solo measures coding models at one job: building software from a written request. It gives the same request to one model alone and to a chief model with workers, and measures what the build passes, what the run cost and how long it took.</p>
+
+    <div class="tvs-doc">
+      <nav class="toc" aria-label="On this page">
+        <p>On this page</p>
+        {toc.map(([id, label]) => <a href={`#${id}`}>{label}</a>)}
+      </nav>
+      <div class="tvs-prose">
+        <h2 id="run">A run</h2>
+        <p>A run is one test, done once, by one setup, in one mode.</p>
+        <ul>
+          <li>A <strong>setup</strong> names the models, the effort each is set to, and the coding tool each one works in: Claude Code, Codex or Pi.</li>
+          <li>The model gets the written request and a copy of the starting files.</li>
+          <li>The models work in their usual coding tools, started as command-line programs. No other software sits between the benchmark and the tool.</li>
+          <li>The request asks the model to end with a fixed line when everything is done. If the model stops before that, it is answered and told to continue, up to twelve times.</li>
+          <li>There is no time limit. A run that changes no file of its project for 60 minutes is stopped. So is a run that reaches ten times the price expected of its setup. Neither is ranked.</li>
+        </ul>
+
+        <h2 id="modes">The three modes</h2>
+        <p>Every setup gets the same request. Only who does the work changes, and how they talk.</p>
+        <ModeFigure />
+        <p>In a team, the chief gets a command to give a task to a worker, to wait for reports and to read them. In active mode it can also answer a worker, send it a message while it works, or stop it. A worker in active mode can ask and wait for the answer, or send a note and go on.</p>
+        <p>In delegation, a worker that asks a question gets one fixed line back, and the chief never sees the question. A setup names how many workers may work at once.</p>
+        <p>A team that does not keep to its mode is void and is not counted.</p>
+
+        <h2 id="score">Score</h2>
+        <p>The score is the number of cases a build passes. It is counted after the run has ended, by checks the model never saw.</p>
+        <ul>
+          <li>A test can have more than one check. Their scores are shown side by side and never added up.</li>
+          <li>Some checks also count their cases by part.</li>
+          <li>A check must judge every one of its cases. If the scoring itself breaks, the check gets no number and the run is not ranked.</li>
+        </ul>
+
+        <h2 id="price">Price</h2>
+        <p>The price is the tokens counted for the run at list prices. It is not what was paid.</p>
+        <ul>
+          <li>A team's price is the chief's plus the workers', and a reviewer's where the setup has one.</li>
+        </ul>
+
+        <h2 id="time">Time</h2>
+        <p>Time is the clock from the moment the request is given to the moment the run ends.</p>
+        <ul>
+          <li>It includes all waiting: for a model's answer, for a worker's report, for a rate limit.</li>
+          <li>The runs of a round are played one at a time, on one machine.</li>
+        </ul>
+
+        <h2 id="ranked">Which runs count</h2>
+        <p>A run is ranked only if all of this holds. Any other run is listed as not ranked, with the reason, and is never counted in a table.</p>
+        <ul>
+          <li>It ended because the model said it was done.</li>
+          <li>Where the test changes the request part-way, the run finished after the change was given.</li>
+          <li>Every check judged every one of its cases.</li>
+          <li>Its records passed the screen for reads outside the project, or a person looked and kept it.</li>
+        </ul>
+
+        <h2 id="honest">Keeping the checks out of reach</h2>
+        <ul>
+          <li><strong>A read lock.</strong> Every session runs inside a lock of the operating system that refuses it the places where the checks are kept.</li>
+          <li><strong>A screen.</strong> After a run, its records are read for any sign of a read outside the project. A flagged run waits for a person to look at it.</li>
+        </ul>
+        <p>The screen is not proof. Clean means that no sign was found, not that nothing happened.</p>
+
+        {published && <h2 id="pages">How these pages count</h2>}
+        {published && <ul>
+          <li><strong>The middle run.</strong> Where a setup has several ranked runs, a table shows the middle one (the median) for each number. With two runs it shows the value half-way between them.</li>
+          <li><strong>The order of rows.</strong> Rows are in order of cases passed in the test's first check, then the next check, then the lower price. Another order would be as fair.</li>
+          <li><strong>The best solo.</strong> The solo setup that comes first in that order.</li>
+          <li><strong>A team that matches it.</strong> A team that passed at least as many cases as the best solo in every check of the test. Its price and time are then compared with the best solo's.</li>
+        </ul>}
+
+        <h2 id="public">Public and private</h2>
+        <p><strong>Public:</strong> this method, and the results of each round once it is complete, with one record for each run.</p>
+        <p><strong>Private:</strong> the benchmark's code, the requests and the scoring checks.</p>
+        <p>This means nobody outside can repeat a run today. Weigh the results with that in mind.</p>
+
+        <h2 id="limits">Limits</h2>
+        <ul>
+          <li><strong>Few runs.</strong> A setup is played once or a few times. Models do not do the same thing twice. One run is one sample, and a small gap between two setups may be chance.</li>
+          <li><strong>List prices, not bills.</strong> The price is the tokens at list price. A subscription, a discount or a different cache setting changes what you would pay.</li>
+          <li><strong>Time depends on the day.</strong> Providers answer faster or slower with their load, and a rate limit can add waiting. The runs of a round are played on one machine.</li>
+          <li><strong>A few tests.</strong> Each test is one kind of job, building software from a written request. None is work inside a large existing codebase.</li>
+          <li><strong>One shape of team.</strong> One chief and one kind of worker, a few at once. Other shapes may do better or worse.</li>
+          <li><strong>One effort setting each.</strong> A model is run at the effort its setup names. Another setting may change its score, price and time.</li>
+          <li><strong>Models and tools change.</strong> A result holds for the models, tools and versions it was run with, on its date.</li>
+          <li><strong>Through a gateway, the account may differ.</strong> A model reached through a gateway can be answered by a subscription login or by an API key of the same model. It is still that model's run.</li>
+          <li><strong>The screen is not proof.</strong> A clean run showed no sign of reading the checks. That is all it means.</li>
+          <li><strong>One party runs it.</strong> providers.dev makes and runs this benchmark, and the checks are private, so no one else can repeat a run.</li>
+        </ul>
+        <p>Questions about the method: <a href="mailto:office@providers.dev">office@providers.dev</a></p>
+      </div>
+    </div>
+  </div>
+</TeamVsSolo>

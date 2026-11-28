@@ -6,10 +6,11 @@ import { SITE, SITEMAP_PATH } from "../src/core/crawl.ts";
 import type { Summary } from "../src/core/entries.ts";
 import { handlePage, isPage, PAGE_SHELL, RETRY_AFTER_S } from "../src/core/pages.ts";
 import { movedToPiCacheKeeper, PI_CACHE_KEEPER } from "../src/core/pi-cache-keeper-site.ts";
-import { siteRoute, type ProductSite } from "../src/core/product-site.ts";
+import { isSitePage, siteRoute, type ProductSite } from "../src/core/product-site.ts";
 import { movedToProvimux, PROVIMUX } from "../src/core/provimux-site.ts";
 import type { CanonicalModel } from "../src/core/resources.ts";
 import type { Meta } from "../src/core/schema.ts";
+import { movedToTeamVsSolo, TEAMVSSOLO } from "../src/core/teamvssolo-site.ts";
 import { readSnapshot, type AssetBinding } from "../src/core/snapshot.ts";
 
 interface Env { ASSETS: AssetBinding }
@@ -17,7 +18,7 @@ const SITE_HOST = new URL(SITE).hostname;
 const WWW_HOST = `www.${SITE_HOST}`;
 
 /** The products' own sites, each on its own subdomain (src/core/product-site.ts). */
-const PRODUCT_SITES: readonly ProductSite[] = [PROVIMUX, PI_CACHE_KEEPER];
+const PRODUCT_SITES: readonly ProductSite[] = [PROVIMUX, PI_CACHE_KEEPER, TEAMVSSOLO];
 
 /**
  * Where a request at Cloudflare's edge must go instead, or null to serve it. The site has one address, SITE, and each
@@ -59,7 +60,7 @@ async function productSite(request: Request, env: Env, site: ProductSite): Promi
     target.search = url.search;
     return new Response(null, { status: 301, headers: { Location: target.toString() } });
   }
-  const page = route.status === 200 && site.pages.includes(url.pathname);
+  const page = route.status === 200 && isSitePage(site, url.pathname);
   const markdown = page && prefersMarkdown(request.headers.get("Accept"));
   const asset = markdown ? `${route.asset}index.html.md` : route.asset;
   const response = await env.ASSETS.fetch(new Request(new URL(asset, url.origin), request));
@@ -72,7 +73,7 @@ async function productSite(request: Request, env: Env, site: ProductSite): Promi
     }
     // A markdown version names its page as the one to show in search results.
     const of = /^(.*\/)index\.html\.md$/.exec(url.pathname)?.[1];
-    if (of !== undefined && site.pages.includes(of)) headers.set("Link", linkHeader(site.site, [{ href: of, rel: "canonical" }]));
+    if (of !== undefined && isSitePage(site, of)) headers.set("Link", linkHeader(site.site, [{ href: of, rel: "canonical" }]));
     if (markdown || url.pathname.endsWith(".md")) headers.set("Content-Type", MARKDOWN_TYPE);
     else if (url.pathname.endsWith(".txt")) headers.set("Content-Type", "text/plain; charset=utf-8");
     // Astro's hashed stylesheets and fonts, shared with providers.dev, are kept a year; the site's own files are not.
@@ -87,6 +88,7 @@ async function productSite(request: Request, env: Env, site: ProductSite): Promi
 const LLMS_PRODUCTS = [
   { name: "Provimux", site: PROVIMUX.site, what: "a self-hosted AI gateway, by providers.dev" },
   { name: "pi-cache-keeper", site: PI_CACHE_KEEPER.site, what: "an extension for Pi that makes the prompt cache pay off" },
+  { name: "Team vs Solo", site: TEAMVSSOLO.site, what: "a benchmark of coding models, one model alone against a chief model with workers, by providers.dev" },
 ] as const;
 
 /**
@@ -115,7 +117,7 @@ export default {
     const product = PRODUCT_SITES.find((site) => site.host === url.hostname);
     if (product) return productSite(request, env, product);
     // The support page and anything of a product site's build live on that site's subdomain only.
-    const moved = movedToProvimux(url) ?? movedToPiCacheKeeper(url);
+    const moved = movedToProvimux(url) ?? movedToPiCacheKeeper(url) ?? movedToTeamVsSolo(url);
     if (moved) return new Response(null, { status: 301, headers: { Location: moved } });
     const api = url.pathname.startsWith("/api/v1/") || url.pathname === "/api.json" || url.pathname === "/data/catalog.json";
     const data = url.pathname.startsWith("/data/");

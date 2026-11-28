@@ -1,0 +1,162 @@
+---
+// teamvssolo.providers.dev/ (served at the subdomain's root; see src/core/teamvssolo-site.ts). The front page answers
+// the benchmark's question for each test in a sentence and a board, both made from the results file, then says how to
+// read the numbers and what they cannot say. Every sentence about how the benchmark works is the method page's, shorter.
+// While there are no results it says that the first round is being played, and shows no number of a run.
+import TeamVsSolo from "../../layouts/TeamVsSolo.astro";
+import Board from "../../components/teamvssolo/Board.astro";
+import ModeFigure from "../../components/teamvssolo/ModeFigure.astro";
+import { suitePath, testName, TESTS } from "../../core/teamvssolo.ts";
+import { teamVsSoloBoards } from "../../core/teamvssolo-data.ts";
+import { TEAMVSSOLO_SITE } from "../../core/teamvssolo-site.ts";
+import { ORGANIZATION_ID, webPage } from "../../core/structured-data.ts";
+
+const all = teamVsSoloBoards();
+const title = "Team vs Solo · One model alone, or a chief with workers?";
+const description = "A benchmark of coding models by providers.dev: the same written request goes to one model alone and to a chief model with workers. Hidden checks score what each built, and each run is measured on its price and its time.";
+const website = `${TEAMVSSOLO_SITE}/#website`;
+const jsonLd = [
+  { "@type": "Organization", "@id": ORGANIZATION_ID, name: "providers.dev", url: "https://providers.dev/" },
+  { "@type": "WebSite", "@id": website, name: "Team vs Solo", url: `${TEAMVSSOLO_SITE}/`, inLanguage: "en", publisher: { "@id": ORGANIZATION_ID } },
+  ...webPage({ url: `${TEAMVSSOLO_SITE}/`, meta: { title, description }, website }),
+];
+const played = new Set(all.map((board) => board.suite));
+const first = all[0] ?? null;
+const others = all.slice(1);
+---
+
+<TeamVsSolo title={title} description={description} path="/" jsonLd={jsonLd}>
+  <section class="tvs-hero">
+    <div class="tvs-page">
+      <p class="eyebrow tvs-eyebrow">A benchmark by <a href="https://providers.dev">providers.dev</a></p>
+      <h1>One model alone, or a chief with workers?</h1>
+      <p class="tvs-lead">
+        Team vs Solo gives the same written request to one coding model working alone, and to a chief model that hands tasks to workers. Hidden checks score what each one built. Each run is also measured on what it cost and how long it took.
+      </p>
+      <p class="tvs-sub">The question: does a chief with workers match the best single model, and at what price and time?</p>
+      <div class="tvs-cta">
+        <a class="button primary" href="/method/">How it works, and its limits</a>
+        <a class="button" href="/tests/">The tests</a>
+      </div>
+
+      {first === null && (
+        <div id="round">
+          <p class="tvs-answer">The first round is being played. Its results appear here when it is complete.</p>
+        </div>
+      )}
+      {first && (
+        <div id={first.suite}>
+          {first.answer && first.best ? (
+            <p class="tvs-answer">
+              On {testName(first.suite)}, {first.answer.matched === 0 ? <>none of the <b>{first.answer.teams}</b> teams</> : <><b>{first.answer.matched}</b> of <b>{first.answer.teams}</b> teams</>} passed at least as many cases as the best solo in every check.
+              {first.answer.matched > 0 && <>{" "}<b>{first.answer.cheaper}</b> of those cost less, and <b>{first.answer.faster}</b> took less time.</>}
+            </p>
+          ) : (
+            <p class="tvs-answer">On {testName(first.suite)}, no solo run is ranked yet, so the teams have nothing to be compared with.</p>
+          )}
+          <p class="tvs-answer-note">
+            {first.best && <>The best solo is {first.best.chief.short}. </>}A team is one chief and its workers in one mode. Most rows rest on a single run, so a small gap between two rows says little. <a href={suitePath(first.suite)}>{testName(first.suite)} in full</a>
+          </p>
+          <Board board={first} />
+        </div>
+      )}
+    </div>
+  </section>
+
+  {others.length > 0 && (
+    <section class="tvs-section" id="other-tests">
+      <div class="tvs-page">
+        <div class="tvs-head">
+          <h2>{others.length === 1 ? "The other test" : "The other tests"}</h2>
+          <p>The same setups, on a different job. A setup that leads on one test does not have to lead on the next.</p>
+        </div>
+        <div class="tvs-others">
+          {others.map((board) => (
+            <div class="tvs-other tvs-data" id={board.suite}>
+              <h3>{testName(board.suite)}</h3>
+              {board.answer && board.best ? (
+                <p class="tvs-answer">
+                  {board.answer.matched === 0 ? <>None of the <b>{board.answer.teams}</b> teams</> : <><b>{board.answer.matched}</b> of <b>{board.answer.teams}</b> teams</>} passed at least as many cases as the best solo in every check.
+                  {board.answer.matched > 0 && <>{" "}<b>{board.answer.cheaper}</b> of those cost less, and <b>{board.answer.faster}</b> took less time.</>}
+                </p>
+              ) : (
+                <p class="tvs-answer">No solo run is ranked yet, so the teams have nothing to be compared with.</p>
+              )}
+              <p class="tvs-answer-note">{board.best && <>The best solo is {board.best.chief.short}. </>}{board.ranked} of {board.runs} runs are ranked.</p>
+              <a class="button" href={suitePath(board.suite)}>{testName(board.suite)}: board and every run</a>
+            </div>
+          ))}
+        </div>
+        <p class="tvs-more"><a href="/results/">Every setup, on every test</a></p>
+      </div>
+    </section>
+  )}
+
+  <section class="tvs-section" id="modes">
+    <div class="tvs-page">
+      <div class="tvs-head">
+        <h2>Three ways to do the same request</h2>
+        <p>Every setup gets the same request and the same starting files. Only who does the work changes, and how they talk.</p>
+      </div>
+      <ModeFigure />
+    </div>
+  </section>
+
+  <section class="tvs-section" id="numbers">
+    <div class="tvs-page">
+      <div class="tvs-head">
+        <h2>What each number means</h2>
+      </div>
+      <div class="tvs-three">
+        <div>
+          <h3>Score</h3>
+          <p>The number of cases the finished build passed, counted by checks the models never see. A test can have more than one check. Their scores stand side by side and are never added up.</p>
+        </div>
+        <div>
+          <h3>Price</h3>
+          <p>The tokens counted for the run, chief and workers together, at list prices. It is not what was paid.</p>
+        </div>
+        <div>
+          <h3>Time</h3>
+          <p>The clock, from the moment the request is given to the moment the run ends.</p>
+        </div>
+      </div>
+      <p class="tvs-more"><a href="/method/">The method in full</a></p>
+    </div>
+  </section>
+
+  <section class="tvs-section" id="limits">
+    <div class="tvs-page">
+      <div class="tvs-head">
+        <h2>Read this before you quote a number</h2>
+      </div>
+      <ul class="tvs-list">
+        <li><strong>Few runs.</strong> A setup is played once or a few times. Models do not do the same thing twice, so one run is one sample, and a small difference between two runs says little.</li>
+        <li><strong>List prices, not bills.</strong> The price is the tokens at list price. A subscription changes what you pay, not the price counted here.</li>
+        <li><strong>A few tests, not all of programming.</strong> Each test is one kind of job. A setup that leads here may not lead on your work.</li>
+        <li>providers.dev keeps its scoring checks private. You can read how a run is scored, but you cannot read the checks.</li>
+        <li><strong>Models and tools change.</strong> A result holds for the models, the tools and their versions it was run with, on its date.</li>
+      </ul>
+      <p class="tvs-more"><a href="/method/#limits">All limits</a></p>
+    </div>
+  </section>
+
+  <section class="tvs-section" id="tests">
+    <div class="tvs-page">
+      <div class="tvs-head">
+        <h2>The tests</h2>
+        <p>Each test is one written request for a piece of software, with checks the model never sees.</p>
+      </div>
+      <div class="tvs-tests">
+        {TESTS.map((test) => (
+          <div class="tvs-test">
+            <h3>{testName(test.name)}</h3>
+            <p class="line">{test.line}</p>
+            {played.has(test.name) && <p class="state"><a href={suitePath(test.name)}>Results on {testName(test.name)}</a></p>}
+          </div>
+        ))}
+      </div>
+      <p class="tvs-more"><a href="/tests/">Each test in a paragraph</a></p>
+    </div>
+  </section>
+</TeamVsSolo>

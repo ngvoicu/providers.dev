@@ -1,0 +1,38 @@
+---
+// Every run of a list, one a row: what ran, when, what it scored, cost and took, and whether it counts.
+import { checkName, clock, day, MODE_NAME, passedWords, roleView, runPath, setupWords, usd, whyNotRanked, type RunRecord } from "../../core/teamvssolo.ts";
+
+interface Props { runs: RunRecord[]; checks: string[]; caption: string }
+const { runs, checks, caption } = Astro.props;
+---
+
+<div class="tvs-data tvs-scroll">
+  <table class="tvs-table tvs-plain">
+    <caption>{caption}</caption>
+    <thead>
+      <tr>
+        <th scope="col">Run</th>
+        <th scope="col">Started<small>UTC</small></th>
+        {checks.map((check) => <th scope="col" class="num">{checkName(check)}</th>)}
+        <th scope="col" class="num">Price<small>at list</small></th>
+        <th scope="col" class="num">Time</th>
+        <th scope="col">Counts?</th>
+      </tr>
+    </thead>
+    <tbody>
+      {runs.map((run) => (
+        <tr>
+          <th scope="row">
+            <a href={runPath(run.id)}>{setupWords(roleView(run.roles.chief), run.roles.worker ? roleView(run.roles.worker) : null)}</a>
+            <small>{MODE_NAME[run.mode]}, run {run.repeat.n}{run.repeat.of !== null && ` of ${run.repeat.of}`}</small>
+          </th>
+          <td>{day(run.started_at)}</td>
+          {checks.map((check) => <td class="num">{passedWords(run, check)}</td>)}
+          <td class="num">{run.cost.usd_at_list === null ? "Not known" : usd(run.cost.usd_at_list)}</td>
+          <td class="num">{run.time.wall_seconds === null ? "Not known" : clock(run.time.wall_seconds)}</td>
+          <td class={run.ranked ? undefined : "wrap"}>{run.ranked ? <span class="tvs-state">Ranked</span> : <><span class="tvs-state not">Not ranked</span><small>{whyNotRanked(run)}</small></>}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>

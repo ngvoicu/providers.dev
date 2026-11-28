@@ -1,0 +1,264 @@
+---
+// teamvssolo.providers.dev/runs/<run id>/: one run, with everything its record says that a reader needs to judge it:
+// what was run (models, effort, tools and their versions, mode, date), what it used and cost, how long it took, its
+// score by part, whether it was judged in full, and whether it counts. One page for each run of the results file.
+import TeamVsSolo from "../../../layouts/TeamVsSolo.astro";
+import { auditWords, boards, cases, checkName, clock, day, endedWords, judgedInFull, MODE_NAME, MODE_WORDS, partName, roleView, runPath, setupWords, statusWords, suitePath, testName, tokens, toolName, usd, whyNotRanked, yesNo, type RoleView, type RunRecord } from "../../../core/teamvssolo.ts";
+import { teamVsSoloResults, teamVsSoloRuns } from "../../../core/teamvssolo-data.ts";
+import { TEAMVSSOLO_SITE } from "../../../core/teamvssolo-site.ts";
+import { productPage } from "../../../core/structured-data.ts";
+
+export function getStaticPaths() {
+  // None while there are no results: then no page of a run is built.
+  const runs = teamVsSoloRuns();
+  const paths = runs.map((run) => ({ params: { id: runPath(run.id).slice("/runs/".length, -1) }, props: { run } }));
+  // Two runs must never share an address ("+" is written "--").
+  if (new Set(paths.map((item) => item.params.id)).size !== paths.length) throw new Error("two runs of data/teamvssolo/results.json have the same page address");
+  return paths;
+}
+interface Props { run: RunRecord }
+const { run } = Astro.props;
+const results = teamVsSoloResults()!;
+const chief = roleView(run.roles.chief);
+const worker = run.roles.worker ? roleView(run.roles.worker) : null;
+const reviewer = run.roles.reviewer ? roleView(run.roles.reviewer) : null;
+const roles: [string, RoleView][] = [[worker ? "Chief" : "The model", chief], ...(worker ? [["Workers", worker] as [string, RoleView]] : []), ...(reviewer ? [["Reviewers", reviewer] as [string, RoleView]] : [])];
+const test = testName(run.suite.name);
+const words = setupWords(chief, worker);
+const path = runPath(run.id);
+const title = `${words}, ${MODE_NAME[run.mode].toLowerCase()}, run ${run.repeat.n} on ${test} · Team vs Solo`;
+const description = `One run of Team vs Solo on ${test}, started ${day(run.started_at)}: ${words} (${MODE_NAME[run.mode].toLowerCase()}). Models, tools and versions, tokens, price at list prices, time and score by part.`;
+const jsonLd = productPage(TEAMVSSOLO_SITE, path, { title, description }, [["Team vs Solo", `${TEAMVSSOLO_SITE}/`], ["Results", `${TEAMVSSOLO_SITE}/results/`], [test, `${TEAMVSSOLO_SITE}${suitePath(run.suite.name)}`], [`Run ${run.repeat.n}`, `${TEAMVSSOLO_SITE}${path}`]]);
+const why = whyNotRanked(run);
+const judged = judgedInFull(run);
+const checks = run.quality.checks ?? [];
+const wall = run.time.wall_seconds;
+const percent = (value: number | null, of: number | null): number | null => (value === null || of === null || of <= 0 ? null : Math.max(0, Math.min(100, (value / of) * 100)));
+const lanes = wall !== null && wall > 0 ? run.windows.filter((window) => window.started_at !== null) : [];
+// The chief's session on the first line; under it the tasks, each on the first line that is free when it starts, so
+// that the lines show how many workers were at work at once.
+const packed: (typeof lanes)[] = [lanes.filter((window) => window.role === "chief")];
+for (const window of lanes.filter((item) => item.role !== "chief").sort((a, b) => a.started_at! - b.started_at!)) {
+  const free = packed.slice(1).find((lane) => (lane.at(-1)!.ended_at ?? wall!) <= window.started_at!);
+  if (free) free.push(window);
+  else packed.push([window]);
+}
+const changeAt = run.owner_change?.given === true ? run.owner_change.read_at : null;
+const siblings = boards(results).flatMap((board) => [...board.solos, ...board.teams]).find((row) => row.runs.some((item) => item.id === run.id))?.runs.filter((item) => item.id !== run.id) ?? [];
+const change = run.owner_change;
+const versions = run.versions;
+const scorers = [...new Set(checks.flatMap((check) => (check.scored_with?.scorer_version ? [`${checkName(check.name)}: version ${check.scored_with.scorer_version}`] : [])))];
+---
+
+<TeamVsSolo title={title} description={description} path={path} jsonLd={jsonLd} section="results">
+  <div class="tvs-page tvs-first">
+    <p class="crumbs"><a href="/">Team vs Solo</a> / <a href="/results/">Results</a> / <a href={suitePath(run.suite.name)}>{test}</a> / Run</p>
+    <h1>{words}</h1>
+    <p class="tvs-run-head">
+      <span class:list={["tvs-mode", run.mode]}>{MODE_NAME[run.mode]}</span>
+      <span>{test}, run {run.repeat.n}{run.repeat.of !== null && ` of ${run.repeat.of}`}, started {day(run.started_at)} (UTC)</span>
+      {run.ranked ? <span class="tvs-state">Ranked</span> : <span class="tvs-state not">Not ranked</span>}
+    </p>
+    {why && <p class="tvs-run-why"><strong>This run is not counted.</strong> {why} Its numbers are shown as they were measured.</p>}
+
+    <div class="tvs-tiles">
+      {checks.map((check) => (
+        <div class="tile">
+          <p class="label">{checkName(check.name)}</p>
+          <p class="value">{check.passed === null ? (check.state === "not-judged" ? "Not judged" : "No score") : <>{cases(check.passed)} <span class="unit">of {check.total === null ? "an unknown number" : cases(check.total)} passed</span></>}</p>
+        </div>
+      ))}
+      <div class="tile">
+        <p class="label">Price</p>
+        <p class="value">{run.cost.usd_at_list === null ? "Not known" : <>{usd(run.cost.usd_at_list)} <span class="unit">at list prices</span></>}</p>
+      </div>
+      <div class="tile">
+        <p class="label">Time</p>
+        <p class="value">{wall === null ? "Not known" : <>{clock(wall)} <span class="unit">start to end</span></>}</p>
+      </div>
+    </div>
+
+    <h2 class="tvs-sub-h" id="what">What was run</h2>
+    <p class="tvs-sub">{MODE_WORDS[run.mode]}</p>
+    <div class="tvs-block">
+      <div class="tvs-data tvs-scroll">
+        <table class="tvs-table tvs-plain">
+          <caption>Models and tools</caption>
+          <thead>
+            <tr>
+              <th scope="col">Role</th>
+              <th scope="col">Model</th>
+              <th scope="col">Effort</th>
+              <th scope="col">Tool</th>
+              <th scope="col">Reached through</th>
+              <th scope="col" class="num">Sessions</th>
+              <th scope="col" class="num">Model calls</th>
+            </tr>
+          </thead>
+          <tbody>
+            {roles.map(([name, role]) => (
+              <tr>
+                <th scope="row">{name}</th>
+                <td>{role.entry ? <a href={role.entry}>{role.name}</a> : role.name}<small class="tvs-id">{role.model}</small></td>
+                <td>{role.effort ?? "Not set"}</td>
+                <td>{role.tool}{versions.harnesses.find((harness) => toolName(harness.name) === role.tool)?.before ? ` ${versions.harnesses.find((harness) => toolName(harness.name) === role.tool)!.before}` : ""}</td>
+                <td>{role.route}{role.gateway && <small>Through the Provimux gateway</small>}</td>
+                <td class="num">{role.row.sessions === null ? "Not known" : cases(role.row.sessions)}</td>
+                <td class="num">{role.row.calls === null ? "Not reported" : cases(role.row.calls)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <h2 class="tvs-sub-h" id="price">Tokens and price</h2>
+    <p class="tvs-sub">The tokens counted for the run, at list prices{versions.prices?.fetched && ` fetched on ${versions.prices.fetched}`}. It is not what was paid.</p>
+    <div class="tvs-block">
+      <div class="tvs-data tvs-scroll">
+        <table class="tvs-table tvs-plain">
+          <caption>Tokens by role</caption>
+          <thead>
+            <tr>
+              <th scope="col">Role</th>
+              <th scope="col" class="num">New input</th>
+              <th scope="col" class="num">Written to cache</th>
+              <th scope="col" class="num">Read from cache</th>
+              <th scope="col" class="num">Output</th>
+              <th scope="col" class="num">Price<small>at list</small></th>
+            </tr>
+          </thead>
+          <tbody>
+            {roles.map(([name, role]) => {
+              const used = role.row.tokens;
+              return (
+                <tr>
+                  <th scope="row">{name}<small>{role.name}</small></th>
+                  {used === null ? <td colspan="4" class="muted">Not fully counted</td> : (
+                    <>
+                      <td class="num">{used.fresh_input === null ? "Not known" : tokens(used.fresh_input)}</td>
+                      <td class="num">{used.cache_write === null || used.cache_write_1h === null ? "Not known" : tokens(used.cache_write + used.cache_write_1h)}</td>
+                      <td class="num">{used.cache_read === null ? "Not known" : tokens(used.cache_read)}</td>
+                      <td class="num">{used.output === null ? "Not known" : tokens(used.output)}</td>
+                    </>
+                  )}
+                  <td class="num">{role.row.usd_at_list === null ? "Not known" : usd(role.row.usd_at_list)}</td>
+                </tr>
+              );
+            })}
+            {roles.length > 1 && (
+              <tr>
+                <th scope="row">The whole run</th>
+                <td colspan="4"></td>
+                <td class="num">{run.cost.usd_at_list === null ? "Not known" : usd(run.cost.usd_at_list)}</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <h2 class="tvs-sub-h" id="score">Score by part</h2>
+    <p class="tvs-sub"><strong>Judged in full?</strong> {judged.words}</p>
+    {checks.length > 0 && (
+      <div class="tvs-block">
+        <div class="tvs-data tvs-scroll">
+          <table class="tvs-table tvs-plain">
+            <caption>Cases passed</caption>
+            <thead>
+              <tr>
+                <th scope="col">Check and part</th>
+                <th scope="col" class="num">Passed</th>
+                <th scope="col" class="num">Of</th>
+                <th scope="col"><span class="sr-only">Share passed</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              {checks.flatMap((check) => [{ name: checkName(check.name), passed: check.passed, total: check.total, whole: true, state: check.state }, ...(check.parts ?? []).map((part) => ({ name: partName(part.name), passed: part.passed, total: part.total, whole: false, state: check.state }))]).map((line) => (
+                <tr class={worker ? "is-team" : "is-solo"}>
+                  {line.whole ? <th scope="row">{line.name}</th> : <td>{line.name}</td>}
+                  <td class="num">{line.passed === null ? (line.state === "not-judged" ? "Not judged" : "No score") : cases(line.passed)}</td>
+                  <td class="num">{line.total === null ? "" : cases(line.total)}</td>
+                  <td><span class="tvs-bar" aria-hidden="true">{percent(line.passed, line.total) !== null && <i style={`width:${percent(line.passed, line.total)!.toFixed(2)}%`}></i>}</span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    )}
+
+    {lanes.length > 1 && wall !== null && (
+      <>
+        <h2 class="tvs-sub-h" id="when">Who worked when</h2>
+        <p class="tvs-sub">
+          The chief's session and each task a worker did, on the run's clock.{run.time.most_at_once !== null && ` At most ${cases(run.time.most_at_once)} ${run.time.most_at_once === 1 ? "worker was" : "workers were"} at work at once.`}{run.time.to_first_task !== null && ` The first task started ${clock(run.time.to_first_task)} in.`}{changeAt !== null && ` The mark on the chief's line is where the request changed, ${clock(changeAt)} in.`}
+        </p>
+        <div class="tvs-block">
+          <div class="tvs-data tvs-timeline" role="img" aria-label={`A timeline of the run: the chief's session over ${clock(wall)}, and ${lanes.length - 1} tasks done by workers, at most ${packed.length - 1} at once.`}>
+            <div class="tvs-lanes">
+              {packed.map((lane, i) => (
+                <>
+                  <span>{i === 0 ? "Chief" : i === 1 ? "Workers" : ""}</span>
+                  <span class:list={["tvs-lane", i === 0 ? "chief" : "worker"]}>
+                    {lane.map((window) => <i class={window.ended === "stopped" ? "stopped" : undefined} style={`left:${percent(window.started_at, wall)!.toFixed(2)}%;width:${Math.max(0.4, percent((window.ended_at ?? wall) - window.started_at!, wall)!).toFixed(2)}%`}></i>)}
+                    {i === 0 && changeAt !== null && <b style={`left:${percent(changeAt, wall)!.toFixed(2)}%`}></b>}
+                  </span>
+                </>
+              ))}
+            </div>
+            <p class="tvs-axis"><span>Start</span><span>{clock(wall / 2)}</span><span>{clock(wall)}</span></p>
+          </div>
+        </div>
+      </>
+    )}
+
+    {run.messages && (
+      <>
+        <h2 class="tvs-sub-h" id="talk">How the team talked</h2>
+        <dl class="tvs-facts">
+          <dt>Tasks the chief gave</dt><dd>{run.messages.tasks === null ? "Not known" : cases(run.messages.tasks)}</dd>
+          <dt>Reports the chief got</dt><dd>{run.messages.results === null ? "Not known" : cases(run.messages.results)}</dd>
+          <dt>Questions workers asked</dt><dd>{run.messages.questions === null ? "Not known" : cases(run.messages.questions)}{run.mode === "delegation" && " (in delegation each gets one fixed line, and the chief never sees it)"}</dd>
+          <dt>Answers from the chief</dt><dd>{run.messages.answers === null ? "Not known" : cases(run.messages.answers)}</dd>
+          <dt>Notes from workers</dt><dd>{run.messages.notes === null ? "Not known" : cases(run.messages.notes)}</dd>
+          <dt>Messages to working workers</dt><dd>{run.messages.tells === null ? "Not known" : cases(run.messages.tells)}</dd>
+          <dt>Workers the chief stopped</dt><dd>{run.messages.stops === null ? "Not known" : cases(run.messages.stops)}</dd>
+        </dl>
+      </>
+    )}
+
+    <h2 class="tvs-sub-h" id="counts">How it ended, and whether it counts</h2>
+    <dl class="tvs-facts">
+      <dt>How it ended</dt><dd>{statusWords(run.status)}. {endedWords(run.ended_by)}</dd>
+      <dt>Counted in the results</dt><dd>{run.ranked ? "Yes, it is ranked." : `No. ${why}`}</dd>
+      {change && <><dt>The change to the request</dt><dd>{change.given !== true ? "It was not given: the run ended first." : change.done_after_at === null ? `Given ${change.read_at === null ? "" : `${clock(change.read_at)} in`}; the run did not finish after it.` : `Given ${change.read_at === null ? "" : `${clock(change.read_at)} in, `}and the run finished after it.`}</dd></>}
+      {run.owner && <><dt>Times it stopped and was told to go on</dt><dd>{run.owner.turns === null ? "Not known" : cases(run.owner.turns)}{run.owner.max_turns !== null && ` of ${cases(run.owner.max_turns)} allowed`}</dd></>}
+      <dt>Screen for reads outside the project</dt><dd>{auditWords(run.validity.read_audit?.verdict ?? null)}{run.validity.look && ` A person looked on ${day(run.validity.look.at)} and ${run.validity.look.verdict === "kept" ? "kept the run" : "voided the run"}.`}</dd>
+      <dt>Read lock on every session</dt><dd>{yesNo(run.validity.lock.on_every_session)}</dd>
+      <dt>All traffic through the benchmark's proxy</dt><dd>{yesNo(run.validity.network.complete)}</dd>
+      {run.mode !== "solo" && <><dt>The team kept to its mode</dt><dd>{yesNo(run.validity.mode_kept)}</dd></>}
+    </dl>
+
+    <h2 class="tvs-sub-h" id="versions">Tools and versions</h2>
+    <dl class="tvs-facts">
+      <dt>Run</dt><dd class="tvs-id">{run.id}</dd>
+      <dt>Started and ended (UTC)</dt><dd>{run.started_at.replace("T", " ").replace(/(\.\d+)?Z$/, "")}{run.ended_at ? ` to ${run.ended_at.replace("T", " ").replace(/(\.\d+)?Z$/, "")}` : "; the end was not recorded"}</dd>
+      <dt>Test</dt><dd>{test}{run.suite.version && `, version ${run.suite.version}`}, the {run.suite.request} request</dd>
+      <dt>Coding tools</dt><dd>{versions.harnesses.map((harness) => `${toolName(harness.name)} ${harness.before ?? "(version not read)"}${harness.after && harness.before && harness.after !== harness.before ? `, ${harness.after} at the end` : ""}`).join("; ")}</dd>
+      {versions.extensions && versions.extensions.length > 0 && <><dt>Add-ons of a tool</dt><dd>{versions.extensions.map((extension) => `${extension.name ?? "unnamed"} ${extension.before ?? ""}`.trim()).join("; ")}</dd></>}
+      <dt>Benchmark runner</dt><dd>{run.runner.version === null ? "Version not recorded" : `Version ${run.runner.version}`}</dd>
+      {scorers.length > 0 && <><dt>Scorers</dt><dd>{scorers.join("; ")}</dd></>}
+      <dt>Price list</dt><dd>{versions.prices === null ? "None: the run has no price" : `${versions.prices.version === null ? "" : `Version ${versions.prices.version}, `}fetched ${versions.prices.fetched ?? "on an unknown day"}`}</dd>
+      {versions.toolchains && <><dt>Compilers and runtimes on the machine</dt><dd>{versions.toolchains.tools.map((tool) => `${tool.name} ${tool.version ?? ""}`.trim()).join(", ")}{versions.toolchains.changed === true && ". One of them changed during the run."}</dd></>}
+      {versions.machine && <><dt>Machine</dt><dd>{[versions.machine.chip, versions.machine.cores === null ? null : `${versions.machine.cores} cores`, versions.machine.memory_gib === null ? null : `${versions.machine.memory_gib} GB memory`, versions.machine.os].filter(Boolean).join(", ")}</dd></>}
+      <dt>Time limit</dt><dd>{run.setup.time_limit_minutes === null ? "None. A run that changes no file for 60 minutes is stopped." : `${cases(run.setup.time_limit_minutes)} minutes`}</dd>
+      {run.setup.parallel !== null && run.mode !== "solo" && <><dt>Workers allowed at once</dt><dd>{cases(run.setup.parallel)}</dd></>}
+    </dl>
+
+    {siblings.length > 0 && (
+      <p class="tvs-more">Other runs of this setup: {siblings.map((item, i) => <>{i > 0 && ", "}<a href={runPath(item.id)}>run {item.repeat.n}</a></>)}.</p>
+    )}
+    <p class="tvs-more"><a href={suitePath(run.suite.name)}>All results on {test}</a></p>
+  </div>
+</TeamVsSolo>

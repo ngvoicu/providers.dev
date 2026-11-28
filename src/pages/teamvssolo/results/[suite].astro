@@ -1,0 +1,95 @@
+---
+// teamvssolo.providers.dev/results/<test>/: one test's board, its scores by part where a check has parts, and every
+// run of it. One page for each test the results file has runs of.
+import TeamVsSolo from "../../../layouts/TeamVsSolo.astro";
+import Board from "../../../components/teamvssolo/Board.astro";
+import RunsTable from "../../../components/teamvssolo/RunsTable.astro";
+import { cases, checkName, MODE_NAME, partName, testName, testText, type Board as BoardData, type BoardRow } from "../../../core/teamvssolo.ts";
+import { teamVsSoloBoards } from "../../../core/teamvssolo-data.ts";
+import { TEAMVSSOLO_SITE } from "../../../core/teamvssolo-site.ts";
+import { productPage } from "../../../core/structured-data.ts";
+
+export function getStaticPaths() {
+  // None while there are no results: then no page of a test's results is built.
+  const all = teamVsSoloBoards();
+  return [...new Set(all.map((board) => board.suite))].map((suite) => ({ params: { suite }, props: { own: all.filter((board) => board.suite === suite) } }));
+}
+interface Props { own: BoardData[] }
+const { own } = Astro.props;
+const suite = Astro.params.suite!;
+const name = testName(suite);
+const text = testText(suite);
+const path = `/results/${suite}/`;
+const title = `${name}: results · Team vs Solo`;
+const description = `Team vs Solo on ${name}: every setup's cases passed, price at list prices and time, and every run. ${text?.line ?? ""}`.trim();
+const jsonLd = productPage(TEAMVSSOLO_SITE, path, { title, description }, [["Team vs Solo", `${TEAMVSSOLO_SITE}/`], ["Results", `${TEAMVSSOLO_SITE}/results/`], [name, `${TEAMVSSOLO_SITE}${path}`]]);
+
+/** The parts of a board's checks, as the ranked runs give them: the middle run's cases passed in each part. */
+function parts(board: BoardData): { check: string; names: { name: string; total: number | null }[]; rows: { row: BoardRow; passed: (number | null)[] }[] }[] {
+  const rows = [...board.solos, ...board.teams].filter((row) => row.ranked.length > 0);
+  return board.checks.flatMap((check) => {
+    const first = rows.flatMap((row) => row.ranked).map((run) => run.quality.checks?.find((item) => item.name === check.name)?.parts ?? null).find((list) => list !== null);
+    if (!first) return [];
+    const names = first.map((part) => ({ name: part.name, total: part.total }));
+    const middle = (values: number[]): number | null => { if (values.length === 0) return null; const sorted = [...values].sort((a, b) => a - b); const at = Math.floor(sorted.length / 2); return sorted.length % 2 ? sorted[at]! : (sorted[at - 1]! + sorted[at]!) / 2; };
+    return [{ check: check.name, names, rows: rows.map((row) => ({ row, passed: names.map((part) => middle(row.ranked.flatMap((run) => run.quality.checks?.find((item) => item.name === check.name)?.parts?.find((item) => item.name === part.name)?.passed ?? []))) })) }];
+  });
+}
+---
+
+<TeamVsSolo title={title} description={description} path={path} jsonLd={jsonLd} section="results">
+  <div class="tvs-page tvs-first">
+    <p class="crumbs"><a href="/">Team vs Solo</a> / <a href="/results/">Results</a> / {name}</p>
+    <h1>{name}: results</h1>
+    {text && <p class="tvs-lead">{text.line} <a href={`/tests/#${suite}`}>About this test</a></p>}
+    {own.map((board) => (
+      <>
+        {own.length > 1 && <h2 class="tvs-sub-h">The {board.request} request</h2>}
+        {board.answer && board.best && (
+          <>
+            <p class="tvs-answer">
+              {board.answer.matched === 0 ? <>None of the <b>{board.answer.teams}</b> teams</> : <><b>{board.answer.matched}</b> of <b>{board.answer.teams}</b> teams</>} passed at least as many cases as the best solo in every check.
+              {board.answer.matched > 0 && <>{" "}<b>{board.answer.cheaper}</b> of those cost less, <b>{board.answer.faster}</b> took less time, and <b>{board.answer.both}</b> did both.</>}
+            </p>
+            <p class="tvs-answer-note">The best solo is {board.best.chief.short}. {board.ranked} of {board.runs} runs are ranked; a run that is not ranked is listed below and never counted.</p>
+          </>
+        )}
+        <Board board={board} />
+
+        {parts(board).map((part) => (
+          <>
+            <h2 class="tvs-sub-h" id={`parts-${part.check}`}>{checkName(part.check)}, part by part</h2>
+            <p class="tvs-sub">The cases passed in each part of the check: the middle run of each setup's ranked runs.</p>
+            <div class="tvs-block">
+              <div class="tvs-data tvs-scroll">
+                <table class="tvs-table tvs-plain">
+                  <caption>{checkName(part.check)}: cases passed in each part</caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">Setup</th>
+                      {part.names.map((item) => <th scope="col" class="num">{partName(item.name)}{item.total !== null && <small>of {cases(item.total)}</small>}</th>)}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {part.rows.map(({ row, passed }) => (
+                      <tr>
+                        <th scope="row">{row.chief.short}{row.worker && ` with ${row.worker.short}`}<small>{MODE_NAME[row.mode]}</small></th>
+                        {passed.map((value) => <td class="num">{value === null ? "Not known" : cases(value)}</td>)}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </>
+        ))}
+
+        <h2 class="tvs-sub-h" id="runs">Every run</h2>
+        <p class="tvs-sub">Open a run to see exactly what was run: models, tools and versions, tokens, price, time and score.</p>
+        <div class="tvs-block">
+          <RunsTable runs={[...board.solos, ...board.teams].flatMap((row) => row.runs)} checks={board.checks.map((check) => check.name)} caption={`${name}: all ${board.runs} runs`} />
+        </div>
+      </>
+    ))}
+  </div>
+</TeamVsSolo>

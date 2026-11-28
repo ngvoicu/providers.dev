@@ -463,15 +463,15 @@ describe("structured data", () => {
   });
 
   // Every page of providers.dev is written into one shell, whose footer names the owner; each product page has its own.
-  it.skipIf(!existsSync(join(built, "site-shell", "index.html")))("links the owner's site from the footer of every page of the three sites, and from their markdown", () => {
+  it.skipIf(!existsSync(join(built, "site-shell", "index.html")))("links the owner's site from the footer of every page of the four sites, and from their markdown", () => {
     const footer = (html: string): string => html.slice(html.indexOf("<footer"), html.indexOf("</footer>"));
-    for (const path of ["site-shell/index.html", "provimux/index.html", "provimux/support/index.html", "provimux/not-found/index.html", "pi-cache-keeper/index.html", "pi-cache-keeper/not-found/index.html"]) {
+    for (const path of ["site-shell/index.html", "provimux/index.html", "provimux/support/index.html", "provimux/not-found/index.html", "pi-cache-keeper/index.html", "pi-cache-keeper/not-found/index.html", "teamvssolo/index.html", "teamvssolo/results/index.html", "teamvssolo/tests/index.html", "teamvssolo/method/index.html", "teamvssolo/not-found/index.html"]) {
       const html = readFileSync(join(built, path), "utf8");
       expect(footer(html).split(OWNER_LINK).length - 1, path).toBe(1);
       // The link is followed by the contact, as the plan places it.
       expect(footer(html), path).toMatch(/Gabriel Voicu<\/a><\/li>\s*<li><a href="mailto:office@providers\.dev">Contact<\/a>/);
     }
-    for (const path of ["provimux/index.html.md", "provimux/support/index.html.md", "pi-cache-keeper/index.html.md"]) {
+    for (const path of ["provimux/index.html.md", "provimux/support/index.html.md", "pi-cache-keeper/index.html.md", "teamvssolo/index.html.md", "teamvssolo/method/index.html.md"]) {
       expect(readFileSync(join(built, path), "utf8"), path).toContain("[Gabriel Voicu](https://ngvoicu.dev/)");
     }
   });

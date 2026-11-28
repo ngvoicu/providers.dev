@@ -1,0 +1,42 @@
+---
+// The three modes, drawn: who is there, and how messages move between them. A task goes down and a report comes
+// back; in active mode a question and a message also pass while the worker works. The words under each picture say
+// the same, so the pictures are for the eye only.
+import { MODE_NAME, MODE_WORDS, type Mode } from "../../core/teamvssolo.ts";
+
+const workers = [[-66, 72], [0, 72], [66, 72]] as const;
+const modes: Mode[] = ["solo", "delegation", "active"];
+---
+
+<div class="tvs-modes">
+  {modes.map((mode) => (
+    <div class="tvs-mode-card">
+      <svg viewBox="0 0 220 132" aria-hidden="true">
+        {mode === "solo" ? (
+          <>
+            <circle class="tvs-fig-solo" cx="110" cy="62" r="17"></circle>
+            <text class="tvs-fig-label" x="110" y="104" text-anchor="middle">one model</text>
+          </>
+        ) : (
+          <>
+            {workers.map(([dx, dy]) => <path class="tvs-fig-link" d={`M110 30 L${110 + dx} ${30 + dy}`}></path>)}
+            {workers.map(([dx, dy], n) => (
+              <>
+                <circle class="tvs-fig-msg task" cx="110" cy="30" r="3.6" style={`--dx:${dx}px;--dy:${dy}px;--n:${n}`}></circle>
+                <circle class="tvs-fig-msg report" cx="110" cy="30" r="3.6" style={`--dx:${dx}px;--dy:${dy}px;--n:${n}`}></circle>
+                {mode === "active" && <circle class="tvs-fig-msg ask" cx="110" cy="30" r="2.6" style={`--dx:${dx}px;--dy:${dy}px;--n:${n}`}></circle>}
+                {mode === "active" && <circle class="tvs-fig-msg tell" cx="110" cy="30" r="2.6" style={`--dx:${dx}px;--dy:${dy}px;--n:${n}`}></circle>}
+              </>
+            ))}
+            <circle class="tvs-fig-chief" cx="110" cy="30" r="12"></circle>
+            {workers.map(([dx, dy]) => <circle class="tvs-fig-worker" cx={110 + dx} cy={30 + dy} r="9"></circle>)}
+            <text class="tvs-fig-label" x="130" y="27">chief</text>
+            <text class="tvs-fig-label" x="110" y="128" text-anchor="middle">{mode === "active" ? "workers, talking with the chief" : "workers"}</text>
+          </>
+        )}
+      </svg>
+      <h3>{MODE_NAME[mode]}</h3>
+      <p>{MODE_WORDS[mode]}</p>
+    </div>
+  ))}
+</div>

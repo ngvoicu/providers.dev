@@ -18,6 +18,19 @@ import type { AssetBinding } from "../src/core/snapshot.ts";
 import worker from "../worker/index.ts";
 import { fetchReturning, fixtureUpstream, ROOT, tempDataDir, writeAuthored } from "./helpers.ts";
 import { htmlText, markdownText, type PageText } from "./page-text.ts";
+import { runPath, suitePath } from "../src/core/teamvssolo.ts";
+import { teamVsSoloBoards } from "../src/core/teamvssolo-data.ts";
+
+/**
+ * A test's results and one run of each kind (a solo, a team, a run that is not ranked) of Team vs Solo's results file;
+ * none while there is no results file (the first round is being played).
+ */
+function teamVsSoloDataPages(): string[] {
+  const all = teamVsSoloBoards(ROOT);
+  const rows = all.flatMap((board) => [...board.solos, ...board.teams]);
+  const runs = [rows.find((row) => row.mode === "solo"), rows.find((row) => row.mode !== "solo" && row.ranked.length > 0), rows.find((row) => row.ranked.length === 0)].flatMap((row) => (row ? [row.runs[0]!] : []));
+  return [...all.slice(0, 1).map((board) => suitePath(board.suite)), ...runs.map((run) => runPath(run.id))];
+}
 
 const SITE = "https://providers.dev";
 const MARKDOWN = "text/markdown; charset=utf-8";
@@ -296,10 +309,12 @@ describe("pages, their markdown, llms.txt and the API catalogue, on the fixture"
     expect((await ask("/llms.txt", {}, "HEAD")).status).toBe(200);
     const links = [...text.matchAll(/\]\((https:\/\/[^)]+)\)/g)].map((match) => match[1]!);
     expect(links.length).toBeGreaterThan(12);
+    // The products' own sites, under Optional, in the order of LLMS_PRODUCTS.
+    expect(links.filter((link) => new URL(link).hostname !== "providers.dev")).toEqual(["https://provimux.providers.dev/llms.txt", "https://pi-cache-keeper.providers.dev/llms.txt", "https://teamvssolo.providers.dev/llms.txt"]);
     for (const link of links) {
       const url = new URL(link);
       // The products' files are built into dist/, not in this fixture; their own test follows them.
-      if (url.hostname !== "providers.dev") { expect(link).toMatch(/^https:\/\/(provimux|pi-cache-keeper)\.providers\.dev\/llms\.txt$/); continue; }
+      if (url.hostname !== "providers.dev") { expect(link).toMatch(/^https:\/\/(provimux|pi-cache-keeper|teamvssolo)\.providers\.dev\/llms\.txt$/); continue; }
       const answer = await ask(link);
       const type = answer.headers.get("Content-Type");
       expect([link, answer.status]).toEqual([link, 200]);
@@ -362,6 +377,8 @@ describe("the build in dist/", () => {
     const sites = [
       { site: "https://provimux.providers.dev", folder: "provimux", pages: ["/", "/support/"] },
       { site: "https://pi-cache-keeper.providers.dev", folder: "pi-cache-keeper", pages: ["/"] },
+      // Team vs Solo: the pages every build has, and one page of each kind its results file gives.
+      { site: "https://teamvssolo.providers.dev", folder: "teamvssolo", pages: ["/", "/results/", "/tests/", "/method/", ...teamVsSoloDataPages()] },
     ];
     for (const { site, folder, pages } of sites) {
       for (const path of pages) {

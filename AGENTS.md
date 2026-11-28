@@ -21,6 +21,7 @@ The baseline is imported from models.dev; our additions, corrections and measure
 | `data/sources/` | the measurements file (`observed.json`) and the discovery file (`listed.json`) from groundtruth | `npm run sync` only |
 | `data/authored/` | our providers, overrides, catalog-wide rules, access rules, route map, measurement labels | people |
 | `data/published/` | the resolved snapshot (not in git) | `npm run data` only |
+| `data/teamvssolo/` | the results file of teamvssolo.providers.dev, in the Team vs Solo benchmark's published shape; absent until the first round is complete (README, "Team vs Solo's site") | copied from the benchmark, never edited by hand |
 | `src/core/` | pure logic shared by scripts, Worker, pages and browser: merge, resolve, entries, query, api, render | |
 | `scripts/` | sync, data build, staging | |
 | `worker/` | the Cloudflare Worker | |
@@ -159,6 +160,13 @@ The baseline is imported from models.dev; our additions, corrections and measure
 - A page's markdown version is the page itself, written as markdown (`src/core/markdown.ts`): never a second
   renderer of the data. A change to a page changes its markdown with it; `tests/agents.test.ts` compares the two over
   the whole build.
+- Team vs Solo's site (`src/pages/teamvssolo/`) publishes results and method only: nothing of the benchmark's code,
+  requests or checks, no path or internal name of it. Its pages read `data/teamvssolo/results.json` through
+  `src/core/teamvssolo.ts` and nothing else. Until the first round is complete there is no such file, and the pages say
+  that the round is being played and show no result. A sample is never published: the build refuses one, and the
+  tests make their own records with made-up names and numbers. Every sentence about the method must match the
+  benchmark as it is. A number on a page carries its date and what it rests on, and a setup with one run is said to
+  have one.
 - Commit messages carry no links to agent sessions (no `Claude-Session:` line). `scripts/commit-msg` removes one;
   install it once per clone with `ln -sf ../../scripts/commit-msg .git/hooks/commit-msg`.
 

@@ -1055,6 +1055,43 @@ text. Provimux's site says what pi-provimux's commands do from pi-provimux's REA
 as Provimux's site (`src/core/pi-cache-keeper-site.ts`); on providers.dev anything under `/pi-cache-keeper/` gets a 301
 to the same path on the subdomain. Preview: `npx wrangler dev --port <port> --local-upstream pi-cache-keeper.providers.dev`.
 
+**Team vs Solo's site, `https://teamvssolo.providers.dev`.** The results of the Team vs Solo
+benchmark: one written request given to one coding model alone and to a chief model with workers, scored by hidden
+checks, with each run's price at list prices and its time. Only results and method are published; the benchmark's code,
+requests and checks are not in this repository. Astro builds the site from `src/pages/teamvssolo/` into
+`dist/teamvssolo/` with its own layout (`src/layouts/TeamVsSolo.astro`), stylesheet (`src/styles/teamvssolo.css`),
+components (`src/components/teamvssolo/`) and files (`public/teamvssolo/`: icons, `og.png`, `robots.txt`). Its pages: `/`
+(the answer for the first test, in a sentence and a board, once there are results), `/results/` (every setup across the tests),
+`/results/<test>/` (a test's board, its parts and every run), `/runs/<run id>/` (one run: models, effort, tools and
+versions, tokens, price, time, score by part, whether it counts), `/tests/` and `/method/`. On that host the Worker
+serves `dist/teamvssolo/` as the root by the rules of the other product sites (`src/core/teamvssolo-site.ts`); the pages
+of a test and of a run are told by the shape of their address (`families` of a `ProductSite`), and
+`scripts/finalize-site.ts` writes each page's markdown and the site's `sitemap.xml` from the pages the build has.
+
+- **One file of data.** `data/teamvssolo/results.json` is the benchmark's built file as it publishes it
+  (`team-vs-solo-results-v1`, its `runs` records of `team-vs-solo-record-v1`), copied whole and never edited here.
+  `src/core/teamvssolo.ts` checks the keys the pages read (`ResultsSchema`: a file it cannot read stops the build and
+  names the key), groups the runs into boards and holds the plain words for every fixed word of a record. A page works
+  out three things and says so on `/method/`: the middle run of a setup's ranked runs, the order of rows, and which
+  teams passed at least as many cases as the best solo in every check. A run that is not ranked is listed and never counted.
+  Only the tests are shown (`suite.domain` `backend`, `fullstack`, `frontend`, `design`), never the benchmark's trial
+  suites.
+- **No results until the first round is complete.** While `data/teamvssolo/results.json` is absent, the front page
+  and `/results/` say that the first round is being played and that its results appear when it is complete; no page of
+  a test's results or of a run is built, and `/method/` leaves out how the pages count. The question, the method with
+  its limits and the tests are there. Results come with one commit: the benchmark's built file at
+  `data/teamvssolo/results.json`, a name and an entry for any new model (`MODELS`), a paragraph for any new test
+  (`TESTS`) and a label for any new check (`CHECK`).
+- **No sample is published.** A file is taken as results only when `built_from.commit` is a commit,
+  `built_from.dirty` is false and no run's `round` is missing or begins with `sample` (`isSample`); any other file at
+  `data/teamvssolo/results.json` stops the build (`readResults`, `src/core/teamvssolo-data.ts`).
+  The tests make their own records, with made-up names and numbers (`tests/teamvssolo-site.test.ts`).
+- **The route.** `wrangler.jsonc` has `{ "pattern": "teamvssolo.providers.dev", "custom_domain": true }`, as the other
+  product sites have theirs; the deploy attaches the custom domain (its token needs the right to edit the zone's Workers
+  routes and custom domains). providers.dev's `/llms.txt` lists the site under Optional, beside Provimux and
+  pi-cache-keeper (`LLMS_PRODUCTS` of `worker/index.ts`).
+- Preview: `npx wrangler dev --port <port> --local-upstream teamvssolo.providers.dev`.
+
 A deploy takes its credentials from the environment, never from a file: `CLOUDFLARE_API_TOKEN` (an API token that
 can edit Workers scripts and their routes and custom domains on the zone) and `CLOUDFLARE_ACCOUNT_ID`. By hand:
 

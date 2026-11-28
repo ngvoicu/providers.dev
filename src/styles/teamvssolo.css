@@ -1,0 +1,1002 @@
+/* teamvssolo.providers.dev: providers.dev's tokens and components (global.css), laid out as the two product sites are
+   (provimux.css, pi-cache-keeper.css), plus what a page of results needs: the board, the run's tables and its
+   timeline. Two colours carry the data and nothing else does: ink is one model alone, the site's own colour is a
+   team. Green and amber keep their meaning from global.css: counted, and not counted or a warning. */
+
+@layer components {
+  .tvs {
+    --tvs: #a21caf;
+    --tvs-team: #a21caf;
+    --tvs-solo: #52525b;
+    --tvs-bg: #fdf4ff;
+    --tvs-line: color-mix(in srgb, var(--tvs) 30%, var(--line));
+    --tvs-track: var(--panel);
+  }
+  :root[data-theme="dark"] .tvs {
+    --tvs: #e879f9;
+    --tvs-team: #d946ef;
+    --tvs-solo: #d4d4d8;
+    --tvs-bg: color-mix(in srgb, #d946ef 13%, var(--bg));
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .tvs {
+      --tvs: #e879f9;
+      --tvs-team: #d946ef;
+      --tvs-solo: #d4d4d8;
+      --tvs-bg: color-mix(in srgb, #d946ef 13%, var(--bg));
+    }
+  }
+
+  .tvs-page {
+    width: 100%;
+    max-width: 76rem;
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+  @media (min-width: 640px) {
+    .tvs-page {
+      padding-inline: 1.75rem;
+    }
+  }
+
+  /* Header: the mark is one large dot beside three small ones */
+  .tvs-brand svg.mark {
+    width: 20px;
+    height: 24px;
+  }
+  .tvs-by {
+    font-size: 0.8rem;
+    font-weight: 450;
+    letter-spacing: 0;
+    color: var(--muted);
+  }
+  @media (max-width: 430px) {
+    .site-header .tvs-by {
+      display: none;
+    }
+  }
+  .tvs :is(p, li, dd, td) > code {
+    background: var(--panel);
+    border-radius: 4px;
+    padding: 0.06rem 0.3rem;
+    font-size: 0.82em;
+  }
+
+  /* Hero: the family's faint grid, with the site's colour behind the board */
+  .tvs-hero {
+    position: relative;
+    padding-top: clamp(2.5rem, 6vw, 4.5rem);
+    isolation: isolate;
+    overflow-x: clip;
+  }
+  .tvs-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 40rem;
+    z-index: -1;
+    background-image:
+      linear-gradient(to right, var(--line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--line) 1px, transparent 1px);
+    background-size: 32px 32px;
+    background-position: center top;
+    opacity: 0.55;
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, #000 30%, transparent 75%);
+  }
+  .tvs-hero::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 20rem;
+    width: min(70rem, 100%);
+    height: 28rem;
+    transform: translateX(-50%);
+    z-index: -1;
+    background: radial-gradient(ellipse at center, color-mix(in srgb, var(--tvs-team) 12%, transparent), transparent 68%);
+    pointer-events: none;
+  }
+  .tvs-eyebrow::before {
+    background: var(--tvs-team);
+  }
+  .tvs-eyebrow a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: var(--line-strong);
+    text-underline-offset: 3px;
+  }
+  .tvs-hero h1 {
+    margin-top: 1.1rem;
+    max-width: 17ch;
+    text-wrap: balance;
+    font-size: clamp(2.35rem, 5.6vw, 4.1rem);
+    line-height: 1.02;
+    letter-spacing: -0.045em;
+    font-weight: 680;
+  }
+  .tvs-lead {
+    margin-top: 1.15rem;
+    max-width: 46rem;
+    font-size: clamp(1.05rem, 1.55vw, 1.2rem);
+    line-height: 1.55;
+    color: var(--fg-soft);
+  }
+  .tvs-sub {
+    margin-top: 0.7rem;
+    max-width: 46rem;
+    color: var(--muted);
+  }
+  .tvs-cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 1.6rem;
+  }
+  .tvs-cta .button {
+    height: 2.6rem;
+    padding: 0 1.05rem;
+  }
+
+  /* Sections */
+  .tvs-section {
+    padding-top: clamp(3.5rem, 7vw, 5.5rem);
+    scroll-margin-top: 3.5rem;
+  }
+  .tvs-section > h2,
+  .tvs-head > h2 {
+    margin: 0;
+    font-size: clamp(1.5rem, 2.6vw, 2rem);
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+    font-weight: 650;
+  }
+  .tvs-head > p,
+  .tvs-section > p {
+    margin-top: 0.75rem;
+    max-width: 48rem;
+    color: var(--fg-soft);
+  }
+  .tvs-first {
+    padding-top: clamp(2rem, 5vw, 3.25rem);
+  }
+  .tvs-first h1 {
+    font-size: clamp(1.9rem, 4vw, 2.75rem);
+    line-height: 1.08;
+    letter-spacing: -0.035em;
+    font-weight: 670;
+    max-width: 24ch;
+    text-wrap: balance;
+  }
+  .tvs-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .tvs-more {
+    margin-top: 1rem;
+    font-size: 0.92rem;
+  }
+  .tvs-others {
+    display: grid;
+    gap: 0.9rem;
+    margin-top: 1.6rem;
+  }
+  .tvs-other {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background-color: var(--bg);
+    box-shadow: var(--shadow);
+    padding: 1.2rem 1.3rem 1.3rem;
+  }
+  .tvs-other h3 {
+    margin: 0;
+    font-size: 1.02rem;
+  }
+  .tvs-other .tvs-answer {
+    margin-top: 0.5rem;
+    font-size: clamp(1.1rem, 1.7vw, 1.3rem);
+  }
+  .tvs-other .button {
+    margin-top: 0.9rem;
+  }
+
+  /* The answer: one sentence in large type above a board */
+  p.tvs-answer {
+    color: var(--fg);
+  }
+  .tvs-answer {
+    margin-top: clamp(2rem, 4vw, 2.75rem);
+    max-width: 52rem;
+    font-size: clamp(1.2rem, 2.1vw, 1.55rem);
+    line-height: 1.35;
+    letter-spacing: -0.02em;
+    font-weight: 560;
+    text-wrap: pretty;
+  }
+  .tvs-answer b {
+    font-weight: 680;
+    font-variant-numeric: tabular-nums;
+    box-shadow: inset 0 -0.5em 0 color-mix(in srgb, var(--tvs-team) 20%, transparent);
+  }
+  p.tvs-answer-note {
+    color: var(--muted);
+  }
+  .tvs-answer-note {
+    margin-top: 0.6rem;
+    max-width: 48rem;
+    color: var(--muted);
+    font-size: 0.92rem;
+  }
+
+  /* The board: every setup of a test in a row; score, price and time each on its own scale */
+  .tvs-board,
+  .tvs-block {
+    margin: 1.4rem 0 0;
+    min-width: 0;
+  }
+  .tvs-data {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background-color: var(--bg);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .tvs-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .tvs-table caption {
+    caption-side: top;
+    text-align: left;
+    padding: 0.8rem 1.1rem 0.75rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    border-bottom: 1px solid var(--line);
+  }
+  .tvs-table thead th {
+    padding: 0.55rem 0.75rem 0.5rem;
+    text-align: left;
+    vertical-align: bottom;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--fg-soft);
+    border-bottom: 1px solid var(--line);
+    background: color-mix(in srgb, var(--bg-subtle) 80%, transparent);
+  }
+  .tvs-table thead th small {
+    display: block;
+    font-size: 0.74rem;
+    font-weight: 400;
+    color: var(--muted);
+  }
+  .tvs-table th:first-child,
+  .tvs-table td:first-child {
+    padding-left: 1.1rem;
+  }
+  .tvs-table th:last-child,
+  .tvs-table td:last-child {
+    padding-right: 1.1rem;
+  }
+  .tvs-table tbody th,
+  .tvs-table tbody td {
+    padding: 0.65rem 0.75rem;
+    text-align: left;
+    vertical-align: top;
+    font-weight: 400;
+    border-top: 1px solid var(--line);
+  }
+  .tvs-table tbody tr:first-child > * {
+    border-top: 0;
+  }
+  .tvs-board .tvs-table {
+    table-layout: fixed;
+  }
+  .tvs-board col.setup {
+    width: 31%;
+  }
+  .tvs-table tr.tvs-group > th {
+    padding-top: 0.5rem;
+    padding-bottom: 0.45rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--muted);
+    background: color-mix(in srgb, var(--bg-subtle) 80%, transparent);
+    border-top: 1px solid var(--line);
+  }
+  .tvs-setup-name {
+    display: block;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--fg);
+    line-height: 1.3;
+  }
+  .tvs-setup-name a {
+    color: inherit;
+  }
+  .tvs-setup-name .plus {
+    font-weight: 400;
+    color: var(--muted);
+  }
+  .tvs-setup-note {
+    display: block;
+    margin-top: 0.2rem;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    color: var(--muted);
+  }
+  .tvs-setup-note a {
+    color: var(--fg-soft);
+    text-decoration: underline;
+    text-decoration-color: var(--line-strong);
+    text-underline-offset: 2px;
+  }
+  .tvs-setup-note a.is-unranked {
+    color: var(--warn);
+  }
+  .tvs-mode {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-right: 0.35rem;
+    padding: 0 0.45rem;
+    border-radius: 5px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    line-height: 1.55;
+    white-space: nowrap;
+    color: var(--tvs);
+    background: var(--tvs-bg);
+  }
+  .tvs-mode.solo {
+    color: var(--fg-soft);
+    background: var(--panel);
+  }
+  .tvs-best {
+    display: inline-flex;
+    margin-left: 0.4rem;
+    padding: 0 0.45rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    line-height: 1.5;
+    color: var(--fg);
+    white-space: nowrap;
+    vertical-align: 0.08em;
+  }
+  .tvs-value {
+    display: block;
+    font-weight: 600;
+    color: var(--fg);
+    line-height: 1.3;
+  }
+  .tvs-value small {
+    font-size: 0.74rem;
+    font-weight: 400;
+    color: var(--muted);
+  }
+  .tvs-bar {
+    position: relative;
+    display: block;
+    height: 8px;
+    margin-top: 0.4rem;
+    border-radius: 4px;
+    background: var(--tvs-track);
+    color: var(--tvs-team);
+  }
+  .is-solo .tvs-bar {
+    color: var(--tvs-solo);
+  }
+  .tvs-bar > i {
+    position: absolute;
+    inset: 0 auto 0 0;
+    border-radius: 4px;
+    background: currentColor;
+    transform-origin: left center;
+  }
+  /* Each run of a setup that has several: a dot under the bar, so the bar stays clean */
+  .tvs-bar.has-runs {
+    margin-bottom: 11px;
+  }
+  .tvs-bar > u {
+    position: absolute;
+    top: 12px;
+    width: 6px;
+    height: 6px;
+    margin-left: -3px;
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 0 0 1.5px var(--bg);
+  }
+  /* The best solo's value, the same place in every row of a column: read down, it is a line */
+  .tvs-bar > s {
+    position: absolute;
+    top: -5px;
+    bottom: -5px;
+    width: 2px;
+    margin-left: -1px;
+    border-radius: 1px;
+    background: var(--fg);
+    box-shadow: 0 0 0 1.5px var(--bg);
+  }
+  .tvs-unranked td.tvs-why,
+  .tvs-why {
+    color: var(--fg-soft);
+    font-size: 0.86rem;
+  }
+  .tvs-why strong {
+    color: var(--warn);
+    font-weight: 600;
+  }
+  .tvs-board figcaption {
+    margin-top: 0.8rem;
+    max-width: 62rem;
+    font-size: 0.84rem;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+  .tvs-key {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1.1rem;
+    margin-bottom: 0.45rem;
+    color: var(--fg-soft);
+  }
+  .tvs-key span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .tvs-key i {
+    display: inline-block;
+    width: 1.3rem;
+    height: 8px;
+    border-radius: 4px;
+    background: var(--tvs-team);
+  }
+  .tvs-key i.solo {
+    background: var(--tvs-solo);
+  }
+  .tvs-key i.ring {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+  .tvs-key i.line {
+    width: 2px;
+    height: 16px;
+    border-radius: 1px;
+    background: var(--fg);
+  }
+
+  /* On a phone a row is a card: the setup, then each measure on a line with its name */
+  @media (max-width: 820px) {
+    .tvs-board .tvs-table,
+    .tvs-board .tvs-table tbody,
+    .tvs-board .tvs-table tr,
+    .tvs-board .tvs-table th,
+    .tvs-board .tvs-table td,
+    .tvs-board .tvs-table caption {
+      display: block;
+    }
+    .tvs-board .tvs-table thead,
+    .tvs-board .tvs-table colgroup {
+      display: none;
+    }
+    .tvs-board .tvs-table tbody tr.tvs-row {
+      padding: 0.8rem 1rem 0.9rem;
+      border-top: 1px solid var(--line);
+    }
+    .tvs-board .tvs-table tbody tr.tvs-row > * {
+      padding: 0;
+      border: 0;
+    }
+    .tvs-board .tvs-table tbody tr.tvs-group > th {
+      padding: 0.45rem 1rem;
+    }
+    .tvs-board .tvs-table td.tvs-measure {
+      display: grid;
+      grid-template-columns: 7.2rem 4.6rem minmax(0, 1fr);
+      align-items: center;
+      gap: 0.6rem;
+      margin-top: 0.5rem;
+    }
+    .tvs-board .tvs-table td.tvs-measure::before {
+      content: attr(data-label);
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+    .tvs-board .tvs-table td.tvs-measure .tvs-bar {
+      margin-top: 0;
+    }
+    .tvs-board .tvs-table td.tvs-why {
+      margin-top: 0.5rem;
+    }
+  }
+
+  /* Plain tables of a run and of the lists of runs */
+  .tvs-scroll {
+    overflow-x: auto;
+  }
+  .tvs-plain {
+    min-width: 34rem;
+  }
+  /* A cell keeps to one line and the table scrolls sideways on a narrow screen; only a row's name and a sentence wrap */
+  .tvs-plain :is(td, th) {
+    white-space: nowrap;
+  }
+  .tvs-plain tbody th,
+  .tvs-plain td.wrap,
+  .tvs-plain caption {
+    white-space: normal;
+  }
+  .tvs-plain td.wrap {
+    min-width: 15rem;
+  }
+  .tvs-plain .tvs-id {
+    overflow-wrap: normal;
+  }
+  .tvs-plain td.num,
+  .tvs-plain th.num {
+    text-align: right;
+  }
+  .tvs-plain tbody th {
+    min-width: 11rem;
+    font-weight: 600;
+    color: var(--fg);
+  }
+  .tvs-plain tbody tr.tvs-group > th {
+    font-weight: 600;
+    color: var(--muted);
+  }
+  .tvs-plain small {
+    display: block;
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-weight: 400;
+  }
+  .tvs-plain .tvs-bar {
+    min-width: 6rem;
+    margin-top: 0.3rem;
+  }
+  .tvs-id {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    overflow-wrap: anywhere;
+  }
+  .tvs-state {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0 0.55rem;
+    border-radius: 999px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    line-height: 1.65;
+    white-space: nowrap;
+    color: var(--measured);
+    background: var(--measured-bg);
+  }
+  .tvs-state::before {
+    content: "";
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 50%;
+    background: currentColor;
+  }
+  .tvs-state.not {
+    color: var(--warn);
+    background: var(--warn-bg);
+  }
+
+  /* A run's page */
+  .tvs-run-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem 0.9rem;
+    margin-top: 0.9rem;
+    color: var(--fg-soft);
+  }
+  .tvs-run-why {
+    margin-top: 1rem;
+    max-width: 48rem;
+    padding: 0.7rem 0.9rem;
+    border: 1px solid color-mix(in srgb, var(--warn) 35%, var(--line));
+    border-radius: 10px;
+    background: var(--warn-bg);
+    color: var(--fg);
+  }
+  .tvs-tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    gap: 0.6rem;
+    margin-top: 1.5rem;
+  }
+  .tvs-tiles .tile {
+    background-color: var(--bg);
+  }
+  .tvs-sub-h {
+    margin: 2.4rem 0 0.8rem;
+    font-size: 1.15rem;
+    letter-spacing: -0.015em;
+  }
+  .tvs-facts {
+    display: grid;
+    grid-template-columns: minmax(9rem, 15rem) minmax(0, 1fr);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+    font-size: 0.9rem;
+  }
+  .tvs-facts dt,
+  .tvs-facts dd {
+    padding: 0.55rem 0.9rem;
+    border-top: 1px solid var(--line);
+  }
+  .tvs-facts dt:first-of-type,
+  .tvs-facts dt:first-of-type + dd {
+    border-top: 0;
+  }
+  .tvs-facts dt {
+    color: var(--muted);
+    background: var(--bg-subtle);
+  }
+  .tvs-facts dd {
+    color: var(--fg);
+    font-variant-numeric: tabular-nums;
+  }
+  @media (max-width: 560px) {
+    .tvs-facts {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .tvs-facts dd {
+      border-top: 0;
+      padding-top: 0;
+    }
+    .tvs-facts dt {
+      background: none;
+      padding-bottom: 0.1rem;
+    }
+  }
+
+  /* Who worked when: the top session and each task on the run's clock */
+  .tvs-timeline {
+    padding: 1rem 1.1rem 1.1rem;
+  }
+  .tvs-lanes {
+    display: grid;
+    grid-template-columns: 4.4rem minmax(0, 1fr);
+    align-items: center;
+    gap: 7px 0.75rem;
+    font-size: 0.76rem;
+    color: var(--muted);
+  }
+  .tvs-lane {
+    position: relative;
+    height: 14px;
+    border-radius: 3px;
+    background: var(--tvs-track);
+  }
+  .tvs-lane > i {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    min-width: 3px;
+    border-radius: 3px;
+    background: var(--tvs-team);
+  }
+  .tvs-lane.chief > i {
+    background: var(--tvs-solo);
+  }
+  .tvs-lane.worker > i {
+    box-shadow: 0 0 0 1px var(--bg);
+  }
+  /* Where the request changed */
+  .tvs-lane > b {
+    position: absolute;
+    top: -4px;
+    bottom: -4px;
+    width: 2px;
+    margin-left: -1px;
+    background: var(--fg);
+    box-shadow: 0 0 0 1.5px var(--bg);
+  }
+  .tvs-lane > i.stopped {
+    background: repeating-linear-gradient(135deg, var(--warn) 0 3px, transparent 3px 6px);
+    outline: 1px solid var(--warn);
+    outline-offset: -1px;
+  }
+  .tvs-axis {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    padding-left: 5.15rem;
+    font-size: 0.74rem;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* The three modes, drawn: who is there and how messages move */
+  .tvs-modes {
+    display: grid;
+    gap: 0.9rem;
+    margin-top: 1.6rem;
+  }
+  @media (min-width: 860px) {
+    .tvs-modes {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .tvs-mode-card {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--bg);
+    box-shadow: var(--shadow);
+    padding: 1.1rem 1.2rem 1.2rem;
+  }
+  .tvs-mode-card svg {
+    display: block;
+    width: 100%;
+    max-width: 16rem;
+    height: auto;
+    margin: 0 auto 0.6rem;
+  }
+  .tvs-mode-card h3 {
+    margin: 0;
+    font-size: 1.02rem;
+  }
+  .tvs-mode-card p {
+    margin-top: 0.35rem;
+    color: var(--fg-soft);
+    font-size: 0.92rem;
+  }
+  .tvs-fig-solo {
+    fill: var(--tvs-solo);
+  }
+  .tvs-fig-chief {
+    fill: var(--tvs-team);
+  }
+  .tvs-fig-worker {
+    fill: var(--bg);
+    stroke: var(--tvs-team);
+    stroke-width: 2.5;
+  }
+  .tvs-fig-link {
+    stroke: var(--line-strong);
+    stroke-width: 1.5;
+    fill: none;
+  }
+  /* Without motion, the messages stand still on their way: two on each line in delegation (a task, a report), four
+     in active mode */
+  .tvs-fig-msg {
+    fill: var(--fg-soft);
+    translate: calc(var(--dx) * var(--at)) calc(var(--dy) * var(--at));
+  }
+  .tvs-fig-msg.task {
+    --at: 0.3;
+  }
+  .tvs-fig-msg.report {
+    --at: 0.72;
+  }
+  .tvs-fig-msg.ask {
+    --at: 0.44;
+  }
+  .tvs-fig-msg.tell {
+    --at: 0.58;
+  }
+  .tvs-fig-label {
+    fill: var(--muted);
+    font-size: 9.5px;
+    font-family: var(--font-sans);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    /* A task goes down and a report comes back; in active mode messages also pass while the worker works */
+    .tvs-fig-msg {
+      animation-duration: 7s;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+      animation-fill-mode: both;
+      animation-delay: calc(var(--n) * 0.5s);
+    }
+    .tvs-fig-msg.task {
+      animation-name: tvs-task;
+    }
+    .tvs-fig-msg.report {
+      animation-name: tvs-report;
+    }
+    .tvs-fig-msg.ask {
+      animation-name: tvs-ask;
+    }
+    .tvs-fig-msg.tell {
+      animation-name: tvs-tell;
+    }
+  }
+  @keyframes tvs-task {
+    0% { translate: 0 0; opacity: 0; }
+    3% { opacity: 1; }
+    17% { opacity: 1; }
+    20%, 100% { translate: var(--dx) var(--dy); opacity: 0; }
+  }
+  @keyframes tvs-report {
+    0%, 72% { translate: var(--dx) var(--dy); opacity: 0; }
+    75% { opacity: 1; }
+    89% { opacity: 1; }
+    92%, 100% { translate: 0 0; opacity: 0; }
+  }
+  @keyframes tvs-ask {
+    0%, 30% { translate: var(--dx) var(--dy); opacity: 0; }
+    33% { opacity: 1; }
+    42% { opacity: 1; }
+    45%, 100% { translate: 0 0; opacity: 0; }
+  }
+  @keyframes tvs-tell {
+    0%, 48% { translate: 0 0; opacity: 0; }
+    51% { opacity: 1; }
+    60% { opacity: 1; }
+    63%, 100% { translate: var(--dx) var(--dy); opacity: 0; }
+  }
+
+  /* What each number means: three columns of plain text */
+  .tvs-three {
+    display: grid;
+    gap: 1.5rem 2.25rem;
+    margin-top: 1.6rem;
+  }
+  @media (min-width: 860px) {
+    .tvs-three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .tvs-three h3 {
+    margin: 0;
+    padding-top: 0.8rem;
+    border-top: 2px solid var(--fg);
+    font-size: 1.02rem;
+  }
+  .tvs-three p {
+    margin-top: 0.4rem;
+    color: var(--fg-soft);
+  }
+
+  /* Limits and other lists of plain statements */
+  .tvs-list {
+    margin-top: 1.3rem;
+    max-width: 52rem;
+    border-top: 1px solid var(--line);
+  }
+  .tvs-list li {
+    padding: 0.8rem 0;
+    border-bottom: 1px solid var(--line);
+    color: var(--fg-soft);
+  }
+  .tvs-list li strong {
+    color: var(--fg);
+  }
+
+  /* The tests, a paragraph each */
+  .tvs-tests {
+    display: grid;
+    gap: 0.9rem;
+    margin-top: 1.6rem;
+  }
+  @media (min-width: 860px) {
+    .tvs-tests {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .tvs-test {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--bg);
+    box-shadow: var(--shadow);
+    padding: 1.1rem 1.2rem 1.2rem;
+    scroll-margin-top: 4.5rem;
+  }
+  .tvs-test h2,
+  .tvs-test h3 {
+    margin: 0;
+    font-size: 1.15rem;
+    letter-spacing: -0.015em;
+  }
+  .tvs-test .line {
+    margin-top: 0.15rem;
+    color: var(--fg);
+    font-weight: 520;
+  }
+  .tvs-test p {
+    margin-top: 0.5rem;
+    color: var(--fg-soft);
+  }
+  .tvs-test .state {
+    margin-top: 0.8rem;
+    font-size: 0.88rem;
+    color: var(--muted);
+  }
+
+  /* The method: long text with its contents beside it */
+  .tvs-doc {
+    display: grid;
+    gap: 2.5rem;
+    margin-top: 2rem;
+  }
+  @media (min-width: 980px) {
+    .tvs-doc {
+      grid-template-columns: 13rem minmax(0, 1fr);
+    }
+  }
+  .tvs-doc .toc {
+    display: none;
+  }
+  @media (min-width: 980px) {
+    .tvs-doc .toc {
+      display: block;
+      align-self: start;
+    }
+  }
+  .tvs-doc .toc a {
+    display: block;
+    padding: 0.2rem 0;
+    color: var(--fg-soft);
+  }
+  .tvs-prose {
+    max-width: 46rem;
+  }
+  .tvs-prose h2 {
+    margin: 2.8rem 0 0.7rem;
+    font-size: 1.4rem;
+    letter-spacing: -0.025em;
+    scroll-margin-top: 4.5rem;
+  }
+  .tvs-prose h2:first-child {
+    margin-top: 0;
+  }
+  .tvs-prose h3 {
+    margin: 1.6rem 0 0.4rem;
+    font-size: 1rem;
+  }
+  .tvs-prose p,
+  .tvs-prose ul {
+    margin: 0.7rem 0;
+    color: var(--fg-soft);
+  }
+  .tvs-prose ul {
+    list-style: disc;
+    padding-left: 1.2rem;
+  }
+  .tvs-prose li {
+    margin: 0.35rem 0;
+  }
+  .tvs-prose strong {
+    color: var(--fg);
+  }
+  .tvs-prose dl.tvs-facts {
+    margin: 1rem 0;
+  }
+
+  .tvs-missing {
+    padding-top: clamp(3rem, 8vw, 6rem);
+  }
+
+  /* The board comes in once: its bars grow from the left, then the marks appear. Nothing moves for those who ask for
+     less motion. */
+  @media (prefers-reduced-motion: no-preference) {
+    .tvs-board .tvs-bar > i {
+      animation: tvs-grow 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+      animation-delay: calc(var(--row, 0) * 28ms);
+    }
+    .tvs-board .tvs-bar > u,
+    .tvs-board .tvs-bar > s {
+      animation: tvs-show 0.35s ease-out both;
+      animation-delay: calc(0.55s + var(--row, 0) * 28ms);
+    }
+  }
+  @keyframes tvs-grow {
+    from { transform: scaleX(0); }
+  }
+  @keyframes tvs-show {
+    from { opacity: 0; }
+  }
+}
