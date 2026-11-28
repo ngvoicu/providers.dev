@@ -10,7 +10,10 @@
 // across a restart, the second try on an overloaded provider and sending a conversation back from the README of
 // v8.1.7-pmx.4 ("Conversations keep their account across a restart", "An overloaded provider does not cost you your
 // first account", "Send a conversation back to your first account") and that release's notes; the console's Restarts
-// page from provimux-ui v1.29.2-pmx.7's release notes.
+// page from provimux-ui v1.29.2-pmx.7's release notes. The entry on each answer, the figures in the model list and the
+// conversation that goes back by itself from the README of v8.1.7-pmx.5 ("Which model entry answered", "Prices and
+// cache lifetimes for your tools", "A conversation that fell back goes back by itself", "Requests to providers") and
+// that release's notes; the Routing page's card from provimux-ui v1.29.2-pmx.8's release notes.
 import Provimux from "../../layouts/Provimux.astro";
 import { PROVIMUX_SITE } from "../../core/provimux-site.ts";
 import { productGraph } from "../../core/structured-data.ts";
@@ -65,7 +68,7 @@ const groups: { title: string; promise: string; rows: Row[] }[] = [
       {
         topic: "A conversation on a fallback account",
         cpa: "With session affinity, a conversation that moved to another account while its first one cooled down stays there after the first is free again: a shorter prompt cache, or a paid key where you wanted your subscription.",
-        pmx: "A client can see which account its conversation is bound to and release it, so that its next message goes to the first free account. These requests need client keys (<code>access.api-keys</code>).",
+        pmx: "A conversation that fell back can go back by itself: set <code>routing.session-affinity-return.cold-after</code> (for example <code>\"6m\"</code>, 6 minutes), and once no message of the conversation has been routed to an account for that long, its next message goes to the highest-priority account it may use. Set it to the longest cache lifetime of the accounts your conversations can fall to, plus a margin: within that time it never moves a conversation, and it sends nothing to any provider. Off until set; the console's Routing page sets it and shows whether it is in effect. A client can also see which account its conversation is bound to and release it, so that its next message goes to the first free account. These requests need client keys (<code>access.api-keys</code>).",
       },
     ],
   },
@@ -77,6 +80,16 @@ const groups: { title: string; promise: string; rows: Row[] }[] = [
         topic: "Which account answered",
         cpa: "A client behind the proxy sees one list of models and cannot tell which account it is using.",
         pmx: "The model list names the accounts behind each model, highest priority first (<code>/v1/models?include=accounts</code>), and every response names the one that answered (<code>X-CPA-AUTH-KIND</code>, <code>X-CPA-AUTH-PROVIDER</code>, <code>X-CPA-AUTH-HOST</code>). Each response also carries a marker of its account (<code>X-Provimux-Account</code>), the same as that account's marker in the list, so even two accounts of the same kind are told apart; no e-mail, key or file name can be read from it. On by default; <code>models.answered-by: false</code> turns it off. Nothing is sent in Home mode.",
+      },
+      {
+        topic: "Which model answered",
+        cpa: "A client sees the name it asked for. An alias, a rule or a fallback to another account can change the model on the way, so the client cannot know the price or the cache lifetime of what answered.",
+        pmx: "Your tools can know the price and the cache lifetime of what really answered. Every answer names the providers.dev entry of the model its account received, for example <code>anthropic/claude-opus-5-5</code>, in <code>X-Provimux-Entry</code>. Provimux reads it from the request it sent and never guesses from the name you called; where it cannot be certain, the answer names its account and no entry. <code>models.answered-by: false</code> turns it off with the account marker.",
+      },
+      {
+        topic: "Prices and cache lifetimes",
+        cpa: "A cost meter or a cache keeper has to know each provider's prices and cache lifetimes itself.",
+        pmx: "Your tools get the figures from the model list: <code>/v1/models?include=figures</code> adds providers.dev's published prices (per million tokens, cache reads and writes included) and cache lifetimes, with their dates, for the entries your own answers named. An entry providers.dev has no figures for gets none, never a guess. A client that does not ask gets the list as before. Provimux fetches the figures from providers.dev at startup and every 6 hours, sending nothing about your accounts or requests, and keeps them on disk; <code>models.published-lists: false</code> stops it contacting providers.dev at all.",
       },
       {
         topic: "Each login's own model list",
@@ -256,7 +269,7 @@ const piList = `<span class="pmx-t-row pmx-t-dim">/model</span>` + piRows
         </p>
         <p>
           <strong>Releases follow CLIProxyAPI's.</strong> A workflow checks for a new CLIProxyAPI release every 3 hours, moves Provimux onto it, builds and tests it,
-          and publishes it on its own when the check passes; a release that fails a check waits for the maintainer. A version names its base: <code>v8.1.2-pmx.1</code> is CLIProxyAPI 8.1.2 with Provimux build 1. <a href={`${github}/releases/latest`}>Latest release</a>
+          and publishes it on its own when the check passes; a release that fails a check waits for the maintainer. A version names its base: <code>v8.1.7-pmx.5</code> is CLIProxyAPI 8.1.7 with Provimux build 5. <a href={`${github}/releases/latest`}>Latest release</a>
         </p>
       </div>
     </div>
@@ -362,6 +375,7 @@ const piList = `<span class="pmx-t-row pmx-t-dim">/model</span>` + piRows
         <li><strong>Your names.</strong> Short names, and <a href="#pools">pools</a>: one name served by several accounts. Saved in one action.</li>
         <li><strong>Savings.</strong> Daily usage totals kept across restarts and estimated at public list prices: what prompt caching was worth, and what the paid keys cost. <a href="#savings">More below</a>.</li>
         <li><strong>Restarts.</strong> What a stop, a restart or an upgrade does to the answers in flight and the conversations under way; there you set how long a stop waits and whether conversations keep their account.</li>
+        <li><strong>Back to the first account.</strong> A card on the Routing page, under Session affinity: after how long a conversation that fell back to a lower-priority account goes back to a higher one at its next message, or off, and whether the gateway has it in effect and, if not, why. It needs Provimux <span class="whitespace-nowrap">8.1.7-pmx.5</span> or newer.</li>
       </ul>
       <figure class="pmx-shot pmx-shot-wide">
         <div class="pmx-frame">

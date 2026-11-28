@@ -182,7 +182,7 @@ describe("Provimux's pages", () => {
     ]) expect(text, words).toContain(words);
   });
 
-  it("says what v8.1.7-pmx.4 and provimux-ui v1.29.2-pmx.7 added, each where it belongs, and never that a conversation moves back by itself", () => {
+  it("says what v8.1.7-pmx.4 and provimux-ui v1.29.2-pmx.7 added, each where it belongs", () => {
     for (const words of [
       // Restarts: conversations keep their account.
       "A restart lets the answers being written finish, and conversations keep their account.",
@@ -191,16 +191,35 @@ describe("Provimux's pages", () => {
       // Cache: the second try on an overloaded provider, and sending a conversation back.
       "Provimux waits about a second and tries the same account once more; only if that fails too does the request move down the list.",
       "<code>routing.retry.same-account-retry: false</code> turns it off.",
-      "A client can see which account its conversation is bound to and release it, so that its next message goes to the first free account.",
+      "A client can also see which account its conversation is bound to and release it, so that its next message goes to the first free account.",
       // The console's Restarts page, in the comparison and in the console's list.
       "Provimux's own pages Accounts, Models, Savings and Restarts.",
       "<li><strong>Restarts.</strong> What a stop, a restart or an upgrade does to the answers in flight and the conversations under way",
     ]) expect(text, words).toContain(words);
-    for (const words of ["automatically", "moves it back", "moved back", "goes back to the first", "back by itself", "returns on its own"]) {
-      expect(text.toLowerCase(), words).not.toContain(words);
-    }
     // The section's pictures stay the released console's, with example data: no screen of the Restarts page.
     expect(home).not.toContain("console-restarts");
+  });
+
+  it("says what v8.1.7-pmx.5 and provimux-ui v1.29.2-pmx.8 added: the entry that answered, the figures in the model list, the way back by itself", () => {
+    for (const words of [
+      // Clarity: the entry on each answer, and the figures for it.
+      "Your tools can know the price and the cache lifetime of what really answered.",
+      "Every answer names the providers.dev entry of the model its account received, for example <code>anthropic/claude-opus-5-5</code>, in <code>X-Provimux-Entry</code>.",
+      "never guesses from the name you called",
+      "<code>/v1/models?include=figures</code> adds providers.dev's published prices",
+      "A client that does not ask gets the list as before.",
+      "<code>models.published-lists: false</code> stops it contacting providers.dev at all.",
+      // Cache: back by itself, off until set, and the console's card.
+      "A conversation that fell back can go back by itself: set <code>routing.session-affinity-return.cold-after</code>",
+      "within that time it never moves a conversation, and it sends nothing to any provider. Off until set;",
+      "<li><strong>Back to the first account.</strong> A card on the Routing page, under Session affinity",
+      "It needs Provimux <span class=\"whitespace-nowrap\">8.1.7-pmx.5</span> or newer.",
+      "<code>v8.1.7-pmx.5</code> is CLIProxyAPI 8.1.7 with Provimux build 5.",
+    ]) expect(text, words).toContain(words);
+    // What is not released: nothing in Provimux's rows counts a cache down or keeps it warm by these figures.
+    const rows = home.slice(home.indexOf("const groups"), home.indexOf("/** The console screenshots")).toLowerCase();
+    for (const words of ["countdown", "keep warm", "keeps warm", "warm", "expires"]) expect(rows, words).not.toContain(words);
+    expect(home).not.toContain("v8.1.2-pmx.1");
   });
 
   it("says what pi-provimux 105.0.8 and pi-cache-keeper 0.10.8 show: the pause in the footer, commands that say what they did, what answered by name", () => {
