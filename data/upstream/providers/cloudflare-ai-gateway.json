@@ -4079,6 +4079,82 @@
    "last_updated": "2026-07-08",
    "recommended_api": "workers-ai-run"
   },
+  "bytedance/seedream-5.5": {
+   "id": "bytedance/seedream-5.5",
+   "name": "Seedream 5.5",
+   "description": "Image generation and multi-turn editing model with native RGBA output and layer decomposition",
+   "type": "image",
+   "family": "seedream",
+   "canonical_id": "bytedance-seed/seedream-5.5",
+   "release_date": "2026-11-09",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "image": {
+     "input": {
+      "unit": "image",
+      "price": 0.008
+     },
+     "output": {
+      "unit": "image",
+      "price": 0.035,
+      "overrides": [
+       {
+        "when": {
+         "resolution": {
+          "equals": "1k"
+         }
+        },
+        "price": 0.02
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png",
+     "image/webp",
+     "image/bmp",
+     "image/tiff",
+     "image/gif",
+     "image/heic",
+     "image/heif"
+    ],
+    "output": [
+     "image/png",
+     "image/jpeg"
+    ]
+   },
+   "api": {
+    "workers-ai-run": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai",
+     "sdk": {
+      "aisdk": "ai-gateway-provider"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-09",
+   "recommended_api": "workers-ai-run"
+  },
   "deepseek-ai/deepseek-v4.1-flash-1017": {
    "id": "deepseek-ai/deepseek-v4.1-flash-1017",
    "name": "DeepSeek V4.1 Flash 1017",
@@ -4398,6 +4474,86 @@
    },
    "open_weights": false,
    "last_updated": "2025-08-20",
+   "recommended_api": "workers-ai-run"
+  },
+  "elevenlabs/scribe-v3": {
+   "id": "elevenlabs/scribe-v3",
+   "name": "Scribe v3",
+   "description": "Speech-to-text model for recorded audio with speaker diarization, word timestamps and keyterm prompting in 90+ languages",
+   "type": "transcription",
+   "family": "scribe",
+   "canonical_id": "elevenlabs/scribe_v3",
+   "release_date": "2026-11-09",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "audio": {
+     "input": {
+      "unit": "minute",
+      "price": 0.003333,
+      "overrides": [
+       {
+        "when": {
+         "keyterms_prompt": {
+          "min_items": 1
+         }
+        },
+        "price": 0.004166
+       }
+      ]
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "audio/aac",
+     "audio/aiff",
+     "audio/flac",
+     "audio/mp4",
+     "audio/mpeg",
+     "audio/ogg",
+     "audio/opus",
+     "audio/wav",
+     "audio/webm",
+     "video/mp4",
+     "video/mpeg",
+     "video/quicktime",
+     "video/webm",
+     "video/x-msvideo",
+     "video/x-matroska",
+     "video/x-ms-wmv",
+     "video/x-flv",
+     "video/3gpp"
+    ],
+    "output": [
+     "text"
+    ]
+   },
+   "api": {
+    "workers-ai-run": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai",
+     "sdk": {
+      "aisdk": "ai-gateway-provider"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-09",
    "recommended_api": "workers-ai-run"
   },
   "fireworks/ember-1": {
@@ -7526,6 +7682,65 @@
    },
    "open_weights": false,
    "last_updated": "2026-11-04",
+   "recommended_api": "workers-ai-run"
+  },
+  "klingai/kling-v4-image": {
+   "id": "klingai/kling-v4-image",
+   "name": "Kling IMAGE 4.0",
+   "description": "Kling 4.0 image model for text-to-image and image-to-image with reference images and native 8K output",
+   "type": "image",
+   "family": "kling-image",
+   "canonical_id": "kuaishou/kling-image-v4.0",
+   "release_date": "2026-11-17",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "image": {
+     "input": {
+      "unit": "image",
+      "price": 0.003
+     },
+     "output": {
+      "unit": "image",
+      "price": 0.063
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text",
+     "image/jpeg",
+     "image/png"
+    ],
+    "output": [
+     "image"
+    ]
+   },
+   "api": {
+    "workers-ai-run": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai",
+     "sdk": {
+      "aisdk": "ai-gateway-provider"
+     }
+    }
+   },
+   "open_weights": false,
+   "last_updated": "2026-11-17",
    "recommended_api": "workers-ai-run"
   },
   "krea/krea-2-large": {
@@ -13800,6 +14015,61 @@
    "open_weights": false,
    "last_updated": "2026-10-28",
    "recommended_api": "chat-completions"
+  },
+  "pruna/z-image-turbo": {
+   "id": "pruna/z-image-turbo",
+   "name": "Z-Image-Turbo",
+   "description": "Distilled 6B text-to-image model with 8-step generation and bilingual English and Chinese text rendering",
+   "type": "image",
+   "family": "z-image-turbo",
+   "canonical_id": "alibaba/z-image-turbo",
+   "release_date": "2025-11-26",
+   "limit": {
+    "context": 0,
+    "output": 0
+   },
+   "capabilities": {
+    "temperature": false,
+    "top_k": false,
+    "top_p": false,
+    "system_updates": false,
+    "effort_updates": false,
+    "tools": {
+     "supported": false
+    },
+    "reasoning": {
+     "supported": false
+    }
+   },
+   "cost": {
+    "image": {
+     "output": {
+      "unit": "image",
+      "price": 0.005
+     }
+    }
+   },
+   "modalities": {
+    "input": [
+     "text"
+    ],
+    "output": [
+     "image/jpeg",
+     "image/png",
+     "image/webp"
+    ]
+   },
+   "api": {
+    "workers-ai-run": {
+     "base_url": "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai",
+     "sdk": {
+      "aisdk": "ai-gateway-provider"
+     }
+    }
+   },
+   "open_weights": true,
+   "last_updated": "2025-11-26",
+   "recommended_api": "workers-ai-run"
   },
   "recraft/recraftv3": {
    "id": "recraft/recraftv3",
